@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Veretino
+Comment=Check folder-wide data integrity
+Exec=veretino
+Icon=veretino
+Categories=Utility;
+MimeType=application/json;inode/directory;

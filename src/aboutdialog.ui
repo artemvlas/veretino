@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>aboutDialog</class>
+ <widget class="QDialog" name="aboutDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>200</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About</string>
+  </property>
+  <widget class="QLabel" name="labelAuthor">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>431</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>author</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelPix">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>100</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>pix</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelInfo">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>10</y>
+     <width>311</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>info</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

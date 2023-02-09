@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>settingDialog</class>
+ <widget class="QDialog" name="settingDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>410</width>
+    <height>220</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Settings</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>180</y>
+     <width>181</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>391</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QRadioButton" name="rbSha1">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SHA-1</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rbSha256">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>10</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SHA-256</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rbSha512">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>10</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SHA-512</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>391</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>151</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Filter files by extensions</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="inputFilterExtensions">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>371</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Extensions list separated by spaces</string>
+    </property>
+    <property name="placeholderText">
+     <string>log jpg docx mkv</string>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="filterDbFiles">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>151</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Exclude *.ver.json files from the filelist</string>
+    </property>
+    <property name="text">
+     <string>Filter DataBase files</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="filterShaFiles">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>70</y>
+      <width>221</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>exclude text files with {checksum &amp; filename} from database</string>
+    </property>
+    <property name="text">
+     <string>Filter sha files (*.sha1/256/512)</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>settingDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>settingDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

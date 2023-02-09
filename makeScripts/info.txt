@@ -1,0 +1,7 @@
+# Script files must be executable
+chmod +x makeAppImage.sh
+chmod +x makeInstall.sh
+
+System requirements based on Manjaro Linux:
+makeInstall.sh: 'make' needed (sudo pacman -S make)
+makeAppImage.sh: 'libjxl' additionally required (sudo pacman -S libjxl)
