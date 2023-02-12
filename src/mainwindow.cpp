@@ -178,8 +178,9 @@ void MainWindow::setMode(const QString &mode)
 
     if (mode == "endProcess") {
         viewMode = "";
-        ui->progressBar->resetFormat();
         ui->progressBar->setVisible(false);
+        ui->progressBar->resetFormat();
+        ui->progressBar->setValue(0);
         if (ui->treeView->isViewFileSystem()) {
             ui->treeView->pathAnalyzer(ui->lineEdit->text());
             return;
