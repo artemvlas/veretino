@@ -44,6 +44,7 @@ public slots:
     void updateMismatch(); // update json Database with new checksums for files with failed verification
     void getSettings(const QVariantMap &settingsMap);
     void resetDatabase(); // reopening and reparsing current database
+    void showNewLostOnly();
 
 signals:
     void status(const QString &text); //text to statusbar

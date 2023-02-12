@@ -46,13 +46,13 @@ void MainWindow::connections()
     //TreeView
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onCustomContextMenu(QPoint)));
     connect(ui->treeView, &View::pathChanged, ui->lineEdit, &QLineEdit::setText);
-    connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){if(ui->treeView->isViewFileSystem()) emit getFInfo(path);});
+    connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; if(ui->treeView->isViewFileSystem()) emit getFInfo(path);});
     connect(ui->treeView, &View::setMode, this, &MainWindow::setMode);
     connect(ui->treeView, &View::modelChanged, this, [=]{if(ui->treeView->isViewFileSystem()) ui->lineEdit->setEnabled(true); else ui->lineEdit->setDisabled(true);});
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
-    connect(ui->treeView, &View::doubleClicked, this, [=]{if(viewMode == "db") emit parseJsonFile(ui->lineEdit->text()); else if (viewMode == "sum") emit checkFileSummary(ui->lineEdit->text());});
+    connect(ui->treeView, &View::doubleClicked, this, [=]{if(viewMode == "db") emit parseJsonFile(curPath); else if (viewMode == "sum") emit checkFileSummary(curPath);});
 
-    connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text());});
+    connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(curPath);});
 
     //menu actions
     connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this,"Open folder",homePath);
@@ -109,7 +109,10 @@ void MainWindow::connectManager()
     //transfer settings and modes
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
     connect(this, &MainWindow::settingsChanged, manager, &Manager::getSettings); // send settings Map
+
+    // change view
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
+    connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
 
     thread->start();
 }
@@ -117,7 +120,7 @@ void MainWindow::connectManager()
 void MainWindow::onCustomContextMenu(const QPoint &point)
 {
     QModelIndex index = ui->treeView->indexAt(point);
-    QString path = ui->lineEdit->text();
+    QString path = curPath;
 
     QMenu *contextMenu = new QMenu(ui->treeView);
 
@@ -145,19 +148,23 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
     else if (viewMode == "db")
         contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
     else if (viewMode == "sum") {
-        contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(ui->lineEdit->text());});
+        contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(curPath);});
     }
-    else if (viewMode == "model" || viewMode == "modelNewLost") {
-        contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(ui->lineEdit->text());});
+    else if (viewMode == "updateMismatch")
+        contextMenu->addAction("update json Database with new checksums", this, &MainWindow::updateMismatch);
+
+    if (viewMode == "modelNewLost") {
+        contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
+        contextMenu->addAction("Update DataBase with New/Lost files", this, &MainWindow::updateNewLost);
+        contextMenu->addSeparator();
+    }
+
+    if (viewMode == "model" || viewMode == "modelNewLost") {
+        contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
         contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);
         contextMenu->addSeparator();
         contextMenu->addAction("Reset Database", this, &MainWindow::resetDatabase);
     }
-    else if (viewMode == "modelNewLost") {
-        contextMenu->addAction("Update DataBase with New/Lost files", this, &MainWindow::updateNewLost);
-    }
-    else if (viewMode == "updateMismatch")
-        contextMenu->addAction("update json Database with new checksums", this, &MainWindow::updateMismatch);
 
     if (!ui->treeView->isViewFileSystem()) {
         contextMenu->addSeparator();
@@ -182,7 +189,7 @@ void MainWindow::setMode(const QString &mode)
         ui->progressBar->resetFormat();
         ui->progressBar->setValue(0);
         if (ui->treeView->isViewFileSystem()) {
-            ui->treeView->pathAnalyzer(ui->lineEdit->text());
+            ui->treeView->pathAnalyzer(curPath);
             return;
         }
         else {
@@ -224,7 +231,7 @@ void MainWindow::setMode(const QString &mode)
 
 void MainWindow::doWork()
 {
-    QString path = ui->lineEdit->text();
+    QString path = curPath;
     if (viewMode == "folder")
         emit processFolderSha(path, settings["shaType"].toInt());
     else if (viewMode == "file")

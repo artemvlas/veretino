@@ -163,6 +163,25 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     setMode_model();
 }
 
+void Manager::showNewLostOnly()
+{
+    QMap<QString,QString> newlost;
+
+    if (lostFiles.size() > 0) {
+        foreach (const QString &file, lostFiles) {
+            newlost.insert(file, "LOST file");
+        }
+    }
+
+    if (newFiles.size() > 0) {
+        foreach (const QString &file, newFiles) {
+            newlost.insert(file, "NEW file");
+        }
+    }
+
+    makeTreeModel(newlost);
+}
+
 //remove lost files, add new files
 void Manager::updateNewLost()
 {

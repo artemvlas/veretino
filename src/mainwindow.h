@@ -31,7 +31,7 @@ private:
     Manager *manager = new Manager; // Manager performs the main tasks. Works in separate thread^
     QString homePath = QDir::homePath();
     QVariantMap settings; // stores the app settings
-
+    QString curPath; // current path from &View::pathChanged
     QString viewMode; // "folder", "file", "db", "sum", "model"...
     QString previousViewMode; //^
     QElapsedTimer elapsedTimer;
@@ -62,5 +62,6 @@ signals:
     void settingsChanged(const QVariantMap &settingsMap);
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
+    void showNewLostOnly();
 };
 #endif // MAINWINDOW_H
