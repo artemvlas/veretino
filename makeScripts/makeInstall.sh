@@ -3,16 +3,30 @@
 # Install 'make' to system:
 # sudo pacman -S make
 
-REPO_ROOT=$(readlink -f $(dirname $(dirname $0)))
-cd $REPO_ROOT
+set -x
+set -e
 
-# create out-of-source build dir and run qmake to prepare the Makefile
-mkdir build
-cd build
-qmake ..
+TEMP_BASE=/tmp
+
+REPO_ROOT=$(readlink -f $(dirname $(dirname $0)))
+BUILD_DIR=$(mktemp -d -p "$TEMP_BASE" veretino-build-XXXXXX)
+
+cleanup () {
+    if [ -d "$BUILD_DIR" ]; then
+        rm -rf "$BUILD_DIR"
+    fi
+}
+trap cleanup EXIT
+
+pushd "$BUILD_DIR"
+
+# make project
+qmake "$REPO_ROOT"
 
 # build the application on all CPU cores
 make -j$(nproc)
+
+# install to system
 sudo make install
 
 echo "All done..."
