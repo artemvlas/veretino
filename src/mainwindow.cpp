@@ -123,6 +123,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
     QString path = curPath;
 
     QMenu *contextMenu = new QMenu(ui->treeView);
+    connect(contextMenu, &QMenu::aboutToHide, contextMenu, &QMenu::deleteLater);
 
     if (ui->treeView->isViewFileSystem()) {
         contextMenu->addAction("to Home", this,[=]{ui->treeView->setIndexByPath(homePath);});
