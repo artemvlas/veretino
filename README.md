@@ -3,7 +3,7 @@
 
 Veretino calculates checksums for each file in the specified folder and saves this list for later checks. The resulting database (local json file containing file paths and their checksums) can be used to check the integrity of individual files, as well as to check the entire folder contents for data changes.
 Veretino can also determine if there are new or missing files in the given directory relative to the list.
-Filters also can be applied to exclude unnecessary files from the list.
+Filters also can be applied to exclude unnecessary files.
 
 The App is Qt based and cross platform.
 
