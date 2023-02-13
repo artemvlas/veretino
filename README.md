@@ -1,7 +1,7 @@
 # Veretino
 ### The app allows to verify folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
-Veretino creates a local database containing all the paths to the files in the specified folder, as well as their checksums. This database can be used to check the integrity of individual files in the folder, as well as to check the entire folder for data changes.
+Veretino calculates checksums for each file in the specified folder and saves this list for later checks. The resulting database (local json file containing file paths and their checksums) can be used to check the integrity of individual files, as well as to check the entire folder contents for data changes.
 Veretino can also determine if there are new or missing files in the given directory relative to the list.
 Filters also can be applied to exclude unnecessary files from the list.
 
