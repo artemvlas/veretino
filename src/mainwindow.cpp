@@ -52,7 +52,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::doubleClicked, this, [=]{if(viewMode == "db") emit parseJsonFile(curPath); else if (viewMode == "sum") emit checkFileSummary(curPath);});
 
-    connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(curPath);});
+    connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text());});
 
     //menu actions
     connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this,"Open folder",homePath);
