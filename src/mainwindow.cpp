@@ -126,55 +126,63 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
     connect(contextMenu, &QMenu::aboutToHide, contextMenu, &QMenu::deleteLater);
 
     if (ui->treeView->isViewFileSystem()) {
-        contextMenu->addAction("to Home", this,[=]{ui->treeView->setIndexByPath(homePath);});
+        contextMenu->addAction("to Home", this, [=]{ui->treeView->setIndexByPath(homePath);});
+        contextMenu->addSeparator();
+
+        if (viewMode == "processing")
+            contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
+
+        else if (index.isValid()) {
+
+            if (viewMode == "folder")
+                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings["shaType"].toInt()), this, [=]{processFolderSha(path, settings["shaType"].toInt());});
+            else if (viewMode == "file") {
+                contextMenu->addAction("Compute SHA-1 for file", this, [=]{processFileSha(path,1);});
+                contextMenu->addAction("Compute SHA-256 for file", this, [=]{processFileSha(path,256);});
+                contextMenu->addAction("Compute SHA-512 for file", this, [=]{processFileSha(path,512);});
+            }
+            else if (viewMode == "db")
+                contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
+            else if (viewMode == "sum") {
+                contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(curPath);});
+            }
+        }
     }
 
-    else if (viewMode == "processing") {
-        contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
-        contextMenu->addAction("Cancel and Back to FileSystem View", this, [=]{emit cancelProcess(); ui->treeView->setFileSystemModel();});
-    }
     else {
-        contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
-    }
+        if (viewMode == "processing") {
+            contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
+            contextMenu->addAction("Cancel and Back to FileSystem View", this, [=]{emit cancelProcess(); ui->treeView->setFileSystemModel();});
+        }
 
-    contextMenu->addSeparator();
+        else {
+            contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
+            contextMenu->addAction("Reset Database", this, &MainWindow::resetDatabase);
+            contextMenu->addSeparator();
 
-    if (viewMode == "folder")
-        contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings["shaType"].toInt()),this,[=]{processFolderSha(path,settings["shaType"].toInt());});
-    else if (viewMode == "file") {
-        contextMenu->addAction("Compute SHA-1 for file",this,[=]{processFileSha(path,1);});
-        contextMenu->addAction("Compute SHA-256 for file",this,[=]{processFileSha(path,256);});
-        contextMenu->addAction("Compute SHA-512 for file",this,[=]{processFileSha(path,512);});
-    }
-    else if (viewMode == "db")
-        contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
-    else if (viewMode == "sum") {
-        contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(curPath);});
-    }
-    else if (viewMode == "updateMismatch")
-        contextMenu->addAction("update json Database with new checksums", this, &MainWindow::updateMismatch);
+            if (viewMode == "updateMismatch")
+                contextMenu->addAction("update json Database with new checksums", this, &MainWindow::updateMismatch);
 
-    if (viewMode == "modelNewLost") {
-        contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
-        contextMenu->addAction("Update DataBase with New/Lost files", this, &MainWindow::updateNewLost);
-        contextMenu->addSeparator();
-    }
+            else if (viewMode == "modelNewLost") {
+                contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
+                contextMenu->addAction("Update DataBase with New/Lost files", this, &MainWindow::updateNewLost);
+                contextMenu->addSeparator();
+            }
 
-    if (viewMode == "model" || viewMode == "modelNewLost") {
-        contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
-        contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);
-        contextMenu->addSeparator();
-        contextMenu->addAction("Reset Database", this, &MainWindow::resetDatabase);
-    }
+            if (viewMode == "model" || viewMode == "modelNewLost") {
+                if (index.isValid())
+                    contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
 
-    if (!ui->treeView->isViewFileSystem()) {
+                contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);
+            }
+        }
+
         contextMenu->addSeparator();
         contextMenu->addAction("Collapse all", ui->treeView, &QTreeView::collapseAll);
         contextMenu->addAction("Expand all", ui->treeView, &QTreeView::expandAll);
     }
-    if (index.isValid())
-        contextMenu->exec(ui->treeView->viewport()->mapToGlobal(point));
 
+    contextMenu->exec(ui->treeView->viewport()->mapToGlobal(point));
 }
 
 void MainWindow::setMode(const QString &mode)
