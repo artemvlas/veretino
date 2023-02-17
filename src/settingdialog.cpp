@@ -7,7 +7,7 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     ui(new Ui::settingDialog)
 {
     ui->setupUi(this);
-    this->setFixedSize(410,220);
+    this->setFixedSize(440,220);
     this->setWindowIcon(QIcon(":/veretino.png"));
 
     settings = settingsMap;
@@ -21,13 +21,13 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
         ui->rbSha512->setChecked(true);
 
     if(settings["extensions"].isValid())
-        ui->inputFilterExtensions->setText(settings["extensions"].toStringList().join(" "));
+        ui->inputIgnoreExtensions->setText(settings["extensions"].toStringList().join(" "));
 
-    if(settings["filterDbFiles"].isValid()) {
-        ui->filterDbFiles->setChecked(settings["filterDbFiles"].toBool());
+    if(settings["ignoreDbFiles"].isValid()) {
+        ui->ignoreDbFiles->setChecked(settings["ignoreDbFiles"].toBool());
     }
-    if(settings["filterShaFiles"].isValid()){
-        ui->filterShaFiles->setChecked(settings["filterShaFiles"].toBool());
+    if(settings["ignoreShaFiles"].isValid()){
+        ui->ignoreShaFiles->setChecked(settings["ignoreShaFiles"].toBool());
     }
 
 }
@@ -46,20 +46,20 @@ QVariantMap settingDialog::getSettings()
     else if (ui->rbSha512->isChecked())
         settings["shaType"] = 512;
 
-    if (ui->inputFilterExtensions->text() != nullptr) {
-        QString filterExtensions = ui->inputFilterExtensions->text().toLower();
-        filterExtensions.replace("*","");
-        filterExtensions.replace(".","");
+    if (ui->inputIgnoreExtensions->text() != nullptr) {
+        QString ignoreExtensions = ui->inputIgnoreExtensions->text().toLower();
+        ignoreExtensions.replace("*","");
+        ignoreExtensions.replace(".","");
 
-        QStringList ext = filterExtensions.split(" ");
+        QStringList ext = ignoreExtensions.split(" ");
         settings["extensions"] = ext;
     }
     else
         settings["extensions"] = QStringList();
 
 
-    settings["filterDbFiles"] = ui->filterDbFiles->isChecked();
-    settings["filterShaFiles"] = ui->filterShaFiles->isChecked();
+    settings["ignoreDbFiles"] = ui->ignoreDbFiles->isChecked();
+    settings["ignoreShaFiles"] = ui->ignoreShaFiles->isChecked();
 
     return settings;
 }

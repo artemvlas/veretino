@@ -61,7 +61,7 @@ QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
     }
 }
 
-// making "checksums... .ver.json" database from QMAP {full file path : checksum or info(unreadable, filtered)}
+// making "checksums... .ver.json" database from QMAP {full file path : checksum or info(unreadable)}
 bool jsonDB::makeJsonDB(const QMap<QString,QString> &dataMap, const QString &filepath)
 {
     if (dataMap.isEmpty())
@@ -109,9 +109,9 @@ bool jsonDB::makeJsonDB(const QMap<QString,QString> &dataMap, const QString &fil
     header["Updated"] = QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm");
     header["Working folder"] = "Relative"; // functionality to work with this variable will be realized in the next versions
 
-    if (!filteredExtensions.isEmpty()) {
-        header["Filtered"] = filteredExtensions.join(" ");
-        filteredExtensions.clear();
+    if (!ignoredExtensions.isEmpty()) {
+        header["Ignored"] = ignoredExtensions.join(" ");
+        //ignoredExtensions.clear();
     }
 
     data.append(header);
@@ -148,12 +148,12 @@ QMap<QString,QString> jsonDB::parseJson(const QString &pathToFile)
     QJsonObject excludedFiles (mainArray[2].toObject());
     QMap<QString,QString> parsedData;
 
-    if (header.contains("Filtered")) {
-        filteredExtensions = header["Filtered"].toString().split(" ");
-        qDebug()<< "jsonDB::parseJson | filteredExtensions:" << filteredExtensions;
+    if (header.contains("Ignored")) {
+        ignoredExtensions = header["Ignored"].toString().split(" ");
+        qDebug()<< "jsonDB::parseJson | ignoredExtensions:" << ignoredExtensions;
     }
     else {
-        filteredExtensions.clear();
+        ignoredExtensions.clear();
     }
 
     foreach (const QString &file, jsonData.keys()) {

@@ -13,8 +13,8 @@ Files::Files(const QString &path, QObject *parent)
         else if (QFileInfo(path).isDir())
             folderPath = path;
     }
-    filterDbFiles = true;
-    filterShaFiles = true;
+    ignoreDbFiles = true;
+    ignoreShaFiles = true;
 }
 
 QString Files::folderContentStatus(const QString &folder)
@@ -34,11 +34,11 @@ QStringList Files::filterDbShafiles(const QStringList &filelist)
     QStringList resultList; 
 
     foreach(const QString &i, filelist) {
-        if (filterDbFiles) {
+        if (ignoreDbFiles) {
             if(i.endsWith(".ver.json"))
                 continue;
         }
-        if (filterShaFiles) {
+        if (ignoreShaFiles) {
             if (i.endsWith("sha1") || i.endsWith("sha256") || i.endsWith("sha512"))
                 continue;
         }
@@ -73,7 +73,7 @@ QStringList Files::actualFileListFiltered(const QString &folder, const QStringLi
 
     QStringList filteredList; //result filelist
 
-    if (filterDbFiles || filterShaFiles)
+    if (ignoreDbFiles || ignoreShaFiles)
         filteredList = filterDbShafiles(actualFiles);
     else
         filteredList = actualFiles;

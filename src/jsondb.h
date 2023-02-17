@@ -18,7 +18,7 @@ public:
     bool makeJsonDB(const QMap<QString,QString> &dataMap, const QString &filename = QString());
     QMap<QString,QString> parseJson(const QString &pathToFile = QString());
 
-    QStringList filteredExtensions;
+    QStringList ignoredExtensions;
     QString filePath;
     QString folderPath;
     int dbShaType; // 1 or 256 or 512: from json database header or by checksum lenght

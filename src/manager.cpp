@@ -31,17 +31,17 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     //std::auto_ptr<ShaCalculator> shaCalc (new ShaCalculator);
 
     Files F;
-    // to disable filtering db (*.ver.json) or *.shaX files: F.filterDbFiles = false; F.filterShaFiles = false; to enable '= true' | 'true' is default in Files()
-    if (settings["filterDbFiles"].isValid())
-        F.filterDbFiles = settings["filterDbFiles"].toBool();
-    if (settings["filterShaFiles"].isValid())
-        F.filterShaFiles = settings["filterShaFiles"].toBool();
+    // to disable ignoring db (*.ver.json) or *.shaX files: F.ignoreDbFiles = false; F.ignoreShaFiles = false; to enable '= true' | 'true' is default in Files()
+    if (settings["ignoreDbFiles"].isValid())
+        F.ignoreDbFiles = settings["ignoreDbFiles"].toBool();
+    if (settings["ignoreShaFiles"].isValid())
+        F.ignoreShaFiles = settings["ignoreShaFiles"].toBool();
 
     if (settings["extensions"].isValid() && !settings["extensions"].isNull()) {
-        json->filteredExtensions = settings["extensions"].toStringList();
+        json->ignoredExtensions = settings["extensions"].toStringList();
     }
 
-    QStringList fileList = F.actualFileListFiltered(folderPath, json->filteredExtensions); //list of files except filtered
+    QStringList fileList = F.actualFileListFiltered(folderPath, json->ignoredExtensions); //list of files except ignored
 
     if(fileList.isEmpty()) {
         emit showMessage("Empty folder. Nothing to do");
@@ -58,7 +58,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     QString filePath = QString("%1/checksums_%2.ver.json").arg(folderPath, QDir(folderPath).dirName());
 
     if (json->makeJsonDB(calculatedMap, filePath))
-        emit showMessage(QString("SHA-%1 Checksums for %2 files calclutated\nDatabase: %3").arg(shatype).arg(fileList.size()).arg(QFileInfo(filePath).fileName()), "Success");
+        emit showMessage(QString("SHA-%1 Checksums for %2 files calculated\nDatabase: %3\nuse it to check data integrity").arg(shatype).arg(fileList.size()).arg(QFileInfo(filePath).fileName()), "Success");
 
     emit setMode("endProcess");
 }
@@ -126,7 +126,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
 
     workDir = QFileInfo(jsonFilePath).absolutePath() + '/';
     QStringList filelist = parsedData.keys();
-    QStringList actualFiles = Files().actualFileListFiltered(workDir, json->filteredExtensions); // all files from workDir except filtered extensions and *.ver.json and *.sha1/256/512
+    QStringList actualFiles = Files().actualFileListFiltered(workDir, json->ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
 
     filesAvailability.clear();
     lostFiles.clear();
@@ -179,8 +179,13 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     else
         newFilesInfo = "New files: 0";
 
-    emit showMessage(QString("Algorithm: SHA-%1\nLast update: %2\nStored size: %3\n\nStored paths: %4\n%5\nLost files: %6%7")
-                     .arg(json->dbShaType).arg(json->lastUpdate, json->storedDataSize).arg(parsedData.size()).arg(newFilesInfo).arg(lostFiles.size()).arg(tipText), "Database parsed");
+    QString filters;
+    if (!json->ignoredExtensions.isEmpty()) {
+        filters = QString("\nIgnored: %1").arg(json->ignoredExtensions.join(", "));
+    }
+
+    emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nStored paths: %5\n%6\nLost files: %7%8")
+                     .arg(json->dbShaType).arg(filters, json->storedDataSize, json->lastUpdate).arg(parsedData.size()).arg(newFilesInfo).arg(lostFiles.size()).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
@@ -374,8 +379,8 @@ void Manager::checkCurrentItemSum(const QString &path)
     }
 
     QString savedSum = parsedData[filepath];
-    if (savedSum == "unreadable" || savedSum == "filtered") {
-        emit showMessage("This file has been excluded (Filtered or Unreadable).\nNo checksum in the database.", "Excluded File");
+    if (savedSum == "unreadable") {
+        emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
         return;
     }
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>410</width>
+    <width>440</width>
     <height>220</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>250</x>
      <y>180</y>
      <width>181</width>
      <height>32</height>
@@ -34,7 +34,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>391</width>
+     <width>421</width>
      <height>41</height>
     </rect>
    </property>
@@ -60,7 +60,7 @@
    <widget class="QRadioButton" name="rbSha256">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>170</x>
       <y>10</y>
       <width>92</width>
       <height>23</height>
@@ -73,7 +73,7 @@
    <widget class="QRadioButton" name="rbSha512">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>330</x>
       <y>10</y>
       <width>81</width>
       <height>23</height>
@@ -89,7 +89,7 @@
     <rect>
      <x>10</x>
      <y>70</y>
-     <width>391</width>
+     <width>421</width>
      <height>101</height>
     </rect>
    </property>
@@ -104,20 +104,20 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>151</width>
+      <width>201</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Filter files by extensions</string>
+     <string>Ignore files with extensions:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="inputFilterExtensions">
+   <widget class="QLineEdit" name="inputIgnoreExtensions">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>371</width>
+      <width>401</width>
       <height>25</height>
      </rect>
     </property>
@@ -131,12 +131,12 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="filterDbFiles">
+   <widget class="QCheckBox" name="ignoreDbFiles">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>151</width>
+      <width>181</width>
       <height>23</height>
      </rect>
     </property>
@@ -144,23 +144,23 @@
      <string>Exclude *.ver.json files from the filelist</string>
     </property>
     <property name="text">
-     <string>Filter DataBase files</string>
+     <string>Ignore Veretino DB files</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="filterShaFiles">
+   <widget class="QCheckBox" name="ignoreShaFiles">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>190</x>
       <y>70</y>
-      <width>221</width>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
     <property name="toolTip">
-     <string>exclude text files with {checksum &amp; filename} from database</string>
+     <string>Exclude checksum summary files from the filelist</string>
     </property>
     <property name="text">
-     <string>Filter sha files (*.sha1/256/512)</string>
+     <string>Ignore sha files (*.sha1/256/512)</string>
     </property>
    </widget>
   </widget>

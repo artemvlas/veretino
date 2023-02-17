@@ -296,8 +296,8 @@ void MainWindow::timeLeft(const int &percentsDone)
 void MainWindow::setSettings()
 {
     settings["shaType"] = 256;
-    settings["filterDbFiles"] = true;
-    settings["filterShaFiles"] = true;
+    settings["ignoreDbFiles"] = true;
+    settings["ignoreShaFiles"] = true;
     emit settingsChanged(settings);
 }
 

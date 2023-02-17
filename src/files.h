@@ -9,8 +9,8 @@ class Files : public QObject
 public:
     explicit Files(const QString &path = QString(), QObject *parent = nullptr);
 
-    bool filterDbFiles;
-    bool filterShaFiles;
+    bool ignoreDbFiles;
+    bool ignoreShaFiles;
 
     QStringList actualFileList(const QString &folder = QString());
     qint64 filelistSize(const QStringList &filelist);
@@ -24,7 +24,7 @@ public:
     QString filePath;
     QString folderPath;
     QStringList fileList;
-    QStringList filteredFiles; // list of filetered files by filteredByExtensions()
+    QStringList filteredFiles; // list of filtered files created by filterByExtensions() function
 
 public slots:
     void processFileList(const QString &rootFolder);
