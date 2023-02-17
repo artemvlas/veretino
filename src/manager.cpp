@@ -168,8 +168,8 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         tipText = "\n\nUse context menu for more options";
     }
 
-    emit showMessage(QString("Algorithm: SHA-%1\nStored paths: %2\nNew files: %3\nLost files: %4%5")
-                     .arg(json->dbShaType).arg(parsedData.size()).arg(newFiles.size()).arg(lostFiles.size()).arg(tipText), "Database parsed");
+    emit showMessage(QString("Algorithm: SHA-%1\nLast update: %2\nStored size: %3\n\nStored paths: %4\nNew files: %5\nLost files: %6%7")
+                     .arg(json->dbShaType).arg(json->lastUpdate, json->storedDataSize).arg(parsedData.size()).arg(newFiles.size()).arg(lostFiles.size()).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()

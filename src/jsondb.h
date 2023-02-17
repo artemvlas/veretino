@@ -22,6 +22,8 @@ public:
     QString filePath;
     QString folderPath;
     int dbShaType; // 1 or 256 or 512: from json database header or by checksum lenght
+    QString lastUpdate; // from "Updated" value of first json object (from header)
+    QString storedDataSize; // total size of listed files when db was built
 
 private:
     QJsonDocument readJsonFile(const QString &pathToFile = QString());

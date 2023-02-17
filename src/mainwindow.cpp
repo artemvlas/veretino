@@ -324,7 +324,6 @@ bool MainWindow::argumentInput()
 void MainWindow::showMessage(const QString &message, const QString &title)
 {
     QMessageBox messageBox;
-    messageBox.setFixedSize(500,200);
 
     if(title.toLower()=="error" || title.toLower()=="failed")
         messageBox.critical(0,title,message);

@@ -179,6 +179,16 @@ QMap<QString,QString> jsonDB::parseJson(const QString &pathToFile)
         }
     }
 
+    if (header.contains("Updated"))
+        lastUpdate = header["Updated"].toString();
+    else
+        lastUpdate = QString();
+
+    if (header.contains("Total size"))
+        storedDataSize = header["Total size"].toString();
+    else
+        storedDataSize = QString();
+
     return parsedData;
 }
 
