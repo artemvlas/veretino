@@ -168,8 +168,19 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         tipText = "\n\nUse context menu for more options";
     }
 
-    emit showMessage(QString("Algorithm: SHA-%1\nLast update: %2\nStored size: %3\n\nStored paths: %4\nNew files: %5\nLost files: %6%7")
-                     .arg(json->dbShaType).arg(json->lastUpdate, json->storedDataSize).arg(parsedData.size()).arg(newFiles.size()).arg(lostFiles.size()).arg(tipText), "Database parsed");
+    QString newFilesInfo;
+
+    if (newFiles.size() > 0) {
+        QString s; // if only 1 file - text is "file", if more - text is "files"
+        if (newFiles.size() > 1)
+            s = "s";
+        newFilesInfo = QString("New: %1 file%2, %3").arg(newFiles.size()).arg(s, QLocale().formattedDataSize(Files().filelistSize(newFiles)));
+    }
+    else
+        newFilesInfo = "New files: 0";
+
+    emit showMessage(QString("Algorithm: SHA-%1\nLast update: %2\nStored size: %3\n\nStored paths: %4\n%5\nLost files: %6%7")
+                     .arg(json->dbShaType).arg(json->lastUpdate, json->storedDataSize).arg(parsedData.size()).arg(newFilesInfo).arg(lostFiles.size()).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
