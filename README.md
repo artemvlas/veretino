@@ -36,5 +36,4 @@ by parsing the database (a regular Json file, by the way), you can check the ent
 
 The App allows to avoid unexpected data loss*, for example, in the event of a disk error or incomplete download. Checking across the entire folder and multiple subfolders allows to find data loss in any of the contained files.
 
-
 #### *Please note that the Veretino app does not repair the data and is not able to prevent the data loss, but only serves to data integrity verification
