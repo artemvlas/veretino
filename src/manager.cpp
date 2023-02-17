@@ -161,6 +161,15 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     makeTreeModel(filesAvailability);
 
     setMode_model();
+
+    QString tipText;
+
+    if (newFiles.size() > 0 || lostFiles.size() > 0) {
+        tipText = "\n\nUse context menu for more options";
+    }
+
+    emit showMessage(QString("Algorithm: SHA-%1\nStored paths: %2\nNew files: %3\nLost files: %4%5")
+                     .arg(json->dbShaType).arg(parsedData.size()).arg(newFiles.size()).arg(lostFiles.size()).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
