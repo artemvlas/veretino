@@ -4,12 +4,12 @@ jsonDB::jsonDB(const QString &path, QObject *parent)
     : QObject{parent}
 {
     if (path != nullptr) {
-        if (QFileInfo(path).isFile())
+        if (QFileInfo(path).isFile() && path.endsWith(".ver.json"))
             filePath = path;
         else if (QFileInfo(path).isDir())
             folderPath = path;
         else
-            qDebug()<<"JsonDB: Wrong input path"<<path;
+            qDebug()<<"JsonDB: Wrong input path" << path;
     }
 }
 
@@ -61,27 +61,27 @@ QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
     }
 }
 
-// making "checksums... .ver.json" database from QMAP {full file path : checksum or info(unreadable)}
-bool jsonDB::makeJsonDB(const QMap<QString,QString> &dataMap, const QString &filepath)
+// making "checksums... .ver.json" database from DataContainer
+bool jsonDB::makeJsonDB(DataContainer *data)
 {
-    if (dataMap.isEmpty())
+    if (data == nullptr)
         return false;
 
-    if (filepath != nullptr)
-        filePath = filepath;
+    if (data->jsonFilePath != nullptr)
+        filePath = data->jsonFilePath;
 
     qint64 totalSize = 0;
     QDir dir (QFileInfo(filePath).absolutePath());
 
     QJsonDocument doc;
-    QJsonArray data;
+    QJsonArray mainArray;
     QJsonObject header;
     QJsonObject computedData;
     QJsonObject excludedFiles;
     QJsonArray unreadableFiles;
     QString relativePath;
 
-    QMapIterator<QString,QString> i(dataMap);
+    QMapIterator<QString,QString> i(data->mapToSave());
     while(i.hasNext()) {
         i.next();
         relativePath = dir.relativeFilePath(i.key());
@@ -109,64 +109,57 @@ bool jsonDB::makeJsonDB(const QMap<QString,QString> &dataMap, const QString &fil
     header["Updated"] = QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm");
     header["Working folder"] = "Relative"; // functionality to work with this variable will be realized in the next versions
 
-    if (!ignoredExtensions.isEmpty()) {
-        header["Ignored"] = ignoredExtensions.join(" ");
-        //ignoredExtensions.clear();
+    if (!data->ignoredExtensions.isEmpty()) {
+        header["Ignored"] = data->ignoredExtensions.join(" ");
     }
 
-    data.append(header);
-    data.append(computedData);
-    data.append(excludedFiles);
+    mainArray.append(header);
+    mainArray.append(computedData);
+    mainArray.append(excludedFiles);
 
-    doc.setArray(data);
+    doc.setArray(mainArray);
 
-    if(saveJsonFile(doc,filePath))
+    if(saveJsonFile(doc, filePath))
         return true;
     else {
-        emit showMessage("Unable to save json file","Error");
+        emit showMessage(QString("Unable to save json file: %1").arg(filePath),"Error");
         return false;
     }
 }
 
-//returns {"file path" : "checksum" or "unreadable"}
-QMap<QString,QString> jsonDB::parseJson(const QString &pathToFile)
+DataContainer* jsonDB::parseJson(const QString &pathToFile)
 {
     if(pathToFile != nullptr)
         filePath = pathToFile;
 
-    QString workDir = QFileInfo(filePath).absolutePath() + '/';
-    filePath = pathToFile;
-
-    QJsonArray mainArray = loadJsonDB(filePath);
+    QJsonArray mainArray = loadJsonDB(filePath); // json database is QJsonArray of QJsonObjects
 
     if (mainArray.isEmpty()) {
-        return QMap<QString,QString>();
+        return nullptr;
     }
 
     QJsonObject header (mainArray[0].toObject());
-    QJsonObject jsonData (mainArray[1].toObject());
+    QJsonObject filelistData (mainArray[1].toObject());
     QJsonObject excludedFiles (mainArray[2].toObject());
-    QMap<QString,QString> parsedData;
+
+    DataContainer *data = new DataContainer(filePath);
 
     if (header.contains("Ignored")) {
-        ignoredExtensions = header["Ignored"].toString().split(" ");
-        qDebug()<< "jsonDB::parseJson | ignoredExtensions:" << ignoredExtensions;
-    }
-    else {
-        ignoredExtensions.clear();
+        data->ignoredExtensions = header["Ignored"].toString().split(" ");
+        qDebug()<< "jsonDB::parseJson | ignoredExtensions:" << data->ignoredExtensions;
     }
 
-    foreach (const QString &file, jsonData.keys()) {
-        parsedData[workDir + file] = jsonData[file].toString(); // from relative to full path
+    foreach (const QString &file, filelistData.keys()) {
+        data->parsedData[data->workDir + file] = filelistData[file].toString(); // from relative to full path
     }
 
-    dbShaType = shatypeByLen(parsedData.begin().value().size());
+    data->dbShaType = shatypeByLen(data->parsedData.begin().value().size());
     // if something wrong with first value, try others
-    if (dbShaType == 0) {
-        foreach (const QString &v, parsedData.values()) {
+    if (data->dbShaType == 0) {
+        foreach (const QString &v, data->parsedData.values()) {
             int t = shatypeByLen(v.size());
             if(t != 0)
-                dbShaType = t;
+                data->dbShaType = t;
         }
     }
 
@@ -174,22 +167,22 @@ QMap<QString,QString> jsonDB::parseJson(const QString &pathToFile)
         if(excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles["Unreadable files"].toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
-                parsedData[workDir + unreadableFiles.at(var).toString()] = "unreadable";
+                data->parsedData[data->workDir + unreadableFiles.at(var).toString()] = "unreadable";
             }
         }
     }
 
     if (header.contains("Updated"))
-        lastUpdate = header["Updated"].toString();
+        data->lastUpdate = header["Updated"].toString();
     else
-        lastUpdate = QString();
+        data->lastUpdate = QString();
 
     if (header.contains("Total size"))
-        storedDataSize = header["Total size"].toString();
+        data->storedDataSize = header["Total size"].toString();
     else
-        storedDataSize = QString();
+        data->storedDataSize = QString();
 
-    return parsedData;
+    return data;
 }
 
 int jsonDB::shatypeByLen(const int &len)

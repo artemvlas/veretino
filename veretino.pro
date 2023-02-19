@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     src/aboutdialog.cpp \
+    src/datacontainer.cpp \
     src/files.cpp \
     src/jsondb.cpp \
     src/main.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     src/aboutdialog.h \
+    src/datacontainer.h \
     src/files.h \
     src/jsondb.h \
     src/mainwindow.h \

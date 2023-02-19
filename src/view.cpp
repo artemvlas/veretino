@@ -20,6 +20,7 @@ void View::setFileSystemModel()
     }
 
     this->setIndexByPath(lastFileSystemPath);
+    emit fsModel_Setted();
     //qDebug()<<"View::setFileSystemModel() | "<<lastFileSystemPath;
 }
 

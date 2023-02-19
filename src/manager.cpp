@@ -12,6 +12,7 @@ Manager::~Manager()
 {
     delete shaCalc;
     delete json;
+    deleteCurData();
     qDebug()<<"Manager DESTRUCTED. Thread:"<<QThread::currentThread();
 }
 
@@ -31,6 +32,8 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     //std::auto_ptr<ShaCalculator> shaCalc (new ShaCalculator);
 
     Files F;
+    DataContainer calcData (folderPath);
+
     // to disable ignoring db (*.ver.json) or *.shaX files: F.ignoreDbFiles = false; F.ignoreShaFiles = false; to enable '= true' | 'true' is default in Files()
     if (settings["ignoreDbFiles"].isValid())
         F.ignoreDbFiles = settings["ignoreDbFiles"].toBool();
@@ -38,10 +41,10 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
         F.ignoreShaFiles = settings["ignoreShaFiles"].toBool();
 
     if (settings["extensions"].isValid() && !settings["extensions"].isNull()) {
-        json->ignoredExtensions = settings["extensions"].toStringList();
+        calcData.ignoredExtensions = settings["extensions"].toStringList();
     }
 
-    QStringList fileList = F.actualFileListFiltered(folderPath, json->ignoredExtensions); //list of files except ignored
+    QStringList fileList = F.actualFileListFiltered(folderPath, calcData.ignoredExtensions); //list of files except ignored
 
     if(fileList.isEmpty()) {
         emit showMessage("Empty folder. Nothing to do");
@@ -49,16 +52,15 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     }
 
     emit setMode("processing");
-    QMap<QString,QString> calculatedMap = shaCalc->calcShaList(fileList, shatype);
+    calcData.resultMap = shaCalc->calcShaList(fileList, shatype);
 
-    if(calculatedMap.isEmpty()) {
+    if(calcData.resultMap.isEmpty()) {
         return;
     }
 
-    QString filePath = QString("%1/checksums_%2.ver.json").arg(folderPath, QDir(folderPath).dirName());
-
-    if (json->makeJsonDB(calculatedMap, filePath))
-        emit showMessage(QString("SHA-%1 Checksums for %2 files calculated\nDatabase: %3\nuse it to check data integrity").arg(shatype).arg(fileList.size()).arg(QFileInfo(filePath).fileName()), "Success");
+    if (json->makeJsonDB(&calcData))
+        emit showMessage(QString("SHA-%1 Checksums for %2 files calculated\nDatabase: %3\nuse it to check data integrity").arg(shatype)
+                         .arg(fileList.size()).arg(QFileInfo(calcData.jsonFilePath).fileName()), "Success");
 
     emit setMode("endProcess");
 }
@@ -95,10 +97,10 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
     if(!map.isEmpty()) {
         TreeModel *model = new TreeModel;
         model->setObjectName("treeModel");
-        model->populateMap(toRelativePathsMap(map, workDir));
+        model->populateMap(toRelativePathsMap(map, curData->workDir));
 
         emit completeTreeModel(model);
-        emit status(QString("SHA-%1: %2 files").arg(json->dbShaType).arg(map.size()));
+        emit status(QString("SHA-%1: %2 files").arg(curData->dbShaType).arg(map.size()));
     }
     else
         emit resetView();
@@ -106,7 +108,7 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
 
 void Manager::resetDatabase()
 {
-    makeJsonModel(json->filePath);
+    makeJsonModel(curData->jsonFilePath);
 }
 
 //making tree model | file paths : info about current availability on disk
@@ -118,93 +120,52 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     }
 
     emit status("Json Model creation...");
-    parsedData = json->parseJson(jsonFilePath);
 
-    if(parsedData.isEmpty()) {
+    DataContainer *oldData = curData;
+
+    curData = json->parseJson(jsonFilePath);
+
+    if (oldData != nullptr) {
+        delete oldData;
+    }
+
+    if(curData->parsedData.isEmpty()) {
         return;
     }
 
-    workDir = QFileInfo(jsonFilePath).absolutePath() + '/';
-    QStringList filelist = parsedData.keys();
-    QStringList actualFiles = Files().actualFileListFiltered(workDir, json->ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
-
-    filesAvailability.clear();
-    lostFiles.clear();
-    newFiles.clear();
-
-    foreach(const QString &i, filelist) {
-
-        if (parsedData[i] == "unreadable") {
-            if (QFileInfo::exists(i))
-                filesAvailability[i] = "on Disk (unreadable)";
-            else {
-                filesAvailability[i] = "LOST file (unreadable)";
-                lostFiles.append(i);
-            }
-        }
-
-        else if (QFileInfo::exists(i))
-            filesAvailability[i] = "on Disk";
-        else {
-            filesAvailability[i] = "LOST file";
-            lostFiles.append(i);
-        }
-    }
-
-    foreach(const QString &i, actualFiles) {
-        if(!filelist.contains(i)) {
-            filesAvailability[i] = "NEW file";
-            newFiles.append(i);
-        }
-    }
-
-    makeTreeModel(filesAvailability);
+    makeTreeModel(curData->defineFilesAvailability());
 
     setMode_model();
 
     QString tipText;
 
-    if (newFiles.size() > 0 || lostFiles.size() > 0) {
+    if (curData->newFilesNumber > 0 || curData->lostFilesNumber > 0) {
         tipText = "\n\nUse context menu for more options";
     }
 
     QString newFilesInfo;
 
-    if (newFiles.size() > 0) {
+    if (curData->newFilesNumber > 0) {
         QString s; // if only 1 file - text is "file", if more - text is "files"
-        if (newFiles.size() > 1)
+        if (curData->newFiles.size() > 1)
             s = "s";
-        newFilesInfo = QString("New: %1 file%2, %3").arg(newFiles.size()).arg(s, QLocale().formattedDataSize(Files().filelistSize(newFiles)));
+        newFilesInfo = QString("New: %1 file%2, %3").arg(curData->newFilesNumber).arg(s, QLocale().formattedDataSize(Files().filelistSize(curData->newFiles)));
     }
     else
         newFilesInfo = "New files: 0";
 
     QString filters;
-    if (!json->ignoredExtensions.isEmpty()) {
-        filters = QString("\nIgnored: %1").arg(json->ignoredExtensions.join(", "));
+    if (!curData->ignoredExtensions.isEmpty()) {
+        filters = QString("\nIgnored: %1").arg(curData->ignoredExtensions.join(", "));
     }
 
     emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nStored paths: %5\n%6\nLost files: %7%8")
-                     .arg(json->dbShaType).arg(filters, json->storedDataSize, json->lastUpdate).arg(parsedData.size()).arg(newFilesInfo).arg(lostFiles.size()).arg(tipText), "Database parsed");
+                     .arg(curData->dbShaType).arg(filters, curData->storedDataSize, curData->lastUpdate).arg(curData->parsedData.size()).arg(newFilesInfo).arg(curData->lostFilesNumber).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
 {
-    QMap<QString,QString> newlost;
-
-    if (lostFiles.size() > 0) {
-        foreach (const QString &file, lostFiles) {
-            newlost.insert(file, "LOST file");
-        }
-    }
-
-    if (newFiles.size() > 0) {
-        foreach (const QString &file, newFiles) {
-            newlost.insert(file, "NEW file");
-        }
-    }
-
-    makeTreeModel(newlost);
+    makeTreeModel(curData->newlostOnly());
 }
 
 //remove lost files, add new files
@@ -213,29 +174,28 @@ void Manager::updateNewLost()
     emit setMode("processing");
     QMap<QString,QString> changes; // display added/removed from database files
 
-    if (lostFiles.size() > 0) {
-        foreach (const QString &file, lostFiles) {
-            parsedData.remove(file);
+    if (curData->lostFilesNumber > 0) {
+        foreach (const QString &file, curData->lostFiles) {
+            curData->parsedData.remove(file);
             changes.insert(file, "removed from DB");
         }
     }
 
-    if (newFiles.size() > 0) {
-        QMap<QString,QString> newFilesSums = shaCalc->calcShaList(newFiles, json->dbShaType);
+    if (curData->newFilesNumber > 0) {
+        QMap<QString,QString> newFilesSums = shaCalc->calcShaList(curData->newFiles, curData->dbShaType);
         if(newFilesSums.isEmpty()) {
             return;
         }
-        parsedData.insert(newFilesSums); // add new data to Database
+        curData->parsedData.insert(newFilesSums); // add new data to Database
         foreach (const QString &file, newFilesSums.keys()) {
             changes.insert(file, "added to DB");
         }
     }
 
-    if (json->makeJsonDB(parsedData, json->filePath)) {
+    if (json->makeJsonDB(curData)) {
         makeTreeModel(changes);
-        emit showMessage(QString("Database updated. Added %1 files, removed %2").arg(newFiles.size()).arg(lostFiles.size()));
-        lostFiles.clear();
-        newFiles.clear();
+        emit showMessage(QString("Database updated. Added %1 files, removed %2").arg(curData->newFilesNumber).arg(curData->lostFilesNumber));
+        curData->clearNewLostFiles();
     }
 
     emit setMode("endProcess");
@@ -246,9 +206,9 @@ void Manager::updateNewLost()
 void Manager::updateMismatch()
 {
     QMap<QString,QString> changes; // display files with updated checksums
-    if (differences.size() > 0) {
-        foreach (const QString &file, differences.keys()) {
-            parsedData[file] = recalculated[file];
+    if (curData->differences.size() > 0) {
+        foreach (const QString &file, curData->differences.keys()) {
+            curData->parsedData[file] = curData->recalculated[file];
             changes.insert(file, "stored checksum updated");
         }
     }
@@ -257,57 +217,47 @@ void Manager::updateMismatch()
         return;
     }
 
-    if (json->makeJsonDB(parsedData, json->filePath)) {
+    if (json->makeJsonDB(curData)) {
         makeTreeModel(changes);
         setMode_model();
-        emit showMessage(QString("Chechsums updated for %1 files").arg(differences.size()));
+        emit showMessage(QString("Chechsums updated for %1 files").arg(curData->differences.size()));
+        curData->differences.clear();
+        curData->recalculated.clear();
     }
 }
 
 // checking the list of files against the checksums stored in the database
 void Manager::verifyFileList()
 {
-    if(parsedData.isEmpty()) {
+    if(curData->parsedData.isEmpty()) {
         qDebug()<<"parsedData is Empty";
         return;
     }
 
     emit setMode("processing");
 
-    QStringList flist;
-    differences.clear();
-    recalculated.clear();
-
-    QMapIterator<QString,QString> i (filesAvailability);
-    while (i.hasNext()) {
-        i.next();
-        if (i.value() == "on Disk") {
-            flist.append(i.key());
-        }
-    }
-
-    recalculated = shaCalc->calcShaList(flist, json->dbShaType);
-    if(recalculated.isEmpty()) {
+    curData->recalculated = shaCalc->calcShaList(curData->onDiskFiles, curData->dbShaType);
+    if(curData->recalculated.isEmpty()) {
         return;
     }
 
-    QMapIterator<QString,QString> ii (recalculated);
+    QMapIterator<QString,QString> ii (curData->recalculated);
 
     while(ii.hasNext()) {
         ii.next();
-        if (parsedData[ii.key()] != ii.value())
-            differences[ii.key()] = "NOT match";
+        if (curData->parsedData[ii.key()] != ii.value())
+            curData->differences[ii.key()] = "NOT match";
     }
 
-    if (differences.size() > 0) {
-        makeTreeModel(differences);
-        emit showMessage(QString("%1 files changed or corrupted").arg(differences.size()),"FAILED");
+    if (curData->differences.size() > 0) {
+        makeTreeModel(curData->differences);
+        emit showMessage(QString("%1 files changed or corrupted").arg(curData->differences.size()),"FAILED");
         emit setMode("endProcess");
         emit setMode("updateMismatch");
         return;
     }
     else {
-        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.").arg(recalculated.size()).arg(json->dbShaType), "Success");
+        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.").arg(curData->recalculated.size()).arg(curData->dbShaType), "Success");
     }
 
     emit setMode("endProcess");
@@ -327,7 +277,6 @@ void Manager::checkFileSummary(const QString &path)
         line = sumFile.readLine();
     else {
         emit showMessage("Error while reading Summary File", "Error");
-        //emit setMode("cur");
         return;
     }
 
@@ -335,7 +284,6 @@ void Manager::checkFileSummary(const QString &path)
         checkFilePath = line.mid(shaStrLen(shatype)+2).replace("\n","");
         if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
-            //emit setMode("cur");
             return;
         }
     }
@@ -344,7 +292,6 @@ void Manager::checkFileSummary(const QString &path)
     QString savedSum = line.mid(0, shaStrLen(shatype));
     QString sum = shaCalc->calcShaFile(checkFilePath, shatype);
     if(sum == nullptr) {
-        //emit setMode("cur");
         return;
     }
 
@@ -355,13 +302,12 @@ void Manager::checkFileSummary(const QString &path)
         emit showMessage("Checksum does NOT match", "Failed");
     }
     emit setMode("endProcess");
-    //emit setMode("cur");
 }
 
 //check only selected file instead all database cheking
 void Manager::checkCurrentItemSum(const QString &path)
 {
-    QString filepath = workDir + path;
+    QString filepath = curData->workDir + path;
     qDebug()<<"Manager::checkCurrentItemSum | filepath:"<<filepath;
 
     if (QFileInfo(filepath).isDir()) {
@@ -373,19 +319,19 @@ void Manager::checkCurrentItemSum(const QString &path)
         return;
     }
 
-    if (!parsedData.contains(filepath)) {
+    if (!curData->parsedData.contains(filepath)) {
         emit showMessage("Checksum is missing in the database.\nPlease Update New/Lost", "NEW File");
         return;
     }
 
-    QString savedSum = parsedData[filepath];
+    QString savedSum = curData->parsedData[filepath];
     if (savedSum == "unreadable") {
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
         return;
     }
 
     emit setMode("processing");
-    QString sum = shaCalc->calcShaFile(filepath, json->dbShaType);
+    QString sum = shaCalc->calcShaFile(filepath, curData->dbShaType);
     if(sum == nullptr) {
         return;
     }
@@ -418,8 +364,8 @@ void Manager::getFInfo(const QString &path)
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
 void Manager::setMode_model()
 {
-    if (newFiles.size() > 0 || lostFiles.size() > 0) {
-        emit status(QString("SHA-%1: %2 new files, %3 lost files | Total files listed: %4").arg(json->dbShaType).arg(newFiles.size()).arg(lostFiles.size()).arg(filesAvailability.size()));
+    if (curData->newFiles.size() > 0 || curData->lostFiles.size() > 0) {
+        emit status(QString("SHA-%1: %2 new files, %3 lost files | Total files listed: %4").arg(curData->dbShaType).arg(curData->newFiles.size()).arg(curData->lostFiles.size()).arg(curData->filesAvailability.size()));
         emit setMode("modelNewLost");
     }
     else {
@@ -472,4 +418,17 @@ int Manager::shaStrLen(const int &shatype)
 void Manager::getSettings(const QVariantMap &settingsMap)
 {
     settings = settingsMap;
+}
+
+void Manager::deleteCurData()
+{
+    /*if (curData != nullptr) {
+        delete curData;
+        curData = nullptr;
+    }*/
+    DataContainer *oldData = curData;
+    curData = nullptr;
+    if (oldData != nullptr) {
+        delete oldData;
+    }
 }

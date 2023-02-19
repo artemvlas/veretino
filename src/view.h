@@ -30,6 +30,7 @@ signals:
     void setMode(const QString &mode); //"file", "folder", "db", "sum"
     void modelChanged();
     void showMessage(const QString &text, const QString &title = "Info");
+    void fsModel_Setted(); // fileSystem Model setted
 };
 
 #endif // VIEW_H

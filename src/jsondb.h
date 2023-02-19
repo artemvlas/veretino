@@ -8,6 +8,7 @@
 #include "QFile"
 #include "QDir"
 #include "files.h"
+#include "datacontainer.h"
 
 class jsonDB : public QObject
 {
@@ -15,23 +16,17 @@ class jsonDB : public QObject
 public:
     explicit jsonDB(const QString &path = QString(), QObject *parent = nullptr);
 
-    bool makeJsonDB(const QMap<QString,QString> &dataMap, const QString &filename = QString());
-    QMap<QString,QString> parseJson(const QString &pathToFile = QString());
+    bool makeJsonDB(DataContainer *data);
+    DataContainer* parseJson(const QString &pathToFile = QString());
 
-    QStringList ignoredExtensions;
     QString filePath;
     QString folderPath;
-    int dbShaType; // 1 or 256 or 512: from json database header or by checksum lenght
-    QString lastUpdate; // from "Updated" value of first json object (from header)
-    QString storedDataSize; // total size of listed files when db was built
 
 private:
     QJsonDocument readJsonFile(const QString &pathToFile = QString());
     bool saveJsonFile(const QJsonDocument &document, const QString &pathToFile = QString());
     QJsonArray loadJsonDB(const QString &pathToFile = QString());
     int shatypeByLen(const int &len);
-    //QString currentFolder;
-    //QString currentFile;
 
 signals:
     void status(const QString &text); //text to statusbar

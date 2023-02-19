@@ -114,6 +114,9 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
 
+    // cleanup
+    connect(ui->treeView, &View::fsModel_Setted, manager, &Manager::deleteCurData);
+
     thread->start();
 }
 
