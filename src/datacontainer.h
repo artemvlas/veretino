@@ -8,6 +8,13 @@
 #include <QMap>
 #include <QDebug>
 
+/*
+Objects of this class are used to store, organize, manage database data.
+For each database, a separate object is created that stores checksums, all lists of files for various needs,
+info about the algorithm type, relevance, etc.
+The object can perform basic tasks of sorting, filtering, comparing data.
+*/
+
 class DataContainer : public QObject
 {
     Q_OBJECT

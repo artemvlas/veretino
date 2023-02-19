@@ -128,7 +128,8 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     }
 
     if (curData == nullptr) {
-        emit showMessage(QString("%1\n\nThe database doesn't contain checksums. Probably all files have been ignored or deleted.").arg(QFileInfo(jsonFilePath).fileName()), "Empty Database!");
+        emit showMessage(QString("%1\n\nThe database doesn't contain checksums. Probably all files have been ignored or deleted.")
+                         .arg(QFileInfo(jsonFilePath).fileName()), "Empty Database!");
         return;
     }
 
@@ -174,13 +175,6 @@ void Manager::updateNewLost()
     emit setMode("processing");
     QMap<QString,QString> changes; // display added/removed from database files
 
-    if (curData->lostFilesNumber > 0) {
-        foreach (const QString &file, curData->lostFiles) {
-            curData->parsedData.remove(file);
-            changes.insert(file, "removed from DB");
-        }
-    }
-
     if (curData->newFilesNumber > 0) {
         QMap<QString,QString> newFilesSums = shaCalc->calcShaList(curData->newFiles, curData->dbShaType);
         if(newFilesSums.isEmpty()) {
@@ -189,6 +183,13 @@ void Manager::updateNewLost()
         curData->parsedData.insert(newFilesSums); // add new data to Database
         foreach (const QString &file, newFilesSums.keys()) {
             changes.insert(file, "added to DB");
+        }
+    }
+
+    if (curData->lostFilesNumber > 0) {
+        foreach (const QString &file, curData->lostFiles) {
+            curData->parsedData.remove(file);
+            changes.insert(file, "removed from DB");
         }
     }
 
