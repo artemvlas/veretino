@@ -119,8 +119,6 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         return;
     }
 
-    emit status("Json Model creation...");
-
     DataContainer *oldData = curData;
 
     curData = json->parseJson(jsonFilePath);
@@ -129,10 +127,12 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         delete oldData;
     }
 
-    if(curData->parsedData.isEmpty()) {
+    if (curData == nullptr) {
+        emit showMessage(QString("%1\n\nThe database doesn't contain checksums. Probably all files have been ignored or deleted.").arg(QFileInfo(jsonFilePath).fileName()), "Empty Database!");
         return;
     }
 
+    emit status("Json Model creation...");
     makeTreeModel(curData->defineFilesAvailability());
 
     setMode_model();

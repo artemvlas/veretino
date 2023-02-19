@@ -142,6 +142,11 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     QJsonObject filelistData (mainArray[1].toObject());
     QJsonObject excludedFiles (mainArray[2].toObject());
 
+    if (filelistData.isEmpty()) {
+        qDebug()<<"EMPTY filelistData";
+        return nullptr;
+    }
+
     DataContainer *data = new DataContainer(filePath);
 
     if (header.contains("Ignored")) {
