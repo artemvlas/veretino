@@ -29,8 +29,6 @@ void Manager::connections()
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 {
-    //std::auto_ptr<ShaCalculator> shaCalc (new ShaCalculator);
-
     Files F;
     DataContainer calcData (folderPath);
 
@@ -52,14 +50,14 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     }
 
     emit setMode("processing");
-    calcData.resultMap = shaCalc->calcShaList(fileList, shatype);
+    calcData.mainData = shaCalc->calcShaList(fileList, shatype);
 
-    if(calcData.resultMap.isEmpty()) {
+    if(calcData.mainData.isEmpty()) {
         return;
     }
 
     if (json->makeJsonDB(&calcData))
-        emit showMessage(QString("SHA-%1 Checksums for %2 files calculated\nDatabase: %3\nuse it to check data integrity").arg(shatype)
+        emit showMessage(QString("SHA-%1 Checksums for %2 files calculated\nDatabase: %3\nuse it to check the data integrity").arg(shatype)
                          .arg(fileList.size()).arg(QFileInfo(calcData.jsonFilePath).fileName()), "Success");
 
     emit setMode("endProcess");
@@ -161,7 +159,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     }
 
     emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nStored paths: %5\n%6\nLost files: %7%8")
-                     .arg(curData->dbShaType).arg(filters, curData->storedDataSize, curData->lastUpdate).arg(curData->parsedData.size()).arg(newFilesInfo).arg(curData->lostFilesNumber).arg(tipText), "Database parsed");
+                     .arg(curData->dbShaType).arg(filters, curData->storedDataSize, curData->lastUpdate).arg(curData->mainData.size()).arg(newFilesInfo).arg(curData->lostFilesNumber).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
@@ -174,29 +172,22 @@ void Manager::updateNewLost()
 {
     emit setMode("processing");
     QMap<QString,QString> changes; // display added/removed from database files
+    QString info = QString("Database updated. Added %1 files, removed %2").arg(curData->newFilesNumber).arg(curData->lostFilesNumber);
 
     if (curData->newFilesNumber > 0) {
         QMap<QString,QString> newFilesSums = shaCalc->calcShaList(curData->newFiles, curData->dbShaType);
         if(newFilesSums.isEmpty()) {
             return;
         }
-        curData->parsedData.insert(newFilesSums); // add new data to Database
-        foreach (const QString &file, newFilesSums.keys()) {
-            changes.insert(file, "added to DB");
-        }
+        changes.insert(curData->updateMainData(newFilesSums)); // add new data to Database, returns the list of changes
     }
 
-    if (curData->lostFilesNumber > 0) {
-        foreach (const QString &file, curData->lostFiles) {
-            curData->parsedData.remove(file);
-            changes.insert(file, "removed from DB");
-        }
-    }
+    if (curData->lostFilesNumber > 0)
+        changes.insert(curData->clearDataFromLostFiles()); // remove lostFiles items from mainData
 
     if (json->makeJsonDB(curData)) {
         makeTreeModel(changes);
-        emit showMessage(QString("Database updated. Added %1 files, removed %2").arg(curData->newFilesNumber).arg(curData->lostFilesNumber));
-        curData->clearNewLostFiles();
+        emit showMessage(info);
     }
 
     emit setMode("endProcess");
@@ -206,12 +197,12 @@ void Manager::updateNewLost()
 // update json Database with new checksums for files with failed verification
 void Manager::updateMismatch()
 {
-    QMap<QString,QString> changes; // display files with updated checksums
-    if (curData->differences.size() > 0) {
-        foreach (const QString &file, curData->differences.keys()) {
-            curData->parsedData[file] = curData->recalculated[file];
-            changes.insert(file, "stored checksum updated");
-        }
+    QMap<QString,QString> changes;
+    int number = curData->mismatches.size();
+
+    if (number > 0) {
+        // update data and make 'changes' map to display a filelist with updated checksums, original lists 'mismatches' and 'recalculated' will be cleared
+        changes = curData->updateMainData(curData->mismatches, "stored checksum updated");
     }
     else {
         qDebug()<<"Manager::updateMismatch() | ZERO differences.size()";
@@ -221,17 +212,15 @@ void Manager::updateMismatch()
     if (json->makeJsonDB(curData)) {
         makeTreeModel(changes);
         setMode_model();
-        emit showMessage(QString("Chechsums updated for %1 files").arg(curData->differences.size()));
-        curData->differences.clear();
-        curData->recalculated.clear();
+        emit showMessage(QString("Chechsums updated for %1 files").arg(number));
     }
 }
 
 // checking the list of files against the checksums stored in the database
 void Manager::verifyFileList()
 {
-    if(curData->parsedData.isEmpty()) {
-        qDebug()<<"parsedData is Empty";
+    if(curData->mainData.isEmpty()) {
+        qDebug()<<"mainData is Empty";
         return;
     }
 
@@ -246,13 +235,13 @@ void Manager::verifyFileList()
 
     while(ii.hasNext()) {
         ii.next();
-        if (curData->parsedData[ii.key()] != ii.value())
-            curData->differences[ii.key()] = "NOT match";
+        if (curData->mainData[ii.key()] != ii.value())
+            curData->mismatches.insert(ii.key(), ii.value());
     }
 
-    if (curData->differences.size() > 0) {
-        makeTreeModel(curData->differences);
-        emit showMessage(QString("%1 files changed or corrupted").arg(curData->differences.size()),"FAILED");
+    if (curData->mismatches.size() > 0) {
+        makeTreeModel(curData->fillMapSameValues(curData->mismatches.keys(), "NOT match"));
+        emit showMessage(QString("%1 files changed or corrupted").arg(curData->mismatches.size()),"FAILED");
         emit setMode("endProcess");
         emit setMode("updateMismatch");
         return;
@@ -262,7 +251,6 @@ void Manager::verifyFileList()
     }
 
     emit setMode("endProcess");
-    //setMode_model();
 }
 
 void Manager::checkFileSummary(const QString &path)
@@ -320,12 +308,12 @@ void Manager::checkCurrentItemSum(const QString &path)
         return;
     }
 
-    if (!curData->parsedData.contains(filepath)) {
+    if (!curData->mainData.contains(filepath)) {
         emit showMessage("Checksum is missing in the database.\nPlease Update New/Lost", "NEW File");
         return;
     }
 
-    QString savedSum = curData->parsedData[filepath];
+    QString savedSum = curData->mainData[filepath];
     if (savedSum == "unreadable") {
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
         return;

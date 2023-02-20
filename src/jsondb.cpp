@@ -81,7 +81,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     QJsonArray unreadableFiles;
     QString relativePath;
 
-    QMapIterator<QString,QString> i(data->mapToSave());
+    QMapIterator<QString,QString> i(data->mainData);
     while(i.hasNext()) {
         i.next();
         relativePath = dir.relativeFilePath(i.key());
@@ -155,13 +155,13 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     }
 
     foreach (const QString &file, filelistData.keys()) {
-        data->parsedData[data->workDir + file] = filelistData[file].toString(); // from relative to full path
+        data->mainData[data->workDir + file] = filelistData[file].toString(); // from relative to full path
     }
 
-    data->dbShaType = shatypeByLen(data->parsedData.begin().value().size());
+    data->dbShaType = shatypeByLen(data->mainData.begin().value().size());
     // if something wrong with first value, try others
     if (data->dbShaType == 0) {
-        foreach (const QString &v, data->parsedData.values()) {
+        foreach (const QString &v, data->mainData.values()) {
             int t = shatypeByLen(v.size());
             if(t != 0)
                 data->dbShaType = t;
@@ -172,7 +172,7 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
         if(excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles["Unreadable files"].toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
-                data->parsedData[data->workDir + unreadableFiles.at(var).toString()] = "unreadable";
+                data->mainData[data->workDir + unreadableFiles.at(var).toString()] = "unreadable";
             }
         }
     }

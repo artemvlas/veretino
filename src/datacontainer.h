@@ -29,23 +29,21 @@ public:
     QString lastUpdate; // from "Updated" value of first json object (from header)
     QString storedDataSize; // total size of listed files when db was built
 
-    QMap<QString,QString> resultMap; // for writing to json
-    QMap<QString,QString> parsedData;
+    QMap<QString,QString> mainData;
     QMap<QString,QString> filesAvailability; //contains file : availability status (on Disk or Lost or New)
-    QMap<QString,QString> differences; //files with failed checksum test
+    QMap<QString,QString> mismatches; //files with failed checksum test
     QMap<QString,QString> recalculated; //checksums recalculated for given filelist (from json database) during verification
-    QMap<QString,QString>& mapToSave();
+    QMap<QString,QString> fillMapSameValues(const QStringList &keys, const QString &value); // create the QMap with multiple keys(QStrinList) and same values
     QStringList lostFiles;
     QStringList newFiles;
+    int lostFilesNumber = 0;
+    int newFilesNumber = 0;
     QStringList onDiskFiles;
 
     QMap<QString,QString>& defineFilesAvailability();
     QMap<QString,QString> newlostOnly();
-
-    int lostFilesNumber = 0;
-    int newFilesNumber = 0;
-
-    void clearNewLostFiles();
+    QMap<QString,QString> clearDataFromLostFiles(); // remove lostFiles items from mainData, returns the list of changes
+    QMap<QString,QString> updateMainData(const QMap<QString,QString> &listFilesChecksums, const QString &info = "added to DB"); // add calculated checksums to mainData, returns the list of changes
 
 };
 
