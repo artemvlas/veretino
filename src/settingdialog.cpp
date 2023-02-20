@@ -60,6 +60,7 @@ QVariantMap settingDialog::getSettings()
         ignoreExtensions.replace(".","");
 
         QStringList ext = ignoreExtensions.split(" ");
+        ext.removeDuplicates();
         settings["extensions"] = ext;
     }
     else
