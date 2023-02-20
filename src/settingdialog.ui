@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>220</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>180</y>
+     <y>260</y>
      <width>181</width>
      <height>32</height>
     </rect>
@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>20</y>
      <width>421</width>
      <height>41</height>
     </rect>
@@ -88,9 +88,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
+     <y>140</y>
      <width>421</width>
-     <height>101</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -104,19 +104,19 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>201</width>
-      <height>17</height>
+      <width>211</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Ignore files with extensions:</string>
+     <string>Filter files by extensions:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="inputIgnoreExtensions">
+   <widget class="QLineEdit" name="inputExtensions">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>40</y>
       <width>401</width>
       <height>25</height>
      </rect>
@@ -135,7 +135,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>80</y>
       <width>181</width>
       <height>23</height>
      </rect>
@@ -151,7 +151,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>70</y>
+      <y>80</y>
       <width>231</width>
       <height>23</height>
      </rect>
@@ -161,6 +161,64 @@
     </property>
     <property name="text">
      <string>Ignore sha files (*.sha1/256/512)</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButtonIgnore">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>10</y>
+      <width>96</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ignore</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButtonOnly">
+    <property name="geometry">
+     <rect>
+      <x>285</x>
+      <y>10</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Include Only</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>421</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLineEdit" name="inputJsonFileNamePrefix">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>401</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Input a prefix for the DB filename. Default: checksums</string>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

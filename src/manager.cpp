@@ -42,6 +42,10 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
         calcData.ignoredExtensions = settings["extensions"].toStringList();
     }
 
+    if (settings["dbPrefix"].isValid()) {
+        calcData.setJsonFileNamePrefix(settings["dbPrefix"].toString());
+    }
+
     QStringList fileList = F.actualFileListFiltered(folderPath, calcData.ignoredExtensions); //list of files except ignored
 
     if(fileList.isEmpty()) {
@@ -171,7 +175,7 @@ void Manager::showNewLostOnly()
 void Manager::updateNewLost()
 {
     emit setMode("processing");
-    QMap<QString,QString> changes; // display added/removed from database files
+    QMap<QString,QString> changes; // display list of added/removed files from database
     QString info = QString("Database updated. Added %1 files, removed %2").arg(curData->newFilesNumber).arg(curData->lostFilesNumber);
 
     if (curData->newFilesNumber > 0) {

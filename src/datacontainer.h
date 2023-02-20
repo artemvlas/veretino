@@ -28,7 +28,6 @@ public:
     int dbShaType = 0; // 1 or 256 or 512: from json database header or by checksum lenght
     QString lastUpdate; // from "Updated" value of first json object (from header)
     QString storedDataSize; // total size of listed files when db was built
-
     QMap<QString,QString> mainData;
     QMap<QString,QString> filesAvailability; //contains file : availability status (on Disk or Lost or New)
     QMap<QString,QString> mismatches; //files with failed checksum test
@@ -45,6 +44,7 @@ public:
     QMap<QString,QString> clearDataFromLostFiles(); // remove lostFiles items from mainData, returns the list of changes
     QMap<QString,QString> updateMainData(const QMap<QString,QString> &listFilesChecksums, const QString &info = "added to DB"); // add calculated checksums to mainData, returns the list of changes
 
+    void setJsonFileNamePrefix(const QString &prefix);
 };
 
 #endif // DATACONTAINER_H

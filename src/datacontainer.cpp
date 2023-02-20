@@ -132,6 +132,11 @@ QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, 
     return resultMap;
 }
 
+void DataContainer::setJsonFileNamePrefix(const QString &prefix)
+{
+    jsonFilePath = QString("%1/%2_%3.ver.json").arg(workDir, prefix, QDir(workDir).dirName());
+}
+
 DataContainer::~DataContainer()
 {
     qDebug()<<"DataContainer deleted | " << this->objectName();

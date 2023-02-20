@@ -7,8 +7,9 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     ui(new Ui::settingDialog)
 {
     ui->setupUi(this);
-    this->setFixedSize(440,220);
+    this->setFixedSize(440,300);
     this->setWindowIcon(QIcon(":/veretino.png"));
+    ui->radioButtonIgnore->setChecked(true);
 
     settings = settingsMap;
 
@@ -21,7 +22,7 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
         ui->rbSha512->setChecked(true);
 
     if(settings["extensions"].isValid())
-        ui->inputIgnoreExtensions->setText(settings["extensions"].toStringList().join(" "));
+        ui->inputExtensions->setText(settings["extensions"].toStringList().join(" "));
 
     if(settings["ignoreDbFiles"].isValid()) {
         ui->ignoreDbFiles->setChecked(settings["ignoreDbFiles"].toBool());
@@ -29,6 +30,9 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     if(settings["ignoreShaFiles"].isValid()){
         ui->ignoreShaFiles->setChecked(settings["ignoreShaFiles"].toBool());
     }
+
+    if(settings["dbPrefix"].isValid())
+        ui->inputJsonFileNamePrefix->setText(settings["dbPrefix"].toString());
 
 }
 
@@ -46,8 +50,12 @@ QVariantMap settingDialog::getSettings()
     else if (ui->rbSha512->isChecked())
         settings["shaType"] = 512;
 
-    if (ui->inputIgnoreExtensions->text() != nullptr) {
-        QString ignoreExtensions = ui->inputIgnoreExtensions->text().toLower();
+    if (ui->inputJsonFileNamePrefix->text() != nullptr) {
+        settings["dbPrefix"] = ui->inputJsonFileNamePrefix->text();
+    }
+
+    if (ui->inputExtensions->text() != nullptr) {
+        QString ignoreExtensions = ui->inputExtensions->text().toLower();
         ignoreExtensions.replace("*","");
         ignoreExtensions.replace(".","");
 
