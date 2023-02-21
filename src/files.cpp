@@ -23,7 +23,7 @@ QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &f
     if (filesNumber > 1)
         s = 's';
 
-    QString text = QString("%1 file%2 * %3").arg(filesNumber).arg(s).arg(QLocale().formattedDataSize(filesSize));
+    QString text = QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(QLocale().formattedDataSize(filesSize));
 
     return text;
 }
@@ -42,8 +42,7 @@ QString Files::folderContentStatus(const QString &folder)
         folderPath = folder;
 
     QStringList filelist = actualFileList();
-    qint64 folderSize = filelistSize(filelist);
-    QString text = QString("%1: %2 files * %3").arg(QDir(folderPath).dirName()).arg(filelist.size()).arg(QLocale().formattedDataSize(folderSize));
+    QString text = QString("%1: %2").arg(QDir(folderPath).dirName()).arg(filelistContentStatus(filelist));
 
     return text;
 }
