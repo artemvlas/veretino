@@ -42,7 +42,7 @@ QString Files::folderContentStatus(const QString &folder)
         folderPath = folder;
 
     QStringList filelist = actualFileList();
-    QString text = QString("%1: %2").arg(QDir(folderPath).dirName()).arg(filelistContentStatus(filelist));
+    QString text = QString("%1: %2").arg(QDir(folderPath).dirName(), filelistContentStatus(filelist));
 
     return text;
 }
