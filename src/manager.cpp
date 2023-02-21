@@ -57,10 +57,10 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 
     if(fileList.isEmpty()) {
         QString info;
-        if (!calcData.onlyExtensions.isEmpty() || !calcData.ignoredExtensions.isEmpty())
-            info = "All files have been excluded.\nFiltering rules can be changed in the settings.";
-        else
+        if (F.fileList.isEmpty())
             info = "Empty folder. Nothing to do";
+        else
+            info = "All files have been excluded.\nFiltering rules can be changed in the settings.";
 
         emit showMessage(info);
         return;
@@ -363,7 +363,7 @@ void Manager::getFInfo(const QString &path)
     if(f.isDir())
          text = Files(path).folderContentStatus();
     else if(f.isFile())
-        text = QString("%1 %2").arg(f.fileName(), QLocale().formattedDataSize(f.size()));
+        text = QString("%1 (%2)").arg(f.fileName(), QLocale().formattedDataSize(f.size()));
 
     emit status(text);
 }

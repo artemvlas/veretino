@@ -86,16 +86,14 @@ QStringList Files::actualFileListFiltered(const QStringList &extensionsList, con
         folderPath = folder;
 
     if (fileList.isEmpty())
-        actualFileList();
-
-    QStringList actualFiles = fileList; // all files in current folder
+        actualFileList(); // fill 'fileList' with all files in current folder
 
     QStringList filteredList; //result filelist
 
     if (ignoreDbFiles || ignoreShaFiles)
-        filteredList = filterDbShafiles(actualFiles);
+        filteredList = filterDbShafiles(fileList);
     else
-        filteredList = actualFiles;
+        filteredList = fileList;
 
     if (!extensionsList.isEmpty()) {
         filteredList = filterByExtensions(extensionsList, filteredList);
