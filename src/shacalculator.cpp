@@ -74,12 +74,12 @@ QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, c
     int filesNumber = filelist.size();
     doneSize = 0;
     totalSize = Files().filelistSize(filelist);
-
+    QString totalInfo = Files().filesNumberSizeToReadable(filesNumber, totalSize);
     canceled = false;
-
-    emit status(QString("Calculation SHA-%1 checksums for: %2").arg(shatype).arg(Files().filesNumberSizeToReadable(filesNumber, totalSize)));
+    QLocale locale (QLocale::English);
 
     for (int var = 0; var < filesNumber && !canceled; ++var) {
+        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var).arg(locale.formattedDataSize(doneSize), totalInfo));
         map[filelist.at(var)] = calcSha(filelist.at(var));
     }
 
