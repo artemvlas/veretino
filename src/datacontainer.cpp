@@ -25,7 +25,13 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
 QMap<QString,QString>& DataContainer::defineFilesAvailability()
 {
     QStringList filelist = mainData.keys();
-    QStringList actualFiles = Files().actualFileListFiltered(workDir, ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
+    QStringList actualFiles;
+    Files files (workDir);
+
+    if (!onlyExtensions.isEmpty())
+        actualFiles = files.includedOnlyFilelist(onlyExtensions);
+    else
+        actualFiles = files.actualFileListFiltered(ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
 
     foreach(const QString &i, filelist) {
 
@@ -130,6 +136,18 @@ QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, 
     }
 
     return resultMap;
+}
+
+void DataContainer::setIgnoredExtensions(const QStringList &extensions)
+{
+    ignoredExtensions = extensions;
+    onlyExtensions.clear();
+}
+
+void DataContainer::setOnlyExtensions(const QStringList &extensions)
+{
+    onlyExtensions = extensions;
+    ignoredExtensions.clear();
 }
 
 void DataContainer::setJsonFileNamePrefix(const QString &prefix)

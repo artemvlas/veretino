@@ -29,31 +29,45 @@ void Manager::connections()
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 {
-    Files F;
+    Files F (folderPath);
     DataContainer calcData (folderPath);
-
-    // to disable ignoring db (*.ver.json) or *.shaX files: F.ignoreDbFiles = false; F.ignoreShaFiles = false; to enable '= true' | 'true' is default in Files()
-    if (settings["ignoreDbFiles"].isValid())
-        F.ignoreDbFiles = settings["ignoreDbFiles"].toBool();
-    if (settings["ignoreShaFiles"].isValid())
-        F.ignoreShaFiles = settings["ignoreShaFiles"].toBool();
-
-    if (settings["extensions"].isValid() && !settings["extensions"].isNull()) {
-        calcData.ignoredExtensions = settings["extensions"].toStringList();
-    }
+    QStringList fileList;
 
     if (settings["dbPrefix"].isValid()) {
         calcData.setJsonFileNamePrefix(settings["dbPrefix"].toString());
     }
 
-    QStringList fileList = F.actualFileListFiltered(folderPath, calcData.ignoredExtensions); //list of files except ignored
+    if (settings["onlyExtensions"].isValid() && !settings["onlyExtensions"].toStringList().isEmpty()) {
+        calcData.setOnlyExtensions(settings["onlyExtensions"].toStringList());
+        fileList = F.includedOnlyFilelist(calcData.onlyExtensions);
+    }
+    else {
+        // to disable ignoring db (*.ver.json) or *.shaX files: F.ignoreDbFiles = false; F.ignoreShaFiles = false; to enable '= true' | 'true' is default in Files()
+        if (settings["ignoreDbFiles"].isValid())
+            F.ignoreDbFiles = settings["ignoreDbFiles"].toBool();
+        if (settings["ignoreShaFiles"].isValid())
+            F.ignoreShaFiles = settings["ignoreShaFiles"].toBool();
+
+        if (settings["ignoredExtensions"].isValid() && !settings["ignoredExtensions"].toStringList().isEmpty()) {
+            calcData.setIgnoredExtensions(settings["ignoredExtensions"].toStringList());
+        }
+
+        fileList = F.actualFileListFiltered(calcData.ignoredExtensions); //list of files except ignored
+    }
 
     if(fileList.isEmpty()) {
-        emit showMessage("Empty folder. Nothing to do");
+        QString info;
+        if (!calcData.onlyExtensions.isEmpty() || !calcData.ignoredExtensions.isEmpty())
+            info = "All files have been excluded.\nFiltering rules can be changed in the settings.";
+        else
+            info = "Empty folder. Nothing to do";
+
+        emit showMessage(info);
         return;
     }
 
     emit setMode("processing");
+
     calcData.mainData = shaCalc->calcShaList(fileList, shatype);
 
     if(calcData.mainData.isEmpty()) {
@@ -149,10 +163,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     QString newFilesInfo;
 
     if (curData->newFilesNumber > 0) {
-        QString s; // if only 1 file - text is "file", if more - text is "files"
-        if (curData->newFiles.size() > 1)
-            s = "s";
-        newFilesInfo = QString("New: %1 file%2, %3").arg(curData->newFilesNumber).arg(s, QLocale().formattedDataSize(Files().filelistSize(curData->newFiles)));
+        newFilesInfo = "New: " + Files().filelistContentStatus(curData->newFiles);
     }
     else
         newFilesInfo = "New files: 0";
@@ -160,6 +171,9 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     QString filters;
     if (!curData->ignoredExtensions.isEmpty()) {
         filters = QString("\nIgnored: %1").arg(curData->ignoredExtensions.join(", "));
+    }
+    else if (!curData->onlyExtensions.isEmpty()) {
+        filters = QString("\nIncluded Only: %1").arg(curData->onlyExtensions.join(", "));
     }
 
     emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nStored paths: %5\n%6\nLost files: %7%8")
@@ -411,6 +425,7 @@ int Manager::shaStrLen(const int &shatype)
 void Manager::getSettings(const QVariantMap &settingsMap)
 {
     settings = settingsMap;
+    qDebug() << "Manager::getSettings | " << settings;
 }
 
 void Manager::deleteCurData()

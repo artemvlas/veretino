@@ -71,22 +71,26 @@ QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, c
         setShaType(shatype);
 
     QMap<QString,QString> map;
-
+    int filesNumber = filelist.size();
     doneSize = 0;
     totalSize = Files().filelistSize(filelist);
 
     canceled = false;
 
-    for (int var = 0; var < filelist.size() && !canceled; ++var) {
+    emit status(QString("Calculation SHA-%1 checksums for: %2").arg(shatype).arg(Files().filesNumberSizeToReadable(filesNumber, totalSize)));
+
+    for (int var = 0; var < filesNumber && !canceled; ++var) {
         map[filelist.at(var)] = calcSha(filelist.at(var));
     }
 
     if(canceled) {
         qDebug()<<"ShaCalculator::calcShaList | Canceled";
+        emit status("Canceled");
         return QMap<QString,QString> ();
     }
     else {
         //emit resultReady(map);
+        emit status("Done");
         return map;
     }
 }

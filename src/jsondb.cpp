@@ -112,10 +112,14 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     if (!data->ignoredExtensions.isEmpty()) {
         header["Ignored"] = data->ignoredExtensions.join(" ");
     }
+    else if (!data->onlyExtensions.isEmpty()) {
+        header["Included Only"] = data->onlyExtensions.join(" ");
+    }
 
     mainArray.append(header);
     mainArray.append(computedData);
-    mainArray.append(excludedFiles);
+    if (!excludedFiles.isEmpty())
+        mainArray.append(excludedFiles);
 
     doc.setArray(mainArray);
 
@@ -150,8 +154,12 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     DataContainer *data = new DataContainer(filePath);
 
     if (header.contains("Ignored")) {
-        data->ignoredExtensions = header["Ignored"].toString().split(" ");
+        data->setIgnoredExtensions(header["Ignored"].toString().split(" "));
         qDebug()<< "jsonDB::parseJson | ignoredExtensions:" << data->ignoredExtensions;
+    }
+    else if (header.contains("Included Only")) {
+        data->setOnlyExtensions(header["Included Only"].toString().split(" "));
+        qDebug()<< "jsonDB::parseJson | Included Only:" << data->onlyExtensions;
     }
 
     foreach (const QString &file, filelistData.keys()) {

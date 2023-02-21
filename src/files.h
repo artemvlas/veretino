@@ -12,14 +12,17 @@ public:
     bool ignoreDbFiles;
     bool ignoreShaFiles;
 
-    QStringList actualFileList(const QString &folder = QString());
+    QStringList& actualFileList(const QString &folder = QString());
     qint64 filelistSize(const QStringList &filelist);
-    QStringList actualFileListFiltered(const QString &folder = QString(), const QStringList &extensionsList = QStringList());
+    QStringList actualFileListFiltered(const QStringList &extensionsList = QStringList(), const QString &folder = QString());
     QStringList filterDbShafiles(const QStringList &filelist);// filtering *.fcc.json or/and *.sha1/256/512 files from filelist
     QStringList filterByExtensions(const QStringList &extensionsList, const QStringList &filelist = QStringList());
+    QStringList includedOnlyFilelist(const QStringList &extensionsList, const QString &folder = QString()); // actual filelist with only listed extensions included
     int filesNumber(const QString &folder = QString());
     qint64 folderSize(const QString &folder = QString());
     QString folderContentStatus(const QString &folder = QString());
+    QString filelistContentStatus(const QStringList &filelist);
+    QString filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize);
 
     QString filePath;
     QString folderPath;

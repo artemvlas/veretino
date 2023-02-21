@@ -175,6 +175,9 @@
     <property name="text">
      <string>Ignore</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QRadioButton" name="radioButtonOnly">
     <property name="geometry">

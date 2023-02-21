@@ -17,11 +17,31 @@ Files::Files(const QString &path, QObject *parent)
     ignoreShaFiles = true;
 }
 
+QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize)
+{
+    char s = char(); // if only 1 file - text is "file", if more - text is "files"
+    if (filesNumber > 1)
+        s = 's';
+
+    QString text = QString("%1 file%2 * %3").arg(filesNumber).arg(s).arg(QLocale().formattedDataSize(filesSize));
+
+    return text;
+}
+
+QString Files::filelistContentStatus(const QStringList &filelist)
+{
+    int filesNumber = filelist.size();
+    qint64 filesSize = filelistSize(filelist);
+
+    return filesNumberSizeToReadable(filesNumber, filesSize);
+}
+
 QString Files::folderContentStatus(const QString &folder)
 {
     if (folder != nullptr)
         folderPath = folder;
-    QStringList filelist = actualFileList(folderPath);
+
+    QStringList filelist = actualFileList();
     qint64 folderSize = filelistSize(filelist);
     QString text = QString("%1: %2 files * %3").arg(QDir(folderPath).dirName()).arg(filelist.size()).arg(QLocale().formattedDataSize(folderSize));
 
@@ -61,7 +81,7 @@ QStringList Files::filterByExtensions(const QStringList &extensionsList, const Q
     return filteredFiles;
 }
 
-QStringList Files::actualFileListFiltered(const QString &folder, const QStringList &extensionsList)
+QStringList Files::actualFileListFiltered(const QStringList &extensionsList, const QString &folder)
 {
     if (folder != nullptr)
         folderPath = folder;
@@ -86,7 +106,26 @@ QStringList Files::actualFileListFiltered(const QString &folder, const QStringLi
     return filteredList;
 }
 
-QStringList Files::actualFileList(const QString &folder)
+// actual filelist with only listed extensions included
+QStringList Files::includedOnlyFilelist(const QStringList &extensionsList, const QString &folder)
+{
+    if (folder != nullptr)
+        folderPath = folder;
+
+    if (fileList.isEmpty())
+        actualFileList();
+
+    QStringList resultList; //result filelist
+
+    foreach (const QString &file, fileList) {
+        if(extensionsList.contains(QFileInfo(file).suffix().toLower()))
+            resultList.append(file);
+    }
+
+    return resultList;
+}
+
+QStringList& Files::actualFileList(const QString &folder)
 {
     if (folder != nullptr)
         folderPath = folder;

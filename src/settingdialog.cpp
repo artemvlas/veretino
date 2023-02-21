@@ -9,7 +9,8 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(440,300);
     this->setWindowIcon(QIcon(":/veretino.png"));
-    ui->radioButtonIgnore->setChecked(true);
+
+    connect(ui->radioButtonOnly, &QRadioButton::toggled, this, [=](const bool &disable){ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
 
     settings = settingsMap;
 
@@ -21,8 +22,14 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     else if (shaType == 512)
         ui->rbSha512->setChecked(true);
 
-    if(settings["extensions"].isValid())
-        ui->inputExtensions->setText(settings["extensions"].toStringList().join(" "));
+    if (settings["ignoredExtensions"].isValid() && !settings["ignoredExtensions"].toStringList().isEmpty()) {
+        ui->inputExtensions->setText(settings["ignoredExtensions"].toStringList().join(" "));
+        ui->radioButtonIgnore->setChecked(true);
+    }
+    else if (settings["onlyExtensions"].isValid() && !settings["onlyExtensions"].toStringList().isEmpty()) {
+        ui->inputExtensions->setText(settings["onlyExtensions"].toStringList().join(" "));
+        ui->radioButtonOnly->setChecked(true);
+    }
 
     if(settings["ignoreDbFiles"].isValid()) {
         ui->ignoreDbFiles->setChecked(settings["ignoreDbFiles"].toBool());
@@ -61,14 +68,25 @@ QVariantMap settingDialog::getSettings()
 
         QStringList ext = ignoreExtensions.split(" ");
         ext.removeDuplicates();
-        settings["extensions"] = ext;
-    }
-    else
-        settings["extensions"] = QStringList();
 
+        if (ui->radioButtonIgnore->isChecked()) {
+            settings["ignoredExtensions"] = ext;
+            settings["onlyExtensions"] = QStringList();;
+        }
+        else if (ui->radioButtonOnly->isChecked()) {
+            settings["onlyExtensions"] = ext;
+            settings["ignoredExtensions"] = QStringList();;
+        }
+    }
+    else {
+        settings["ignoredExtensions"] = QStringList();
+        settings["onlyExtensions"] = QStringList();
+    }
 
     settings["ignoreDbFiles"] = ui->ignoreDbFiles->isChecked();
     settings["ignoreShaFiles"] = ui->ignoreShaFiles->isChecked();
+
+    //qDebug()<< "settingDialog::getSettings() | " << settings;
 
     return settings;
 }

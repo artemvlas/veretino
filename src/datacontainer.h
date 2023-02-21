@@ -25,6 +25,7 @@ public:
     QString jsonFilePath;
     QString workDir; // current working folder with '/': /home/user/dataFolder/
     QStringList ignoredExtensions;
+    QStringList onlyExtensions;
     int dbShaType = 0; // 1 or 256 or 512: from json database header or by checksum lenght
     QString lastUpdate; // from "Updated" value of first json object (from header)
     QString storedDataSize; // total size of listed files when db was built
@@ -45,6 +46,8 @@ public:
     QMap<QString,QString> updateMainData(const QMap<QString,QString> &listFilesChecksums, const QString &info = "added to DB"); // add calculated checksums to mainData, returns the list of changes
 
     void setJsonFileNamePrefix(const QString &prefix);
+    void setIgnoredExtensions(const QStringList &extensions); // assigns ignoredExtensions, cleares onlyExtensions
+    void setOnlyExtensions(const QStringList &extensions); // assigns onlyExtensions, cleares ignoredExtensions
 };
 
 #endif // DATACONTAINER_H
