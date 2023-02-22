@@ -144,7 +144,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     }
 
     if (curData == nullptr) {
-        emit showMessage(QString("%1\n\nThe database doesn't contain checksums. Probably all files have been ignored or deleted.")
+        emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
                          .arg(QFileInfo(jsonFilePath).fileName()), "Empty Database!");
         return;
     }

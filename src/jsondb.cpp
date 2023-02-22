@@ -48,7 +48,7 @@ QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
 
     if(readJsonFile(filePath).isArray()) {
         QJsonArray dataArray = readJsonFile(filePath).array();
-        if(dataArray.size() >= 2 || dataArray[0].isObject() || dataArray[1].isObject())
+        if(dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
             return readJsonFile(filePath).array();
         else {
             emit showMessage("Corrupted Json/Database", "Error");
@@ -101,7 +101,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     int shatype = shatypeByLen(computedData.begin().value().toString().size());
 
     QLocale locale (QLocale::English);
-    header["Created with"] = "Veretino 0.1.0 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino 0.1.1 https://github.com/artemvlas/veretino";
     header["Files number"] = computedData.size();
     header["Folder"] = dir.dirName();
     header["SHA type"] = QString("SHA-%1").arg(shatype);
