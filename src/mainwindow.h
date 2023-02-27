@@ -50,7 +50,7 @@ private slots:
     void showMessage(const QString &message, const QString &title = "Info");
 
 signals:
-    void getFInfo(const QString &path); //get file size or folder size and number of files
+    void getItemInfo(const QString &path); //get file size or folder contents info
     void processFolderSha(const QString &path, const int &shatype = 0);
     void processFileSha(const QString &path, const int &shatype = 0);
     void parseJsonFile(const QString &path);
@@ -63,5 +63,6 @@ signals:
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
     void showNewLostOnly();
+    void dbItemContents(const QString &itemPath);
 };
 #endif // MAINWINDOW_H

@@ -127,6 +127,77 @@ QMap<QString,QString> DataContainer::updateMainData(const QMap<QString,QString> 
     }
 }
 
+QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolder)
+{
+    QMap<QString, QString> content;
+    QMapIterator<QString,QString> iter (filesAvailability);
+    bool isRelEnd = false; // is Relative End; QMap is sorted by key, so there is no point in itering to the end.
+
+    while (iter.hasNext() && !isRelEnd) {
+        iter.next();
+        if (iter.key().startsWith(rootFolder))
+            content.insert(iter.key(), iter.value());
+        else if (!content.isEmpty()) {
+            isRelEnd = true;
+        }
+    }
+
+    return content;
+}
+
+QString DataContainer::itemContentsInfo(const QString &itemPath)
+{
+    QString fullPath = workDir + itemPath;
+    QFileInfo fInf (fullPath);
+    if (fInf.isFile())
+        return Files(fullPath).fileNameSize();
+    else if (fInf.isDir()) {
+        QMap<QString, QString> content = listFolderContents(fullPath);
+        QMapIterator<QString,QString> iterContent (content);
+        QStringList ondisk;
+        QStringList lost;
+        QStringList newfiles;
+
+        while (iterContent.hasNext()) {
+            iterContent.next();
+            if (iterContent.value() == "on Disk") {
+                ondisk.append(iterContent.key());
+            }
+            else if (iterContent.value() == "LOST file") {
+                lost.append(iterContent.key());
+            }
+            else if (iterContent.value() == "NEW file") {
+                newfiles.append(iterContent.key());
+            }
+            else
+                qDebug()<< "DataContainer::itemContents | Ambiguous item: " << iterContent.key();
+        }
+
+        QString text;
+        if (ondisk.size() > 0) {
+            text = "on Disk: " + Files().filelistContentStatus(ondisk);
+        }
+
+        if (lost.size() > 0) {
+            QString pre;
+            if (ondisk.size() > 0)
+                pre = "; ";
+            text.append(QString("%1Lost files: %2").arg(pre).arg(lost.size()));
+        }
+
+        if (newfiles.size() > 0) {
+            QString pre;
+            if (ondisk.size() > 0 || lost.size() > 0)
+                pre = "; ";
+            text.append(QString("%1New: %2").arg(pre, Files().filelistContentStatus(newfiles)));
+        }
+
+        return text;
+    }
+    else
+        return "The item actually not on a disk";
+}
+
 QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, const QString &value)
 {
     QMap<QString,QString> resultMap;

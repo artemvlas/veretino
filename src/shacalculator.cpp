@@ -55,11 +55,18 @@ QString ShaCalculator::calcShaFile (const QString &filePath, const int &shatype)
         setShaType(shatype);
 
     doneSize = 0;
-    totalSize = QFileInfo(filePath).size();
+    QFileInfo fileInfo (filePath);
+    totalSize = fileInfo.size();
 
     canceled = false;
+
+    emit status(QString("Calculation SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).fileNameSize()));
     QString sum = calcSha(filePath);
-    //emit status(QString("SHA-%1: %2").arg(shatype).arg(sum));
+
+    if(canceled)
+        emit status("Canceled");
+    else
+        emit status(QString("SHA-%1 calculated").arg(shatype));
 
     return sum;
 }

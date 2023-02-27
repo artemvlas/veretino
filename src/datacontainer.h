@@ -48,6 +48,9 @@ public:
     void setJsonFileNamePrefix(const QString &prefix);
     void setIgnoredExtensions(const QStringList &extensions); // assigns ignoredExtensions, cleares onlyExtensions
     void setOnlyExtensions(const QStringList &extensions); // assigns onlyExtensions, cleares ignoredExtensions
+
+    QString itemContentsInfo(const QString &itemPath); // info about Model item (created with mainData), if file - file info, if folder - folder contents (availability, size etc.)
+    QMap<QString,QString> listFolderContents(const QString &rootFolder); // returns a list of files and their availability info in the specified folder from the database
 };
 
 #endif // DATACONTAINER_H

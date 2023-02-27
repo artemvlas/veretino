@@ -25,13 +25,14 @@ private:
     QMap<QString,QString> toRelativePathsMap (const QMap<QString,QString> &filesMap, const QString &relativeFolder); // converting paths (keys) from full to relative
     QStringList toRelativePathsList (const QStringList &filelist, const QString &relativeFolder); // converting paths from full to relative
     void setMode_model(); //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
+    bool isViewFileSysytem;
 
 public slots:
     void processFolderSha(const QString &folderPath, const int &shatype);
     void processFileSha(const QString &filePath, const int &shatype);
     void checkFileSummary(const QString &path); // path to *.sha1/256/512 summary file
     void checkCurrentItemSum(const QString &path); //check only selected file instead all database cheking
-    void getFInfo(const QString &path); // info about folder (number of files and total size) or file (size)
+    void getItemInfo(const QString &path); // info about folder contents or file (size)
     void makeJsonModel(const QString &jsonFilePath); //making tree model | file paths : info about current availability on disk
     void verifyFileList(); //checking the list of files against the checksums stored in the database
     void updateNewLost(); //remove lost files, add new files
@@ -40,6 +41,8 @@ public slots:
     void resetDatabase(); // reopening and reparsing current database
     void showNewLostOnly();
     void deleteCurData();
+    void isViewFS(const bool isFS);
+    void aboutDb(); // show message with info about parsed DB
 
 signals:
     void status(const QString &text); //text to statusbar

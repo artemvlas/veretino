@@ -44,11 +44,10 @@ void MainWindow::connections()
     connect(this, &MainWindow::cancelProcess, [this]{setMode("endProcess");});
 
     //TreeView
-    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onCustomContextMenu(QPoint)));
-    connect(ui->treeView, &View::pathChanged, ui->lineEdit, &QLineEdit::setText);
-    connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; if(ui->treeView->isViewFileSystem()) emit getFInfo(path);});
+    connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
+    connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; ui->lineEdit->setText(path); if (viewMode != "processing") emit getItemInfo(path);});
     connect(ui->treeView, &View::setMode, this, &MainWindow::setMode);
-    connect(ui->treeView, &View::modelChanged, this, [=]{if(ui->treeView->isViewFileSystem()) ui->lineEdit->setEnabled(true); else ui->lineEdit->setDisabled(true);});
+    connect(ui->treeView, &View::modelChanged, ui->lineEdit, &QLineEdit::setEnabled);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::doubleClicked, this, [=]{if(viewMode == "db") emit parseJsonFile(curPath); else if (viewMode == "sum") emit checkFileSummary(curPath);});
 
@@ -83,7 +82,6 @@ void MainWindow::connectManager()
     connect(this, SIGNAL(parseJsonFile(QString)), manager, SLOT(makeJsonModel(QString)));
     connect(this, SIGNAL(processFolderSha(QString,int)), manager, SLOT(processFolderSha(QString,int)));
     connect(this, SIGNAL(processFileSha(QString,int)), manager, SLOT(processFileSha(QString,int)));
-    connect(this, SIGNAL(getFInfo(QString)), manager, SLOT(getFInfo(QString)));
     connect(this, SIGNAL(verifyFileList()), manager, SLOT(verifyFileList()));
     connect(this, SIGNAL(updateNewLost()), manager, SLOT(updateNewLost()));
     connect(this, SIGNAL(updateMismatch()), manager, SLOT(updateMismatch()));
@@ -95,7 +93,8 @@ void MainWindow::connectManager()
 
     //info and notifications
     connect(manager, SIGNAL(status(QString)), ui->statusbar, SLOT(showMessage(QString)));
-    connect(manager,SIGNAL(showMessage(QString,QString)),this,SLOT(showMessage(QString,QString)));
+    connect(manager, SIGNAL(showMessage(QString,QString)), this, SLOT(showMessage(QString,QString)));
+    connect(this, SIGNAL(getItemInfo(QString)), manager, SLOT(getItemInfo(QString)));
 
     //results processing
     connect(manager, &Manager::completeTreeModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
@@ -113,6 +112,7 @@ void MainWindow::connectManager()
     // change view
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
+    connect(ui->treeView, &View::modelChanged, manager, &Manager::isViewFS);
 
     // cleanup
     connect(ui->treeView, &View::fsModel_Setted, manager, &Manager::deleteCurData);

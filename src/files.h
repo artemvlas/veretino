@@ -23,7 +23,7 @@ public:
     QString folderContentStatus(const QString &folder = QString());
     QString filelistContentStatus(const QStringList &filelist);
     QString filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize);
-
+    QString fileNameSize(const QString &path = QString()); // returns "filename (readable size)"
     QString filePath;
     QString folderPath;
     QStringList fileList;

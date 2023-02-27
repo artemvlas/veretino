@@ -52,9 +52,12 @@ void View::smartSetModel(QAbstractItemModel *model)
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index){emit pathChanged(indexToPath(index)); currentIndex = index;});
 
-    emit modelChanged();
-
-    if(!isViewFileSystem()) {
+    // send signal when Model has been changed, FileSystem = true, else = false;
+    if(isViewFileSystem()) {
+        emit modelChanged(true);
+    }
+    else {
+        emit modelChanged(false);
         this->expandAll();
         this->scrollToTop();
     }

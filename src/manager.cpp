@@ -131,7 +131,7 @@ void Manager::resetDatabase()
 void Manager::makeJsonModel(const QString &jsonFilePath)
 {
     if(!jsonFilePath.endsWith(".ver.json")) {
-        emit showMessage("Expected file extension '*.ver.json'", "Wrong DB file!");
+        emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver.json'").arg(jsonFilePath), "Wrong DB file!");
         return;
     }
 
@@ -153,7 +153,11 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     makeTreeModel(curData->defineFilesAvailability());
 
     setMode_model();
+    aboutDb();
+}
 
+void Manager::aboutDb()
+{
     QString tipText;
 
     if (curData->newFilesNumber > 0 || curData->lostFilesNumber > 0) {
@@ -176,8 +180,17 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         filters = QString("\nIncluded Only: %1").arg(curData->onlyExtensions.join(", "));
     }
 
-    emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nStored paths: %5\n%6\nLost files: %7%8")
-                     .arg(curData->dbShaType).arg(filters, curData->storedDataSize, curData->lastUpdate).arg(curData->mainData.size()).arg(newFilesInfo).arg(curData->lostFilesNumber).arg(tipText), "Database parsed");
+    int filesAvailabilityNumber = curData->filesAvailability.size();
+    int storedPathsNumber = curData->mainData.size();
+
+    QString storedPathsInfo;
+    if (filesAvailabilityNumber != storedPathsNumber) {
+        storedPathsInfo = QString("Stored paths: %1\n").arg(storedPathsNumber);
+    }
+
+    emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
+                     .arg(curData->dbShaType).arg(filters, curData->storedDataSize, curData->lastUpdate).arg(filesAvailabilityNumber)
+                     .arg(storedPathsInfo, newFilesInfo).arg(curData->lostFilesNumber).arg(tipText), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
@@ -354,25 +367,35 @@ void Manager::checkCurrentItemSum(const QString &path)
 }
 
 // info about folder (number of files and total size) or file (size)
-void Manager::getFInfo(const QString &path)
+void Manager::getItemInfo(const QString &path)
 {
-    emit status("Counting...");
+    if (isViewFileSysytem) {
+        emit status("Counting...");
 
-    QString text;
-    QFileInfo f (path);
-    if(f.isDir())
-         text = Files(path).folderContentStatus();
-    else if(f.isFile())
-        text = QString("%1 (%2)").arg(f.fileName(), QLocale().formattedDataSize(f.size()));
+        QString text;
+        QFileInfo f (path);
+        if(f.isDir())
+             text = Files(path).folderContentStatus();
+        else if(f.isFile())
+            text = Files(path).fileNameSize();
 
-    emit status(text);
+        emit status(text);
+    }
+    else
+        emit status(curData->itemContentsInfo(path));
+}
+
+void Manager::isViewFS(const bool isFS)
+{
+    isViewFileSysytem = isFS;
+    qDebug()<<"Manager::isViewFS"<<isViewFileSysytem;
 }
 
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
 void Manager::setMode_model()
 {
     if (curData->newFiles.size() > 0 || curData->lostFiles.size() > 0) {
-        emit status(QString("SHA-%1: %2 new files, %3 lost files | Total files listed: %4").arg(curData->dbShaType).arg(curData->newFiles.size()).arg(curData->lostFiles.size()).arg(curData->filesAvailability.size()));
+        //emit status(QString("SHA-%1: %2 new files, %3 lost files | Total files listed: %4").arg(curData->dbShaType).arg(curData->newFiles.size()).arg(curData->lostFiles.size()).arg(curData->filesAvailability.size()));
         emit setMode("modelNewLost");
     }
     else {
