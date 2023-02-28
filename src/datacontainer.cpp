@@ -131,14 +131,13 @@ QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolde
 {
     QMap<QString, QString> content;
     QMapIterator<QString,QString> iter (filesAvailability);
-    bool isRelEnd = false; // is Relative End; QMap is sorted by key, so there is no point in itering to the end.
 
-    while (iter.hasNext() && !isRelEnd) {
+    while (iter.hasNext()) {
         iter.next();
         if (iter.key().startsWith(rootFolder))
             content.insert(iter.key(), iter.value());
         else if (!content.isEmpty()) {
-            isRelEnd = true;
+            break; // is Relative End; QMap is sorted by key, so there is no point in itering to the real end.
         }
     }
 

@@ -80,9 +80,9 @@ QStringList Files::filterDbShafiles(const QStringList &filelist)
 QStringList Files::filterByExtensions(const QStringList &extensionsList, const QStringList &filelist)
 {
     if (filelist != QStringList())
-        fileList = filelist;
+        actualFiles = filelist;
 
-    foreach (const QString &file, fileList) {
+    foreach (const QString &file, actualFiles) {
         if(!extensionsList.contains(QFileInfo(file).suffix().toLower()))
             filteredFiles.append(file);
     }
@@ -95,15 +95,15 @@ QStringList Files::actualFileListFiltered(const QStringList &extensionsList, con
     if (folder != nullptr)
         folderPath = folder;
 
-    if (fileList.isEmpty())
+    if (actualFiles.isEmpty())
         actualFileList(); // fill 'fileList' with all files in current folder
 
     QStringList filteredList; //result filelist
 
     if (ignoreDbFiles || ignoreShaFiles)
-        filteredList = filterDbShafiles(fileList);
+        filteredList = filterDbShafiles(actualFiles);
     else
-        filteredList = fileList;
+        filteredList = actualFiles;
 
     if (!extensionsList.isEmpty()) {
         filteredList = filterByExtensions(extensionsList, filteredList);
@@ -119,12 +119,12 @@ QStringList Files::includedOnlyFilelist(const QStringList &extensionsList, const
     if (folder != nullptr)
         folderPath = folder;
 
-    if (fileList.isEmpty())
+    if (actualFiles.isEmpty())
         actualFileList();
 
     QStringList resultList; //result filelist
 
-    foreach (const QString &file, fileList) {
+    foreach (const QString &file, actualFiles) {
         if(extensionsList.contains(QFileInfo(file).suffix().toLower()))
             resultList.append(file);
     }
@@ -139,10 +139,10 @@ QStringList& Files::actualFileList(const QString &folder)
 
     QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext())
-        fileList.append(it.next());
+        actualFiles.append(it.next());
 
-    //emit completeList(fileList);
-    return fileList;
+    //emit completeList(actualFiles);
+    return actualFiles;
 }
 
 qint64 Files::filelistSize(const QStringList &filelist)

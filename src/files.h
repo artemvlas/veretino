@@ -26,7 +26,8 @@ public:
     QString fileNameSize(const QString &path = QString()); // returns "filename (readable size)"
     QString filePath;
     QString folderPath;
-    QStringList fileList;
+    //QStringList fileList;
+    QStringList actualFiles; // all files contained in the folder and its subfolders
     QStringList filteredFiles; // list of filtered files created by filterByExtensions() function
 
 public slots:
