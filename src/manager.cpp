@@ -153,44 +153,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
     makeTreeModel(curData->defineFilesAvailability());
 
     setMode_model();
-    aboutDb();
-}
-
-void Manager::aboutDb()
-{
-    QString tipText;
-
-    if (curData->newFilesNumber > 0 || curData->lostFilesNumber > 0) {
-        tipText = "\n\nUse context menu for more options";
-    }
-
-    QString newFilesInfo;
-
-    if (curData->newFilesNumber > 0) {
-        newFilesInfo = "New: " + Files().filelistContentStatus(curData->newFiles);
-    }
-    else
-        newFilesInfo = "New files: 0";
-
-    QString filters;
-    if (!curData->ignoredExtensions.isEmpty()) {
-        filters = QString("\nIgnored: %1").arg(curData->ignoredExtensions.join(", "));
-    }
-    else if (!curData->onlyExtensions.isEmpty()) {
-        filters = QString("\nIncluded Only: %1").arg(curData->onlyExtensions.join(", "));
-    }
-
-    int filesAvailabilityNumber = curData->filesAvailability.size();
-    int storedPathsNumber = curData->mainData.size();
-
-    QString storedPathsInfo;
-    if (filesAvailabilityNumber != storedPathsNumber) {
-        storedPathsInfo = QString("Stored paths: %1\n").arg(storedPathsNumber);
-    }
-
-    emit showMessage(QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
-                     .arg(curData->dbShaType).arg(filters, curData->storedDataSize, curData->lastUpdate).arg(filesAvailabilityNumber)
-                     .arg(storedPathsInfo, newFilesInfo).arg(curData->lostFilesNumber).arg(tipText), "Database parsed");
+    emit showMessage(curData->aboutDb(), "Database parsed");
 }
 
 void Manager::showNewLostOnly()

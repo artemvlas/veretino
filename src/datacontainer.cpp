@@ -198,6 +198,42 @@ QString DataContainer::itemContentsInfo(const QString &itemPath)
         return "The item actually not on a disk";
 }
 
+QString DataContainer::aboutDb()
+{
+    QString tipText;
+
+    if (newFilesNumber > 0 || lostFilesNumber > 0) {
+        tipText = "\n\nUse context menu for more options";
+    }
+
+    QString newFilesInfo;
+
+    if (newFilesNumber > 0) {
+        newFilesInfo = "New: " + Files().filelistContentStatus(newFiles);
+    }
+    else
+        newFilesInfo = "New files: 0";
+
+    QString filters;
+    if (!ignoredExtensions.isEmpty()) {
+        filters = QString("\nIgnored: %1").arg(ignoredExtensions.join(", "));
+    }
+    else if (!onlyExtensions.isEmpty()) {
+        filters = QString("\nIncluded Only: %1").arg(onlyExtensions.join(", "));
+    }
+
+    int filesAvailabilityNumber = filesAvailability.size();
+    int storedPathsNumber = mainData.size();
+
+    QString storedPathsInfo;
+    if (filesAvailabilityNumber != storedPathsNumber) {
+        storedPathsInfo = QString("Stored paths: %1\n").arg(storedPathsNumber);
+    }
+
+    return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
+        .arg(dbShaType).arg(filters, storedDataSize, lastUpdate).arg(filesAvailabilityNumber).arg(storedPathsInfo, newFilesInfo).arg(lostFilesNumber).arg(tipText);
+}
+
 QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, const QString &value)
 {
     QMap<QString,QString> resultMap;

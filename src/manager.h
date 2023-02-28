@@ -42,7 +42,6 @@ public slots:
     void showNewLostOnly();
     void deleteCurData();
     void isViewFS(const bool isFS);
-    void aboutDb(); // show message with info about parsed DB
 
 signals:
     void status(const QString &text); //text to statusbar
