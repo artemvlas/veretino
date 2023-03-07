@@ -12,6 +12,7 @@ public:
     bool isViewFileSystem(); //"true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
     QString indexToPath(const QModelIndex &index); //build path by current index data
     void pathAnalyzer(const QString &path);
+    QString workDir;
 
 public slots:
     void setFileSystemModel();

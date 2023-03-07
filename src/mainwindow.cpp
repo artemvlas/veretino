@@ -100,6 +100,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::completeTreeModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
     connect(manager, &Manager::resetView, ui->treeView, &View::setFileSystemModel);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
+    connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
 
     //process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
@@ -173,8 +174,10 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             }
 
             if (viewMode == "model" || viewMode == "modelNewLost") {
-                if (index.isValid())
-                    contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
+                if (index.isValid()) {
+                    if (QFileInfo(ui->treeView->workDir + curPath).isFile())
+                        contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
+                }
 
                 contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);
             }

@@ -116,6 +116,7 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
         model->populateMap(toRelativePathsMap(map, curData->workDir));
 
         emit completeTreeModel(model);
+        emit workDirChanged(curData->workDir);
         emit status(QString("SHA-%1: %2 files").arg(curData->dbShaType).arg(map.size()));
     }
     else
