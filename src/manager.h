@@ -42,6 +42,7 @@ public slots:
     void showNewLostOnly();
     void deleteCurData();
     void isViewFS(const bool isFS);
+    void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
 
 signals:
     void status(const QString &text); //text to statusbar

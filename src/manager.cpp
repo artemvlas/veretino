@@ -349,6 +349,16 @@ void Manager::getItemInfo(const QString &path)
         emit status(curData->itemContentsInfo(path));
 }
 
+void Manager::folderContentsByType(const QString &folderPath)
+{
+    if (isViewFileSysytem) {
+        emit showMessage(Files(folderPath).folderContentsByType(), QString("Contents of: %1").arg(QFileInfo(folderPath).baseName()));
+    }
+    else {
+        qDebug()<< "Manager::folderContentsByType | Not a filesystem view";
+    }
+}
+
 void Manager::isViewFS(const bool isFS)
 {
     isViewFileSysytem = isFS;

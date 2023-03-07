@@ -57,6 +57,40 @@ QString Files::folderContentStatus(const QString &folder)
     return text;
 }
 
+QString Files::folderContentsByType(const QString &folder)
+{
+    if (folder != nullptr)
+        folderPath = folder;
+
+    if (actualFiles.isEmpty())
+        actualFileList();
+
+    QString text;
+
+    if (actualFiles.size() > 0) {
+        QMap<QString,QStringList> lists; // key = extension, value = list of files with that extension
+
+        foreach (const QString &file, actualFiles) {
+            QString ext = QFileInfo(file).suffix().toLower();
+            if (ext == "")
+                ext = "No type";
+            lists[ext].append(file);
+        }
+
+        if (lists.size() < 30) {
+            foreach (const QString &extension, lists.keys()) {
+                text.append(QString("%1: %2\n").arg(extension, filelistContentStatus(lists[extension])));
+            }
+        }
+        else
+            text = "Too many extensions!";
+    }
+    else
+        text = "Empty folder";
+
+    return text;
+}
+
 // filtering *.ver.json or/and *.sha1/256/512 files from filelist
 QStringList Files::filterDbShafiles(const QStringList &filelist)
 {

@@ -64,5 +64,6 @@ signals:
     void resetDatabase(); // reopening and reparsing current database
     void showNewLostOnly();
     void dbItemContents(const QString &itemPath);
+    void folderContentsByType(const QString &folderPath);
 };
 #endif // MAINWINDOW_H

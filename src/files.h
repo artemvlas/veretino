@@ -29,6 +29,7 @@ public:
     //QStringList fileList;
     QStringList actualFiles; // all files contained in the folder and its subfolders
     QStringList filteredFiles; // list of filtered files created by filterByExtensions() function
+    QString folderContentsByType(const QString &folder = QString());
 
 public slots:
     void processFileList(const QString &rootFolder);

@@ -95,6 +95,7 @@ void MainWindow::connectManager()
     connect(manager, SIGNAL(status(QString)), ui->statusbar, SLOT(showMessage(QString)));
     connect(manager, SIGNAL(showMessage(QString,QString)), this, SLOT(showMessage(QString,QString)));
     connect(this, SIGNAL(getItemInfo(QString)), manager, SLOT(getItemInfo(QString)));
+    connect(this, SIGNAL(folderContentsByType(QString)), manager, SLOT(folderContentsByType(QString)));
 
     //results processing
     connect(manager, &Manager::completeTreeModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
@@ -138,8 +139,11 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
         else if (index.isValid()) {
 
-            if (viewMode == "folder")
+            if (viewMode == "folder") {
+                contextMenu->addAction("Folder Contents By Type", this, [=]{folderContentsByType(path);});
+                contextMenu->addSeparator();
                 contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings["shaType"].toInt()), this, [=]{processFolderSha(path, settings["shaType"].toInt());});
+            }
             else if (viewMode == "file") {
                 contextMenu->addAction("Compute SHA-1 for file", this, [=]{processFileSha(path,1);});
                 contextMenu->addAction("Compute SHA-256 for file", this, [=]{processFileSha(path,256);});
