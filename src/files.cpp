@@ -68,22 +68,53 @@ QString Files::folderContentsByType(const QString &folder)
     QString text;
 
     if (actualFiles.size() > 0) {
-        QMap<QString,QStringList> lists; // key = extension, value = list of files with that extension
+        QHash<QString, QStringList> listsByType; // key = extension, value = list of files with that extension
 
         foreach (const QString &file, actualFiles) {
             QString ext = QFileInfo(file).suffix().toLower();
             if (ext == "")
                 ext = "No type";
-            lists[ext].append(file);
+            listsByType[ext].append(file);
         }
 
-        if (lists.size() < 30) {
-            foreach (const QString &extension, lists.keys()) {
-                text.append(QString("%1: %2\n").arg(extension, filelistContentStatus(lists[extension])));
+        struct combinedByType {
+            QString extension;
+            QStringList filelist;
+            qint64 filesSize;
+        };
+
+        QList<combinedByType> combList;
+
+        foreach (const QString &ext, listsByType.keys()) {
+            combinedByType t;
+            t.extension = ext;
+            t.filelist = listsByType.value(ext);
+            t.filesSize = filelistSize(t.filelist);
+            combList.append(t);
+        }
+
+        std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {if (t1.filesSize > t2.filesSize) return true; else return false;});
+
+        if (combList.size() > 10) {
+            text.append(QString("Top sized file types:\n%1\n").arg(QString('-').repeated(40)));
+            qint64 excSize = 0; // total size of files whose types are not displayed
+            int excNumber = 0; // the number of these files
+            for (int var = 0; var < combList.size(); ++var) {
+                if (var < 10) {
+                    text.append(QString("%1: %2\n").arg(combList.at(var).extension, filelistContentStatus(combList.at(var).filelist)));
+                }
+                else {
+                    excSize += combList.at(var).filesSize;
+                    excNumber += combList.at(var).filelist.size();
+                }
+            }
+            text.append(QString("%1\nOther %2 types: %3").arg(QString('-').repeated(40)).arg(combList.size() - 10).arg(filesNumberSizeToReadable(excNumber, excSize)));
+        }
+        else {
+            foreach (const combinedByType &t, combList) {
+                text.append(QString("%1: %2\n").arg(t.extension, filelistContentStatus(t.filelist)));
             }
         }
-        else
-            text = "Too many extensions!";
     }
     else
         text = "Empty folder";
