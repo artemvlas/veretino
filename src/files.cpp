@@ -93,7 +93,7 @@ QString Files::folderContentsByType(const QString &folder)
             combList.append(t);
         }
 
-        std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {if (t1.filesSize > t2.filesSize) return true; else return false;});
+        std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {return (t1.filesSize > t2.filesSize);});
 
         if (combList.size() > 10) {
             text.append(QString("Top sized file types:\n%1\n").arg(QString('-').repeated(40)));
