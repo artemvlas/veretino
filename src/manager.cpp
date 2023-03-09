@@ -57,7 +57,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 
     if(fileList.isEmpty()) {
         QString info;
-        if (F.actualFiles.isEmpty())
+        if (F.actualFileList().isEmpty())
             info = "Empty folder. Nothing to do";
         else
             info = "All files have been excluded.\nFiltering rules can be changed in the settings.";
