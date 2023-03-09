@@ -33,7 +33,7 @@ QString Files::fileNameSize(const QString &path)
 QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize)
 {
     char s = char(); // if only 1 file - text is "file", if more - text is "files"
-    if (filesNumber > 1)
+    if (filesNumber != 1)
         s = 's';
 
     QString text = QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(QLocale(QLocale::English).formattedDataSize(filesSize));
