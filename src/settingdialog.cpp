@@ -63,11 +63,16 @@ QVariantMap settingDialog::getSettings()
 
     if (ui->inputExtensions->text() != nullptr) {
         QString ignoreExtensions = ui->inputExtensions->text().toLower();
-        ignoreExtensions.replace("*","");
-        ignoreExtensions.replace(".","");
+        ignoreExtensions.remove('*');
+        ignoreExtensions.replace(" ."," ");
+        ignoreExtensions.replace(' ',',');
 
-        QStringList ext = ignoreExtensions.split(" ");
+        if (ignoreExtensions.startsWith('.'))
+            ignoreExtensions.remove(0, 1);
+
+        QStringList ext = ignoreExtensions.split(',');
         ext.removeDuplicates();
+        ext.removeOne("");
 
         if (ui->radioButtonIgnore->isChecked()) {
             settings["ignoredExtensions"] = ext;

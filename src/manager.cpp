@@ -39,7 +39,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 
     if (settings["onlyExtensions"].isValid() && !settings["onlyExtensions"].toStringList().isEmpty()) {
         calcData.setOnlyExtensions(settings["onlyExtensions"].toStringList());
-        fileList = F.includedOnlyFilelist(calcData.onlyExtensions);
+        fileList = F.filteredFileList(calcData.onlyExtensions, true);
     }
     else {
         // to disable ignoring db (*.ver.json) or *.shaX files: F.ignoreDbFiles = false; F.ignoreShaFiles = false; to enable '= true' | 'true' is default in Files()
@@ -52,7 +52,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
             calcData.setIgnoredExtensions(settings["ignoredExtensions"].toStringList());
         }
 
-        fileList = F.actualFileListFiltered(calcData.ignoredExtensions); //list of files except ignored
+        fileList = F.filteredFileList(calcData.ignoredExtensions); //list of files except ignored
     }
 
     if(fileList.isEmpty()) {

@@ -120,71 +120,41 @@ QString Files::folderContentsByType(const QString &folder)
     return text;
 }
 
-// filtering *.ver.json or/and *.sha1/256/512 files from filelist
-QStringList Files::filterDbShafiles(const QStringList &filelist)
-{
-    QStringList resultList; 
-
-    foreach(const QString &i, filelist) {
-        if (ignoreDbFiles && i.endsWith(".ver.json")) {
-            continue;
-        }
-        if (ignoreShaFiles && (i.endsWith("sha1") || i.endsWith("sha256") || i.endsWith("sha512"))) {
-            continue;
-        }
-        resultList.append(i);
-    }
-
-    return resultList;
-}
-
-QStringList Files::filterByExtensions(const QStringList &extensionsList, const QStringList &filelist)
+QStringList Files::filteredFileList(QStringList extensionsList, const bool includeOnly, const QStringList &filelist)
 {
     QStringList files;
+    QStringList filteredFiles; // result list
+
     if (filelist != QStringList())
         files = filelist;
     else
         files = actualFileList();
 
+    if (!includeOnly && ignoreDbFiles)
+        extensionsList.append("ver.json");
+    if (!includeOnly && ignoreShaFiles)
+        extensionsList.append({"sha1", "sha256", "sha512"});
+
+    if (extensionsList.isEmpty()) {
+        qDebug() << "Files::filteredFileList | 'extensionsList' is Empty. Original list returned";
+        return files;
+    }
+
     foreach (const QString &file, files) {
-        if(!extensionsList.contains(QFileInfo(file).suffix().toLower()))
+        // to be able to filter compound extensions (like *.ver.json), a comparison loop is used instead of
+        // 'extensionsList.contains(QFileInfo(file).suffix().toLower())'
+        bool allowed = !includeOnly;
+        foreach (const QString &ext, extensionsList) {
+            if (file.endsWith('.' + ext, Qt::CaseInsensitive)) {
+                allowed = includeOnly;
+                break;
+            }
+        }
+        if (allowed)
             filteredFiles.append(file);
     }
 
     return filteredFiles;
-}
-
-QStringList Files::actualFileListFiltered(const QStringList &extensionsList, const QString &folder)
-{
-    QStringList files = actualFileList(folder); // all files in current folder
-
-    QStringList filteredList; //result filelist
-
-    if (ignoreDbFiles || ignoreShaFiles)
-        filteredList = filterDbShafiles(files);
-    else
-        filteredList = files;
-
-    if (!extensionsList.isEmpty()) {
-        filteredList = filterByExtensions(extensionsList, filteredList);
-        qDebug() << "Files::actualFileListFiltered | filterByExtensions: " << extensionsList;
-    }
-
-    return filteredList;
-}
-
-// actual filelist with only listed extensions included
-QStringList Files::includedOnlyFilelist(const QStringList &extensionsList, const QString &folder)
-{
-    QStringList files = actualFileList(folder);
-    QStringList resultList; //result filelist
-
-    foreach (const QString &file, files) {
-        if(extensionsList.contains(QFileInfo(file).suffix().toLower()))
-            resultList.append(file);
-    }
-
-    return resultList;
 }
 
 QStringList Files::actualFileList(const QString &rootFolder)

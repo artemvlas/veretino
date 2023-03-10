@@ -29,9 +29,9 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
     Files files (workDir);
 
     if (!onlyExtensions.isEmpty())
-        actualFiles = files.includedOnlyFilelist(onlyExtensions);
+        actualFiles = files.filteredFileList(onlyExtensions, true);
     else
-        actualFiles = files.actualFileListFiltered(ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
+        actualFiles = files.filteredFileList(ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
 
     foreach(const QString &i, filelist) {
 
