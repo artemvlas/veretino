@@ -4,17 +4,15 @@
 #include "jsondb.h"
 #include "treemodel.h"
 
-Files::Files(const QString &path, QObject *parent)
+Files::Files(const QString &initPath, QObject *parent)
     : QObject{parent}
 {
-    if (path != nullptr) {
-        if (QFileInfo(path).isFile())
-            initFilePath = path;
-        else if (QFileInfo(path).isDir())
-            initFolderPath = path;
+    if (initPath != nullptr) {
+        if (QFileInfo(initPath).isFile())
+            initFilePath = initPath;
+        else if (QFileInfo(initPath).isDir())
+            initFolderPath = initPath;
     }
-    ignoreDbFiles = true;
-    ignoreShaFiles = true;
 }
 
 QString Files::fileNameSize(const QString &path)
@@ -36,30 +34,22 @@ QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &f
     if (filesNumber != 1)
         s = 's';
 
-    QString text = QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(QLocale(QLocale::English).formattedDataSize(filesSize));
-
-    return text;
+    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(QLocale(QLocale::English).formattedDataSize(filesSize));
 }
 
 QString Files::filelistContentStatus(const QStringList &filelist)
 {
-    int filesNumber = filelist.size();
-    qint64 filesSize = filelistSize(filelist);
-
-    return filesNumberSizeToReadable(filesNumber, filesSize);
+    return filesNumberSizeToReadable(filelist.size(), filelistDataSize(filelist));
 }
 
 QString Files::folderContentStatus(const QString &folder)
 {
-    QStringList filelist = actualFileList(folder);
-    QString text = QString("%1: %2").arg(QDir(initFolderPath).dirName(), filelistContentStatus(filelist));
-
-    return text;
+    return QString("%1: %2").arg(QDir(initFolderPath).dirName(), filelistContentStatus(allFiles(folder)));
 }
 
 QString Files::folderContentsByType(const QString &folder)
 {
-    QStringList files = actualFileList(folder);
+    QStringList files = allFiles(folder);
 
     QString text;
 
@@ -87,7 +77,7 @@ QString Files::folderContentsByType(const QString &folder)
         combinedByType t;
         t.extension = ext;
         t.filelist = listsByType.value(ext);
-        t.filesSize = filelistSize(t.filelist);
+        t.filesSize = filelistDataSize(t.filelist);
         combList.append(t);
     }
 
@@ -128,7 +118,7 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
     if (filelist != QStringList())
         files = filelist;
     else
-        files = actualFileList();
+        files = allFiles();
 
     if (!includeOnly && ignoreDbFiles)
         extensionsList.append("ver.json");
@@ -157,24 +147,29 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
     return filteredFiles;
 }
 
-QStringList Files::actualFileList(const QString &rootFolder)
+QStringList& Files::allFiles(const QString &rootFolder)
 {
-    QString curFolder;
-    QStringList actualFiles; // all files contained in the folder and its subfolders
-
-    if (rootFolder != nullptr)
-        curFolder = rootFolder;
-    else
-        curFolder = initFolderPath;
-
-    QDirIterator it(curFolder, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
-        actualFiles.append(it.next());
-
-    return actualFiles;
+    if (rootFolder != nullptr) {
+        allFilesListCustomFolder = iterateFolder(rootFolder);
+        return allFilesListCustomFolder;
+    }
+    else {
+        if (allFilesList.isEmpty())
+            allFilesList = iterateFolder(initFolderPath);
+        return allFilesList;
+    }
 }
 
-qint64 Files::filelistSize(const QStringList &filelist)
+QStringList Files::iterateFolder(const QString &rootFolder)
+{
+    QStringList fileList;
+    QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext())
+        fileList.append(it.next());
+    return fileList;
+}
+
+qint64 Files::filelistDataSize(const QStringList &filelist)
 {
     qint64 size = 0;
 
@@ -187,10 +182,10 @@ qint64 Files::filelistSize(const QStringList &filelist)
 
 int Files::filesNumber(const QString &folder)
 { 
-    return actualFileList(folder).size();
+    return allFiles(folder).size();
 }
 
 qint64 Files::folderSize(const QString &folder)
 {   
-    return filelistSize(actualFileList(folder));
+    return filelistDataSize(allFiles(folder));
 }
