@@ -126,13 +126,11 @@ QStringList Files::filterDbShafiles(const QStringList &filelist)
     QStringList resultList; 
 
     foreach(const QString &i, filelist) {
-        if (ignoreDbFiles) {
-            if(i.endsWith(".ver.json"))
-                continue;
+        if (ignoreDbFiles && i.endsWith(".ver.json")) {
+            continue;
         }
-        if (ignoreShaFiles) {
-            if (i.endsWith("sha1") || i.endsWith("sha256") || i.endsWith("sha512"))
-                continue;
+        if (ignoreShaFiles && (i.endsWith("sha1") || i.endsWith("sha256") || i.endsWith("sha512"))) {
+            continue;
         }
         resultList.append(i);
     }
