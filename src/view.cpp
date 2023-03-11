@@ -15,7 +15,7 @@ void View::setFileSystemModel()
 
     this->smartSetModel(fileSystem);
 
-    if(!QFileInfo::exists(lastFileSystemPath)) {
+    if (!QFileInfo::exists(lastFileSystemPath)) {
         lastFileSystemPath = QDir::homePath();
     }
 
@@ -35,17 +35,17 @@ void View::smartSetModel(QAbstractItemModel *model)
     int previousColumWidth = this->columnWidth(0); // first load = 0
 
     this->setModel(model);
-    qDebug()<<"View::smartSetModel |"<<model->objectName();
+    qDebug() << "View::smartSetModel |" << model->objectName();
 
     if (previousColumWidth == 0)
         this->setColumnWidth(0, 450);
 
-    if(oldModel != nullptr) {
-        qDebug()<<"oldModel deleted";
+    if (oldModel != nullptr) {
+        qDebug() << "oldModel deleted";
         delete oldModel;
     }
-    if(oldSelectModel != nullptr) {
-        qDebug()<<"oldSelectModel deleted";
+    if (oldSelectModel != nullptr) {
+        qDebug() << "oldSelectModel deleted";
         delete oldSelectModel;
     }
 
@@ -53,7 +53,7 @@ void View::smartSetModel(QAbstractItemModel *model)
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index){emit pathChanged(indexToPath(index)); currentIndex = index;});
 
     // send signal when Model has been changed, FileSystem = true, else = false;
-    if(isViewFileSystem()) {
+    if (isViewFileSystem()) {
         emit modelChanged(true);
     }
     else {
@@ -65,10 +65,7 @@ void View::smartSetModel(QAbstractItemModel *model)
 
 bool View::isViewFileSystem()
 {
-    if(this->model() != nullptr && this->model()->objectName() == "fileSystem")
-        return true;
-    else
-        return false;
+    return (this->model() != nullptr && this->model()->objectName() == "fileSystem");
 }
 
 QString View::indexToPath(const QModelIndex &index)
@@ -80,7 +77,7 @@ QString View::indexToPath(const QModelIndex &index)
         QModelIndex newIndex = this->model()->index(index.row(), 0 , index.parent());
         QString path = newIndex.data().toString();
 
-        while(newIndex.parent().isValid()) {
+        while (newIndex.parent().isValid()) {
             path = newIndex.parent().data().toString() + '/' + path;
             newIndex = newIndex.parent();
         }
@@ -94,12 +91,11 @@ void View::setIndexByPath(const QString &path)
 {
     if (isViewFileSystem()) {
 
-        if(QFileInfo::exists(path)) {
+        if (QFileInfo::exists(path)) {
             QModelIndex index = fileSystem->index(path);
             this->expand(index);
             this->setCurrentIndex(index);
             this->scrollToPath(path);
-            //pathAnalyzer(path);
             //if the Model remains the same, the Timer is not necessary, but if the Model is resetting, it does
             //this->scrollTo(index,QAbstractItemView::PositionAtCenter);
         }
@@ -113,19 +109,19 @@ void View::scrollToPath(const QString &path)
     //QFileSystemModel needs some time after setup to Scrolling be able
     //this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)], currentIndex=fileSystem->index(path) NOT working good
     if (isViewFileSystem()) {
-        QTimer::singleShot(500, this,[=]{scrollTo(fileSystem->index(path),QAbstractItemView::PositionAtCenter);});
+        QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path),QAbstractItemView::PositionAtCenter);});
     }
 }
 
-void View::pathAnalyzer (const QString &path)
+void View::pathAnalyzer(const QString &path)
 {
-    qDebug()<<"View::pathAnalyzer | "<<path;
+    qDebug()<< "View::pathAnalyzer | " << path;
 
     if (this->isViewFileSystem()) {
         QFileInfo i(path);
         QString ext = i.suffix().toLower();
-        if(i.isFile()) {
-            if(ext == "json" && path.endsWith(".ver.json")) {
+        if (i.isFile()) {
+            if (ext == "json" && path.endsWith(".ver.json", Qt::CaseInsensitive)) {
                 emit setMode("db");
             }
             else if (ext == "sha1" || ext == "sha256" || ext == "sha512") {
@@ -135,7 +131,7 @@ void View::pathAnalyzer (const QString &path)
                 emit setMode("file");
             }
         }
-        else if(i.isDir()) {
+        else if (i.isDir()) {
             emit setMode("folder");
         }
     }

@@ -4,7 +4,7 @@ jsonDB::jsonDB(const QString &path, QObject *parent)
     : QObject{parent}
 {
     if (path != nullptr) {
-        if (QFileInfo(path).isFile() && path.endsWith(".ver.json"))
+        if (QFileInfo(path).isFile() && path.endsWith(".ver.json", Qt::CaseInsensitive))
             filePath = path;
         else if (QFileInfo(path).isDir())
             folderPath = path;
@@ -19,7 +19,7 @@ QJsonDocument jsonDB::readJsonFile(const QString &pathToFile)
         filePath = pathToFile;
 
     QFile jsonFile(filePath);
-    if(jsonFile.open(QFile::ReadOnly))
+    if (jsonFile.open(QFile::ReadOnly))
         return QJsonDocument().fromJson(jsonFile.readAll());
     else {
         emit showMessage("Error while reading Json File", "Error");
@@ -33,12 +33,10 @@ bool jsonDB::saveJsonFile(const QJsonDocument &document, const QString &pathToFi
         filePath = pathToFile;
 
     QFile jsonFile(filePath);
-    if(!jsonFile.open(QFile::WriteOnly))
+    if (!jsonFile.open(QFile::WriteOnly))
         return false;
-    if(jsonFile.write(document.toJson()))
-        return true;
-    else
-        return false;
+
+    return (jsonFile.write(document.toJson()));
 }
 
 QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
@@ -46,7 +44,7 @@ QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
     if (pathToFile != nullptr)
         filePath = pathToFile;
 
-    if(readJsonFile(filePath).isArray()) {
+    if (readJsonFile(filePath).isArray()) {
         QJsonArray dataArray = readJsonFile(filePath).array();
         if(dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
             return readJsonFile(filePath).array();
@@ -82,11 +80,11 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     QString relativePath;
 
     QMapIterator<QString,QString> i(data->mainData);
-    while(i.hasNext()) {
+    while (i.hasNext()) {
         i.next();
         relativePath = dir.relativeFilePath(i.key());
 
-        if(i.value() == "unreadable") {
+        if (i.value() == "unreadable") {
             unreadableFiles.append(relativePath);
         }
         else {
@@ -101,7 +99,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     int shatype = shatypeByLen(computedData.begin().value().toString().size());
 
     QLocale locale (QLocale::English);
-    header["Created with"] = "Veretino 0.1.1 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino 0.1.2 https://github.com/artemvlas/veretino";
     header["Files number"] = computedData.size();
     header["Folder"] = dir.dirName();
     header["SHA type"] = QString("SHA-%1").arg(shatype);
@@ -123,17 +121,17 @@ bool jsonDB::makeJsonDB(DataContainer *data)
 
     doc.setArray(mainArray);
 
-    if(saveJsonFile(doc, filePath))
+    if (saveJsonFile(doc, filePath))
         return true;
     else {
-        emit showMessage(QString("Unable to save json file: %1").arg(filePath),"Error");
+        emit showMessage(QString("Unable to save json file: %1").arg(filePath), "Error");
         return false;
     }
 }
 
 DataContainer* jsonDB::parseJson(const QString &pathToFile)
 {
-    if(pathToFile != nullptr)
+    if (pathToFile != nullptr)
         filePath = pathToFile;
 
     QJsonArray mainArray = loadJsonDB(filePath); // json database is QJsonArray of QJsonObjects

@@ -5,7 +5,7 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
 {
     QFileInfo initPathInfo (initPath);
 
-    if (initPathInfo.isFile() && initPath.endsWith(".ver.json")) {
+    if (initPathInfo.isFile() && initPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
         jsonFilePath = initPath;
         workDir = initPathInfo.absolutePath() + '/';
     }
@@ -33,7 +33,7 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
     else
         actualFiles = files.filteredFileList(ignoredExtensions); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
 
-    foreach(const QString &i, filelist) {
+    foreach (const QString &i, filelist) {
 
         if (mainData[i] == "unreadable") {
             if (QFileInfo::exists(i))
@@ -54,8 +54,8 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
         }
     }
 
-    foreach(const QString &i, actualFiles) {
-        if(!filelist.contains(i)) {
+    foreach (const QString &i, actualFiles) {
+        if (!filelist.contains(i)) {
             filesAvailability[i] = "NEW file";
             newFiles.append(i);
         }

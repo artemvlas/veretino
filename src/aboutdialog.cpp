@@ -11,13 +11,12 @@ aboutDialog::aboutDialog(QWidget *parent) :
     this->setWindowIcon(QIcon(":/veretino.png"));
     ui->labelPix->setPixmap(QPixmap(":/veretino.png").scaled(100,100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
-    ui->labelInfo->setText("Veretino 0.1.1.5\n\nQt: 5.15\nFree and open-source software\nGNU General Public License v3");
+    ui->labelInfo->setText("Veretino 0.1.2\n\nQt: 5.15\nFree and open-source software\nGNU General Public License v3");
 
     ui->labelAuthor->setTextFormat(Qt::RichText);
     ui->labelAuthor->setOpenExternalLinks(true);
     ui->labelAuthor->setText("<center>Author/Developer:<div><center>Artem Vlasenko: <a href='mailto:artemvlas@proton.me?subject=Veretino'>artemvlas@proton.me</a>"
                              "<div><center><a href='https://github.com/artemvlas/veretino'>GitHub</a>");
-
 
 }
 

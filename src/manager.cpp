@@ -67,7 +67,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 
     calcData.mainData = shaCalc->calcShaList(fileList, shatype);
 
-    if(calcData.mainData.isEmpty()) {
+    if (calcData.mainData.isEmpty()) {
         return;
     }
 
@@ -83,7 +83,7 @@ void Manager::processFileSha(const QString &filePath, const int &shatype)
     emit setMode("processing");
 
     QString sum = shaCalc->calcShaFile(filePath, shatype);
-    if(sum == nullptr) {
+    if (sum == nullptr) {
         return;
     }
 
@@ -91,7 +91,7 @@ void Manager::processFileSha(const QString &filePath, const int &shatype)
 
     QString summaryFile = QString("%1.sha%2").arg(filePath).arg(shatype);
     QFile file(summaryFile);
-    if(file.open(QFile::WriteOnly)) {
+    if (file.open(QFile::WriteOnly)) {
         file.write(QString("%1 *%2").arg(sum, QFileInfo(filePath).fileName()).toUtf8());
         emit showMessage(QString("Checksum saved to summary file:\n%1").arg(QFileInfo(summaryFile).fileName()));
     }
@@ -107,7 +107,7 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
 {
     emit status("File tree creation...");
 
-    if(!map.isEmpty()) {
+    if (!map.isEmpty()) {
         TreeModel *model = new TreeModel;
         model->setObjectName("treeModel");
         model->populateMap(toRelativePathsMap(map, curData->workDir));
@@ -128,7 +128,7 @@ void Manager::resetDatabase()
 //making tree model | file paths : info about current availability on disk
 void Manager::makeJsonModel(const QString &jsonFilePath)
 {
-    if(!jsonFilePath.endsWith(".ver.json")) {
+    if (!jsonFilePath.endsWith(".ver.json", Qt::CaseInsensitive)) {
         emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver.json'").arg(jsonFilePath), "Wrong DB file!");
         return;
     }
@@ -212,7 +212,7 @@ void Manager::updateMismatch()
 // checking the list of files against the checksums stored in the database
 void Manager::verifyFileList()
 {
-    if(curData->mainData.isEmpty()) {
+    if (curData->mainData.isEmpty()) {
         qDebug()<<"mainData is Empty";
         return;
     }
@@ -220,13 +220,13 @@ void Manager::verifyFileList()
     emit setMode("processing");
 
     curData->recalculated = shaCalc->calcShaList(curData->onDiskFiles, curData->dbShaType);
-    if(curData->recalculated.isEmpty()) {
+    if (curData->recalculated.isEmpty()) {
         return;
     }
 
     QMapIterator<QString,QString> ii (curData->recalculated);
 
-    while(ii.hasNext()) {
+    while (ii.hasNext()) {
         ii.next();
         if (curData->mainData[ii.key()] != ii.value())
             curData->mismatches.insert(ii.key(), ii.value());
@@ -255,7 +255,7 @@ void Manager::checkFileSummary(const QString &path)
 
     QFile sumFile(path);
     QString line;
-    if(sumFile.open(QFile::ReadOnly))
+    if (sumFile.open(QFile::ReadOnly))
         line = sumFile.readLine();
     else {
         emit showMessage("Error while reading Summary File", "Error");
@@ -273,7 +273,7 @@ void Manager::checkFileSummary(const QString &path)
     emit setMode("processing");
     QString savedSum = line.mid(0, shaStrLen(shatype));
     QString sum = shaCalc->calcShaFile(checkFilePath, shatype);
-    if(sum == nullptr) {
+    if (sum == nullptr) {
         return;
     }
 
@@ -314,7 +314,7 @@ void Manager::checkCurrentItemSum(const QString &path)
 
     emit setMode("processing");
     QString sum = shaCalc->calcShaFile(filepath, curData->dbShaType);
-    if(sum == nullptr) {
+    if (sum == nullptr) {
         return;
     }
 
@@ -336,9 +336,9 @@ void Manager::getItemInfo(const QString &path)
 
         QString text;
         QFileInfo f (path);
-        if(f.isDir())
+        if (f.isDir())
              text = Files(path).folderContentStatus();
-        else if(f.isFile())
+        else if (f.isFile())
             text = Files(path).fileNameSize();
 
         emit status(text);

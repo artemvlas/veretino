@@ -317,7 +317,7 @@ bool MainWindow::argumentInput()
         QString argPath = QApplication::arguments().at(1);
         qDebug()<<"App Argument:"<<argPath;
         if (QFileInfo::exists(argPath)) {
-            if (QFileInfo(argPath).isFile() && argPath.endsWith(".ver.json")) {
+            if (QFileInfo(argPath).isFile() && argPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
                 emit parseJsonFile(argPath);
             }
             else {
@@ -358,7 +358,7 @@ void MainWindow::dropEvent(QDropEvent *e)
         if (viewMode == "processing")
             emit cancelProcess();
 
-        if (path.endsWith(".ver.json"))
+        if (path.endsWith(".ver.json", Qt::CaseInsensitive))
             emit parseJsonFile(path);
 
         else {

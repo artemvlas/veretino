@@ -63,7 +63,7 @@ QString ShaCalculator::calcShaFile (const QString &filePath, const int &shatype)
     emit status(QString("Calculation SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).fileNameSize()));
     QString sum = calcSha(filePath);
 
-    if(canceled)
+    if (canceled)
         emit status("Canceled");
     else
         emit status(QString("SHA-%1 calculated").arg(shatype));
@@ -73,7 +73,6 @@ QString ShaCalculator::calcShaFile (const QString &filePath, const int &shatype)
 
 QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, const int &shatype)
 {
-    //emit status("Processing");
     if (shatype != 0)
         setShaType(shatype);
 
@@ -92,13 +91,12 @@ QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, c
         emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(locale.formattedDataSize(doneSize), totalInfo));
     }
 
-    if(canceled) {
-        qDebug()<<"ShaCalculator::calcShaList | Canceled";
+    if (canceled) {
+        qDebug() << "ShaCalculator::calcShaList | Canceled";
         emit status("Canceled");
         return QMap<QString,QString> ();
     }
     else {
-        //emit resultReady(map);
         emit status("Done");
         return map;
     }

@@ -47,7 +47,7 @@ QString TreeModel::getPath(const QModelIndex &index)
     QModelIndex newIndex = index;
     QString path = newIndex.data().toString();
 
-    while(newIndex.parent().isValid()) {
+    while (newIndex.parent().isValid()) {
         path = newIndex.parent().data().toString() + '/' + path;
         newIndex = newIndex.parent();
     }
