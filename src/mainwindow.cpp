@@ -26,11 +26,11 @@ MainWindow::~MainWindow()
 {
     if (viewMode == "processing") {
         emit cancelProcess();
-        qDebug()<<"Current Processing canceled due app closed";
+        qDebug() << "Current Processing was canceled due the app is closing";
     }
 
     thread->quit();
-    while(!thread->isFinished());
+    while (!thread->isFinished());
 
     delete thread;
     delete ui;
@@ -268,7 +268,7 @@ void MainWindow::doWork()
     else if (viewMode == "processing")
         emit cancelProcess();
     else
-        qDebug()<<"MainWindow::doWork() | Wrong viewMode:"<<viewMode;
+        qDebug() << "MainWindow::doWork() | Wrong viewMode:" << viewMode;
 }
 
 void MainWindow::timeLeft(const int &percentsDone)
@@ -315,7 +315,7 @@ bool MainWindow::argumentInput()
 {
     if (QApplication::arguments().size() > 1) {
         QString argPath = QApplication::arguments().at(1);
-        qDebug()<<"App Argument:"<<argPath;
+        qDebug() << "App Argument:" << argPath;
         if (QFileInfo::exists(argPath)) {
             if (QFileInfo(argPath).isFile() && argPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
                 emit parseJsonFile(argPath);
@@ -335,12 +335,12 @@ void MainWindow::showMessage(const QString &message, const QString &title)
 {
     QMessageBox messageBox;
 
-    if(title.toLower()=="error" || title.toLower()=="failed")
-        messageBox.critical(0,title,message);
-    else if(title.toLower()=="warning")
-        messageBox.warning(0,title,message);
+    if (title.toLower() == "error" || title.toLower() == "failed")
+        messageBox.critical(0, title, message);
+    else if (title.toLower() == "warning")
+        messageBox.warning(0, title, message);
     else
-        messageBox.information(0,title,message);
+        messageBox.information(0, title, message);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)
@@ -355,12 +355,12 @@ void MainWindow::dropEvent(QDropEvent *e)
     QString path = e->mimeData()->urls().first().toLocalFile();
 
     if (QFileInfo::exists(path)) {
-        if (viewMode == "processing")
+        if (viewMode == "processing") {
             emit cancelProcess();
-
-        if (path.endsWith(".ver.json", Qt::CaseInsensitive))
+        }
+        if (path.endsWith(".ver.json", Qt::CaseInsensitive)) {
             emit parseJsonFile(path);
-
+        }
         else {
             if (!ui->treeView->isViewFileSystem())
                 ui->treeView->setFileSystemModel();

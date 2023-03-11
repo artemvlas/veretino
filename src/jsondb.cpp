@@ -22,7 +22,7 @@ QJsonDocument jsonDB::readJsonFile(const QString &pathToFile)
     if (jsonFile.open(QFile::ReadOnly))
         return QJsonDocument().fromJson(jsonFile.readAll());
     else {
-        emit showMessage("Error while reading Json File", "Error");
+        emit showMessage("Error while reading the Json File", "Error");
         return QJsonDocument();
     }
 }
@@ -175,7 +175,7 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     }
 
     if (!excludedFiles.isEmpty()) {
-        if(excludedFiles.contains("Unreadable files")) {
+        if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles["Unreadable files"].toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
                 data->mainData[data->workDir + unreadableFiles.at(var).toString()] = "unreadable";
