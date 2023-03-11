@@ -31,10 +31,10 @@ void TreeModel::populateMap(const QMap<QString,QString> &map)
             }
 
             if (not_exist) {
-                QString info = "";
-                if(var+1 == splitPath.size())
+                QString info;
+                if (var + 1 == splitPath.size())
                     info = map.value(filelist.at(f));
-                TreeItem *ti = new TreeItem({splitPath.at(var),info},parentItem);
+                TreeItem *ti = new TreeItem({splitPath.at(var), info}, parentItem);
                 parentItem->appendChild(ti);
                 parentItem = ti;
             }
