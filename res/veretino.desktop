@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Veretino
+GenericName=Data Integrity Checker
 Comment=Check folder-wide data integrity
 Exec=veretino
 Icon=veretino
