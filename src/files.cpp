@@ -52,14 +52,18 @@ QString Files::contentStatus(const QStringList &filelist)
 
 QString Files::contentStatus(const QString &folder)
 {
-    return QString("%1: %2").arg(QDir(initFolderPath).dirName(), contentStatus(allFiles(folder)));
+    QString folderName;
+    if (folder != nullptr)
+        folderName = QDir(folder).dirName();
+    else
+        folderName = QDir(initFolderPath).dirName();
+
+    return QString("%1: %2").arg(folderName, contentStatus(allFiles(folder)));
 }
 
 QString Files::folderContentsByType(const QString &folder)
 {
     QStringList files = allFiles(folder);
-
-    QString text;
 
     if (files.isEmpty())
         return "Empty folder";
@@ -91,6 +95,7 @@ QString Files::folderContentsByType(const QString &folder)
 
     std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {return (t1.filesSize > t2.filesSize);});
 
+    QString text;
     if (combList.size() > 10) {
         text.append(QString("Top sized file types:\n%1\n").arg(QString('-').repeated(30)));
         qint64 excSize = 0; // total size of files whose types are not displayed
@@ -186,18 +191,16 @@ qint64 Files::dataSize(const QStringList &filelist)
             totalSize += QFileInfo(file).size();
         }
     }
-    else if (!initFileList.isEmpty()) {
-        foreach (const QString &file, initFileList) {
-            totalSize += QFileInfo(file).size();
-        }
-    }
 
     return totalSize;
 }
 
 qint64 Files::dataSize(const QString &folder)
 {   
-    return dataSize(allFiles(folder));
+    if (folder != nullptr || initFolderPath != nullptr)
+        return dataSize(allFiles(folder));
+    else
+        return dataSize(initFileList);
 }
 
 QString Files::dataSizeReadable(const qint64 &sizeBytes)
