@@ -18,6 +18,11 @@ Files::Files(const QStringList &fileList, QObject *parent)
     : QObject{parent}, initFileList(fileList)
 {}
 
+int Files::filesNumber(const QString &folder)
+{
+    return allFiles(folder).size();
+}
+
 QString Files::fileNameSize(const QString &path)
 {
     QString pathToFile;
@@ -40,14 +45,14 @@ QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &f
     return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(dataSizeReadable(filesSize));
 }
 
-QString Files::filelistContentStatus(const QStringList &filelist)
+QString Files::contentStatus(const QStringList &filelist)
 {
-    return filesNumberSizeToReadable(filelist.size(), filelistDataSize(filelist));
+    return filesNumberSizeToReadable(filelist.size(), dataSize(filelist));
 }
 
-QString Files::folderContentStatus(const QString &folder)
+QString Files::contentStatus(const QString &folder)
 {
-    return QString("%1: %2").arg(QDir(initFolderPath).dirName(), filelistContentStatus(allFiles(folder)));
+    return QString("%1: %2").arg(QDir(initFolderPath).dirName(), contentStatus(allFiles(folder)));
 }
 
 QString Files::folderContentsByType(const QString &folder)
@@ -80,7 +85,7 @@ QString Files::folderContentsByType(const QString &folder)
         combinedByType t;
         t.extension = ext;
         t.filelist = listsByType.value(ext);
-        t.filesSize = filelistDataSize(t.filelist);
+        t.filesSize = dataSize(t.filelist);
         combList.append(t);
     }
 
@@ -92,7 +97,7 @@ QString Files::folderContentsByType(const QString &folder)
         int excNumber = 0; // the number of these files
         for (int var = 0; var < combList.size(); ++var) {
             if (var < 10) {
-                text.append(QString("%1: %2\n").arg(combList.at(var).extension, filelistContentStatus(combList.at(var).filelist)));
+                text.append(QString("%1: %2\n").arg(combList.at(var).extension, contentStatus(combList.at(var).filelist)));
             }
             else {
                 excSize += combList.at(var).filesSize;
@@ -103,11 +108,11 @@ QString Files::folderContentsByType(const QString &folder)
     }
     else {
         foreach (const combinedByType &t, combList) {
-            text.append(QString("%1: %2\n").arg(t.extension, filelistContentStatus(t.filelist)));
+            text.append(QString("%1: %2\n").arg(t.extension, contentStatus(t.filelist)));
         }
     }
 
-    QString totalInfo = QString(" Total: %1 types, %2").arg(combList.size()).arg(filelistContentStatus(files));
+    QString totalInfo = QString(" Total: %1 types, %2").arg(combList.size()).arg(contentStatus(files));
     text.append(QString("%1\n%2").arg(QString('_').repeated(totalInfo.length()), totalInfo));
 
     return text;
@@ -172,25 +177,27 @@ QStringList Files::iterateFolder(const QString &rootFolder)
     return fileList;
 }
 
-qint64 Files::filelistDataSize(const QStringList &filelist)
+qint64 Files::dataSize(const QStringList &filelist)
 {
-    qint64 size = 0;
+    qint64 totalSize = 0;
 
-    foreach (const QString &file, filelist) {
-        size += QFileInfo(file).size();
+    if (!filelist.isEmpty()) {
+        foreach (const QString &file, filelist) {
+            totalSize += QFileInfo(file).size();
+        }
+    }
+    else if (!initFileList.isEmpty()) {
+        foreach (const QString &file, initFileList) {
+            totalSize += QFileInfo(file).size();
+        }
     }
 
-    return size;
+    return totalSize;
 }
 
-int Files::filesNumber(const QString &folder)
-{ 
-    return allFiles(folder).size();
-}
-
-qint64 Files::folderSize(const QString &folder)
+qint64 Files::dataSize(const QString &folder)
 {   
-    return filelistDataSize(allFiles(folder));
+    return dataSize(allFiles(folder));
 }
 
 QString Files::dataSizeReadable(const qint64 &sizeBytes)

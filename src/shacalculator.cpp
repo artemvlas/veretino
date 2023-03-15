@@ -79,7 +79,7 @@ QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, c
     QMap<QString,QString> map;
     int filesNumber = filelist.size();
     doneSize = 0;
-    totalSize = Files().filelistDataSize(filelist);
+    totalSize = Files().dataSize(filelist);
     QString totalInfo = Files().filesNumberSizeToReadable(filesNumber, totalSize);
     canceled = false;
     QLocale locale (QLocale::English);

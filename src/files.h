@@ -26,11 +26,11 @@ public:
     QStringList& allFiles(const QString &rootFolder = QString()); // calls 'iterateFolder' if needed and returns a reference to the 'allFilesList'^ or 'allFilesListCustomFolder'^
     QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
     int filesNumber(const QString &folder = QString());
-    qint64 filelistDataSize(const QStringList &filelist); // total size of all files in the 'filelist'
-    qint64 folderSize(const QString &folder = QString()); // total size of all files in the 'folder'
+    qint64 dataSize(const QStringList &filelist = QStringList()); // total size of all files in the 'filelist'
+    qint64 dataSize(const QString &folder = QString()); // total size of all files in the 'folder'
     QString dataSizeReadable(const qint64 &sizeBytes);
-    QString folderContentStatus(const QString &folder = QString());
-    QString filelistContentStatus(const QStringList &filelist);
+    QString contentStatus(const QString &folder = QString());
+    QString contentStatus(const QStringList &filelist);
     QString filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize);
     QString fileNameSize(const QString &path = QString()); // returns "filename (readable size)"
     QString folderContentsByType(const QString &folder = QString()); // returns sorted by data size list of extensions, files number and their size

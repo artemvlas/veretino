@@ -337,7 +337,7 @@ void Manager::getItemInfo(const QString &path)
         QString text;
         QFileInfo f (path);
         if (f.isDir())
-             text = Files(path).folderContentStatus();
+             text = Files(path).contentStatus();
         else if (f.isFile())
             text = Files(path).fileNameSize();
 

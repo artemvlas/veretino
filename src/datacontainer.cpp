@@ -174,7 +174,7 @@ QString DataContainer::itemContentsInfo(const QString &itemPath)
 
         QString text;
         if (ondisk.size() > 0) {
-            text = "on Disk: " + Files().filelistContentStatus(ondisk);
+            text = "on Disk: " + Files().contentStatus(ondisk);
         }
 
         if (lost.size() > 0) {
@@ -188,7 +188,7 @@ QString DataContainer::itemContentsInfo(const QString &itemPath)
             QString pre;
             if (ondisk.size() > 0 || lost.size() > 0)
                 pre = "; ";
-            text.append(QString("%1New: %2").arg(pre, Files().filelistContentStatus(newfiles)));
+            text.append(QString("%1New: %2").arg(pre, Files().contentStatus(newfiles)));
         }
 
         return text;
@@ -208,7 +208,7 @@ QString DataContainer::aboutDb()
     QString newFilesInfo;
 
     if (newFilesNumber > 0) {
-        newFilesInfo = "New: " + Files().filelistContentStatus(newFiles);
+        newFilesInfo = "New: " + Files().contentStatus(newFiles);
     }
     else
         newFilesInfo = "New files: 0";
