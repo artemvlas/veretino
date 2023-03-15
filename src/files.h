@@ -11,10 +11,12 @@ class Files : public QObject
     Q_OBJECT
 public:
     explicit Files(const QString &initPath = QString(), QObject *parent = nullptr);
+    Files(const QStringList &fileList, QObject *parent = nullptr);
 
     // variables
     QString initFilePath; // path to the File specified when creating the object
     QString initFolderPath; // path to the Folder specified when creating the object
+    QStringList initFileList;
     bool ignoreDbFiles = true; // exlude *.ver.json files while filtering
     bool ignoreShaFiles = true; // exclude *.sha1/256/512 files while filtering
     QStringList allFilesList; // cached list of all files in initial folder
@@ -26,6 +28,7 @@ public:
     int filesNumber(const QString &folder = QString());
     qint64 filelistDataSize(const QStringList &filelist); // total size of all files in the 'filelist'
     qint64 folderSize(const QString &folder = QString()); // total size of all files in the 'folder'
+    QString dataSizeReadable(const qint64 &sizeBytes);
     QString folderContentStatus(const QString &folder = QString());
     QString filelistContentStatus(const QStringList &filelist);
     QString filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize);

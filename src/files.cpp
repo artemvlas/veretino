@@ -1,8 +1,7 @@
 #include "files.h"
-#include "QDirIterator"
-#include "QThread"
-#include "jsondb.h"
-#include "treemodel.h"
+#include <QDirIterator>
+#include <QDebug>
+#include <cmath>
 
 Files::Files(const QString &initPath, QObject *parent)
     : QObject{parent}
@@ -15,6 +14,10 @@ Files::Files(const QString &initPath, QObject *parent)
     }
 }
 
+Files::Files(const QStringList &fileList, QObject *parent)
+    : QObject{parent}, initFileList(fileList)
+{}
+
 QString Files::fileNameSize(const QString &path)
 {
     QString pathToFile;
@@ -25,7 +28,7 @@ QString Files::fileNameSize(const QString &path)
 
     QFileInfo fileInfo (pathToFile);
 
-    return QString("%1 (%2)").arg(fileInfo.fileName(), QLocale(QLocale::English).formattedDataSize(fileInfo.size()));
+    return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
 }
 
 QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize)
@@ -34,7 +37,7 @@ QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &f
     if (filesNumber != 1)
         s = 's';
 
-    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(QLocale(QLocale::English).formattedDataSize(filesSize));
+    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(dataSizeReadable(filesSize));
 }
 
 QString Files::filelistContentStatus(const QStringList &filelist)
@@ -188,4 +191,32 @@ int Files::filesNumber(const QString &folder)
 qint64 Files::folderSize(const QString &folder)
 {   
     return filelistDataSize(allFiles(folder));
+}
+
+QString Files::dataSizeReadable(const qint64 &sizeBytes)
+{
+    long double converted = sizeBytes;
+    QString xB;
+
+    if (converted > 1024) {
+        converted /= 1024;
+        xB = "KiB";
+        if (converted > 1024) {
+            converted /= 1024;
+            xB = "MiB";
+        }
+        if (converted > 1024) {
+            converted /= 1024;
+            xB = "GiB";
+        }
+        if (converted > 1024) {
+            converted /= 1024;
+            xB = "TiB";
+        }
+
+        float x = std::round(converted * 100) / 100;
+        return QString("%1 %2").arg(x).arg(xB);
+    }
+    else
+        return QString("%1 bytes").arg(sizeBytes);
 }
