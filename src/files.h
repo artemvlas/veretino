@@ -27,7 +27,6 @@ public:
     // functions
     QStringList& allFiles(const QString &rootFolder = QString()); // calls 'iterateFolder' if needed and returns a reference to the 'allFilesList'^ or 'allFilesListCustomFolder'^
     QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
-    int filesNumber(const QString &folder = QString());
 
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
     qint64 dataSize(const QString &folder); // total size of all files in the 'folder'

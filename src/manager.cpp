@@ -65,7 +65,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 
     emit setMode("processing");
 
-    calcData.mainData = shaCalc->calcShaList(fileList, shatype);
+    calcData.mainData = shaCalc->calculateSha(fileList, shatype);
 
     if (calcData.mainData.isEmpty()) {
         return;
@@ -82,7 +82,7 @@ void Manager::processFileSha(const QString &filePath, const int &shatype)
 {
     emit setMode("processing");
 
-    QString sum = shaCalc->calcShaFile(filePath, shatype);
+    QString sum = shaCalc->calculateSha(filePath, shatype);
     if (sum == nullptr) {
         return;
     }
@@ -168,7 +168,7 @@ void Manager::updateNewLost()
     QString info = QString("Database updated. Added %1 files, removed %2").arg(curData->newFilesNumber).arg(curData->lostFilesNumber);
 
     if (curData->newFilesNumber > 0) {
-        QMap<QString,QString> newFilesSums = shaCalc->calcShaList(curData->newFiles, curData->dbShaType);
+        QMap<QString,QString> newFilesSums = shaCalc->calculateSha(curData->newFiles, curData->dbShaType);
         if(newFilesSums.isEmpty()) {
             return;
         }
@@ -219,7 +219,7 @@ void Manager::verifyFileList()
 
     emit setMode("processing");
 
-    curData->recalculated = shaCalc->calcShaList(curData->onDiskFiles, curData->dbShaType);
+    curData->recalculated = shaCalc->calculateSha(curData->onDiskFiles, curData->dbShaType);
     if (curData->recalculated.isEmpty()) {
         return;
     }
@@ -272,7 +272,7 @@ void Manager::checkFileSummary(const QString &path)
 
     emit setMode("processing");
     QString savedSum = line.mid(0, shaStrLen(shatype));
-    QString sum = shaCalc->calcShaFile(checkFilePath, shatype);
+    QString sum = shaCalc->calculateSha(checkFilePath, shatype);
     if (sum == nullptr) {
         return;
     }
@@ -313,7 +313,7 @@ void Manager::checkCurrentItemSum(const QString &path)
     }
 
     emit setMode("processing");
-    QString sum = shaCalc->calcShaFile(filepath, curData->dbShaType);
+    QString sum = shaCalc->calculateSha(filepath, curData->dbShaType);
     if (sum == nullptr) {
         return;
     }

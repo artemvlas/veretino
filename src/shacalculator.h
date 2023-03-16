@@ -16,8 +16,8 @@ public:
     void setShaType(const int &shatype);
 
 public slots:
-    QString calcShaFile (const QString &filePath, const int &shatype = 0);
-    QMap<QString,QString> calcShaList (const QStringList &filelist, const int &shatype = 0);
+    QString calculateSha(const QString &filePath, const int &shatype = 0);
+    QMap<QString,QString> calculateSha(const QStringList &filelist, const int &shatype = 0);
     void cancelProcess();
 
 private:

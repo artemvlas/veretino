@@ -49,7 +49,7 @@ QString ShaCalculator::calcSha (const QString &filePath)
         return hash.result().toHex();
 }
 
-QString ShaCalculator::calcShaFile (const QString &filePath, const int &shatype)
+QString ShaCalculator::calculateSha(const QString &filePath, const int &shatype)
 {
     if (shatype != 0)
         setShaType(shatype);
@@ -71,28 +71,29 @@ QString ShaCalculator::calcShaFile (const QString &filePath, const int &shatype)
     return sum;
 }
 
-QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, const int &shatype)
+QMap<QString,QString> ShaCalculator::calculateSha(const QStringList &filelist, const int &shatype)
 {
     if (shatype != 0)
         setShaType(shatype);
 
-    QMap<QString,QString> map;
+    Files files (filelist);
+    totalSize = files.dataSize();
     int filesNumber = filelist.size();
-    doneSize = 0;
-    totalSize = Files().dataSize(filelist);
-    QString totalInfo = Files().contentStatus(filesNumber, totalSize);
-    canceled = false;
-    QLocale locale (QLocale::English);
+    QString totalInfo = files.contentStatus(filesNumber, totalSize);
 
     emit status(QString("Calculation SHA-%1 checksums for: %2").arg(shatype).arg(totalInfo));
 
+    canceled = false;
+    doneSize = 0;
+    QMap<QString,QString> map;
+
     for (int var = 0; var < filesNumber && !canceled; ++var) {
         map[filelist.at(var)] = calcSha(filelist.at(var));
-        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(locale.formattedDataSize(doneSize), totalInfo));
+        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(files.dataSizeReadable(doneSize), totalInfo));
     }
 
     if (canceled) {
-        qDebug() << "ShaCalculator::calcShaList | Canceled";
+        qDebug() << "ShaCalculator::calculateSha | Canceled";
         emit status("Canceled");
         return QMap<QString,QString> ();
     }

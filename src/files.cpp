@@ -20,11 +20,6 @@ Files::Files(const QStringList &fileList, QObject *parent)
     : QObject{parent}, initFileList(fileList)
 {}
 
-int Files::filesNumber(const QString &folder)
-{
-    return allFiles(folder).size();
-}
-
 QString Files::contentStatus()
 {
     if (initFilePath != nullptr)
