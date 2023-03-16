@@ -60,7 +60,7 @@ QString ShaCalculator::calcShaFile (const QString &filePath, const int &shatype)
 
     canceled = false;
 
-    emit status(QString("Calculation SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).fileNameSize()));
+    emit status(QString("Calculation SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
     QString sum = calcSha(filePath);
 
     if (canceled)
@@ -80,7 +80,7 @@ QMap<QString,QString> ShaCalculator::calcShaList (const QStringList &filelist, c
     int filesNumber = filelist.size();
     doneSize = 0;
     totalSize = Files().dataSize(filelist);
-    QString totalInfo = Files().filesNumberSizeToReadable(filesNumber, totalSize);
+    QString totalInfo = Files().contentStatus(filesNumber, totalSize);
     canceled = false;
     QLocale locale (QLocale::English);
 

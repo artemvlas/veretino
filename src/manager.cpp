@@ -333,15 +333,7 @@ void Manager::getItemInfo(const QString &path)
 {
     if (isViewFileSysytem) {
         emit status("Counting...");
-
-        QString text;
-        QFileInfo f (path);
-        if (f.isDir())
-             text = Files(path).contentStatus();
-        else if (f.isFile())
-            text = Files(path).fileNameSize();
-
-        emit status(text);
+        emit status(Files(path).contentStatus());
     }
     else
         emit status(curData->itemContentsInfo(path));

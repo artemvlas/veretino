@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+// This Class is a part of the Veretino project with GNU GPLv3 License. https://github.com/artemvlas/veretino
 // Objects of this class are used to work with lists of files. Folder contents lists, info about size, file types, files count, etc.
 // As well as the output of conveniently readable information about files and folders.
 
@@ -10,7 +11,8 @@ class Files : public QObject
 {
     Q_OBJECT
 public:
-    explicit Files(const QString &initPath = QString(), QObject *parent = nullptr);
+    explicit Files(QObject *parent = nullptr);
+    explicit Files(const QString &initPath, QObject *parent = nullptr);
     Files(const QStringList &fileList, QObject *parent = nullptr);
 
     // variables
@@ -26,13 +28,18 @@ public:
     QStringList& allFiles(const QString &rootFolder = QString()); // calls 'iterateFolder' if needed and returns a reference to the 'allFilesList'^ or 'allFilesListCustomFolder'^
     QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
     int filesNumber(const QString &folder = QString());
-    qint64 dataSize(const QString &folder = QString()); // total size of all files in the 'folder'
+
+    qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
+    qint64 dataSize(const QString &folder); // total size of all files in the 'folder'
     qint64 dataSize(const QStringList &filelist); // total size of all files in the 'filelist'
+
     QString dataSizeReadable(const qint64 &sizeBytes);
-    QString contentStatus(const QString &folder = QString());
+
+    QString contentStatus();
+    QString contentStatus(const QString &path); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
     QString contentStatus(const QStringList &filelist);
-    QString filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize);
-    QString fileNameSize(const QString &path = QString()); // returns "filename (readable size)"
+    QString contentStatus(const int &filesNumber, const qint64 &filesSize);
+
     QString folderContentsByType(const QString &folder = QString()); // returns sorted by data size list of extensions, files number and their size
 
 private:

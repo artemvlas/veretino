@@ -3,15 +3,17 @@
 #include <QDebug>
 #include <cmath>
 
+Files::Files(QObject *parent)
+    : QObject{parent}
+{}
+
 Files::Files(const QString &initPath, QObject *parent)
     : QObject{parent}
 {
-    if (initPath != nullptr) {
-        if (QFileInfo(initPath).isFile())
-            initFilePath = initPath;
-        else if (QFileInfo(initPath).isDir())
-            initFolderPath = initPath;
-    }
+    if (QFileInfo(initPath).isFile())
+        initFilePath = initPath;
+    else if (QFileInfo(initPath).isDir())
+        initFolderPath = initPath;
 }
 
 Files::Files(const QStringList &fileList, QObject *parent)
@@ -23,42 +25,41 @@ int Files::filesNumber(const QString &folder)
     return allFiles(folder).size();
 }
 
-QString Files::fileNameSize(const QString &path)
+QString Files::contentStatus()
 {
-    QString pathToFile;
-    if (path != nullptr)
-        pathToFile = path;
+    if (initFilePath != nullptr)
+        return contentStatus(initFilePath);
+    else if (initFolderPath != nullptr)
+        return contentStatus(initFolderPath);
+    else if (!initFileList.isEmpty())
+        return contentStatus(initFileList);
     else
-        pathToFile = initFilePath;
-
-    QFileInfo fileInfo (pathToFile);
-
-    return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
+        return QString();
 }
 
-QString Files::filesNumberSizeToReadable(const int &filesNumber, const qint64 &filesSize)
+QString Files::contentStatus(const QString &path)
+{
+    QFileInfo fInfo(path);
+    if (fInfo.isFile())
+        return QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
+    else if (fInfo.isDir())
+        return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(allFiles(path)));
+    else
+        return QString();
+}
+
+QString Files::contentStatus(const QStringList &filelist)
+{
+    return contentStatus(filelist.size(), dataSize(filelist));
+}
+
+QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
 {
     char s = char(); // if only 1 file - text is "file", if more - text is "files"
     if (filesNumber != 1)
         s = 's';
 
     return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(dataSizeReadable(filesSize));
-}
-
-QString Files::contentStatus(const QStringList &filelist)
-{
-    return filesNumberSizeToReadable(filelist.size(), dataSize(filelist));
-}
-
-QString Files::contentStatus(const QString &folder)
-{
-    QString folderName;
-    if (folder != nullptr)
-        folderName = QDir(folder).dirName();
-    else
-        folderName = QDir(initFolderPath).dirName();
-
-    return QString("%1: %2").arg(folderName, contentStatus(allFiles(folder)));
 }
 
 QString Files::folderContentsByType(const QString &folder)
@@ -109,7 +110,7 @@ QString Files::folderContentsByType(const QString &folder)
                 excNumber += combList.at(var).filelist.size();
             }
         }
-        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(filesNumberSizeToReadable(excNumber, excSize)));
+        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(contentStatus(excNumber, excSize)));
     }
     else {
         foreach (const combinedByType &t, combList) {
@@ -162,7 +163,7 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
 
 QStringList& Files::allFiles(const QString &rootFolder)
 {
-    if (rootFolder != nullptr) {
+    if (rootFolder != nullptr && rootFolder != initFolderPath) {
         allFilesListCustomFolder = iterateFolder(rootFolder);
         return allFilesListCustomFolder;
     }
@@ -175,11 +176,34 @@ QStringList& Files::allFiles(const QString &rootFolder)
 
 QStringList Files::iterateFolder(const QString &rootFolder)
 {
+    if (!QFileInfo(rootFolder).isDir()) {
+        qDebug() << "Files::iterateFolder | Not a folder path: " << rootFolder;
+        return QStringList();
+    }
+
     QStringList fileList;
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext())
         fileList.append(it.next());
+
     return fileList;
+}
+
+qint64 Files::dataSize()
+{
+    if (initFolderPath != nullptr)
+        return dataSize(allFiles());
+    else if (!initFileList.isEmpty())
+        return dataSize(initFileList);
+    else {
+        qDebug() << "Files::dataSize() | No data to size return";
+        return 0;
+    }
+}
+
+qint64 Files::dataSize(const QString &folder)
+{
+    return dataSize(allFiles(folder));
 }
 
 qint64 Files::dataSize(const QStringList &filelist)
@@ -193,14 +217,6 @@ qint64 Files::dataSize(const QStringList &filelist)
     }
 
     return totalSize;
-}
-
-qint64 Files::dataSize(const QString &folder)
-{   
-    if (folder != nullptr || initFolderPath != nullptr)
-        return dataSize(allFiles(folder));
-    else
-        return dataSize(initFileList);
 }
 
 QString Files::dataSizeReadable(const qint64 &sizeBytes)
