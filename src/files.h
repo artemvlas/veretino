@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-// This Class is a part of the Veretino project with GNU GPLv3 License. https://github.com/artemvlas/veretino
+// This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 // Objects of this class are used to work with lists of files. Folder contents lists, info about size, file types, files count, etc.
 // As well as the output of conveniently readable information about files and folders.
 
