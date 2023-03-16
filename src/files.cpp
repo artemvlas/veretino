@@ -225,14 +225,14 @@ QString Files::dataSizeReadable(const qint64 &sizeBytes)
         if (converted > 1024) {
             converted /= 1024;
             xB = "MiB";
-        }
-        if (converted > 1024) {
-            converted /= 1024;
-            xB = "GiB";
-        }
-        if (converted > 1024) {
-            converted /= 1024;
-            xB = "TiB";
+            if (converted > 1024) {
+                converted /= 1024;
+                xB = "GiB";
+                if (converted > 1024) {
+                    converted /= 1024;
+                    xB = "TiB";
+                }
+            }
         }
 
         float x = std::round(converted * 100) / 100;
