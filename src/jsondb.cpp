@@ -161,7 +161,7 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     }
 
     QJsonObject::const_iterator i;
-    for (i = filelistData.begin(); i != filelistData.end(); ++i) {
+    for (i = filelistData.constBegin(); i != filelistData.constEnd(); ++i) {
         data->mainData.insert(data->workDir + i.key(), i.value().toString()); // from relative to full path
     }
 
