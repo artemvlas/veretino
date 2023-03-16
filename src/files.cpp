@@ -236,7 +236,7 @@ QString Files::dataSizeReadable(const qint64 &sizeBytes)
         }
 
         float x = std::round(converted * 100) / 100;
-        return QString("%1 %2").arg(x).arg(xB);
+        return QString("%1 %2").arg(QString::number(x, 'f', 2), xB);
     }
     else
         return QString("%1 bytes").arg(sizeBytes);
