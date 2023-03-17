@@ -252,7 +252,7 @@ void Manager::checkFileSummary(const QString &path)
     QString ext = QFileInfo(path).suffix().toLower();
     int shatype = ext.replace("sha","").toInt();
     QString checkFileName = QFileInfo(path).completeBaseName();
-    QString checkFilePath = QFileInfo(path).absolutePath() + '/' + checkFileName;
+    QString checkFilePath = Files::joinPath(QFileInfo(path).absolutePath(), checkFileName);
 
     QFile sumFile(path);
     QString line;
@@ -290,7 +290,7 @@ void Manager::checkFileSummary(const QString &path)
 //check only selected file instead all database cheking
 void Manager::checkCurrentItemSum(const QString &path)
 {
-    QString filepath = Files().joinPath(curData->workDir, path);
+    QString filepath = Files::joinPath(curData->workDir, path);
     qDebug()<<"Manager::checkCurrentItemSum | filepath:"<<filepath;
 
     if (QFileInfo(filepath).isDir()) {

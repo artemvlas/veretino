@@ -142,7 +142,7 @@ QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolde
 
 QString DataContainer::itemContentsInfo(const QString &itemPath)
 {
-    QString fullPath = Files().joinPath(workDir, itemPath);
+    QString fullPath = Files::joinPath(workDir, itemPath);
     QFileInfo fInf (fullPath);
     if (fInf.isFile())
         return Files(fullPath).contentStatus();

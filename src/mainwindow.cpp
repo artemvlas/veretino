@@ -179,7 +179,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
             if (viewMode == "model" || viewMode == "modelNewLost") {
                 if (index.isValid()) {
-                    if (QFileInfo(Files().joinPath(ui->treeView->workDir, curPath)).isFile())
+                    if (QFileInfo(Files::joinPath(ui->treeView->workDir, curPath)).isFile())
                         contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
                 }
 

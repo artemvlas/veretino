@@ -29,7 +29,7 @@ public:
     QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
 
     QString joinPath(const QString &addPath); // returns 'initFolderPath/addPath'
-    QString joinPath(const QString &absolutePath, const QString &addPath); // returns 'absolutePath/addPath'
+    static QString joinPath(const QString &absolutePath, const QString &addPath); // returns 'absolutePath/addPath'
 
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
     qint64 dataSize(const QString &folder); // total size of all files in the 'folder'
