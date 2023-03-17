@@ -22,7 +22,7 @@ public:
     ~DataContainer();
 
     QString jsonFilePath;
-    QString workDir; // current working folder with '/': /home/user/dataFolder/
+    QString workDir; // current working folder
     QStringList ignoredExtensions;
     QStringList onlyExtensions;
     int dbShaType = 0; // 1 or 256 or 512: from json database header or by checksum lenght

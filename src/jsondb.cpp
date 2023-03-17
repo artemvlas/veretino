@@ -171,15 +171,16 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
         data->dbShaType = shatypeByLen(data->mainData.begin().value().size());
 
     QJsonObject::const_iterator i;
+    QString curFolder = data->workDir + '/';
     for (i = filelistData.constBegin(); i != filelistData.constEnd(); ++i) {
-        data->mainData.insert(data->workDir + i.key(), i.value().toString()); // from relative to full path
+        data->mainData.insert(curFolder + i.key(), i.value().toString()); // from relative to full path
     }    
 
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles["Unreadable files"].toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
-                data->mainData[data->workDir + unreadableFiles.at(var).toString()] = "unreadable";
+                data->mainData[curFolder + unreadableFiles.at(var).toString()] = "unreadable";
             }
         }
     }

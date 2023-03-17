@@ -184,6 +184,20 @@ QStringList Files::iterateFolder(const QString &rootFolder)
     return fileList;
 }
 
+QString Files::joinPath(const QString &addPath)
+{
+    return joinPath(initFolderPath, addPath);
+}
+
+QString Files::joinPath(const QString &absolutePath, const QString &addPath)
+{
+    QChar sep;
+    if (!absolutePath.endsWith('/'))
+        sep = '/';
+
+    return QString("%1%2%3").arg(absolutePath, sep, addPath);
+}
+
 qint64 Files::dataSize()
 {
     if (initFolderPath != nullptr)

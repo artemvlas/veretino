@@ -8,7 +8,7 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
 
     if (initPathInfo.isFile() && initPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
         jsonFilePath = initPath;
-        workDir = initPathInfo.absolutePath() + '/';
+        workDir = initPathInfo.absolutePath();
     }
     else if (initPathInfo.isDir()) {
         workDir = initPath;
@@ -142,7 +142,7 @@ QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolde
 
 QString DataContainer::itemContentsInfo(const QString &itemPath)
 {
-    QString fullPath = workDir + itemPath;
+    QString fullPath = Files().joinPath(workDir, itemPath);
     QFileInfo fInf (fullPath);
     if (fInf.isFile())
         return Files(fullPath).contentStatus();

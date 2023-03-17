@@ -47,7 +47,7 @@ signals:
     void status(const QString &text); //text to statusbar
     void donePercents(const int &done);
     void completeTreeModel(TreeModel *model);
-    void workDirChanged(const QString workDir);
+    void workDirChanged(const QString &workDir);
     void showMessage(const QString &text, const QString &title = "Info");
     void setButtonText(const QString &text);
     void resetView();
