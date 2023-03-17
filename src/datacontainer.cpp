@@ -1,4 +1,5 @@
 #include "datacontainer.h"
+#include "files.h"
 
 DataContainer::DataContainer(const QString &initPath, QObject *parent)
     : QObject{parent}
@@ -61,9 +62,6 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
         }
     }
 
-    lostFilesNumber = lostFiles.size();
-    newFilesNumber = newFiles.size();
-
     return filesAvailability;
 }
 
@@ -71,11 +69,11 @@ QMap<QString,QString> DataContainer::newlostOnly()
 {
     QMap<QString,QString> newlost;
 
-    if (lostFilesNumber > 0) {
+    if (lostFiles.size() > 0) {
         newlost.insert(fillMapSameValues(lostFiles, "LOST file"));
     }
 
-    if (newFilesNumber > 0) {
+    if (newFiles.size() > 0) {
         newlost.insert(fillMapSameValues(newFiles, "NEW file"));
     }
 
@@ -84,14 +82,13 @@ QMap<QString,QString> DataContainer::newlostOnly()
 
 QMap<QString,QString> DataContainer::clearDataFromLostFiles()
 {
-    if (lostFilesNumber > 0) {
+    if (lostFiles.size() > 0) {
         foreach (const QString &file, lostFiles) {
             mainData.remove(file);
         }
 
         QMap<QString,QString> changes = fillMapSameValues(lostFiles, "removed from DB");
         lostFiles.clear();
-        lostFilesNumber = 0;
         qDebug()<< "DataContainer::clearDataFromLostFiles() | 'lostFiles' cleared";
         return changes;
     }
@@ -116,7 +113,6 @@ QMap<QString,QString> DataContainer::updateMainData(const QMap<QString,QString> 
         }
         else if (newFiles.contains(listFilesChecksums.firstKey())) {
             newFiles.clear();
-            newFilesNumber = 0;
             qDebug()<< "DataContainer::updateMainData() | mainData updated, 'newFiles' cleared";
         }
         return changes;
@@ -201,13 +197,13 @@ QString DataContainer::aboutDb()
 {
     QString tipText;
 
-    if (newFilesNumber > 0 || lostFilesNumber > 0) {
+    if (newFiles.size() > 0 || lostFiles.size() > 0) {
         tipText = "\n\nUse context menu for more options";
     }
 
     QString newFilesInfo;
 
-    if (newFilesNumber > 0) {
+    if (newFiles.size() > 0) {
         newFilesInfo = "New: " + Files().contentStatus(newFiles);
     }
     else
@@ -230,7 +226,7 @@ QString DataContainer::aboutDb()
     }
 
     return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
-        .arg(dbShaType).arg(filters, storedDataSize, lastUpdate).arg(filesAvailabilityNumber).arg(storedPathsInfo, newFilesInfo).arg(lostFilesNumber).arg(tipText);
+        .arg(dbShaType).arg(filters, storedDataSize, lastUpdate).arg(filesAvailabilityNumber).arg(storedPathsInfo, newFilesInfo).arg(lostFiles.size()).arg(tipText);
 }
 
 QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, const QString &value)

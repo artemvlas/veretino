@@ -1,5 +1,6 @@
 #include "manager.h"
 #include "QThread"
+#include "files.h"
 
 Manager::Manager(QObject *parent)
     : QObject{parent}
@@ -165,9 +166,9 @@ void Manager::updateNewLost()
 {
     emit setMode("processing");
     QMap<QString,QString> changes; // display list of added/removed files from database
-    QString info = QString("Database updated. Added %1 files, removed %2").arg(curData->newFilesNumber).arg(curData->lostFilesNumber);
+    QString info = QString("Database updated. Added %1 files, removed %2").arg(curData->newFiles.size()).arg(curData->lostFiles.size());
 
-    if (curData->newFilesNumber > 0) {
+    if (curData->newFiles.size() > 0) {
         QMap<QString,QString> newFilesSums = shaCalc->calculateSha(curData->newFiles, curData->dbShaType);
         if(newFilesSums.isEmpty()) {
             return;
@@ -175,7 +176,7 @@ void Manager::updateNewLost()
         changes.insert(curData->updateMainData(newFilesSums)); // add new data to Database, returns the list of changes
     }
 
-    if (curData->lostFilesNumber > 0)
+    if (curData->lostFiles.size() > 0)
         changes.insert(curData->clearDataFromLostFiles()); // remove lostFiles items from mainData
 
     if (json->makeJsonDB(curData)) {

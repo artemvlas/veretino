@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QFileInfo>
 #include <QDir>
-#include "files.h"
 #include <QMap>
 #include <QDebug>
 
@@ -36,8 +35,6 @@ public:
     QMap<QString,QString> fillMapSameValues(const QStringList &keys, const QString &value); // create the QMap with multiple keys(QStrinList) and same values
     QStringList lostFiles;
     QStringList newFiles;
-    int lostFilesNumber = 0;
-    int newFilesNumber = 0;
     QStringList onDiskFiles;
 
     QMap<QString,QString>& defineFilesAvailability();

@@ -2,7 +2,6 @@
 #define MANAGER_H
 
 #include <QObject>
-#include "files.h"
 #include "shacalculator.h"
 #include "jsondb.h"
 #include "treemodel.h"
