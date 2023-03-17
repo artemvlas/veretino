@@ -15,14 +15,12 @@ TreeModel::~TreeModel()
 void TreeModel::populateMap(const QMap<QString,QString> &map)
 {
     QStringList filelist = map.keys();
-    int fileListSize = filelist.size(); // the list size variable is needed to increase the speed of the loop
 
-    for (int f = 0; f < fileListSize; ++f) {
+    for (int f = 0; f < filelist.size(); ++f) {
         QStringList splitPath = filelist.at(f).split('/');
-        int splitPathSize = splitPath.size(); // for speed up ^
         TreeItem *parentItem = rootItem;
 
-        for (int var = 0; var < splitPathSize; ++var) {
+        for (int var = 0; var < splitPath.size(); ++var) {
             bool not_exist = true;
 
             for (int i = 0; i < parentItem->childCount(); ++i) {
@@ -35,7 +33,7 @@ void TreeModel::populateMap(const QMap<QString,QString> &map)
 
             if (not_exist) {
                 QString info;
-                if (var + 1 == splitPathSize)
+                if (var + 1 == splitPath.size())
                     info = map.value(filelist.at(f));
                 TreeItem *ti = new TreeItem({splitPath.at(var), info}, parentItem);
                 parentItem->appendChild(ti);

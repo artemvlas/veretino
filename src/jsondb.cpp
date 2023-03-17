@@ -160,20 +160,20 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
         qDebug()<< "jsonDB::parseJson | Included Only:" << data->onlyExtensions;
     }
 
+    if (header.contains("SHA type")) {
+        QString shatype = header["SHA type"].toString();
+        shatype.remove("SHA-");
+        data->dbShaType = shatype.toInt();
+    }
+
+    // if the shatype has not readed from the json file, try to determine it by the length of the checksum string
+    if (data->dbShaType == 0)
+        data->dbShaType = shatypeByLen(data->mainData.begin().value().size());
+
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); i != filelistData.constEnd(); ++i) {
         data->mainData.insert(data->workDir + i.key(), i.value().toString()); // from relative to full path
-    }
-
-    data->dbShaType = shatypeByLen(data->mainData.begin().value().size());
-    // if something wrong with first value, try others
-    if (data->dbShaType == 0) {
-        foreach (const QString &v, data->mainData.values()) {
-            int t = shatypeByLen(v.size());
-            if(t != 0)
-                data->dbShaType = t;
-        }
-    }
+    }    
 
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
