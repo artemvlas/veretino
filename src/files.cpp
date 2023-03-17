@@ -50,7 +50,7 @@ QString Files::contentStatus(const QStringList &filelist)
 
 QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
 {
-    char s = char(); // if only 1 file - text is "file", if more - text is "files"
+    QChar s; // if only 1 file - text is "file", if more - text is "files"
     if (filesNumber != 1)
         s = 's';
 
