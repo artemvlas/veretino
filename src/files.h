@@ -23,10 +23,10 @@ public:
     bool ignoreDbFiles = true; // exlude *.ver.json files while filtering
     bool ignoreShaFiles = true; // exclude *.sha1/256/512 files while filtering
     QStringList allFilesList; // cached list of all files in initial folder
-    QStringList allFilesListCustomFolder; // cached list of all files in specified as argument folder
 
     // functions
-    QStringList& allFiles(const QString &rootFolder = QString()); // calls 'iterateFolder' if needed and returns a reference to the 'allFilesList'^ or 'allFilesListCustomFolder'^
+    QStringList& allFiles(); // returns a reference to the 'allFilesList'^; empty list will be filled by overloaded func
+    QStringList allFiles(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
     QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
 
     QString parentFolder(); // returns the parent folder of initFilePath;
@@ -47,9 +47,6 @@ public:
     QString contentStatus(const int &filesNumber, const qint64 &filesSize);
 
     QString folderContentsByType(const QString &folder = QString()); // returns sorted by data size list of extensions, files number and their size
-
-private:
-    QStringList iterateFolder(const QString &rootFolder); // returns a list of all files in specified folder and all its subfolders
 };
 
 #endif // FILES_H

@@ -176,23 +176,21 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
     return filteredFiles;
 }
 
-QStringList& Files::allFiles(const QString &rootFolder)
+QStringList& Files::allFiles()
 {
-    if (rootFolder != nullptr && rootFolder != initFolderPath) {
-        allFilesListCustomFolder = iterateFolder(rootFolder);
-        return allFilesListCustomFolder;
-    }
-    else {
-        if (allFilesList.isEmpty())
-            allFilesList = iterateFolder(initFolderPath);
-        return allFilesList;
-    }
+    if (allFilesList.isEmpty())
+        allFilesList = allFiles(initFolderPath);
+
+    return allFilesList;
 }
 
-QStringList Files::iterateFolder(const QString &rootFolder)
+QStringList Files::allFiles(const QString &rootFolder)
 {
+    if (rootFolder == nullptr) {
+        return allFiles();
+    }
     if (!QFileInfo(rootFolder).isDir()) {
-        qDebug() << "Files::iterateFolder | Not a folder path: " << rootFolder;
+        qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
         return QStringList();
     }
 
