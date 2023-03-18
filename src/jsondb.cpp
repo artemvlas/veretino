@@ -69,7 +69,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
         filePath = data->jsonFilePath;
 
     qint64 totalSize = 0;
-    QDir dir (QFileInfo(filePath).absolutePath());
+    QDir dir (Files::parentFolder(filePath));
 
     QJsonDocument doc;
     QJsonArray mainArray;

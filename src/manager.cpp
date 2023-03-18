@@ -249,10 +249,11 @@ void Manager::verifyFileList()
 
 void Manager::checkFileSummary(const QString &path)
 {
-    QString ext = QFileInfo(path).suffix().toLower();
-    int shatype = ext.replace("sha","").toInt();
-    QString checkFileName = QFileInfo(path).completeBaseName();
-    QString checkFilePath = Files::joinPath(QFileInfo(path).absolutePath(), checkFileName);
+    QFileInfo fileInfo (path);
+    QString ext = fileInfo.suffix().toLower();
+    int shatype = ext.remove("sha").toInt();
+    QString checkFileName = fileInfo.completeBaseName();
+    QString checkFilePath = Files::joinPath(Files::parentFolder(path), checkFileName);
 
     QFile sumFile(path);
     QString line;

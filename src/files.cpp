@@ -20,6 +20,26 @@ Files::Files(const QStringList &fileList, QObject *parent)
     : QObject{parent}, initFileList(fileList)
 {}
 
+QString Files::parentFolder()
+{
+    return parentFolder(initFilePath);
+}
+
+QString Files::parentFolder(const QString &path)
+{
+    int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'
+    if (rootSepIndex == -1)
+        return "/"; // if there is no '/' in 'path', return '/' as root
+
+    if (path.at(rootSepIndex + 1) == '/')
+        ++rootSepIndex; // if the path is like 'ftp://folder' or 'smb://folder', increase index to next position
+    int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
+    if (sepIndex > rootSepIndex)
+        return path.left(sepIndex);
+    else
+        return path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
+}
+
 QString Files::contentStatus()
 {
     if (initFilePath != nullptr)

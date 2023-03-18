@@ -8,7 +8,7 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
 
     if (initPathInfo.isFile() && initPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
         jsonFilePath = initPath;
-        workDir = initPathInfo.absolutePath();
+        workDir = Files::parentFolder(initPath);
     }
     else if (initPathInfo.isDir()) {
         workDir = initPath;

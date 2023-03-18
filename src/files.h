@@ -28,6 +28,9 @@ public:
     QStringList& allFiles(const QString &rootFolder = QString()); // calls 'iterateFolder' if needed and returns a reference to the 'allFilesList'^ or 'allFilesListCustomFolder'^
     QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
 
+    QString parentFolder(); // returns the parent folder of initFilePath;
+    static QString parentFolder(const QString &path); // returns the parent folder of the 'path'
+
     QString joinPath(const QString &addPath); // returns 'initFolderPath/addPath'
     static QString joinPath(const QString &absolutePath, const QString &addPath); // returns 'absolutePath/addPath'
 
@@ -35,7 +38,7 @@ public:
     qint64 dataSize(const QString &folder); // total size of all files in the 'folder'
     qint64 dataSize(const QStringList &filelist); // total size of all files in the 'filelist'
 
-    QString dataSizeReadable(const qint64 &sizeBytes);
+    static QString dataSizeReadable(const qint64 &sizeBytes);
 
     QString contentStatus();
     QString contentStatus(const QString &path); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
