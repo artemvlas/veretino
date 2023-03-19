@@ -4,9 +4,8 @@
 #include <QObject>
 
 // This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
-// Objects of this class are used to work with paths and lists of files. Join relative paths, create the folder contents lists,
-// filtering filelists, return info about size, file types, files count, etc.
-// As well as the output of conveniently readable information about files and folders.
+// Objects of this class are used to work with paths and lists of files: join relative paths, create the folder contents lists,
+// filtering filelists by file types, return info (conveniently readable if needed) about size, file types, files count, etc.
 
 class Files : public QObject
 {
@@ -26,7 +25,7 @@ public:
     QStringList& allFiles(); // returns a reference to the 'allFilesList'^; empty list will be filled by overloaded func
     QStringList allFiles(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
 
-    QStringList filteredFileList(const QStringList &extensionsList, const bool includeOnly = false);
+    QStringList filteredFileList(const QStringList &extensionsList, const bool includeOnly = false); // return filtered filelist: can ignore or include only files with specified extensions
     QStringList filteredFileList(const QStringList &extensionsList, const QStringList &fileList, const bool includeOnly = false);
 
     QString parentFolder(); // returns the parent folder of initFilePath;
