@@ -46,7 +46,7 @@ QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
 
     if (readJsonFile(filePath).isArray()) {
         QJsonArray dataArray = readJsonFile(filePath).array();
-        if(dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
+        if (dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
             return readJsonFile(filePath).array();
         else {
             emit showMessage("Corrupted Json/Database", "Error");
@@ -145,23 +145,23 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     QJsonObject excludedFiles (mainArray[2].toObject());
 
     if (filelistData.isEmpty()) {
-        qDebug()<<"EMPTY filelistData";
+        qDebug()<< "EMPTY filelistData";
         return nullptr;
     }
 
     DataContainer *data = new DataContainer(filePath);
 
     if (header.contains("Ignored")) {
-        data->setIgnoredExtensions(header["Ignored"].toString().split(" "));
+        data->setIgnoredExtensions(header.value("Ignored").toString().split(" "));
         qDebug()<< "jsonDB::parseJson | ignoredExtensions:" << data->ignoredExtensions;
     }
     else if (header.contains("Included Only")) {
-        data->setOnlyExtensions(header["Included Only"].toString().split(" "));
+        data->setOnlyExtensions(header.value("Included Only").toString().split(" "));
         qDebug()<< "jsonDB::parseJson | Included Only:" << data->onlyExtensions;
     }
 
     if (header.contains("SHA type")) {
-        QString shatype = header["SHA type"].toString();
+        QString shatype = header.value("SHA type").toString();
         shatype.remove("SHA-");
         data->dbShaType = shatype.toInt();
     }
@@ -178,7 +178,7 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
 
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
-            QJsonArray unreadableFiles = excludedFiles["Unreadable files"].toArray();
+            QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
                 data->mainData[curFolder + unreadableFiles.at(var).toString()] = "unreadable";
             }
@@ -186,12 +186,12 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     }
 
     if (header.contains("Updated"))
-        data->lastUpdate = header["Updated"].toString();
+        data->lastUpdate = header.value("Updated").toString();
     else
         data->lastUpdate = QString();
 
     if (header.contains("Total size"))
-        data->storedDataSize = header["Total size"].toString();
+        data->storedDataSize = header.value("Total size").toString();
     else
         data->storedDataSize = QString();
 
