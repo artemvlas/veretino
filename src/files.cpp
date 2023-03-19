@@ -40,103 +40,44 @@ QString Files::parentFolder(const QString &path)
         return path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
 }
 
-QString Files::contentStatus()
+QString Files::joinPath(const QString &addPath)
 {
-    if (initFilePath != nullptr)
-        return contentStatus(initFilePath);
-    else if (initFolderPath != nullptr)
-        return contentStatus(initFolderPath);
-    else if (!initFileList.isEmpty())
-        return contentStatus(initFileList);
-    else
-        return QString();
+    return joinPath(initFolderPath, addPath);
 }
 
-QString Files::contentStatus(const QString &path)
+QString Files::joinPath(const QString &absolutePath, const QString &addPath)
 {
-    QFileInfo fInfo(path);
-    if (fInfo.isFile())
-        return QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
-    else if (fInfo.isDir())
-        return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(allFiles(path)));
-    else
-        return QString();
+    QChar sep;
+    if (!absolutePath.endsWith('/'))
+        sep = '/';
+
+    return QString("%1%2%3").arg(absolutePath, sep, addPath);
 }
 
-QString Files::contentStatus(const QStringList &filelist)
+QStringList& Files::allFiles()
 {
-    return contentStatus(filelist.size(), dataSize(filelist));
+    if (allFilesList.isEmpty())
+        allFilesList = allFiles(initFolderPath);
+
+    return allFilesList;
 }
 
-QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
+QStringList Files::allFiles(const QString &rootFolder)
 {
-    QChar s; // if only 1 file - text is "file", if more - text is "files"
-    if (filesNumber != 1)
-        s = 's';
-
-    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(dataSizeReadable(filesSize));
-}
-
-QString Files::folderContentsByType(const QString &folder)
-{
-    QStringList files = allFiles(folder);
-
-    if (files.isEmpty())
-        return "Empty folder";
-
-    QHash<QString, QStringList> listsByType; // key = extension, value = list of files with that extension
-
-    foreach (const QString &file, files) {
-        QString ext = QFileInfo(file).suffix().toLower();
-        if (ext == "")
-            ext = "No type";
-        listsByType[ext].append(file);
+    if (rootFolder == nullptr) {
+        return allFiles();
+    }
+    if (!QFileInfo(rootFolder).isDir()) {
+        qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
+        return QStringList();
     }
 
-    struct combinedByType {
-        QString extension;
-        QStringList filelist;
-        qint64 filesSize;
-    };
+    QStringList fileList;
+    QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext())
+        fileList.append(it.next());
 
-    QList<combinedByType> combList;
-
-    foreach (const QString &ext, listsByType.keys()) {
-        combinedByType t;
-        t.extension = ext;
-        t.filelist = listsByType.value(ext);
-        t.filesSize = dataSize(t.filelist);
-        combList.append(t);
-    }
-
-    std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {return (t1.filesSize > t2.filesSize);});
-
-    QString text;
-    if (combList.size() > 10) {
-        text.append(QString("Top sized file types:\n%1\n").arg(QString('-').repeated(30)));
-        qint64 excSize = 0; // total size of files whose types are not displayed
-        int excNumber = 0; // the number of these files
-        for (int var = 0; var < combList.size(); ++var) {
-            if (var < 10) {
-                text.append(QString("%1: %2\n").arg(combList.at(var).extension, contentStatus(combList.at(var).filelist)));
-            }
-            else {
-                excSize += combList.at(var).filesSize;
-                excNumber += combList.at(var).filelist.size();
-            }
-        }
-        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(contentStatus(excNumber, excSize)));
-    }
-    else {
-        foreach (const combinedByType &t, combList) {
-            text.append(QString("%1: %2\n").arg(t.extension, contentStatus(t.filelist)));
-        }
-    }
-
-    QString totalInfo = QString(" Total: %1 types, %2").arg(combList.size()).arg(contentStatus(files));
-    text.append(QString("%1\n%2").arg(QString('_').repeated(totalInfo.length()), totalInfo));
-
-    return text;
+    return fileList;
 }
 
 QStringList Files::filteredFileList(QStringList extensionsList, const bool includeOnly, const QStringList &filelist)
@@ -176,44 +117,117 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
     return filteredFiles;
 }
 
-QStringList& Files::allFiles()
+QString Files::contentStatus()
 {
-    if (allFilesList.isEmpty())
-        allFilesList = allFiles(initFolderPath);
-
-    return allFilesList;
+    if (initFilePath != nullptr)
+        return contentStatus(initFilePath);
+    else if (initFolderPath != nullptr)
+        return contentStatus(initFolderPath);
+    else if (!initFileList.isEmpty())
+        return contentStatus(initFileList);
+    else
+        return QString();
 }
 
-QStringList Files::allFiles(const QString &rootFolder)
+QString Files::contentStatus(const QString &path)
 {
-    if (rootFolder == nullptr) {
-        return allFiles();
+    QFileInfo fInfo(path);
+    if (fInfo.isFile())
+        return QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
+    else if (fInfo.isDir())
+        return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(allFiles(path)));
+    else
+        return QString();
+}
+
+QString Files::contentStatus(const QStringList &filelist)
+{
+    return contentStatus(filelist.size(), dataSize(filelist));
+}
+
+QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
+{
+    QChar s; // if only 1 file - text is "file", if more - text is "files"
+    if (filesNumber != 1)
+        s = 's';
+
+    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(dataSizeReadable(filesSize));
+}
+
+QString Files::folderContentsByType()
+{
+    if (initFolderPath != nullptr)
+        return folderContentsByType(allFiles());
+    else if (!initFileList.isEmpty())
+        return folderContentsByType(initFileList);
+    else
+        return "Files::folderContentsByType | No initial data";
+}
+
+QString Files::folderContentsByType(const QString &folder)
+{
+    return folderContentsByType(allFiles(folder));
+}
+
+QString Files::folderContentsByType(const QStringList &fileList)
+{
+    if (fileList.isEmpty())
+        return "Empty folder. No file types to display.";
+
+    QHash<QString, QStringList> listsByType; // key = extension, value = list of files with that extension
+
+    foreach (const QString &file, fileList) {
+        QString ext = QFileInfo(file).suffix().toLower();
+        if (ext == "")
+            ext = "No type";
+        listsByType[ext].append(file);
     }
-    if (!QFileInfo(rootFolder).isDir()) {
-        qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
-        return QStringList();
+
+    struct combinedByType {
+        QString extension;
+        QStringList filelist;
+        qint64 filesSize;
+    };
+
+    QList<combinedByType> combList;
+
+    QHash<QString, QStringList>::const_iterator iter;
+    for (iter = listsByType.constBegin(); iter != listsByType.constEnd(); ++iter) {
+        combinedByType t;
+        t.extension = iter.key();
+        t.filelist = iter.value();
+        t.filesSize = dataSize(t.filelist);
+        combList.append(t);
     }
 
-    QStringList fileList;
-    QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
-        fileList.append(it.next());
+    std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {return (t1.filesSize > t2.filesSize);});
 
-    return fileList;
-}
+    QString text;
+    if (combList.size() > 10) {
+        text.append(QString("Top sized file types:\n%1\n").arg(QString('-').repeated(30)));
+        qint64 excSize = 0; // total size of files whose types are not displayed
+        int excNumber = 0; // the number of these files
+        for (int var = 0; var < combList.size(); ++var) {
+            if (var < 10) {
+                text.append(QString("%1: %2\n").arg(combList.at(var).extension, contentStatus(combList.at(var).filelist)));
+            }
+            else {
+                excSize += combList.at(var).filesSize;
+                excNumber += combList.at(var).filelist.size();
+            }
+        }
+        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(contentStatus(excNumber, excSize)));
+    }
+    else {
+        foreach (const combinedByType &t, combList) {
+            text.append(QString("%1: %2\n").arg(t.extension, contentStatus(t.filelist)));
+        }
+    }
 
-QString Files::joinPath(const QString &addPath)
-{
-    return joinPath(initFolderPath, addPath);
-}
+    QString totalInfo = QString(" Total: %1 types, %2").arg(combList.size()).arg(contentStatus(fileList));
+    text.append(QString("%1\n%2").arg(QString('_').repeated(totalInfo.length()), totalInfo));
 
-QString Files::joinPath(const QString &absolutePath, const QString &addPath)
-{
-    QChar sep;
-    if (!absolutePath.endsWith('/'))
-        sep = '/';
-
-    return QString("%1%2%3").arg(absolutePath, sep, addPath);
+    return text;
 }
 
 qint64 Files::dataSize()

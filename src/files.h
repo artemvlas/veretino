@@ -46,7 +46,9 @@ public:
     QString contentStatus(const QStringList &filelist);
     QString contentStatus(const int &filesNumber, const qint64 &filesSize);
 
-    QString folderContentsByType(const QString &folder = QString()); // returns sorted by data size list of extensions, files number and their size
+    QString folderContentsByType(); // returns sorted by data size list of extensions, files number and their size
+    QString folderContentsByType(const QString &folder);
+    QString folderContentsByType(const QStringList &fileList);
 };
 
 #endif // FILES_H
