@@ -227,11 +227,11 @@ void Manager::verifyFileList()
         return;
     }
 
-    QMapIterator<QString,QString> ii (curData->recalculated);
+    QMapIterator<QString,QString> ii(curData->recalculated);
 
     while (ii.hasNext()) {
         ii.next();
-        if (curData->mainData[ii.key()] != ii.value())
+        if (curData->mainData.value(ii.key()) != ii.value())
             curData->mismatches.insert(ii.key(), ii.value());
     }
 
@@ -310,7 +310,7 @@ void Manager::checkCurrentItemSum(const QString &path)
         return;
     }
 
-    QString savedSum = curData->mainData[filepath];
+    QString savedSum = curData->mainData.value(filepath);
     if (savedSum == "unreadable") {
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
         return;
@@ -329,7 +329,6 @@ void Manager::checkCurrentItemSum(const QString &path)
         emit showMessage("Checksum does NOT match", "Failed");
     }
     emit setMode("endProcess");
-    //setMode_model();
 }
 
 // info about folder (number of files and total size) or file (size)
@@ -362,10 +361,8 @@ void Manager::isViewFS(const bool isFS)
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
 void Manager::setMode_model()
 {
-    if (curData->newFiles.size() > 0 || curData->lostFiles.size() > 0) {
-        //emit status(QString("SHA-%1: %2 new files, %3 lost files | Total files listed: %4").arg(curData->dbShaType).arg(curData->newFiles.size()).arg(curData->lostFiles.size()).arg(curData->filesAvailability.size()));
+    if (curData->newFiles.size() > 0 || curData->lostFiles.size() > 0)
         emit setMode("modelNewLost");
-    }
     else {
         emit setMode("model");
     }
