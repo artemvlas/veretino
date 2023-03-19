@@ -99,7 +99,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     int shatype = shatypeByLen(computedData.begin().value().toString().size());
 
     QLocale locale (QLocale::English);
-    header["Created with"] = "Veretino 0.1.2 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino 0.1.3 https://github.com/artemvlas/veretino";
     header["Files number"] = computedData.size();
     header["Folder"] = dir.dirName();
     header["SHA type"] = QString("SHA-%1").arg(shatype);

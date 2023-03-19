@@ -64,9 +64,6 @@ QStringList& Files::allFiles()
 
 QStringList Files::allFiles(const QString &rootFolder)
 {
-    if (rootFolder == nullptr) {
-        return allFiles();
-    }
     if (!QFileInfo(rootFolder).isDir()) {
         qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
         return QStringList();
