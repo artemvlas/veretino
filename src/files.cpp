@@ -77,15 +77,14 @@ QStringList Files::allFiles(const QString &rootFolder)
     return fileList;
 }
 
-QStringList Files::filteredFileList(QStringList extensionsList, const bool includeOnly, const QStringList &filelist)
+QStringList Files::filteredFileList(QStringList extensionsList, const bool includeOnly)
 {
-    QStringList files;
-    QStringList filteredFiles; // result list
+    return filteredFileList(extensionsList, allFiles(), includeOnly);
+}
 
-    if (filelist != QStringList())
-        files = filelist;
-    else
-        files = allFiles();
+QStringList Files::filteredFileList(QStringList extensionsList, const QStringList &fileList, const bool includeOnly)
+{
+    QStringList filteredFiles; // result list
 
     if (!includeOnly && ignoreDbFiles)
         extensionsList.append("ver.json");
@@ -94,10 +93,10 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
 
     if (extensionsList.isEmpty()) {
         qDebug() << "Files::filteredFileList | 'extensionsList' is Empty. Original list returned";
-        return files;
+        return fileList;
     }
 
-    foreach (const QString &file, files) {
+    foreach (const QString &file, fileList) {
         // to be able to filter compound extensions (like *.ver.json), a comparison loop is used instead of
         // 'extensionsList.contains(QFileInfo(file).suffix().toLower())'
         bool allowed = !includeOnly;

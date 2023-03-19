@@ -27,7 +27,9 @@ public:
     // functions
     QStringList& allFiles(); // returns a reference to the 'allFilesList'^; empty list will be filled by overloaded func
     QStringList allFiles(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
-    QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false, const QStringList &filelist = QStringList());
+
+    QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false);
+    QStringList filteredFileList(QStringList extensionsList, const QStringList &fileList, const bool includeOnly = false);
 
     QString parentFolder(); // returns the parent folder of initFilePath;
     static QString parentFolder(const QString &path); // returns the parent folder of the 'path'
