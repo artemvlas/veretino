@@ -84,8 +84,6 @@ QStringList Files::filteredFileList(QStringList extensionsList, const bool inclu
 
 QStringList Files::filteredFileList(QStringList extensionsList, const QStringList &fileList, const bool includeOnly)
 {
-    QStringList filteredFiles; // result list
-
     if (!includeOnly && ignoreDbFiles)
         extensionsList.append("ver.json");
     if (!includeOnly && ignoreShaFiles)
@@ -95,6 +93,8 @@ QStringList Files::filteredFileList(QStringList extensionsList, const QStringLis
         qDebug() << "Files::filteredFileList | 'extensionsList' is Empty. Original list returned";
         return fileList;
     }
+
+    QStringList filteredFiles; // result list
 
     foreach (const QString &file, fileList) {
         // to be able to filter compound extensions (like *.ver.json), a comparison loop is used instead of
@@ -122,7 +122,7 @@ QString Files::contentStatus()
     else if (!initFileList.isEmpty())
         return contentStatus(initFileList);
     else
-        return QString();
+        return "Files::contentStatus() | No content to display status";
 }
 
 QString Files::contentStatus(const QString &path)
@@ -133,7 +133,7 @@ QString Files::contentStatus(const QString &path)
     else if (fInfo.isDir())
         return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(allFiles(path)));
     else
-        return QString();
+        return "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
 }
 
 QString Files::contentStatus(const QStringList &filelist)
