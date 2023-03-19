@@ -77,18 +77,13 @@ QStringList Files::allFiles(const QString &rootFolder)
     return fileList;
 }
 
-QStringList Files::filteredFileList(QStringList extensionsList, const bool includeOnly)
+QStringList Files::filteredFileList(const QStringList &extensionsList, const bool includeOnly)
 {
     return filteredFileList(extensionsList, allFiles(), includeOnly);
 }
 
-QStringList Files::filteredFileList(QStringList extensionsList, const QStringList &fileList, const bool includeOnly)
+QStringList Files::filteredFileList(const QStringList &extensionsList, const QStringList &fileList, const bool includeOnly)
 {
-    if (!includeOnly && ignoreDbFiles)
-        extensionsList.append("ver.json");
-    if (!includeOnly && ignoreShaFiles)
-        extensionsList.append({"sha1", "sha256", "sha512"});
-
     if (extensionsList.isEmpty()) {
         qDebug() << "Files::filteredFileList | 'extensionsList' is Empty. Original list returned";
         return fileList;

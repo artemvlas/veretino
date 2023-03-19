@@ -20,16 +20,14 @@ public:
     QString initFilePath; // path to the File specified when creating the object
     QString initFolderPath; // path to the Folder specified when creating the object
     QStringList initFileList;
-    bool ignoreDbFiles = true; // exlude *.ver.json files while filtering
-    bool ignoreShaFiles = true; // exclude *.sha1/256/512 files while filtering
     QStringList allFilesList; // cached list of all files in initial folder
 
     // functions
     QStringList& allFiles(); // returns a reference to the 'allFilesList'^; empty list will be filled by overloaded func
     QStringList allFiles(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
 
-    QStringList filteredFileList(QStringList extensionsList, const bool includeOnly = false);
-    QStringList filteredFileList(QStringList extensionsList, const QStringList &fileList, const bool includeOnly = false);
+    QStringList filteredFileList(const QStringList &extensionsList, const bool includeOnly = false);
+    QStringList filteredFileList(const QStringList &extensionsList, const QStringList &fileList, const bool includeOnly = false);
 
     QString parentFolder(); // returns the parent folder of initFilePath;
     static QString parentFolder(const QString &path); // returns the parent folder of the 'path'

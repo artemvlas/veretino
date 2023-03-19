@@ -43,17 +43,19 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
         fileList = F.filteredFileList(calcData.onlyExtensions, true); // the list with only those files whose extensions are specified
     }
     else {
-        // to disable ignoring db (*.ver.json) or *.shaX files: F.ignoreDbFiles = false; F.ignoreShaFiles = false; to enable '= true' | 'true' is default in Files()
-        if (settings["ignoreDbFiles"].isValid())
-            F.ignoreDbFiles = settings["ignoreDbFiles"].toBool();
-        if (settings["ignoreShaFiles"].isValid())
-            F.ignoreShaFiles = settings["ignoreShaFiles"].toBool();
-
+        QStringList ignoreList;
         if (settings["ignoredExtensions"].isValid() && !settings["ignoredExtensions"].toStringList().isEmpty()) {
             calcData.setIgnoredExtensions(settings["ignoredExtensions"].toStringList());
+            ignoreList.append(settings["ignoredExtensions"].toStringList());
         }
 
-        fileList = F.filteredFileList(calcData.ignoredExtensions); // the list of all files except ignored
+        // adding *.ver.json or *.shaX file types to ignore list, if needed
+        if (settings["ignoreDbFiles"].isValid() && settings["ignoreDbFiles"].toBool())
+            ignoreList.append("ver.json");
+        if (settings["ignoreShaFiles"].isValid() && settings["ignoreShaFiles"].toBool())
+            ignoreList.append({"sha1", "sha256", "sha512"});
+
+        fileList = F.filteredFileList(ignoreList); // the list of all files except ignored
     }
 
     if (fileList.isEmpty()) {
