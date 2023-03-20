@@ -113,7 +113,7 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
     doc.setArray(mainArray);
 
     if (saveJsonFile(doc, filePath))
-        emit showMessage(QString("%1\n\nDatabase: %2\nuse it to check the data integrity\n\n%3").arg(about, QFileInfo(filePath).fileName(), databaseStatus), "Success");
+        emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity").arg(about, databaseStatus, QFileInfo(filePath).fileName()), "Success");
     else {
         QString workFolder = Files::parentFolder(filePath);
         header["Working folder"] = workFolder;
@@ -121,8 +121,8 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
         doc.setArray(mainArray);
 
         if (saveJsonFile(doc, QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + '/' + QFileInfo(filePath).fileName())) {
-            emit showMessage(QString("%1\n\nUnable to save in: %2\nSaved to Desktop folder !!!\nDatabase: %3\nuse it to check the data integrity\n\n%4")
-                                .arg(about, workFolder, QFileInfo(filePath).fileName(), databaseStatus), "Warning");
+            emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\nSaved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
+                                .arg(about, databaseStatus, workFolder, QFileInfo(filePath).fileName()), "Warning");
         }
         else {
             emit showMessage(QString("Unable to save json file: %1").arg(filePath), "Error");
