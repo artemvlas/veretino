@@ -87,7 +87,7 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
     header["Created with"] = "Veretino 0.1.3 https://github.com/artemvlas/veretino";
     header["Files number"] = computedData.size();
     header["Folder"] = dir.dirName();
-    header["SHA type"] = QString("SHA-%1").arg(shatype);
+    header["Used algorithm"] = QString("SHA-%1").arg(shatype);
     header["Total size"] = QString("%1 (%2 bytes)").arg(locale.formattedDataSize(totalSize), locale.toString(totalSize));
     header["Updated"] = QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm");
 
@@ -161,10 +161,12 @@ DataContainer* jsonDB::parseJson(const QString &filePath)
         qDebug()<< "jsonDB::parseJson | Included Only:" << data->onlyExtensions;
     }
 
-    if (header.contains("SHA type")) {
-        QString shatype = header.value("SHA type").toString();
+    if (header.contains("Used algorithm")) {
+        QString shatype = header.value("Used algorithm").toString();
         shatype.remove("SHA-");
-        data->shatype = shatype.toInt();
+        int type = shatype.toInt();
+        if (type == 1 || type == 256 || type == 512)
+            data->shatype = type;
     }
 
     QJsonObject::const_iterator i;
