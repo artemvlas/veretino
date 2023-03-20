@@ -2,16 +2,13 @@
 #define DATACONTAINER_H
 
 #include <QObject>
-#include <QFileInfo>
-#include <QDir>
 #include <QMap>
-#include <QDebug>
 
-/*
-Objects of this class are used to store, organize, manage database data.
-For each database, a separate object is created that stores checksums, all lists of files for various needs,
-info about the algorithm type, relevance, etc.
-The object can perform basic tasks of sorting, filtering, comparing data.
+
+/* This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
+ * Objects of this class are used to store, organize, manage database data.
+ * For each database, a separate object is created that stores checksums, all lists of files for various needs,
+ * info about the algorithm type, relevance, etc. The object can perform basic tasks of sorting, filtering, comparing data.
 */
 
 class DataContainer : public QObject
@@ -25,7 +22,8 @@ public:
     QString workDir; // current working folder
     QStringList ignoredExtensions;
     QStringList onlyExtensions;
-    int dbShaType = 0; // 1 or 256 or 512: from json database header or by checksum lenght
+    int shatype = 0; // 1 or 256 or 512: from json database header or by checksum lenght
+    int shaType(); // if ^ is 0 try to compute it by stored checksum string len
     QString lastUpdate; // from "Updated" value of first json object (from header)
     QString storedDataSize; // total size of listed files when db was built
     QMap<QString,QString> mainData;

@@ -1,6 +1,9 @@
 #include "manager.h"
 #include "QThread"
 #include "files.h"
+#include "QFile"
+#include "QFileInfo"
+#include "QDir"
 
 Manager::Manager(QObject *parent)
     : QObject{parent}
@@ -74,9 +77,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
         return;
     }
 
-    if (json->makeJsonDB(&calcData))
-        emit showMessage(QString("SHA-%1 Checksums for %2 files calculated\nDatabase: %3\nuse it to check the data integrity").arg(shatype)
-                         .arg(fileList.size()).arg(QFileInfo(calcData.jsonFilePath).fileName()), "Success");
+    json->makeJson(&calcData, QString("SHA-%1 Checksums for %2 files calculated").arg(shatype).arg(fileList.size()));
 
     emit setMode("endProcess");
 }
@@ -117,7 +118,7 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
 
         emit completeTreeModel(model);
         emit workDirChanged(curData->workDir);
-        emit status(QString("SHA-%1: %2 files").arg(curData->dbShaType).arg(map.size()));
+        emit status(QString("SHA-%1: %2 files").arg(curData->shaType()).arg(map.size()));
     }
     else
         emit resetView();
@@ -171,7 +172,7 @@ void Manager::updateNewLost()
     QString info = QString("Database updated. Added %1 files, removed %2").arg(curData->newFiles.size()).arg(curData->lostFiles.size());
 
     if (curData->newFiles.size() > 0) {
-        QMap<QString,QString> newFilesSums = shaCalc->calculateSha(curData->newFiles, curData->dbShaType);
+        QMap<QString,QString> newFilesSums = shaCalc->calculateSha(curData->newFiles, curData->shaType());
         if(newFilesSums.isEmpty()) {
             return;
         }
@@ -181,10 +182,8 @@ void Manager::updateNewLost()
     if (curData->lostFiles.size() > 0)
         changes.insert(curData->clearDataFromLostFiles()); // remove lostFiles items from mainData
 
-    if (json->makeJsonDB(curData)) {
-        makeTreeModel(changes);
-        emit showMessage(info);
-    }
+    json->makeJson(curData, info);
+    makeTreeModel(changes);
 
     emit setMode("endProcess");
     emit setMode("model");
@@ -205,11 +204,9 @@ void Manager::updateMismatch()
         return;
     }
 
-    if (json->makeJsonDB(curData)) {
-        makeTreeModel(changes);
-        setMode_model();
-        emit showMessage(QString("Chechsums updated for %1 files").arg(number));
-    }
+    json->makeJson(curData, QString("Chechsums updated for %1 files").arg(number));
+    makeTreeModel(changes);
+    setMode_model();
 }
 
 // checking the list of files against the checksums stored in the database
@@ -222,7 +219,7 @@ void Manager::verifyFileList()
 
     emit setMode("processing");
 
-    curData->recalculated = shaCalc->calculateSha(curData->onDiskFiles, curData->dbShaType);
+    curData->recalculated = shaCalc->calculateSha(curData->onDiskFiles, curData->shaType());
     if (curData->recalculated.isEmpty()) {
         return;
     }
@@ -243,7 +240,7 @@ void Manager::verifyFileList()
         return;
     }
     else {
-        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.").arg(curData->recalculated.size()).arg(curData->dbShaType), "Success");
+        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.").arg(curData->recalculated.size()).arg(curData->shaType()), "Success");
     }
 
     emit setMode("endProcess");
@@ -317,7 +314,7 @@ void Manager::checkCurrentItemSum(const QString &path)
     }
 
     emit setMode("processing");
-    QString sum = shaCalc->calculateSha(filepath, curData->dbShaType);
+    QString sum = shaCalc->calculateSha(filepath, curData->shaType());
     if (sum == nullptr) {
         return;
     }

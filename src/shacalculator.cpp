@@ -1,5 +1,7 @@
 #include "shacalculator.h"
 #include "qthread.h"
+#include "QFile"
+#include "QFileInfo"
 
 ShaCalculator::ShaCalculator(const int &shatype, QObject *parent)
     : QObject(parent)

@@ -1,5 +1,8 @@
 #include "datacontainer.h"
 #include "files.h"
+#include <QFileInfo>
+#include <QDir>
+#include <QDebug>
 
 DataContainer::DataContainer(const QString &initPath, QObject *parent)
     : QObject{parent}
@@ -229,7 +232,7 @@ QString DataContainer::aboutDb()
     }
 
     return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
-        .arg(dbShaType).arg(filters, storedDataSize, lastUpdate).arg(filesAvailabilityNumber).arg(storedPathsInfo, newFilesInfo).arg(lostFiles.size()).arg(tipText);
+        .arg(shaType()).arg(filters, storedDataSize, lastUpdate).arg(filesAvailabilityNumber).arg(storedPathsInfo, newFilesInfo).arg(lostFiles.size()).arg(tipText);
 }
 
 QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, const QString &value)
@@ -258,6 +261,22 @@ void DataContainer::setOnlyExtensions(const QStringList &extensions)
 void DataContainer::setJsonFileNamePrefix(const QString &prefix)
 {
     jsonFilePath = QString("%1/%2_%3.ver.json").arg(workDir, prefix, QDir(workDir).dirName());
+}
+
+int DataContainer::shaType()
+{
+    if (shatype != 0)
+        return shatype;
+
+    int len = mainData.begin().value().size();
+    if (len == 40)
+        return 1;
+    else if (len == 64)
+        return 256;
+    else if (len == 128)
+        return 512;
+    else
+        return 0;
 }
 
 DataContainer::~DataContainer()

@@ -1,23 +1,15 @@
 #include "jsondb.h"
+#include "QFile"
+#include "QDir"
+#include "files.h"
+#include "QStandardPaths"
 
-jsonDB::jsonDB(const QString &path, QObject *parent)
+jsonDB::jsonDB(QObject *parent)
     : QObject{parent}
-{
-    if (path != nullptr) {
-        if (QFileInfo(path).isFile() && path.endsWith(".ver.json", Qt::CaseInsensitive))
-            filePath = path;
-        else if (QFileInfo(path).isDir())
-            folderPath = path;
-        else
-            qDebug()<<"JsonDB: Wrong input path" << path;
-    }
-}
+{}
 
-QJsonDocument jsonDB::readJsonFile(const QString &pathToFile)
+QJsonDocument jsonDB::readJsonFile(const QString &filePath)
 {
-    if (pathToFile != nullptr)
-        filePath = pathToFile;
-
     QFile jsonFile(filePath);
     if (jsonFile.open(QFile::ReadOnly))
         return QJsonDocument().fromJson(jsonFile.readAll());
@@ -27,11 +19,8 @@ QJsonDocument jsonDB::readJsonFile(const QString &pathToFile)
     }
 }
 
-bool jsonDB::saveJsonFile(const QJsonDocument &document, const QString &pathToFile)
+bool jsonDB::saveJsonFile(const QJsonDocument &document, const QString &filePath)
 {
-    if (pathToFile != nullptr)
-        filePath = pathToFile;
-
     QFile jsonFile(filePath);
     if (!jsonFile.open(QFile::WriteOnly))
         return false;
@@ -39,11 +28,8 @@ bool jsonDB::saveJsonFile(const QJsonDocument &document, const QString &pathToFi
     return (jsonFile.write(document.toJson()));
 }
 
-QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
+QJsonArray jsonDB::loadJsonDB(const QString &filePath)
 {
-    if (pathToFile != nullptr)
-        filePath = pathToFile;
-
     if (readJsonFile(filePath).isArray()) {
         QJsonArray dataArray = readJsonFile(filePath).array();
         if (dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
@@ -60,16 +46,14 @@ QJsonArray jsonDB::loadJsonDB(const QString &pathToFile)
 }
 
 // making "checksums... .ver.json" database from DataContainer
-bool jsonDB::makeJsonDB(DataContainer *data)
+void jsonDB::makeJson(DataContainer *data, const QString &about)
 {
     if (data == nullptr)
-        return false;
+        return;
 
-    if (data->jsonFilePath != nullptr)
-        filePath = data->jsonFilePath;
+    QString filePath = data->jsonFilePath;
 
-    qint64 totalSize = 0;
-    QDir dir (Files::parentFolder(filePath));
+    QDir dir (data->workDir);
 
     QJsonDocument doc;
     QJsonArray mainArray;
@@ -79,6 +63,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     QJsonArray unreadableFiles;
     QString relativePath;
 
+    qint64 totalSize = 0;
     QMapIterator<QString,QString> i(data->mainData);
     while (i.hasNext()) {
         i.next();
@@ -96,7 +81,7 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     if (unreadableFiles.size() > 0)
         excludedFiles["Unreadable files"] = unreadableFiles;
 
-    int shatype = shatypeByLen(computedData.begin().value().toString().size());
+    int shatype = data->shaType();
 
     QLocale locale (QLocale::English);
     header["Created with"] = "Veretino 0.1.3 https://github.com/artemvlas/veretino";
@@ -105,7 +90,11 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     header["SHA type"] = QString("SHA-%1").arg(shatype);
     header["Total size"] = QString("%1 (%2 bytes)").arg(locale.formattedDataSize(totalSize), locale.toString(totalSize));
     header["Updated"] = QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm");
-    header["Working folder"] = "Relative"; // functionality to work with this variable will be realized in the next versions
+
+    if (data->workDir == Files::parentFolder(filePath))
+        header["Working folder"] = "Relative";
+    else
+        header["Working folder"] = data->workDir;
 
     if (!data->ignoredExtensions.isEmpty()) {
         header["Ignored"] = data->ignoredExtensions.join(" ");
@@ -113,6 +102,8 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     else if (!data->onlyExtensions.isEmpty()) {
         header["Included Only"] = data->onlyExtensions.join(" ");
     }
+
+    QString databaseStatus = QString("Current status:\nChecksums stored: %1\nTotal size: %2").arg(computedData.size()).arg(header.value("Total size").toString());
 
     mainArray.append(header);
     mainArray.append(computedData);
@@ -122,18 +113,25 @@ bool jsonDB::makeJsonDB(DataContainer *data)
     doc.setArray(mainArray);
 
     if (saveJsonFile(doc, filePath))
-        return true;
+        emit showMessage(QString("%1\n\nDatabase: %2\nuse it to check the data integrity\n\n%3").arg(about, QFileInfo(filePath).fileName(), databaseStatus), "Success");
     else {
-        emit showMessage(QString("Unable to save json file: %1").arg(filePath), "Error");
-        return false;
+        QString workFolder = Files::parentFolder(filePath);
+        header["Working folder"] = workFolder;
+        mainArray[0] = header;
+        doc.setArray(mainArray);
+
+        if (saveJsonFile(doc, QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + '/' + QFileInfo(filePath).fileName())) {
+            emit showMessage(QString("%1\n\nUnable to save in: %2\nSaved to Desktop folder !!!\nDatabase: %3\nuse it to check the data integrity\n\n%4")
+                                .arg(about, workFolder, QFileInfo(filePath).fileName(), databaseStatus), "Warning");
+        }
+        else {
+            emit showMessage(QString("Unable to save json file: %1").arg(filePath), "Error");
+        }
     }
 }
 
-DataContainer* jsonDB::parseJson(const QString &pathToFile)
+DataContainer* jsonDB::parseJson(const QString &filePath)
 {
-    if (pathToFile != nullptr)
-        filePath = pathToFile;
-
     QJsonArray mainArray = loadJsonDB(filePath); // json database is QJsonArray of QJsonObjects
 
     if (mainArray.isEmpty()) {
@@ -151,6 +149,9 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
 
     DataContainer *data = new DataContainer(filePath);
 
+    if (header.contains("Working folder") && !(header.value("Working folder").toString() == "Relative"))
+        data->workDir = header.value("Working folder").toString();
+
     if (header.contains("Ignored")) {
         data->setIgnoredExtensions(header.value("Ignored").toString().split(" "));
         qDebug()<< "jsonDB::parseJson | ignoredExtensions:" << data->ignoredExtensions;
@@ -163,12 +164,8 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
     if (header.contains("SHA type")) {
         QString shatype = header.value("SHA type").toString();
         shatype.remove("SHA-");
-        data->dbShaType = shatype.toInt();
+        data->shatype = shatype.toInt();
     }
-
-    // if the shatype has not readed from the json file, try to determine it by the length of the checksum string
-    if (data->dbShaType == 0)
-        data->dbShaType = shatypeByLen(data->mainData.begin().value().size());
 
     QJsonObject::const_iterator i;
     QString curFolder = data->workDir + '/';
@@ -196,16 +193,4 @@ DataContainer* jsonDB::parseJson(const QString &pathToFile)
         data->storedDataSize = QString();
 
     return data;
-}
-
-int jsonDB::shatypeByLen(const int &len)
-{
-    if (len == 40)
-        return 1;
-    else if (len == 64)
-        return 256;
-    else if (len == 128)
-        return 512;
-    else
-        return 0;
 }

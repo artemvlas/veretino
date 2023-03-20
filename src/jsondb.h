@@ -5,31 +5,26 @@
 #include "QJsonDocument"
 #include "QJsonObject"
 #include "QJsonArray"
-#include "QFile"
-#include "QDir"
-#include "files.h"
 #include "datacontainer.h"
+
+// This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
+// Used to create json databases from Veretino DataContainer objects and vice versa.
 
 class jsonDB : public QObject
 {
     Q_OBJECT
 public:
-    explicit jsonDB(const QString &path = QString(), QObject *parent = nullptr);
+    explicit jsonDB(QObject *parent = nullptr);
 
-    bool makeJsonDB(DataContainer *data);
-    DataContainer* parseJson(const QString &pathToFile = QString());
-
-    QString filePath;
-    QString folderPath;
+    DataContainer* parseJson(const QString &pathToFile);
+    void makeJson(DataContainer *data, const QString &about);
 
 private:
-    QJsonDocument readJsonFile(const QString &pathToFile = QString());
-    bool saveJsonFile(const QJsonDocument &document, const QString &pathToFile = QString());
-    QJsonArray loadJsonDB(const QString &pathToFile = QString());
-    int shatypeByLen(const int &len);
+    QJsonDocument readJsonFile(const QString &filePath);
+    bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
+    QJsonArray loadJsonDB(const QString &filePath);
 
 signals:
-    void status(const QString &text); //text to statusbar
     void showMessage(const QString &text, const QString &title = "Info");
 };
 
