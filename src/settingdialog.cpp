@@ -57,9 +57,11 @@ QVariantMap settingDialog::getSettings()
     else if (ui->rbSha512->isChecked())
         settings["shaType"] = 512;
 
-    if (ui->inputJsonFileNamePrefix->text() != nullptr) {
+    if (!ui->inputJsonFileNamePrefix->text().isEmpty()) {
         settings["dbPrefix"] = ui->inputJsonFileNamePrefix->text();
     }
+    else
+        settings.remove("dbPrefix");
 
     if (ui->inputExtensions->text() != nullptr) {
         QString ignoreExtensions = ui->inputExtensions->text().toLower();
