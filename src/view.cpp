@@ -26,8 +26,10 @@ void View::setFileSystemModel()
 
 void View::smartSetModel(QAbstractItemModel *model)
 {
-    if (model == nullptr)
+    if (model == nullptr) {
+        setFileSystemModel();
         return;
+    }
 
     if (isViewFileSystem())
         lastFileSystemPath = indexToPath(currentIndex);

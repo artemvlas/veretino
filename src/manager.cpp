@@ -115,12 +115,13 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
         model->setObjectName("treeModel");
         model->populateMap(toRelativePathsMap(map, curData->workDir));
 
-        emit completeTreeModel(model);
+        emit setModel(model);
         emit workDirChanged(curData->workDir);
         emit status(QString("SHA-%1: %2 files").arg(curData->shaType()).arg(map.size()));
     }
     else {
         qDebug()<< "Manager::makeTreeModel | Empty model";
+        emit setModel();
     }
 }
 
@@ -134,11 +135,13 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
 {
     if (!jsonFilePath.endsWith(".ver.json", Qt::CaseInsensitive)) {
         emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver.json'").arg(jsonFilePath), "Wrong DB file!");
+        emit setModel();
         return;
     }
 
     DataContainer *newData = json->parseJson(jsonFilePath);
     if (newData == nullptr) {
+        emit setModel();
         return;
     }
 

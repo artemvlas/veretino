@@ -98,7 +98,7 @@ void MainWindow::connectManager()
     connect(this, SIGNAL(folderContentsByType(QString)), manager, SLOT(folderContentsByType(QString)));
 
     //results processing
-    connect(manager, &Manager::completeTreeModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
+    connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
     connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
 
