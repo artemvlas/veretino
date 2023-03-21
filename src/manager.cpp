@@ -101,7 +101,7 @@ void Manager::processFileSha(const QString &filePath, const int &shatype)
     }
     else {
         emit toClipboard(sum); // send checksum to clipboard
-        emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(summaryFile), "Error");
+        emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(summaryFile), "Warning");
     }
 
     emit setMode("endProcess");
