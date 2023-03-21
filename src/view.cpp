@@ -26,13 +26,16 @@ void View::setFileSystemModel()
 
 void View::smartSetModel(QAbstractItemModel *model)
 {
-    QAbstractItemModel *oldModel = this->model();
-    QItemSelectionModel *oldSelectModel = this->selectionModel();
+    if (model == nullptr)
+        return;
 
     if (isViewFileSystem())
         lastFileSystemPath = indexToPath(currentIndex);
 
     int previousColumWidth = this->columnWidth(0); // first load = 0
+
+    QAbstractItemModel *oldModel = this->model();
+    QItemSelectionModel *oldSelectModel = this->selectionModel();   
 
     this->setModel(model);
     qDebug() << "View::smartSetModel |" << model->objectName();

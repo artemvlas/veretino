@@ -109,9 +109,8 @@ void Manager::processFileSha(const QString &filePath, const int &shatype)
 
 void Manager::makeTreeModel(const QMap<QString,QString> &map)
 {
-    emit status("File tree creation...");
-
     if (!map.isEmpty()) {
+        emit status("File tree creation...");
         TreeModel *model = new TreeModel;
         model->setObjectName("treeModel");
         model->populateMap(toRelativePathsMap(map, curData->workDir));
@@ -120,8 +119,9 @@ void Manager::makeTreeModel(const QMap<QString,QString> &map)
         emit workDirChanged(curData->workDir);
         emit status(QString("SHA-%1: %2 files").arg(curData->shaType()).arg(map.size()));
     }
-    else
-        emit resetView();
+    else {
+        qDebug()<< "Manager::makeTreeModel | Empty model";
+    }
 }
 
 void Manager::resetDatabase()
@@ -137,19 +137,16 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         return;
     }
 
-    DataContainer *oldData = curData;
+    DataContainer *newData = json->parseJson(jsonFilePath);
+    if (newData == nullptr) {
+        return;
+    }
 
-    curData = json->parseJson(jsonFilePath);
+    DataContainer *oldData = curData;
+    curData = newData;
 
     if (oldData != nullptr) {
         delete oldData;
-    }
-
-    if (curData == nullptr) {
-        emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
-                         .arg(QFileInfo(jsonFilePath).fileName()), "Empty Database!");
-        emit resetView();
-        return;
     }
 
     emit status("Json Model creation...");

@@ -22,10 +22,7 @@ QJsonDocument jsonDB::readJsonFile(const QString &filePath)
 bool jsonDB::saveJsonFile(const QJsonDocument &document, const QString &filePath)
 {
     QFile jsonFile(filePath);
-    if (!jsonFile.open(QFile::WriteOnly))
-        return false;
-
-    return (jsonFile.write(document.toJson()));
+    return (jsonFile.open(QFile::WriteOnly) && jsonFile.write(document.toJson()));
 }
 
 QJsonArray jsonDB::loadJsonDB(const QString &filePath)
@@ -34,15 +31,11 @@ QJsonArray jsonDB::loadJsonDB(const QString &filePath)
         QJsonArray dataArray = readJsonFile(filePath).array();
         if (dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
             return readJsonFile(filePath).array();
-        else {
-            emit showMessage("Corrupted Json/Database", "Error");
-            return QJsonArray();
-        }
     }
-    else {
-        emit showMessage("Corrupted Json/Database", "Error");
-        return QJsonArray();
-    }
+
+    emit showMessage("Corrupted Json/Database", "Error");
+    return QJsonArray();
+
 }
 
 // making "checksums... .ver.json" database from DataContainer
@@ -121,7 +114,7 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
         doc.setArray(mainArray);
 
         if (saveJsonFile(doc, QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + '/' + QFileInfo(filePath).fileName())) {
-            emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\nSaved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
+            emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
                                 .arg(about, databaseStatus, workFolder, QFileInfo(filePath).fileName()), "Warning");
         }
         else {
@@ -143,7 +136,9 @@ DataContainer* jsonDB::parseJson(const QString &filePath)
     QJsonObject excludedFiles (mainArray[2].toObject());
 
     if (filelistData.isEmpty()) {
-        qDebug()<< "EMPTY filelistData";
+        emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
+                         .arg(QFileInfo(filePath).fileName()), "Empty Database!");
+        //qDebug()<< "EMPTY filelistData";
         return nullptr;
     }
 

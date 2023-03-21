@@ -50,7 +50,6 @@ signals:
     void workDirChanged(const QString &workDir);
     void showMessage(const QString &text, const QString &title = "Info");
     void setButtonText(const QString &text);
-    void resetView();
     void setMode(const QString &mode); //jsonModel,
     void toClipboard(const QString &text);
     void cancelProcess();
