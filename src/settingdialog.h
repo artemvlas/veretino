@@ -19,6 +19,7 @@ public:
 private:
     Ui::settingDialog *ui;
     QVariantMap settings;
+    QStringList extensionsList(); // return a list of extensions from input
 };
 
 #endif // SETTINGDIALOG_H

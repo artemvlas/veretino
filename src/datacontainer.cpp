@@ -201,12 +201,6 @@ QString DataContainer::itemContentsInfo(const QString &itemPath)
 
 QString DataContainer::aboutDb()
 {
-    QString tipText;
-
-    if (newFiles.size() > 0 || lostFiles.size() > 0) {
-        tipText = "\n\nUse context menu for more options";
-    }
-
     QString newFilesInfo;
 
     if (newFiles.size() > 0) {
@@ -229,6 +223,12 @@ QString DataContainer::aboutDb()
     QString storedPathsInfo;
     if (filesAvailabilityNumber != storedPathsNumber) {
         storedPathsInfo = QString("Stored paths: %1\n").arg(storedPathsNumber);
+    }
+
+    QString tipText;
+
+    if (newFiles.size() > 0 || lostFiles.size() > 0) {
+        tipText = "\n\nUse context menu for more options";
     }
 
     return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")

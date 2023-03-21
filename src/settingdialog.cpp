@@ -14,7 +14,7 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
 
     settings = settingsMap;
 
-    int shaType = settings["shaType"].toInt();
+    int shaType = settings.value("shaType").toInt();
     if (shaType == 1)
         ui->rbSha1->setChecked(true);
     else if (shaType == 256)
@@ -22,24 +22,24 @@ settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     else if (shaType == 512)
         ui->rbSha512->setChecked(true);
 
-    if (settings["ignoredExtensions"].isValid() && !settings["ignoredExtensions"].toStringList().isEmpty()) {
-        ui->inputExtensions->setText(settings["ignoredExtensions"].toStringList().join(" "));
+    if (settings.value("ignoredExtensions").isValid() && !settings.value("ignoredExtensions").toStringList().isEmpty()) {
+        ui->inputExtensions->setText(settings.value("ignoredExtensions").toStringList().join(" "));
         ui->radioButtonIgnore->setChecked(true);
     }
-    else if (settings["onlyExtensions"].isValid() && !settings["onlyExtensions"].toStringList().isEmpty()) {
-        ui->inputExtensions->setText(settings["onlyExtensions"].toStringList().join(" "));
+    else if (settings.value("onlyExtensions").isValid() && !settings.value("onlyExtensions").toStringList().isEmpty()) {
+        ui->inputExtensions->setText(settings.value("onlyExtensions").toStringList().join(" "));
         ui->radioButtonOnly->setChecked(true);
     }
 
-    if(settings["ignoreDbFiles"].isValid()) {
-        ui->ignoreDbFiles->setChecked(settings["ignoreDbFiles"].toBool());
+    if (settings.value("ignoreDbFiles").isValid()) {
+        ui->ignoreDbFiles->setChecked(settings.value("ignoreDbFiles").toBool());
     }
-    if(settings["ignoreShaFiles"].isValid()){
-        ui->ignoreShaFiles->setChecked(settings["ignoreShaFiles"].toBool());
+    if (settings.value("ignoreShaFiles").isValid()){
+        ui->ignoreShaFiles->setChecked(settings.value("ignoreShaFiles").toBool());
     }
 
-    if(settings["dbPrefix"].isValid())
-        ui->inputJsonFileNamePrefix->setText(settings["dbPrefix"].toString());
+    if (settings.value("dbPrefix").isValid())
+        ui->inputJsonFileNamePrefix->setText(settings.value("dbPrefix").toString());
 
 }
 
@@ -48,9 +48,29 @@ settingDialog::~settingDialog()
     delete ui;
 }
 
+QStringList settingDialog::extensionsList()
+{
+    if (!ui->inputExtensions->text().isEmpty()) {
+        QString ignoreExtensions = ui->inputExtensions->text().toLower();
+        ignoreExtensions.remove('*');
+        ignoreExtensions.replace(" ."," ");
+        ignoreExtensions.replace(' ',',');
+
+        if (ignoreExtensions.startsWith('.'))
+            ignoreExtensions.remove(0, 1);
+
+        QStringList ext = ignoreExtensions.split(',');
+        ext.removeDuplicates();
+        ext.removeOne("");
+        return ext;
+    }
+    else
+        return QStringList();
+}
+
 QVariantMap settingDialog::getSettings()
 {
-    if(ui->rbSha1->isChecked())
+    if (ui->rbSha1->isChecked())
         settings["shaType"] = 1;
     else if (ui->rbSha256->isChecked())
         settings["shaType"] = 256;
@@ -63,31 +83,19 @@ QVariantMap settingDialog::getSettings()
     else
         settings.remove("dbPrefix");
 
-    if (ui->inputExtensions->text() != nullptr) {
-        QString ignoreExtensions = ui->inputExtensions->text().toLower();
-        ignoreExtensions.remove('*');
-        ignoreExtensions.replace(" ."," ");
-        ignoreExtensions.replace(' ',',');
-
-        if (ignoreExtensions.startsWith('.'))
-            ignoreExtensions.remove(0, 1);
-
-        QStringList ext = ignoreExtensions.split(',');
-        ext.removeDuplicates();
-        ext.removeOne("");
-
+    if (!ui->inputExtensions->text().isEmpty()) {
         if (ui->radioButtonIgnore->isChecked()) {
-            settings["ignoredExtensions"] = ext;
-            settings["onlyExtensions"] = QStringList();;
+            settings["ignoredExtensions"] = extensionsList();
+            settings.remove("onlyExtensions");
         }
         else if (ui->radioButtonOnly->isChecked()) {
-            settings["onlyExtensions"] = ext;
-            settings["ignoredExtensions"] = QStringList();;
+            settings["onlyExtensions"] = extensionsList();
+            settings.remove("ignoredExtensions");
         }
     }
     else {
-        settings["ignoredExtensions"] = QStringList();
-        settings["onlyExtensions"] = QStringList();
+        settings.remove("ignoredExtensions");
+        settings.remove("onlyExtensions");
     }
 
     settings["ignoreDbFiles"] = ui->ignoreDbFiles->isChecked();

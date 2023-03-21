@@ -37,25 +37,25 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     DataContainer calcData (folderPath);
     QStringList fileList;
 
-    if (settings["dbPrefix"].isValid()) {
-        calcData.setJsonFileNamePrefix(settings["dbPrefix"].toString());
+    if (settings.value("dbPrefix").isValid()) {
+        calcData.setJsonFileNamePrefix(settings.value("dbPrefix").toString());
     }
 
-    if (settings["onlyExtensions"].isValid() && !settings["onlyExtensions"].toStringList().isEmpty()) {
-        calcData.setOnlyExtensions(settings["onlyExtensions"].toStringList());
+    if (settings.value("onlyExtensions").isValid() && !settings.value("onlyExtensions").toStringList().isEmpty()) {
+        calcData.setOnlyExtensions(settings.value("onlyExtensions").toStringList());
         fileList = F.filteredFileList(calcData.onlyExtensions, true); // the list with only those files whose extensions are specified
     }
     else {
         QStringList ignoreList;
-        if (settings["ignoredExtensions"].isValid() && !settings["ignoredExtensions"].toStringList().isEmpty()) {
-            calcData.setIgnoredExtensions(settings["ignoredExtensions"].toStringList());
-            ignoreList.append(settings["ignoredExtensions"].toStringList());
+        if (settings.value("ignoredExtensions").isValid() && !settings.value("ignoredExtensions").toStringList().isEmpty()) {
+            calcData.setIgnoredExtensions(settings.value("ignoredExtensions").toStringList());
+            ignoreList.append(settings.value("ignoredExtensions").toStringList());
         }
 
         // adding *.ver.json or *.shaX file types to ignore list, if needed
-        if (settings["ignoreDbFiles"].isValid() && settings["ignoreDbFiles"].toBool())
+        if (settings.value("ignoreDbFiles").isValid() && settings.value("ignoreDbFiles").toBool())
             ignoreList.append("ver.json");
-        if (settings["ignoreShaFiles"].isValid() && settings["ignoreShaFiles"].toBool())
+        if (settings.value("ignoreShaFiles").isValid() && settings.value("ignoreShaFiles").toBool())
             ignoreList.append({"sha1", "sha256", "sha512"});
 
         fileList = F.filteredFileList(ignoreList); // the list of all files except ignored
@@ -210,7 +210,7 @@ void Manager::updateMismatch()
 void Manager::verifyFileList()
 {
     if (curData->mainData.isEmpty()) {
-        qDebug()<<"mainData is Empty";
+        qDebug() << "mainData is Empty";
         return;
     }
 
