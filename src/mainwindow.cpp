@@ -314,7 +314,7 @@ bool MainWindow::argumentInput()
 {
     if (QApplication::arguments().size() > 1) {
         QString argPath = QApplication::arguments().at(1);
-        qDebug() << "App Argument:" << argPath;
+        argPath.replace("\\", "/"); // win-->posix
         if (QFileInfo::exists(argPath)) {
             if (QFileInfo(argPath).isFile() && argPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
                 emit parseJsonFile(argPath);
