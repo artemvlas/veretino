@@ -55,10 +55,10 @@ void MainWindow::connections()
 
     //menu actions
     connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this,"Open folder",homePath);
-        if(path != nullptr) {if (viewMode == "processing") emit cancelProcess(); if(!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
+        if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); if(!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
 
     connect(ui->actionOpenJson, &QAction::triggered, this, [=]{QString path = QFileDialog::getOpenFileName(this, tr("Open Veretino database"), homePath, tr("DB Files (*.ver.json)"));
-        if(path != nullptr) {if (viewMode == "processing") emit cancelProcess(); emit parseJsonFile(path);}});
+        if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); emit parseJsonFile(path);}});
 
     connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == "processing") {emit cancelProcess();} ui->treeView->setFileSystemModel();});
 

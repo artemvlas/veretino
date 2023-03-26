@@ -84,7 +84,7 @@ void Manager::processFileSha(const QString &filePath, const int &shatype)
     emit setMode("processing");
 
     QString sum = shaCalc->calculateSha(filePath, shatype);
-    if (sum == nullptr) {
+    if (sum.isEmpty()) {
         return;
     }
 
@@ -271,7 +271,7 @@ void Manager::checkFileSummary(const QString &path)
     emit setMode("processing");
     QString savedSum = line.mid(0, shaStrLen(shatype));
     QString sum = shaCalc->calculateSha(checkFilePath, shatype);
-    if (sum == nullptr) {
+    if (sum.isEmpty()) {
         return;
     }
 
@@ -312,7 +312,7 @@ void Manager::checkCurrentItemSum(const QString &path)
 
     emit setMode("processing");
     QString sum = shaCalc->calculateSha(filepath, curData->shaType());
-    if (sum == nullptr) {
+    if (sum.isEmpty()) {
         return;
     }
 

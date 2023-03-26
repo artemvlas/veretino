@@ -110,9 +110,9 @@ QStringList Files::filteredFileList(const QStringList &extensionsList, const QSt
 
 QString Files::contentStatus()
 {
-    if (initFilePath != nullptr)
+    if (!initFilePath.isEmpty())
         return contentStatus(initFilePath);
-    else if (initFolderPath != nullptr)
+    else if (!initFolderPath.isEmpty())
         return contentStatus(initFolderPath);
     else if (!initFileList.isEmpty())
         return contentStatus(initFileList);
@@ -147,7 +147,7 @@ QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
 
 QString Files::folderContentsByType()
 {
-    if (initFolderPath != nullptr)
+    if (!initFolderPath.isEmpty())
         return folderContentsByType(allFiles());
     else if (!initFileList.isEmpty())
         return folderContentsByType(initFileList);
@@ -223,7 +223,7 @@ QString Files::folderContentsByType(const QStringList &fileList)
 
 qint64 Files::dataSize()
 {
-    if (initFolderPath != nullptr)
+    if (!initFolderPath.isEmpty())
         return dataSize(allFiles());
     else if (!initFileList.isEmpty())
         return dataSize(initFileList);
