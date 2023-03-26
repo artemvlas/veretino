@@ -123,10 +123,21 @@ QString Files::contentStatus()
 QString Files::contentStatus(const QString &path)
 {
     QFileInfo fInfo(path);
-    if (fInfo.isFile())
+
+    if (fInfo.isDir()) {
+        int filesNumber = 0;
+        qint64 totalSize = 0;
+        QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
+
+        while (it.hasNext()) {
+            totalSize += QFileInfo(it.next()).size();
+            ++filesNumber;
+        }
+
+        return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
+    }
+    else if (fInfo.isFile())
         return QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
-    else if (fInfo.isDir())
-        return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(allFiles(path)));
     else
         return "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
 }
