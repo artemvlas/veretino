@@ -76,26 +76,26 @@ void MainWindow::connectManager()
     manager->moveToThread(thread);
 
     //when closing the thread
-    connect(thread, SIGNAL(finished()), manager, SLOT(deleteLater()));
+    connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
     //signals for execution tasks
-    connect(this, SIGNAL(parseJsonFile(QString)), manager, SLOT(makeJsonModel(QString)));
-    connect(this, SIGNAL(processFolderSha(QString,int)), manager, SLOT(processFolderSha(QString,int)));
-    connect(this, SIGNAL(processFileSha(QString,int)), manager, SLOT(processFileSha(QString,int)));
-    connect(this, SIGNAL(verifyFileList()), manager, SLOT(verifyFileList()));
-    connect(this, SIGNAL(updateNewLost()), manager, SLOT(updateNewLost()));
-    connect(this, SIGNAL(updateMismatch()), manager, SLOT(updateMismatch()));
-    connect(this, SIGNAL(checkFileSummary(QString)), manager, SLOT(checkFileSummary(QString))); // check *.sha1 *.sha256 *.sha512 summaries
-    connect(this, SIGNAL(checkCurrentItemSum(QString)), manager, SLOT(checkCurrentItemSum(QString)));
+    connect(this, &MainWindow::parseJsonFile, manager, &Manager::makeJsonModel);
+    connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
+    connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
+    connect(this, &MainWindow::verifyFileList, manager, &Manager::verifyFileList);
+    connect(this, &MainWindow::updateNewLost, manager, &Manager::updateNewLost);
+    connect(this, &MainWindow::updateMismatch, manager, &Manager::updateMismatch);
+    connect(this, &MainWindow::checkFileSummary, manager, &Manager::checkFileSummary); // check *.sha1 *.sha256 *.sha512 summaries
+    connect(this, &MainWindow::checkCurrentItemSum, manager, &Manager::checkCurrentItemSum);
 
     //cancel process
     connect(this, &MainWindow::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);
 
     //info and notifications
     connect(manager, SIGNAL(status(QString)), ui->statusbar, SLOT(showMessage(QString)));
-    connect(manager, SIGNAL(showMessage(QString,QString)), this, SLOT(showMessage(QString,QString)));
-    connect(this, SIGNAL(getItemInfo(QString)), manager, SLOT(getItemInfo(QString)));
-    connect(this, SIGNAL(folderContentsByType(QString)), manager, SLOT(folderContentsByType(QString)));
+    connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
+    connect(this, &MainWindow::getItemInfo, manager, &Manager::getItemInfo);
+    connect(this, &MainWindow::folderContentsByType, manager, &Manager::folderContentsByType);
 
     //results processing
     connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager

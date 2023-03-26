@@ -22,13 +22,10 @@ Manager::~Manager()
 
 void Manager::connections()
 {
-    connect(shaCalc,SIGNAL(donePercents(int)),this,SIGNAL(donePercents(int)));
-    connect(shaCalc,SIGNAL(status(QString)),this,SIGNAL(status(QString)));
-
     connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
-
-    connect(json,SIGNAL(status(QString)),this,SIGNAL(status(QString)));
-    connect(json,SIGNAL(showMessage(QString,QString)),this,SIGNAL(showMessage(QString,QString)));
+    connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
+    connect(shaCalc, &ShaCalculator::status, this, &Manager::status);
+    connect(json, &jsonDB::showMessage, this, &Manager::showMessage);
 }
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
