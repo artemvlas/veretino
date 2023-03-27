@@ -71,7 +71,7 @@ QStringList Files::allFiles(const QString &rootFolder)
 
     QStringList fileList;
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
+    while (it.hasNext() && !canceled)
         fileList.append(it.next());
 
     return fileList;
@@ -194,7 +194,7 @@ QString Files::folderContentsByType(const QStringList &fileList)
 
     foreach (const QString &file, fileList) {
         QString ext = QFileInfo(file).suffix().toLower();
-        if (ext == "")
+        if (ext.isEmpty())
             ext = "No type";
         listsByType[ext].append(file);
     }
