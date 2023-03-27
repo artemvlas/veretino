@@ -125,19 +125,33 @@ QString Files::contentStatus(const QString &path)
     QFileInfo fInfo(path);
 
     if (fInfo.isDir()) {
+        canceled = false;
         int filesNumber = 0;
         qint64 totalSize = 0;
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
 
-        while (it.hasNext()) {
+        emit status("counting...");
+
+        while (it.hasNext() && !canceled) {
             totalSize += QFileInfo(it.next()).size();
             ++filesNumber;
         }
 
-        return QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
+        if (canceled) {
+            qDebug()<< "Files::contentStatus(const QString &path) | Canceled";
+            emit status("Canceled");
+            return "Canceled";
+        }
+
+        QString result = QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
+        emit status(result);
+        return result;
     }
-    else if (fInfo.isFile())
-        return QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
+    else if (fInfo.isFile()) {
+        QString result = QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
+        emit status(result);
+        return result;
+    }
     else
         return "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
 }
@@ -288,4 +302,10 @@ QString Files::dataSizeReadable(const qint64 &sizeBytes)
     }
     else
         return QString("%1 bytes").arg(sizeBytes);
+}
+
+void Files::cancelProcess()
+{
+    canceled = true;
+    //qDebug()<<"!!! Files::cancelProcess() invoked" << canceled;
 }

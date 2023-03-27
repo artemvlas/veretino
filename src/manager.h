@@ -5,6 +5,7 @@
 #include "shacalculator.h"
 #include "jsondb.h"
 #include "treemodel.h"
+#include "QThread"
 
 class Manager : public QObject
 {
@@ -16,6 +17,8 @@ public:
 private:
     jsonDB *json = new jsonDB;
     ShaCalculator *shaCalc = new ShaCalculator;
+    Files *filesObject = new Files;
+    QThread *anotherThread = new QThread;
     void connections();
     DataContainer *curData = nullptr;
     void makeTreeModel(const QMap<QString,QString> &map); // populate AbstractItemModel from Map {file path : info}
@@ -53,6 +56,7 @@ signals:
     void setMode(const QString &mode); //jsonModel,
     void toClipboard(const QString &text);
     void cancelProcess();
+    void getContentStatus(const QString &path);
 };
 
 #endif // MANAGER_H

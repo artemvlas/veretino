@@ -24,13 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    if (viewMode == "processing") {
+    /*if (viewMode == "processing") {
         emit cancelProcess();
         qDebug() << "Current Processing was canceled due the app is closing";
-    }
+    }*/
 
+    emit cancelProcess();
     thread->quit();
-    while (!thread->isFinished());
+    while (!thread->isFinished()); // waiting for processes finishing
 
     delete thread;
     delete ui;

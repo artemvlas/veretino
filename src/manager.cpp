@@ -1,5 +1,4 @@
 #include "manager.h"
-#include "QThread"
 #include "files.h"
 #include "QFile"
 #include "QFileInfo"
@@ -14,18 +13,33 @@ Manager::Manager(QObject *parent)
 
 Manager::~Manager()
 {
+    emit cancelProcess();
+
     delete shaCalc;
     delete json;
+
+    anotherThread->quit();
+    while (!anotherThread->isFinished()); // waiting for processes finishing
+
+    delete anotherThread;
+
     deleteCurData();
     qDebug()<<"Manager DESTRUCTED. Thread:"<<QThread::currentThread();
 }
 
 void Manager::connections()
 {
-    connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
+    connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess);
     connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
     connect(shaCalc, &ShaCalculator::status, this, &Manager::status);
     connect(json, &jsonDB::showMessage, this, &Manager::showMessage);
+
+    filesObject->moveToThread(anotherThread);
+    connect(anotherThread, &QThread::finished, filesObject, &Files::deleteLater);
+    connect(this, &Manager::cancelProcess, filesObject, &Files::cancelProcess, Qt::DirectConnection);
+    connect(filesObject, &Files::status, this, &Manager::status);
+    connect(this, &Manager::getContentStatus, filesObject, qOverload<const QString &>(&Files::contentStatus));
+    anotherThread->start();
 }
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
@@ -329,8 +343,8 @@ void Manager::checkCurrentItemSum(const QString &path)
 void Manager::getItemInfo(const QString &path)
 {
     if (isViewFileSysytem) {
-        emit status("Counting...");
-        emit status(Files(path).contentStatus());
+        emit cancelProcess();
+        emit getContentStatus(path);
     }
     else
         emit status(curData->itemContentsInfo(path));

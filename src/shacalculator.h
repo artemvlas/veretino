@@ -21,8 +21,8 @@ public slots:
     void cancelProcess();
 
 private:
-    int chunk; // file read buffer size
-    bool canceled; // if true, task should be aborted
+    int chunk = 1048576; // file read buffer size
+    bool canceled = false; // if true, task should be aborted
     qint64 totalSize; // total file or filelist size
     qint64 doneSize;
     QCryptographicHash::Algorithm algorithm;

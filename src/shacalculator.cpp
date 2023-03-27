@@ -5,14 +5,9 @@
 
 ShaCalculator::ShaCalculator(const int &shatype, QObject *parent)
     : QObject(parent)
-{
-    chunk = 1048576;
-
+{    
     if (shatype != 0)
         setShaType(shatype);
-
-    canceled = false;
-    qDebug()<< "ShaCalculator created: " << QThread::currentThread();
 }
 
 void ShaCalculator::setShaType(const int &shatype)
@@ -27,14 +22,14 @@ void ShaCalculator::setShaType(const int &shatype)
         qDebug()<<"Wrong shatype. It must be int 1, 256 or 512";
 }
 
-QString ShaCalculator::calcSha (const QString &filePath)
+QString ShaCalculator::calcSha(const QString &filePath)
 {
     QFile file (filePath);
     if (!file.open (QIODevice::ReadOnly)) {
         return "unreadable";
     }
 
-    QCryptographicHash hash (algorithm);
+    QCryptographicHash hash(algorithm);
     while (!file.atEnd() && !canceled) {
         const QByteArray &buf = file.read(chunk);
         hash.addData (buf);
