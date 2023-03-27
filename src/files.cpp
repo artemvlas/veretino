@@ -69,6 +69,7 @@ QStringList Files::allFiles(const QString &rootFolder)
         return QStringList();
     }
 
+    canceled = false;
     QStringList fileList;
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext() && !canceled)
