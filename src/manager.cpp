@@ -335,7 +335,7 @@ void Manager::getItemInfo(const QString &path)
         QFileInfo fileInfo(path);
 
         // If a file path is specified, then there is no need to complicate this function and create an Object and a Thread
-        // If a folder path is specified, then that folder is iterated on a separate thread to be able to interrupt this process
+        // If a folder path is specified, then that folder should be iterated on a separate thread to be able to interrupt this process
         if (fileInfo.isFile()) {
             emit status(Files::fileSize(path));
         }
