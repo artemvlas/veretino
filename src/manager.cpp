@@ -332,22 +332,30 @@ void Manager::getItemInfo(const QString &path)
 {
     if (isViewFileSysytem) {
         emit cancelProcess();
+        QFileInfo fileInfo(path);
 
-        QThread *thread = new QThread;
-        Files *files = new Files(path);
-        files->moveToThread(thread);
+        // If a file path is specified, then there is no need to complicate this function and create an Object and a Thread
+        // If a folder path is specified, then that folder is iterated on a separate thread to be able to interrupt this process
+        if (fileInfo.isFile()) {
+            emit status(Files::fileSize(path));
+        }
+        else if (fileInfo.isDir()) {
+            QThread *thread = new QThread;
+            Files *files = new Files(path);
+            files->moveToThread(thread);
 
-        connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
-        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-        connect(thread, &QThread::finished, files, &Files::deleteLater);
-        connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-        connect(files, &Files::status, this, &Manager::status);
-        connect(files, &Files::status, this, [=](const QString &txt){if (txt != "counting...") thread->quit();});
+            connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
+            connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+            connect(thread, &QThread::finished, files, &Files::deleteLater);
+            connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
+            connect(files, &Files::sendText, this, &Manager::status);
+            connect(files, &Files::sendText, this, [=](const QString &txt){if (txt != "counting...") thread->quit();});
 
-        //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Files destroyed: " << path;});
-        //connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Thread destroyed:" << path;});
+            //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Files destroyed: " << path;});
+            //connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Thread destroyed:" << path;});
 
-        thread->start();
+            thread->start();
+        }
     }
     else
         emit status(curData->itemContentsInfo(path));

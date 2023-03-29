@@ -151,7 +151,7 @@ QString DataContainer::itemContentsInfo(const QString &itemPath)
     QString fullPath = Files::joinPath(workDir, itemPath);
     QFileInfo fInf (fullPath);
     if (fInf.isFile())
-        return Files(fullPath).contentStatus();
+        return Files::fileSize(fullPath);
     else if (fInf.isDir()) {
         QMap<QString, QString> content = listFolderContents(fullPath + '/');
         QMapIterator<QString,QString> iterContent (content);

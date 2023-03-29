@@ -40,6 +40,8 @@ public:
 
     static QString dataSizeReadable(const qint64 &sizeBytes);
 
+    static QString fileSize(const QString &filePath); // returns "filename (readable size)" for file, can be used without Object
+
     QString contentStatus(const QString &path); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
     QString contentStatus(const QStringList &filelist);
     QString contentStatus(const int &filesNumber, const qint64 &filesSize);
@@ -57,8 +59,7 @@ private:
     bool canceled = false;
 
 signals:
-    void status(const QString &text); // send text to statusbar
-
+    void sendText(const QString &text);
 };
 
 #endif // FILES_H

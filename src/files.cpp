@@ -108,6 +108,12 @@ QStringList Files::filteredFileList(const QStringList &extensionsList, const QSt
     return filteredFiles;
 }
 
+QString Files::fileSize(const QString &filePath)
+{
+    QFileInfo fileInfo(filePath);
+    return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
+}
+
 QString Files::contentStatus()
 {
     if (!initFilePath.isEmpty())
@@ -130,7 +136,7 @@ QString Files::contentStatus(const QString &path)
         qint64 totalSize = 0;
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
 
-        emit status("counting...");
+        emit sendText("counting...");
 
         while (it.hasNext() && !canceled) {
             totalSize += QFileInfo(it.next()).size();
@@ -139,17 +145,17 @@ QString Files::contentStatus(const QString &path)
 
         if (canceled) {
             qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
-            emit status(QString());
+            emit sendText(QString());
             return QString();
         }
 
         QString result = QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
-        emit status(result);
+        emit sendText(result);
         return result;
     }
     else if (fInfo.isFile()) {
-        QString result = QString("%1 (%2)").arg(fInfo.fileName(), dataSizeReadable(fInfo.size()));
-        emit status(result);
+        QString result = fileSize(path);
+        emit sendText(result);
         return result;
     }
     else
@@ -172,8 +178,11 @@ QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
 
 QString Files::folderContentsByType()
 {
-    if (!initFolderPath.isEmpty())
-        return folderContentsByType(allFiles());
+    if (!initFolderPath.isEmpty()) {
+        QString result = folderContentsByType(allFiles());
+        emit sendText(result);
+        return result;
+    }
     else if (!initFileList.isEmpty())
         return folderContentsByType(initFileList);
     else
