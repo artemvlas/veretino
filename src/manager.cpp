@@ -18,11 +18,6 @@ Manager::~Manager()
     delete shaCalc;
     delete json;
 
-    anotherThread->quit();
-    while (!anotherThread->isFinished()); // waiting for processes finishing
-
-    delete anotherThread;
-
     deleteCurData();
     qDebug()<<"Manager DESTRUCTED. Thread:"<<QThread::currentThread();
 }
@@ -33,13 +28,6 @@ void Manager::connections()
     connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
     connect(shaCalc, &ShaCalculator::status, this, &Manager::status);
     connect(json, &jsonDB::showMessage, this, &Manager::showMessage);
-
-    filesObject->moveToThread(anotherThread);
-    connect(anotherThread, &QThread::finished, filesObject, &Files::deleteLater);
-    connect(this, &Manager::cancelProcess, filesObject, &Files::cancelProcess, Qt::DirectConnection);
-    connect(filesObject, &Files::status, this, &Manager::status);
-    connect(this, &Manager::getContentStatus, filesObject, qOverload<const QString &>(&Files::contentStatus));
-    anotherThread->start();
 }
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
@@ -344,7 +332,22 @@ void Manager::getItemInfo(const QString &path)
 {
     if (isViewFileSysytem) {
         emit cancelProcess();
-        emit getContentStatus(path);
+
+        QThread *thread = new QThread;
+        Files *files = new Files(path);
+        files->moveToThread(thread);
+
+        connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        connect(thread, &QThread::finished, files, &Files::deleteLater);
+        connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
+        connect(files, &Files::status, this, &Manager::status);
+        connect(files, &Files::status, this, [=](const QString &txt){if (txt != "counting...") thread->quit();});
+
+        //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Files destroyed: " << path;});
+        //connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Thread destroyed:" << path;});
+
+        thread->start();
     }
     else
         emit status(curData->itemContentsInfo(path));

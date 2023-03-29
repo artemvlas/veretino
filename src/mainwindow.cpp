@@ -24,16 +24,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    /*if (viewMode == "processing") {
-        emit cancelProcess();
-        qDebug() << "Current Processing was canceled due the app is closing";
-    }*/
-
     emit cancelProcess();
-    thread->quit();
-    while (!thread->isFinished()); // waiting for processes finishing
 
-    delete thread;
+    thread->quit();
+    thread->wait();
+
     delete ui;
 }
 
@@ -77,6 +72,7 @@ void MainWindow::connectManager()
     manager->moveToThread(thread);
 
     //when closing the thread
+    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
     //signals for execution tasks

@@ -40,17 +40,17 @@ public:
 
     static QString dataSizeReadable(const qint64 &sizeBytes);
 
+    QString contentStatus(const QString &path); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
+    QString contentStatus(const QStringList &filelist);
+    QString contentStatus(const int &filesNumber, const qint64 &filesSize);
+
     QString folderContentsByType(); // returns sorted by data size list of extensions, files number and their size
     QString folderContentsByType(const QString &folder);
     QString folderContentsByType(const QStringList &fileList);
 
 public slots:
     void cancelProcess();
-
     QString contentStatus();
-    QString contentStatus(const QString &path); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
-    QString contentStatus(const QStringList &filelist);
-    QString contentStatus(const int &filesNumber, const qint64 &filesSize);
 
 private:
     // variables

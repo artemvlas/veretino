@@ -138,9 +138,9 @@ QString Files::contentStatus(const QString &path)
         }
 
         if (canceled) {
-            qDebug()<< "Files::contentStatus(const QString &path) | Canceled";
-            emit status("Canceled");
-            return "Canceled";
+            qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
+            emit status(QString());
+            return QString();
         }
 
         QString result = QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
@@ -307,5 +307,4 @@ QString Files::dataSizeReadable(const qint64 &sizeBytes)
 void Files::cancelProcess()
 {
     canceled = true;
-    //qDebug()<<"!!! Files::cancelProcess() invoked" << canceled;
 }
