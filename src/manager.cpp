@@ -368,10 +368,7 @@ void Manager::folderContentsByType(const QString &folderPath)
     if (isViewFileSysytem) {
         emit cancelProcess();
 
-        QString folderName = QFileInfo(folderPath).baseName();
-        if (folderName.isEmpty())
-            folderName = "ROOT";
-        QString statusText(QString("Contents of: %1").arg(folderName));
+        QString statusText(QString("Contents of: %1").arg(Files::folderName(folderPath)));
         emit status(statusText);
 
         QThread *thread = new QThread;

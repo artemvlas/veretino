@@ -152,7 +152,7 @@ QString Files::contentStatus(const QString &path)
         }
 
         if (!canceled) {
-            result = QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
+            result = QString("%1: %2").arg(folderName(path), contentStatus(filesNumber, totalSize));
         }
         else {
             qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
@@ -326,6 +326,16 @@ QString Files::dataSizeReadable(const qint64 &sizeBytes)
     }
     else
         return QString("%1 bytes").arg(sizeBytes);
+}
+
+QString Files::folderName(const QString &folderPath)
+{
+    QString dirName = QDir(folderPath).dirName();
+
+    if (dirName.isEmpty())
+        dirName = "ROOT";
+
+    return dirName;
 }
 
 void Files::cancelProcess()

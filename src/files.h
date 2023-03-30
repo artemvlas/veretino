@@ -49,6 +49,8 @@ public:
     QString folderContentsByType(const QString &folder);
     QString folderContentsByType(const QStringList &fileList);
 
+    static QString folderName(const QString &folderPath); // returns folder name: "/home/user/folder" --> "folder"
+
 public slots:
     void cancelProcess();
     QString contentStatus();
