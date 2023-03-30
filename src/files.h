@@ -28,6 +28,8 @@ public:
     QStringList filteredFileList(const QStringList &extensionsList, const bool includeOnly = false); // return filtered filelist: can ignore or include only files with specified extensions
     QStringList filteredFileList(const QStringList &extensionsList, const QStringList &fileList, const bool includeOnly = false);
 
+    static QString folderName(const QString &folderPath); // returns folder name: "/home/user/folder" --> "folder"; if empty, returns 'parentFolder()'
+
     QString parentFolder(); // returns the parent folder of initFilePath;
     static QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 
@@ -48,8 +50,6 @@ public:
 
     QString folderContentsByType(const QString &folder);
     QString folderContentsByType(const QStringList &fileList);
-
-    static QString folderName(const QString &folderPath); // returns folder name: "/home/user/folder" --> "folder"
 
 public slots:
     void cancelProcess();
