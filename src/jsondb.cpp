@@ -46,7 +46,7 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
 
     QString filePath = data->jsonFilePath;
 
-    QDir dir (data->workDir);
+    QDir dir(data->workDir);
 
     QJsonDocument doc;
     QJsonArray mainArray;

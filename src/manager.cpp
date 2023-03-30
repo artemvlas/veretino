@@ -368,6 +368,12 @@ void Manager::folderContentsByType(const QString &folderPath)
     if (isViewFileSysytem) {
         emit cancelProcess();
 
+        QString folderName = QFileInfo(folderPath).baseName();
+        if (folderName.isEmpty())
+            folderName = "ROOT";
+        QString statusText(QString("Contents of: %1").arg(folderName));
+        emit status(statusText);
+
         QThread *thread = new QThread;
         Files *files = new Files(folderPath);
         files->moveToThread(thread);
@@ -377,7 +383,7 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::finished, thread, &QThread::quit);
-        connect(files, &Files::sendText, this, [=](const QString &text){emit showMessage(text, QString("Contents of: %1").arg(QFileInfo(folderPath).baseName()));});
+        connect(files, &Files::sendText, this, [=](const QString &text){emit showMessage(text, statusText);});
 
         // **** debug info, can be removed in release
         //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | Files destroyed: " << folderPath;});
