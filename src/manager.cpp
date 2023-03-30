@@ -334,7 +334,7 @@ void Manager::getItemInfo(const QString &path)
         emit cancelProcess();
         QFileInfo fileInfo(path);
 
-        // If a file path is specified, then there is no need to complicate this function and create an Object and a Thread
+        // If a file path is specified, then there is no need to complicate this task and create an Object and a Thread
         // If a folder path is specified, then that folder should be iterated on a separate thread to be able to interrupt this process
         if (fileInfo.isFile()) {
             emit status(Files::fileSize(path));
@@ -348,11 +348,13 @@ void Manager::getItemInfo(const QString &path)
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             connect(thread, &QThread::finished, files, &Files::deleteLater);
             connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
+            connect(files, &Files::finished, thread, &QThread::quit);
             connect(files, &Files::sendText, this, &Manager::status);
-            connect(files, &Files::sendText, this, [=](const QString &txt){if (txt != "counting...") thread->quit();});
 
-            //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Files destroyed: " << path;});
-            //connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Thread destroyed:" << path;});
+            // **** debug info, can be removed in release
+            //connect(files, &Files::sendText, this, [=](const QString &txt){if (txt != "counting...") thread->quit();});
+            //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | Files destroyed: " << path;});
+            connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | Thread destroyed:" << path;});
 
             thread->start();
         }
@@ -364,7 +366,24 @@ void Manager::getItemInfo(const QString &path)
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
-        emit showMessage(Files(folderPath).folderContentsByType(), QString("Contents of: %1").arg(QFileInfo(folderPath).baseName()));
+        emit cancelProcess();
+
+        QThread *thread = new QThread;
+        Files *files = new Files(folderPath);
+        files->moveToThread(thread);
+
+        connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        connect(thread, &QThread::finished, files, &Files::deleteLater);
+        connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
+        connect(files, &Files::finished, thread, &QThread::quit);
+        connect(files, &Files::sendText, this, [=](const QString &text){emit showMessage(text, QString("Contents of: %1").arg(QFileInfo(folderPath).baseName()));});
+
+        // **** debug info, can be removed in release
+        //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | Files destroyed: " << folderPath;});
+        connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | Thread destroyed:" << folderPath;});
+
+        thread->start();
     }
     else {
         qDebug()<< "Manager::folderContentsByType | Not a filesystem view";
@@ -374,7 +393,7 @@ void Manager::folderContentsByType(const QString &folderPath)
 void Manager::isViewFS(const bool isFS)
 {
     isViewFileSysytem = isFS;
-    qDebug()<<"Manager::isViewFS"<<isViewFileSysytem;
+    qDebug() << "Manager::isViewFS" << isViewFileSysytem;
 }
 
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");

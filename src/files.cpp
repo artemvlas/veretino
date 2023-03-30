@@ -69,10 +69,17 @@ QStringList Files::allFiles(const QString &rootFolder)
         return QStringList();
     }
 
+    canceled = false;
     QStringList fileList;
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
+
+    while (it.hasNext() && !canceled)
         fileList.append(it.next());
+
+    if (canceled) {
+        qDebug() << "Files::allFiles | Canceled:" << rootFolder;
+        return QStringList();
+    }
 
     return fileList;
 }
@@ -129,6 +136,7 @@ QString Files::contentStatus()
 QString Files::contentStatus(const QString &path)
 {
     QFileInfo fInfo(path);
+    QString result;
 
     if (fInfo.isDir()) {
         canceled = false;
@@ -143,23 +151,24 @@ QString Files::contentStatus(const QString &path)
             ++filesNumber;
         }
 
-        if (canceled) {
-            qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
-            emit sendText(QString());
-            return QString();
+        if (!canceled) {
+            result = QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
         }
-
-        QString result = QString("%1: %2").arg(QDir(path).dirName(), contentStatus(filesNumber, totalSize));
-        emit sendText(result);
-        return result;
+        else {
+            qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
+        }
     }
     else if (fInfo.isFile()) {
-        QString result = fileSize(path);
-        emit sendText(result);
-        return result;
+        result = fileSize(path);
     }
     else
-        return "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
+        qDebug() << "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
+
+    if (!result.isEmpty())
+        emit sendText(result);
+
+    emit finished();
+    return result;
 }
 
 QString Files::contentStatus(const QStringList &filelist)
@@ -180,7 +189,13 @@ QString Files::folderContentsByType()
 {
     if (!initFolderPath.isEmpty()) {
         QString result = folderContentsByType(allFiles());
-        emit sendText(result);
+
+        if (!canceled)
+            emit sendText(result);
+        else
+            result = "Canceled";
+
+        emit finished();
         return result;
     }
     else if (!initFileList.isEmpty())
