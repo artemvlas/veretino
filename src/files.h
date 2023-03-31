@@ -62,7 +62,6 @@ private:
 
 signals:
     void sendText(const QString &text);
-    void finished();
 };
 
 #endif // FILES_H

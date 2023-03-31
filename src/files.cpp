@@ -164,10 +164,7 @@ QString Files::contentStatus(const QString &path)
     else
         qDebug() << "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
 
-    if (!result.isEmpty())
-        emit sendText(result);
-
-    emit finished();
+    emit sendText(result);
     return result;
 }
 
@@ -190,12 +187,10 @@ QString Files::folderContentsByType()
     if (!initFolderPath.isEmpty()) {
         QString result = folderContentsByType(allFiles());
 
-        if (!canceled)
-            emit sendText(result);
-        else
-            result = "Canceled";
+        if (canceled)
+            result.clear();
 
-        emit finished();
+        emit sendText(result);
         return result;
     }
     else if (!initFileList.isEmpty())

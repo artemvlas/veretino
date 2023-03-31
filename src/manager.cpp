@@ -348,11 +348,10 @@ void Manager::getItemInfo(const QString &path)
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             connect(thread, &QThread::finished, files, &Files::deleteLater);
             connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-            connect(files, &Files::finished, thread, &QThread::quit);
-            connect(files, &Files::sendText, this, &Manager::status);
+            connect(files, &Files::sendText, this, [=](const QString &text){if (text != "counting...") thread->quit();});
+            connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit status(text);});
 
             // **** debug info, can be removed in release
-            //connect(files, &Files::sendText, this, [=](const QString &txt){if (txt != "counting...") thread->quit();});
             //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | Files destroyed: " << path;});
             connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | Thread destroyed:" << path;});
 
@@ -379,8 +378,7 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
-        connect(files, &Files::finished, thread, &QThread::quit);
-        connect(files, &Files::sendText, this, [=](const QString &text){emit showMessage(text, statusText);});
+        connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit showMessage(text, statusText); thread->quit();});
 
         // **** debug info, can be removed in release
         //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | Files destroyed: " << folderPath;});
