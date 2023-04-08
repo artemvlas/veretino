@@ -32,8 +32,13 @@ void Manager::connections()
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 {
-    Files F (folderPath);
-    DataContainer calcData (folderPath);
+    emit cancelProcess();
+    emit setMode("processing");
+
+    Files F(folderPath);
+    connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
+
+    DataContainer calcData(folderPath);
     QStringList fileList;
 
     if (settings.value("dbPrefix").isValid()) {
@@ -61,14 +66,14 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
     }
 
     if (fileList.isEmpty()) {
-        if (F.allFiles().isEmpty())
-            emit showMessage("Empty folder. Nothing to do");
-        else
-            emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
+        if (!F.canceled) {
+            if (F.allFiles().isEmpty())
+                emit showMessage("Empty folder. Nothing to do");
+            else
+                emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
+        }
         return;
     }
-
-    emit setMode("processing");
 
     calcData.mainData = shaCalc->calculateSha(fileList, shatype);
 

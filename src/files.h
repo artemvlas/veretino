@@ -20,6 +20,7 @@ public:
     QString initFolderPath; // path to the Folder specified when creating the object
     QStringList initFileList;
     QStringList allFilesList; // cached list of all files in initial folder
+    bool canceled = false;
 
     // functions
     QStringList& allFiles(); // returns a reference to the 'allFilesList'^; empty list will be filled by overloaded func
@@ -58,7 +59,7 @@ public slots:
 
 private:
     // variables
-    bool canceled = false;
+    //bool canceled = false;
 
 signals:
     void sendText(const QString &text);
