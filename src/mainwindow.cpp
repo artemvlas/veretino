@@ -199,7 +199,7 @@ void MainWindow::setMode(const QString &mode)
         return;
 
     if (mode == "endProcess") {
-        viewMode = "";
+        viewMode.clear();
         ui->progressBar->setVisible(false);
         ui->progressBar->resetFormat();
         ui->progressBar->setValue(0);
@@ -219,7 +219,7 @@ void MainWindow::setMode(const QString &mode)
         }
     }
     else {
-        if (viewMode != "")
+        if (!viewMode.isEmpty())
             previousViewMode = viewMode;
         viewMode = mode;
     }
