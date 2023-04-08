@@ -72,6 +72,7 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
             else
                 emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
         }
+        emit setMode("endProcess");
         return;
     }
 
