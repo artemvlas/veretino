@@ -83,15 +83,14 @@ QMap<QString,QString> ShaCalculator::calculateSha(const QStringList &filelist, c
     connect(this, &ShaCalculator::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
     totalSize = files.dataSize(filelist);
 
-    int filesNumber = filelist.size();
-    QString totalInfo = Files::contentStatus(filesNumber, totalSize);
+    QString totalInfo = Files::contentStatus(filelist.size(), totalSize);
 
     emit status(QString("Calculation SHA-%1 checksums for: %2").arg(shatype).arg(totalInfo));
 
     doneSize = 0;
     QMap<QString,QString> map;
 
-    for (int var = 0; var < filesNumber && !canceled; ++var) {
+    for (int var = 0; var < filelist.size() && !canceled; ++var) {
         map.insert(filelist.at(var), calcSha(filelist.at(var)));
         emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(Files::dataSizeReadable(doneSize), totalInfo));
     }
