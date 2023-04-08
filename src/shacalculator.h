@@ -18,7 +18,6 @@ public:
 public slots:
     QString calculateSha(const QString &filePath, const int &shatype = 0);
     QMap<QString,QString> calculateSha(const QStringList &filelist, const int &shatype = 0);
-    void cancelProcess();
 
 private:
     int chunk = 1048576; // file read buffer size
@@ -30,6 +29,7 @@ private:
     void toPercents(const int &bytes); // add this processed piece, calculate total done size and emit donePercents()
 
 signals:
+    void cancelProcess();
     void status(const QString &status); //text to statusbar
     void resultReady(const QMap<QString,QString> &result);
     void donePercents(const int &done);

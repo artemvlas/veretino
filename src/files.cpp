@@ -285,11 +285,17 @@ qint64 Files::dataSize(const QString &folder)
 qint64 Files::dataSize(const QStringList &filelist)
 {
     qint64 totalSize = 0;
+    canceled = false;
 
     if (!filelist.isEmpty()) {
-        foreach (const QString &file, filelist) {
-            totalSize += QFileInfo(file).size();
+        for (int i = 0; i < filelist.size() && !canceled; ++i) {
+            totalSize += QFileInfo(filelist.at(i)).size();
         }
+    }
+
+    if (canceled) {
+        qDebug() << "Files::dataSize | Canceled";
+        totalSize = 0;
     }
 
     return totalSize;

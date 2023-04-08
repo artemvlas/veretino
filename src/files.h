@@ -39,7 +39,7 @@ public:
 
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
     qint64 dataSize(const QString &folder); // total size of all files in the 'folder'
-    static qint64 dataSize(const QStringList &filelist); // total size of all files in the 'filelist'
+    qint64 dataSize(const QStringList &filelist); // total size of all files in the 'filelist'
 
     static QString dataSizeReadable(const qint64 &sizeBytes);
 

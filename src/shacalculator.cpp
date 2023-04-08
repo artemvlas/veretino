@@ -8,6 +8,8 @@ ShaCalculator::ShaCalculator(const int &shatype, QObject *parent)
 {    
     if (shatype != 0)
         setShaType(shatype);
+
+    connect(this, &ShaCalculator::cancelProcess, this, [&]{canceled = true;});
 }
 
 void ShaCalculator::setShaType(const int &shatype)
@@ -77,7 +79,10 @@ QMap<QString,QString> ShaCalculator::calculateSha(const QStringList &filelist, c
 
     emit status("Total size calculation...");
 
-    totalSize = Files::dataSize(filelist);
+    Files files;
+    connect(this, &ShaCalculator::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
+    totalSize = files.dataSize(filelist);
+
     int filesNumber = filelist.size();
     QString totalInfo = Files::contentStatus(filesNumber, totalSize);
 
@@ -115,11 +120,6 @@ void ShaCalculator::toPercents(const int &bytes)
     if (curPerc > lastPerc) {
         emit donePercents(curPerc);
     }
-}
-
-void ShaCalculator::cancelProcess()
-{
-    canceled = true;
 }
 
 ShaCalculator::~ShaCalculator()
