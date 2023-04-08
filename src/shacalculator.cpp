@@ -73,6 +73,9 @@ QMap<QString,QString> ShaCalculator::calculateSha(const QStringList &filelist, c
     if (shatype != 0)
         setShaType(shatype);
 
+    canceled = false;
+
+    emit status("Total size calculation...");
     Files files (filelist);
     totalSize = files.dataSize();
     int filesNumber = filelist.size();
@@ -80,13 +83,12 @@ QMap<QString,QString> ShaCalculator::calculateSha(const QStringList &filelist, c
 
     emit status(QString("Calculation SHA-%1 checksums for: %2").arg(shatype).arg(totalInfo));
 
-    canceled = false;
     doneSize = 0;
     QMap<QString,QString> map;
 
     for (int var = 0; var < filesNumber && !canceled; ++var) {
         map[filelist.at(var)] = calcSha(filelist.at(var));
-        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(files.dataSizeReadable(doneSize), totalInfo));
+        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(Files::dataSizeReadable(doneSize), totalInfo));
     }
 
     if (canceled) {
