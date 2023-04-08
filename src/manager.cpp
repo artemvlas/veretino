@@ -45,6 +45,8 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
         calcData.setJsonFileNamePrefix(settings.value("dbPrefix").toString());
     }
 
+    emit status("Creating a list of files...");
+
     if (settings.value("onlyExtensions").isValid() && !settings.value("onlyExtensions").toStringList().isEmpty()) {
         calcData.setOnlyExtensions(settings.value("onlyExtensions").toStringList());
         fileList = F.filteredFileList(calcData.onlyExtensions, true); // the list with only those files whose extensions are specified
@@ -71,6 +73,9 @@ void Manager::processFolderSha(const QString &folderPath, const int &shatype)
                 emit showMessage("Empty folder. Nothing to do");
             else
                 emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
+        }
+        else {
+            emit status("Canceled");
         }
         emit setMode("endProcess");
         return;

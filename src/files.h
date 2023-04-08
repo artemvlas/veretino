@@ -39,7 +39,7 @@ public:
 
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
     qint64 dataSize(const QString &folder); // total size of all files in the 'folder'
-    qint64 dataSize(const QStringList &filelist); // total size of all files in the 'filelist'
+    static qint64 dataSize(const QStringList &filelist); // total size of all files in the 'filelist'
 
     static QString dataSizeReadable(const qint64 &sizeBytes);
 
@@ -47,7 +47,7 @@ public:
 
     QString contentStatus(const QString &path); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
     QString contentStatus(const QStringList &filelist);
-    QString contentStatus(const int &filesNumber, const qint64 &filesSize);
+    static QString contentStatus(const int &filesNumber, const qint64 &filesSize);
 
     QString folderContentsByType(const QString &folder);
     QString folderContentsByType(const QStringList &fileList);
