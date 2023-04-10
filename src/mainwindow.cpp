@@ -45,20 +45,20 @@ void MainWindow::connections()
     connect(ui->treeView, &View::setMode, this, &MainWindow::setMode);
     connect(ui->treeView, &View::modelChanged, ui->lineEdit, &QLineEdit::setEnabled);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
-    connect(ui->treeView, &View::doubleClicked, this, [=]{if(viewMode == "db") emit parseJsonFile(curPath); else if (viewMode == "sum") emit checkFileSummary(curPath);});
+    connect(ui->treeView, &View::doubleClicked, this, [=]{if (viewMode == "db") emit parseJsonFile(curPath); else if (viewMode == "sum") emit checkFileSummary(curPath);});
 
     connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text().replace("\\", "/"));});
 
     //menu actions
-    connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this,"Open folder",homePath);
-        if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); if(!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
+    connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this, "Open folder", homePath);
+        if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); if (!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
 
     connect(ui->actionOpenJson, &QAction::triggered, this, [=]{QString path = QFileDialog::getOpenFileName(this, tr("Open Veretino database"), homePath, tr("DB Files (*.ver.json)"));
         if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); emit parseJsonFile(path);}});
 
     connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == "processing") {emit cancelProcess();} ui->treeView->setFileSystemModel();});
 
-    connect(ui->actionSettings, &QAction::triggered, this, [=]{settingDialog dialog (settings); if(dialog.exec() == QDialog::Accepted){
+    connect(ui->actionSettings, &QAction::triggered, this, [=]{settingDialog dialog (settings); if (dialog.exec() == QDialog::Accepted){
                 settings = dialog.getSettings(); setMode(viewMode); emit settingsChanged(settings);}}); //"setMode" changes the text on button
 
     connect(ui->actionAbout, &QAction::triggered, this, [=]{aboutDialog about; about.exec();});
@@ -138,12 +138,12 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             if (viewMode == "folder") {
                 contextMenu->addAction("Folder Contents By Type", this, [=]{folderContentsByType(path);});
                 contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings["shaType"].toInt()), this, [=]{processFolderSha(path, settings["shaType"].toInt());});
+                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{processFolderSha(path, settings.value("shaType").toInt());});
             }
             else if (viewMode == "file") {
-                contextMenu->addAction("Compute SHA-1 for file", this, [=]{processFileSha(path,1);});
-                contextMenu->addAction("Compute SHA-256 for file", this, [=]{processFileSha(path,256);});
-                contextMenu->addAction("Compute SHA-512 for file", this, [=]{processFileSha(path,512);});
+                contextMenu->addAction("Compute SHA-1 for file", this, [=]{processFileSha(path, 1);});
+                contextMenu->addAction("Compute SHA-256 for file", this, [=]{processFileSha(path, 256);});
+                contextMenu->addAction("Compute SHA-512 for file", this, [=]{processFileSha(path, 512);});
             }
             else if (viewMode == "db")
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);

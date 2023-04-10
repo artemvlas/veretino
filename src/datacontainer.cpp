@@ -15,15 +15,15 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
     }
     else if (initPathInfo.isDir()) {
         workDir = initPath;
-        jsonFilePath = QString("%1/checksums_%2.ver.json").arg(workDir, QDir(workDir).dirName());
+        jsonFilePath = Files::joinPath(workDir, QString("checksums_%1.ver.json").arg(QDir(workDir).dirName()));
     }
     else {
-        qDebug()<< "DataContainer | Wrong initPath" << initPath;
+        qDebug() << "DataContainer | Wrong initPath" << initPath;
     }
 
     this->setObjectName(QString("DataContainer_%1").arg(initPathInfo.baseName()));
 
-    qDebug()<<"DataContainer created | " << this->objectName();
+    qDebug() << "DataContainer created | " << this->objectName();
 }
 
 QMap<QString,QString>& DataContainer::defineFilesAvailability()
@@ -260,7 +260,7 @@ void DataContainer::setOnlyExtensions(const QStringList &extensions)
 
 void DataContainer::setJsonFileNamePrefix(const QString &prefix)
 {
-    jsonFilePath = QString("%1/%2_%3.ver.json").arg(workDir, prefix, QDir(workDir).dirName());
+    jsonFilePath = Files::joinPath(workDir, QString("%1_%2.ver.json").arg(prefix, QDir(workDir).dirName()));
 }
 
 int DataContainer::shaType()
@@ -281,5 +281,5 @@ int DataContainer::shaType()
 
 DataContainer::~DataContainer()
 {
-    qDebug()<<"DataContainer deleted | " << this->objectName();
+    qDebug()<< "DataContainer deleted | " << this->objectName();
 }

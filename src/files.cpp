@@ -47,9 +47,10 @@ QString Files::joinPath(const QString &addPath)
 
 QString Files::joinPath(const QString &absolutePath, const QString &addPath)
 {
-    QChar sep;
+    QString sep;
+
     if (!absolutePath.endsWith('/'))
-        sep = '/';
+        sep = "/";
 
     return QString("%1%2%3").arg(absolutePath, sep, addPath);
 }
@@ -175,11 +176,12 @@ QString Files::contentStatus(const QStringList &filelist)
 
 QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
 {
-    QChar s; // if only 1 file - text is "file", if more - text is "files"
-    if (filesNumber != 1)
-        s = 's';
+    QString s; // if only 1 file - text is "file", if more - text is "files"
 
-    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s).arg(dataSizeReadable(filesSize));
+    if (filesNumber != 1)
+        s = "s";
+
+    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s, dataSizeReadable(filesSize));
 }
 
 QString Files::folderContentsByType()

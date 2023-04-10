@@ -8,7 +8,6 @@ Manager::Manager(QObject *parent)
     : QObject{parent}
 {
     connections();
-    qDebug()<<"Manager created. Thread:"<<QThread::currentThread();
 }
 
 Manager::~Manager()
@@ -19,7 +18,7 @@ Manager::~Manager()
     delete json;
 
     deleteCurData();
-    qDebug()<<"Manager DESTRUCTED. Thread:"<<QThread::currentThread();
+    //qDebug() << "Manager DESTRUCTED. Thread:" << QThread::currentThread();
 }
 
 void Manager::connections()
@@ -362,10 +361,6 @@ void Manager::getItemInfo(const QString &path)
             connect(files, &Files::sendText, this, [=](const QString &text){if (text != "counting...") thread->quit();});
             connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit status(text);});
 
-            // **** debug info, can be removed in release
-            //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | Files destroyed: " << path;});
-            connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | Thread destroyed:" << path;});
-
             thread->start();
         }
     }
@@ -390,10 +385,6 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit showMessage(text, statusText); thread->quit();});
-
-        // **** debug info, can be removed in release
-        //connect(files, &Files::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | Files destroyed: " << folderPath;});
-        connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | Thread destroyed:" << folderPath;});
 
         thread->start();
     }
