@@ -369,8 +369,8 @@ void Manager::getItemInfo(const QString &path)
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
-        QString statusText(QString("Contents of: %1").arg(Files::folderName(folderPath)));
-        emit status(statusText);
+        QString statusText(QString("Contents of <%1>").arg(Files::folderName(folderPath)));
+        emit status(statusText + ": processing...");
 
         QThread *thread = new QThread;
         Files *files = new Files(folderPath);
@@ -380,7 +380,11 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
-        connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit showMessage(text, statusText); thread->quit();});
+        connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
+                                {emit showMessage(text, statusText); emit status(QStringList(text.split("\n")).last());}});
+
+        // ***debug***
+        connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});
 
         thread->start();
     }
