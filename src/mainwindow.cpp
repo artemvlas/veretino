@@ -38,7 +38,7 @@ void MainWindow::connections()
 
     connect(ui->button, &QPushButton::clicked, this , &MainWindow::doWork);
     connect(this, &MainWindow::cancelProcess, this, [=]{if (viewMode == "processing") setMode("endProcess");});
-    connect(this, &MainWindow::processFolderSha, this, &MainWindow::cancelProcess);
+    //connect(this, &MainWindow::processFolderSha, this, &MainWindow::cancelProcess);
     connect(this, &MainWindow::getItemInfo, this, &MainWindow::cancelProcess);
     connect(this, &MainWindow::folderContentsByType, this, &MainWindow::cancelProcess);
 
@@ -250,10 +250,12 @@ void MainWindow::setMode(const QString &mode)
 void MainWindow::doWork()
 {
     QString path = curPath;
-    if (viewMode == "folder")
-        emit processFolderSha(path, settings["shaType"].toInt());
+    if (viewMode == "folder") {
+        emit cancelProcess();
+        emit processFolderSha(path, settings.value("shaType").toInt());
+    }
     else if (viewMode == "file")
-        emit processFileSha(path, settings["shaType"].toInt());
+        emit processFileSha(path, settings.value("shaType").toInt());
     else if (viewMode == "db")
         emit parseJsonFile(path);
     else if (viewMode == "sum")
