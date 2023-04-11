@@ -12,7 +12,7 @@ Manager::Manager(QObject *parent)
 
 Manager::~Manager()
 {
-    emit cancelProcess();
+    //emit cancelProcess();
 
     delete shaCalc;
     delete json;
@@ -31,7 +31,6 @@ void Manager::connections()
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
 {
-    emit cancelProcess();
     emit setMode("processing");
 
     Files F(folderPath);
@@ -341,7 +340,6 @@ void Manager::checkCurrentItemSum(const QString &path)
 void Manager::getItemInfo(const QString &path)
 {
     if (isViewFileSysytem) {
-        emit cancelProcess();
         QFileInfo fileInfo(path);
 
         // If a file path is specified, then there is no need to complicate this task and create an Object and a Thread
@@ -371,8 +369,6 @@ void Manager::getItemInfo(const QString &path)
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
-        emit cancelProcess();
-
         QString statusText(QString("Contents of: %1").arg(Files::folderName(folderPath)));
         emit status(statusText);
 

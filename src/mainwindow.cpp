@@ -37,7 +37,10 @@ void MainWindow::connections()
     connectManager();
 
     connect(ui->button, &QPushButton::clicked, this , &MainWindow::doWork);
-    connect(this, &MainWindow::cancelProcess, [this]{setMode("endProcess");});
+    connect(this, &MainWindow::cancelProcess, this, [=]{setMode("endProcess");});
+    connect(this, &MainWindow::processFolderSha, this, &MainWindow::cancelProcess);
+    connect(this, &MainWindow::getItemInfo, this, &MainWindow::cancelProcess);
+    connect(this, &MainWindow::folderContentsByType, this, &MainWindow::cancelProcess);
 
     //TreeView
     connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
