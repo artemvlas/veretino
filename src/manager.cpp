@@ -242,7 +242,7 @@ void Manager::verifyFileList()
 
     if (curData->mismatches.size() > 0) {
         makeTreeModel(curData->fillMapSameValues(curData->mismatches.keys(), "NOT match"));
-        emit showMessage(QString("%1 files changed or corrupted").arg(curData->mismatches.size()),"FAILED");
+        emit showMessage(QString("%1 files changed or corrupted").arg(curData->mismatches.size()), "FAILED");
         emit setMode("endProcess");
         emit setMode("updateMismatch");
         return;
@@ -272,7 +272,7 @@ void Manager::checkFileSummary(const QString &path)
     }
 
     if (!QFileInfo(checkFilePath).isFile()) {
-        checkFilePath = line.mid(shaStrLen(shatype)+2).replace("\n","");
+        checkFilePath = line.mid(shaStrLen(shatype) + 2).remove("\n");
         if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
             return;
@@ -299,7 +299,7 @@ void Manager::checkFileSummary(const QString &path)
 void Manager::checkCurrentItemSum(const QString &path)
 {
     QString filepath = Files::joinPath(curData->workDir, path);
-    qDebug()<<"Manager::checkCurrentItemSum | filepath:"<<filepath;
+    qDebug() << "Manager::checkCurrentItemSum | filepath:" << filepath;
 
     if (QFileInfo(filepath).isDir()) {
         emit showMessage("Currently only files can be checked independently.\nPlease select a file or check the whole database", "Warning");
@@ -359,6 +359,9 @@ void Manager::getItemInfo(const QString &path)
             connect(files, &Files::sendText, this, [=](const QString &text){if (text != "counting...") thread->quit();});
             connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit status(text);});
 
+            // ***debug***
+            connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});
+
             thread->start();
         }
     }
@@ -412,7 +415,7 @@ void Manager::setMode_model()
 // converting paths from full to relative
 QStringList Manager::toRelativePathsList (const QStringList &filelist, const QString &relativeFolder)
 {
-    QDir folder (relativeFolder);
+    QDir folder(relativeFolder);
     QStringList relativePaths;
 
     for (int var = 0; var < filelist.size(); ++var) {

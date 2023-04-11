@@ -38,7 +38,6 @@ void MainWindow::connections()
 
     connect(ui->button, &QPushButton::clicked, this , &MainWindow::doWork);
     connect(this, &MainWindow::cancelProcess, this, [=]{if (viewMode == "processing") setMode("endProcess");});
-    //connect(this, &MainWindow::processFolderSha, this, &MainWindow::cancelProcess);
     connect(this, &MainWindow::getItemInfo, this, &MainWindow::cancelProcess);
     connect(this, &MainWindow::folderContentsByType, this, &MainWindow::cancelProcess);
 
@@ -139,14 +138,14 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         else if (index.isValid()) {
 
             if (viewMode == "folder") {
-                contextMenu->addAction("Folder Contents By Type", this, [=]{folderContentsByType(path);});
+                contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(path);});
                 contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{processFolderSha(path, settings.value("shaType").toInt());});
+                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{emit processFolderSha(path, settings.value("shaType").toInt());});
             }
             else if (viewMode == "file") {
-                contextMenu->addAction("Compute SHA-1 for file", this, [=]{processFileSha(path, 1);});
-                contextMenu->addAction("Compute SHA-256 for file", this, [=]{processFileSha(path, 256);});
-                contextMenu->addAction("Compute SHA-512 for file", this, [=]{processFileSha(path, 512);});
+                contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(path, 1);});
+                contextMenu->addAction("Compute SHA-256 for file", this, [=]{emit processFileSha(path, 256);});
+                contextMenu->addAction("Compute SHA-512 for file", this, [=]{emit processFileSha(path, 512);});
             }
             else if (viewMode == "db")
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);

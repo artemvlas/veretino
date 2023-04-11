@@ -7,7 +7,7 @@
 DataContainer::DataContainer(const QString &initPath, QObject *parent)
     : QObject{parent}
 {
-    QFileInfo initPathInfo (initPath);
+    QFileInfo initPathInfo(initPath);
 
     if (initPathInfo.isFile() && initPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
         jsonFilePath = initPath;
@@ -30,7 +30,7 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
 {
     QStringList filelist = mainData.keys();
     QStringList actualFiles;
-    Files files (workDir);
+    Files files(workDir);
 
     if (!onlyExtensions.isEmpty())
         actualFiles = files.filteredFileList(onlyExtensions, true);
@@ -42,7 +42,7 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
 
     foreach (const QString &i, filelist) {
 
-        if (mainData[i] == "unreadable") {
+        if (mainData.value(i) == "unreadable") {
             if (QFileInfo::exists(i))
                 filesAvailability[i] = "on Disk (unreadable)";
             else {
@@ -132,7 +132,7 @@ QMap<QString,QString> DataContainer::updateMainData(const QMap<QString,QString> 
 QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolder)
 {
     QMap<QString, QString> content;
-    QMapIterator<QString,QString> iter (filesAvailability);
+    QMapIterator<QString,QString> iter(filesAvailability);
 
     while (iter.hasNext()) {
         iter.next();
@@ -149,12 +149,12 @@ QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolde
 QString DataContainer::itemContentsInfo(const QString &itemPath)
 {
     QString fullPath = Files::joinPath(workDir, itemPath);
-    QFileInfo fInf (fullPath);
+    QFileInfo fInf(fullPath);
     if (fInf.isFile())
         return Files::fileSize(fullPath);
     else if (fInf.isDir()) {
         QMap<QString, QString> content = listFolderContents(fullPath + '/');
-        QMapIterator<QString,QString> iterContent (content);
+        QMapIterator<QString,QString> iterContent(content);
         QStringList ondisk;
         QStringList lost;
         QStringList newfiles;
