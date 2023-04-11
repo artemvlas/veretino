@@ -272,7 +272,7 @@ void Manager::checkFileSummary(const QString &path)
     }
 
     if (!QFileInfo(checkFilePath).isFile()) {
-        checkFilePath = line.mid(shaStrLen(shatype) + 2).remove("\n");
+        checkFilePath = Files::joinPath(Files::parentFolder(path), line.mid(shaStrLen(shatype) + 2).remove("\n"));
         if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
             return;
