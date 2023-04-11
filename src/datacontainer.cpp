@@ -15,7 +15,7 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
     }
     else if (initPathInfo.isDir()) {
         workDir = initPath;
-        jsonFilePath = Files::joinPath(workDir, QString("checksums_%1.ver.json").arg(QDir(workDir).dirName()));
+        jsonFilePath = Files::joinPath(workDir, QString("checksums_%1.ver.json").arg(Files::folderName(workDir)));
     }
     else {
         qDebug() << "DataContainer | Wrong initPath" << initPath;
@@ -260,7 +260,7 @@ void DataContainer::setOnlyExtensions(const QStringList &extensions)
 
 void DataContainer::setJsonFileNamePrefix(const QString &prefix)
 {
-    jsonFilePath = Files::joinPath(workDir, QString("%1_%2.ver.json").arg(prefix, QDir(workDir).dirName()));
+    jsonFilePath = Files::joinPath(workDir, QString("%1_%2.ver.json").arg(prefix, Files::folderName(workDir)));
 }
 
 int DataContainer::shaType()

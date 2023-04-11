@@ -336,7 +336,7 @@ QString Files::folderName(const QString &folderPath)
     QString dirName = QDir(folderPath).dirName();
 
     if (dirName.isEmpty())
-        dirName = parentFolder(folderPath);
+        dirName = "Root";
 
     return dirName;
 }
