@@ -140,7 +140,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             if (viewMode == "folder") {
                 contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(path);});
                 contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{emit processFolderSha(path, settings.value("shaType").toInt());});
+                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{emit cancelProcess(); emit processFolderSha(path, settings.value("shaType").toInt());});
             }
             else if (viewMode == "file") {
                 contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(path, 1);});
