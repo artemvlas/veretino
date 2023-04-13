@@ -28,7 +28,29 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
 
 QMap<QString,QString>& DataContainer::defineFilesAvailability()
 {
-    QStringList filelist = mainData.keys();
+    // parsing 'mainData' keys
+    QMap<QString, QString>::const_iterator i;
+    for (i = mainData.constBegin(); i != mainData.constEnd(); ++i) {
+        if (i.value() == "unreadable") {
+            if (QFileInfo::exists(i.key()))
+                filesAvailability[i.key()] = "on Disk (unreadable)";
+            else {
+                filesAvailability[i.key()] = "LOST file (unreadable)";
+                lostFiles.append(i.key());
+            }
+        }
+
+        else if (QFileInfo::exists(i.key())) {
+            filesAvailability[i.key()] = "on Disk";
+            onDiskFiles.append(i.key());
+        }
+        else {
+            filesAvailability[i.key()] = "LOST file";
+            lostFiles.append(i.key());
+        }
+    }
+
+    // looking for new files
     QStringList actualFiles;
     Files files(workDir);
 
@@ -40,31 +62,10 @@ QMap<QString,QString>& DataContainer::defineFilesAvailability()
         actualFiles = files.filteredFileList(ignoreList); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
     }
 
-    foreach (const QString &i, filelist) {
-
-        if (mainData.value(i) == "unreadable") {
-            if (QFileInfo::exists(i))
-                filesAvailability[i] = "on Disk (unreadable)";
-            else {
-                filesAvailability[i] = "LOST file (unreadable)";
-                lostFiles.append(i);
-            }
-        }
-
-        else if (QFileInfo::exists(i)) {
-            filesAvailability[i] = "on Disk";
-            onDiskFiles.append(i);
-        }
-        else {
-            filesAvailability[i] = "LOST file";
-            lostFiles.append(i);
-        }
-    }
-
-    foreach (const QString &i, actualFiles) {
-        if (!filelist.contains(i)) {
-            filesAvailability[i] = "NEW file";
-            newFiles.append(i);
+    foreach (const QString &file, actualFiles) {
+        if (!mainData.contains(file)) {
+            filesAvailability[file] = "NEW file";
+            newFiles.append(file);
         }
     }
 
