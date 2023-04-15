@@ -280,7 +280,7 @@ void Manager::checkFileSummary(const QString &path)
     }
 
     emit setMode("processing");
-    QString savedSum = line.mid(0, shaStrLen(shatype));
+    QString savedSum = line.mid(0, shaStrLen(shatype)).toLower();
     QString sum = shaCalc->calculateSha(checkFilePath, shatype);
     if (sum.isEmpty()) {
         return;
