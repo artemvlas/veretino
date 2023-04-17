@@ -147,9 +147,11 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         return;
     }
 
+    emit status("Parsing the database...");
     DataContainer *newData = json->parseJson(jsonFilePath);
     if (newData == nullptr) {
         emit setModel();
+        emit status();
         return;
     }
 
@@ -160,7 +162,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         delete oldData;
     }
 
-    emit status("Json Model creation...");
+    emit status("Finding files...");
     makeTreeModel(curData->defineFilesAvailability());
 
     setMode_model();
