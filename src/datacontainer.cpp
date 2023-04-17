@@ -218,12 +218,9 @@ QString DataContainer::aboutDb()
         filters = QString("\nIncluded Only: %1").arg(onlyExtensions.join(", "));
     }
 
-    int filesAvailabilityNumber = filesAvailability.size();
-    int storedPathsNumber = mainData.size();
-
     QString storedPathsInfo;
-    if (filesAvailabilityNumber != storedPathsNumber) {
-        storedPathsInfo = QString("Stored paths: %1\n").arg(storedPathsNumber);
+    if (filesAvailability.size() != mainData.size()) {
+        storedPathsInfo = QString("Stored paths: %1\n").arg(mainData.size());
     }
 
     QString tipText;
@@ -233,7 +230,7 @@ QString DataContainer::aboutDb()
     }
 
     return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
-        .arg(shaType()).arg(filters, storedDataSize, lastUpdate).arg(filesAvailabilityNumber).arg(storedPathsInfo, newFilesInfo).arg(lostFiles.size()).arg(tipText);
+        .arg(shaType()).arg(filters, storedDataSize, lastUpdate).arg(filesAvailability.size()).arg(storedPathsInfo, newFilesInfo).arg(lostFiles.size()).arg(tipText);
 }
 
 QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, const QString &value)
