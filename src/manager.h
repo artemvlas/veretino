@@ -45,7 +45,7 @@ public slots:
     void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
 
 signals:
-    void status(const QString &text = QString()); //text to statusbar
+    void status(const QString &text = QString()); // text to statusbar
     void donePercents(const int &done);
     void setModel(TreeModel *model = nullptr);
     void workDirChanged(const QString &workDir);

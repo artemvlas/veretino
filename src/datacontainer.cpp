@@ -26,52 +26,6 @@ DataContainer::DataContainer(const QString &initPath, QObject *parent)
     qDebug() << "DataContainer created | " << this->objectName();
 }
 
-QMap<QString,QString>& DataContainer::defineFilesAvailability()
-{
-    // parsing 'mainData' keys
-    QMap<QString, QString>::const_iterator i;
-    for (i = mainData.constBegin(); i != mainData.constEnd(); ++i) {
-        if (i.value() == "unreadable") {
-            if (QFileInfo::exists(i.key()))
-                filesAvailability[i.key()] = "on Disk (unreadable)";
-            else {
-                filesAvailability[i.key()] = "LOST file (unreadable)";
-                lostFiles.append(i.key());
-            }
-        }
-
-        else if (QFileInfo::exists(i.key())) {
-            filesAvailability[i.key()] = "on Disk";
-            onDiskFiles.append(i.key());
-        }
-        else {
-            filesAvailability[i.key()] = "LOST file";
-            lostFiles.append(i.key());
-        }
-    }
-
-    // looking for new files
-    QStringList actualFiles;
-    Files files(workDir);
-
-    if (!onlyExtensions.isEmpty())
-        actualFiles = files.filteredFileList(onlyExtensions, true);
-    else {
-        QStringList ignoreList(ignoredExtensions);
-        ignoreList.append({"ver.json", "sha1", "sha256", "sha512"});
-        actualFiles = files.filteredFileList(ignoreList); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
-    }
-
-    foreach (const QString &file, actualFiles) {
-        if (!mainData.contains(file)) {
-            filesAvailability[file] = "NEW file";
-            newFiles.append(file);
-        }
-    }
-
-    return filesAvailability;
-}
-
 QMap<QString,QString> DataContainer::newlostOnly()
 {
     QMap<QString,QString> newlost;

@@ -26,7 +26,9 @@ void Manager::connections()
     connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess);
     connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
     connect(shaCalc, &ShaCalculator::status, this, &Manager::status);
+
     connect(json, &jsonDB::showMessage, this, &Manager::showMessage);
+    connect(json, &jsonDB::status, this, &Manager::status);
 }
 
 void Manager::processFolderSha(const QString &folderPath, const int &shatype)
@@ -147,11 +149,9 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         return;
     }
 
-    emit status("Parsing the database...");
     DataContainer *newData = json->parseJson(jsonFilePath);
     if (newData == nullptr) {
         emit setModel();
-        emit status();
         return;
     }
 
@@ -162,8 +162,7 @@ void Manager::makeJsonModel(const QString &jsonFilePath)
         delete oldData;
     }
 
-    emit status("Finding files...");
-    makeTreeModel(curData->defineFilesAvailability());
+    makeTreeModel(curData->filesAvailability);
 
     setMode_model();
     emit showMessage(curData->aboutDb(), "Database parsed");

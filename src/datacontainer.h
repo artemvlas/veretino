@@ -35,7 +35,7 @@ public:
     QStringList newFiles;
     QStringList onDiskFiles;
 
-    QMap<QString,QString>& defineFilesAvailability();
+    //QMap<QString,QString>& defineFilesAvailability();
     QMap<QString,QString> newlostOnly();
     QMap<QString,QString> clearDataFromLostFiles(); // remove lostFiles items from mainData, returns the list of changes
     QMap<QString,QString> updateMainData(const QMap<QString,QString> &listFilesChecksums, const QString &info = "added to DB"); // add calculated checksums to mainData, returns the list of changes

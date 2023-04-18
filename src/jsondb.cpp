@@ -29,7 +29,7 @@ QJsonArray jsonDB::loadJsonDB(const QString &filePath)
 {
     if (readJsonFile(filePath).isArray()) {
         QJsonArray dataArray = readJsonFile(filePath).array();
-        if (dataArray.size() >= 2 && dataArray[0].isObject() && dataArray[1].isObject())
+        if (dataArray.size() >= 2 && dataArray.at(0).isObject() && dataArray.at(1).isObject())
             return readJsonFile(filePath).array();
     }
 
@@ -56,6 +56,7 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
     QJsonArray unreadableFiles;
     QString relativePath;
 
+    emit status("Creating the filelist...");
     qint64 totalSize = 0;
     QMapIterator<QString,QString> i(data->mainData);
     while (i.hasNext()) {
@@ -77,7 +78,7 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
     int shatype = data->shaType();
 
     QLocale locale (QLocale::English);
-    header["Created with"] = "Veretino 0.1.4 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino dev_0.1.5 https://github.com/artemvlas/veretino";
     header["Files number"] = computedData.size();
     header["Folder"] = Files::folderName(data->workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(shatype);
@@ -105,8 +106,10 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
 
     doc.setArray(mainArray);
 
-    if (saveJsonFile(doc, filePath))
+    if (saveJsonFile(doc, filePath)) {
+        emit status("Saved");
         emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity").arg(about, databaseStatus, QFileInfo(filePath).fileName()), "Success");
+    }
     else {
         QString workFolder = Files::parentFolder(filePath);
         header["Working folder"] = workFolder;
@@ -114,10 +117,12 @@ void jsonDB::makeJson(DataContainer *data, const QString &about)
         doc.setArray(mainArray);
 
         if (saveJsonFile(doc, Files::joinPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation), QFileInfo(filePath).fileName()))) {
+            emit status("Saved to Desktop");
             emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
                                 .arg(about, databaseStatus, workFolder, QFileInfo(filePath).fileName()), "Warning");
         }
         else {
+            emit status("NOT Saved");
             emit showMessage(QString("Unable to save json file: %1").arg(filePath), "Error");
         }
     }
@@ -131,14 +136,17 @@ DataContainer* jsonDB::parseJson(const QString &filePath)
         return nullptr;
     }
 
-    QJsonObject header (mainArray[0].toObject());
-    QJsonObject filelistData (mainArray[1].toObject());
-    QJsonObject excludedFiles (mainArray[2].toObject());
+    emit status("Parsing the database...");
+
+    QJsonObject header(mainArray.at(0).toObject());
+    QJsonObject filelistData(mainArray.at(1).toObject());
+    QJsonObject excludedFiles(mainArray.at(2).toObject());
 
     if (filelistData.isEmpty()) {
         emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
                          .arg(QFileInfo(filePath).fileName()), "Empty Database!");
         //qDebug()<< "EMPTY filelistData";
+        emit status();
         return nullptr;
     }
 
@@ -166,15 +174,53 @@ DataContainer* jsonDB::parseJson(const QString &filePath)
 
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); i != filelistData.constEnd(); ++i) {
-        data->mainData.insert(Files::joinPath(data->workDir, i.key()), i.value().toString()); // from relative to full path
+        QString curFilePath = Files::joinPath(data->workDir, i.key()); // from relative to full path
+        data->mainData.insert(curFilePath, i.value().toString()); // adding value to mainData
+
+        if (QFileInfo::exists(curFilePath)) {
+            data->filesAvailability.insert(curFilePath, "on Disk");
+            data->onDiskFiles.append(curFilePath);
+        }
+        else {
+            data->filesAvailability.insert(curFilePath, "LOST file");
+            data->lostFiles.append(curFilePath);
+        }
     }    
 
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
-                data->mainData.insert(Files::joinPath(data->workDir, unreadableFiles.at(var).toString()), "unreadable");
+                QString curFilePath = Files::joinPath(data->workDir, unreadableFiles.at(var).toString());
+                data->mainData.insert(curFilePath, "unreadable");
+
+                if (QFileInfo::exists(curFilePath))
+                    data->filesAvailability.insert(curFilePath, "on Disk (unreadable)");
+                else {
+                    data->filesAvailability.insert(curFilePath, "LOST file (unreadable)");
+                    data->lostFiles.append(curFilePath);
+                }
             }
+        }
+    }
+
+    emit status("Finding new files...");
+
+    QStringList actualFiles;
+    Files files(data->workDir);
+
+    if (!data->onlyExtensions.isEmpty())
+        actualFiles = files.filteredFileList(data->onlyExtensions, true);
+    else {
+        QStringList ignoreList(data->ignoredExtensions);
+        ignoreList.append({"ver.json", "sha1", "sha256", "sha512"});
+        actualFiles = files.filteredFileList(ignoreList); // all files from workDir except ignored extensions and *.ver.json and *.sha1/256/512
+    }
+
+    foreach (const QString &file, actualFiles) {
+        if (!data->mainData.contains(file)) {
+            data->filesAvailability.insert(file, "NEW file");
+            data->newFiles.append(file);
         }
     }
 
