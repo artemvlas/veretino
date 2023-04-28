@@ -258,17 +258,21 @@ void Manager::verifyFileList()
     FileList::const_iterator iter;
 
     for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
+        FileValues curFileValues = curData->data_.filesData.value(iter.key());
         if (iter.value().checksum != curData->data_.filesData.value(iter.key()).checksum) {
-            FileValues curFileValues = curData->data_.filesData.value(iter.key());
+            curFileValues.about = "NOT match!!!";
             curFileValues.reChecksum = iter.value().checksum;
-            curFileValues.about = "NOT match";
-            curData->data_.filesData.insert(iter.key(), curFileValues);
             ++mismatchNumber;
         }
+        else
+            curFileValues.about = "Checksum matches";
+
+        curData->data_.filesData.insert(iter.key(), curFileValues);
     }
 
+    makeTreeModel(curData->changesOnly());
+
     if (mismatchNumber > 0) {
-        makeTreeModel(curData->changesOnly());
         emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
         emit setMode("endProcess");
         emit setMode("updateMismatch");
