@@ -59,6 +59,7 @@ signals:
     void updateMismatch();// update json Database with new checksums for files with failed verification
     void checkCurrentItemSum(const QString &path); //check selected file only instead all database cheking
     void checkFileSummary(const QString &path);
+    void copyStoredChecksum(const QString &path, bool clipboard = true);
     void settingsChanged(const QVariantMap &settingsMap);
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database

@@ -32,6 +32,7 @@ public slots:
     void processFileSha(const QString &filePath, int shatype);
     void checkFileSummary(const QString &path); // path to *.sha1/256/512 summary file
     void checkCurrentItemSum(const QString &path); // check only selected file instead all database cheking
+    QString copyStoredChecksum(const QString &path, bool clipboard = true);
     void getItemInfo(const QString &path); // info about folder contents or file (size)
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
     void verifyFileList(); // checking the list of files against the checksums stored in the database

@@ -15,7 +15,6 @@ DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
 {
     updateMetaData();
 
-    //this->setObjectName(QString("DataMaintainer_%1").arg(data_.metaData.workDir));
     qDebug() << "DataMaintainer created | " << data_.metaData.workDir;
 }
 
@@ -201,8 +200,6 @@ void DataMaintainer::importJson(const QString &jsonFilePath)
         updateFilesValues();
     if (!canceled)
         findNewFiles();
-    if (!canceled)
-        updateMetaData();
     else
         data_.filesData.clear();
 }

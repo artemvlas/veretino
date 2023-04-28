@@ -69,15 +69,13 @@ void MainWindow::connections()
 
 void MainWindow::connectManager()
 {
-    //qRegisterMetaType <TreeModel*> ("tree");
-
     manager->moveToThread(thread);
 
-    //when closing the thread
+    // when closing the thread
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
-    //signals for execution tasks
+    // signals for execution tasks
     connect(this, &MainWindow::parseJsonFile, manager, &Manager::createDataModel);
     connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
     connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
@@ -86,27 +84,28 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::updateMismatch, manager, &Manager::updateMismatch);
     connect(this, &MainWindow::checkFileSummary, manager, &Manager::checkFileSummary); // check *.sha1 *.sha256 *.sha512 summaries
     connect(this, &MainWindow::checkCurrentItemSum, manager, &Manager::checkCurrentItemSum);
+    connect(this, &MainWindow::copyStoredChecksum, manager, &Manager::copyStoredChecksum);
 
-    //cancel process
+    // cancel process
     connect(this, &MainWindow::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);
 
-    //info and notifications
+    // info and notifications
     connect(manager, SIGNAL(status(QString)), ui->statusbar, SLOT(showMessage(QString)));
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(this, &MainWindow::getItemInfo, manager, &Manager::getItemInfo);
     connect(this, &MainWindow::folderContentsByType, manager, &Manager::folderContentsByType);
     connect(this, &MainWindow::aboutDatabase, manager, &Manager::aboutDatabase);
 
-    //results processing
+    // results processing
     connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
     connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
 
-    //process status
+    // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
     connect(manager, &Manager::donePercents, this, [=](const int &done){timeLeft(done);});
 
-    //transfer settings and modes
+    // transfer settings and modes
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
     connect(this, &MainWindow::settingsChanged, manager, &Manager::getSettings); // send settings Map
 
@@ -183,8 +182,10 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
             if (viewMode == "model" || viewMode == "modelNewLost") {
                 if (index.isValid()) {
-                    if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
+                    if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile()) {
                         contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
+                        contextMenu->addAction("Copy stored checksum to clipboard", this, [=]{emit copyStoredChecksum(curPath);});
+                    }
                 }
 
                 contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);

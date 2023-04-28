@@ -12,12 +12,8 @@ Manager::Manager(QObject *parent)
 
 Manager::~Manager()
 {
-    //emit cancelProcess();
-
     delete shaCalc;
-
     deleteCurData();
-    //qDebug() << "Manager DESTRUCTED. Thread:" << QThread::currentThread();
 }
 
 void Manager::connections()
@@ -196,10 +192,9 @@ void Manager::createDataModel(const QString &databaseFilePath)
         delete oldData;
     }
 
+    aboutDatabase();
     makeTreeModel(curData->data_.filesData);
-
     setMode_model();
-    emit showMessage(curData->aboutDb(), "Database parsed");
 }
 
 void Manager::showNewLostOnly()
@@ -207,7 +202,6 @@ void Manager::showNewLostOnly()
     makeTreeModel(curData->newlostOnly());
 }
 
-//remove lost files, add new files
 void Manager::updateNewLost()
 {
     emit setMode("processing");
@@ -232,7 +226,7 @@ void Manager::updateNewLost()
     emit setMode("model");
 }
 
-// update json Database with new checksums for files with failed verification
+// update the Database with new checksums for files with failed verification
 void Manager::updateMismatch()
 {
     curData->data_.metaData.about = QString("Stored checksums updated");
@@ -244,7 +238,7 @@ void Manager::updateMismatch()
     setMode_model();
 }
 
-// checking the list of files against the checksums stored in the database
+// checking the list of files against stored in the database checksums
 void Manager::verifyFileList()
 {
     if (curData->data_.filesData.isEmpty()) {
@@ -331,19 +325,9 @@ void Manager::checkFileSummary(const QString &path)
 //check only selected file instead all database cheking
 void Manager::checkCurrentItemSum(const QString &path)
 {
-    if (curData->data_.filesData.value(path).isNew) {
-        emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
-        return;
-    }
+    QString savedSum = copyStoredChecksum(path, false);
 
-    if (!curData->data_.filesData.value(path).isReadable) {
-        emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
-        return;
-    }
-
-    QString savedSum = curData->data_.filesData.value(path).checksum;
     if (savedSum.isEmpty()) {
-        emit showMessage("No checksum in the database.", "No checksum");
         return;
     }
 
@@ -360,6 +344,30 @@ void Manager::checkCurrentItemSum(const QString &path)
         emit showMessage("Checksum does NOT match", "Failed");
     }
     emit setMode("endProcess");
+}
+
+QString Manager::copyStoredChecksum(const QString &path, bool clipboard)
+{
+    if (curData->data_.filesData.value(path).isNew) {
+        emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
+        return QString();
+    }
+
+    if (!curData->data_.filesData.value(path).isReadable) {
+        emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
+        return QString();
+    }
+
+    QString savedSum = curData->data_.filesData.value(path).checksum;
+
+    if (savedSum.isEmpty()) {
+        emit showMessage("No checksum in the database.", "No checksum");
+    }
+
+    if (clipboard && !savedSum.isEmpty())
+        emit toClipboard(savedSum); // send checksum to clipboard
+
+    return savedSum;
 }
 
 // info about folder (number of files and total size) or file (size)
@@ -423,7 +431,6 @@ void Manager::folderContentsByType(const QString &folderPath)
 }
 void Manager::showAll()
 {
-    //curData->updateMetaData();
     makeTreeModel(curData->data_.filesData);
 }
 
