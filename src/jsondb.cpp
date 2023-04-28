@@ -31,14 +31,13 @@ bool JsonDb::saveJsonFile(const QJsonDocument &document, const QString &filePath
 
 QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 {
-    if (!readJsonFile(filePath).isEmpty() && readJsonFile(filePath).isArray()) {
+    if (readJsonFile(filePath).isArray()) {
         QJsonArray dataArray = readJsonFile(filePath).array();
         if (dataArray.size() > 1 && dataArray.at(0).isObject() && dataArray.at(1).isObject())
             return readJsonFile(filePath).array();
-        else
-            emit showMessage("Corrupted Json/Database", "Error");
     }
 
+    emit showMessage("Corrupted Json/Database", "Error");
     return QJsonArray();
 }
 
