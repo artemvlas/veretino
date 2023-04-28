@@ -279,16 +279,16 @@ QString dataSizeReadable(qint64 sizeBytes)
     long double converted = sizeBytes;
     QString xB;
 
-    if (converted > 1024) {
+    if (converted > 1000) {
         converted /= 1024;
         xB = "KiB";
-        if (converted > 1024) {
+        if (converted > 1000) {
             converted /= 1024;
             xB = "MiB";
-            if (converted > 1024) {
+            if (converted > 1000) {
                 converted /= 1024;
                 xB = "GiB";
-                if (converted > 1024) {
+                if (converted > 1000) {
                     converted /= 1024;
                     xB = "TiB";
                 }
