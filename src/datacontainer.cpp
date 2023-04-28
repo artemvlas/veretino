@@ -333,7 +333,7 @@ int DataMaintainer::shaType(const FileList &fileList)
     int len = 0;
 
     FileList::const_iterator iter;
-    for (iter = fileList.constBegin(); len != 0 && iter != fileList.constEnd(); ++iter)  {
+    for (iter = fileList.constBegin(); len == 0 && iter != fileList.constEnd(); ++iter)  {
         if (!iter.value().checksum.isEmpty())
             len = iter.value().checksum.size();
     }
