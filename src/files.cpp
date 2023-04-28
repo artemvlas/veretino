@@ -43,6 +43,8 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
         return FileList();
     }
 
+    emit sendText("Creating a list of files...");
+
     canceled = false;
     FileList resultList; // result list
 
@@ -66,9 +68,11 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
 
     if (canceled) {
         qDebug() << "Files::allFiles | Canceled:" << rootFolder;
+        emit sendText("Canceled");
         return FileList();
     }
 
+    emit sendText(QString("%1 files found").arg(resultList.size()));
     return resultList;
 }
 

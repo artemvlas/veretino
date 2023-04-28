@@ -29,6 +29,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     Files F(folderPath);
     connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
+    connect(&F, &Files::sendText, this, &Manager::status);
 
     DataContainer calcData;
     calcData.metaData.workDir = folderPath;
@@ -63,7 +64,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
         calcData.metaData.filter.extensionsList = ignoreList;
     }
 
-    emit status("Creating a list of files...");
+    // create the filelist
     calcData.filesData = F.allFiles(calcData.metaData.filter);
 
     // clear unneeded filtering rules
