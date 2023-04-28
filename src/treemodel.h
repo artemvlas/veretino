@@ -3,6 +3,7 @@
 
 #include <QAbstractItemModel>
 #include "treeitem.h"
+#include "datacontainer.h"
 
 class TreeModel : public QAbstractItemModel
 {
@@ -21,12 +22,11 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    void populateMap(const QMap<QString,QString> &map);
+    void populate(const FileList &filesData);
 
 private:
     TreeItem *rootItem;
     QString getPath(const QModelIndex &index);
-    void errorMessage(const QString &text);
 };
 
 #endif // TREEMODEL_H

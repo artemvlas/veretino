@@ -10,16 +10,18 @@
 // This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 // Used to create json databases from Veretino DataContainer objects and vice versa.
 
-class jsonDB : public QObject
+class JsonDb : public QObject
 {
     Q_OBJECT
 public:
-    explicit jsonDB(QObject *parent = nullptr);
+    explicit JsonDb(QObject *parent = nullptr);
+    explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
-    DataContainer* parseJson(const QString &pathToFile);
-    void makeJson(DataContainer *data, const QString &about);
+    DataContainer parseJson(const QString &filePath);
+    void makeJson(const DataContainer &data);
 
 private:
+    QString jsonFilePath;
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);

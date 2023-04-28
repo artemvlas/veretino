@@ -78,7 +78,7 @@ void MainWindow::connectManager()
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
     //signals for execution tasks
-    connect(this, &MainWindow::parseJsonFile, manager, &Manager::makeJsonModel);
+    connect(this, &MainWindow::parseJsonFile, manager, &Manager::createDataModel);
     connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
     connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
     connect(this, &MainWindow::verifyFileList, manager, &Manager::verifyFileList);
@@ -95,6 +95,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(this, &MainWindow::getItemInfo, manager, &Manager::getItemInfo);
     connect(this, &MainWindow::folderContentsByType, manager, &Manager::folderContentsByType);
+    connect(this, &MainWindow::aboutDatabase, manager, &Manager::aboutDatabase);
 
     //results processing
     connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
@@ -113,6 +114,7 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::isViewFS);
+    connect(this, &MainWindow::showAll, manager, &Manager::showAll);
 
     // cleanup
     connect(ui->treeView, &View::fsModel_Setted, manager, &Manager::deleteCurData);
@@ -162,22 +164,26 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         }
 
         else {
+            contextMenu->addAction("About", this, &MainWindow::aboutDatabase);
+            contextMenu->addSeparator();
             contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
             contextMenu->addAction("Reset Database", this, &MainWindow::resetDatabase);
             contextMenu->addSeparator();
+            contextMenu->addAction("Show All", this, &MainWindow::showAll);
+            contextMenu->addSeparator();
 
             if (viewMode == "updateMismatch")
-                contextMenu->addAction("update json Database with new checksums", this, &MainWindow::updateMismatch);
+                contextMenu->addAction("Update the Database with new checksums", this, &MainWindow::updateMismatch);
 
             else if (viewMode == "modelNewLost") {
                 contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
-                contextMenu->addAction("Update DataBase with New/Lost files", this, &MainWindow::updateNewLost);
+                contextMenu->addAction("Update the DataBase with New/Lost files", this, &MainWindow::updateNewLost);
                 contextMenu->addSeparator();
             }
 
             if (viewMode == "model" || viewMode == "modelNewLost") {
                 if (index.isValid()) {
-                    if (QFileInfo(Files::joinPath(ui->treeView->workDir, curPath)).isFile())
+                    if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
                         contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
                 }
 

@@ -1,53 +1,81 @@
+/* This file is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
+ * Objects of this class are used to store, organize, manage database data.
+ * For each database, a separate object is created that stores checksums, all lists of files for various needs,
+ * info about the algorithm type, relevance, etc. The object can perform basic tasks of sorting, filtering, comparing data.
+*/
 #ifndef DATACONTAINER_H
 #define DATACONTAINER_H
 
 #include <QObject>
 #include <QMap>
+#include "files.h"
 
+struct MetaData {
+    int shaType = 0; // 1 or 256 or 512
+    int numChecksums = 0; // number of files with checksums
+    int numNewFiles = 0;
+    int numMissingFiles = 0;
+    QString workDir; // current working folder
+    QString databaseFileName;
+    QString saveDateTime; // date and time the database was saved
+    QString about; // contains a brief description of the item changes or status, if any
+    QString storedTotalSize; // imported from database value
+    qint64 totalSize = 0; // total size of all files for which there are checksums in 'filesData'
+    FilterRule filter;
+};
 
-/* This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
- * Objects of this class are used to store, organize, manage database data.
- * For each database, a separate object is created that stores checksums, all lists of files for various needs,
- * info about the algorithm type, relevance, etc. The object can perform basic tasks of sorting, filtering, comparing data.
-*/
+struct DataContainer {
+    MetaData metaData;
+    FileList filesData; // main data
 
-class DataContainer : public QObject
+    DataContainer(){}
+    DataContainer(const MetaData &metadata) : metaData(metadata){}
+};
+
+class DataMaintainer : public QObject
 {
     Q_OBJECT
 public:
-    explicit DataContainer(const QString &initPath = QString(), QObject *parent = nullptr);
-    ~DataContainer();
+    explicit DataMaintainer(QObject *parent = nullptr);
+    explicit DataMaintainer(const DataContainer &initData, QObject *parent = nullptr);
+    ~DataMaintainer();
 
-    QString jsonFilePath;
-    QString workDir; // current working folder
-    QStringList ignoredExtensions;
-    QStringList onlyExtensions;
-    int shatype = 0; // 1 or 256 or 512: from json database header or by checksum lenght
-    int shaType(); // if ^ is 0 try to compute it by stored checksum string len
-    QString lastUpdate; // from "Updated" value of first json object (from header)
-    QString storedDataSize; // total size of listed files when db was built
-    QMap<QString,QString> mainData;
-    QMap<QString,QString> filesAvailability; //contains file : availability status (on Disk or Lost or New)
-    QMap<QString,QString> mismatches; //files with failed checksum test
-    QMap<QString,QString> recalculated; //checksums recalculated for given filelist (from json database) during verification
-    QMap<QString,QString> fillMapSameValues(const QStringList &keys, const QString &value); // create the QMap with multiple keys(QStrinList) and same values
-    QStringList lostFiles;
-    QStringList newFiles;
-    QStringList onDiskFiles;
+    // functions
+    void updateMetaData();
 
-    //QMap<QString,QString>& defineFilesAvailability();
-    QMap<QString,QString> newlostOnly();
-    QMap<QString,QString> clearDataFromLostFiles(); // remove lostFiles items from mainData, returns the list of changes
-    QMap<QString,QString> updateMainData(const QMap<QString,QString> &listFilesChecksums, const QString &info = "added to DB"); // add calculated checksums to mainData, returns the list of changes
+    void updateData(const FileList &updateFiles); // add new data to 'data_.filesData'
 
-    void setJsonFileNamePrefix(const QString &prefix);
-    void setIgnoredExtensions(const QStringList &extensions); // assigns ignoredExtensions, cleares onlyExtensions
-    void setOnlyExtensions(const QStringList &extensions); // assigns onlyExtensions, cleares ignoredExtensions
+    void updateFilesValues();
+    void findNewFiles(); // Searches for new readable files regarding stored list and filters
+
+    void clearDataFromLostFiles();
+    void updateMismatchedChecksums();
+
+    DataContainer availableFiles(); // returns a list of available (existing on disk and readable) files from the stored database list ('data_.filesData')
+    DataContainer newFiles(); // returns a list of files marked as new (isNew = true) from the 'dataContainer.filesData'
+    FileList newlostOnly();
+    FileList changesOnly();
+
+    void importJson(const QString &jsonFilePath);
+    void exportToJson();
 
     QString itemContentsInfo(const QString &itemPath); // info about Model item (created with mainData), if file - file info, if folder - folder contents (availability, size etc.)
-    QMap<QString,QString> listFolderContents(const QString &rootFolder); // returns a list of files and their availability info in the specified folder from the database
+    FileList listFolderContents(QString rootFolder); // returns a list of files and their availability info in the specified folder from the database
 
-    QString aboutDb(); // info about parsed DB
+    QString aboutDb(); // info about current DB
+
+    // variables
+    DataContainer data_;
+
+public slots:
+    void cancelProcess();
+private:
+    bool canceled = false;
+    int shaType(const FileList &fileList); // determines the shaType by the string length of the stored checksum
+
+signals:
+    void status(const QString &text = QString()); // text to statusbar
+    void showMessage(const QString &text, const QString &title = "Info");
 };
 
 #endif // DATACONTAINER_H

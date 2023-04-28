@@ -65,5 +65,7 @@ signals:
     void showNewLostOnly();
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);
+    void showAll();
+    void aboutDatabase();
 };
 #endif // MAINWINDOW_H

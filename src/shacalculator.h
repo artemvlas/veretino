@@ -10,30 +10,32 @@ class ShaCalculator : public QObject
 {
     Q_OBJECT
 public:
-    explicit ShaCalculator(const int &shatype = 0, QObject *parent = nullptr);
+    explicit ShaCalculator(QObject *parent = nullptr);
+    explicit ShaCalculator(int shatype, QObject *parent = nullptr);
     ~ShaCalculator();
 
-    void setShaType(const int &shatype);
-
 public slots:
-    QString calculateSha(const QString &filePath, const int &shatype = 0);
-    QMap<QString,QString> calculateSha(const QStringList &filelist, const int &shatype = 0);
+    QString calculate(const QString &filePath);
+    QString calculate(const QString &filePath, int shatype);
+    FileList calculate(const DataContainer &filesContainer);
 
 private:
     int chunk = 1048576; // file read buffer size
     bool canceled = false; // if true, task should be aborted
+    int initShaType = 0;
     qint64 totalSize; // total file or filelist size
     qint64 doneSize;
-    QCryptographicHash::Algorithm algorithm;
-    QString calcSha (const QString &filePath);
-    void toPercents(const int &bytes); // add this processed piece, calculate total done size and emit donePercents()
+    QCryptographicHash::Algorithm algorithm();
+    QCryptographicHash::Algorithm algorithm(int shatype);
+    FileValues computeChecksum(const QString &filePath, int shatype);
+    void toPercents(int bytes); // add this processed piece, calculate total done size and emit donePercents()
 
 signals:
     void cancelProcess();
-    void status(const QString &status); //text to statusbar
-    void resultReady(const QMap<QString,QString> &result);
-    void donePercents(const int &done);
-    void errorMessage(const QString &text);
+    void donePercents(int done);
+    void status(const QString &text); // text to statusbar
+    //void resultReady(const QMap<QString,QString> &result);
+    //void errorMessage(const QString &text);
 };
 
 #endif // SHACALCULATOR_H

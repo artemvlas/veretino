@@ -2,7 +2,7 @@
 #include <QTimer>
 #include <QDebug>
 
-View::View(QWidget *parent):QTreeView(parent)
+View::View(QWidget *parent) : QTreeView(parent)
 {
     connect(this, &View::pathChanged, this, &View::pathAnalyzer);
 }
@@ -55,13 +55,16 @@ void View::smartSetModel(QAbstractItemModel *model)
     }
 
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
-    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index){emit pathChanged(indexToPath(index)); currentIndex = index;});
+    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
+                                                {emit pathChanged(indexToPath(index)); currentIndex = index;});
 
     // send signal when Model has been changed, FileSystem = true, else = false;
     if (isViewFileSystem()) {
         emit modelChanged(true);
+        this->setColumnWidth(1, 100);
     }
     else {
+        this->setColumnWidth(1, 120);
         emit modelChanged(false);
         this->expandAll();
         this->scrollToTop();

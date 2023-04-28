@@ -1,10 +1,10 @@
 #include "treemodel.h"
-#include "QDir"
+//#include "QDir"
 
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({tr("Path"), tr("Info")});
+    rootItem = new TreeItem({"Path", "Size / Availability", "About"});
 }
 
 TreeModel::~TreeModel()
@@ -12,12 +12,11 @@ TreeModel::~TreeModel()
     delete rootItem;
 }
 
-void TreeModel::populateMap(const QMap<QString,QString> &map)
+void TreeModel::populate(const FileList &filesData)
 {
-    QStringList filelist = map.keys();
-
-    for (int f = 0; f < filelist.size(); ++f) {
-        QStringList splitPath = filelist.at(f).split('/');
+    FileList::const_iterator iter;
+    for (iter = filesData.constBegin(); iter != filesData.constEnd(); ++iter) {
+        QStringList splitPath = iter.key().split('/');
         TreeItem *parentItem = rootItem;
 
         for (int var = 0; var < splitPath.size(); ++var) {
@@ -32,10 +31,21 @@ void TreeModel::populateMap(const QMap<QString,QString> &map)
             }
 
             if (not_exist) {
-                QString info;
-                if (var + 1 == splitPath.size())
-                    info = map.value(filelist.at(f));
-                TreeItem *ti = new TreeItem({splitPath.at(var), info}, parentItem);
+                QString avail, about;
+                if (var + 1 == splitPath.size()) {
+                    if (iter.value().isNew)
+                        avail = QString("New file: %1").arg(format::dataSizeReadable(iter.value().size));
+                    else if (!iter.value().exists)
+                        avail = "Missing file";
+                    else if (!iter.value().isReadable)
+                        avail = "Unreadable";
+                    else
+                        avail = format::dataSizeReadable(iter.value().size);
+
+                    about = iter.value().about;
+                }
+
+                TreeItem *ti = new TreeItem({splitPath.at(var), avail, about}, parentItem);
                 parentItem->appendChild(ti);
                 parentItem = ti;
             }

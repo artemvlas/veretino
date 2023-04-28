@@ -3,110 +3,131 @@
 #include "QFile"
 #include "QFileInfo"
 
-ShaCalculator::ShaCalculator(const int &shatype, QObject *parent)
+ShaCalculator::ShaCalculator(QObject *parent)
     : QObject(parent)
-{    
-    if (shatype != 0)
-        setShaType(shatype);
+{
+    connect(this, &ShaCalculator::cancelProcess, this, [&]{canceled = true;});
+}
+
+ShaCalculator::ShaCalculator(int shatype, QObject *parent)
+    : QObject(parent)
+{
+    initShaType = shatype;
 
     connect(this, &ShaCalculator::cancelProcess, this, [&]{canceled = true;});
 }
 
-void ShaCalculator::setShaType(const int &shatype)
+QCryptographicHash::Algorithm ShaCalculator::algorithm()
 {
-    if (shatype == 1)
-        algorithm = QCryptographicHash::Sha1;
-    else if (shatype == 256)
-        algorithm = QCryptographicHash::Sha256;
-    else if (shatype == 512)
-        algorithm = QCryptographicHash::Sha512;
-    else
-        qDebug()<<"Wrong shatype. It must be int 1, 256 or 512";
+    return algorithm(initShaType);
 }
 
-QString ShaCalculator::calcSha(const QString &filePath)
+QCryptographicHash::Algorithm ShaCalculator::algorithm(int shatype)
 {
-    QFile file (filePath);
+    if (shatype == 1)
+        return QCryptographicHash::Sha1;
+    else if (shatype == 512)
+        return QCryptographicHash::Sha512;
+    else
+        return QCryptographicHash::Sha256;
+}
+
+FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
+{
+    FileValues curFileValues;
+    QFile file(filePath);
     if (!file.open (QIODevice::ReadOnly)) {
-        return "unreadable";
+        curFileValues.isReadable = false;
+        return curFileValues;
     }
 
-    QCryptographicHash hash(algorithm);
+    QCryptographicHash hash(algorithm(shatype));
     while (!file.atEnd() && !canceled) {
         const QByteArray &buf = file.read(chunk);
-        hash.addData (buf);
-
+        hash.addData(buf);
         toPercents(buf.size()); // add this processed piece, calculate total done size and emit donePercents()
     }
 
     if (canceled) {        
         emit donePercents(0);
-        qDebug()<<"ShaCalculator::calcSha | Canceled";
-        return QString();
+        qDebug()<<"ShaCalculator::computeChecksum | Canceled";
+        curFileValues.about = "Canceled";
+        return curFileValues;
     }
-    else
-        return hash.result().toHex();
+
+    curFileValues.checksum = hash.result().toHex();
+    return curFileValues;
 }
 
-QString ShaCalculator::calculateSha(const QString &filePath, const int &shatype)
+QString ShaCalculator::calculate(const QString &filePath)
 {
-    if (shatype != 0)
-        setShaType(shatype);
+    return calculate(filePath, initShaType);
+}
 
+QString ShaCalculator::calculate(const QString &filePath, int shatype)
+{
     doneSize = 0;
-    QFileInfo fileInfo (filePath);
-    totalSize = fileInfo.size();
+    totalSize = QFileInfo(filePath).size();
 
     canceled = false;
 
     emit status(QString("Calculation SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
-    QString sum = calcSha(filePath);
+    FileValues curFileValues = computeChecksum(filePath, shatype);
 
-    if (canceled)
+    if (canceled) {
         emit status("Canceled");
-    else
-        emit status(QString("SHA-%1 calculated").arg(shatype));
+        return QString();
+    }
 
-    return sum;
+    if (curFileValues.isReadable && !curFileValues.checksum.isEmpty()) {
+        emit status(QString("SHA-%1 calculated").arg(shatype));
+        return curFileValues.checksum;
+    }
+    else {
+        emit status("read error");
+        return QString();
+    }
 }
 
-QMap<QString,QString> ShaCalculator::calculateSha(const QStringList &filelist, const int &shatype)
+FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 {
-    if (shatype != 0)
-        setShaType(shatype);
-
+    emit status("Total size calculation...");
     canceled = false;
 
-    emit status("Total size calculation...");
-
-    Files files;
-    connect(this, &ShaCalculator::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
-    totalSize = files.dataSize(filelist);
-
-    QString totalInfo = Files::contentStatus(filelist.size(), totalSize);
-
-    emit status(QString("Calculation SHA-%1 checksums for: %2").arg(shatype).arg(totalInfo));
-
+    totalSize = Files::dataSize(filesContainer.filesData);
     doneSize = 0;
-    QMap<QString,QString> map;
 
-    for (int var = 0; var < filelist.size() && !canceled; ++var) {
-        map.insert(filelist.at(var), calcSha(filelist.at(var)));
-        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4").arg(shatype).arg(var+1).arg(Files::dataSizeReadable(doneSize), totalInfo));
+    QString totalInfo = format::filesNumberAndSize(filesContainer.filesData.size(), totalSize);
+
+    emit status(QString("Calculation SHA-%1 checksums for: %2").arg(filesContainer.metaData.shaType).arg(totalInfo));
+
+    FileList resultList;
+    FileList::const_iterator iter;
+    for (iter = filesContainer.filesData.constBegin(); iter != filesContainer.filesData.constEnd() && !canceled; ++iter) {
+        FileValues curFileValues = computeChecksum(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.shaType);
+        if (!filesContainer.metaData.about.isEmpty())
+            curFileValues.about = filesContainer.metaData.about;
+
+        curFileValues.size = iter.value().size;
+
+        resultList.insert(iter.key(), curFileValues);
+
+        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4")
+                        .arg(filesContainer.metaData.shaType).arg(resultList.size()).arg(format::dataSizeReadable(doneSize), totalInfo));
     }
 
     if (canceled) {
-        qDebug() << "ShaCalculator::calculateSha | Canceled";
+        qDebug() << "ShaCalculator::calculate | Canceled";
         emit status("Canceled");
-        return QMap<QString,QString> ();
+        return FileList();
     }
     else {
         emit status("Done");
-        return map;
+        return resultList;
     }
 }
 
-void ShaCalculator::toPercents(const int &bytes)
+void ShaCalculator::toPercents(int bytes)
 {
     if (doneSize == 0)
         emit donePercents(0); // initial 0 to reset progressbar value

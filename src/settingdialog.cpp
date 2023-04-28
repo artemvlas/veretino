@@ -1,6 +1,6 @@
 #include "settingdialog.h"
 #include "ui_settingdialog.h"
-#include "QDebug"
+//#include "QDebug"
 
 settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     QDialog(parent),
@@ -78,7 +78,14 @@ QVariantMap settingDialog::getSettings()
         settings["shaType"] = 512;
 
     if (!ui->inputJsonFileNamePrefix->text().isEmpty()) {
-        settings["dbPrefix"] = ui->inputJsonFileNamePrefix->text();
+        QString fileNamePrefix = ui->inputJsonFileNamePrefix->text();
+
+        QString forbSymb(":*/\?|<>");
+        for (int i = 0; i < forbSymb.size(); ++i) {
+            fileNamePrefix.replace(forbSymb.at(i), '_');
+        }
+
+        settings["dbPrefix"] = fileNamePrefix;
     }
     else
         settings.remove("dbPrefix");

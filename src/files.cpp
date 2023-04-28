@@ -2,13 +2,14 @@
 #include <QDirIterator>
 #include <QDebug>
 #include <cmath>
+#include <QDateTime>
 
 Files::Files(QObject *parent)
-    : QObject{parent}
+    : QObject(parent)
 {}
 
 Files::Files(const QString &initPath, QObject *parent)
-    : QObject{parent}
+    : QObject(parent)
 {
     if (QFileInfo(initPath).isFile())
         initFilePath = initPath;
@@ -16,110 +17,72 @@ Files::Files(const QString &initPath, QObject *parent)
         initFolderPath = initPath;
 }
 
-Files::Files(const QStringList &fileList, QObject *parent)
-    : QObject{parent}, initFileList(fileList)
+Files::Files(const FileList &fileList, QObject *parent)
+    : QObject(parent), initFileList(fileList)
 {}
 
-QString Files::parentFolder()
+FileList Files::allFiles()
 {
-    return parentFolder(initFilePath);
+    return allFiles(initFolderPath);
 }
 
-QString Files::parentFolder(const QString &path)
+FileList Files::allFiles(const QString &rootFolder)
 {
-    int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'
-    if (rootSepIndex == -1)
-        return "/"; // if there is no '/' in 'path', return '/' as root
-
-    if (path.at(rootSepIndex + 1) == '/')
-        ++rootSepIndex; // if the path is like 'ftp://folder' or 'smb://folder', increase index to next position
-    int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
-    if (sepIndex > rootSepIndex)
-        return path.left(sepIndex);
-    else
-        return path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
+    return allFiles(rootFolder, FilterRule()); // empty FilterRule with empty extensionsList simple returns true from 'isFileAllowed()' func
 }
 
-QString Files::joinPath(const QString &addPath)
+FileList Files::allFiles(const FilterRule &filter)
 {
-    return joinPath(initFolderPath, addPath);
+    return allFiles(initFolderPath, filter);
 }
 
-QString Files::joinPath(const QString &absolutePath, const QString &addPath)
-{
-    QString sep;
-
-    if (!absolutePath.endsWith('/'))
-        sep = "/";
-
-    return QString("%1%2%3").arg(absolutePath, sep, addPath);
-}
-
-QStringList& Files::allFiles()
-{
-    if (allFilesList.isEmpty())
-        allFilesList = allFiles(initFolderPath);
-
-    return allFilesList;
-}
-
-QStringList Files::allFiles(const QString &rootFolder)
+FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
 {
     if (!QFileInfo(rootFolder).isDir()) {
         qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
-        return QStringList();
+        return FileList();
     }
 
     canceled = false;
-    QStringList fileList;
+    FileList resultList; // result list
+
+    QDir dir(rootFolder);
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext() && !canceled)
-        fileList.append(it.next());
+    while (it.hasNext() && !canceled) {
+        QString fullPath = it.next();
+        QString relPath = dir.relativeFilePath(fullPath);
+
+        if (paths::isFileAllowed(relPath, filter)) {
+            FileValues curFileValues;
+            QFileInfo fileInfo(fullPath);
+            curFileValues.isReadable = fileInfo.isReadable();
+            if (curFileValues.isReadable)
+                curFileValues.size = fileInfo.size(); // If the file is unreadable, then its size is not needed
+
+            resultList.insert(relPath, curFileValues);
+        }
+    }
 
     if (canceled) {
         qDebug() << "Files::allFiles | Canceled:" << rootFolder;
-        return QStringList();
+        return FileList();
     }
 
-    return fileList;
+    return resultList;
 }
 
-QStringList Files::filteredFileList(const QStringList &extensionsList, const bool includeOnly)
+FileList Files::allFiles(const FileList &fileList, const FilterRule &filter)
 {
-    return filteredFileList(extensionsList, allFiles(), includeOnly);
-}
+    FileList filteredFiles; // result list
+    FileList::const_iterator iter;
 
-QStringList Files::filteredFileList(const QStringList &extensionsList, const QStringList &fileList, const bool includeOnly)
-{
-    if (extensionsList.isEmpty()) {
-        qDebug() << "Files::filteredFileList | 'extensionsList' is Empty. Original list returned";
-        return fileList;
-    }
-
-    QStringList filteredFiles; // result list
-
-    foreach (const QString &file, fileList) {
-        // to be able to filter compound extensions (like *.ver.json), a comparison loop is used instead of
-        // 'extensionsList.contains(QFileInfo(file).suffix().toLower())'
-        bool allowed = !includeOnly;
-        foreach (const QString &ext, extensionsList) {
-            if (file.endsWith('.' + ext, Qt::CaseInsensitive)) {
-                allowed = includeOnly;
-                break;
-            }
-        }
-        if (allowed)
-            filteredFiles.append(file);
+    for (iter = fileList.constBegin(); iter != fileList.constEnd(); ++iter) {
+        if (paths::isFileAllowed(iter.key(), filter))
+            filteredFiles.insert(iter.key(), iter.value());
     }
 
     return filteredFiles;
-}
-
-QString Files::fileSize(const QString &filePath)
-{
-    QFileInfo fileInfo(filePath);
-    return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
 }
 
 QString Files::contentStatus()
@@ -136,10 +99,10 @@ QString Files::contentStatus()
 
 QString Files::contentStatus(const QString &path)
 {
-    QFileInfo fInfo(path);
+    QFileInfo fileInfo(path);
     QString result;
 
-    if (fInfo.isDir()) {
+    if (fileInfo.isDir()) {
         canceled = false;
         int filesNumber = 0;
         qint64 totalSize = 0;
@@ -153,14 +116,14 @@ QString Files::contentStatus(const QString &path)
         }
 
         if (!canceled) {
-            result = QString("%1: %2").arg(folderName(path), contentStatus(filesNumber, totalSize));
+            result = QString("%1: %2").arg(paths::folderName(path), format::filesNumberAndSize(filesNumber, totalSize));
         }
         else {
             qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
         }
     }
-    else if (fInfo.isFile()) {
-        result = fileSize(path);
+    else if (fileInfo.isFile()) {
+        result = format::fileNameAndSize(path);
     }
     else
         qDebug() << "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
@@ -169,19 +132,9 @@ QString Files::contentStatus(const QString &path)
     return result;
 }
 
-QString Files::contentStatus(const QStringList &filelist)
+QString Files::contentStatus(const FileList &fileList)
 {
-    return contentStatus(filelist.size(), dataSize(filelist));
-}
-
-QString Files::contentStatus(const int &filesNumber, const qint64 &filesSize)
-{
-    QString s; // if only 1 file - text is "file", if more - text is "files"
-
-    if (filesNumber != 1)
-        s = "s";
-
-    return QString("%1 file%2 (%3)").arg(filesNumber).arg(s, dataSizeReadable(filesSize));
+    return format::filesNumberAndSize(fileList.size(), dataSize(fileList));
 }
 
 QString Files::folderContentsByType()
@@ -206,29 +159,30 @@ QString Files::folderContentsByType(const QString &folder)
     return folderContentsByType(allFiles(folder));
 }
 
-QString Files::folderContentsByType(const QStringList &fileList)
+QString Files::folderContentsByType(const FileList &fileList)
 {
     if (fileList.isEmpty())
         return "Empty folder. No file types to display.";
 
-    QHash<QString, QStringList> listsByType; // key = extension, value = list of files with that extension
+    QHash<QString, FileList> listsByType; // key = extension, value = list of files with that extension
 
-    foreach (const QString &file, fileList) {
-        QString ext = QFileInfo(file).suffix().toLower();
+    FileList::const_iterator filesIter;
+    for (filesIter = fileList.constBegin(); filesIter != fileList.constEnd(); ++filesIter) {
+        QString ext = QFileInfo(filesIter.key()).suffix().toLower();
         if (ext.isEmpty())
             ext = "No type";
-        listsByType[ext].append(file);
+        listsByType[ext].insert(filesIter.key(), filesIter.value());
     }
 
     struct combinedByType {
         QString extension;
-        QStringList filelist;
+        FileList filelist;
         qint64 filesSize;
     };
 
     QList<combinedByType> combList;
 
-    QHash<QString, QStringList>::const_iterator iter;
+    QHash<QString, FileList>::const_iterator iter;
     for (iter = listsByType.constBegin(); iter != listsByType.constEnd(); ++iter) {
         combinedByType t;
         t.extension = iter.key();
@@ -253,7 +207,7 @@ QString Files::folderContentsByType(const QStringList &fileList)
                 excNumber += combList.at(var).filelist.size();
             }
         }
-        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(contentStatus(excNumber, excSize)));
+        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(format::filesNumberAndSize(excNumber, excSize)));
     }
     else {
         foreach (const combinedByType &t, combList) {
@@ -284,26 +238,43 @@ qint64 Files::dataSize(const QString &folder)
     return dataSize(allFiles(folder));
 }
 
-qint64 Files::dataSize(const QStringList &filelist)
+qint64 Files::dataSize(const FileList &filelist)
 {
     qint64 totalSize = 0;
-    canceled = false;
 
     if (!filelist.isEmpty()) {
-        for (int i = 0; i < filelist.size() && !canceled; ++i) {
-            totalSize += QFileInfo(filelist.at(i)).size();
+        FileList::const_iterator iter;
+        for (iter = filelist.constBegin(); iter != filelist.constEnd(); ++iter) {
+            totalSize += iter.value().size;
         }
-    }
-
-    if (canceled) {
-        qDebug() << "Files::dataSize | Canceled";
-        totalSize = 0;
     }
 
     return totalSize;
 }
 
-QString Files::dataSizeReadable(const qint64 &sizeBytes)
+void Files::cancelProcess()
+{
+    canceled = true;
+}
+
+namespace format {
+QString currentDateTime()
+{
+    return QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm");
+}
+
+QString numString(qint64 num)
+{
+    QString numstr = QString::number(num);
+
+    for (int i = numstr.size() - 3; i > 0; i -= 3) {
+        numstr.insert(i, ',');
+    }
+
+    return numstr;
+}
+
+QString dataSizeReadable(qint64 sizeBytes)
 {
     long double converted = sizeBytes;
     QString xB;
@@ -331,7 +302,31 @@ QString Files::dataSizeReadable(const qint64 &sizeBytes)
         return QString("%1 bytes").arg(sizeBytes);
 }
 
-QString Files::folderName(const QString &folderPath)
+QString dataSizeReadableExt(qint64 sizeBytes)
+{
+    return QString("%1 (%2 bytes)").arg(dataSizeReadable(sizeBytes), numString(sizeBytes));
+}
+
+QString filesNumberAndSize(int filesNumber, qint64 filesSize)
+{
+    QString s("files");
+
+    if (filesNumber == 1)
+        s = "file"; // if only 1 file the text is "file", if more the text is "files"
+
+    return QString("%1 %2 (%3)").arg(filesNumber).arg(s, dataSizeReadable(filesSize));
+}
+
+QString fileNameAndSize(const QString &filePath)
+{
+    QFileInfo fileInfo(filePath);
+    return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
+}
+
+} // namespace 'format'
+
+namespace paths {
+QString folderName(const QString &folderPath)
 {
     QString dirName = QDir(folderPath).dirName();
 
@@ -341,7 +336,45 @@ QString Files::folderName(const QString &folderPath)
     return dirName;
 }
 
-void Files::cancelProcess()
+QString parentFolder(const QString &path)
 {
-    canceled = true;
+    int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'
+    if (rootSepIndex == -1)
+        return "/"; // if there is no '/' in 'path'
+
+    if (path.at(rootSepIndex + 1) == '/')
+        ++rootSepIndex; // if the path's root contains double '/' like 'ftp://folder' or 'smb://folder', increase index to next position
+    int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
+    if (sepIndex > rootSepIndex)
+        return path.left(sepIndex);
+    else
+        return path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
 }
+
+QString joinPath(const QString &absolutePath, const QString &addPath)
+{
+    if (absolutePath.endsWith('/'))
+        return absolutePath + addPath;
+    else
+        return QString("%1/%2").arg(absolutePath, addPath);
+}
+
+bool isFileAllowed(const QString &filePath, const FilterRule &filter)
+{
+    if (filter.extensionsList.isEmpty())
+        return true;
+
+    // if 'filter.include' = true, a file ('filePath') with any extension from 'extensionsList' is allowed
+    // if 'filter.include' = false, than all files except these types allowed
+
+    bool allowed = !filter.include;
+    foreach (const QString &ext, filter.extensionsList) {
+        if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
+            allowed = filter.include;
+            break;
+        }
+    }
+
+    return allowed;
+}
+} // namespace 'paths'

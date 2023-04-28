@@ -3,94 +3,230 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
+#include "jsondb.h"
+#include <QDirIterator>
 
-DataContainer::DataContainer(const QString &initPath, QObject *parent)
-    : QObject{parent}
+DataMaintainer::DataMaintainer(QObject *parent)
+    : QObject(parent)
+{}
+
+DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
+    : QObject(parent), data_(initData)
 {
-    QFileInfo initPathInfo(initPath);
+    updateMetaData();
 
-    if (initPathInfo.isFile() && initPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
-        jsonFilePath = initPath;
-        workDir = Files::parentFolder(initPath);
-    }
-    else if (initPathInfo.isDir()) {
-        workDir = initPath;
-        jsonFilePath = Files::joinPath(workDir, QString("checksums_%1.ver.json").arg(Files::folderName(workDir)));
-    }
-    else {
-        qDebug() << "DataContainer | Wrong initPath" << initPath;
-    }
-
-    this->setObjectName(QString("DataContainer_%1").arg(initPathInfo.baseName()));
-
-    qDebug() << "DataContainer created | " << this->objectName();
+    //this->setObjectName(QString("DataMaintainer_%1").arg(data_.metaData.workDir));
+    qDebug() << "DataMaintainer created | " << data_.metaData.workDir;
 }
 
-QMap<QString,QString> DataContainer::newlostOnly()
+void DataMaintainer::updateMetaData()
 {
-    QMap<QString,QString> newlost;
+    if (data_.metaData.shaType != 1 && data_.metaData.shaType != 256 && data_.metaData.shaType != 512)
+        data_.metaData.shaType = shaType(data_.filesData);
 
-    if (lostFiles.size() > 0) {
-        newlost.insert(fillMapSameValues(lostFiles, "LOST file"));
+    data_.metaData.numNewFiles = 0;
+    data_.metaData.numMissingFiles = 0;
+    data_.metaData.numChecksums = 0;
+    data_.metaData.totalSize = 0;
+
+    FileList::const_iterator iter;
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (!iter.value().checksum.isEmpty()) {
+            data_.metaData.totalSize += iter.value().size;
+            ++data_.metaData.numChecksums;
+            if (!iter.value().exists)
+                ++data_.metaData.numMissingFiles;
+        }
+        if (iter.value().isNew)
+            ++data_.metaData.numNewFiles;
+    }
+}
+
+void DataMaintainer::updateFilesValues()
+{
+    emit status("Defining files values...");
+    canceled = false;
+    QMutableMapIterator<QString, FileValues> iter(data_.filesData);
+
+    while (iter.hasNext() && !canceled) {
+        QString fullPath = paths::joinPath(data_.metaData.workDir, iter.next().key());
+        iter.value().exists = QFileInfo::exists(fullPath);
+        if (iter.value().exists && iter.value().isReadable && iter.value().size == 0) {
+            iter.value().size = QFileInfo(fullPath).size();
+        }
     }
 
-    if (newFiles.size() > 0) {
-        newlost.insert(fillMapSameValues(newFiles, "NEW file"));
+    if (canceled) {
+        qDebug() << "DataMaintainer::updateFilesValues() | Canceled:" << data_.metaData.workDir;
+    }
+}
+
+void DataMaintainer::findNewFiles()
+{
+    emit status("Looking for new files...");
+
+    FilterRule filter = data_.metaData.filter;
+    if (filter.extensionsList.isEmpty() || !filter.include) {
+        filter.include = false;
+        filter.extensionsList.append({"ver.json", "sha1", "sha256", "sha512"}); // <-- ignore these types while looking for new files
+    }
+
+    canceled = false;
+    QDir dir(data_.metaData.workDir);
+    QDirIterator it(data_.metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
+
+    while (it.hasNext() && !canceled) {
+        QString fullPath = it.next();
+        QString relPath = dir.relativeFilePath(fullPath);
+
+        if (paths::isFileAllowed(fullPath, filter) && !data_.filesData.contains(relPath)) {
+            QFileInfo fileInfo(fullPath);
+            // unreadable files are ignored
+            if (fileInfo.isReadable()) {
+                FileValues curFileValues;
+                curFileValues.isNew = true;
+                curFileValues.size = fileInfo.size();
+                data_.filesData.insert(relPath, curFileValues);
+            }
+        }
+    }
+
+    if (canceled) {
+        qDebug() << "DataMaintainer::findNewFiles() | Canceled:" << data_.metaData.workDir;
+    }
+}
+
+DataContainer DataMaintainer::availableFiles()
+{
+    DataContainer curData(data_.metaData);
+    FileList::const_iterator iter;
+
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (!iter.value().isNew && iter.value().exists && iter.value().isReadable) {
+            curData.filesData.insert(iter.key(), iter.value());
+        }
+    }
+
+    return curData;
+}
+
+DataContainer DataMaintainer::newFiles()
+{
+    DataContainer curData(data_.metaData);
+    FileList::const_iterator iter;
+
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (iter.value().isNew) {
+            curData.filesData.insert(iter.key(), iter.value());
+        }
+    }
+
+    return curData;
+}
+
+FileList DataMaintainer::newlostOnly()
+{
+    FileList newlost;
+    FileList::const_iterator iter;
+
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (iter.value().isNew || !iter.value().exists) {
+            newlost.insert(iter.key(), iter.value());
+        }
     }
 
     return newlost;
 }
 
-QMap<QString,QString> DataContainer::clearDataFromLostFiles()
+FileList DataMaintainer::changesOnly()
 {
-    if (lostFiles.size() > 0) {
-        foreach (const QString &file, lostFiles) {
-            mainData.remove(file);
-        }
+    FileList resultMap;
+    FileList::const_iterator iter;
 
-        QMap<QString,QString> changes = fillMapSameValues(lostFiles, "removed from DB");
-        lostFiles.clear();
-        qDebug()<< "DataContainer::clearDataFromLostFiles() | 'lostFiles' cleared";
-        return changes;
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (!iter.value().about.isEmpty()) {
+            resultMap.insert(iter.key(), iter.value());
+        }
     }
-    else {
-        qDebug() << "DataContainer::clearDataFromLostFiles() | NO Lost Files";
-        return QMap<QString,QString>();
-    }
+
+    return resultMap;
 }
 
-QMap<QString,QString> DataContainer::updateMainData(const QMap<QString,QString> &listFilesChecksums, const QString &info)
+void DataMaintainer::clearDataFromLostFiles()
 {
-    if (!listFilesChecksums.isEmpty()) {
-        mainData.insert(listFilesChecksums); // update the mainData map with new data
-
-        QMap<QString,QString> changes = fillMapSameValues(listFilesChecksums.keys(), info); // create 'changes' map to display a list of changes
-
-        // determine and clear the origin of the added Data
-        if (mismatches.contains(listFilesChecksums.firstKey())) {
-            mismatches.clear();
-            recalculated.clear();
-            qDebug()<< "DataContainer::updateMainData() | mainData updated, 'mismatches' and 'recalculated' cleared";
-        }
-        else if (newFiles.contains(listFilesChecksums.firstKey())) {
-            newFiles.clear();
-            qDebug()<< "DataContainer::updateMainData() | mainData updated, 'newFiles' cleared";
-        }
-        return changes;
-    }
-    else {
-        qDebug() << "DataContainer::updateMainData() | NO Data to add";
-        return QMap<QString,QString>();
-    }
-}
-
-QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolder)
-{
-    QMap<QString, QString> content;
-    QMapIterator<QString,QString> iter(filesAvailability);
+    QMutableMapIterator<QString, FileValues> iter(data_.filesData);
 
     while (iter.hasNext()) {
         iter.next();
+        if (!iter.value().exists) {
+            iter.value().checksum.clear();
+            iter.value().about = "removed from DB";
+        }
+    }
+}
+
+void DataMaintainer::updateMismatchedChecksums()
+{
+    QMutableMapIterator<QString, FileValues> iter(data_.filesData);
+
+    while (iter.hasNext()) {
+        iter.next();
+        if (!iter.value().reChecksum.isEmpty()) {
+            iter.value().checksum = iter.value().reChecksum;
+            iter.value().reChecksum.clear();
+            iter.value().about = "stored checksum updated";
+        }
+    }
+}
+
+void DataMaintainer::updateData(const FileList &updateFiles)
+{
+    data_.filesData.insert(updateFiles);
+}
+
+void DataMaintainer::importJson(const QString &jsonFilePath)
+{
+    JsonDb *json = new JsonDb;
+    connect(json, &JsonDb::status, this, &DataMaintainer::status);
+    connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
+
+    data_ = json->parseJson(jsonFilePath);
+    json->deleteLater();
+
+    if (data_.filesData.isEmpty()) {
+        return;
+    }
+
+    if (!canceled)
+        updateFilesValues();
+    if (!canceled)
+        findNewFiles();
+    if (!canceled)
+        updateMetaData();
+    else
+        data_.filesData.clear();
+}
+
+void DataMaintainer::exportToJson()
+{
+    JsonDb *json = new JsonDb;
+    connect(json, &JsonDb::status, this, &DataMaintainer::status);
+    connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
+
+    json->makeJson(data_);
+
+    json->deleteLater();
+}
+
+FileList DataMaintainer::listFolderContents(QString rootFolder)
+{
+    if (!rootFolder.endsWith('/'))
+        rootFolder.append('/');
+
+    FileList content;
+    FileList::const_iterator iter;
+
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
         if (iter.key().startsWith(rootFolder))
             content.insert(iter.key(), iter.value());
         else if (!content.isEmpty()) {
@@ -101,51 +237,50 @@ QMap<QString,QString> DataContainer::listFolderContents(const QString &rootFolde
     return content;
 }
 
-QString DataContainer::itemContentsInfo(const QString &itemPath)
+QString DataMaintainer::itemContentsInfo(const QString &itemPath)
 {
-    QString fullPath = Files::joinPath(workDir, itemPath);
-    QFileInfo fInf(fullPath);
-    if (fInf.isFile())
-        return Files::fileSize(fullPath);
-    else if (fInf.isDir()) {
-        QMap<QString, QString> content = listFolderContents(fullPath + '/');
-        QMapIterator<QString,QString> iterContent(content);
-        QStringList ondisk;
-        QStringList lost;
-        QStringList newfiles;
+    QString fullPath = paths::joinPath(data_.metaData.workDir, itemPath);
+    QFileInfo fileInfo(fullPath);
+    if (fileInfo.isFile())
+        return format::fileNameAndSize(fullPath);
+    else if (fileInfo.isDir()) {
+        FileList content = listFolderContents(itemPath);        
+        FileList newfiles;
+        FileList ondisk;
+        int lost = 0;
 
-        while (iterContent.hasNext()) {
-            iterContent.next();
-            if (iterContent.value() == "on Disk") {
-                ondisk.append(iterContent.key());
+        FileList::const_iterator iterContent;
+        for (iterContent = content.constBegin(); iterContent != content.constEnd(); ++iterContent) {
+            if (iterContent.value().isNew) {
+                newfiles.insert(iterContent.key(), iterContent.value());
             }
-            else if (iterContent.value() == "LOST file") {
-                lost.append(iterContent.key());
+            else if (iterContent.value().exists && iterContent.value().isReadable) {
+                ondisk.insert(iterContent.key(), iterContent.value());
             }
-            else if (iterContent.value() == "NEW file") {
-                newfiles.append(iterContent.key());
+            else if (!iterContent.value().exists) {
+                ++lost;
             }
             else
-                qDebug()<< "DataContainer::itemContents | Ambiguous item: " << iterContent.key();
+                qDebug()<< "DataMaintainer::itemContents | Ambiguous item: " << iterContent.key();
         }
 
         QString text;
         if (ondisk.size() > 0) {
-            text = "on Disk: " + Files().contentStatus(ondisk);
+            text = "on Disk: " + Files::contentStatus(ondisk);
         }
 
-        if (lost.size() > 0) {
+        if (lost > 0) {
             QString pre;
             if (ondisk.size() > 0)
                 pre = "; ";
-            text.append(QString("%1Lost files: %2").arg(pre).arg(lost.size()));
+            text.append(QString("%1Lost files: %2").arg(pre).arg(lost));
         }
 
         if (newfiles.size() > 0) {
             QString pre;
-            if (ondisk.size() > 0 || lost.size() > 0)
+            if (ondisk.size() > 0 || lost > 0)
                 pre = "; ";
-            text.append(QString("%1New: %2").arg(pre, Files().contentStatus(newfiles)));
+            text.append(QString("%1New: %2").arg(pre, Files::contentStatus(newfiles)));
         }
 
         return text;
@@ -154,84 +289,76 @@ QString DataContainer::itemContentsInfo(const QString &itemPath)
         return "The item actually not on a disk";
 }
 
-QString DataContainer::aboutDb()
+QString DataMaintainer::aboutDb()
 {
-    QString newFilesInfo;
-
-    if (newFiles.size() > 0) {
-        newFilesInfo = "New: " + Files().contentStatus(newFiles);
+    QString about_newfiles;
+    if (data_.metaData.numNewFiles > 0) {
+        about_newfiles = "New: " + Files::contentStatus(newFiles().filesData);
     }
     else
-        newFilesInfo = "New files: 0";
+        about_newfiles = "No New files found";
+
+    QString about_missingfiles;
+    if (data_.metaData.numMissingFiles > 0) {
+        about_missingfiles = QString("Missing: %1 files").arg(data_.metaData.numMissingFiles);
+    }
+    else
+        about_missingfiles = "No Missing files found";
 
     QString filters;
-    if (!ignoredExtensions.isEmpty()) {
-        filters = QString("\nIgnored: %1").arg(ignoredExtensions.join(", "));
-    }
-    else if (!onlyExtensions.isEmpty()) {
-        filters = QString("\nIncluded Only: %1").arg(onlyExtensions.join(", "));
-    }
-
-    QString storedPathsInfo;
-    if (filesAvailability.size() != mainData.size()) {
-        storedPathsInfo = QString("Stored paths: %1\n").arg(mainData.size());
+    if (!data_.metaData.filter.extensionsList.isEmpty()) {
+        if (data_.metaData.filter.include)
+            filters = QString("\nIncluded Only: %1").arg(data_.metaData.filter.extensionsList.join(", "));
+        else
+            filters = QString("\nIgnored: %1").arg(data_.metaData.filter.extensionsList.join(", "));
     }
 
     QString tipText;
 
-    if (newFiles.size() > 0 || lostFiles.size() > 0) {
+    if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
         tipText = "\n\nUse context menu for more options";
     }
 
-    return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\nLost files: %8%9")
-        .arg(shaType()).arg(filters, storedDataSize, lastUpdate).arg(filesAvailability.size()).arg(storedPathsInfo, newFilesInfo).arg(lostFiles.size()).arg(tipText);
+    QString storedChecksums;
+    if (data_.metaData.numChecksums != data_.filesData.size())
+        storedChecksums = QString("Stored checksums: %1\n").arg(data_.metaData.numChecksums);
+
+    return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\n%8%9")
+        .arg(data_.metaData.shaType).arg(filters, data_.metaData.storedTotalSize, data_.metaData.saveDateTime)
+        .arg(data_.filesData.size()).arg(storedChecksums, about_newfiles, about_missingfiles, tipText);
 }
 
-QMap<QString,QString> DataContainer::fillMapSameValues(const QStringList &keys, const QString &value)
+int DataMaintainer::shaType(const FileList &fileList)
 {
-    QMap<QString,QString> resultMap;
+    int len = 0;
 
-    foreach (const QString &key, keys) {
-        resultMap.insert(key, value);
+    FileList::const_iterator iter;
+    for (iter = fileList.constBegin(); len != 0 && iter != fileList.constEnd(); ++iter)  {
+        if (!iter.value().checksum.isEmpty())
+            len = iter.value().checksum.size();
     }
 
-    return resultMap;
-}
-
-void DataContainer::setIgnoredExtensions(const QStringList &extensions)
-{
-    ignoredExtensions = extensions;
-    onlyExtensions.clear();
-}
-
-void DataContainer::setOnlyExtensions(const QStringList &extensions)
-{
-    onlyExtensions = extensions;
-    ignoredExtensions.clear();
-}
-
-void DataContainer::setJsonFileNamePrefix(const QString &prefix)
-{
-    jsonFilePath = Files::joinPath(workDir, QString("%1_%2.ver.json").arg(prefix, Files::folderName(workDir)));
-}
-
-int DataContainer::shaType()
-{
-    if (shatype != 0)
-        return shatype;
-
-    int len = mainData.begin().value().size();
-    if (len == 40)
+    if (len == 40) {
         return 1;
-    else if (len == 64)
+    }
+    else if (len == 64) {
         return 256;
-    else if (len == 128)
+    }
+    else if (len == 128) {
         return 512;
-    else
+    }
+    else {
+        qDebug() << "DataMaintainer::shaType() | Failed to determine the Algorithm. Invalid string length:" << len;
         return 0;
+    }
 }
 
-DataContainer::~DataContainer()
+void DataMaintainer::cancelProcess()
 {
-    qDebug()<< "DataContainer deleted | " << this->objectName();
+    canceled = true;
+}
+
+DataMaintainer::~DataMaintainer()
+{
+    qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
 }
