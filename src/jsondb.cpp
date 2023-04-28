@@ -46,6 +46,7 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 void JsonDb::makeJson(const DataContainer &data)
 {
     emit status("Exporting data to json...");
+    bool isWorkDirRelative = !data.metaData.databaseFileName.contains('/');
 
     QJsonObject header;
     header["Created with"] = "Veretino dev_0.2.0 https://github.com/artemvlas/veretino";
@@ -54,7 +55,10 @@ void JsonDb::makeJson(const DataContainer &data)
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
     header["Total size"] = format::dataSizeReadableExt(data.metaData.totalSize);
     header["Updated"] = format::currentDateTime();
-    header["Working folder"] = "Relative";
+    if (isWorkDirRelative)
+        header["Working folder"] = "Relative";
+    else
+        header["Working folder"] = data.metaData.workDir;
 
     if (!data.metaData.filter.extensionsList.isEmpty()) {
         if (data.metaData.filter.include)
@@ -92,11 +96,13 @@ void JsonDb::makeJson(const DataContainer &data)
     QString databaseStatus = QString("Current status:\nChecksums stored: %1\nTotal size: %2")
                                  .arg(data.metaData.numChecksums).arg(format::dataSizeReadable(data.metaData.totalSize));
 
+
     QString pathToSave;
-    if (data.metaData.databaseFileName.contains('/'))
-        pathToSave = data.metaData.databaseFileName;
-    else
+    if (isWorkDirRelative)
         pathToSave = paths::joinPath(data.metaData.workDir, data.metaData.databaseFileName);
+    else
+        pathToSave = data.metaData.databaseFileName;
+
 
     if (saveJsonFile(doc, pathToSave)) {
         emit status("Saved");
