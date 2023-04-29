@@ -60,7 +60,7 @@ void DataMaintainer::updateFilesValues()
     }
 }
 
-void DataMaintainer::findNewFiles()
+int DataMaintainer::findNewFiles()
 {
     emit status("Looking for new files...");
 
@@ -71,6 +71,7 @@ void DataMaintainer::findNewFiles()
     }
 
     canceled = false;
+    int number = 0;
     QDir dir(data_.metaData.workDir);
     QDirIterator it(data_.metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
 
@@ -86,13 +87,17 @@ void DataMaintainer::findNewFiles()
                 curFileValues.isNew = true;
                 curFileValues.size = fileInfo.size();
                 data_.filesData.insert(relPath, curFileValues);
+                ++number;
             }
         }
     }
 
     if (canceled) {
+        number = 0;
         qDebug() << "DataMaintainer::findNewFiles() | Canceled:" << data_.metaData.workDir;
     }
+
+    return number;
 }
 
 DataContainer DataMaintainer::availableFiles()

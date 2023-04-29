@@ -46,10 +46,10 @@ public:
     void updateData(const FileList &updateFiles); // add new data to 'data_.filesData'
 
     void updateFilesValues();
-    void findNewFiles(); // Searches for new readable files regarding stored list and filters
+    int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
 
     int clearDataFromLostFiles(); // returns number of cleared
-    int updateMismatchedChecksums(); // returs number of updated checksums
+    int updateMismatchedChecksums(); // returns number of updated checksums
 
     DataContainer availableFiles(); // returns a list of available (existing on disk and readable) files from the stored database list ('data_.filesData')
     DataContainer newFiles(); // returns a list of files marked as new (isNew = true) from the 'dataContainer.filesData'
