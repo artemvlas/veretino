@@ -335,8 +335,9 @@ QString folderName(const QString &folderPath)
     QString dirName = QDir(folderPath).dirName();
 
     if (dirName.isEmpty()) {
-        if (parentFolder(folderPath).at(1) == ':') // if Windows-style root path like C:
-            dirName = QString("Drive_%1").arg(parentFolder(folderPath).at(0));
+        QString rootPath = parentFolder(folderPath);
+        if (rootPath.size() == 3 && rootPath.at(1) == ':') // if Windows-style root path like C:
+            dirName = QString("Drive_%1").arg(rootPath.at(0));
         else
             dirName = "Root";
     }
