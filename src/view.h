@@ -2,7 +2,7 @@
 #define VIEW_H
 
 #include <QTreeView>
-#include "QFileSystemModel"
+#include <QFileSystemModel>
 
 class View : public QTreeView
 {
@@ -20,7 +20,7 @@ public slots:
     void setIndexByPath(const QString &path);
 
 private:
-    QFileSystemModel *fileSystem;
+    QFileSystemModel *fileSystem = new QFileSystemModel;
     QModelIndex currentIndex;
     QString lastFileSystemPath;
     void scrollToPath(const QString &path); //QTimer used. QFileSystemModel needs some time after setup to Scrolling be able

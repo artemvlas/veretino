@@ -2,9 +2,9 @@
 #define JSONDB_H
 
 #include <QObject>
-#include "QJsonDocument"
-#include "QJsonObject"
-#include "QJsonArray"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "datacontainer.h"
 
 // This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino

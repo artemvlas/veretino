@@ -1,7 +1,7 @@
 /* This file is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
- * Objects of this class are used to store, organize, manage database data.
+ * These classes are used to store, organize, manage the data.
  * For each database, a separate object is created that stores checksums, all lists of files for various needs,
- * info about the algorithm type, relevance, etc. The object can perform basic tasks of sorting, filtering, comparing data.
+ * info about the algorithm type, relevance, etc. Objects can perform basic tasks of sorting, filtering, comparing data.
 */
 #ifndef DATACONTAINER_H
 #define DATACONTAINER_H

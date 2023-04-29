@@ -1,7 +1,6 @@
 #include "shacalculator.h"
-#include "qthread.h"
-#include "QFile"
-#include "QFileInfo"
+#include <QFile>
+#include <QFileInfo>
 
 ShaCalculator::ShaCalculator(QObject *parent)
     : QObject(parent)
@@ -50,7 +49,7 @@ FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
 
     if (canceled) {        
         emit donePercents(0);
-        qDebug()<<"ShaCalculator::computeChecksum | Canceled";
+        qDebug() << "ShaCalculator::computeChecksum | Canceled";
         curFileValues.about = "Canceled";
         return curFileValues;
     }
@@ -144,5 +143,5 @@ void ShaCalculator::toPercents(int bytes)
 
 ShaCalculator::~ShaCalculator()
 {
-    qDebug()<< "ShaCalculator Destructed: " << QThread::currentThread();
+    qDebug() << "ShaCalculator Destructed";
 }

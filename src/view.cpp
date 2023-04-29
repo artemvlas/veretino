@@ -2,17 +2,17 @@
 #include <QTimer>
 #include <QDebug>
 
-View::View(QWidget *parent) : QTreeView(parent)
+View::View(QWidget *parent)
+    : QTreeView(parent)
 {
+    fileSystem->setObjectName("fileSystem");
+    fileSystem->setRootPath(QDir::rootPath());
+
     connect(this, &View::pathChanged, this, &View::pathAnalyzer);
 }
 
 void View::setFileSystemModel()
 {
-    fileSystem = new QFileSystemModel;
-    fileSystem->setObjectName("fileSystem");
-    fileSystem->setRootPath(QDir::rootPath());
-
     this->smartSetModel(fileSystem);
 
     if (!QFileInfo::exists(lastFileSystemPath)) {
@@ -21,7 +21,6 @@ void View::setFileSystemModel()
 
     this->setIndexByPath(lastFileSystemPath);
     emit fsModel_Setted();
-    //qDebug()<<"View::setFileSystemModel() | "<<lastFileSystemPath;
 }
 
 void View::smartSetModel(QAbstractItemModel *model)
@@ -31,8 +30,9 @@ void View::smartSetModel(QAbstractItemModel *model)
         return;
     }
 
-    if (isViewFileSystem())
+    if (isViewFileSystem()) {
         lastFileSystemPath = indexToPath(currentIndex);
+    }
 
     int previousColumWidth = this->columnWidth(0); // first load = 0
 
@@ -45,7 +45,7 @@ void View::smartSetModel(QAbstractItemModel *model)
     if (previousColumWidth == 0)
         this->setColumnWidth(0, 450);
 
-    if (oldModel != nullptr) {
+    if (oldModel != nullptr && oldModel->objectName() != "fileSystem") {
         qDebug() << "oldModel deleted";
         delete oldModel;
     }
@@ -98,14 +98,13 @@ QString View::indexToPath(const QModelIndex &index)
 void View::setIndexByPath(const QString &path)
 {
     if (isViewFileSystem()) {
-
         if (QFileInfo::exists(path)) {
             QModelIndex index = fileSystem->index(path);
             this->expand(index);
             this->setCurrentIndex(index);
             this->scrollToPath(path);
-            //if the Model remains the same, the Timer is not necessary, but if the Model is resetting, it does
-            //this->scrollTo(index,QAbstractItemView::PositionAtCenter);
+            // for better scrolling work, a timer^ is used
+            // this->scrollTo(index, QAbstractItemView::PositionAtCenter);
         }
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
@@ -114,17 +113,16 @@ void View::setIndexByPath(const QString &path)
 
 void View::scrollToPath(const QString &path)
 {
-    //QFileSystemModel needs some time after setup to Scrolling be able
-    //this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)], currentIndex=fileSystem->index(path) NOT working good
+    // QFileSystemModel needs some time after setup to Scrolling be able
+    // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
+    // 'currentIndex' (wich is =fileSystem->index(path)) is NOT working good
     if (isViewFileSystem()) {
-        QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path),QAbstractItemView::PositionAtCenter);});
+        QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter);});
     }
 }
 
 void View::pathAnalyzer(const QString &path)
 {
-    qDebug()<< "View::pathAnalyzer | " << path;
-
     if (this->isViewFileSystem()) {
         QFileInfo i(path);
         QString ext = i.suffix().toLower();

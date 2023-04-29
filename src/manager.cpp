@@ -1,8 +1,8 @@
+#include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include "manager.h"
 #include "files.h"
-#include "QFile"
-#include "QFileInfo"
-#include "QDir"
 
 Manager::Manager(QObject *parent)
     : QObject(parent)
@@ -469,12 +469,6 @@ void Manager::deleteCurData()
         curData->deleteLater();
         curData = nullptr;
     }
-    /*
-    DataMaintainer *oldData = curData;
-    curData = nullptr;
-    if (oldData != nullptr) {
-        delete oldData;
-    }*/
 }
 
 namespace tools {

@@ -1,6 +1,5 @@
 #include "settingdialog.h"
 #include "ui_settingdialog.h"
-//#include "QDebug"
 
 settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
     QDialog(parent),
@@ -107,8 +106,6 @@ QVariantMap settingDialog::getSettings()
 
     settings["ignoreDbFiles"] = ui->ignoreDbFiles->isChecked();
     settings["ignoreShaFiles"] = ui->ignoreShaFiles->isChecked();
-
-    //qDebug()<< "settingDialog::getSettings() | " << settings;
 
     return settings;
 }

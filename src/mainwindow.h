@@ -3,16 +3,16 @@
 
 #include <QMainWindow>
 
-#include "QThread"
+#include <QThread>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QClipboard>
+#include <QDragEnterEvent>
+#include <QMimeData>
 #include "treemodel.h"
 #include "manager.h"
 #include "settingdialog.h"
 #include "aboutdialog.h"
-#include "QMessageBox"
-#include "QFileDialog"
-#include "QClipboard"
-#include "QDragEnterEvent"
-#include "QMimeData"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

@@ -1,8 +1,9 @@
-#include "jsondb.h"
-#include "QFile"
-#include "QFileInfo"
+#include <QStandardPaths>
+#include <QFile>
+#include <QFileInfo>
 #include "files.h"
-#include "QStandardPaths"
+#include "jsondb.h"
+
 
 JsonDb::JsonDb(QObject *parent)
     : QObject(parent)
