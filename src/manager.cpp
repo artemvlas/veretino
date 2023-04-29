@@ -29,7 +29,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     Files F(folderPath);
     connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
-    connect(&F, &Files::sendText, this, &Manager::status);
+    connect(&F, &Files::status, this, &Manager::status);
 
     DataContainer calcData;
     calcData.metaData.workDir = folderPath;
@@ -391,8 +391,8 @@ void Manager::getItemInfo(const QString &path)
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             connect(thread, &QThread::finished, files, &Files::deleteLater);
             connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-            connect(files, &Files::sendText, this, [=](const QString &text){if (text != "counting...") thread->quit();});
-            connect(files, &Files::sendText, this, [=](const QString &text){if (!text.isEmpty()) emit status(text);});
+            connect(files, &Files::status, this, [=](const QString &text){if (text != "counting...") thread->quit();});
+            connect(files, &Files::status, this, [=](const QString &text){if (!text.isEmpty()) emit status(text);});
 
             // ***debug***
             connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});

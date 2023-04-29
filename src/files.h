@@ -82,6 +82,7 @@ private:
     FileList initFileList;
 
 signals:
+    void status(const QString &text = QString());
     void sendText(const QString &text = QString());
 };
 

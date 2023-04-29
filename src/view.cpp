@@ -32,6 +32,8 @@ void View::smartSetModel(QAbstractItemModel *model)
 
     if (isViewFileSystem()) {
         lastFileSystemPath = indexToPath(currentIndex);
+        if (model->objectName() == "fileSystem")
+            return;
     }
 
     int previousColumWidth = this->columnWidth(0); // first load = 0
