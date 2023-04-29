@@ -143,7 +143,9 @@ void Manager::makeTreeModel(const FileList &data)
 
         emit setModel(model);
         emit workDirChanged(curData->data_.metaData.workDir);
-        emit status(QString("SHA-%1: %2 files").arg(curData->data_.metaData.shaType).arg(curData->data_.filesData.size()));
+        emit status(QString("SHA-%1: %2 files")
+                        .arg(curData->data_.metaData.shaType)
+                        .arg(curData->data_.filesData.size()));
     }
     else {
         qDebug()<< "Manager::makeTreeModel | Empty model";
@@ -217,7 +219,9 @@ void Manager::updateNewLost()
     }
 
     curData->data_.metaData.about = QString("Database updated. Added %1 files, removed %2")
-                            .arg(curData->data_.metaData.numNewFiles).arg(curData->data_.metaData.numMissingFiles);
+                                            .arg(curData->data_.metaData.numNewFiles)
+                                            .arg(curData->data_.metaData.numMissingFiles);
+
     curData->updateMetaData();
     curData->exportToJson();
 
@@ -230,9 +234,9 @@ void Manager::updateNewLost()
 // update the Database with new checksums for files with failed verification
 void Manager::updateMismatch()
 {
-    curData->data_.metaData.about = QString("Stored checksums updated");
+    curData->data_.metaData.about = QString("%1 checksums updated")
+                        .arg(curData->updateMismatchedChecksums());
 
-    curData->updateMismatchedChecksums();
     curData->exportToJson();
 
     makeTreeModel(curData->changesOnly());

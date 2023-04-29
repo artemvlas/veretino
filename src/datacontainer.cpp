@@ -151,8 +151,9 @@ FileList DataMaintainer::changesOnly()
     return resultMap;
 }
 
-void DataMaintainer::clearDataFromLostFiles()
+int DataMaintainer::clearDataFromLostFiles()
 {
+    int number = 0;
     QMutableMapIterator<QString, FileValues> iter(data_.filesData);
 
     while (iter.hasNext()) {
@@ -160,12 +161,15 @@ void DataMaintainer::clearDataFromLostFiles()
         if (!iter.value().exists) {
             iter.value().checksum.clear();
             iter.value().about = "removed from DB";
+            ++number;
         }
     }
+    return number;
 }
 
-void DataMaintainer::updateMismatchedChecksums()
+int DataMaintainer::updateMismatchedChecksums()
 {
+    int number = 0;
     QMutableMapIterator<QString, FileValues> iter(data_.filesData);
 
     while (iter.hasNext()) {
@@ -174,8 +178,10 @@ void DataMaintainer::updateMismatchedChecksums()
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
             iter.value().about = "stored checksum updated";
+            ++number;
         }
     }
+    return number;
 }
 
 void DataMaintainer::updateData(const FileList &updateFiles)

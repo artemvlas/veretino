@@ -48,8 +48,8 @@ public:
     void updateFilesValues();
     void findNewFiles(); // Searches for new readable files regarding stored list and filters
 
-    void clearDataFromLostFiles();
-    void updateMismatchedChecksums();
+    int clearDataFromLostFiles(); // returns number of cleared
+    int updateMismatchedChecksums(); // returs number of updated checksums
 
     DataContainer availableFiles(); // returns a list of available (existing on disk and readable) files from the stored database list ('data_.filesData')
     DataContainer newFiles(); // returns a list of files marked as new (isNew = true) from the 'dataContainer.filesData'
