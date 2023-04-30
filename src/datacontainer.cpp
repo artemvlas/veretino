@@ -50,7 +50,7 @@ void DataMaintainer::updateFilesValues()
     while (iter.hasNext() && !canceled) {
         QString fullPath = paths::joinPath(data_.metaData.workDir, iter.next().key());
         iter.value().exists = QFileInfo::exists(fullPath);
-        if (iter.value().exists && iter.value().isReadable && iter.value().size == 0) {
+        if (iter.value().exists && iter.value().isReadable) {
             iter.value().size = QFileInfo(fullPath).size();
         }
     }
