@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/veretino.png"));
 
-    permanentStatus->setToolTip("Algorithm | Number of checksums | Total size");
     ui->statusbar->addPermanentWidget(permanentStatus);
 
     connections();
