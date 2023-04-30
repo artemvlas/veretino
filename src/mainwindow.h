@@ -2,13 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
 #include <QThread>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QClipboard>
 #include <QDragEnterEvent>
 #include <QMimeData>
+#include <QLabel>
 #include "treemodel.h"
 #include "manager.h"
 #include "settingdialog.h"
@@ -25,29 +25,31 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void setMode(const QString &mode); // sets viewMode^ and button text
+    void showMessage(const QString &message, const QString &title = "Info");
+    void onCustomContextMenu(const QPoint &point);
+
 private:
+    void connectManager(); // connections with Manager separated for convenience
+    void connections();
+    void doWork();
+    void setSettings();
+    bool argumentInput(); // using the path argument if it's provided
+    void timeLeft(const int percentsDone);
+    void dragEnterEvent(QDragEnterEvent *e);
+    void dropEvent(QDropEvent *e);
+
     Ui::MainWindow *ui;
     QThread *thread = new QThread;
     Manager *manager = new Manager; // Manager performs the main tasks. Works in separate thread^
+    QLabel *permanentStatus = new QLabel;
     QString homePath = QDir::homePath();
     QVariantMap settings; // stores the app settings
     QString curPath; // current path from &View::pathChanged
     QString viewMode; // "folder", "file", "db", "sum", "model"...
     QString previousViewMode; //^
     QElapsedTimer elapsedTimer;
-    void connectManager(); // connections with Manager separated for convenience
-    void connections();
-    void doWork();
-    void setSettings();
-    bool argumentInput(); // using the path argument if it's provided
-    void dragEnterEvent(QDragEnterEvent *e);
-    void dropEvent(QDropEvent *e);
-    void timeLeft(const int percentsDone);
-
-private slots:
-    void onCustomContextMenu(const QPoint &point);
-    void setMode(const QString &mode); // sets viewMode^ and button text
-    void showMessage(const QString &message, const QString &title = "Info");
 
 signals:
     void getItemInfo(const QString &path); //get file size or folder contents info

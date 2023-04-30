@@ -8,6 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/veretino.png"));
 
+    permanentStatus->setToolTip("Algorithm | Number of checksums | Total size");
+    ui->statusbar->addPermanentWidget(permanentStatus);
+
     connections();
 
     QThread::currentThread()->setObjectName("MAIN Thread");
@@ -90,6 +93,7 @@ void MainWindow::connectManager()
 
     // info and notifications
     connect(manager, SIGNAL(status(QString)), ui->statusbar, SLOT(showMessage(QString)));
+    connect(manager, &Manager::setPermanentStatus, permanentStatus, &QLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(this, &MainWindow::getItemInfo, manager, &Manager::getItemInfo);
     connect(this, &MainWindow::folderContentsByType, manager, &Manager::folderContentsByType);
@@ -309,6 +313,18 @@ void MainWindow::timeLeft(const int percentsDone)
     ui->progressBar->setFormat(QString("%p% | %1").arg(estimatedTime));
 }
 
+void MainWindow::showMessage(const QString &message, const QString &title)
+{
+    QMessageBox messageBox;
+
+    if (title.toLower() == "error" || title.toLower() == "failed")
+        messageBox.critical(0, title, message);
+    else if (title.toLower() == "warning")
+        messageBox.warning(0, title, message);
+    else
+        messageBox.information(0, title, message);
+}
+
 void MainWindow::setSettings()
 {
     settings["shaType"] = 256;
@@ -335,18 +351,6 @@ bool MainWindow::argumentInput()
     }
 
     return false;
-}
-
-void MainWindow::showMessage(const QString &message, const QString &title)
-{
-    QMessageBox messageBox;
-
-    if (title.toLower() == "error" || title.toLower() == "failed")
-        messageBox.critical(0, title, message);
-    else if (title.toLower() == "warning")
-        messageBox.warning(0, title, message);
-    else
-        messageBox.information(0, title, message);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)

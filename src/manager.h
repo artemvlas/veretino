@@ -49,6 +49,7 @@ public slots:
 
 signals:
     void status(const QString &text = QString()); // text to statusbar
+    void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void setModel(TreeModel *model = nullptr);
     void workDirChanged(const QString &workDir);

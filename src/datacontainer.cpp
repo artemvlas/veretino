@@ -39,6 +39,11 @@ void DataMaintainer::updateMetaData()
         if (iter.value().isNew)
             ++data_.metaData.numNewFiles;
     }
+
+    emit setPermanentStatus(QString("SHA-%1 | %2 | %3")
+                            .arg(data_.metaData.shaType)
+                            .arg(data_.metaData.numChecksums)
+                            .arg(format::dataSizeReadable(data_.metaData.totalSize)));
 }
 
 void DataMaintainer::updateFilesValues()
@@ -369,4 +374,5 @@ void DataMaintainer::cancelProcess()
 DataMaintainer::~DataMaintainer()
 {
     qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
+    emit setPermanentStatus();
 }

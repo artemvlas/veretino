@@ -76,6 +76,7 @@ private:
 signals:
     void status(const QString &text = QString()); // text to statusbar
     void showMessage(const QString &text, const QString &title = "Info");
+    void setPermanentStatus(const QString &text = QString());
 };
 
 #endif // DATACONTAINER_H

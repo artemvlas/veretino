@@ -179,6 +179,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
     connect(this, &Manager::cancelProcess, curData, &DataMaintainer::cancelProcess, Qt::DirectConnection);
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(curData, &DataMaintainer::status, this, &Manager::status);
+    connect(curData, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
 
     curData->importJson(databaseFilePath);
 
