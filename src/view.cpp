@@ -66,7 +66,7 @@ void View::smartSetModel(QAbstractItemModel *model)
         this->setColumnWidth(1, 100);
     }
     else {
-        this->setColumnWidth(1, 120);
+        this->setColumnWidth(1, 130);
         emit modelChanged(false);
         this->expandAll();
         this->scrollToTop();

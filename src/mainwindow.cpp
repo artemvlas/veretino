@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     connections();
 
     QThread::currentThread()->setObjectName("MAIN Thread");
-    qDebug() << "Main thread: " << QThread::currentThread()->objectName();
 
     setSettings(); // set initial values to <settings> Map. In future versions, values from file
 
@@ -55,7 +54,7 @@ void MainWindow::connections()
     connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this, "Open folder", homePath);
         if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); if (!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
 
-    connect(ui->actionOpenJson, &QAction::triggered, this, [=]{QString path = QFileDialog::getOpenFileName(this, tr("Open Veretino database"), homePath, tr("DB Files (*.ver.json)"));
+    connect(ui->actionOpenJson, &QAction::triggered, this, [=]{QString path = QFileDialog::getOpenFileName(this, "Open Veretino database", homePath, "DB Files (*.ver.json)");
         if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); emit parseJsonFile(path);}});
 
     connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == "processing") {emit cancelProcess();} ui->treeView->setFileSystemModel();});
@@ -278,7 +277,7 @@ void MainWindow::doWork()
         qDebug() << "MainWindow::doWork() | Wrong viewMode:" << viewMode;
 }
 
-void MainWindow::timeLeft(const int &percentsDone)
+void MainWindow::timeLeft(const int percentsDone)
 {
     if (percentsDone == 0) {
         elapsedTimer.start();

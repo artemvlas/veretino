@@ -42,7 +42,7 @@ private:
     bool argumentInput(); // using the path argument if it's provided
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
-    void timeLeft(const int &percentsDone);
+    void timeLeft(const int percentsDone);
 
 private slots:
     void onCustomContextMenu(const QPoint &point);
@@ -51,8 +51,8 @@ private slots:
 
 signals:
     void getItemInfo(const QString &path); //get file size or folder contents info
-    void processFolderSha(const QString &path, const int &shatype = 0);
-    void processFileSha(const QString &path, const int &shatype = 0);
+    void processFolderSha(const QString &path, int shatype = 0);
+    void processFileSha(const QString &path, int shatype = 0);
     void parseJsonFile(const QString &path);
     void verifyFileList();
     void updateNewLost();
