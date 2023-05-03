@@ -226,7 +226,8 @@ void DataMaintainer::exportToJson()
     connect(json, &JsonDb::status, this, &DataMaintainer::status);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
-    json->makeJson(data_);
+    if (json->makeJson(data_))
+        data_.metaData.storedTotalSize = format::dataSizeReadableExt(data_.metaData.totalSize);
 
     json->deleteLater();
 }

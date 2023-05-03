@@ -43,7 +43,7 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 }
 
 // making "checksums... .ver.json" database
-void JsonDb::makeJson(const DataContainer &data)
+bool JsonDb::makeJson(const DataContainer &data)
 {
     emit status("Exporting data to json...");
     bool isWorkDirRelative = !data.metaData.databaseFileName.contains('/');
@@ -125,8 +125,11 @@ void JsonDb::makeJson(const DataContainer &data)
         else {
             emit status("NOT Saved");
             emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
+            return false;
         }
     }
+
+    return true;
 }
 
 DataContainer JsonDb::parseJson(const QString &filePath)

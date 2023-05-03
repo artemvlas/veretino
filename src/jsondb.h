@@ -18,7 +18,7 @@ public:
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
     DataContainer parseJson(const QString &filePath);
-    void makeJson(const DataContainer &data);
+    bool makeJson(const DataContainer &data);
 
 private:
     QString jsonFilePath;
