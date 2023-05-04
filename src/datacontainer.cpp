@@ -226,8 +226,7 @@ void DataMaintainer::exportToJson()
     connect(json, &JsonDb::status, this, &DataMaintainer::status);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
-    if (json->makeJson(data_))
-        data_.metaData.storedTotalSize = format::dataSizeReadableExt(data_.metaData.totalSize);
+    json->makeJson(data_);
 
     json->deleteLater();
 }
@@ -337,8 +336,8 @@ QString DataMaintainer::aboutDb()
     if (data_.metaData.numChecksums != data_.filesData.size())
         storedChecksums = QString("Stored checksums: %1\n").arg(data_.metaData.numChecksums);
 
-    return QString("Algorithm: SHA-%1%2\nStored size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\n%8%9")
-        .arg(data_.metaData.shaType).arg(filters, data_.metaData.storedTotalSize, data_.metaData.saveDateTime)
+    return QString("Algorithm: SHA-%1%2\nTotal size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\n%8%9")
+        .arg(data_.metaData.shaType).arg(filters, format::dataSizeReadableExt(data_.metaData.totalSize), data_.metaData.saveDateTime)
         .arg(data_.filesData.size()).arg(storedChecksums, about_newfiles, about_missingfiles, tipText);
 }
 

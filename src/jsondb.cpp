@@ -94,7 +94,8 @@ bool JsonDb::makeJson(const DataContainer &data)
     doc.setArray(mainArray);
 
     QString databaseStatus = QString("Current status:\nChecksums stored: %1\nTotal size: %2")
-                                 .arg(data.metaData.numChecksums).arg(format::dataSizeReadable(data.metaData.totalSize));
+                                    .arg(data.metaData.numChecksums)
+                                    .arg(format::dataSizeReadable(data.metaData.totalSize));
 
 
     QString pathToSave;
@@ -168,12 +169,10 @@ DataContainer JsonDb::parseJson(const QString &filePath)
     if (header.contains("Ignored")) {
         parsedData.metaData.filter.include = false;
         parsedData.metaData.filter.extensionsList = header.value("Ignored").toString().split(" ");
-        //qDebug() << "jsonDB::parseJson | ignoredExtensions:" << parsedData.ignoredExtensions;
     }
     else if (header.contains("Included Only")) {
         parsedData.metaData.filter.include = true;
         parsedData.metaData.filter.extensionsList = header.value("Included Only").toString().split(" ");
-        //qDebug() << "jsonDB::parseJson | Included Only:" << parsedData.onlyExtensions;
     }
 
     if (header.contains("Used algorithm")) {
@@ -186,12 +185,6 @@ DataContainer JsonDb::parseJson(const QString &filePath)
 
     if (header.contains("Updated"))
         parsedData.metaData.saveDateTime = header.value("Updated").toString();
-
-    if (header.contains("Total size"))
-        parsedData.metaData.storedTotalSize = header.value("Total size").toString();
-
-    if (header.contains("Files number"))
-        parsedData.metaData.numChecksums = header.value("Files number").toInt();
 
     // populating the main data
     QJsonObject::const_iterator i;

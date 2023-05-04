@@ -19,7 +19,6 @@ struct MetaData {
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved
     QString about; // contains a brief description of the item changes or status, if any
-    QString storedTotalSize; // imported from database value
     qint64 totalSize = 0; // total size of all files for which there are checksums in 'filesData'
     FilterRule filter;
 };
