@@ -44,9 +44,9 @@ void DataMaintainer::updateMetaData()
             ++data_.metaData.numNewFiles;
     }
 
-    emit setPermanentStatus(QString("SHA-%1 | %2 items | %3")
+    emit setPermanentStatus(QString("SHA-%1 | %2 avail. | %3")
                             .arg(data_.metaData.shaType)
-                            .arg(data_.metaData.numChecksums)
+                            .arg(data_.metaData.numAvailable)
                             .arg(format::dataSizeReadable(data_.metaData.totalSize)));
 }
 

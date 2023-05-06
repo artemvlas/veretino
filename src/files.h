@@ -13,7 +13,6 @@ struct FileValues {
     bool exists = true; // whether the file is present on disk or not
     bool isReadable = true; // if false, there is no checksum
     bool isNew = false; // true if the file is on disk but not in the stored filelist
-    //bool isMismatched = false; // true if the newly computed checksum ('reChecksum') does not match the stored one
 }; // struct FileValues
 
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}

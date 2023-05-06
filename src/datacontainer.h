@@ -13,7 +13,7 @@
 struct MetaData {
     int shaType = 0; // 1 or 256 or 512
     int numChecksums = 0; // number of files with checksums
-    int numAvailable = 0;
+    int numAvailable = 0; // the number of files that exist on the disk and are readable, for which checksums are stored
     int numNewFiles = 0;
     int numMissingFiles = 0;
     QString workDir; // current working folder
