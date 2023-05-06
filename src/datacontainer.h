@@ -13,6 +13,7 @@
 struct MetaData {
     int shaType = 0; // 1 or 256 or 512
     int numChecksums = 0; // number of files with checksums
+    int numAvailable = 0;
     int numNewFiles = 0;
     int numMissingFiles = 0;
     QString workDir; // current working folder
@@ -61,7 +62,7 @@ public:
     QString itemContentsInfo(const QString &itemPath); // info about Model item (created with mainData), if file - file info, if folder - folder contents (availability, size etc.)
     FileList listFolderContents(QString rootFolder); // returns a list of files and their availability info in the specified folder from the database
 
-    QString aboutDb(); // info about current DB
+    void aboutDb(); // info about current DB
 
     // variables
     DataContainer data_;

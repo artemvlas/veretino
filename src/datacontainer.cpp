@@ -26,14 +26,18 @@ void DataMaintainer::updateMetaData()
     data_.metaData.numNewFiles = 0;
     data_.metaData.numMissingFiles = 0;
     data_.metaData.numChecksums = 0;
+    data_.metaData.numAvailable = 0;
     data_.metaData.totalSize = 0;
 
     FileList::const_iterator iter;
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (!iter.value().checksum.isEmpty()) {
-            data_.metaData.totalSize += iter.value().size;
+        if (!iter.value().checksum.isEmpty()) {           
             ++data_.metaData.numChecksums;
-            if (!iter.value().exists)
+            if (iter.value().exists) {
+                data_.metaData.totalSize += iter.value().size;
+                ++data_.metaData.numAvailable;
+            }
+            else
                 ++data_.metaData.numMissingFiles;
         }
         if (iter.value().isNew)
@@ -302,43 +306,46 @@ QString DataMaintainer::itemContentsInfo(const QString &itemPath)
         return "The item actually not on a disk";
 }
 
-QString DataMaintainer::aboutDb()
+void DataMaintainer::aboutDb()
 {
-    QString about_newfiles;
-    if (data_.metaData.numNewFiles > 0) {
-        about_newfiles = "New: " + Files::contentStatus(newFiles().filesData);
-    }
-    else
-        about_newfiles = "No New files found";
+    updateMetaData();
 
-    QString about_missingfiles;
-    if (data_.metaData.numMissingFiles > 0) {
-        about_missingfiles = QString("Missing: %1 files").arg(data_.metaData.numMissingFiles);
-    }
-    else
-        about_missingfiles = "No Missing files found";
+    QString result = QString("Algorithm: SHA-%1").arg(data_.metaData.shaType);
 
-    QString filters;
     if (!data_.metaData.filter.extensionsList.isEmpty()) {
         if (data_.metaData.filter.include)
-            filters = QString("\nIncluded Only: %1").arg(data_.metaData.filter.extensionsList.join(", "));
+            result.append(QString("\nIncluded Only: %1").arg(data_.metaData.filter.extensionsList.join(", ")));
         else
-            filters = QString("\nIgnored: %1").arg(data_.metaData.filter.extensionsList.join(", "));
+            result.append(QString("\nIgnored: %1").arg(data_.metaData.filter.extensionsList.join(", ")));
     }
 
-    QString tipText;
+    result.append(QString("\nLast update: %1").arg(data_.metaData.saveDateTime));
+
+    if (data_.metaData.numAvailable != data_.filesData.size())
+        result.append(QString("\n\nTotal files listed: %1").arg(data_.filesData.size()));
+
+    if (data_.metaData.numChecksums != data_.filesData.size())
+        result.append(QString("\nStored checksums: %1").arg(data_.metaData.numChecksums));
+
+    result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
+
+    if (data_.metaData.numNewFiles > 0) {
+        result.append("\n\nNew: " + Files::contentStatus(newFiles().filesData));
+    }
+    else
+        result.append("\n\nNo New files found");
+
+    if (data_.metaData.numMissingFiles > 0) {
+        result.append(QString("\nMissing: %1 files").arg(data_.metaData.numMissingFiles));
+    }
+    else
+        result.append("\nNo Missing files found");
 
     if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
-        tipText = "\n\nUse context menu for more options";
+        result.append("\n\nUse context menu for more options");
     }
 
-    QString storedChecksums;
-    if (data_.metaData.numChecksums != data_.filesData.size())
-        storedChecksums = QString("Stored checksums: %1\n").arg(data_.metaData.numChecksums);
-
-    return QString("Algorithm: SHA-%1%2\nTotal size: %3\nLast update: %4\n\nTotal files listed: %5\n%6%7\n%8%9")
-        .arg(data_.metaData.shaType).arg(filters, format::dataSizeReadableExt(data_.metaData.totalSize), data_.metaData.saveDateTime)
-        .arg(data_.filesData.size()).arg(storedChecksums, about_newfiles, about_missingfiles, tipText);
+    emit showMessage(result, "DB Status: " + data_.metaData.databaseFileName);
 }
 
 int DataMaintainer::shaType(const FileList &fileList)

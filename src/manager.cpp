@@ -424,7 +424,7 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
-                                {emit showMessage(text, statusText); emit status(QStringList(text.split("\n")).last());}});
+                        {emit showMessage(text, statusText); emit status(QStringList(text.split("\n")).last());}});
 
         // ***debug***
         connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});
@@ -442,8 +442,7 @@ void Manager::showAll()
 
 void Manager::aboutDatabase()
 {
-    curData->updateMetaData();
-    emit showMessage(curData->aboutDb(), "Database status");
+    curData->aboutDb();
 }
 
 void Manager::isViewFS(const bool isFS)
