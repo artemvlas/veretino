@@ -48,7 +48,7 @@ void DataMaintainer::updateMetaData()
         }
     }
 
-    emit setPermanentStatus(QString("SHA-%1 | %2 avail. | %3")
+    emit setPermanentStatus(QString("\tSHA-%1 | %2 avail. | %3")
                             .arg(data_.metaData.shaType)
                             .arg(data_.metaData.numAvailable)
                             .arg(format::dataSizeReadable(data_.metaData.totalSize)));
@@ -178,7 +178,7 @@ int DataMaintainer::clearDataFromLostFiles()
         iter.next();
         if (!iter.value().exists) {
             iter.value().checksum.clear();
-            iter.value().about = "removed from DB";
+            iter.value().about = "- removed from DB";
             ++number;
         }
     }
@@ -195,7 +195,7 @@ int DataMaintainer::updateMismatchedChecksums()
         if (!iter.value().reChecksum.isEmpty()) {
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
-            iter.value().about = "stored checksum updated";
+            iter.value().about = "^ stored checksum updated";
             ++number;
         }
     }

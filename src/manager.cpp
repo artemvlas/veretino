@@ -216,7 +216,7 @@ void Manager::updateNewLost()
 
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont = curData->newFiles();
-        dataCont.metaData.about = "added to DB";
+        dataCont.metaData.about = "+ added to DB";
         curData->updateData(shaCalc->calculate(dataCont));
     }
 
@@ -263,29 +263,30 @@ void Manager::verifyFileList()
     int mismatchNumber = 0;
     FileList::const_iterator iter;
 
-    for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {       
+    for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
+        FileValues curFileValues = curData->data_.filesData.value(iter.key());
         if (iter.value().checksum != curData->data_.filesData.value(iter.key()).checksum) {
-            FileValues curFileValues = curData->data_.filesData.value(iter.key());
-            curFileValues.about = "NOT match";
+            curFileValues.about = "!= NOT match";
             curFileValues.reChecksum = iter.value().checksum;
             ++mismatchNumber;
-            curData->data_.filesData.insert(iter.key(), curFileValues);
         }
-    }
-
-    if (mismatchNumber > 0) {
-        emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
-        makeTreeModel(curData->changesOnly());
-        emit setMode("endProcess");
-        emit setMode("updateMismatch");
-        return;
-    }
-    else {
-        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
-                                    .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
+        else
+            curFileValues.about = "== ok";
+        curData->data_.filesData.insert(iter.key(), curFileValues);
     }
 
     emit setMode("endProcess");
+
+    if (mismatchNumber > 0) {
+        emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
+        emit setMode("updateMismatch");
+    }
+    else {
+        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
+                                 .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
+    }
+
+    makeTreeModel(curData->changesOnly());
 }
 
 void Manager::checkFileSummary(const QString &path)
