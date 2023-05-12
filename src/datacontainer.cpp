@@ -28,11 +28,16 @@ void DataMaintainer::updateMetaData()
     data_.metaData.numMissingFiles = 0;
     data_.metaData.numChecksums = 0;
     data_.metaData.numAvailable = 0;
+    data_.metaData.numUnreadable = 0;
     data_.metaData.totalSize = 0;
 
     FileList::const_iterator iter;
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (!iter.value().checksum.isEmpty()) {           
+        if (iter.value().isNew)
+            ++data_.metaData.numNewFiles;
+        else if (!iter.value().isReadable)
+            ++data_.metaData.numUnreadable;
+        else if (!iter.value().checksum.isEmpty()) {
             ++data_.metaData.numChecksums;
             if (iter.value().exists) {
                 data_.metaData.totalSize += iter.value().size;
@@ -41,8 +46,6 @@ void DataMaintainer::updateMetaData()
             else
                 ++data_.metaData.numMissingFiles;
         }
-        if (iter.value().isNew)
-            ++data_.metaData.numNewFiles;
     }
 
     emit setPermanentStatus(QString("SHA-%1 | %2 avail. | %3")
@@ -331,15 +334,16 @@ void DataMaintainer::aboutDb()
 
     result.append(QString("\n\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
 
-    if (data_.metaData.numNewFiles > 0) {
+    if (data_.metaData.numUnreadable > 0)
+        result.append("\n\nUnreadable files: " + data_.metaData.numUnreadable);
+
+    if (data_.metaData.numNewFiles > 0)
         result.append("\n\nNew: " + Files::contentStatus(newFiles().filesData));
-    }
     else
         result.append("\n\nNo New files found");
 
-    if (data_.metaData.numMissingFiles > 0) {
+    if (data_.metaData.numMissingFiles > 0)
         result.append(QString("\nMissing: %1 files").arg(data_.metaData.numMissingFiles));
-    }
     else
         result.append("\nNo Missing files found");
 

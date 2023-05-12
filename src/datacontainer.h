@@ -16,6 +16,7 @@ struct MetaData {
     int numAvailable = 0; // the number of files that exist on the disk and are readable, for which checksums are stored
     int numNewFiles = 0;
     int numMissingFiles = 0;
+    int numUnreadable = 0;
     QString workDir; // current working folder
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved
