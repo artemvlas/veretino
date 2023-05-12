@@ -33,6 +33,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)  // if a computing process is running, show a hint when user wants to close the app
+{
+    if (viewMode == "processing" && QMessageBox::No == QMessageBox::question(this, "Closing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No))
+        event->ignore();
+    else
+        event->accept();
+}
+
 void MainWindow::connections()
 {
     connectManager();

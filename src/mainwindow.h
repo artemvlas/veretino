@@ -39,6 +39,7 @@ private:
     void timeLeft(const int percentsDone);
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
+    void closeEvent(QCloseEvent *event);
 
     Ui::MainWindow *ui;
     QThread *thread = new QThread;
