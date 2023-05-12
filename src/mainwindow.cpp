@@ -113,7 +113,7 @@ void MainWindow::connectManager()
 
     // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
-    connect(manager, &Manager::donePercents, this, [=](const int done){timeLeft(done);});
+    connect(manager, &Manager::donePercents, this, &MainWindow::timeLeft);
 
     // transfer settings and modes
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
