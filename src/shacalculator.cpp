@@ -90,30 +90,32 @@ QString ShaCalculator::calculate(const QString &filePath, int shatype)
 
 FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 {
-    emit status("Total size calculating...");
     canceled = false;
 
     totalSize = Files::dataSize(filesContainer.filesData);
+    QString totalSizeReadable = format::dataSizeReadable(totalSize);
     doneSize = 0;
-
-    QString totalInfo = format::filesNumberAndSize(filesContainer.filesData.size(), totalSize);
-
-    emit status(QString("Checksums calculating: %1").arg(totalInfo));
 
     FileList resultList;
     FileList::const_iterator iter;
     for (iter = filesContainer.filesData.constBegin(); iter != filesContainer.filesData.constEnd() && !canceled; ++iter) {
+        QString doneData;
+        if (doneSize == 0)
+            doneData = QString("(%1)").arg(totalSizeReadable);
+        else
+            doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(doneSize), totalSizeReadable);
+
+        emit status(QString("Calculating %1 of %2 checksums %3")
+                        .arg(resultList.size() + 1)
+                        .arg(filesContainer.filesData.size())
+                        .arg(doneData));
+
         FileValues curFileValues = computeChecksum(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.shaType);
         if (!filesContainer.metaData.about.isEmpty())
             curFileValues.about = filesContainer.metaData.about;
 
         curFileValues.size = iter.value().size;
-
         resultList.insert(iter.key(), curFileValues);
-
-        emit status(QString("Checksums calculating: done %1 (%2) of %3")
-                        .arg(resultList.size())
-                        .arg(format::dataSizeReadable(doneSize), totalInfo));
     }
 
     if (canceled) {
