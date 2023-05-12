@@ -7,10 +7,6 @@
 #include "treemodel.h"
 #include "QThread"
 
-namespace tools {
-int shaStrLen(int shatype); // returns the length of the checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
-} // namespace tools
-
 class Manager : public QObject
 {
     Q_OBJECT

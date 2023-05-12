@@ -2,6 +2,23 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <cmath>
+#include <QDebug>
+
+namespace tools {
+int shaStrLen(int shatype)
+{
+    if (shatype == 1)
+        return 40;
+    else if (shatype == 256)
+        return 64;
+    else if (shatype == 512)
+        return 128;
+    else {
+        qDebug() << "tools::shaStrLen | Wrong input shatype:" << shatype;
+        return 0;
+    }
+}
+} // namespace tools
 
 namespace format {
 QString currentDateTime()
