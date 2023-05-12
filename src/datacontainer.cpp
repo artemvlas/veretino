@@ -48,10 +48,10 @@ void DataMaintainer::updateMetaData()
         }
     }
 
-    emit setPermanentStatus(QString("\tSHA-%1 | %2 avail. | %3")
-                            .arg(data_.metaData.shaType)
+    emit setPermanentStatus(QString("\t%1 avail. | %2 | SHA-%3")
                             .arg(data_.metaData.numAvailable)
-                            .arg(format::dataSizeReadable(data_.metaData.totalSize)));
+                            .arg(format::dataSizeReadable(data_.metaData.totalSize))
+                            .arg(data_.metaData.shaType));
 }
 
 void DataMaintainer::updateFilesValues()

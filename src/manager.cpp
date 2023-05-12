@@ -89,8 +89,16 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
         return;
     }
 
+    QString permStatus = QString("SHA-%1").arg(shatype);
+    if (!calcData.metaData.filter.extensionsList.isEmpty())
+        permStatus.prepend("filters applied | ");
+
+    emit setPermanentStatus(permStatus);
+
     // calculating checksums
     calcData.filesData = shaCalc->calculate(calcData);
+
+    emit setPermanentStatus();
 
     if (calcData.filesData.isEmpty()) {
         return;
