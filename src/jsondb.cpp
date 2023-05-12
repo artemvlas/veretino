@@ -49,7 +49,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     bool isWorkDirRelative = !data.metaData.databaseFileName.contains('/');
 
     QJsonObject header;
-    header["Created with"] = "Veretino 0.2.0 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino dev_0.2.1 https://github.com/artemvlas/veretino";
     header["Files number"] = data.metaData.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
@@ -93,7 +93,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     QJsonDocument doc;
     doc.setArray(mainArray);
 
-    QString databaseStatus = QString("Current status:\nChecksums stored: %1\nTotal size: %2")
+    QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
                                     .arg(data.metaData.numChecksums)
                                     .arg(format::dataSizeReadable(data.metaData.totalSize));
 
@@ -108,7 +108,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     if (saveJsonFile(doc, pathToSave)) {
         emit status("Saved");
         emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity")
-                             .arg(data.metaData.about, databaseStatus, QFileInfo(pathToSave).fileName()), "Success");
+                .arg(data.metaData.about, databaseStatus, QFileInfo(pathToSave).fileName()), "Success");
     }
     else {
         header["Working folder"] = data.metaData.workDir;
@@ -121,7 +121,7 @@ bool JsonDb::makeJson(const DataContainer &data)
         if (saveJsonFile(doc, pathToSave)) {
             emit status("Saved to Desktop");
             emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
-                                .arg(data.metaData.about, databaseStatus, data.metaData.workDir, QFileInfo(pathToSave).fileName()), "Warning");
+                                                .arg(data.metaData.about, databaseStatus, data.metaData.workDir, QFileInfo(pathToSave).fileName()), "Warning");
         }
         else {
             emit status("NOT Saved");
@@ -147,7 +147,7 @@ DataContainer JsonDb::parseJson(const QString &filePath)
 
     if (filelistData.isEmpty()) {
         emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
-                         .arg(QFileInfo(filePath).fileName()), "Empty Database!");
+                                                                .arg(QFileInfo(filePath).fileName()), "Empty Database!");
         //qDebug()<< "EMPTY filelistData";
         emit status();
         return DataContainer();

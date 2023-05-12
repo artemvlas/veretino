@@ -51,10 +51,10 @@ FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
         emit donePercents(0);
         qDebug() << "ShaCalculator::computeChecksum | Canceled";
         curFileValues.about = "Canceled";
-        return curFileValues;
     }
+    else
+        curFileValues.checksum = hash.result().toHex();
 
-    curFileValues.checksum = hash.result().toHex();
     return curFileValues;
 }
 
@@ -70,27 +70,26 @@ QString ShaCalculator::calculate(const QString &filePath, int shatype)
 
     canceled = false;
 
-    emit status(QString("Calculation SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
+    emit status(QString("Calculating SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
+
     FileValues curFileValues = computeChecksum(filePath, shatype);
 
     if (canceled) {
         emit status("Canceled");
-        return QString();
     }
-
-    if (curFileValues.isReadable && !curFileValues.checksum.isEmpty()) {
+    else if (curFileValues.isReadable && !curFileValues.checksum.isEmpty()) {
         emit status(QString("SHA-%1 calculated").arg(shatype));
-        return curFileValues.checksum;
     }
     else {
         emit status("read error");
-        return QString();
     }
+
+    return curFileValues.checksum;
 }
 
 FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 {
-    emit status("Total size calculation...");
+    emit status("Total size calculating...");
     canceled = false;
 
     totalSize = Files::dataSize(filesContainer.filesData);
@@ -98,7 +97,7 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 
     QString totalInfo = format::filesNumberAndSize(filesContainer.filesData.size(), totalSize);
 
-    emit status(QString("Calculation SHA-%1 checksums for: %2").arg(filesContainer.metaData.shaType).arg(totalInfo));
+    emit status(QString("Checksums calculating: %1").arg(totalInfo));
 
     FileList resultList;
     FileList::const_iterator iter;
@@ -111,8 +110,9 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 
         resultList.insert(iter.key(), curFileValues);
 
-        emit status(QString("Calculation SHA-%1 checksums: done %2 (%3) of %4")
-                        .arg(filesContainer.metaData.shaType).arg(resultList.size()).arg(format::dataSizeReadable(doneSize), totalInfo));
+        emit status(QString("Checksums calculating: done %1 (%2) of %3")
+                        .arg(resultList.size())
+                        .arg(format::dataSizeReadable(doneSize), totalInfo));
     }
 
     if (canceled) {
