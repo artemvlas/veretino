@@ -1,5 +1,6 @@
 #include "datacontainer.h"
 #include "files.h"
+#include "tools.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
@@ -310,7 +311,8 @@ void DataMaintainer::aboutDb()
 {
     updateMetaData();
 
-    QString result = QString("Algorithm: SHA-%1").arg(data_.metaData.shaType);
+    QString result("DB filename: " + data_.metaData.databaseFileName);
+    result.append(QString("\nAlgorithm: SHA-%1").arg(data_.metaData.shaType));
 
     if (!data_.metaData.filter.extensionsList.isEmpty()) {
         if (data_.metaData.filter.include)
@@ -327,7 +329,7 @@ void DataMaintainer::aboutDb()
     if (data_.metaData.numChecksums != data_.filesData.size())
         result.append(QString("\nStored checksums: %1").arg(data_.metaData.numChecksums));
 
-    result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
+    result.append(QString("\n\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
 
     if (data_.metaData.numNewFiles > 0) {
         result.append("\n\nNew: " + Files::contentStatus(newFiles().filesData));
@@ -345,7 +347,7 @@ void DataMaintainer::aboutDb()
         result.append("\n\nUse context menu for more options");
     }
 
-    emit showMessage(result, "DB Status: " + data_.metaData.databaseFileName);
+    emit showMessage(result, "Database status");
 }
 
 int DataMaintainer::shaType(const FileList &fileList)

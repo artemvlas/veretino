@@ -18,6 +18,7 @@ SOURCES += \
     src/manager.cpp \
     src/settingdialog.cpp \
     src/shacalculator.cpp \
+    src/tools.cpp \
     src/treeitem.cpp \
     src/treemodel.cpp \
     src/view.cpp
@@ -31,6 +32,7 @@ HEADERS += \
     src/manager.h \
     src/settingdialog.h \
     src/shacalculator.h \
+    src/tools.h \
     src/treeitem.h \
     src/treemodel.h \
     src/view.h

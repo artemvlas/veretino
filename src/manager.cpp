@@ -1,8 +1,9 @@
+#include "manager.h"
+#include "files.h"
+#include "tools.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include "manager.h"
-#include "files.h"
 
 Manager::Manager(QObject *parent)
     : QObject(parent)

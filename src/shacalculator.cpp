@@ -1,4 +1,5 @@
 #include "shacalculator.h"
+#include "tools.h"
 #include <QFile>
 #include <QFileInfo>
 
