@@ -70,6 +70,6 @@ signals:
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);
     void showAll();
-    void aboutDatabase();
+    void dbStatus();
 };
 #endif // MAINWINDOW_H

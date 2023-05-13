@@ -310,7 +310,7 @@ QString DataMaintainer::itemContentsInfo(const QString &itemPath)
         return "The item actually not on a disk";
 }
 
-void DataMaintainer::aboutDb()
+void DataMaintainer::dbStatus()
 {
     updateMetaData();
 

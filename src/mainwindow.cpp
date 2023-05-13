@@ -104,7 +104,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(this, &MainWindow::getItemInfo, manager, &Manager::getItemInfo);
     connect(this, &MainWindow::folderContentsByType, manager, &Manager::folderContentsByType);
-    connect(this, &MainWindow::aboutDatabase, manager, &Manager::aboutDatabase);
+    connect(this, &MainWindow::dbStatus, manager, &Manager::dbStatus);
 
     // results processing
     connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
@@ -173,7 +173,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         }
 
         else {
-            contextMenu->addAction("About", this, &MainWindow::aboutDatabase);
+            contextMenu->addAction("DB Status", this, &MainWindow::dbStatus);
             contextMenu->addSeparator();
             contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
             contextMenu->addAction("Reset Database", this, &MainWindow::resetDatabase);

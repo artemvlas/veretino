@@ -205,7 +205,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
         delete oldData;
     }
 
-    aboutDatabase();
+    dbStatus();
     makeTreeModel(curData->data_.filesData);
     setMode_model();
 }
@@ -450,9 +450,9 @@ void Manager::showAll()
     makeTreeModel(curData->data_.filesData);
 }
 
-void Manager::aboutDatabase()
+void Manager::dbStatus()
 {
-    curData->aboutDb();
+    curData->dbStatus();
 }
 
 void Manager::isViewFS(const bool isFS)

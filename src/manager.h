@@ -41,7 +41,7 @@ public slots:
     void isViewFS(const bool isFS);
     void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
     void showAll();
-    void aboutDatabase();
+    void dbStatus();
 
 signals:
     void status(const QString &text = QString()); // text to statusbar
