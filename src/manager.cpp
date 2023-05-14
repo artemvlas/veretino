@@ -228,14 +228,16 @@ void Manager::updateNewLost()
         curData->updateData(shaCalc->calculate(dataCont));
     }
 
-    curData->data_.metaData.about = "Database updated: ";
+    QString itemsInfo;
     if (curData->data_.metaData.numNewFiles > 0) {
-        curData->data_.metaData.about.append(QString("added %1").arg(curData->data_.metaData.numNewFiles));
+        itemsInfo = QString("added %1").arg(curData->data_.metaData.numNewFiles);
         if (curData->data_.metaData.numMissingFiles > 0)
-            curData->data_.metaData.about.append(", ");
+            itemsInfo.append(", ");
     }
     if (curData->data_.metaData.numMissingFiles > 0)
-        curData->data_.metaData.about.append(QString("removed %1").arg(curData->data_.metaData.numMissingFiles));
+        itemsInfo.append(QString("removed %1").arg(curData->data_.metaData.numMissingFiles));
+
+    curData->data_.metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
 
     curData->updateMetaData();
     curData->exportToJson();
