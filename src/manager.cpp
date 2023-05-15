@@ -212,7 +212,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
 void Manager::showNewLostOnly()
 {
-    makeTreeModel(curData->newlostOnly());
+    makeTreeModel(curData->listOnly(DataMaintainer::NewLost));
 }
 
 void Manager::updateNewLost()
@@ -223,7 +223,8 @@ void Manager::updateNewLost()
         curData->clearDataFromLostFiles();
 
     if (curData->data_.metaData.numNewFiles > 0) {
-        DataContainer dataCont = curData->newFiles();
+        DataContainer dataCont(curData->data_.metaData);
+        dataCont.filesData =  curData->listOnly(DataMaintainer::New);
         dataCont.metaData.about = "+ added to DB";
         curData->updateData(shaCalc->calculate(dataCont));
     }
@@ -242,7 +243,7 @@ void Manager::updateNewLost()
     curData->updateMetaData();
     curData->exportToJson();
 
-    makeTreeModel(curData->changesOnly());
+    makeTreeModel(curData->listOnly(DataMaintainer::Changes));
 
     emit setMode("endProcess");
     emit setMode("model");
@@ -256,7 +257,7 @@ void Manager::updateMismatch()
 
     curData->exportToJson();
 
-    makeTreeModel(curData->changesOnly());
+    makeTreeModel(curData->listOnly(DataMaintainer::Changes));
     setMode_model();
 }
 
@@ -269,7 +270,9 @@ void Manager::verifyFileList()
     }
 
     emit setMode("processing");
-    FileList recalculated = shaCalc->calculate(curData->availableFiles());
+    DataContainer dataCont(curData->data_.metaData);
+    dataCont.filesData = curData->listOnly(DataMaintainer::Available);
+    FileList recalculated = shaCalc->calculate(dataCont);
 
     if (recalculated.isEmpty()) {
         return;
@@ -295,12 +298,12 @@ void Manager::verifyFileList()
     if (mismatchNumber > 0) {
         emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
         emit setMode("updateMismatch");
-        makeTreeModel(curData->mismatchesOnly());
+        makeTreeModel(curData->listOnly(DataMaintainer::Mismatches));
     }
     else {
         emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                  .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
-        makeTreeModel(curData->changesOnly());
+        makeTreeModel(curData->listOnly(DataMaintainer::Changes));
     }
 }
 

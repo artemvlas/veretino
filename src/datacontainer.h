@@ -52,11 +52,9 @@ public:
     int clearDataFromLostFiles(); // returns number of cleared
     int updateMismatchedChecksums(); // returns number of updated checksums
 
-    DataContainer availableFiles(); // returns a list of available (existing on disk and readable) files from the stored database list ('data_.filesData')
-    DataContainer newFiles(); // returns a list of files marked as new (isNew = true) from the 'dataContainer.filesData'
-    FileList newlostOnly();
-    FileList changesOnly();
-    FileList mismatchesOnly();
+    enum Only {Available, New, NewLost, Changes, Mismatches};
+    Q_ENUM(Only)
+    FileList listOnly(Only only);
 
     void importJson(const QString &jsonFilePath);
     void exportToJson();

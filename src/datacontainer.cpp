@@ -113,74 +113,37 @@ int DataMaintainer::findNewFiles()
     return number;
 }
 
-DataContainer DataMaintainer::availableFiles()
+FileList DataMaintainer::listOnly(Only only)
 {
-    DataContainer curData(data_.metaData);
+    FileList result;
     FileList::const_iterator iter;
 
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (!iter.value().isNew && iter.value().exists && iter.value().isReadable) {
-            curData.filesData.insert(iter.key(), iter.value());
+        switch (only) {
+            case Available:
+                if (!iter.value().isNew && iter.value().exists && iter.value().isReadable)
+                    result.insert(iter.key(), iter.value());
+                break;
+            case New:
+                if (iter.value().isNew)
+                    result.insert(iter.key(), iter.value());
+                break;
+            case Changes:
+                if (!iter.value().about.isEmpty())
+                    result.insert(iter.key(), iter.value());
+                break;
+            case NewLost:
+                if (iter.value().isNew || !iter.value().exists)
+                    result.insert(iter.key(), iter.value());
+                break;
+            case Mismatches:
+                if (!iter.value().reChecksum.isEmpty())
+                    result.insert(iter.key(), iter.value());
+                break;
         }
     }
 
-    return curData;
-}
-
-DataContainer DataMaintainer::newFiles()
-{
-    DataContainer curData(data_.metaData);
-    FileList::const_iterator iter;
-
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (iter.value().isNew) {
-            curData.filesData.insert(iter.key(), iter.value());
-        }
-    }
-
-    return curData;
-}
-
-FileList DataMaintainer::newlostOnly()
-{
-    FileList newlost;
-    FileList::const_iterator iter;
-
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (iter.value().isNew || !iter.value().exists) {
-            newlost.insert(iter.key(), iter.value());
-        }
-    }
-
-    return newlost;
-}
-
-FileList DataMaintainer::changesOnly()
-{
-    FileList resultMap;
-    FileList::const_iterator iter;
-
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (!iter.value().about.isEmpty()) {
-            resultMap.insert(iter.key(), iter.value());
-        }
-    }
-
-    return resultMap;
-}
-
-FileList DataMaintainer::mismatchesOnly()
-{
-    FileList resultMap;
-    FileList::const_iterator iter;
-
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (!iter.value().reChecksum.isEmpty()) {
-            resultMap.insert(iter.key(), iter.value());
-        }
-    }
-
-    return resultMap;
+    return result;
 }
 
 int DataMaintainer::clearDataFromLostFiles()
@@ -352,7 +315,7 @@ void DataMaintainer::dbStatus()
         result.append("\n\nUnreadable files: " + data_.metaData.numUnreadable);
 
     if (data_.metaData.numNewFiles > 0)
-        result.append("\n\nNew: " + Files::contentStatus(newFiles().filesData));
+        result.append("\n\nNew: " + Files::contentStatus(listOnly(Only::New)));
     else
         result.append("\n\nNo New files found");
 
