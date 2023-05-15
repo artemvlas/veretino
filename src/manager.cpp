@@ -295,13 +295,13 @@ void Manager::verifyFileList()
     if (mismatchNumber > 0) {
         emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
         emit setMode("updateMismatch");
+        makeTreeModel(curData->mismatchesOnly());
     }
     else {
         emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                  .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
+        makeTreeModel(curData->changesOnly());
     }
-
-    makeTreeModel(curData->changesOnly());
 }
 
 void Manager::checkFileSummary(const QString &path)

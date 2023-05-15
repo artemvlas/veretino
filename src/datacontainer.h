@@ -56,6 +56,7 @@ public:
     DataContainer newFiles(); // returns a list of files marked as new (isNew = true) from the 'dataContainer.filesData'
     FileList newlostOnly();
     FileList changesOnly();
+    FileList mismatchesOnly();
 
     void importJson(const QString &jsonFilePath);
     void exportToJson();

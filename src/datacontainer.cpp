@@ -169,6 +169,20 @@ FileList DataMaintainer::changesOnly()
     return resultMap;
 }
 
+FileList DataMaintainer::mismatchesOnly()
+{
+    FileList resultMap;
+    FileList::const_iterator iter;
+
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (!iter.value().reChecksum.isEmpty()) {
+            resultMap.insert(iter.key(), iter.value());
+        }
+    }
+
+    return resultMap;
+}
+
 int DataMaintainer::clearDataFromLostFiles()
 {
     int number = 0;
