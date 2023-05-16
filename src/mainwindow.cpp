@@ -199,9 +199,9 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
                 contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);
             }
+            contextMenu->addSeparator();
+            contextMenu->addAction("Show All", this, &MainWindow::showAll);
         }
-        contextMenu->addSeparator();
-        contextMenu->addAction("Show All", this, &MainWindow::showAll);
         contextMenu->addSeparator();
         contextMenu->addAction("Collapse all", ui->treeView, &QTreeView::collapseAll);
         contextMenu->addAction("Expand all", ui->treeView, &QTreeView::expandAll);
