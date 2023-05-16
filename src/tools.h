@@ -19,4 +19,18 @@ QString fileNameAndSize(const QString &filePath); // returns "filename (readable
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
 } // namespace format
 
+namespace Mode {
+enum Modes {
+    NoMode,
+    Folder,
+    File,
+    DbFile,
+    SumFile,
+    Model,
+    ModelNewLost,
+    UpdateMismatch,
+    Processing,
+    EndProcess
+};
+}
 #endif // TOOLS_H

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "tools.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,7 +36,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)  // if a computing process is running, show a hint when user wants to close the app
 {
-    if (viewMode == "processing" && QMessageBox::No == QMessageBox::question(this, "Closing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No))
+    if (viewMode == Mode::Processing && QMessageBox::No == QMessageBox::question(this, "Closing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No))
         event->ignore();
     else
         event->accept();
@@ -46,31 +47,31 @@ void MainWindow::connections()
     connectManager();
 
     connect(ui->button, &QPushButton::clicked, this , &MainWindow::doWork);
-    connect(this, &MainWindow::cancelProcess, this, [=]{if (viewMode == "processing") setMode("endProcess");});
+    connect(this, &MainWindow::cancelProcess, this, [=]{if (viewMode == Mode::Processing) setMode(Mode::EndProcess);});
     connect(this, &MainWindow::getItemInfo, this, &MainWindow::cancelProcess);
     connect(this, &MainWindow::folderContentsByType, this, &MainWindow::cancelProcess);
 
     //TreeView
     connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
-    connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; ui->lineEdit->setText(path); if (viewMode != "processing") emit getItemInfo(path);});
+    connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; ui->lineEdit->setText(path); if (viewMode != Mode::Processing) emit getItemInfo(path);});
     connect(ui->treeView, &View::setMode, this, &MainWindow::setMode);
     connect(ui->treeView, &View::modelChanged, ui->lineEdit, &QLineEdit::setEnabled);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
-    connect(ui->treeView, &View::doubleClicked, this, [=]{if (viewMode == "db") emit parseJsonFile(curPath); else if (viewMode == "sum") emit checkFileSummary(curPath);});
+    connect(ui->treeView, &View::doubleClicked, this, [=]{if (viewMode == Mode::DbFile) emit parseJsonFile(curPath); else if (viewMode == Mode::SumFile) emit checkFileSummary(curPath);});
 
     connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text().replace("\\", "/"));});
 
     //menu actions
     connect(ui->actionOpenFolder, &QAction::triggered, this, [=]{QString path = QFileDialog::getExistingDirectory(this, "Open folder", homePath);
-        if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); if (!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
+        if (!path.isEmpty()) {if (viewMode == Mode::Processing) emit cancelProcess(); if (!ui->treeView->isViewFileSystem()) ui->treeView->setFileSystemModel(); ui->treeView->setIndexByPath(path);}});
 
     connect(ui->actionOpenJson, &QAction::triggered, this, [=]{QString path = QFileDialog::getOpenFileName(this, "Open Veretino database", homePath, "DB Files (*.ver.json)");
-        if (!path.isEmpty()) {if (viewMode == "processing") emit cancelProcess(); emit parseJsonFile(path);}});
+        if (!path.isEmpty()) {if (viewMode == Mode::Processing) emit cancelProcess(); emit parseJsonFile(path);}});
 
-    connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == "processing") {emit cancelProcess();} ui->treeView->setFileSystemModel();});
+    connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == Mode::Processing) {emit cancelProcess();} ui->treeView->setFileSystemModel();});
 
     connect(ui->actionSettings, &QAction::triggered, this, [=]{settingDialog dialog (settings); if (dialog.exec() == QDialog::Accepted){
-                settings = dialog.getSettings(); setMode(viewMode); emit settingsChanged(settings);}}); //"setMode" changes the text on button
+                settings = dialog.getSettings(); setMode(viewMode); emit settingsChanged(settings);}}); // "setMode" changes the text on button
 
     connect(ui->actionAbout, &QAction::triggered, this, [=]{aboutDialog about; about.exec();});
 
@@ -143,31 +144,31 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         contextMenu->addAction("to Home", this, [=]{ui->treeView->setIndexByPath(homePath);});
         contextMenu->addSeparator();
 
-        if (viewMode == "processing")
+        if (viewMode == Mode::Processing)
             contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
 
         else if (index.isValid()) {
 
-            if (viewMode == "folder") {
+            if (viewMode == Mode::Folder) {
                 contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(path);});
                 contextMenu->addSeparator();
                 contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{emit cancelProcess(); emit processFolderSha(path, settings.value("shaType").toInt());});
             }
-            else if (viewMode == "file") {
+            else if (viewMode == Mode::File) {
                 contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(path, 1);});
                 contextMenu->addAction("Compute SHA-256 for file", this, [=]{emit processFileSha(path, 256);});
                 contextMenu->addAction("Compute SHA-512 for file", this, [=]{emit processFileSha(path, 512);});
             }
-            else if (viewMode == "db")
+            else if (viewMode == Mode::DbFile)
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
-            else if (viewMode == "sum") {
+            else if (viewMode == Mode::SumFile) {
                 contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(curPath);});
             }
         }
     }
 
     else {
-        if (viewMode == "processing") {
+        if (viewMode == Mode::Processing) {
             contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
             contextMenu->addAction("Cancel and Back to FileSystem View", this, [=]{emit cancelProcess(); ui->treeView->setFileSystemModel();});
         }
@@ -179,16 +180,16 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
             contextMenu->addSeparator();
 
-            if (viewMode == "updateMismatch")
+            if (viewMode == Mode::UpdateMismatch)
                 contextMenu->addAction("Update the Database with new checksums", this, &MainWindow::updateMismatch);
 
-            else if (viewMode == "modelNewLost") {
+            else if (viewMode == Mode::ModelNewLost) {
                 contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
                 contextMenu->addAction("Update the DataBase with New/Lost files", this, &MainWindow::updateNewLost);
                 contextMenu->addSeparator();
             }
 
-            if (viewMode == "model" || viewMode == "modelNewLost") {
+            if (viewMode == Mode::Model || viewMode == Mode::ModelNewLost) {
                 if (index.isValid()) {
                     if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile()) {
                         contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
@@ -209,15 +210,15 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
     contextMenu->exec(ui->treeView->viewport()->mapToGlobal(point));
 }
 
-void MainWindow::setMode(const QString &mode)
+void MainWindow::setMode(int mode)
 {
     qDebug() << "MainWindow::setMode | mode:" << mode;
 
-    if (viewMode == "processing" && mode != "endProcess")
+    if (viewMode == Mode::Processing && mode != Mode::EndProcess)
         return;
 
-    if (mode == "endProcess") {
-        viewMode.clear();
+    if (mode == Mode::EndProcess) {
+        viewMode = 0;
         ui->progressBar->setVisible(false);
         ui->progressBar->resetFormat();
         ui->progressBar->setValue(0);
@@ -226,65 +227,86 @@ void MainWindow::setMode(const QString &mode)
             return;
         }
         else {
-            if (previousViewMode == "model") {
-                viewMode = "model";
+            if (previousViewMode == Mode::Model) {
+                viewMode = Mode::Model;
                 qDebug()<< "previousViewMode setted:" << previousViewMode;
             }
-            else if (previousViewMode == "modelNewLost") {
-                viewMode = "modelNewLost";
+            else if (previousViewMode == Mode::ModelNewLost) {
+                viewMode = Mode::ModelNewLost;
                 qDebug()<< "previousViewMode setted:" << previousViewMode;
             }
         }
     }
     else {
-        if (!viewMode.isEmpty())
+        if (viewMode != 0)
             previousViewMode = viewMode;
         viewMode = mode;
     }
 
-    if (viewMode == "folder")
+    switch (viewMode) {
+    case Mode::Folder:
         ui->button->setText(QString("SHA-%1: Folder").arg(settings.value("shaType").toInt()));
-    else if (viewMode == "file")
+        break;
+    case Mode::File:
         ui->button->setText(QString("SHA-%1: File").arg(settings.value("shaType").toInt()));
-    else if (viewMode == "db")
+        break;
+    case Mode::DbFile:
         ui->button->setText("Open DataBase");
-    else if (viewMode == "sum")
+        break;
+    case Mode::SumFile:
         ui->button->setText("Check");
-    else if (viewMode == "model")
+        break;
+    case Mode::Model:
         ui->button->setText("Verify All");
-    else if (viewMode == "modelNewLost")
+        break;
+    case Mode::ModelNewLost:
         ui->button->setText("Update New/Lost");
-    else if (viewMode == "updateMismatch")
+        break;
+    case Mode::UpdateMismatch:
         ui->button->setText("Update");
-    else if (viewMode == "processing") {
+        break;
+    case Mode::Processing:
         ui->progressBar->setVisible(true);
         ui->button->setText("Cancel");
+        break;
+    default:
+        qDebug() << "MainWindow::setMode | WRONG MODE";
+        break;
     }
 }
 
 void MainWindow::doWork()
 {
-    QString path = curPath;
-    if (viewMode == "folder") {
+    switch (viewMode) {
+    case Mode::Folder:
         emit cancelProcess();
-        emit processFolderSha(path, settings.value("shaType").toInt());
-    }
-    else if (viewMode == "file")
-        emit processFileSha(path, settings.value("shaType").toInt());
-    else if (viewMode == "db")
-        emit parseJsonFile(path);
-    else if (viewMode == "sum")
-        emit checkFileSummary(path);
-    else if (viewMode == "model")
+        emit processFolderSha(curPath, settings.value("shaType").toInt());
+        break;
+    case Mode::File:
+        emit processFileSha(curPath, settings.value("shaType").toInt());
+        break;
+    case Mode::DbFile:
+        emit parseJsonFile(curPath);
+        break;
+    case Mode::SumFile:
+        emit checkFileSummary(curPath);
+        break;
+    case Mode::Model:
         emit verifyFileList();
-    else if (viewMode == "modelNewLost")
+        break;
+    case Mode::ModelNewLost:
         emit updateNewLost();
-    else if (viewMode == "updateMismatch")
+        break;
+    case Mode::UpdateMismatch:
         emit updateMismatch();
-    else if (viewMode == "processing")
+        break;
+    case Mode::Processing:
         emit cancelProcess();
-    else
+        break;
+    default:
         qDebug() << "MainWindow::doWork() | Wrong viewMode:" << viewMode;
+        break;
+    }
 }
 
 void MainWindow::timeLeft(const int percentsDone)
@@ -371,7 +393,7 @@ void MainWindow::dropEvent(QDropEvent *e)
     QString path = e->mimeData()->urls().first().toLocalFile();
 
     if (QFileInfo::exists(path)) {
-        if (viewMode == "processing") {
+        if (viewMode == Mode::Processing) {
             emit cancelProcess();
         }
         if (path.endsWith(".ver.json", Qt::CaseInsensitive)) {

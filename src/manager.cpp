@@ -26,7 +26,7 @@ void Manager::connections()
 
 void Manager::processFolderSha(const QString &folderPath, int shatype)
 {
-    emit setMode("processing");
+    emit setMode(Mode::Processing);
 
     Files F(folderPath);
     connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
@@ -85,7 +85,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
         else {
             emit status("Canceled");
         }
-        emit setMode("endProcess");
+        emit setMode(Mode::EndProcess);
         return;
     }
 
@@ -114,12 +114,12 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     deleteCurData();
 
-    emit setMode("endProcess");
+    emit setMode(Mode::EndProcess);
 }
 
 void Manager::processFileSha(const QString &filePath, int shatype)
 {
-    emit setMode("processing");
+    emit setMode(Mode::Processing);
 
     QString sum = shaCalc->calculate(filePath, shatype);
     if (sum.isEmpty()) {
@@ -139,7 +139,7 @@ void Manager::processFileSha(const QString &filePath, int shatype)
         emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(summaryFile), "Warning");
     }
 
-    emit setMode("endProcess");
+    emit setMode(Mode::EndProcess);
 }
 
 void Manager::makeTreeModel(const FileList &data)
@@ -217,7 +217,7 @@ void Manager::showNewLostOnly()
 
 void Manager::updateNewLost()
 {
-    emit setMode("processing");
+    emit setMode(Mode::Processing);
 
     if (curData->data_.metaData.numMissingFiles > 0)
         curData->clearDataFromLostFiles();
@@ -245,8 +245,8 @@ void Manager::updateNewLost()
 
     makeTreeModel(curData->listOnly(DataMaintainer::Changes));
 
-    emit setMode("endProcess");
-    emit setMode("model");
+    emit setMode(Mode::EndProcess);
+    emit setMode(Mode::Model);
 }
 
 // update the Database with new checksums for files with failed verification
@@ -269,7 +269,7 @@ void Manager::verifyFileList()
         return;
     }
 
-    emit setMode("processing");
+    emit setMode(Mode::Processing);
     DataContainer dataCont(curData->data_.metaData);
     dataCont.filesData = curData->listOnly(DataMaintainer::Available);
     FileList recalculated = shaCalc->calculate(dataCont);
@@ -293,11 +293,11 @@ void Manager::verifyFileList()
         curData->data_.filesData.insert(iter.key(), curFileValues);
     }
 
-    emit setMode("endProcess");
+    emit setMode(Mode::EndProcess);
 
     if (mismatchNumber > 0) {
         emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
-        emit setMode("updateMismatch");
+        emit setMode(Mode::UpdateMismatch);
         makeTreeModel(curData->listOnly(DataMaintainer::Mismatches));
     }
     else {
@@ -332,7 +332,7 @@ void Manager::checkFileSummary(const QString &path)
         }
     }
 
-    emit setMode("processing");
+    emit setMode(Mode::Processing);
     QString savedSum = line.mid(0, tools::shaStrLen(shatype)).toLower();
     QString sum = shaCalc->calculate(checkFilePath, shatype);
     if (sum.isEmpty()) {
@@ -345,7 +345,7 @@ void Manager::checkFileSummary(const QString &path)
     else {
         emit showMessage("Checksum does NOT match", "Failed");
     }
-    emit setMode("endProcess");
+    emit setMode(Mode::EndProcess);
 }
 
 //check only selected file instead all database cheking
@@ -357,7 +357,7 @@ void Manager::checkCurrentItemSum(const QString &path)
         return;
     }
 
-    emit setMode("processing");
+    emit setMode(Mode::Processing);
     QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.shaType);
     if (sum.isEmpty()) {
         return;
@@ -369,7 +369,7 @@ void Manager::checkCurrentItemSum(const QString &path)
     else {
         emit showMessage("Checksum does NOT match", "Failed");
     }
-    emit setMode("endProcess");
+    emit setMode(Mode::EndProcess);
 }
 
 QString Manager::copyStoredChecksum(const QString &path, bool clipboard)
@@ -475,9 +475,9 @@ void Manager::isViewFS(const bool isFS)
 void Manager::setMode_model()
 {
     if (curData->data_.metaData.numNewFiles > 0 || curData->data_.metaData.numMissingFiles > 0)
-        emit setMode("modelNewLost");
+        emit setMode(Mode::ModelNewLost);
     else {
-        emit setMode("model");
+        emit setMode(Mode::Model);
     }
 }
 

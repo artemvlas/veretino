@@ -1,4 +1,5 @@
 #include "view.h"
+#include "tools.h"
 #include <QTimer>
 #include <QDebug>
 
@@ -130,17 +131,17 @@ void View::pathAnalyzer(const QString &path)
         QString ext = i.suffix().toLower();
         if (i.isFile()) {
             if (ext == "json" && path.endsWith(".ver.json", Qt::CaseInsensitive)) {
-                emit setMode("db");
+                emit setMode(Mode::DbFile);
             }
             else if (ext == "sha1" || ext == "sha256" || ext == "sha512") {
-                emit setMode("sum");
+                emit setMode(Mode::SumFile);
             }
             else {
-                emit setMode("file");
+                emit setMode(Mode::File);
             }
         }
         else if (i.isDir()) {
-            emit setMode("folder");
+            emit setMode(Mode::Folder);
         }
     }
 }
