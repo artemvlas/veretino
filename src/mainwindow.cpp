@@ -243,9 +243,9 @@ void MainWindow::setMode(const QString &mode)
     }
 
     if (viewMode == "folder")
-        ui->button->setText(QString("SHA-%1: Folder").arg(settings["shaType"].toInt()));
+        ui->button->setText(QString("SHA-%1: Folder").arg(settings.value("shaType").toInt()));
     else if (viewMode == "file")
-        ui->button->setText(QString("SHA-%1: File").arg(settings["shaType"].toInt()));
+        ui->button->setText(QString("SHA-%1: File").arg(settings.value("shaType").toInt()));
     else if (viewMode == "db")
         ui->button->setText("Open DataBase");
     else if (viewMode == "sum")
