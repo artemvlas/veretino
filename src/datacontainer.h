@@ -53,7 +53,6 @@ public:
     int updateMismatchedChecksums(); // returns number of updated checksums
 
     enum Only {Available, New, NewLost, Changes, Mismatches};
-    Q_ENUM(Only)
     FileList listOnly(Only only);
 
     void importJson(const QString &jsonFilePath);

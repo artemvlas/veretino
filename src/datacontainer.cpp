@@ -303,13 +303,12 @@ void DataMaintainer::dbStatus()
 
     result.append(QString("\nLast update: %1").arg(data_.metaData.saveDateTime));
 
-    if (data_.metaData.numAvailable != data_.filesData.size())
-        result.append(QString("\n\nTotal files listed: %1").arg(data_.filesData.size()));
+    if (data_.metaData.numChecksums != data_.metaData.numAvailable)
+        result.append(QString("\n\nStored checksums: %1").arg(data_.metaData.numChecksums));
+    else
+        result.append("\n");
 
-    if (data_.metaData.numChecksums != data_.filesData.size())
-        result.append(QString("\nStored checksums: %1").arg(data_.metaData.numChecksums));
-
-    result.append(QString("\n\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
+    result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
 
     if (data_.metaData.numUnreadable > 0)
         result.append("\n\nUnreadable files: " + data_.metaData.numUnreadable);
