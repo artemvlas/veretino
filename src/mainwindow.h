@@ -48,7 +48,7 @@ private:
     QString homePath = QDir::homePath();
     QVariantMap settings; // stores the app settings
     QString curPath; // current path from &View::pathChanged
-    int viewMode = 0; // "folder", "file", "db", "sum", "model"...
+    int viewMode = 0; // Folder, File, DbFile, SumFile, Model...
     int previousViewMode = 0; //^
     QElapsedTimer elapsedTimer;
 

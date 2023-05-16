@@ -1,3 +1,5 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
+// Used to create json databases from Veretino DataContainer objects and vice versa
 #ifndef JSONDB_H
 #define JSONDB_H
 
@@ -6,9 +8,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "datacontainer.h"
-
-// This class is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
-// Used to create json databases from Veretino DataContainer objects and vice versa.
 
 class JsonDb : public QObject
 {

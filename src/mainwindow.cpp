@@ -213,11 +213,12 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 void MainWindow::setMode(int mode)
 {
     qDebug() << "MainWindow::setMode | mode:" << mode;
+    using namespace Mode;
 
-    if (viewMode == Mode::Processing && mode != Mode::EndProcess)
+    if (viewMode == Processing && mode != EndProcess)
         return;
 
-    if (mode == Mode::EndProcess) {
+    if (mode == EndProcess) {
         viewMode = 0;
         ui->progressBar->setVisible(false);
         ui->progressBar->resetFormat();
@@ -227,12 +228,12 @@ void MainWindow::setMode(int mode)
             return;
         }
         else {
-            if (previousViewMode == Mode::Model) {
-                viewMode = Mode::Model;
+            if (previousViewMode == Model) {
+                viewMode = Model;
                 qDebug()<< "previousViewMode setted:" << previousViewMode;
             }
-            else if (previousViewMode == Mode::ModelNewLost) {
-                viewMode = Mode::ModelNewLost;
+            else if (previousViewMode == ModelNewLost) {
+                viewMode = ModelNewLost;
                 qDebug()<< "previousViewMode setted:" << previousViewMode;
             }
         }
@@ -244,28 +245,28 @@ void MainWindow::setMode(int mode)
     }
 
     switch (viewMode) {
-    case Mode::Folder:
+    case Folder:
         ui->button->setText(QString("SHA-%1: Folder").arg(settings.value("shaType").toInt()));
         break;
-    case Mode::File:
+    case File:
         ui->button->setText(QString("SHA-%1: File").arg(settings.value("shaType").toInt()));
         break;
-    case Mode::DbFile:
+    case DbFile:
         ui->button->setText("Open DataBase");
         break;
-    case Mode::SumFile:
+    case SumFile:
         ui->button->setText("Check");
         break;
-    case Mode::Model:
+    case Model:
         ui->button->setText("Verify All");
         break;
-    case Mode::ModelNewLost:
+    case ModelNewLost:
         ui->button->setText("Update New/Lost");
         break;
-    case Mode::UpdateMismatch:
+    case UpdateMismatch:
         ui->button->setText("Update");
         break;
-    case Mode::Processing:
+    case Processing:
         ui->progressBar->setVisible(true);
         ui->button->setText("Cancel");
         break;
@@ -277,30 +278,31 @@ void MainWindow::setMode(int mode)
 
 void MainWindow::doWork()
 {
+    using namespace Mode;
     switch (viewMode) {
-    case Mode::Folder:
+    case Folder:
         emit cancelProcess();
         emit processFolderSha(curPath, settings.value("shaType").toInt());
         break;
-    case Mode::File:
+    case File:
         emit processFileSha(curPath, settings.value("shaType").toInt());
         break;
-    case Mode::DbFile:
+    case DbFile:
         emit parseJsonFile(curPath);
         break;
-    case Mode::SumFile:
+    case SumFile:
         emit checkFileSummary(curPath);
         break;
-    case Mode::Model:
+    case Model:
         emit verifyFileList();
         break;
-    case Mode::ModelNewLost:
+    case ModelNewLost:
         emit updateNewLost();
         break;
-    case Mode::UpdateMismatch:
+    case UpdateMismatch:
         emit updateMismatch();
         break;
-    case Mode::Processing:
+    case Processing:
         emit cancelProcess();
         break;
     default:

@@ -1,3 +1,4 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #ifndef VIEW_H
 #define VIEW_H
 
@@ -28,7 +29,7 @@ private:
 signals:
     void indexChanged(const QModelIndex &index);
     void pathChanged(const QString &path); //by indexToPath()
-    void setMode(int mode); // "file", "folder", "db", "sum"
+    void setMode(int mode);
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void showMessage(const QString &text, const QString &title = "Info");
     void fsModel_Setted(); // fileSystem Model setted

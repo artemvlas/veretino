@@ -1,3 +1,4 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #ifndef SHACALCULATOR_H
 #define SHACALCULATOR_H
 
@@ -34,8 +35,6 @@ signals:
     void cancelProcess();
     void donePercents(int done);
     void status(const QString &text); // text to statusbar
-    //void resultReady(const QMap<QString,QString> &result);
-    //void errorMessage(const QString &text);
 };
 
 #endif // SHACALCULATOR_H
