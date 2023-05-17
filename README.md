@@ -5,7 +5,7 @@
 * Calculation a checksum of the specified file and store it in a summary (*.sha1/256/512). Verification the integrity of the file against a previously saved summary.
 * Calculation a list of checksums for all files in the specified folder and store it in a local database. Verification the integrity of all files in a certain folder by comparing their checksums with those calculated and stored earlier in the database.
 * This can also be done with only selected file types by applying filters.
-* Looking for for new or missing files in the folder by comparing the current contents with the previously saved list.
+* Looking for new or missing files in the folder by comparing the current contents with the previously saved list.
 
 <p align="center">
   <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
