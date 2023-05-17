@@ -291,7 +291,14 @@ void DataMaintainer::dbStatus()
 {
     updateMetaData();
 
-    QString result("DB filename: " + data_.metaData.databaseFileName);
+    QString result("DB filename: ");
+    if (data_.metaData.databaseFileName.contains('/')) {
+        result.append(QFileInfo(data_.metaData.databaseFileName).fileName());
+        result.append("\nWorkDir: " + data_.metaData.workDir);
+    }
+    else
+        result.append(data_.metaData.databaseFileName);
+
     result.append(QString("\nAlgorithm: SHA-%1").arg(data_.metaData.shaType));
 
     if (!data_.metaData.filter.extensionsList.isEmpty()) {
@@ -311,7 +318,7 @@ void DataMaintainer::dbStatus()
     result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
 
     if (data_.metaData.numUnreadable > 0)
-        result.append("\n\nUnreadable files: " + data_.metaData.numUnreadable);
+        result.append(QString("\nUnreadable files: %1").arg(data_.metaData.numUnreadable));
 
     if (data_.metaData.numNewFiles > 0)
         result.append("\n\nNew: " + Files::contentStatus(listOnly(Only::New)));

@@ -32,5 +32,6 @@ enum Modes {
     Processing,
     EndProcess
 };
-}
+} // namespace Mode
+
 #endif // TOOLS_H

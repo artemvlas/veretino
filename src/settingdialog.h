@@ -1,3 +1,4 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #ifndef SETTINGDIALOG_H
 #define SETTINGDIALOG_H
 

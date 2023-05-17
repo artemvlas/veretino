@@ -20,7 +20,7 @@ using FileList = QMap<QString, FileValues>; // {relative path to file : FileValu
 struct FilterRule {
     bool include = true; // if true, only files with any extension from the list included, else all files except these types
     QStringList extensionsList;
-};
+}; // struct FilterRule
 
 namespace paths {
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'

@@ -134,6 +134,7 @@ void MainWindow::connectManager()
 
 void MainWindow::onCustomContextMenu(const QPoint &point)
 {
+    using namespace Mode;
     QModelIndex index = ui->treeView->indexAt(point);
     QString path = curPath;
 
@@ -144,31 +145,31 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         contextMenu->addAction("to Home", this, [=]{ui->treeView->setIndexByPath(homePath);});
         contextMenu->addSeparator();
 
-        if (viewMode == Mode::Processing)
+        if (viewMode == Processing)
             contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
 
         else if (index.isValid()) {
 
-            if (viewMode == Mode::Folder) {
+            if (viewMode == Folder) {
                 contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(path);});
                 contextMenu->addSeparator();
                 contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{emit cancelProcess(); emit processFolderSha(path, settings.value("shaType").toInt());});
             }
-            else if (viewMode == Mode::File) {
+            else if (viewMode == File) {
                 contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(path, 1);});
                 contextMenu->addAction("Compute SHA-256 for file", this, [=]{emit processFileSha(path, 256);});
                 contextMenu->addAction("Compute SHA-512 for file", this, [=]{emit processFileSha(path, 512);});
             }
-            else if (viewMode == Mode::DbFile)
+            else if (viewMode == DbFile)
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
-            else if (viewMode == Mode::SumFile) {
+            else if (viewMode == SumFile) {
                 contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(curPath);});
             }
         }
     }
 
     else {
-        if (viewMode == Mode::Processing) {
+        if (viewMode == Processing) {
             contextMenu->addAction("Cancel operation", this, &MainWindow::cancelProcess);
             contextMenu->addAction("Cancel and Back to FileSystem View", this, [=]{emit cancelProcess(); ui->treeView->setFileSystemModel();});
         }
@@ -180,16 +181,16 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
             contextMenu->addSeparator();
 
-            if (viewMode == Mode::UpdateMismatch)
+            if (viewMode == UpdateMismatch)
                 contextMenu->addAction("Update the Database with new checksums", this, &MainWindow::updateMismatch);
 
-            else if (viewMode == Mode::ModelNewLost) {
+            else if (viewMode == ModelNewLost) {
                 contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
                 contextMenu->addAction("Update the DataBase with New/Lost files", this, &MainWindow::updateNewLost);
                 contextMenu->addSeparator();
             }
 
-            if (viewMode == Mode::Model || viewMode == Mode::ModelNewLost) {
+            if (viewMode == Model || viewMode == ModelNewLost) {
                 if (index.isValid()) {
                     if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile()) {
                         contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
@@ -212,7 +213,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
 void MainWindow::setMode(int mode)
 {
-    qDebug() << "MainWindow::setMode | mode:" << mode;
+    //qDebug() << "MainWindow::setMode | mode:" << mode;
     using namespace Mode;
 
     if (viewMode == Processing && mode != EndProcess)
