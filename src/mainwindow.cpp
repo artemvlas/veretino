@@ -36,7 +36,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)  // if a computing process is running, show a hint when user wants to close the app
 {
-    if (viewMode == Mode::Processing && QMessageBox::No == QMessageBox::question(this, "Closing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No))
+    if (viewMode == Mode::Processing && !processAbortPrompt())
         event->ignore();
     else
         event->accept();
@@ -356,6 +356,11 @@ void MainWindow::showMessage(const QString &message, const QString &title)
         messageBox.information(0, title, message);
 }
 
+bool MainWindow::processAbortPrompt()
+{
+    return (QMessageBox::Yes == QMessageBox::question(this, "Processing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No));
+}
+
 void MainWindow::setSettings()
 {
     settings["shaType"] = 256;
@@ -397,7 +402,10 @@ void MainWindow::dropEvent(QDropEvent *e)
 
     if (QFileInfo::exists(path)) {
         if (viewMode == Mode::Processing) {
-            emit cancelProcess();
+            if (processAbortPrompt())
+                emit cancelProcess();
+            else
+                return;
         }
         if (path.endsWith(".ver.json", Qt::CaseInsensitive)) {
             emit parseJsonFile(path);

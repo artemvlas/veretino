@@ -41,6 +41,7 @@ private:
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
     void closeEvent(QCloseEvent *event);
+    bool processAbortPrompt();
 
     Ui::MainWindow *ui;
     QThread *thread = new QThread;
