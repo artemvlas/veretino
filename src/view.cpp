@@ -128,12 +128,11 @@ void View::pathAnalyzer(const QString &path)
 {
     if (this->isViewFileSystem()) {
         QFileInfo i(path);
-        QString ext = i.suffix().toLower();
         if (i.isFile()) {
-            if (ext == "json" && tools::isDatabaseFile(path)) {
+            if (tools::isDatabaseFile(path)) {
                 emit setMode(Mode::DbFile);
             }
-            else if (ext == "sha1" || ext == "sha256" || ext == "sha512") {
+            else if (tools::isSummaryFile(path)) {
                 emit setMode(Mode::SumFile);
             }
             else {

@@ -22,6 +22,13 @@ int shaStrLen(int shatype)
 bool isDatabaseFile(const QString &filePath) {
     return filePath.endsWith(".ver.json", Qt::CaseInsensitive);
 }
+
+bool isSummaryFile(const QString &filePath)
+{
+    return (filePath.endsWith(".sha1", Qt::CaseInsensitive)
+            || filePath.endsWith(".sha256", Qt::CaseInsensitive)
+            || filePath.endsWith(".sha512", Qt::CaseInsensitive));
+}
 } // namespace tools
 
 namespace format {
