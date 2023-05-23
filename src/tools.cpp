@@ -18,6 +18,10 @@ int shaStrLen(int shatype)
         return 0;
     }
 }
+
+bool isDatabaseFile(const QString &filePath) {
+    return filePath.endsWith(".ver.json", Qt::CaseInsensitive);
+}
 } // namespace tools
 
 namespace format {

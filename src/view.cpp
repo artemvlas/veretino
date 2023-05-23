@@ -130,7 +130,7 @@ void View::pathAnalyzer(const QString &path)
         QFileInfo i(path);
         QString ext = i.suffix().toLower();
         if (i.isFile()) {
-            if (ext == "json" && path.endsWith(".ver.json", Qt::CaseInsensitive)) {
+            if (ext == "json" && tools::isDatabaseFile(path)) {
                 emit setMode(Mode::DbFile);
             }
             else if (ext == "sha1" || ext == "sha256" || ext == "sha512") {

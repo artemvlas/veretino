@@ -375,7 +375,7 @@ bool MainWindow::argumentInput()
         QString argPath = QApplication::arguments().at(1);
         argPath.replace("\\", "/"); // win-->posix
         if (QFileInfo::exists(argPath)) {
-            if (QFileInfo(argPath).isFile() && argPath.endsWith(".ver.json", Qt::CaseInsensitive)) {
+            if (QFileInfo(argPath).isFile() && tools::isDatabaseFile(argPath)) {
                 emit parseJsonFile(argPath);
             }
             else {
@@ -407,7 +407,7 @@ void MainWindow::dropEvent(QDropEvent *e)
             else
                 return;
         }
-        if (path.endsWith(".ver.json", Qt::CaseInsensitive)) {
+        if (tools::isDatabaseFile(path)) {
             emit parseJsonFile(path);
         }
         else {

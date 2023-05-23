@@ -176,7 +176,7 @@ void Manager::resetDatabase()
 //making tree model | file paths : info about current availability on disk
 void Manager::createDataModel(const QString &databaseFilePath)
 {
-    if (!databaseFilePath.endsWith(".ver.json", Qt::CaseInsensitive)) {
+    if (!tools::isDatabaseFile(databaseFilePath)) {
         emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver.json'").arg(databaseFilePath), "Wrong DB file!");
         emit setModel();
         return;
