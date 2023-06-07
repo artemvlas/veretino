@@ -155,7 +155,7 @@ int DataMaintainer::clearDataFromLostFiles()
         iter.next();
         if (!iter.value().exists) {
             iter.value().checksum.clear();
-            iter.value().about = "- removed from DB";
+            iter.value().about = "✂ removed from DB";
             ++number;
         }
     }
@@ -172,7 +172,7 @@ int DataMaintainer::updateMismatchedChecksums()
         if (!iter.value().reChecksum.isEmpty()) {
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
-            iter.value().about = "^ stored checksum updated";
+            iter.value().about = "🗘 stored checksum updated";
             ++number;
         }
     }

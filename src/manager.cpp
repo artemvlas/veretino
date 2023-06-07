@@ -157,7 +157,7 @@ void Manager::makeTreeModel(const FileList &data)
                         .arg(curData->data_.filesData.size()));
     }
     else {
-        qDebug()<< "Manager::makeTreeModel | Empty model";
+        qDebug() << "Manager::makeTreeModel | Empty model";
         emit setModel();
     }
 }
@@ -225,7 +225,7 @@ void Manager::updateNewLost()
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
         dataCont.filesData =  curData->listOnly(DataMaintainer::New);
-        dataCont.metaData.about = "+ added to DB";
+        dataCont.metaData.about = "➔ added to DB";
         curData->updateData(shaCalc->calculate(dataCont));
     }
 
@@ -284,12 +284,12 @@ void Manager::verifyFileList()
     for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
         FileValues curFileValues = curData->data_.filesData.value(iter.key());
         if (iter.value().checksum != curData->data_.filesData.value(iter.key()).checksum) {
-            curFileValues.about = "!= NOT match";
+            curFileValues.about = "❌ NOT match";
             curFileValues.reChecksum = iter.value().checksum;
             ++mismatchNumber;
         }
         else
-            curFileValues.about = "== ok";
+            curFileValues.about = "✓ OK";
         curData->data_.filesData.insert(iter.key(), curFileValues);
     }
 

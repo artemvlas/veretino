@@ -4,7 +4,7 @@
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({"Path", "Size / Availability", "About"});
+    rootItem = new TreeItem({"Path", "Size / Availability", "Status"});
 }
 
 TreeModel::~TreeModel()
