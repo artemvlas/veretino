@@ -51,7 +51,15 @@ void DataMaintainer::updateMetaData()
         }
     }
 
-    emit setPermanentStatus(QString("\t%1 avail. | %2 | SHA-%3")
+    QString checkStatus ("\t");
+    if (data_.metaData.isChecked) {
+        if (data_.metaData.numMismatched > 0)
+            checkStatus.append(QString("❌%1 | ").arg(data_.metaData.numMismatched));
+        else
+            checkStatus.append(QString("✓%1 | ").arg(data_.metaData.numChecksums));
+    }
+    emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
+                            .arg(checkStatus)
                             .arg(data_.metaData.numAvailable)
                             .arg(format::dataSizeReadable(data_.metaData.totalSize))
                             .arg(data_.metaData.shaType));
@@ -175,10 +183,11 @@ int DataMaintainer::updateMismatchedChecksums()
         if (!iter.value().reChecksum.isEmpty()) {
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
-            iter.value().about = "🗘 stored checksum updated";
+            iter.value().about = "↺ stored checksum updated"; // 🗘
             ++number;
         }
     }
+
     return number;
 }
 
@@ -210,6 +219,8 @@ void DataMaintainer::importJson(const QString &jsonFilePath)
 
 void DataMaintainer::exportToJson()
 {
+    updateMetaData();
+
     JsonDb *json = new JsonDb;
     connect(json, &JsonDb::status, this, &DataMaintainer::status);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);

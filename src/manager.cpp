@@ -225,7 +225,7 @@ void Manager::updateNewLost()
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
         dataCont.filesData =  curData->listOnly(DataMaintainer::New);
-        dataCont.metaData.about = "➔ added to DB";
+        dataCont.metaData.about = "→ added to DB"; // ➔
         curData->updateData(shaCalc->calculate(dataCont));
     }
 
@@ -240,7 +240,6 @@ void Manager::updateNewLost()
 
     curData->data_.metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
 
-    curData->updateMetaData();
     curData->exportToJson();
 
     makeTreeModel(curData->listOnly(DataMaintainer::Changes));
@@ -294,7 +293,7 @@ void Manager::verifyFileList()
     }
 
     curData->data_.metaData.isChecked = true;
-    curData->data_.metaData.numMismatched = mismatchNumber;
+    curData->updateMetaData();
     emit setMode(Mode::EndProcess);
 
     if (mismatchNumber > 0) {
