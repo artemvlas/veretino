@@ -234,8 +234,7 @@ void Manager::updateNewLost()
     }
 
     if (curData->data_.metaData.numMissingFiles > 0) {
-        curData->clearDataFromLostFiles();
-        itemsInfo.append(QString("removed %1").arg(curData->data_.metaData.numMissingFiles));
+        itemsInfo.append(QString("removed %1").arg(curData->clearDataFromLostFiles()));
     }
 
     curData->data_.metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
