@@ -46,7 +46,7 @@ public:
     // functions
     void updateMetaData();
 
-    void updateData(const FileList &updateFiles); // add new data to 'data_.filesData'
+    int updateData(const FileList &updateFiles); // add new data to 'data_.filesData', returns number of added/updated items: updateFiles.size()
 
     void updateFilesValues();
     int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found

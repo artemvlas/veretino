@@ -218,25 +218,25 @@ void Manager::showNewLostOnly()
 void Manager::updateNewLost()
 {
     emit setMode(Mode::Processing);
-
-    if (curData->data_.metaData.numMissingFiles > 0)
-        curData->clearDataFromLostFiles();
+    QString itemsInfo;
 
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
         dataCont.filesData =  curData->listOnly(DataMaintainer::New);
         dataCont.metaData.about = "→ added to DB"; // ➔
-        curData->updateData(shaCalc->calculate(dataCont));
-    }
 
-    QString itemsInfo;
-    if (curData->data_.metaData.numNewFiles > 0) {
+        if (curData->updateData(shaCalc->calculate(dataCont)) == 0)
+            return;
+
         itemsInfo = QString("added %1").arg(curData->data_.metaData.numNewFiles);
         if (curData->data_.metaData.numMissingFiles > 0)
             itemsInfo.append(", ");
     }
-    if (curData->data_.metaData.numMissingFiles > 0)
+
+    if (curData->data_.metaData.numMissingFiles > 0) {
+        curData->clearDataFromLostFiles();
         itemsInfo.append(QString("removed %1").arg(curData->data_.metaData.numMissingFiles));
+    }
 
     curData->data_.metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
 

@@ -191,9 +191,12 @@ int DataMaintainer::updateMismatchedChecksums()
     return number;
 }
 
-void DataMaintainer::updateData(const FileList &updateFiles)
+int DataMaintainer::updateData(const FileList &updateFiles)
 {
-    data_.filesData.insert(updateFiles);
+    if (!updateFiles.isEmpty())
+        data_.filesData.insert(updateFiles);
+
+    return updateFiles.size();
 }
 
 void DataMaintainer::importJson(const QString &jsonFilePath)
