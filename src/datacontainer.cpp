@@ -54,9 +54,9 @@ void DataMaintainer::updateMetaData()
     QString checkStatus ("\t");
     if (data_.metaData.isChecked) {
         if (data_.metaData.numMismatched > 0)
-            checkStatus.append(QString("❌%1 | ").arg(data_.metaData.numMismatched));
+            checkStatus.append(QString("❌%1 : ").arg(data_.metaData.numMismatched));
         else
-            checkStatus.append(QString("✓%1 | ").arg(data_.metaData.numChecksums));
+            checkStatus.append(QString("✓%1 : ").arg(data_.metaData.numChecksums));
     }
     emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
                             .arg(checkStatus)
