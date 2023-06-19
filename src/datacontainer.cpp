@@ -345,11 +345,10 @@ void DataMaintainer::dbStatus()
         result.append("\nNo Missing files found");
 
     if (data_.metaData.isChecked) {
-        result.append("\n\nChecking result: ");
         if (data_.metaData.numMismatched > 0)
-            result.append(QString("%1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
+            result.append(QString("\n\n❌ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
         else
-            result.append(QString("ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
+            result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
     }
     else if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
         result.append("\n\nUse context menu for more options");
