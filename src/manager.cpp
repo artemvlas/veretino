@@ -374,20 +374,16 @@ void Manager::checkCurrentItemSum(const QString &path)
 
 QString Manager::copyStoredChecksum(const QString &path, bool clipboard)
 {
-    if (curData->data_.filesData.value(path).isNew) {
+    QString savedSum;
+
+    if (curData->data_.filesData.value(path).isNew)
         emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
-        return QString();
-    }
-
-    if (!curData->data_.filesData.value(path).isReadable) {
+    else if (!curData->data_.filesData.value(path).isReadable)
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
-        return QString();
-    }
-
-    QString savedSum = curData->data_.filesData.value(path).checksum;
-
-    if (savedSum.isEmpty()) {
-        emit showMessage("No checksum in the database.", "No checksum");
+    else {
+        savedSum = curData->data_.filesData.value(path).checksum;
+        if (savedSum.isEmpty())
+            emit showMessage("No checksum in the database.", "No checksum");
     }
 
     if (clipboard && !savedSum.isEmpty())
