@@ -11,8 +11,10 @@
 #include "files.h"
 
 struct MetaData {
+    bool isChecked = false; // Has the data been verified?
     int shaType = 0; // 1 or 256 or 512
     int numChecksums = 0; // number of files with checksums
+    int numMismatched = 0; // number of files with mismatched checksums
     int numAvailable = 0; // the number of files that exist on the disk and are readable, for which checksums are stored
     int numNewFiles = 0;
     int numMissingFiles = 0;

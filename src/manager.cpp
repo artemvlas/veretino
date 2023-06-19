@@ -293,6 +293,8 @@ void Manager::verifyFileList()
         curData->data_.filesData.insert(iter.key(), curFileValues);
     }
 
+    curData->data_.metaData.isChecked = true;
+    curData->data_.metaData.numMismatched = mismatchNumber;
     emit setMode(Mode::EndProcess);
 
     if (mismatchNumber > 0) {

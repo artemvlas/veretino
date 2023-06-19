@@ -27,6 +27,7 @@ void DataMaintainer::updateMetaData()
     data_.metaData.numNewFiles = 0;
     data_.metaData.numMissingFiles = 0;
     data_.metaData.numChecksums = 0;
+    data_.metaData.numMismatched = 0;
     data_.metaData.numAvailable = 0;
     data_.metaData.numUnreadable = 0;
     data_.metaData.totalSize = 0;
@@ -39,6 +40,8 @@ void DataMaintainer::updateMetaData()
             ++data_.metaData.numUnreadable;
         else if (!iter.value().checksum.isEmpty()) {
             ++data_.metaData.numChecksums;
+            if (!iter.value().reChecksum.isEmpty())
+                ++data_.metaData.numMismatched;
             if (iter.value().exists) {
                 data_.metaData.totalSize += iter.value().size;
                 ++data_.metaData.numAvailable;
@@ -259,7 +262,7 @@ QString DataMaintainer::itemContentsInfo(const QString &itemPath)
                 ++lost;
             }
             else
-                qDebug()<< "DataMaintainer::itemContents | Ambiguous item: " << iterContent.key();
+                qDebug() << "DataMaintainer::itemContents | Ambiguous item: " << iterContent.key();
         }
 
         QString text;
@@ -330,7 +333,14 @@ void DataMaintainer::dbStatus()
     else
         result.append("\nNo Missing files found");
 
-    if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
+    if (data_.metaData.isChecked) {
+        result.append("\n\nChecking result: ");
+        if (data_.metaData.numMismatched > 0)
+            result.append(QString("%1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
+        else
+            result.append(QString("ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
+    }
+    else if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
         result.append("\n\nUse context menu for more options");
     }
 
