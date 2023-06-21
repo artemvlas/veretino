@@ -54,7 +54,7 @@ void DataMaintainer::updateMetaData()
     QString checkStatus ("\t");
     if (data_.metaData.isChecked) {
         if (data_.metaData.numMismatched > 0)
-            checkStatus.append(QString("❌%1 : ").arg(data_.metaData.numMismatched));
+            checkStatus.append(QString("☒%1 : ").arg(data_.metaData.numMismatched));
         else
             checkStatus.append(QString("✓%1 : ").arg(data_.metaData.numChecksums));
     }
@@ -183,7 +183,7 @@ int DataMaintainer::updateMismatchedChecksums()
         if (!iter.value().reChecksum.isEmpty()) {
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
-            iter.value().about = "↺ stored checksum updated"; // 🗘
+            iter.value().about = "↻ stored checksum updated"; // 🗘
             ++number;
         }
     }
@@ -349,7 +349,7 @@ void DataMaintainer::dbStatus()
 
     if (data_.metaData.isChecked) {
         if (data_.metaData.numMismatched > 0)
-            result.append(QString("\n\n❌ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
+            result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
         else
             result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
     }

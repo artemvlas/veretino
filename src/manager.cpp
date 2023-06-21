@@ -282,7 +282,7 @@ void Manager::verifyFileList()
     for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
         FileValues curFileValues = curData->data_.filesData.value(iter.key());
         if (iter.value().checksum != curData->data_.filesData.value(iter.key()).checksum) {
-            curFileValues.about = "❌ NOT match";
+            curFileValues.about = "☒ NOT match";
             curFileValues.reChecksum = iter.value().checksum;
             ++mismatchNumber;
         }
