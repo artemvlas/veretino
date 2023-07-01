@@ -56,7 +56,7 @@ void DataMaintainer::updateMetaData()
         if (data_.metaData.numMismatched > 0)
             checkStatus.append(QString("☒%1 : ").arg(data_.metaData.numMismatched));
         else
-            checkStatus.append(QString("✓%1 : ").arg(data_.metaData.numChecksums));
+            checkStatus.append(QString("✓%1 : ").arg(data_.metaData.numAvailable));
     }
     emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
                             .arg(checkStatus)
@@ -350,8 +350,10 @@ void DataMaintainer::dbStatus()
     if (data_.metaData.isChecked) {
         if (data_.metaData.numMismatched > 0)
             result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
-        else
+        else if (data_.metaData.numChecksums == data_.metaData.numAvailable)
             result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
+        else
+            result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_.metaData.numAvailable));
     }
     else if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
         result.append("\n\nUse context menu for more options");
