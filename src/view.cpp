@@ -36,6 +36,10 @@ void View::smartSetModel(QAbstractItemModel *model)
         if (model->objectName() == "fileSystem")
             return;
     }
+    else if (currentIndex.isValid())
+        lastModelPath = indexToPath(currentIndex);
+
+    //qDebug() << "@@@@@@@@@@@@@@@@" << lastModelPath;
 
     int previousColumWidth = this->columnWidth(0); // first load = 0
 
@@ -67,10 +71,9 @@ void View::smartSetModel(QAbstractItemModel *model)
         this->setColumnWidth(1, 100);
     }
     else {
-        this->setColumnWidth(1, 130);
         emit modelChanged(false);
-        this->expandAll();
-        this->scrollToTop();
+        this->setColumnWidth(1, 130);
+        setIndexByPath(lastModelPath);
     }
 }
 
@@ -98,6 +101,31 @@ QString View::indexToPath(const QModelIndex &index)
     return QString();
 }
 
+QModelIndex View::pathToIndex(const QString &path)
+{
+    QModelIndex curIndex = this->model()->index(0, 0);
+    if (path.isEmpty())
+        return curIndex;
+
+    QStringList parts = path.split('/');
+    QModelIndex parentIndex;
+
+    foreach (const QString &str, parts) {
+        for (int i = 0; curIndex.isValid(); ++i) {
+            curIndex = this->model()->index(i, 0, parentIndex);
+            if (curIndex.data().toString() == str) {
+                //qDebug() << "***" << str << "finded on" << i << "row";
+                parentIndex = this->model()->index(i, 0, parentIndex);
+                break;
+            }
+            //qDebug() << "*** Looking for:" << str << curIndex.data();
+        }
+    }
+
+    //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
+    return curIndex;
+}
+
 void View::setIndexByPath(const QString &path)
 {
     if (isViewFileSystem()) {
@@ -111,6 +139,18 @@ void View::setIndexByPath(const QString &path)
         }
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
+    }
+    else {
+        QModelIndex index = pathToIndex(path);
+        if (index.isValid()) {
+            this->expand(index);
+            this->setCurrentIndex(index);
+            this->scrollTo(index, QAbstractItemView::PositionAtCenter);
+        }
+        else {
+            this->expandAll();
+            this->scrollToTop();
+        }
     }
 }
 

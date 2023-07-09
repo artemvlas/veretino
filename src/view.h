@@ -11,7 +11,8 @@ class View : public QTreeView
 public:
     explicit View(QWidget *parent = nullptr);
     bool isViewFileSystem(); //"true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
-    QString indexToPath(const QModelIndex &index); //build path by current index data
+    QString indexToPath(const QModelIndex &index); // build path by current index data
+    QModelIndex pathToIndex(const QString &path); // find index of specified 'path'
     void pathAnalyzer(const QString &path);
     QString workDir;
 
@@ -24,6 +25,7 @@ private:
     QFileSystemModel *fileSystem = new QFileSystemModel;
     QModelIndex currentIndex;
     QString lastFileSystemPath;
+    QString lastModelPath;
     void scrollToPath(const QString &path); //QTimer used. QFileSystemModel needs some time after setup to Scrolling be able
 
 signals:
