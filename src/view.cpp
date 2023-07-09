@@ -84,23 +84,22 @@ bool View::isViewFileSystem()
 
 QString View::indexToPath(const QModelIndex &index)
 {
-    QString resultPath;
+    QString path;
 
     if (isViewFileSystem()) {
-        resultPath = fileSystem->filePath(index);
+        path = fileSystem->filePath(index);
     }
     else if (this->model()->objectName() == "treeModel") {
         QModelIndex newIndex = this->model()->index(index.row(), 0 , index.parent());
-        QString path = newIndex.data().toString();
+        path = newIndex.data().toString();
 
         while (newIndex.parent().isValid()) {
             path = newIndex.parent().data().toString() + '/' + path;
             newIndex = newIndex.parent();
         }
-        resultPath = path;
     }
 
-    return resultPath;
+    return path;
 }
 
 QModelIndex View::pathToIndex(const QString &path)
