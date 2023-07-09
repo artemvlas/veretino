@@ -47,15 +47,18 @@ public:
     void updateMetaData();
 
     int updateData(const FileList &updateFiles); // add new data to 'data_.filesData', returns number of added/updated items: updateFiles.size()
+    int updateData(FileList updateFiles, FileValues::FileStatus status); // adding 'status' to 'updateFiles' and updateData(updateFiles)^
+    bool updateData(const QString &filePath, const QString &checksum); // update the check status of the file
 
     void updateFilesValues();
     int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
 
-    int clearDataFromLostFiles(); // returns number of cleared
-    int updateMismatchedChecksums(); // returns number of updated checksums
+    int clearDataFromLostFiles(); // returns the number of cleared
+    int updateMismatchedChecksums(); // returns the number of updated checksums
 
-    enum Only {Available, New, NewLost, Changes, Mismatches};
-    FileList listOnly(Only only);
+    enum Listing {Available, New, Lost, Changes, Mismatches, Added, Removed, Updated};
+    FileList listOf(Listing only);
+    FileList listOf(QList<Listing> only); // list of multiple conditions^
 
     void importJson(const QString &jsonFilePath);
     void exportToJson();
@@ -75,7 +78,7 @@ private:
     int shaType(const FileList &fileList); // determines the shaType by the string length of the stored checksum
 
 signals:
-    void status(const QString &text = QString()); // text to statusbar
+    void statusChanged(const QString &text = QString()); // text to statusbar
     void showMessage(const QString &text, const QString &title = "Info");
     void setPermanentStatus(const QString &text = QString());
 };

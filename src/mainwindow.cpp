@@ -100,7 +100,7 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);
 
     // info and notifications
-    connect(manager, SIGNAL(status(QString)), ui->statusbar, SLOT(showMessage(QString)));
+    connect(manager, SIGNAL(statusChanged(QString)), ui->statusbar, SLOT(showMessage(QString)));
     connect(manager, &Manager::setPermanentStatus, permanentStatus, &QLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(this, &MainWindow::getItemInfo, manager, &Manager::getItemInfo);

@@ -45,11 +45,11 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 // making "checksums... .ver.json" database
 bool JsonDb::makeJson(const DataContainer &data)
 {
-    emit status("Exporting data to json...");
+    emit statusChanged("Exporting data to json...");
     bool isWorkDirRelative = !data.metaData.databaseFileName.contains('/');
 
     QJsonObject header;
-    header["Created with"] = "Veretino 0.2.2 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino 0.2.3 https://github.com/artemvlas/veretino";
     header["Files number"] = data.metaData.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
@@ -106,7 +106,7 @@ bool JsonDb::makeJson(const DataContainer &data)
 
 
     if (saveJsonFile(doc, pathToSave)) {
-        emit status("Saved");
+        emit statusChanged("Saved");
         emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity")
                 .arg(data.metaData.about, databaseStatus, QFileInfo(pathToSave).fileName()), "Success");
     }
@@ -119,12 +119,12 @@ bool JsonDb::makeJson(const DataContainer &data)
                                     QFileInfo(pathToSave).fileName());
 
         if (saveJsonFile(doc, pathToSave)) {
-            emit status("Saved to Desktop");
+            emit statusChanged("Saved to Desktop");
             emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
                                                 .arg(data.metaData.about, databaseStatus, data.metaData.workDir, QFileInfo(pathToSave).fileName()), "Warning");
         }
         else {
-            emit status("NOT Saved");
+            emit statusChanged("NOT Saved");
             emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
             return false;
         }
@@ -141,7 +141,7 @@ DataContainer JsonDb::parseJson(const QString &filePath)
         return DataContainer();
     }
 
-    emit status("Importing the Json database...");
+    emit statusChanged("Importing the Json database...");
 
     QJsonObject filelistData(mainArray.at(1).toObject());
 
@@ -149,7 +149,7 @@ DataContainer JsonDb::parseJson(const QString &filePath)
         emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
                                                                 .arg(QFileInfo(filePath).fileName()), "Empty Database!");
         //qDebug()<< "EMPTY filelistData";
-        emit status();
+        emit statusChanged();
         return DataContainer();
     }
 

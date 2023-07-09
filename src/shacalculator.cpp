@@ -51,7 +51,6 @@ FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
     if (canceled) {        
         emit donePercents(0);
         qDebug() << "ShaCalculator::computeChecksum | Canceled";
-        curFileValues.about = "Canceled";
     }
     else
         curFileValues.checksum = hash.result().toHex();
@@ -71,18 +70,18 @@ QString ShaCalculator::calculate(const QString &filePath, int shatype)
 
     canceled = false;
 
-    emit status(QString("Calculating SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
+    emit statusChanged(QString("Calculating SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
 
     FileValues curFileValues = computeChecksum(filePath, shatype);
 
     if (canceled) {
-        emit status("Canceled");
+        emit statusChanged("Canceled");
     }
     else if (curFileValues.isReadable && !curFileValues.checksum.isEmpty()) {
-        emit status(QString("SHA-%1 calculated").arg(shatype));
+        emit statusChanged(QString("SHA-%1 calculated").arg(shatype));
     }
     else {
-        emit status("read error");
+        emit statusChanged("read error");
     }
 
     return curFileValues.checksum;
@@ -105,14 +104,12 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
         else
             doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(doneSize), totalSizeReadable);
 
-        emit status(QString("Calculating %1 of %2 checksums %3")
+        emit statusChanged(QString("Calculating %1 of %2 checksums %3")
                         .arg(resultList.size() + 1)
                         .arg(filesContainer.filesData.size())
                         .arg(doneData));
 
         FileValues curFileValues = computeChecksum(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.shaType);
-        if (!filesContainer.metaData.about.isEmpty())
-            curFileValues.about = filesContainer.metaData.about;
 
         curFileValues.size = iter.value().size;
         resultList.insert(iter.key(), curFileValues);
@@ -120,11 +117,11 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 
     if (canceled) {
         qDebug() << "ShaCalculator::calculate | Canceled";
-        emit status("Canceled");
+        emit statusChanged("Canceled");
         return FileList();
     }
     else {
-        emit status("Done");
+        emit statusChanged("Done");
         return resultList;
     }
 }

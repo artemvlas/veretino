@@ -21,7 +21,7 @@ void Manager::connections()
 {
     connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess);
     connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
-    connect(shaCalc, &ShaCalculator::status, this, &Manager::status);
+    connect(shaCalc, &ShaCalculator::statusChanged, this, &Manager::statusChanged);
 }
 
 void Manager::processFolderSha(const QString &folderPath, int shatype)
@@ -30,7 +30,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     Files F(folderPath);
     connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
-    connect(&F, &Files::status, this, &Manager::status);
+    connect(&F, &Files::statusChanged, this, &Manager::statusChanged);
 
     DataContainer calcData;
     calcData.metaData.workDir = folderPath;
@@ -83,7 +83,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
                 emit showMessage("Empty folder. Nothing to do");
         }
         else {
-            emit status("Canceled");
+            emit statusChanged("Canceled");
         }
         emit setMode(Mode::EndProcess);
         return;
@@ -109,7 +109,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     curData = new DataMaintainer(calcData);
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
-    connect(curData, &DataMaintainer::status, this, &Manager::status);
+    connect(curData, &DataMaintainer::statusChanged, this, &Manager::statusChanged);
     curData->exportToJson();
 
     deleteCurData();
@@ -145,16 +145,16 @@ void Manager::processFileSha(const QString &filePath, int shatype)
 void Manager::makeTreeModel(const FileList &data)
 {
     if (!data.isEmpty()) {
-        emit status("File tree creation...");
+        emit statusChanged("File tree creation...");
         TreeModel *model = new TreeModel;
         model->setObjectName("treeModel");
         model->populate(data);
 
         emit setModel(model);
         emit workDirChanged(curData->data_.metaData.workDir);
-        emit status(QString("SHA-%1: %2 files")
-                        .arg(curData->data_.metaData.shaType)
-                        .arg(curData->data_.filesData.size()));
+        emit statusChanged(QString("SHA-%1: %2 files")
+                 .arg(curData->data_.metaData.shaType)
+                 .arg(curData->data_.filesData.size()));
     }
     else {
         qDebug() << "Manager::makeTreeModel | Empty model";
@@ -187,7 +187,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
     curData = new DataMaintainer;
     connect(this, &Manager::cancelProcess, curData, &DataMaintainer::cancelProcess, Qt::DirectConnection);
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
-    connect(curData, &DataMaintainer::status, this, &Manager::status);
+    connect(curData, &DataMaintainer::statusChanged, this, &Manager::statusChanged);
     connect(curData, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
 
     curData->importJson(databaseFilePath);
@@ -212,7 +212,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
 void Manager::showNewLostOnly()
 {
-    makeTreeModel(curData->listOnly(DataMaintainer::NewLost));
+    makeTreeModel(curData->listOf({DataMaintainer::New, DataMaintainer::Lost}));
 }
 
 void Manager::updateNewLost()
@@ -222,10 +222,9 @@ void Manager::updateNewLost()
 
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
-        dataCont.filesData =  curData->listOnly(DataMaintainer::New);
-        dataCont.metaData.about = "→ added to DB"; // ➔
+        dataCont.filesData =  curData->listOf(DataMaintainer::New);
 
-        if (curData->updateData(shaCalc->calculate(dataCont)) == 0)
+        if (curData->updateData(shaCalc->calculate(dataCont), FileValues::Added) == 0)
             return;
 
         itemsInfo = QString("added %1").arg(curData->data_.metaData.numNewFiles);
@@ -241,7 +240,7 @@ void Manager::updateNewLost()
 
     curData->exportToJson();
 
-    makeTreeModel(curData->listOnly(DataMaintainer::Changes));
+    makeTreeModel(curData->listOf(DataMaintainer::Changes));
 
     emit setMode(Mode::EndProcess);
     emit setMode(Mode::Model);
@@ -255,7 +254,7 @@ void Manager::updateMismatch()
 
     curData->exportToJson();
 
-    makeTreeModel(curData->listOnly(DataMaintainer::Changes));
+    makeTreeModel(curData->listOf(DataMaintainer::Changes));
     setMode_model();
 }
 
@@ -269,41 +268,34 @@ void Manager::verifyFileList()
 
     emit setMode(Mode::Processing);
     DataContainer dataCont(curData->data_.metaData);
-    dataCont.filesData = curData->listOnly(DataMaintainer::Available);
+    dataCont.filesData = curData->listOf(DataMaintainer::Available);
     FileList recalculated = shaCalc->calculate(dataCont);
 
     if (recalculated.isEmpty()) {
         return;
     }
 
-    int mismatchNumber = 0;
+    //int mismatchNumber = 0;
     FileList::const_iterator iter;
 
     for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
-        FileValues curFileValues = curData->data_.filesData.value(iter.key());
-        if (iter.value().checksum != curData->data_.filesData.value(iter.key()).checksum) {
-            curFileValues.about = "☒ NOT match";
-            curFileValues.reChecksum = iter.value().checksum;
-            ++mismatchNumber;
-        }
-        else
-            curFileValues.about = "✓ OK";
-        curData->data_.filesData.insert(iter.key(), curFileValues);
+        curData->updateData(iter.key(), iter.value().checksum);
     }
 
     curData->data_.metaData.isChecked = true;
     curData->updateMetaData();
     emit setMode(Mode::EndProcess);
 
-    if (mismatchNumber > 0) {
-        emit showMessage(QString("%1 files changed or corrupted").arg(mismatchNumber), "FAILED");
+    if (curData->data_.metaData.numMismatched > 0) {
+        emit showMessage(QString("%1 files changed or corrupted").arg(curData->data_.metaData.numMismatched), "FAILED");
         emit setMode(Mode::UpdateMismatch);
-        makeTreeModel(curData->listOnly(DataMaintainer::Mismatches));
+        makeTreeModel(curData->listOf(DataMaintainer::Mismatches));
     }
     else {
         emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                  .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
-        makeTreeModel(curData->listOnly(DataMaintainer::Changes));
+        makeTreeModel(curData->listOf(DataMaintainer::Changes));
+        //showAll();
     }
 }
 
@@ -335,6 +327,7 @@ void Manager::checkFileSummary(const QString &path)
     emit setMode(Mode::Processing);
     QString savedSum = line.mid(0, tools::shaStrLen(shatype)).toLower();
     QString sum = shaCalc->calculate(checkFilePath, shatype);
+
     if (sum.isEmpty()) {
         return;
     }
@@ -345,7 +338,9 @@ void Manager::checkFileSummary(const QString &path)
     else {
         emit showMessage("Checksum does NOT match", "Failed");
     }
+
     emit setMode(Mode::EndProcess);
+
 }
 
 //check only selected file instead all database cheking
@@ -359,16 +354,21 @@ void Manager::checkCurrentItemSum(const QString &path)
 
     emit setMode(Mode::Processing);
     QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.shaType);
+
     if (sum.isEmpty()) {
         return;
     }
 
-    if (sum == savedSum) {
+    if (curData->updateData(path, sum)) {
         emit showMessage("Checksum Match", "Success");
     }
     else {
         emit showMessage("Checksum does NOT match", "Failed");
     }
+
+    curData->updateMetaData();
+    showAll();
+
     emit setMode(Mode::EndProcess);
 }
 
@@ -401,7 +401,7 @@ void Manager::getItemInfo(const QString &path)
         // If a file path is specified, then there is no need to complicate this task and create an Object and a Thread
         // If a folder path is specified, then that folder should be iterated on a separate thread to be able to interrupt this process
         if (fileInfo.isFile()) {
-            emit status(format::fileNameAndSize(path));
+            emit statusChanged(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
             QThread *thread = new QThread;
@@ -412,8 +412,8 @@ void Manager::getItemInfo(const QString &path)
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             connect(thread, &QThread::finished, files, &Files::deleteLater);
             connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-            connect(files, &Files::status, this, [=](const QString &text){if (text != "counting...") thread->quit();});
-            connect(files, &Files::status, this, [=](const QString &text){if (!text.isEmpty()) emit status(text);});
+            connect(files, &Files::statusChanged, this, [=](const QString &text){if (text != "counting...") thread->quit();});
+            connect(files, &Files::statusChanged, this, [=](const QString &text){if (!text.isEmpty()) emit statusChanged(text);});
 
             // ***debug***
             connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});
@@ -422,14 +422,14 @@ void Manager::getItemInfo(const QString &path)
         }
     }
     else
-        emit status(curData->itemContentsInfo(path));
+        emit statusChanged(curData->itemContentsInfo(path));
 }
 
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
         QString statusText(QString("Contents of <%1>").arg(paths::folderName(folderPath)));
-        emit status(statusText + ": processing...");
+        emit statusChanged(statusText + ": processing...");
 
         QThread *thread = new QThread;
         Files *files = new Files(folderPath);
@@ -440,7 +440,7 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
-                        {emit showMessage(text, statusText); emit status(QStringList(text.split("\n")).last());}});
+                        {emit showMessage(text, statusText); emit statusChanged(QStringList(text.split("\n")).last());}});
 
         // ***debug***
         connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});

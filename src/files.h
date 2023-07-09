@@ -8,11 +8,12 @@
 struct FileValues {
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
-    QString about; // contains a brief description of the item changes or status, if any
     qint64 size = 0; // file size in bytes
     bool exists = true; // whether the file is present on disk or not
     bool isReadable = true; // if false, there is no checksum
     bool isNew = false; // true if the file is on disk but not in the stored filelist
+    enum FileStatus {NotChecked, Matched, Mismatched, ChecksumUpdated, Added, Removed};
+    int status = 0;
 }; // struct FileValues
 
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
@@ -70,7 +71,7 @@ private:
     FileList initFileList;
 
 signals:
-    void status(const QString &text = QString());
+    void statusChanged(const QString &text = QString());
     void sendText(const QString &text = QString());
 };
 

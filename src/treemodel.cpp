@@ -31,8 +31,9 @@ void TreeModel::populate(const FileList &filesData)
             }
 
             if (not_exist) {
-                QString avail, about;
+                QString avail, status;
                 if (var + 1 == splitPath.size()) {
+                    // Size/Avail. column
                     if (iter.value().isNew)
                         avail = QString("New file: %1").arg(format::dataSizeReadable(iter.value().size));
                     else if (!iter.value().exists)
@@ -42,10 +43,27 @@ void TreeModel::populate(const FileList &filesData)
                     else
                         avail = format::dataSizeReadable(iter.value().size);
 
-                    about = iter.value().about;
+                    // Status column
+                    switch (iter.value().status) {
+                    case FileValues::Matched:
+                        status = "✓ OK";
+                        break;
+                    case FileValues::Mismatched:
+                        status = "☒ NOT match";
+                        break;
+                    case FileValues::ChecksumUpdated:
+                        status = "↻ stored checksum updated"; // 🗘
+                        break;
+                    case FileValues::Added:
+                        status = "→ added to DB"; // ➔
+                        break;
+                    case FileValues::Removed:
+                        status = "✂ removed from DB";
+                        break;
+                    }
                 }
 
-                TreeItem *ti = new TreeItem({splitPath.at(var), avail, about}, parentItem);
+                TreeItem *ti = new TreeItem({splitPath.at(var), avail, status}, parentItem);
                 parentItem->appendChild(ti);
                 parentItem = ti;
             }

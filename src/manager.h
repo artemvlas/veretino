@@ -45,7 +45,7 @@ public slots:
     void dbStatus();
 
 signals:
-    void status(const QString &text = QString()); // text to statusbar
+    void statusChanged(const QString &text = QString()); // text to statusbar
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void setModel(TreeModel *model = nullptr);

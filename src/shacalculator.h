@@ -34,7 +34,7 @@ private:
 signals:
     void cancelProcess();
     void donePercents(int done);
-    void status(const QString &text); // text to statusbar
+    void statusChanged(const QString &text); // text to statusbar
 };
 
 #endif // SHACALCULATOR_H

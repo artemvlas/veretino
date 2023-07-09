@@ -67,7 +67,7 @@ void DataMaintainer::updateMetaData()
 
 void DataMaintainer::updateFilesValues()
 {
-    emit status("Defining files values...");
+    emit statusChanged("Defining files values...");
     canceled = false;
     QMutableMapIterator<QString, FileValues> iter(data_.filesData);
 
@@ -86,7 +86,7 @@ void DataMaintainer::updateFilesValues()
 
 int DataMaintainer::findNewFiles()
 {
-    emit status("Looking for new files...");
+    emit statusChanged("Looking for new files...");
 
     FilterRule filter = data_.metaData.filter;
     if (filter.extensionsList.isEmpty() || !filter.include) {
@@ -124,7 +124,7 @@ int DataMaintainer::findNewFiles()
     return number;
 }
 
-FileList DataMaintainer::listOnly(Only only)
+FileList DataMaintainer::listOf(Listing only)
 {
     FileList result;
     FileList::const_iterator iter;
@@ -139,22 +139,43 @@ FileList DataMaintainer::listOnly(Only only)
                 if (iter.value().isNew)
                     result.insert(iter.key(), iter.value());
                 break;
-            case Changes:
-                if (!iter.value().about.isEmpty())
+            case Lost:
+                if (!iter.value().exists)
                     result.insert(iter.key(), iter.value());
                 break;
-            case NewLost:
-                if (iter.value().isNew || !iter.value().exists)
+            case Changes:
+                if (iter.value().status != 0)
                     result.insert(iter.key(), iter.value());
                 break;
             case Mismatches:
                 if (!iter.value().reChecksum.isEmpty())
                     result.insert(iter.key(), iter.value());
                 break;
+            case Added:
+                if (iter.value().status == FileValues::Added)
+                    result.insert(iter.key(), iter.value());
+                break;
+            case Removed:
+                if (iter.value().status == FileValues::Removed)
+                    result.insert(iter.key(), iter.value());
+                break;
+            case Updated:
+                if (iter.value().status == FileValues::ChecksumUpdated)
+                    result.insert(iter.key(), iter.value());
+                break;
         }
     }
 
     return result;
+}
+
+FileList DataMaintainer::listOf(QList<Listing> only)
+{
+    FileList resultList;
+    for (int i = 0; i < only.size(); ++i) {
+        resultList.insert(listOf(only.at(i)));
+    }
+    return resultList;
 }
 
 int DataMaintainer::clearDataFromLostFiles()
@@ -166,7 +187,7 @@ int DataMaintainer::clearDataFromLostFiles()
         iter.next();
         if (!iter.value().exists) {
             iter.value().checksum.clear();
-            iter.value().about = "✂ removed from DB";
+            iter.value().status = FileValues::Removed;
             ++number;
         }
     }
@@ -183,7 +204,7 @@ int DataMaintainer::updateMismatchedChecksums()
         if (!iter.value().reChecksum.isEmpty()) {
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
-            iter.value().about = "↻ stored checksum updated"; // 🗘
+            iter.value().status = FileValues::ChecksumUpdated;
             ++number;
         }
     }
@@ -199,10 +220,39 @@ int DataMaintainer::updateData(const FileList &updateFiles)
     return updateFiles.size();
 }
 
+int DataMaintainer::updateData(FileList updateFiles, FileValues::FileStatus status)
+{
+    QMutableMapIterator<QString, FileValues> iter(updateFiles);
+
+    while (iter.hasNext()) {
+        iter.next();
+        iter.value().status = status;
+    }
+
+    return updateData(updateFiles);
+}
+
+bool DataMaintainer::updateData(const QString &filePath, const QString &checksum)
+{
+    FileValues curFileValues = data_.filesData.value(filePath);
+
+    if (checksum == curFileValues.checksum) {
+        curFileValues.status = FileValues::Matched;
+    }
+    else {
+        curFileValues.reChecksum = checksum;
+        curFileValues.status = FileValues::Mismatched;
+    }
+
+    data_.filesData.insert(filePath, curFileValues);
+
+    return (curFileValues.status == FileValues::Matched);
+}
+
 void DataMaintainer::importJson(const QString &jsonFilePath)
 {
     JsonDb *json = new JsonDb;
-    connect(json, &JsonDb::status, this, &DataMaintainer::status);
+    connect(json, &JsonDb::statusChanged, this, &DataMaintainer::statusChanged);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
     data_ = json->parseJson(jsonFilePath);
@@ -225,7 +275,7 @@ void DataMaintainer::exportToJson()
     updateMetaData();
 
     JsonDb *json = new JsonDb;
-    connect(json, &JsonDb::status, this, &DataMaintainer::status);
+    connect(json, &JsonDb::statusChanged, this, &DataMaintainer::statusChanged);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
     json->makeJson(data_);
@@ -338,7 +388,7 @@ void DataMaintainer::dbStatus()
         result.append(QString("\nUnreadable files: %1").arg(data_.metaData.numUnreadable));
 
     if (data_.metaData.numNewFiles > 0)
-        result.append("\n\nNew: " + Files::contentStatus(listOnly(Only::New)));
+        result.append("\n\nNew: " + Files::contentStatus(listOf(Listing::New)));
     else
         result.append("\n\nNo New files found");
 
