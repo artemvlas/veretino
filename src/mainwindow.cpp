@@ -316,15 +316,24 @@ void MainWindow::doWork()
 
 void MainWindow::quickAction()
 {
+    using namespace Mode;
     switch (viewMode) {
-    case Mode::File:
+    case File:
         emit processFileSha(curPath, settings.value("shaType").toInt(), false, true);
         break;
-    case Mode::DbFile:
+    case DbFile:
         emit parseJsonFile(curPath);
         break;
-    case Mode::SumFile:
+    case SumFile:
         emit checkFileSummary(curPath);
+        break;
+    case Model:
+        if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
+            emit checkCurrentItemSum(curPath);
+        break;
+    case ModelNewLost:
+        if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
+            emit checkCurrentItemSum(curPath);
         break;
     }
 }
