@@ -3,6 +3,7 @@
 #include <QFileInfo>
 #include <cmath>
 #include <QDebug>
+#include "files.h"
 
 namespace tools {
 int shaStrLen(int shatype)
@@ -97,4 +98,26 @@ QString fileNameAndSize(const QString &filePath)
     return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
 }
 
+QString fileItemStatus(int status)
+{
+    QString result;
+    switch (status) {
+    case FileValues::Matched:
+        result = "✓ OK";
+        break;
+    case FileValues::Mismatched:
+        result = "☒ NOT match";
+        break;
+    case FileValues::ChecksumUpdated:
+        result = "↻ stored checksum updated"; // 🗘
+        break;
+    case FileValues::Added:
+        result = "→ added to DB"; // ➔
+        break;
+    case FileValues::Removed:
+        result = "✂ removed from DB";
+        break;
+    }
+    return result;
+}
 } // namespace 'format'

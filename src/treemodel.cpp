@@ -44,23 +44,7 @@ void TreeModel::populate(const FileList &filesData)
                         avail = format::dataSizeReadable(iter.value().size);
 
                     // Status column
-                    switch (iter.value().status) {
-                    case FileValues::Matched:
-                        status = "✓ OK";
-                        break;
-                    case FileValues::Mismatched:
-                        status = "☒ NOT match";
-                        break;
-                    case FileValues::ChecksumUpdated:
-                        status = "↻ stored checksum updated"; // 🗘
-                        break;
-                    case FileValues::Added:
-                        status = "→ added to DB"; // ➔
-                        break;
-                    case FileValues::Removed:
-                        status = "✂ removed from DB";
-                        break;
-                    }
+                    status = format::fileItemStatus(iter.value().status);
                 }
 
                 TreeItem *ti = new TreeItem({splitPath.at(var), avail, status}, parentItem);

@@ -19,6 +19,8 @@ QString dataSizeReadableExt(qint64 sizeBytes); // returning style example: "6.08
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
+
+QString fileItemStatus(int status);
 } // namespace format
 
 namespace Mode {
