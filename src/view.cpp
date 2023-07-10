@@ -199,6 +199,7 @@ void View::keyPressEvent(QKeyEvent* event)
             this->collapse(currentIndex);
         else
             this->expand(currentIndex);
+        emit keyEnterPressed();
     }
 
     QTreeView::keyPressEvent(event);

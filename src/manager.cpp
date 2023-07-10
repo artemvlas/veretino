@@ -417,7 +417,7 @@ void Manager::getItemInfo(const QString &path)
             connect(files, &Files::statusChanged, this, [=](const QString &text){if (!text.isEmpty()) emit statusChanged(text);});
 
             // ***debug***
-            connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});
+            // connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});
 
             thread->start();
         }

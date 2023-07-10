@@ -37,7 +37,7 @@ signals:
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void showMessage(const QString &text, const QString &title = "Info");
     void fsModel_Setted(); // fileSystem Model setted
-    void keyEnderPressed();
+    void keyEnterPressed();
 };
 
 #endif // VIEW_H

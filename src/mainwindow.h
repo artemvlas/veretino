@@ -35,6 +35,7 @@ private:
     void connectManager(); // connections with Manager separated for convenience
     void connections();
     void doWork();
+    void quickAction(); // tasks for some items when double-clicking or pressing Enter
     void setSettings();
     bool argumentInput(); // using the path argument if it's provided
     void timeLeft(const int percentsDone);

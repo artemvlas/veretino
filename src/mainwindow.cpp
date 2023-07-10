@@ -52,12 +52,13 @@ void MainWindow::connections()
     connect(this, &MainWindow::folderContentsByType, this, &MainWindow::cancelProcess);
 
     //TreeView
+    connect(ui->treeView, &View::keyEnterPressed, this, &MainWindow::quickAction);
+    connect(ui->treeView, &View::doubleClicked, this, &MainWindow::quickAction);
     connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
     connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; ui->lineEdit->setText(path); if (viewMode != Mode::Processing) emit getItemInfo(path);});
     connect(ui->treeView, &View::setMode, this, &MainWindow::setMode);
     connect(ui->treeView, &View::modelChanged, ui->lineEdit, &QLineEdit::setEnabled);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
-    connect(ui->treeView, &View::doubleClicked, this, [=]{if (viewMode == Mode::DbFile) emit parseJsonFile(curPath); else if (viewMode == Mode::SumFile) emit checkFileSummary(curPath);});
 
     connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text().replace("\\", "/"));});
 
@@ -309,6 +310,21 @@ void MainWindow::doWork()
         break;
     default:
         qDebug() << "MainWindow::doWork() | Wrong viewMode:" << viewMode;
+        break;
+    }
+}
+
+void MainWindow::quickAction()
+{
+    switch (viewMode) {
+    case Mode::File:
+        emit processFileSha(curPath, settings.value("shaType").toInt());
+        break;
+    case Mode::DbFile:
+        emit parseJsonFile(curPath);
+        break;
+    case Mode::SumFile:
+        emit checkFileSummary(curPath);
         break;
     }
 }
