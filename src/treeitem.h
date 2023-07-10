@@ -5,22 +5,22 @@
 class TreeItem
 {
 public:
-    explicit TreeItem(const QStringList &data, TreeItem *parentItem = nullptr);
+    explicit TreeItem(const QVector<QVariant> &data, TreeItem *parent = nullptr);
     ~TreeItem();
 
-    void appendChild(TreeItem *child);
-
-    TreeItem *child(int row);
+    TreeItem *child(int number);
+    TreeItem *parent();
+    int childNumber() const;
     int childCount() const;
     int columnCount() const;
-    QString data(int column) const;
-    int row() const;
-    TreeItem *parentItem();
+    QVariant data(int column) const;
+    bool setData(int column, const QVariant &value);
+    void appendChild(TreeItem *child);
 
 private:
-    QList<TreeItem *> m_childItems;
-    QStringList m_itemData;
-    TreeItem *m_parentItem;
+    QVector<TreeItem*> childItems;
+    QVector<QVariant> itemData;
+    TreeItem *parentItem;
 };
 
 #endif // TREEITEM_H

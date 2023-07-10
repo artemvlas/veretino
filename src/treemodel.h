@@ -6,6 +6,8 @@
 #include "treeitem.h"
 #include "datacontainer.h"
 
+class TreeItem;
+
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -22,12 +24,14 @@ public:
     QModelIndex parent(const QModelIndex &index) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
+    bool setData(const QModelIndex &index, const QVariant &value,
+                        int role = Qt::EditRole) override;
     void populate(const FileList &filesData);
 
 private:
-    TreeItem *rootItem;
+    TreeItem *getItem(const QModelIndex &index) const;
     QString getPath(const QModelIndex &index);
+    TreeItem *rootItem;
 };
 
 #endif // TREEMODEL_H
