@@ -26,7 +26,7 @@ private:
 
 public slots:
     void processFolderSha(const QString &folderPath, int shatype);
-    void processFileSha(const QString &filePath, int shatype);
+    void processFileSha(const QString &filePath, int shatype = 0, bool summaryFile = true, bool clipboard = false);
     void checkFileSummary(const QString &path); // path to *.sha1/256/512 summary file
     void checkCurrentItemSum(const QString &path); // check only selected file instead all database cheking
     QString copyStoredChecksum(const QString &path, bool clipboard = true);

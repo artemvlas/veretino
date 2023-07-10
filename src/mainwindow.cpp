@@ -318,7 +318,7 @@ void MainWindow::quickAction()
 {
     switch (viewMode) {
     case Mode::File:
-        emit processFileSha(curPath, settings.value("shaType").toInt());
+        emit processFileSha(curPath, settings.value("shaType").toInt(), false, true);
         break;
     case Mode::DbFile:
         emit parseJsonFile(curPath);

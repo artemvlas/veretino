@@ -59,7 +59,7 @@ private:
 signals:
     void getItemInfo(const QString &path); //get file size or folder contents info
     void processFolderSha(const QString &path, int shatype = 0);
-    void processFileSha(const QString &path, int shatype = 0);
+    void processFileSha(const QString &path, int shatype = 0, bool summaryFile = true, bool clipboard = false);
     void parseJsonFile(const QString &path);
     void verifyFileList();
     void updateNewLost();

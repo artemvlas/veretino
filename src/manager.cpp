@@ -117,7 +117,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
     emit setMode(Mode::EndProcess);
 }
 
-void Manager::processFileSha(const QString &filePath, int shatype)
+void Manager::processFileSha(const QString &filePath, int shatype, bool summaryFile, bool clipboard)
 {
     emit setMode(Mode::Processing);
 
@@ -126,17 +126,22 @@ void Manager::processFileSha(const QString &filePath, int shatype)
         return;
     }
 
-    //emit toClipboard(sum); // send checksum to clipboard
-
-    QString summaryFile = QString("%1.sha%2").arg(filePath).arg(shatype);
-    QFile file(summaryFile);
-    if (file.open(QFile::WriteOnly)) {
-        file.write(QString("%1 *%2").arg(sum, QFileInfo(filePath).fileName()).toUtf8());
-        emit showMessage(QString("Checksum saved to summary file:\n%1").arg(QFileInfo(summaryFile).fileName()));
-    }
-    else {
+    if (clipboard) {
         emit toClipboard(sum); // send checksum to clipboard
-        emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(summaryFile), "Warning");
+        emit statusChanged("Computed checksum copied to clipboard");
+    }
+
+    if (summaryFile) {
+        QString summaryFile = QString("%1.sha%2").arg(filePath).arg(shatype);
+        QFile file(summaryFile);
+        if (file.open(QFile::WriteOnly)) {
+            file.write(QString("%1 *%2").arg(sum, QFileInfo(filePath).fileName()).toUtf8());
+            emit showMessage(QString("Checksum saved to summary file:\n%1").arg(QFileInfo(summaryFile).fileName()));
+        }
+        else {
+            emit toClipboard(sum); // send checksum to clipboard
+            emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(summaryFile), "Warning");
+        }
     }
 
     emit setMode(Mode::EndProcess);
