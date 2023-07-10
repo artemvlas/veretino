@@ -42,6 +42,7 @@ private:
     void dropEvent(QDropEvent *e);
     void closeEvent(QCloseEvent *event);
     bool processAbortPrompt();
+    void keyPressEvent(QKeyEvent* event) override;
 
     Ui::MainWindow *ui;
     QThread *thread = new QThread;

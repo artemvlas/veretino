@@ -419,3 +419,17 @@ void MainWindow::dropEvent(QDropEvent *e)
         }
     }
 }
+
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        if (viewMode == Mode::Processing) {
+            if (processAbortPrompt())
+                emit cancelProcess();
+        }
+        else if (!ui->treeView->isViewFileSystem())
+            ui->treeView->setFileSystemModel();
+    }
+
+    //QMainWindow::keyPressEvent(event);
+}

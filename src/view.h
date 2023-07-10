@@ -28,6 +28,7 @@ private:
     QString lastFileSystemPath;
     QString lastModelPath;
     void scrollToPath(const QString &path); //QTimer used. QFileSystemModel needs some time after setup to Scrolling be able
+    void keyPressEvent(QKeyEvent* event) override;
 
 signals:
     void indexChanged(const QModelIndex &index);
@@ -36,6 +37,7 @@ signals:
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void showMessage(const QString &text, const QString &title = "Info");
     void fsModel_Setted(); // fileSystem Model setted
+    void keyEnderPressed();
 };
 
 #endif // VIEW_H

@@ -2,6 +2,7 @@
 #include "tools.h"
 #include <QTimer>
 #include <QDebug>
+#include <QKeyEvent>
 
 View::View(QWidget *parent)
     : QTreeView(parent)
@@ -189,4 +190,12 @@ void View::pathAnalyzer(const QString &path)
             emit setMode(Mode::Folder);
         }
     }
+}
+
+void View::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+        emit keyEnderPressed();
+
+    QTreeView::keyPressEvent(event);
 }

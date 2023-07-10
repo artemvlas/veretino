@@ -369,7 +369,6 @@ void Manager::checkCurrentItemSum(const QString &path)
     }
 
     curData->updateMetaData();
-    //showAll();
 
     emit setMode(Mode::EndProcess);
 }
