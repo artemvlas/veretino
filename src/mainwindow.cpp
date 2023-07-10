@@ -111,6 +111,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
     connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
+    connect(manager, &Manager::setItemStatus, ui->treeView, &View::setItemStatus);
 
     // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);

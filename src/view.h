@@ -20,6 +20,7 @@ public slots:
     void setFileSystemModel();
     void smartSetModel(QAbstractItemModel *model);
     void setIndexByPath(const QString &path);
+    void setItemStatus(const QString &itemPath, int status);
 
 private:
     QFileSystemModel *fileSystem = new QFileSystemModel;

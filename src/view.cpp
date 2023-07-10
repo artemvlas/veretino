@@ -39,8 +39,6 @@ void View::smartSetModel(QAbstractItemModel *model)
     else if (currentIndex.isValid())
         lastModelPath = indexToPath(currentIndex);
 
-    //qDebug() << "@@@@@@@@@@@@@@@@" << lastModelPath;
-
     int previousColumWidth = this->columnWidth(0); // first load = 0
 
     QAbstractItemModel *oldModel = this->model();
@@ -162,6 +160,14 @@ void View::scrollToPath(const QString &path)
     if (isViewFileSystem()) {
         QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter);});
     }
+}
+
+void View::setItemStatus(const QString &itemPath, int status)
+{
+    QModelIndex curIndex = pathToIndex(itemPath);
+    QModelIndex chIndex = this->model()->index(curIndex.row(), 2, curIndex.parent());
+
+    this->model()->setData(chIndex, format::fileItemStatus(status));
 }
 
 void View::pathAnalyzer(const QString &path)

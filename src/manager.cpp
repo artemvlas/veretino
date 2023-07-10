@@ -361,13 +361,15 @@ void Manager::checkCurrentItemSum(const QString &path)
 
     if (curData->updateData(path, sum)) {
         emit showMessage("Checksum Match", "Success");
+        emit setItemStatus(path, FileValues::Matched);
     }
     else {
         emit showMessage("Checksum does NOT match", "Failed");
+        emit setItemStatus(path, FileValues::Mismatched);
     }
 
     curData->updateMetaData();
-    showAll();
+    //showAll();
 
     emit setMode(Mode::EndProcess);
 }
