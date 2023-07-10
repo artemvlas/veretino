@@ -194,8 +194,12 @@ void View::pathAnalyzer(const QString &path)
 
 void View::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-        emit keyEnderPressed();
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        if (this->isExpanded(currentIndex))
+            this->collapse(currentIndex);
+        else
+            this->expand(currentIndex);
+    }
 
     QTreeView::keyPressEvent(event);
 }
