@@ -27,6 +27,7 @@ void DataMaintainer::updateMetaData()
     data_.metaData.numNewFiles = 0;
     data_.metaData.numMissingFiles = 0;
     data_.metaData.numChecksums = 0;
+    data_.metaData.numMatched = 0;
     data_.metaData.numMismatched = 0;
     data_.metaData.numAvailable = 0;
     data_.metaData.numUnreadable = 0;
@@ -49,15 +50,22 @@ void DataMaintainer::updateMetaData()
             else
                 ++data_.metaData.numMissingFiles;
         }
+        if (iter.value().status == FileValues::Matched)
+            ++data_.metaData.numMatched;
     }
 
-    QString checkStatus ("\t");
-    if (data_.metaData.isChecked) {
-        if (data_.metaData.numMismatched > 0)
-            checkStatus.append(QString("☒%1 : ").arg(data_.metaData.numMismatched));
-        else
-            checkStatus.append(QString("✓%1 : ").arg(data_.metaData.numAvailable));
+    QString checkStatus;
+
+    if (data_.metaData.numMismatched > 0)
+        checkStatus.append(QString("☒%1").arg(data_.metaData.numMismatched));
+    if (data_.metaData.numMatched > 0)
+        checkStatus.append(QString(" ✓%1").arg(data_.metaData.numMatched));
+
+    if (!checkStatus.isEmpty()) {
+        checkStatus.prepend("\t");
+        checkStatus.append(" : ");
     }
+
     emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
                             .arg(checkStatus)
                             .arg(data_.metaData.numAvailable)
