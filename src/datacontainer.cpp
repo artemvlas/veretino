@@ -50,21 +50,21 @@ void DataMaintainer::updateMetaData()
             else
                 ++data_.metaData.numMissingFiles;
         }
-        if (iter.value().status == FileValues::Matched)
+        if (iter.value().status == FileValues::Matched
+            || iter.value().status == FileValues::Added
+            || iter.value().status == FileValues::ChecksumUpdated)
             ++data_.metaData.numMatched;
     }
 
-    QString checkStatus;
+    QString checkStatus("\t");
 
     if (data_.metaData.numMismatched > 0)
         checkStatus.append(QString("☒%1").arg(data_.metaData.numMismatched));
     if (data_.metaData.numMatched > 0)
         checkStatus.append(QString(" ✓%1").arg(data_.metaData.numMatched));
 
-    if (!checkStatus.isEmpty()) {
-        checkStatus.prepend("\t");
+    if (checkStatus.size() > 2)
         checkStatus.append(" : ");
-    }
 
     emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
                             .arg(checkStatus)

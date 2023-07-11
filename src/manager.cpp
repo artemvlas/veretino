@@ -280,7 +280,6 @@ void Manager::verifyFileList()
         return;
     }
 
-    //int mismatchNumber = 0;
     FileList::const_iterator iter;
 
     for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
@@ -300,7 +299,6 @@ void Manager::verifyFileList()
         emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                  .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
         makeTreeModel(curData->listOf(DataMaintainer::Changes));
-        //showAll();
     }
 }
 
