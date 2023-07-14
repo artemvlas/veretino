@@ -104,24 +104,27 @@ QString View::indexToPath(const QModelIndex &index)
 QModelIndex View::pathToIndex(const QString &path)
 {
     QModelIndex curIndex = this->model()->index(0, 0);
-    if (path.isEmpty())
-        return curIndex;
 
-    QStringList parts = path.split('/');
-    QModelIndex parentIndex;
+    if (!path.isEmpty()) {
+        QStringList parts = path.split('/');
+        QModelIndex parentIndex;
 
-    foreach (const QString &str, parts) {
-        for (int i = 0; curIndex.isValid(); ++i) {
-            curIndex = this->model()->index(i, 0, parentIndex);
-            if (curIndex.data().toString() == str) {
-                //qDebug() << "***" << str << "finded on" << i << "row";
-                parentIndex = this->model()->index(i, 0, parentIndex);
-                break;
+        foreach (const QString &str, parts) {
+            for (int i = 0; curIndex.isValid(); ++i) {
+                curIndex = this->model()->index(i, 0, parentIndex);
+                if (curIndex.data().toString() == str) {
+                    //qDebug() << "***" << str << "finded on" << i << "row";
+                    parentIndex = this->model()->index(i, 0, parentIndex);
+                    break;
+                }
+                //qDebug() << "*** Looking for:" << str << curIndex.data();
             }
-            //qDebug() << "*** Looking for:" << str << curIndex.data();
         }
+        //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
+        if (!curIndex.isValid())
+            curIndex = this->model()->index(0, 0);
     }
-    //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
+
     return curIndex;
 }
 
@@ -141,15 +144,9 @@ void View::setIndexByPath(const QString &path)
     }
     else {
         QModelIndex index = pathToIndex(path);
-        if (index.isValid()) {
-            this->expand(index);
-            this->setCurrentIndex(index);
-            this->scrollTo(index, QAbstractItemView::PositionAtCenter);
-        }
-        else {
-            this->expandAll();
-            this->scrollToTop();
-        }
+        this->expand(index);
+        this->setCurrentIndex(index);
+        this->scrollTo(index, QAbstractItemView::PositionAtCenter);
     }
 }
 

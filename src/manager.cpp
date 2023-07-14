@@ -157,9 +157,9 @@ void Manager::makeTreeModel(const FileList &data)
 
         emit setModel(model);
         emit workDirChanged(curData->data_.metaData.workDir);
-        emit statusChanged(QString("SHA-%1: %2 files")
+        /*emit statusChanged(QString("SHA-%1: %2 files")
                  .arg(curData->data_.metaData.shaType)
-                 .arg(curData->data_.filesData.size()));
+                 .arg(curData->data_.filesData.size()));*/
     }
     else {
         qDebug() << "Manager::makeTreeModel | Empty model";
@@ -200,7 +200,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
     if (curData->data_.filesData.isEmpty()) {
         delete curData;
         curData = oldData;
-        qDebug()<< "Manager::createDataModel | DataMaintainer 'oldData' restored" << databaseFilePath;
+        qDebug() << "Manager::createDataModel | DataMaintainer 'oldData' restored" << databaseFilePath;
 
         emit setModel();
         return;
@@ -222,15 +222,16 @@ void Manager::showNewLostOnly()
 
 void Manager::updateNewLost()
 {
-    emit setMode(Mode::Processing);
     QString itemsInfo;
 
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
         dataCont.filesData =  curData->listOf(DataMaintainer::New);
 
+        emit setMode(Mode::Processing);
         if (curData->updateData(shaCalc->calculate(dataCont), FileValues::Added) == 0)
             return;
+        emit setMode(Mode::EndProcess);
 
         itemsInfo = QString("added %1").arg(curData->data_.metaData.numNewFiles);
         if (curData->data_.metaData.numMissingFiles > 0)
@@ -247,7 +248,6 @@ void Manager::updateNewLost()
 
     makeTreeModel(curData->listOf(DataMaintainer::Changes));
 
-    emit setMode(Mode::EndProcess);
     emit setMode(Mode::Model);
 }
 
