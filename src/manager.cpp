@@ -368,10 +368,9 @@ QString Manager::copyStoredChecksum(const QString &path, bool clipboard)
         savedSum = curData->data_.filesData.value(path).checksum;
         if (savedSum.isEmpty())
             emit showMessage("No checksum in the database.", "No checksum");
+        else if (clipboard)
+            emit toClipboard(savedSum); // send checksum to clipboard
     }
-
-    if (clipboard && !savedSum.isEmpty())
-        emit toClipboard(savedSum); // send checksum to clipboard
 
     return savedSum;
 }
