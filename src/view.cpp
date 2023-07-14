@@ -135,28 +135,22 @@ void View::setIndexByPath(const QString &path)
             QModelIndex index = fileSystem->index(path);
             this->expand(index);
             this->setCurrentIndex(index);
-            this->scrollToPath(path);
+            QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter);});
             // for better scrolling work, a timer^ is used
-            // this->scrollTo(index, QAbstractItemView::PositionAtCenter);
+            // QFileSystemModel needs some time after setup to Scrolling be able
+            // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
+            // 'index' (wich is =fileSystem->index(path)) is NOT working good
         }
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
     else {
         QModelIndex index = pathToIndex(path);
-        this->expand(index);
-        this->setCurrentIndex(index);
-        this->scrollTo(index, QAbstractItemView::PositionAtCenter);
-    }
-}
-
-void View::scrollToPath(const QString &path)
-{
-    // QFileSystemModel needs some time after setup to Scrolling be able
-    // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
-    // 'currentIndex' (wich is =fileSystem->index(path)) is NOT working good
-    if (isViewFileSystem()) {
-        QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter);});
+        if (index.isValid()) {
+            this->expand(index);
+            this->setCurrentIndex(index);
+            this->scrollTo(index, QAbstractItemView::PositionAtCenter);
+        }
     }
 }
 

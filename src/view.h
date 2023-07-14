@@ -27,7 +27,6 @@ private:
     QModelIndex currentIndex;
     QString lastFileSystemPath;
     QString lastModelPath;
-    void scrollToPath(const QString &path); //QTimer used. QFileSystemModel needs some time after setup to Scrolling be able
     void keyPressEvent(QKeyEvent* event) override;
 
 signals:
