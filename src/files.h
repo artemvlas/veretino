@@ -71,7 +71,7 @@ private:
     FileList initFileList;
 
 signals:
-    void statusChanged(const QString &text = QString());
+    void setStatusbarText(const QString &text = QString());
     void sendText(const QString &text = QString());
 };
 

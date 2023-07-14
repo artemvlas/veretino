@@ -21,7 +21,7 @@ void Manager::connections()
 {
     connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess);
     connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
-    connect(shaCalc, &ShaCalculator::statusChanged, this, &Manager::statusChanged);
+    connect(shaCalc, &ShaCalculator::setStatusbarText, this, &Manager::setStatusbarText);
 }
 
 void Manager::processFolderSha(const QString &folderPath, int shatype)
@@ -30,7 +30,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     Files F(folderPath);
     connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
-    connect(&F, &Files::statusChanged, this, &Manager::statusChanged);
+    connect(&F, &Files::setStatusbarText, this, &Manager::setStatusbarText);
 
     DataContainer calcData;
     calcData.metaData.workDir = folderPath;
@@ -83,7 +83,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
                 emit showMessage("Empty folder. Nothing to do");
         }
         else {
-            emit statusChanged("Canceled");
+            emit setStatusbarText("Canceled");
         }
         emit setMode(Mode::EndProcess);
         return;
@@ -109,7 +109,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     curData = new DataMaintainer(calcData);
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
-    connect(curData, &DataMaintainer::statusChanged, this, &Manager::statusChanged);
+    connect(curData, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     curData->exportToJson();
 
     deleteCurData();
@@ -128,7 +128,7 @@ void Manager::processFileSha(const QString &filePath, int shatype, bool summaryF
 
     if (clipboard) {
         emit toClipboard(sum); // send checksum to clipboard
-        emit statusChanged("Computed checksum copied to clipboard");
+        emit setStatusbarText("Computed checksum copied to clipboard");
     }
 
     if (summaryFile) {
@@ -150,14 +150,14 @@ void Manager::processFileSha(const QString &filePath, int shatype, bool summaryF
 void Manager::makeTreeModel(const FileList &data)
 {
     if (!data.isEmpty()) {
-        emit statusChanged("File tree creation...");
+        emit setStatusbarText("File tree creation...");
         TreeModel *model = new TreeModel;
         model->setObjectName("treeModel");
         model->populate(data);
 
         emit setModel(model);
         emit workDirChanged(curData->data_.metaData.workDir);
-        /*emit statusChanged(QString("SHA-%1: %2 files")
+        /*emit setStatusbarText(QString("SHA-%1: %2 files")
                  .arg(curData->data_.metaData.shaType)
                  .arg(curData->data_.filesData.size()));*/
     }
@@ -192,7 +192,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
     curData = new DataMaintainer;
     connect(this, &Manager::cancelProcess, curData, &DataMaintainer::cancelProcess, Qt::DirectConnection);
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
-    connect(curData, &DataMaintainer::statusChanged, this, &Manager::statusChanged);
+    connect(curData, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     connect(curData, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
 
     curData->importJson(databaseFilePath);
@@ -405,7 +405,7 @@ void Manager::getItemInfo(const QString &path)
         // If a file path is specified, then there is no need to complicate this task and create an Object and a Thread
         // If a folder path is specified, then that folder should be iterated on a separate thread to be able to interrupt this process
         if (fileInfo.isFile()) {
-            emit statusChanged(format::fileNameAndSize(path));
+            emit setStatusbarText(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
             QThread *thread = new QThread;
@@ -416,8 +416,8 @@ void Manager::getItemInfo(const QString &path)
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             connect(thread, &QThread::finished, files, &Files::deleteLater);
             connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-            connect(files, &Files::statusChanged, this, [=](const QString &text){if (text != "counting...") thread->quit();});
-            connect(files, &Files::statusChanged, this, [=](const QString &text){if (!text.isEmpty()) emit statusChanged(text);});
+            connect(files, &Files::setStatusbarText, this, [=](const QString &text){if (text != "counting...") thread->quit();});
+            connect(files, &Files::setStatusbarText, this, [=](const QString &text){if (!text.isEmpty()) emit setStatusbarText(text);});
 
             // ***debug***
             // connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});
@@ -426,14 +426,14 @@ void Manager::getItemInfo(const QString &path)
         }
     }
     else
-        emit statusChanged(curData->itemContentsInfo(path));
+        emit setStatusbarText(curData->itemContentsInfo(path));
 }
 
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
         QString statusText(QString("Contents of <%1>").arg(paths::folderName(folderPath)));
-        emit statusChanged(statusText + ": processing...");
+        emit setStatusbarText(statusText + ": processing...");
 
         QThread *thread = new QThread;
         Files *files = new Files(folderPath);
@@ -444,7 +444,7 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
-                        {emit showMessage(text, statusText); emit statusChanged(QStringList(text.split("\n")).last());}});
+                        {emit showMessage(text, statusText); emit setStatusbarText(QStringList(text.split("\n")).last());}});
 
         // ***debug***
         connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});

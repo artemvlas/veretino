@@ -79,7 +79,7 @@ private:
     int shaType(const FileList &fileList); // determines the shaType by the string length of the stored checksum
 
 signals:
-    void statusChanged(const QString &text = QString()); // text to statusbar
+    void setStatusbarText(const QString &text = QString()); // text to statusbar
     void showMessage(const QString &text, const QString &title = "Info");
     void setPermanentStatus(const QString &text = QString());
 };

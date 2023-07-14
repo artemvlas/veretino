@@ -42,7 +42,7 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
         return FileList();
     }
 
-    emit statusChanged("Creating a list of files...");
+    emit setStatusbarText("Creating a list of files...");
 
     canceled = false;
     FileList resultList; // result list
@@ -67,11 +67,11 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
 
     if (canceled) {
         qDebug() << "Files::allFiles | Canceled:" << rootFolder;
-        emit statusChanged();
+        emit setStatusbarText();
         return FileList();
     }
 
-    emit statusChanged(QString("%1 files found").arg(resultList.size()));
+    emit setStatusbarText(QString("%1 files found").arg(resultList.size()));
     return resultList;
 }
 
@@ -111,7 +111,7 @@ QString Files::contentStatus(const QString &path)
         qint64 totalSize = 0;
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
 
-        emit statusChanged("counting...");
+        emit setStatusbarText("counting...");
 
         while (it.hasNext() && !canceled) {
             totalSize += QFileInfo(it.next()).size();
@@ -131,7 +131,7 @@ QString Files::contentStatus(const QString &path)
     else
         qDebug() << "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
 
-    emit statusChanged(result);
+    emit setStatusbarText(result);
     return result;
 }
 

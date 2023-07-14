@@ -70,18 +70,18 @@ QString ShaCalculator::calculate(const QString &filePath, int shatype)
 
     canceled = false;
 
-    emit statusChanged(QString("Calculating SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
+    emit setStatusbarText(QString("Calculating SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
 
     FileValues curFileValues = computeChecksum(filePath, shatype);
 
     if (canceled) {
-        emit statusChanged("Canceled");
+        emit setStatusbarText("Canceled");
     }
     else if (curFileValues.isReadable && !curFileValues.checksum.isEmpty()) {
-        emit statusChanged(QString("SHA-%1 calculated").arg(shatype));
+        emit setStatusbarText(QString("SHA-%1 calculated").arg(shatype));
     }
     else {
-        emit statusChanged("read error");
+        emit setStatusbarText("read error");
     }
 
     return curFileValues.checksum;
@@ -104,7 +104,7 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
         else
             doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(doneSize), totalSizeReadable);
 
-        emit statusChanged(QString("Calculating %1 of %2 checksums %3")
+        emit setStatusbarText(QString("Calculating %1 of %2 checksums %3")
                         .arg(resultList.size() + 1)
                         .arg(filesContainer.filesData.size())
                         .arg(doneData));
@@ -117,11 +117,11 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 
     if (canceled) {
         qDebug() << "ShaCalculator::calculate | Canceled";
-        emit statusChanged("Canceled");
+        emit setStatusbarText("Canceled");
         return FileList();
     }
     else {
-        emit statusChanged("Done");
+        emit setStatusbarText("Done");
         return resultList;
     }
 }

@@ -75,7 +75,7 @@ void DataMaintainer::updateMetaData()
 
 void DataMaintainer::updateFilesValues()
 {
-    emit statusChanged("Defining files values...");
+    emit setStatusbarText("Defining files values...");
     canceled = false;
     QMutableMapIterator<QString, FileValues> iter(data_.filesData);
 
@@ -94,7 +94,7 @@ void DataMaintainer::updateFilesValues()
 
 int DataMaintainer::findNewFiles()
 {
-    emit statusChanged("Looking for new files...");
+    emit setStatusbarText("Looking for new files...");
 
     FilterRule filter = data_.metaData.filter;
     if (filter.extensionsList.isEmpty() || !filter.include) {
@@ -260,7 +260,7 @@ bool DataMaintainer::updateData(const QString &filePath, const QString &checksum
 void DataMaintainer::importJson(const QString &jsonFilePath)
 {
     JsonDb *json = new JsonDb;
-    connect(json, &JsonDb::statusChanged, this, &DataMaintainer::statusChanged);
+    connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
     data_ = json->parseJson(jsonFilePath);
@@ -283,7 +283,7 @@ void DataMaintainer::exportToJson()
     updateMetaData();
 
     JsonDb *json = new JsonDb;
-    connect(json, &JsonDb::statusChanged, this, &DataMaintainer::statusChanged);
+    connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
     json->makeJson(data_);
