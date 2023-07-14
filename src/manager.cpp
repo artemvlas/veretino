@@ -194,6 +194,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(curData, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     connect(curData, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
+    connect(curData, &DataMaintainer::itemStatusChanged, this, &Manager::setItemStatus);
 
     curData->importJson(databaseFilePath);
 
@@ -246,7 +247,7 @@ void Manager::updateNewLost()
 
     curData->exportToJson();
 
-    makeTreeModel(curData->listOf(DataMaintainer::Changes));
+    //makeTreeModel(curData->listOf(DataMaintainer::Changes));
 
     emit setMode(Mode::Model);
 }
@@ -259,7 +260,7 @@ void Manager::updateMismatch()
 
     curData->exportToJson();
 
-    makeTreeModel(curData->listOf(DataMaintainer::Changes));
+    //makeTreeModel(curData->listOf(DataMaintainer::Changes));
     setMode_model();
 }
 
@@ -298,7 +299,7 @@ void Manager::verifyFileList()
     else {
         emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                  .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
-        makeTreeModel(curData->listOf(DataMaintainer::Changes));
+        //makeTreeModel(curData->listOf(DataMaintainer::Changes));
     }
 }
 
@@ -364,11 +365,11 @@ void Manager::checkCurrentItemSum(const QString &path)
 
     if (curData->updateData(path, sum)) {
         emit showMessage("Checksum Match", "Success");
-        emit setItemStatus(path, FileValues::Matched);
+        //emit setItemStatus(path, FileValues::Matched);
     }
     else {
         emit showMessage("Checksum does NOT match", "Failed");
-        emit setItemStatus(path, FileValues::Mismatched);
+        //emit setItemStatus(path, FileValues::Mismatched);
     }
 
     curData->updateMetaData();

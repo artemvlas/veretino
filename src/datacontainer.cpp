@@ -151,10 +151,10 @@ FileList DataMaintainer::listOf(Listing only)
                 if (!iter.value().exists)
                     result.insert(iter.key(), iter.value());
                 break;
-            case Changes:
+            /*case Changes:
                 if (iter.value().status != 0)
                     result.insert(iter.key(), iter.value());
-                break;
+                break;*/
             case Mismatches:
                 if (!iter.value().reChecksum.isEmpty())
                     result.insert(iter.key(), iter.value());
@@ -196,6 +196,7 @@ int DataMaintainer::clearDataFromLostFiles()
         if (!iter.value().exists) {
             iter.value().checksum.clear();
             iter.value().status = FileValues::Removed;
+            emit itemStatusChanged(iter.key(), FileValues::Removed);
             ++number;
         }
     }
@@ -213,6 +214,7 @@ int DataMaintainer::updateMismatchedChecksums()
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
             iter.value().status = FileValues::ChecksumUpdated;
+            emit itemStatusChanged(iter.key(), FileValues::ChecksumUpdated);
             ++number;
         }
     }
@@ -235,6 +237,7 @@ int DataMaintainer::updateData(FileList updateFiles, FileValues::FileStatus stat
     while (iter.hasNext()) {
         iter.next();
         iter.value().status = status;
+        emit itemStatusChanged(iter.key(), iter.value().status);
     }
 
     return updateData(updateFiles);
@@ -253,6 +256,7 @@ bool DataMaintainer::updateData(const QString &filePath, const QString &checksum
     }
 
     data_.filesData.insert(filePath, curFileValues);
+    emit itemStatusChanged(filePath, curFileValues.status);
 
     return (curFileValues.status == FileValues::Matched);
 }

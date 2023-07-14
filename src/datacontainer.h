@@ -57,7 +57,7 @@ public:
     int clearDataFromLostFiles(); // returns the number of cleared
     int updateMismatchedChecksums(); // returns the number of updated checksums
 
-    enum Listing {Available, New, Lost, Changes, Mismatches, Added, Removed, Updated};
+    enum Listing {Available, New, Lost, Mismatches, Added, Removed, Updated};
     FileList listOf(Listing only);
     FileList listOf(QList<Listing> only); // list of multiple conditions^
 
@@ -80,8 +80,9 @@ private:
 
 signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
-    void showMessage(const QString &text, const QString &title = "Info");
     void setPermanentStatus(const QString &text = QString());
+    void showMessage(const QString &text, const QString &title = "Info");    
+    void itemStatusChanged(const QString &itemPath, int status);
 };
 
 #endif // DATACONTAINER_H
