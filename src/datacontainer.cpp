@@ -151,10 +151,6 @@ FileList DataMaintainer::listOf(Listing only)
                 if (!iter.value().exists)
                     result.insert(iter.key(), iter.value());
                 break;
-            /*case Changes:
-                if (iter.value().status != 0)
-                    result.insert(iter.key(), iter.value());
-                break;*/
             case Mismatches:
                 if (!iter.value().reChecksum.isEmpty())
                     result.insert(iter.key(), iter.value());

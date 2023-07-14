@@ -247,8 +247,6 @@ void Manager::updateNewLost()
 
     curData->exportToJson();
 
-    //makeTreeModel(curData->listOf(DataMaintainer::Changes));
-
     emit setMode(Mode::Model);
 }
 
@@ -259,8 +257,6 @@ void Manager::updateMismatch()
                         .arg(curData->updateMismatchedChecksums());
 
     curData->exportToJson();
-
-    //makeTreeModel(curData->listOf(DataMaintainer::Changes));
     setMode_model();
 }
 
@@ -299,7 +295,6 @@ void Manager::verifyFileList()
     else {
         emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                  .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
-        //makeTreeModel(curData->listOf(DataMaintainer::Changes));
     }
 }
 
@@ -328,23 +323,12 @@ void Manager::checkFileSummary(const QString &path)
         }
     }
 
-    emit setMode(Mode::Processing);
-    QString savedSum = line.mid(0, tools::shaStrLen(shatype)).toLower();
+    emit setMode(Mode::Processing);   
     QString sum = shaCalc->calculate(checkFilePath, shatype);
-
-    if (sum.isEmpty()) {
-        return;
-    }
-
-    if (sum == savedSum) {
-        emit showMessage("Checksum Match", "Success");
-    }
-    else {
-        emit showMessage("Checksum does NOT match", "Failed");
-    }
-
     emit setMode(Mode::EndProcess);
 
+    if (!sum.isEmpty())
+        showFileCheckResultMessage(sum == line.mid(0, tools::shaStrLen(shatype)).toLower());
 }
 
 //check only selected file instead all database cheking
@@ -352,29 +336,24 @@ void Manager::checkCurrentItemSum(const QString &path)
 {
     QString savedSum = copyStoredChecksum(path, false);
 
-    if (savedSum.isEmpty()) {
-        return;
+    if (!savedSum.isEmpty()) {
+        emit setMode(Mode::Processing);
+        QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.shaType);
+        emit setMode(Mode::EndProcess);
+
+        if (!sum.isEmpty()) {
+            showFileCheckResultMessage(curData->updateData(path, sum));
+            curData->updateMetaData();
+        }
     }
+}
 
-    emit setMode(Mode::Processing);
-    QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.shaType);
-
-    if (sum.isEmpty()) {
-        return;
-    }
-
-    if (curData->updateData(path, sum)) {
+void Manager::showFileCheckResultMessage(bool isMatched)
+{
+    if (isMatched)
         emit showMessage("Checksum Match", "Success");
-        //emit setItemStatus(path, FileValues::Matched);
-    }
-    else {
+    else
         emit showMessage("Checksum does NOT match", "Failed");
-        //emit setItemStatus(path, FileValues::Mismatched);
-    }
-
-    curData->updateMetaData();
-
-    emit setMode(Mode::EndProcess);
 }
 
 QString Manager::copyStoredChecksum(const QString &path, bool clipboard)

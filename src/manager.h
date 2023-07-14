@@ -23,6 +23,7 @@ private:
     QVariantMap settings;
     void setMode_model(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     bool isViewFileSysytem;
+    void showFileCheckResultMessage(bool isMatched);
 
 public slots:
     void processFolderSha(const QString &folderPath, int shatype);
