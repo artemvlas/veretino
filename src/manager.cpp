@@ -218,7 +218,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
 void Manager::showNewLostOnly()
 {
-    makeTreeModel(curData->listOf({DataMaintainer::New, DataMaintainer::Lost}));
+    makeTreeModel(curData->listOf({FileValues::New, FileValues::Missing}));
 }
 
 void Manager::updateNewLost()
@@ -227,7 +227,7 @@ void Manager::updateNewLost()
 
     if (curData->data_.metaData.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
-        dataCont.filesData =  curData->listOf(DataMaintainer::New);
+        dataCont.filesData =  curData->listOf(FileValues::New);
 
         emit setMode(Mode::Processing);
         if (curData->updateData(shaCalc->calculate(dataCont), FileValues::Added) == 0)
@@ -270,31 +270,29 @@ void Manager::verifyFileList()
 
     emit setMode(Mode::Processing);
     DataContainer dataCont(curData->data_.metaData);
-    dataCont.filesData = curData->listOf(DataMaintainer::Available);
+    dataCont.filesData = curData->listOf(FileValues::NotChecked);
     FileList recalculated = shaCalc->calculate(dataCont);
-
-    if (recalculated.isEmpty()) {
-        return;
-    }
-
-    FileList::const_iterator iter;
-
-    for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
-        curData->updateData(iter.key(), iter.value().checksum);
-    }
-
-    curData->data_.metaData.isChecked = true;
-    curData->updateMetaData();
     emit setMode(Mode::EndProcess);
 
-    if (curData->data_.metaData.numMismatched > 0) {
-        emit showMessage(QString("%1 files changed or corrupted").arg(curData->data_.metaData.numMismatched), "FAILED");
-        emit setMode(Mode::UpdateMismatch);
-        makeTreeModel(curData->listOf(DataMaintainer::Mismatches));
+    if (!recalculated.isEmpty()) {
+        FileList::const_iterator iter;
+        for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
+            curData->updateData(iter.key(), iter.value().checksum);
+        }
+
+        curData->data_.metaData.isChecked = true;
     }
-    else {
-        emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
-                                 .arg(recalculated.size()).arg(curData->data_.metaData.shaType), "Success");
+
+    if (!recalculated.isEmpty() || dataCont.filesData.isEmpty()) {
+        curData->updateMetaData();
+        if (curData->data_.metaData.numMismatched > 0) {
+            emit showMessage(QString("%1 files changed or corrupted").arg(curData->data_.metaData.numMismatched), "FAILED");
+            emit setMode(Mode::UpdateMismatch);
+            makeTreeModel(curData->listOf(FileValues::Mismatched));
+        }
+        else
+            emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
+                            .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
     }
 }
 
@@ -360,9 +358,9 @@ QString Manager::copyStoredChecksum(const QString &path, bool clipboard)
 {
     QString savedSum;
 
-    if (curData->data_.filesData.value(path).isNew)
+    if (curData->data_.filesData.value(path).status == FileValues::New)
         emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
-    else if (!curData->data_.filesData.value(path).isReadable)
+    else if (curData->data_.filesData.value(path).status == FileValues::Unreadable)
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
     else {
         savedSum = curData->data_.filesData.value(path).checksum;

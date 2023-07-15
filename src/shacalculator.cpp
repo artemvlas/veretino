@@ -37,7 +37,7 @@ FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
     FileValues curFileValues;
     QFile file(filePath);
     if (!file.open (QIODevice::ReadOnly)) {
-        curFileValues.isReadable = false;
+        curFileValues.status = FileValues::Unreadable;
         return curFileValues;
     }
 
@@ -77,7 +77,7 @@ QString ShaCalculator::calculate(const QString &filePath, int shatype)
     if (canceled) {
         emit setStatusbarText("Canceled");
     }
-    else if (curFileValues.isReadable && !curFileValues.checksum.isEmpty()) {
+    else if (curFileValues.status != FileValues::Unreadable && !curFileValues.checksum.isEmpty()) {
         emit setStatusbarText(QString("SHA-%1 calculated").arg(shatype));
     }
     else {
@@ -89,14 +89,17 @@ QString ShaCalculator::calculate(const QString &filePath, int shatype)
 
 FileList ShaCalculator::calculate(const DataContainer &filesContainer)
 {
-    canceled = false;
+    FileList resultList;
 
+    if (filesContainer.filesData.isEmpty())
+        return resultList;
+
+    canceled = false;
     totalSize = Files::dataSize(filesContainer.filesData);
     QString totalSizeReadable = format::dataSizeReadable(totalSize);
     doneSize = 0;
-
-    FileList resultList;
     FileList::const_iterator iter;
+
     for (iter = filesContainer.filesData.constBegin(); iter != filesContainer.filesData.constEnd() && !canceled; ++iter) {
         QString doneData;
         if (doneSize == 0)
@@ -120,10 +123,9 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
         emit setStatusbarText("Canceled");
         return FileList();
     }
-    else {
-        emit setStatusbarText("Done");
-        return resultList;
-    }
+
+    emit setStatusbarText("Done");
+    return resultList;
 }
 
 void ShaCalculator::toPercents(int bytes)

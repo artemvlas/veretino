@@ -57,9 +57,10 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
         if (paths::isFileAllowed(relPath, filter)) {
             FileValues curFileValues;
             QFileInfo fileInfo(fullPath);
-            curFileValues.isReadable = fileInfo.isReadable();
-            if (curFileValues.isReadable)
+            if (fileInfo.isReadable())
                 curFileValues.size = fileInfo.size(); // If the file is unreadable, then its size is not needed
+            else
+                curFileValues.status = FileValues::Unreadable;
 
             resultList.insert(relPath, curFileValues);
         }

@@ -35,25 +35,44 @@ void DataMaintainer::updateMetaData()
 
     FileList::const_iterator iter;
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (iter.value().isNew)
-            ++data_.metaData.numNewFiles;
-        else if (!iter.value().isReadable)
-            ++data_.metaData.numUnreadable;
-        else if (!iter.value().checksum.isEmpty()) {
+        if (!iter.value().checksum.isEmpty())
             ++data_.metaData.numChecksums;
-            if (!iter.value().reChecksum.isEmpty())
-                ++data_.metaData.numMismatched;
-            if (iter.value().exists) {
-                data_.metaData.totalSize += iter.value().size;
-                ++data_.metaData.numAvailable;
-            }
-            else
-                ++data_.metaData.numMissingFiles;
-        }
-        if (iter.value().status == FileValues::Matched
-            || iter.value().status == FileValues::Added
-            || iter.value().status == FileValues::ChecksumUpdated)
+
+        switch (iter.value().status) {
+        case FileValues::NotChecked:
+            data_.metaData.totalSize += iter.value().size;
+            ++data_.metaData.numAvailable;
+            break;
+        case FileValues::Matched:
             ++data_.metaData.numMatched;
+            data_.metaData.totalSize += iter.value().size;
+            ++data_.metaData.numAvailable;
+            break;
+        case FileValues::Mismatched:
+            ++data_.metaData.numMismatched;
+            data_.metaData.totalSize += iter.value().size;
+            ++data_.metaData.numAvailable;
+            break;
+        case FileValues::New:
+            ++data_.metaData.numNewFiles;
+            break;
+        case FileValues::Missing:
+            ++data_.metaData.numMissingFiles;
+            break;
+        case FileValues::Unreadable:
+            ++data_.metaData.numUnreadable;
+            break;
+        case FileValues::Added:
+            ++data_.metaData.numMatched;
+            data_.metaData.totalSize += iter.value().size;
+            ++data_.metaData.numAvailable;
+            break;
+        case FileValues::ChecksumUpdated:
+            ++data_.metaData.numMatched;
+            data_.metaData.totalSize += iter.value().size;
+            ++data_.metaData.numAvailable;
+            break;
+        }
     }
 
     QString checkStatus("\t");
@@ -81,10 +100,10 @@ void DataMaintainer::updateFilesValues()
 
     while (iter.hasNext() && !canceled) {
         QString fullPath = paths::joinPath(data_.metaData.workDir, iter.next().key());
-        iter.value().exists = QFileInfo::exists(fullPath);
-        if (iter.value().exists && iter.value().isReadable) {
+        if (QFileInfo::exists(fullPath))
             iter.value().size = QFileInfo(fullPath).size();
-        }
+        else
+            iter.value().status = FileValues::Missing;
     }
 
     if (canceled) {
@@ -116,7 +135,7 @@ int DataMaintainer::findNewFiles()
             // unreadable files are ignored
             if (fileInfo.isReadable()) {
                 FileValues curFileValues;
-                curFileValues.isNew = true;
+                curFileValues.status = FileValues::New;
                 curFileValues.size = fileInfo.size();
                 data_.filesData.insert(relPath, curFileValues);
                 ++number;
@@ -132,53 +151,29 @@ int DataMaintainer::findNewFiles()
     return number;
 }
 
-FileList DataMaintainer::listOf(Listing only)
+FileList DataMaintainer::listOf(int fileStatus)
 {
-    FileList result;
+    FileList resultList;
     FileList::const_iterator iter;
 
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        switch (only) {
-            case Available:
-                if (!iter.value().isNew && iter.value().exists && iter.value().isReadable)
-                    result.insert(iter.key(), iter.value());
-                break;
-            case New:
-                if (iter.value().isNew)
-                    result.insert(iter.key(), iter.value());
-                break;
-            case Lost:
-                if (!iter.value().exists)
-                    result.insert(iter.key(), iter.value());
-                break;
-            case Mismatches:
-                if (!iter.value().reChecksum.isEmpty())
-                    result.insert(iter.key(), iter.value());
-                break;
-            case Added:
-                if (iter.value().status == FileValues::Added)
-                    result.insert(iter.key(), iter.value());
-                break;
-            case Removed:
-                if (iter.value().status == FileValues::Removed)
-                    result.insert(iter.key(), iter.value());
-                break;
-            case Updated:
-                if (iter.value().status == FileValues::ChecksumUpdated)
-                    result.insert(iter.key(), iter.value());
-                break;
-        }
+        if (iter.value().status == fileStatus)
+            resultList.insert(iter.key(), iter.value());
     }
 
-    return result;
+    return resultList;
 }
 
-FileList DataMaintainer::listOf(QList<Listing> only)
+FileList DataMaintainer::listOf(QSet<int> fileStatuses)
 {
     FileList resultList;
-    for (int i = 0; i < only.size(); ++i) {
-        resultList.insert(listOf(only.at(i)));
+    FileList::const_iterator iter;
+
+    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+        if (fileStatuses.contains(iter.value().status))
+            resultList.insert(iter.key(), iter.value());
     }
+
     return resultList;
 }
 
@@ -189,7 +184,7 @@ int DataMaintainer::clearDataFromLostFiles()
 
     while (iter.hasNext()) {
         iter.next();
-        if (!iter.value().exists) {
+        if (iter.value().status == FileValues::Missing) {
             iter.value().checksum.clear();
             iter.value().status = FileValues::Removed;
             emit itemStatusChanged(iter.key(), FileValues::Removed);
@@ -324,15 +319,12 @@ QString DataMaintainer::itemContentsInfo(const QString &itemPath)
 
         FileList::const_iterator iterContent;
         for (iterContent = content.constBegin(); iterContent != content.constEnd(); ++iterContent) {
-            if (iterContent.value().isNew) {
+            if (iterContent.value().status == FileValues::New)
                 newfiles.insert(iterContent.key(), iterContent.value());
-            }
-            else if (iterContent.value().exists && iterContent.value().isReadable) {
-                ondisk.insert(iterContent.key(), iterContent.value());
-            }
-            else if (!iterContent.value().exists) {
+            else if (iterContent.value().status == FileValues::Missing)
                 ++lost;
-            }
+            else if (iterContent.value().status != FileValues::Unreadable)
+                ondisk.insert(iterContent.key(), iterContent.value());
             else
                 qDebug() << "DataMaintainer::itemContents | Ambiguous item: " << iterContent.key();
         }
@@ -396,7 +388,7 @@ void DataMaintainer::dbStatus()
         result.append(QString("\nUnreadable files: %1").arg(data_.metaData.numUnreadable));
 
     if (data_.metaData.numNewFiles > 0)
-        result.append("\n\nNew: " + Files::contentStatus(listOf(Listing::New)));
+        result.append("\n\nNew: " + Files::contentStatus(listOf(FileValues::New)));
     else
         result.append("\n\nNo New files found");
 

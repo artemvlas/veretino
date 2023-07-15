@@ -34,14 +34,19 @@ void TreeModel::populate(const FileList &filesData)
                 QString avail, status;
                 if (var + 1 == splitPath.size()) {
                     // Size/Avail. column
-                    if (iter.value().isNew)
+                    switch (iter.value().status) {
+                    case FileValues::New:
                         avail = QString("New file: %1").arg(format::dataSizeReadable(iter.value().size));
-                    else if (!iter.value().exists)
+                        break;
+                    case FileValues::Missing:
                         avail = "Missing file";
-                    else if (!iter.value().isReadable)
+                        break;
+                    case FileValues::Unreadable:
                         avail = "Unreadable";
-                    else
+                        break;
+                    default:
                         avail = format::dataSizeReadable(iter.value().size);
+                    }
 
                     // Status column
                     status = format::fileItemStatus(iter.value().status);
@@ -55,6 +60,7 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
+/*
 QString TreeModel::getPath(const QModelIndex &index)
 {
     QModelIndex newIndex = index;
@@ -66,7 +72,7 @@ QString TreeModel::getPath(const QModelIndex &index)
     }
 
     return path;
-}
+}*/
 
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const
 {

@@ -72,7 +72,7 @@ bool JsonDb::makeJson(const DataContainer &data)
 
     FileList::const_iterator i;
     for (i = data.filesData.constBegin(); i != data.filesData.constEnd(); ++i) {
-        if (!i.value().isReadable) {
+        if (i.value().status == FileValues::Unreadable) {
             unreadableFiles.append(i.key());
         }
         else if (!i.value().checksum.isEmpty()) {
@@ -200,7 +200,7 @@ DataContainer JsonDb::parseJson(const QString &filePath)
             QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
             for (int var = 0; var < unreadableFiles.size(); ++var) {
                 FileValues curFileValues;
-                curFileValues.isReadable = false;
+                curFileValues.status = FileValues::Unreadable;
                 parsedData.filesData.insert(unreadableFiles.at(var).toString(), curFileValues);
             }
         }

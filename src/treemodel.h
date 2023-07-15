@@ -30,7 +30,7 @@ public:
 
 private:
     TreeItem *getItem(const QModelIndex &index) const;
-    QString getPath(const QModelIndex &index);
+    //QString getPath(const QModelIndex &index);
     TreeItem *rootItem;
 };
 

@@ -9,10 +9,7 @@ struct FileValues {
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
     qint64 size = 0; // file size in bytes
-    bool exists = true; // whether the file is present on disk or not
-    bool isReadable = true; // if false, there is no checksum
-    bool isNew = false; // true if the file is on disk but not in the stored filelist
-    enum FileStatus {NotChecked, Matched, Mismatched, ChecksumUpdated, Added, Removed};
+    enum FileStatus {NotChecked, Matched, Mismatched, New, Missing, Unreadable, Added, Removed, ChecksumUpdated};
     int status = 0;
 }; // struct FileValues
 
