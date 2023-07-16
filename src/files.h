@@ -10,7 +10,7 @@ struct FileValues {
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
     qint64 size = 0; // file size in bytes
     enum FileStatus {NotChecked, Matched, Mismatched, New, Missing, Unreadable, Added, Removed, ChecksumUpdated};
-    int status = 0;
+    FileStatus status = NotChecked;
 }; // struct FileValues
 
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}

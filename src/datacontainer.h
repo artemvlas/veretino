@@ -57,8 +57,8 @@ public:
     int clearDataFromLostFiles(); // returns the number of cleared
     int updateMismatchedChecksums(); // returns the number of updated checksums
 
-    FileList listOf(int fileStatus); // using enum FileValues::FileStatus
-    FileList listOf(QSet<int> fileStatuses); // list of multiple conditions^
+    FileList listOf(FileValues::FileStatus fileStatus); // using enum FileValues::FileStatus
+    FileList listOf(QSet<FileValues::FileStatus> fileStatuses); // list of multiple conditions^
 
     void importJson(const QString &jsonFilePath);
     void exportToJson();

@@ -67,6 +67,8 @@ void DataMaintainer::updateMetaData()
             data_.metaData.totalSize += iter.value().size;
             ++data_.metaData.numAvailable;
             break;
+        case FileValues::Removed:
+            break;
         case FileValues::ChecksumUpdated:
             ++data_.metaData.numMatched;
             data_.metaData.totalSize += iter.value().size;
@@ -151,7 +153,7 @@ int DataMaintainer::findNewFiles()
     return number;
 }
 
-FileList DataMaintainer::listOf(int fileStatus)
+FileList DataMaintainer::listOf(FileValues::FileStatus fileStatus)
 {
     FileList resultList;
     FileList::const_iterator iter;
@@ -164,7 +166,7 @@ FileList DataMaintainer::listOf(int fileStatus)
     return resultList;
 }
 
-FileList DataMaintainer::listOf(QSet<int> fileStatuses)
+FileList DataMaintainer::listOf(QSet<FileValues::FileStatus> fileStatuses)
 {
     FileList resultList;
     FileList::const_iterator iter;
