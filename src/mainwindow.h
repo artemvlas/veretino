@@ -27,7 +27,7 @@ public:
     ~MainWindow();
 
 public slots:
-    void setMode(int mode); // sets viewMode and button text
+    void setMode(Mode::Modes mode); // sets viewMode and button text
     void showMessage(const QString &message, const QString &title = "Info");
     void onCustomContextMenu(const QPoint &point);
 
@@ -52,8 +52,8 @@ private:
     QString homePath = QDir::homePath();
     QVariantMap settings; // stores the app settings
     QString curPath; // current path from &View::pathChanged
-    int viewMode = 0; // Folder, File, DbFile, SumFile, Model...
-    int previousViewMode = 0; //^
+    Mode::Modes viewMode = Mode::NoMode; // Folder, File, DbFile, SumFile, Model...
+    Mode::Modes previousViewMode = Mode::NoMode; //^
     QElapsedTimer elapsedTimer;
 
 signals:

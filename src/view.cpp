@@ -1,5 +1,4 @@
 #include "view.h"
-#include "tools.h"
 #include <QTimer>
 #include <QDebug>
 #include <QKeyEvent>

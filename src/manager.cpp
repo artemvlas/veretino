@@ -1,6 +1,5 @@
 #include "manager.h"
 #include "files.h"
-#include "tools.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -213,7 +212,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
     dbStatus();
     makeTreeModel(curData->data_.filesData);
-    setMode_model();
+    chooseMode();
 }
 
 void Manager::showNewLostOnly()
@@ -257,7 +256,7 @@ void Manager::updateMismatch()
                         .arg(curData->updateMismatchedChecksums());
 
     curData->exportToJson();
-    setMode_model();
+    chooseMode();
 }
 
 // checking the list of files against stored in the database checksums
@@ -342,6 +341,7 @@ void Manager::checkCurrentItemSum(const QString &path)
         if (!sum.isEmpty()) {
             showFileCheckResultMessage(curData->updateData(path, sum));
             curData->updateMetaData();
+            chooseMode();
         }
     }
 }
@@ -449,9 +449,11 @@ void Manager::isViewFS(const bool isFS)
 }
 
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
-void Manager::setMode_model()
+void Manager::chooseMode()
 {
-    if (curData->data_.metaData.numNewFiles > 0 || curData->data_.metaData.numMissingFiles > 0)
+    if (curData->data_.metaData.numMismatched > 0)
+        emit setMode(Mode::UpdateMismatch);
+    else if (curData->data_.metaData.numNewFiles > 0 || curData->data_.metaData.numMissingFiles > 0)
         emit setMode(Mode::ModelNewLost);
     else {
         emit setMode(Mode::Model);

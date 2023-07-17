@@ -4,7 +4,7 @@
 
 #include <QObject>
 #include "shacalculator.h"
-#include "jsondb.h"
+#include "tools.h"
 #include "treemodel.h"
 #include "QThread"
 
@@ -21,7 +21,7 @@ private:
     DataMaintainer *curData = nullptr;
     void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
     QVariantMap settings;
-    void setMode_model(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
+    void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     bool isViewFileSysytem;
     void showFileCheckResultMessage(bool isMatched);
 
@@ -53,7 +53,7 @@ signals:
     void workDirChanged(const QString &workDir);
     void showMessage(const QString &text, const QString &title = "Info");
     void setButtonText(const QString &text);
-    void setMode(int mode);
+    void setMode(Mode::Modes mode);
     void toClipboard(const QString &text);
     void setItemStatus(const QString &itemPath, int status);
     void cancelProcess();

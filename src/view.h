@@ -4,6 +4,7 @@
 
 #include <QTreeView>
 #include <QFileSystemModel>
+#include "tools.h"
 
 class View : public QTreeView
 {
@@ -32,7 +33,7 @@ private:
 signals:
     void indexChanged(const QModelIndex &index);
     void pathChanged(const QString &path); //by indexToPath()
-    void setMode(int mode);
+    void setMode(Mode::Modes mode);
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void showMessage(const QString &text, const QString &title = "Info");
     void fsModel_Setted(); // fileSystem Model setted

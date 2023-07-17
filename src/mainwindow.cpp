@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "tools.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -119,6 +118,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::donePercents, this, &MainWindow::timeLeft);
 
     // transfer settings and modes
+    qRegisterMetaType<Mode::Modes>("Mode::Modes");
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
     connect(this, &MainWindow::settingsChanged, manager, &Manager::getSettings); // send settings Map
 
@@ -213,7 +213,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
     contextMenu->exec(ui->treeView->viewport()->mapToGlobal(point));
 }
 
-void MainWindow::setMode(int mode)
+void MainWindow::setMode(Mode::Modes mode)
 {
     //qDebug() << "MainWindow::setMode | mode:" << mode;
     using namespace Mode;
@@ -222,7 +222,7 @@ void MainWindow::setMode(int mode)
         return;
 
     if (mode == EndProcess) {
-        viewMode = 0;
+        viewMode = NoMode;
         ui->progressBar->setVisible(false);
         ui->progressBar->resetFormat();
         ui->progressBar->setValue(0);
@@ -242,7 +242,7 @@ void MainWindow::setMode(int mode)
         }
     }
     else {
-        if (viewMode != 0)
+        if (viewMode != NoMode)
             previousViewMode = viewMode;
         viewMode = mode;
     }
@@ -335,6 +335,11 @@ void MainWindow::quickAction()
         if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
             emit checkCurrentItemSum(curPath);
         break;
+    case UpdateMismatch:
+        if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
+            emit checkCurrentItemSum(curPath);
+        break;
+    default: break;
     }
 }
 
