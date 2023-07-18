@@ -262,14 +262,24 @@ void Manager::updateMismatch()
 // checking the list of files against stored in the database checksums
 void Manager::verifyFileList()
 {
-    if (curData->data_.filesData.isEmpty()) {
-        qDebug() << "filesData is Empty";
+    verifyFileList(curData->data_.filesData);
+}
+
+void Manager::verifyFileList(const QString &subFolder)
+{
+    verifyFileList(curData->subfolderContent(subFolder));
+}
+
+void Manager::verifyFileList(const FileList &fileList)
+{
+    if (fileList.isEmpty()) {
+        qDebug() << "Manager::verifyFileList --> fileList is Empty";
         return;
     }
 
     emit setMode(Mode::Processing);
     DataContainer dataCont(curData->data_.metaData);
-    dataCont.filesData = curData->listOf(FileValues::NotChecked);
+    dataCont.filesData = curData->listOf(FileValues::NotChecked, fileList);
     FileList recalculated = shaCalc->calculate(dataCont);
     emit setMode(Mode::EndProcess);
 
@@ -279,7 +289,8 @@ void Manager::verifyFileList()
             curData->updateData(iter.key(), iter.value().checksum);
         }
 
-        curData->data_.metaData.isChecked = true;
+        if (fileList.size() == curData->data_.filesData.size())
+            curData->data_.metaData.isChecked = true;
     }
 
     if (!recalculated.isEmpty() || dataCont.filesData.isEmpty()) {
@@ -291,7 +302,7 @@ void Manager::verifyFileList()
         }
         else
             emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
-                            .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
+                                 .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
     }
 }
 

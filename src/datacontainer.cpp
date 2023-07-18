@@ -155,10 +155,15 @@ int DataMaintainer::findNewFiles()
 
 FileList DataMaintainer::listOf(FileValues::FileStatus fileStatus)
 {
+    return listOf(fileStatus, data_.filesData);
+}
+
+FileList DataMaintainer::listOf(FileValues::FileStatus fileStatus, const FileList &originalList)
+{
     FileList resultList;
     FileList::const_iterator iter;
 
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
+    for (iter = originalList.constBegin(); iter != originalList.constEnd(); ++iter) {
         if (iter.value().status == fileStatus)
             resultList.insert(iter.key(), iter.value());
     }
@@ -288,16 +293,16 @@ void DataMaintainer::exportToJson()
     json->deleteLater();
 }
 
-FileList DataMaintainer::listFolderContents(QString rootFolder)
+FileList DataMaintainer::subfolderContent(QString subFolder)
 {
-    if (!rootFolder.endsWith('/'))
-        rootFolder.append('/');
+    if (!subFolder.endsWith('/'))
+        subFolder.append('/');
 
     FileList content;
     FileList::const_iterator iter;
 
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (iter.key().startsWith(rootFolder))
+        if (iter.key().startsWith(subFolder))
             content.insert(iter.key(), iter.value());
         else if (!content.isEmpty()) {
             break; // is Relative End; QMap is sorted by key, so there is no point in itering to the real end.
@@ -314,7 +319,7 @@ QString DataMaintainer::itemContentsInfo(const QString &itemPath)
     if (fileInfo.isFile())
         return format::fileNameAndSize(fullPath);
     else if (fileInfo.isDir()) {
-        FileList content = listFolderContents(itemPath);        
+        FileList content = subfolderContent(itemPath);
         FileList newfiles;
         FileList ondisk;
         int lost = 0;

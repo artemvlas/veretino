@@ -51,20 +51,18 @@ public:
     int updateData(FileList updateFiles, FileValues::FileStatus status); // adding 'status' to 'updateFiles' and updateData(updateFiles)^
     bool updateData(const QString &filePath, const QString &checksum); // update the check status of the file
 
-    void updateFilesValues();
-    int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
-
     int clearDataFromLostFiles(); // returns the number of cleared
     int updateMismatchedChecksums(); // returns the number of updated checksums
 
-    FileList listOf(FileValues::FileStatus fileStatus); // using enum FileValues::FileStatus
+    FileList listOf(FileValues::FileStatus fileStatus); // list of files with specified status
+    FileList listOf(FileValues::FileStatus fileStatus, const FileList &originalList);
     FileList listOf(QSet<FileValues::FileStatus> fileStatuses); // list of multiple conditions^
 
     void importJson(const QString &jsonFilePath);
     void exportToJson();
 
-    QString itemContentsInfo(const QString &itemPath); // info about Model item (created with mainData), if file - file info, if folder - folder contents (availability, size etc.)
-    FileList listFolderContents(QString rootFolder); // returns a list of files and their availability info in the specified folder from the database
+    FileList subfolderContent(QString subFolder);
+    QString itemContentsInfo(const QString &itemPath); // if file - file info, if folder - folder contents (availability, size etc.)
 
     void dbStatus(); // info about current DB
 
@@ -76,6 +74,8 @@ public slots:
 private:
     bool canceled = false;
     int shaType(const FileList &fileList); // determines the shaType by the string length of the stored checksum
+    int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
+    void updateFilesValues();
 
 signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar

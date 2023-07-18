@@ -15,16 +15,6 @@ public:
     explicit Manager(QObject *parent = nullptr);
     ~Manager();
 
-private:
-    ShaCalculator *shaCalc = new ShaCalculator;
-    void connections();
-    DataMaintainer *curData = nullptr;
-    void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
-    QVariantMap settings;
-    void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
-    bool isViewFileSysytem;
-    void showFileCheckResultMessage(bool isMatched);
-
 public slots:
     void processFolderSha(const QString &folderPath, int shatype);
     void processFileSha(const QString &filePath, int shatype = 0, bool summaryFile = true, bool clipboard = false);
@@ -33,7 +23,6 @@ public slots:
     QString copyStoredChecksum(const QString &path, bool clipboard = true);
     void getItemInfo(const QString &path); // info about folder contents or file (size)
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
-    void verifyFileList(); // checking the list of files against the checksums stored in the database
     void updateNewLost(); // remove lost files, add new files
     void updateMismatch(); // update json Database with new checksums for files with failed verification
     void getSettings(const QVariantMap &settingsMap);
@@ -44,6 +33,22 @@ public slots:
     void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
     void showAll();
     void dbStatus();
+
+    void verifyFileList(); // checking the list of files against the checksums stored in the database
+    void verifyFileList(const QString &subFolder);
+
+private:
+    void verifyFileList(const FileList &fileList);
+    void connections();
+    void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
+    void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
+    void showFileCheckResultMessage(bool isMatched);
+
+    ShaCalculator *shaCalc = new ShaCalculator;
+    DataMaintainer *curData = nullptr;
+    QVariantMap settings;
+    bool isViewFileSysytem;
+
 
 signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
