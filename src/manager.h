@@ -47,7 +47,6 @@ private:
     QVariantMap settings;
     bool isViewFileSysytem;
 
-
 signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void setPermanentStatus(const QString &text = QString());

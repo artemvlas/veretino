@@ -120,8 +120,6 @@ QModelIndex View::pathToIndex(const QString &path)
             }
         }
         //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
-        if (!curIndex.isValid())
-            curIndex = this->model()->index(0, 0);
     }
 
     return curIndex;
@@ -158,7 +156,8 @@ void View::setItemStatus(const QString &itemPath, int status)
     QModelIndex curIndex = pathToIndex(itemPath);
     QModelIndex chIndex = this->model()->index(curIndex.row(), 2, curIndex.parent());
 
-    this->model()->setData(chIndex, format::fileItemStatus(status));
+    if (chIndex.isValid())
+        this->model()->setData(chIndex, format::fileItemStatus(status));
 }
 
 void View::pathAnalyzer(const QString &path)
