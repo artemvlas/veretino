@@ -154,10 +154,10 @@ void View::setIndexByPath(const QString &path)
 void View::setItemStatus(const QString &itemPath, int status)
 {
     QModelIndex curIndex = pathToIndex(itemPath);
-    QModelIndex chIndex = this->model()->index(curIndex.row(), 2, curIndex.parent());
-
-    if (chIndex.isValid())
-        this->model()->setData(chIndex, format::fileItemStatus(status));
+    if (curIndex.isValid()) {
+        this->model()->setData(this->model()->index(curIndex.row(), 2, curIndex.parent()),
+                               format::fileItemStatus(status));
+    }
 }
 
 void View::pathAnalyzer(const QString &path)
