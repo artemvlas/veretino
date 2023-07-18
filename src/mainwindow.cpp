@@ -89,8 +89,7 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::parseJsonFile, manager, &Manager::createDataModel);
     connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
     connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
-    connect(this, &MainWindow::verifyFileList, manager, qOverload<>(&Manager::verifyFileList));
-    connect(this, &MainWindow::verifySubfolder, manager, qOverload<const QString&>(&Manager::verifyFileList));
+    connect(this, &MainWindow::verifyFileList, manager, &Manager::verifyFileList);
     connect(this, &MainWindow::updateNewLost, manager, &Manager::updateNewLost);
     connect(this, &MainWindow::updateMismatch, manager, &Manager::updateMismatch);
     connect(this, &MainWindow::checkFileSummary, manager, &Manager::checkFileSummary); // check *.sha1 *.sha256 *.sha512 summaries
@@ -201,11 +200,11 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                         contextMenu->addAction("Copy stored checksum to clipboard", this, [=]{emit copyStoredChecksum(curPath);});
                     }
                     else if (pathInfo.isDir()) {
-                        contextMenu->addAction("Check current Subfolder", this, [=]{emit verifySubfolder(curPath);});
+                        contextMenu->addAction("Check current Subfolder", this, [=]{emit verifyFileList(curPath);});
                     }
                 }
 
-                contextMenu->addAction("Check ALL files against stored checksums", this, &MainWindow::verifyFileList);
+                contextMenu->addAction("Check ALL files against stored checksums", this, [=]{emit verifyFileList();});
             }
             contextMenu->addSeparator();
             contextMenu->addAction("Show All", this, &MainWindow::showAll);

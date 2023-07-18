@@ -61,8 +61,7 @@ signals:
     void processFolderSha(const QString &path, int shatype = 0);
     void processFileSha(const QString &path, int shatype = 0, bool summaryFile = true, bool clipboard = false);
     void parseJsonFile(const QString &path);
-    void verifyFileList();
-    void verifySubfolder(const QString &subFolder);
+    void verifyFileList(const QString &subFolder = QString());
     void updateNewLost();
     void updateMismatch();// update json Database with new checksums for files with failed verification
     void checkCurrentItemSum(const QString &path); //check selected file only instead all database cheking

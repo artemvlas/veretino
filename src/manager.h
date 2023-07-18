@@ -34,11 +34,9 @@ public slots:
     void showAll();
     void dbStatus();
 
-    void verifyFileList(); // checking the list of files against the checksums stored in the database
-    void verifyFileList(const QString &subFolder);
+    void verifyFileList(const QString &subFolder = QString()); // checking the list of files against the checksums stored in the database
 
 private:
-    void verifyFileList(const FileList &fileList);
     void connections();
     void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
     void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");

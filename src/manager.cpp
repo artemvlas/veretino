@@ -260,18 +260,15 @@ void Manager::updateMismatch()
 }
 
 // checking the list of files against stored in the database checksums
-void Manager::verifyFileList()
-{
-    verifyFileList(curData->data_.filesData);
-}
-
 void Manager::verifyFileList(const QString &subFolder)
 {
-    verifyFileList(curData->subfolderContent(subFolder));
-}
+    FileList fileList;
 
-void Manager::verifyFileList(const FileList &fileList)
-{
+    if (!subFolder.isEmpty())
+        fileList = curData->subfolderContent(subFolder);
+    else
+        fileList = curData->data_.filesData;
+
     if (fileList.isEmpty()) {
         qDebug() << "Manager::verifyFileList --> fileList is Empty";
         return;
