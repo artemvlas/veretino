@@ -297,6 +297,9 @@ void DataMaintainer::exportToJson()
 
 FileList DataMaintainer::subfolderContent(QString subFolder)
 {
+    if (subFolder.isEmpty())
+        return data_.filesData;
+
     if (!subFolder.endsWith('/'))
         subFolder.append('/');
 
