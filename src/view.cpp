@@ -14,115 +14,50 @@ View::View(QWidget *parent)
 
 void View::setFileSystemModel()
 {
-    this->smartSetModel(fileSystem);
+    saveLastPath();
+    deleteOldModel();
+    this->setModel(fileSystem);
 
-    if (!QFileInfo::exists(lastFileSystemPath)) {
+    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
+    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
+                                      {currentIndex = index; emit pathChanged(fileSystem->filePath(index));});
+
+    if (!QFileInfo::exists(lastFileSystemPath))
         lastFileSystemPath = QDir::homePath();
-    }
 
+    this->setColumnWidth(0, 450);
+    this->setColumnWidth(1, 100);
     this->setIndexByPath(lastFileSystemPath);
-    emit fsModel_Setted();
+    emit modelChanged(true);
 }
 
-void View::smartSetModel(QAbstractItemModel *model)
+void View::setTreeModel(TreeModel *model)
 {
+    saveLastPath();
+
     if (model == nullptr) {
         setFileSystemModel();
         return;
     }
 
-    if (isViewFileSystem()) {
-        lastFileSystemPath = indexToPath(currentIndex);
-        if (model->objectName() == "fileSystem")
-            return;
-    }
-    else if (currentIndex.isValid())
-        lastModelPath = indexToPath(currentIndex);
-
-    int previousColumWidth = this->columnWidth(0); // first load = 0
-
-    QAbstractItemModel *oldModel = this->model();
-    QItemSelectionModel *oldSelectModel = this->selectionModel();   
+    model_ = model;
+    deleteOldModel();
 
     this->setModel(model);
-    qDebug() << "View::smartSetModel |" << model->objectName();
-
-    if (previousColumWidth == 0)
-        this->setColumnWidth(0, 450);
-
-    if (oldModel != nullptr && oldModel->objectName() != "fileSystem") {
-        qDebug() << "oldModel deleted";
-        delete oldModel;
-    }
-    if (oldSelectModel != nullptr) {
-        qDebug() << "oldSelectModel deleted";
-        delete oldSelectModel;
-    }
 
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
-                                               {emit pathChanged(indexToPath(index)); currentIndex = index;});
+                                           {currentIndex = index; emit pathChanged(model_->getPath(index));});
 
-    // send signal when Model has been changed, FileSystem = true, else = false;
-    if (isViewFileSystem()) {
-        emit modelChanged(true);
-        this->setColumnWidth(1, 100);
-    }
-    else {
-        emit modelChanged(false);
-        this->setColumnWidth(1, 130);
-        setIndexByPath(lastModelPath);
-    }
+    this->setColumnWidth(0, 450);
+    this->setColumnWidth(1, 130);
+    setIndexByPath(lastModelPath);
+    emit modelChanged(false);
 }
 
 bool View::isViewFileSystem()
 {
     return (this->model() != nullptr && this->model()->objectName() == "fileSystem");
-}
-
-QString View::indexToPath(const QModelIndex &index)
-{
-    QString path;
-
-    if (isViewFileSystem()) {
-        path = fileSystem->filePath(index);
-    }
-    else if (this->model()->objectName() == "treeModel") {
-        QModelIndex newIndex = this->model()->index(index.row(), 0 , index.parent());
-        path = newIndex.data().toString();
-
-        while (newIndex.parent().isValid()) {
-            path = newIndex.parent().data().toString() + '/' + path;
-            newIndex = newIndex.parent();
-        }
-    }
-
-    return path;
-}
-
-QModelIndex View::pathToIndex(const QString &path)
-{
-    QModelIndex curIndex = this->model()->index(0, 0);
-
-    if (!path.isEmpty()) {
-        QStringList parts = path.split('/');
-        QModelIndex parentIndex;
-
-        foreach (const QString &str, parts) {
-            for (int i = 0; curIndex.isValid(); ++i) {
-                curIndex = this->model()->index(i, 0, parentIndex);
-                if (curIndex.data().toString() == str) {
-                    //qDebug() << "***" << str << "finded on" << i << "row";
-                    parentIndex = this->model()->index(i, 0, parentIndex);
-                    break;
-                }
-                //qDebug() << "*** Looking for:" << str << curIndex.data();
-            }
-        }
-        //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
-    }
-
-    return curIndex;
 }
 
 void View::setIndexByPath(const QString &path)
@@ -141,8 +76,8 @@ void View::setIndexByPath(const QString &path)
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
-    else {
-        QModelIndex index = pathToIndex(path);
+    else if (model_ != nullptr){
+        QModelIndex index = model_->getIndex(path);
         if (index.isValid()) {
             this->expand(index);
             this->setCurrentIndex(index);
@@ -151,18 +86,9 @@ void View::setIndexByPath(const QString &path)
     }
 }
 
-void View::setItemStatus(const QString &itemPath, int status)
-{
-    QModelIndex curIndex = pathToIndex(itemPath);
-    if (curIndex.isValid()) {
-        this->model()->setData(this->model()->index(curIndex.row(), 2, curIndex.parent()),
-                               format::fileItemStatus(status));
-    }
-}
-
 void View::pathAnalyzer(const QString &path)
 {
-    if (this->isViewFileSystem()) {
+    if (isViewFileSystem()) {
         QFileInfo i(path);
         if (i.isFile()) {
             if (tools::isDatabaseFile(path)) {
@@ -178,6 +104,26 @@ void View::pathAnalyzer(const QString &path)
         else if (i.isDir()) {
             emit setMode(Mode::Folder);
         }
+    }
+}
+
+void View::saveLastPath()
+{
+    if (isViewFileSystem())
+        lastFileSystemPath = fileSystem->filePath(currentIndex);
+    else if (model_ != nullptr && currentIndex.isValid())
+        lastModelPath = model_->getPath(currentIndex);
+}
+
+void View::deleteOldModel()
+{
+    if (this->model() != nullptr && this->model()->objectName() != "fileSystem") {
+        qDebug() << "oldModel deleted";
+        delete this->model();
+    }
+    if (this->selectionModel() != nullptr) {
+        qDebug() << "oldSelectionModel deleted";
+        delete this->selectionModel();
     }
 }
 

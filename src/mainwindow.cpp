@@ -108,10 +108,9 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::dbStatus, manager, &Manager::dbStatus);
 
     // results processing
-    connect(manager, &Manager::setModel, ui->treeView, &View::smartSetModel); //set the tree model created by Manager
+    connect(manager, &Manager::setModel, ui->treeView, &View::setTreeModel); //set the tree model created by Manager
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
     connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
-    connect(manager, &Manager::setItemStatus, ui->treeView, &View::setItemStatus);
 
     // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
@@ -127,9 +126,6 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::isViewFS);
     connect(this, &MainWindow::showAll, manager, &Manager::showAll);
-
-    // cleanup
-    connect(ui->treeView, &View::fsModel_Setted, manager, &Manager::deleteCurData);
 
     thread->start();
 }
@@ -278,7 +274,7 @@ void MainWindow::setMode(Mode::Modes mode)
         ui->button->setText("Cancel");
         break;
     default:
-        qDebug() << "MainWindow::setMode | WRONG MODE";
+        qDebug() << "MainWindow::setMode | WRONG MODE" << mode;
         break;
     }
 }

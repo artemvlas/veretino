@@ -5,6 +5,7 @@
 #include <QTreeView>
 #include <QFileSystemModel>
 #include "tools.h"
+#include "treemodel.h"
 
 class View : public QTreeView
 {
@@ -12,18 +13,18 @@ class View : public QTreeView
 public:
     explicit View(QWidget *parent = nullptr);
     bool isViewFileSystem(); //"true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
-    QString indexToPath(const QModelIndex &index); // build path by current index data
-    QModelIndex pathToIndex(const QString &path); // find index of specified 'path'
     void pathAnalyzer(const QString &path);
     QString workDir;
+    TreeModel *model_ = nullptr;
 
 public slots:
     void setFileSystemModel();
-    void smartSetModel(QAbstractItemModel *model);
+    void setTreeModel(TreeModel *model);
     void setIndexByPath(const QString &path);
-    void setItemStatus(const QString &itemPath, int status);
 
 private:
+    void saveLastPath();
+    void deleteOldModel();
     QFileSystemModel *fileSystem = new QFileSystemModel;
     QModelIndex currentIndex;
     QString lastFileSystemPath;
@@ -36,7 +37,6 @@ signals:
     void setMode(Mode::Modes mode);
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void showMessage(const QString &text, const QString &title = "Info");
-    void fsModel_Setted(); // fileSystem Model setted
     void keyEnterPressed();
 };
 

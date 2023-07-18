@@ -1,5 +1,4 @@
 #include "datacontainer.h"
-#include "files.h"
 #include "tools.h"
 #include <QFileInfo>
 #include <QDir>
@@ -196,7 +195,7 @@ int DataMaintainer::clearDataFromLostFiles()
         if (iter.value().status == FileValues::Missing) {
             iter.value().checksum.clear();
             iter.value().status = FileValues::Removed;
-            emit itemStatusChanged(iter.key(), FileValues::Removed);
+            model_->setItemStatus(iter.key(), FileValues::Removed);
             ++number;
         }
     }
@@ -214,7 +213,7 @@ int DataMaintainer::updateMismatchedChecksums()
             iter.value().checksum = iter.value().reChecksum;
             iter.value().reChecksum.clear();
             iter.value().status = FileValues::ChecksumUpdated;
-            emit itemStatusChanged(iter.key(), FileValues::ChecksumUpdated);
+            model_->setItemStatus(iter.key(), FileValues::ChecksumUpdated);
             ++number;
         }
     }
@@ -237,7 +236,7 @@ int DataMaintainer::updateData(FileList updateFiles, FileValues::FileStatus stat
     while (iter.hasNext()) {
         iter.next();
         iter.value().status = status;
-        emit itemStatusChanged(iter.key(), iter.value().status);
+        model_->setItemStatus(iter.key(), iter.value().status);
     }
 
     return updateData(updateFiles);
@@ -256,7 +255,7 @@ bool DataMaintainer::updateData(const QString &filePath, const QString &checksum
     }
 
     data_.filesData.insert(filePath, curFileValues);
-    emit itemStatusChanged(filePath, curFileValues.status);
+    model_->setItemStatus(filePath, curFileValues.status);
 
     return (curFileValues.status == FileValues::Matched);
 }

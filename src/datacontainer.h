@@ -9,6 +9,9 @@
 #include <QObject>
 #include <QMap>
 #include "files.h"
+#include "treemodel.h"
+
+class TreeModel;
 
 struct MetaData {
     int shaType = 0; // 1 or 256 or 512
@@ -68,6 +71,7 @@ public:
 
     // variables
     DataContainer data_;
+    TreeModel *model_ = nullptr;
 
 public slots:
     void cancelProcess();
@@ -81,7 +85,6 @@ signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void setPermanentStatus(const QString &text = QString());
     void showMessage(const QString &text, const QString &title = "Info");    
-    void itemStatusChanged(const QString &itemPath, int status);
 };
 
 #endif // DATACONTAINER_H

@@ -150,15 +150,14 @@ void Manager::makeTreeModel(const FileList &data)
 {
     if (!data.isEmpty()) {
         emit setStatusbarText("File tree creation...");
-        TreeModel *model = new TreeModel;
-        model->setObjectName("treeModel");
-        model->populate(data);
+        curData->model_ = new TreeModel;
+        curData->model_->setObjectName("treeModel");
+        curData->model_->populate(data);
 
-        emit setModel(model);
+        emit setModel(curData->model_);
         emit workDirChanged(curData->data_.metaData.workDir);
-        /*emit setStatusbarText(QString("SHA-%1: %2 files")
-                 .arg(curData->data_.metaData.shaType)
-                 .arg(curData->data_.filesData.size()));*/
+        emit setStatusbarText(QString("%1 files listed")
+                                      .arg(data.size()));
     }
     else {
         qDebug() << "Manager::makeTreeModel | Empty model";
@@ -193,7 +192,6 @@ void Manager::createDataModel(const QString &databaseFilePath)
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(curData, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     connect(curData, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
-    connect(curData, &DataMaintainer::itemStatusChanged, this, &Manager::setItemStatus);
 
     curData->importJson(databaseFilePath);
 
@@ -478,7 +476,9 @@ void Manager::dbStatus()
 void Manager::isViewFS(const bool isFS)
 {
     isViewFileSysytem = isFS;
-    qDebug() << "Manager::isViewFS" << isViewFileSysytem;
+    if (isFS)
+        deleteCurData();
+    //qDebug() << "Manager::isViewFS" << isViewFileSysytem;
 }
 
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");

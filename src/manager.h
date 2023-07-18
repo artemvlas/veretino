@@ -57,7 +57,6 @@ signals:
     void setButtonText(const QString &text);
     void setMode(Mode::Modes mode);
     void toClipboard(const QString &text);
-    void setItemStatus(const QString &itemPath, int status);
     void cancelProcess();
 };
 
