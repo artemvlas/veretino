@@ -308,17 +308,17 @@ void Manager::verifyFileList(const QString &subFolder)
         curData->updateMetaData();
         if (subFolder.isEmpty()) {
             if (curData->data_.metaData.numMismatched > 0)
-                emit showMessage(QString("%1 files changed or corrupted")
-                                 .arg(curData->data_.metaData.numMismatched), "FAILED");
+                emit showMessage(QString("%1 out of %2 files is changed or corrupted")
+                                 .arg(curData->data_.metaData.numMismatched).arg(curData->data_.metaData.numMatched), "FAILED");
             else
                 emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                 .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
         }
         else if (subMismatched > 0)
-            emit showMessage(QString("Subfolder: %1\n%2 files in the Subfolder is changed or corrupted\n%3 files passed the verification.")
+            emit showMessage(QString("Subfolder: %1\n\n%2 out of %3 files in the Subfolder is changed or corrupted")
                              .arg(subFolder).arg(subMismatched).arg(subMatched), "FAILED");
         else
-            emit showMessage(QString("Subfolder: %1\nAll %2 checked files passed the verification.")
+            emit showMessage(QString("Subfolder: %1\n\nAll %2 checked files passed the verification")
                              .arg(subFolder).arg(subMatched), "Success");
 
         if (curData->data_.metaData.numMismatched > 0 || subMismatched > 0) {
