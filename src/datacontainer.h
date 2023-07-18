@@ -11,7 +11,6 @@
 #include "files.h"
 
 struct MetaData {
-    bool isChecked = false; // Has the data been verified?
     int shaType = 0; // 1 or 256 or 512
     int numChecksums = 0; // number of files with checksums
     int numMatched = 0; // number of check files with matched checksums
@@ -20,6 +19,7 @@ struct MetaData {
     int numNewFiles = 0;
     int numMissingFiles = 0;
     int numUnreadable = 0;
+    int numNotChecked = 0;
     QString workDir; // current working folder
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved

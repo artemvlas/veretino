@@ -31,6 +31,7 @@ void DataMaintainer::updateMetaData()
     data_.metaData.numMismatched = 0;
     data_.metaData.numAvailable = 0;
     data_.metaData.numUnreadable = 0;
+    data_.metaData.numNotChecked = 0;
     data_.metaData.totalSize = 0;
 
     FileList::const_iterator iter;
@@ -42,6 +43,7 @@ void DataMaintainer::updateMetaData()
         case FileValues::NotChecked:
             data_.metaData.totalSize += iter.value().size;
             ++data_.metaData.numAvailable;
+            ++data_.metaData.numNotChecked;
             break;
         case FileValues::Matched:
             ++data_.metaData.numMatched;
@@ -404,7 +406,7 @@ void DataMaintainer::dbStatus()
     else
         result.append("\nNo Missing files found");
 
-    if (data_.metaData.isChecked) {
+    if (data_.metaData.numNotChecked == 0) {
         if (data_.metaData.numMismatched > 0)
             result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
         else if (data_.metaData.numChecksums == data_.metaData.numAvailable)

@@ -280,26 +280,51 @@ void Manager::verifyFileList(const QString &subFolder)
     FileList recalculated = shaCalc->calculate(dataCont);
     emit setMode(Mode::EndProcess);
 
+    // updating the Main data
     if (!recalculated.isEmpty()) {
         FileList::const_iterator iter;
         for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
             curData->updateData(iter.key(), iter.value().checksum);
         }
-
-        if (fileList.size() == curData->data_.filesData.size())
-            curData->data_.metaData.isChecked = true;
     }
 
+    // subfolder values
+    int subMatched = 0; // number of matched in subFolder
+    int subMismatched = 0; // number of mismatched in subFolder
+    if (!subFolder.isEmpty()) {
+        FileList::const_iterator iter;
+        for (iter = fileList.constBegin(); iter != fileList.constEnd(); ++iter) {
+            if (curData->data_.filesData.value(iter.key()).status == FileValues::Mismatched)
+                ++subMismatched;
+            else if (curData->data_.filesData.value(iter.key()).status == FileValues::Matched
+                     || curData->data_.filesData.value(iter.key()).status == FileValues::Added
+                     || curData->data_.filesData.value(iter.key()).status == FileValues::ChecksumUpdated)
+                ++subMatched;
+        }
+    }
+
+    // result
     if (!recalculated.isEmpty() || dataCont.filesData.isEmpty()) {
         curData->updateMetaData();
-        if (curData->data_.metaData.numMismatched > 0) {
-            emit showMessage(QString("%1 files changed or corrupted").arg(curData->data_.metaData.numMismatched), "FAILED");
+        if (subFolder.isEmpty()) {
+            if (curData->data_.metaData.numMismatched > 0)
+                emit showMessage(QString("%1 files changed or corrupted")
+                                 .arg(curData->data_.metaData.numMismatched), "FAILED");
+            else
+                emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
+                                .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
+        }
+        else if (subMismatched > 0)
+            emit showMessage(QString("Subfolder: %1\n%2 files in the Subfolder is changed or corrupted\n%3 files passed the verification.")
+                             .arg(subFolder).arg(subMismatched).arg(subMatched), "FAILED");
+        else
+            emit showMessage(QString("Subfolder: %1\nAll %2 checked files passed the verification.")
+                             .arg(subFolder).arg(subMatched), "Success");
+
+        if (curData->data_.metaData.numMismatched > 0 || subMismatched > 0) {
             emit setMode(Mode::UpdateMismatch);
             makeTreeModel(curData->listOf(FileValues::Mismatched));
         }
-        else
-            emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
-                                 .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
     }
 }
 
