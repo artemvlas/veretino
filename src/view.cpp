@@ -16,7 +16,9 @@ void View::setFileSystemModel()
 {
     saveLastPath();
     deleteOldModel();
+
     this->setModel(fileSystem);
+    emit modelChanged(true);
 
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
@@ -28,7 +30,7 @@ void View::setFileSystemModel()
     this->setColumnWidth(0, 450);
     this->setColumnWidth(1, 100);
     this->setIndexByPath(lastFileSystemPath);
-    emit modelChanged(true);
+
 }
 
 void View::setTreeModel(TreeModel *model)
@@ -44,6 +46,7 @@ void View::setTreeModel(TreeModel *model)
     deleteOldModel();
 
     this->setModel(model);
+    emit modelChanged(false);
 
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
@@ -52,7 +55,6 @@ void View::setTreeModel(TreeModel *model)
     this->setColumnWidth(0, 450);
     this->setColumnWidth(1, 130);
     setIndexByPath(lastModelPath);
-    emit modelChanged(false);
 }
 
 bool View::isViewFileSystem()
