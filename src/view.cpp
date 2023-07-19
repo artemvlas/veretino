@@ -57,7 +57,7 @@ void View::setTreeModel(TreeModel *model)
 
 bool View::isViewFileSystem()
 {
-    return (this->model() != nullptr && this->model()->objectName() == "fileSystem");
+    return (this->model() == fileSystem);
 }
 
 void View::setIndexByPath(const QString &path)
@@ -117,13 +117,17 @@ void View::saveLastPath()
 
 void View::deleteOldModel()
 {
-    if (this->model() != nullptr && this->model()->objectName() != "fileSystem") {
-        qDebug() << "oldModel deleted";
-        delete this->model();
+    if (this->model() != nullptr && this->model() != fileSystem) {
+        qDebug() << "'oldModel' will be deleted...";
+        QAbstractItemModel *oldModel = this->model();
+        delete oldModel;
+        oldModel = nullptr;
     }
     if (this->selectionModel() != nullptr) {
-        qDebug() << "oldSelectionModel deleted";
-        delete this->selectionModel();
+        qDebug() << "'oldSelectionModel' will be deleted...";
+        QItemSelectionModel *oldSelectionModel = this->selectionModel();
+        delete oldSelectionModel;
+        oldSelectionModel = nullptr;
     }
 }
 
