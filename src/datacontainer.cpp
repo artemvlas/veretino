@@ -393,7 +393,10 @@ void DataMaintainer::dbStatus()
     else
         result.append("\n");
 
-    result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
+    if (data_.metaData.numAvailable > 0)
+        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
+    else
+        result.append("\nNO FILES available to check");
 
     if (data_.metaData.numUnreadable > 0)
         result.append(QString("\nUnreadable files: %1").arg(data_.metaData.numUnreadable));
@@ -408,16 +411,17 @@ void DataMaintainer::dbStatus()
     else
         result.append("\nNo Missing files found");
 
-    if (data_.metaData.numNotChecked == 0) {
-        if (data_.metaData.numMismatched > 0)
-            result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
-        else if (data_.metaData.numChecksums == data_.metaData.numAvailable)
-            result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
-        else
-            result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_.metaData.numAvailable));
-    }
-    else if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0) {
-        result.append("\n\nUse context menu for more options");
+    if (data_.metaData.numAvailable > 0) {
+        if (data_.metaData.numNotChecked == 0) {
+            if (data_.metaData.numMismatched > 0)
+                result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
+            else if (data_.metaData.numChecksums == data_.metaData.numAvailable)
+                result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
+            else
+                result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_.metaData.numAvailable));
+        }
+        else if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0)
+            result.append("\n\nUse context menu for more options");
     }
 
     emit showMessage(result, "Database status");

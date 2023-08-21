@@ -308,7 +308,7 @@ void Manager::verifyFileList(const QString &subFolder)
             if (curData->data_.metaData.numMismatched > 0)
                 emit showMessage(QString("%1 out of %2 files is changed or corrupted")
                                  .arg(curData->data_.metaData.numMismatched).arg(curData->data_.metaData.numMatched + curData->data_.metaData.numMismatched), "FAILED");
-            else
+            else if (curData->data_.metaData.numMatched > 0)
                 emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 chechsums matched.")
                                 .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
         }

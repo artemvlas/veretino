@@ -14,6 +14,11 @@ View::View(QWidget *parent)
 
 void View::setFileSystemModel()
 {
+    if (isViewFileSystem()) {
+        setIndexByPath(fileSystem->filePath(currentIndex));
+        return;
+    }
+
     saveLastPath();
     deleteOldModel();
 
@@ -35,13 +40,12 @@ void View::setFileSystemModel()
 
 void View::setTreeModel(TreeModel *model)
 {
-    saveLastPath();
-
     if (model == nullptr) {
         setFileSystemModel();
         return;
     }
 
+    saveLastPath();
     model_ = model;
     deleteOldModel();
 
