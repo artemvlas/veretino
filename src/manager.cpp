@@ -222,7 +222,7 @@ void Manager::updateNewLost()
 {
     QString itemsInfo;
 
-    if (curData->data_.metaData.numNewFiles > 0) {
+    if (curData->data_.numbers.numNewFiles > 0) {
         DataContainer dataCont(curData->data_.metaData);
         dataCont.filesData =  curData->listOf(FileValues::New);
 
@@ -231,12 +231,12 @@ void Manager::updateNewLost()
             return;
         emit setMode(Mode::EndProcess);
 
-        itemsInfo = QString("added %1").arg(curData->data_.metaData.numNewFiles);
-        if (curData->data_.metaData.numMissingFiles > 0)
+        itemsInfo = QString("added %1").arg(curData->data_.numbers.numNewFiles);
+        if (curData->data_.numbers.numMissingFiles > 0)
             itemsInfo.append(", ");
     }
 
-    if (curData->data_.metaData.numMissingFiles > 0) {
+    if (curData->data_.numbers.numMissingFiles > 0) {
         itemsInfo.append(QString("removed %1").arg(curData->clearDataFromLostFiles()));
     }
 
@@ -305,12 +305,12 @@ void Manager::verifyFileList(const QString &subFolder)
     if (!recalculated.isEmpty() || dataCont.filesData.isEmpty()) {
         curData->updateMetaData();
         if (subFolder.isEmpty()) {
-            if (curData->data_.metaData.numMismatched > 0)
+            if (curData->data_.numbers.numMismatched > 0)
                 emit showMessage(QString("%1 out of %2 files is changed or corrupted")
-                                 .arg(curData->data_.metaData.numMismatched).arg(curData->data_.metaData.numMatched + curData->data_.metaData.numMismatched), "FAILED");
-            else if (curData->data_.metaData.numMatched > 0)
+                                 .arg(curData->data_.numbers.numMismatched).arg(curData->data_.numbers.numMatched + curData->data_.numbers.numMismatched), "FAILED");
+            else if (curData->data_.numbers.numMatched > 0)
                 emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 checksums matched.")
-                                .arg(curData->data_.metaData.numMatched).arg(curData->data_.metaData.shaType), "Success");
+                                .arg(curData->data_.numbers.numMatched).arg(curData->data_.metaData.shaType), "Success");
         }
         else if (subMismatched > 0)
             emit showMessage(QString("Subfolder: %1\n\n%2 out of %3 files in the Subfolder is changed or corrupted")
@@ -319,7 +319,7 @@ void Manager::verifyFileList(const QString &subFolder)
             emit showMessage(QString("Subfolder: %1\n\nAll %2 checked files passed the verification")
                              .arg(subFolder).arg(subMatched), "Success");
 
-        if (curData->data_.metaData.numMismatched > 0 || subMismatched > 0) {
+        if (curData->data_.numbers.numMismatched > 0 || subMismatched > 0) {
             emit setMode(Mode::UpdateMismatch);
             makeTreeModel(curData->listOf(FileValues::Mismatched));
         }
@@ -484,9 +484,9 @@ void Manager::isViewFS(const bool isFS)
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
 void Manager::chooseMode()
 {
-    if (curData->data_.metaData.numMismatched > 0)
+    if (curData->data_.numbers.numMismatched > 0)
         emit setMode(Mode::UpdateMismatch);
-    else if (curData->data_.metaData.numNewFiles > 0 || curData->data_.metaData.numMissingFiles > 0)
+    else if (curData->data_.numbers.numNewFiles > 0 || curData->data_.numbers.numMissingFiles > 0)
         emit setMode(Mode::ModelNewLost);
     else {
         emit setMode(Mode::Model);

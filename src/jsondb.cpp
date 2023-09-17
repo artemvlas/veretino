@@ -50,7 +50,7 @@ bool JsonDb::makeJson(const DataContainer &data)
 
     QJsonObject header;
     header["Created with"] = "Veretino 0.2.3 https://github.com/artemvlas/veretino";
-    header["Files number"] = data.metaData.numChecksums;
+    header["Files number"] = data.numbers.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
     header["Total size"] = format::dataSizeReadableExt(data.metaData.totalSize);
@@ -94,7 +94,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     doc.setArray(mainArray);
 
     QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
-                                    .arg(data.metaData.numChecksums)
+                                    .arg(data.numbers.numChecksums)
                                     .arg(format::dataSizeReadable(data.metaData.totalSize));
 
 

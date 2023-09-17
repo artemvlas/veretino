@@ -15,14 +15,6 @@ class TreeModel;
 
 struct MetaData {
     int shaType = 0; // 1 or 256 or 512
-    int numChecksums = 0; // number of files with checksums
-    int numMatched = 0; // number of check files with matched checksums
-    int numMismatched = 0; // ... mismatched checksums
-    int numAvailable = 0; // the number of files that exist on the disk and are readable, for which checksums are stored
-    int numNewFiles = 0;
-    int numMissingFiles = 0;
-    int numUnreadable = 0;
-    int numNotChecked = 0;
     QString workDir; // current working folder
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved
@@ -31,8 +23,20 @@ struct MetaData {
     FilterRule filter;
 };
 
+struct Numbers {
+    int numChecksums = 0; // number of files with checksums
+    int numMatched = 0; // number of check files with matched checksums
+    int numMismatched = 0; // ... mismatched checksums
+    int numAvailable = 0; // the number of files that exist on the disk and are readable, for which checksums are stored
+    int numNewFiles = 0;
+    int numMissingFiles = 0;
+    int numUnreadable = 0;
+    int numNotChecked = 0;
+};
+
 struct DataContainer {
     MetaData metaData;
+    Numbers numbers;
     FileList filesData; // main data
 
     DataContainer(){}
@@ -49,6 +53,7 @@ public:
 
     // functions
     void updateMetaData();
+    void updateNumbers();
 
     int updateData(const FileList &updateFiles); // add new data to 'data_.filesData', returns number of added/updated items: updateFiles.size()
     int updateData(FileList updateFiles, FileValues::FileStatus status); // adding 'status' to 'updateFiles' and updateData(updateFiles)^

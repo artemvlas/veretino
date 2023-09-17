@@ -23,76 +23,84 @@ void DataMaintainer::updateMetaData()
     if (data_.metaData.shaType != 1 && data_.metaData.shaType != 256 && data_.metaData.shaType != 512)
         data_.metaData.shaType = shaType(data_.filesData);
 
-    data_.metaData.numNewFiles = 0;
-    data_.metaData.numMissingFiles = 0;
-    data_.metaData.numChecksums = 0;
-    data_.metaData.numMatched = 0;
-    data_.metaData.numMismatched = 0;
-    data_.metaData.numAvailable = 0;
-    data_.metaData.numUnreadable = 0;
-    data_.metaData.numNotChecked = 0;
-    data_.metaData.totalSize = 0;
+    updateNumbers();
+}
+
+void DataMaintainer::updateNumbers()
+{
+    Numbers num;
 
     FileList::const_iterator iter;
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
         if (!iter.value().checksum.isEmpty())
-            ++data_.metaData.numChecksums;
+            ++num.numChecksums;
 
         switch (iter.value().status) {
         case FileValues::NotChecked:
             data_.metaData.totalSize += iter.value().size;
-            ++data_.metaData.numAvailable;
-            ++data_.metaData.numNotChecked;
+            ++num.numAvailable;
+            ++num.numNotChecked;
             break;
         case FileValues::Matched:
-            ++data_.metaData.numMatched;
+            ++num.numMatched;
             data_.metaData.totalSize += iter.value().size;
-            ++data_.metaData.numAvailable;
+            ++num.numAvailable;
             break;
         case FileValues::Mismatched:
-            ++data_.metaData.numMismatched;
+            ++num.numMismatched;
             data_.metaData.totalSize += iter.value().size;
-            ++data_.metaData.numAvailable;
+            ++num.numAvailable;
             break;
         case FileValues::New:
-            ++data_.metaData.numNewFiles;
+            ++num.numNewFiles;
             break;
         case FileValues::Missing:
-            ++data_.metaData.numMissingFiles;
+            ++num.numMissingFiles;
             break;
         case FileValues::Unreadable:
-            ++data_.metaData.numUnreadable;
+            ++num.numUnreadable;
             break;
         case FileValues::Added:
-            ++data_.metaData.numMatched;
+            ++num.numMatched;
             data_.metaData.totalSize += iter.value().size;
-            ++data_.metaData.numAvailable;
+            ++num.numAvailable;
             break;
         case FileValues::Removed:
             break;
         case FileValues::ChecksumUpdated:
-            ++data_.metaData.numMatched;
+            ++num.numMatched;
             data_.metaData.totalSize += iter.value().size;
-            ++data_.metaData.numAvailable;
+            ++num.numAvailable;
             break;
         }
     }
 
-    QString checkStatus("\t");
+    data_.numbers = num;
 
-    if (data_.metaData.numMismatched > 0)
-        checkStatus.append(QString("☒%1").arg(data_.metaData.numMismatched));
-    if (data_.metaData.numMatched > 0)
-        checkStatus.append(QString(" ✓%1").arg(data_.metaData.numMatched));
+    QString newmissing;
+    QString mismatched;
+    QString matched;
+    QString sep;
 
-    if (checkStatus.size() > 2)
-        checkStatus.append(" : ");
+    if (num.numNewFiles > 0 || num.numMissingFiles > 0)
+        newmissing = "! ";
+
+    if (num.numMismatched > 0)
+        mismatched = QString("☒%1").arg(num.numMismatched);
+    if (num.numMatched > 0)
+        matched = QString(" ✓%1").arg(num.numMatched);
+
+    if (num.numMismatched > 0 || num.numMatched > 0)
+        sep = " : ";
+
+    QString checkStatus = QString("\t%1%2%3%4").arg(newmissing, mismatched, matched, sep);
 
     emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
                             .arg(checkStatus)
-                            .arg(data_.metaData.numAvailable)
+                            .arg(num.numAvailable)
                             .arg(format::dataSizeReadable(data_.metaData.totalSize))
                             .arg(data_.metaData.shaType));
+
 }
 
 void DataMaintainer::updateFilesValues()
@@ -388,39 +396,39 @@ void DataMaintainer::dbStatus()
 
     result.append(QString("\nLast update: %1").arg(data_.metaData.saveDateTime));
 
-    if (data_.metaData.numChecksums != data_.metaData.numAvailable)
-        result.append(QString("\n\nStored checksums: %1").arg(data_.metaData.numChecksums));
+    if (data_.numbers.numChecksums != data_.numbers.numAvailable)
+        result.append(QString("\n\nStored checksums: %1").arg(data_.numbers.numChecksums));
     else
         result.append("\n");
 
-    if (data_.metaData.numAvailable > 0)
-        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.metaData.numAvailable, data_.metaData.totalSize)));
+    if (data_.numbers.numAvailable > 0)
+        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.numbers.numAvailable, data_.metaData.totalSize)));
     else
         result.append("\nNO FILES available to check");
 
-    if (data_.metaData.numUnreadable > 0)
-        result.append(QString("\nUnreadable files: %1").arg(data_.metaData.numUnreadable));
+    if (data_.numbers.numUnreadable > 0)
+        result.append(QString("\nUnreadable files: %1").arg(data_.numbers.numUnreadable));
 
-    if (data_.metaData.numNewFiles > 0)
+    if (data_.numbers.numNewFiles > 0)
         result.append("\n\nNew: " + Files::contentStatus(listOf(FileValues::New)));
     else
         result.append("\n\nNo New files found");
 
-    if (data_.metaData.numMissingFiles > 0)
-        result.append(QString("\nMissing: %1 files").arg(data_.metaData.numMissingFiles));
+    if (data_.numbers.numMissingFiles > 0)
+        result.append(QString("\nMissing: %1 files").arg(data_.numbers.numMissingFiles));
     else
         result.append("\nNo Missing files found");
 
-    if (data_.metaData.numAvailable > 0) {
-        if (data_.metaData.numNotChecked == 0) {
-            if (data_.metaData.numMismatched > 0)
-                result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.metaData.numMismatched).arg(data_.metaData.numChecksums));
-            else if (data_.metaData.numChecksums == data_.metaData.numAvailable)
-                result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.metaData.numChecksums));
+    if (data_.numbers.numAvailable > 0) {
+        if (data_.numbers.numNotChecked == 0) {
+            if (data_.numbers.numMismatched > 0)
+                result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.numbers.numMismatched).arg(data_.numbers.numChecksums));
+            else if (data_.numbers.numChecksums == data_.numbers.numAvailable)
+                result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.numbers.numChecksums));
             else
-                result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_.metaData.numAvailable));
+                result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_.numbers.numAvailable));
         }
-        else if (data_.metaData.numNewFiles > 0 || data_.metaData.numMissingFiles > 0)
+        else if (data_.numbers.numNewFiles > 0 || data_.numbers.numMissingFiles > 0)
             result.append("\n\nUse context menu for more options");
     }
 
