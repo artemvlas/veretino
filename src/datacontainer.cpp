@@ -291,7 +291,8 @@ void DataMaintainer::importJson(const QString &jsonFilePath)
 
 void DataMaintainer::exportToJson()
 {
-    updateMetaData();
+    updateNumbers();
+    data_.metaData.saveDateTime = format::currentDateTime();
 
     JsonDb *json = new JsonDb;
     connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);

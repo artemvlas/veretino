@@ -54,7 +54,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
     header["Total size"] = format::dataSizeReadableExt(data.metaData.totalSize);
-    header["Updated"] = format::currentDateTime();
+    header["Updated"] = data.metaData.saveDateTime;
     if (isWorkDirRelative)
         header["Working folder"] = "Relative";
     else
