@@ -29,6 +29,7 @@ void DataMaintainer::updateMetaData()
 void DataMaintainer::updateNumbers()
 {
     Numbers num;
+    data_.metaData.totalSize = 0;
 
     FileList::const_iterator iter;
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
