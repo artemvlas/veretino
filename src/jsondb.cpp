@@ -53,7 +53,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     header["Files number"] = data.numbers.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
-    header["Total size"] = format::dataSizeReadableExt(data.metaData.totalSize);
+    header["Total size"] = data.metaData.totalSize;
     header["Updated"] = data.metaData.saveDateTime;
     if (isWorkDirRelative)
         header["Working folder"] = "Relative";
@@ -95,7 +95,7 @@ bool JsonDb::makeJson(const DataContainer &data)
 
     QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
                                     .arg(data.numbers.numChecksums)
-                                    .arg(format::dataSizeReadable(data.metaData.totalSize));
+                                    .arg(format::dataSizeReadable(data.numbers.totalSize));
 
 
     QString pathToSave;

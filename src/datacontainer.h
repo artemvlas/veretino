@@ -19,7 +19,7 @@ struct MetaData {
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved
     QString about; // contains a brief description of the item changes or status, if any
-    qint64 totalSize = 0; // total size of all files for which there are checksums in 'filesData'
+    QString totalSize;
     FilterRule filter;
 };
 
@@ -32,6 +32,8 @@ struct Numbers {
     int numMissingFiles = 0;
     int numUnreadable = 0;
     int numNotChecked = 0;
+
+    qint64 totalSize = 0; // total size in bytes of all files for which there are checksums in 'filesData'
 };
 
 struct DataContainer {

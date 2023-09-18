@@ -24,12 +24,13 @@ void DataMaintainer::updateMetaData()
         data_.metaData.shaType = shaType(data_.filesData);
 
     updateNumbers();
+
+    data_.metaData.totalSize = format::dataSizeReadableExt(data_.numbers.totalSize);
 }
 
 void DataMaintainer::updateNumbers()
 {
     Numbers num;
-    data_.metaData.totalSize = 0;
 
     FileList::const_iterator iter;
     for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
@@ -38,19 +39,16 @@ void DataMaintainer::updateNumbers()
 
         switch (iter.value().status) {
         case FileValues::NotChecked:
-            data_.metaData.totalSize += iter.value().size;
-            ++num.numAvailable;
             ++num.numNotChecked;
+            num.totalSize += iter.value().size;
             break;
         case FileValues::Matched:
             ++num.numMatched;
-            data_.metaData.totalSize += iter.value().size;
-            ++num.numAvailable;
+            num.totalSize += iter.value().size;
             break;
         case FileValues::Mismatched:
             ++num.numMismatched;
-            data_.metaData.totalSize += iter.value().size;
-            ++num.numAvailable;
+            num.totalSize += iter.value().size;
             break;
         case FileValues::New:
             ++num.numNewFiles;
@@ -63,19 +61,18 @@ void DataMaintainer::updateNumbers()
             break;
         case FileValues::Added:
             ++num.numMatched;
-            data_.metaData.totalSize += iter.value().size;
-            ++num.numAvailable;
+            num.totalSize += iter.value().size;
             break;
         case FileValues::Removed:
             break;
         case FileValues::ChecksumUpdated:
             ++num.numMatched;
-            data_.metaData.totalSize += iter.value().size;
-            ++num.numAvailable;
+            num.totalSize += iter.value().size;
             break;
         }
     }
 
+    num.numAvailable = num.numNotChecked + num.numMatched + num.numMismatched;
     data_.numbers = num;
 
     QString newmissing;
@@ -99,7 +96,7 @@ void DataMaintainer::updateNumbers()
     emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
                             .arg(checkStatus)
                             .arg(num.numAvailable)
-                            .arg(format::dataSizeReadable(data_.metaData.totalSize))
+                            .arg(format::dataSizeReadable(num.totalSize))
                             .arg(data_.metaData.shaType));
 
 }
@@ -404,7 +401,7 @@ void DataMaintainer::dbStatus()
         result.append("\n");
 
     if (data_.numbers.numAvailable > 0)
-        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.numbers.numAvailable, data_.metaData.totalSize)));
+        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.numbers.numAvailable, data_.numbers.totalSize)));
     else
         result.append("\nNO FILES available to check");
 
