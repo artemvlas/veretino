@@ -92,7 +92,8 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::verifyFileList, manager, &Manager::verifyFileList);
     connect(this, &MainWindow::updateNewLost, manager, &Manager::updateNewLost);
     connect(this, &MainWindow::updateMismatch, manager, &Manager::updateMismatch);
-    connect(this, &MainWindow::checkFileSummary, manager, &Manager::checkFileSummary); // check *.sha1 *.sha256 *.sha512 summaries
+    connect(this, &MainWindow::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
+    connect(this, &MainWindow::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
     connect(this, &MainWindow::checkCurrentItemSum, manager, &Manager::checkCurrentItemSum);
     connect(this, &MainWindow::copyStoredChecksum, manager, &Manager::copyStoredChecksum);
 
@@ -134,7 +135,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 {
     using namespace Mode;
     QModelIndex index = ui->treeView->indexAt(point);
-    QString path = curPath;
+    QString clipboardText = QGuiApplication::clipboard()->text();
 
     QMenu *contextMenu = new QMenu(ui->treeView);
     connect(contextMenu, &QMenu::aboutToHide, contextMenu, &QMenu::deleteLater);
@@ -149,19 +150,24 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         else if (index.isValid()) {
 
             if (viewMode == Folder) {
-                contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(path);});
+                contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(curPath);});
                 contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this, [=]{emit cancelProcess(); emit processFolderSha(path, settings.value("shaType").toInt());});
+                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this,
+                                       [=]{emit cancelProcess(); emit processFolderSha(curPath, settings.value("shaType").toInt());});
             }
             else if (viewMode == File) {
-                contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(path, 1);});
-                contextMenu->addAction("Compute SHA-256 for file", this, [=]{emit processFileSha(path, 256);});
-                contextMenu->addAction("Compute SHA-512 for file", this, [=]{emit processFileSha(path, 512);});
+                if (tools::mayBeChecksum(clipboardText)) {
+                    contextMenu->addAction("Check the file with the copied checksum", this, [=]{emit checkFile(curPath, clipboardText);});
+                    contextMenu->addSeparator();
+                }
+                contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(curPath, 1);});
+                contextMenu->addAction("Compute SHA-256 for file", this, [=]{emit processFileSha(curPath, 256);});
+                contextMenu->addAction("Compute SHA-512 for file", this, [=]{emit processFileSha(curPath, 512);});
             }
             else if (viewMode == DbFile)
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
             else if (viewMode == SumFile) {
-                contextMenu->addAction("Check the Checksum", this, [=]{emit checkFileSummary(curPath);});
+                contextMenu->addAction("Check the Checksum", this, [=]{emit checkSummaryFile(curPath);});
             }
         }
     }
@@ -294,7 +300,7 @@ void MainWindow::doWork()
         emit parseJsonFile(curPath);
         break;
     case SumFile:
-        emit checkFileSummary(curPath);
+        emit checkSummaryFile(curPath);
         break;
     case Model:
         emit verifyFileList();
@@ -325,7 +331,7 @@ void MainWindow::quickAction()
         emit parseJsonFile(curPath);
         break;
     case SumFile:
-        emit checkFileSummary(curPath);
+        emit checkSummaryFile(curPath);
         break;
     case Model:
         if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())

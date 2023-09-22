@@ -326,13 +326,13 @@ void Manager::verifyFileList(const QString &subFolder)
     }
 }
 
-void Manager::checkFileSummary(const QString &path)
+void Manager::checkSummaryFile(const QString &path)
 {
     QFileInfo fileInfo(path);
     QString ext = fileInfo.suffix().toLower();
     int shatype = ext.remove("sha").toInt();
-    QString checkFileName = fileInfo.completeBaseName();
-    QString checkFilePath = paths::joinPath(paths::parentFolder(path), checkFileName);
+    QString checkSummaryFileName = fileInfo.completeBaseName();
+    QString checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), checkSummaryFileName);
 
     QFile sumFile(path);
     QString line;
@@ -343,20 +343,30 @@ void Manager::checkFileSummary(const QString &path)
         return;
     }
 
-    if (!QFileInfo(checkFilePath).isFile()) {
-        checkFilePath = paths::joinPath(paths::parentFolder(path), line.mid(tools::shaStrLen(shatype) + 2).remove("\n"));
-        if (!QFileInfo(checkFilePath).isFile()) {
+    if (!QFileInfo(checkSummaryFilePath).isFile()) {
+        checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), line.mid(tools::shaStrLen(shatype) + 2).remove("\n"));
+        if (!QFileInfo(checkSummaryFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
             return;
         }
     }
 
-    emit setMode(Mode::Processing);   
-    QString sum = shaCalc->calculate(checkFilePath, shatype);
+    checkFile(checkSummaryFilePath, line.mid(0, tools::shaStrLen(shatype)).toLower(), shatype);
+}
+
+void Manager::checkFile(const QString &filePath, const QString &checkSum)
+{
+    checkFile(filePath, checkSum, tools::shaTypeByLen(checkSum.length()));
+}
+
+void Manager::checkFile(const QString &filePath, const QString &checkSum, int shaType)
+{
+    emit setMode(Mode::Processing);
+    QString sum = shaCalc->calculate(filePath, shaType);
     emit setMode(Mode::EndProcess);
 
     if (!sum.isEmpty())
-        showFileCheckResultMessage(sum == line.mid(0, tools::shaStrLen(shatype)).toLower());
+        showFileCheckResultMessage(sum == checkSum);
 }
 
 //check only selected file instead all database cheking

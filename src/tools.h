@@ -6,8 +6,10 @@
 
 namespace tools {
 int shaStrLen(int shatype); // returns the length of the checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
+int shaTypeByLen(int length);
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
+bool mayBeChecksum(const QString &text);
 } // namespace tools
 
 namespace format {

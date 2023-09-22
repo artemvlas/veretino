@@ -20,6 +20,20 @@ int shaStrLen(int shatype)
     }
 }
 
+int shaTypeByLen(int length)
+{
+    if (length == 40)
+        return 1;
+    else if (length == 64)
+        return 256;
+    else if (length == 128)
+        return 512;
+    else {
+        qDebug() << "tools::shaTypeByLen | Wrong input length:" << length;
+        return 0;
+    }
+}
+
 bool isDatabaseFile(const QString &filePath) {
     return filePath.endsWith(".ver.json", Qt::CaseInsensitive);
 }
@@ -29,6 +43,11 @@ bool isSummaryFile(const QString &filePath)
     return (filePath.endsWith(".sha1", Qt::CaseInsensitive)
             || filePath.endsWith(".sha256", Qt::CaseInsensitive)
             || filePath.endsWith(".sha512", Qt::CaseInsensitive));
+}
+
+bool mayBeChecksum(const QString &text)
+{
+    return (text.length() == 40 || text.length() == 64 || text.length() == 128);
 }
 } // namespace tools
 
