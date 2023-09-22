@@ -45,7 +45,7 @@ bool isSummaryFile(const QString &filePath)
             || filePath.endsWith(".sha512", Qt::CaseInsensitive));
 }
 
-bool mayBeChecksum(const QString &text)
+bool canBeChecksum(const QString &text)
 {
     bool isOK = false;
 

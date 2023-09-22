@@ -135,7 +135,6 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 {
     using namespace Mode;
     QModelIndex index = ui->treeView->indexAt(point);
-    QString clipboardText = QGuiApplication::clipboard()->text();
 
     QMenu *contextMenu = new QMenu(ui->treeView);
     connect(contextMenu, &QMenu::aboutToHide, contextMenu, &QMenu::deleteLater);
@@ -156,7 +155,8 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                                        [=]{emit cancelProcess(); emit processFolderSha(curPath, settings.value("shaType").toInt());});
             }
             else if (viewMode == File) {
-                if (tools::mayBeChecksum(clipboardText)) {
+                QString clipboardText = QGuiApplication::clipboard()->text();
+                if (tools::canBeChecksum(clipboardText)) {
                     contextMenu->addAction("Check the file with the copied checksum:", this, [=]{emit checkFile(curPath, clipboardText);});
                     contextMenu->addAction(clipboardText, this, [=]{emit checkFile(curPath, clipboardText);});
                     contextMenu->addSeparator();

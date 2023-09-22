@@ -9,7 +9,7 @@ int shaStrLen(int shatype); // returns the length of the checksum string dependi
 int shaTypeByLen(int length);
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
-bool mayBeChecksum(const QString &text);
+bool canBeChecksum(const QString &text);
 } // namespace tools
 
 namespace format {
