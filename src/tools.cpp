@@ -47,7 +47,17 @@ bool isSummaryFile(const QString &filePath)
 
 bool mayBeChecksum(const QString &text)
 {
-    return (text.length() == 40 || text.length() == 64 || text.length() == 128);
+    bool isOK = false;
+
+    if (text.length() == 40 || text.length() == 64 || text.length() == 128) {
+        isOK = true;
+        for (int i = 0; isOK && i < text.length(); ++i) {
+            if (!text.at(i).isLetterOrNumber())
+                isOK = false;
+        }
+    }
+
+    return isOK;
 }
 } // namespace tools
 
