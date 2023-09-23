@@ -111,6 +111,14 @@ QString dataSizeReadableExt(qint64 sizeBytes)
     return QString("%1 (%2 bytes)").arg(dataSizeReadable(sizeBytes), numString(sizeBytes));
 }
 
+QString shortenString(const QString &string, int length)
+{
+    if (string.length() > length)
+        return string.mid(0, length).append("...");
+    else
+        return string;
+}
+
 QString filesNumberAndSize(int filesNumber, qint64 filesSize)
 {
     QString s("files");

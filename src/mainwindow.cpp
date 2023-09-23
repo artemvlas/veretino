@@ -157,8 +157,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             else if (viewMode == File) {
                 QString clipboardText = QGuiApplication::clipboard()->text();
                 if (tools::canBeChecksum(clipboardText)) {
-                    contextMenu->addAction("Check the file with the copied checksum:", this, [=]{emit checkFile(curPath, clipboardText);});
-                    contextMenu->addAction(clipboardText, this, [=]{emit checkFile(curPath, clipboardText);});
+                    contextMenu->addAction("Check the file by checksum: " + format::shortenString(clipboardText), this, [=]{emit checkFile(curPath, clipboardText);});
                     contextMenu->addSeparator();
                 }
                 contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(curPath, 1);});

@@ -39,12 +39,12 @@ For users of Arch-based distros, Veretino also is available on the [AUR](https:/
 #### Building the app is very easy:
 * Download and extract the source code, or type in terminal:
 
-      $ git clone https://github.com/artemvlas/veretino
+      git clone https://github.com/artemvlas/veretino
 * execute 'makeScripts/makeInstall.sh'
 * Or do it yourself:
 
-      $ mkdir build
-      $ cd build
-      $ qmake ..
-      $ make -j$(nproc)
-      $ sudo make install
+      mkdir build
+      cd build
+      qmake ..
+      make -j$(nproc)
+      sudo make install
