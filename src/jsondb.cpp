@@ -49,7 +49,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     bool isWorkDirRelative = !data.metaData.databaseFileName.contains('/');
 
     QJsonObject header;
-    header["Created with"] = "Veretino 0.2.3 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino 0.2.4 https://github.com/artemvlas/veretino";
     header["Files number"] = data.numbers.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);

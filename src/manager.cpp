@@ -127,7 +127,7 @@ void Manager::processFileSha(const QString &filePath, int shatype, bool summaryF
 
     if (clipboard) {
         emit toClipboard(sum); // send checksum to clipboard
-        emit setStatusbarText("Computed checksum copied to clipboard");
+        emit setStatusbarText("Computed checksum is copied to clipboard");
     }
 
     if (summaryFile) {
@@ -135,7 +135,7 @@ void Manager::processFileSha(const QString &filePath, int shatype, bool summaryF
         QFile file(summaryFile);
         if (file.open(QFile::WriteOnly)) {
             file.write(QString("%1 *%2").arg(sum, QFileInfo(filePath).fileName()).toUtf8());
-            emit showMessage(QString("Checksum saved to summary file:\n%1").arg(QFileInfo(summaryFile).fileName()));
+            emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(QFileInfo(summaryFile).fileName()));
         }
         else {
             emit toClipboard(sum); // send checksum to clipboard

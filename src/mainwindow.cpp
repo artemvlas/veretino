@@ -160,9 +160,9 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                     contextMenu->addAction("Check the file by checksum: " + format::shortenString(clipboardText), this, [=]{emit checkFile(curPath, clipboardText);});
                     contextMenu->addSeparator();
                 }
-                contextMenu->addAction("Compute SHA-1 for file", this, [=]{emit processFileSha(curPath, 1);});
-                contextMenu->addAction("Compute SHA-256 for file", this, [=]{emit processFileSha(curPath, 256);});
-                contextMenu->addAction("Compute SHA-512 for file", this, [=]{emit processFileSha(curPath, 512);});
+                contextMenu->addAction("SHA-1 --> *.sha1", this, [=]{emit processFileSha(curPath, 1);});
+                contextMenu->addAction("SHA-256 --> *.sha256", this, [=]{emit processFileSha(curPath, 256);});
+                contextMenu->addAction("SHA-512 --> *.sha512", this, [=]{emit processFileSha(curPath, 512);});
             }
             else if (viewMode == DbFile)
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
