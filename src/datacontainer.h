@@ -20,7 +20,6 @@ struct MetaData {
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved
     QString about; // contains a brief description of the item changes or status, if any
-    QString totalSize;
     FilterRule filter;
 };
 
