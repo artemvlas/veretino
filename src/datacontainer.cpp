@@ -81,7 +81,7 @@ void DataMaintainer::updateNumbers()
     QString sep;
 
     if (num.numNewFiles > 0 || num.numMissingFiles > 0)
-        newmissing = "! ";
+        newmissing = "* ";
 
     if (num.numMismatched > 0)
         mismatched = QString("☒%1").arg(num.numMismatched);
