@@ -144,6 +144,9 @@ QString algoToStr(QCryptographicHash::Algorithm algo)
 
 QString filesNumberAndSize(int filesNumber, qint64 filesSize)
 {
+    if (filesNumber == 0)
+        return "no files";
+
     QString s("files");
 
     if (filesNumber == 1)
