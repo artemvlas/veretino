@@ -26,7 +26,8 @@ settingDialog::settingDialog(const Settings &settings, QWidget *parent) :
     ui->ignoreDbFiles->setChecked(settings_.filter.ignoreDbFiles);
     ui->ignoreShaFiles->setChecked(settings_.filter.ignoreShaFiles);
 
-    ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
+    if (settings_.dbPrefix != "checksums")
+        ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
 }
 
 settingDialog::~settingDialog()
