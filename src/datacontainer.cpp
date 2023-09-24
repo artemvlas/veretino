@@ -416,6 +416,18 @@ void DataMaintainer::dbStatus()
     emit showMessage(result, "Database status");
 }
 
+void DataMaintainer::cancelProcess()
+{
+    canceled = true;
+}
+
+DataMaintainer::~DataMaintainer()
+{
+    qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
+    emit setPermanentStatus();
+}
+
+/*
 QCryptographicHash::Algorithm DataMaintainer::defineAlgorithm(const FileList &fileList)
 {
     int len = 0;
@@ -440,14 +452,4 @@ QCryptographicHash::Algorithm DataMaintainer::defineAlgorithm(const FileList &fi
         return QCryptographicHash::Sha256;
     }
 }
-
-void DataMaintainer::cancelProcess()
-{
-    canceled = true;
-}
-
-DataMaintainer::~DataMaintainer()
-{
-    qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
-    emit setPermanentStatus();
-}
+*/

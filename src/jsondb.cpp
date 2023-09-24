@@ -175,11 +175,14 @@ DataContainer JsonDb::parseJson(const QString &filePath)
         parsedData.metaData.filter.extensionsList = header.value("Included Only").toString().split(" ");
     }
 
-    parsedData.metaData.algorithm = tools::algorithmByStrLen(filelistData.begin().value().toString().length());
-
-    if (header.contains("Used algorithm")
-        && parsedData.metaData.algorithm != tools::strToAlgo(header.value("Used algorithm").toString()))
+    if (header.contains("Used algorithm")) {
         parsedData.metaData.algorithm = tools::strToAlgo(header.value("Used algorithm").toString());
+        qDebug() << "JsonDb::parseJson | Used algorithm from header data";
+    }
+    else {
+        parsedData.metaData.algorithm = tools::algorithmByStrLen(filelistData.begin().value().toString().length());
+        qDebug() << "JsonDb::parseJson | The algorithm is determined by the length of the checksum string";
+    }
 
     if (header.contains("Updated"))
         parsedData.metaData.saveDateTime = header.value("Updated").toString();
