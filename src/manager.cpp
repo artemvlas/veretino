@@ -280,7 +280,7 @@ void Manager::verifyFileList(const QString &subFolder)
 
     // result
     if (!recalculated.isEmpty() || dataCont.filesData.isEmpty()) {
-        curData->updateMetaData();
+        curData->updateNumbers();
         if (subFolder.isEmpty()) {
             if (curData->data_.numbers.numMismatched > 0)
                 emit showMessage(QString("%1 out of %2 files is changed or corrupted")
@@ -357,7 +357,7 @@ void Manager::checkCurrentItemSum(const QString &path)
 
         if (!sum.isEmpty()) {
             showFileCheckResultMessage(curData->updateData(path, sum));
-            curData->updateMetaData();
+            curData->updateNumbers();
             chooseMode();
         }
     }

@@ -53,7 +53,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     header["Files number"] = data.numbers.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = format::algoToStr(data.metaData.algorithm);
-    header["Total size"] = data.metaData.totalSize;
+    header["Total size"] = format::dataSizeReadableExt(data.numbers.totalSize);
     header["Updated"] = data.metaData.saveDateTime;
     if (isWorkDirRelative)
         header["Working folder"] = "Relative";

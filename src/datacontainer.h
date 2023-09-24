@@ -16,7 +16,6 @@ class TreeModel;
 
 struct MetaData {
     QCryptographicHash::Algorithm algorithm;
-    //int shaType = 0; // 1 or 256 or 512
     QString workDir; // current working folder
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved
@@ -56,7 +55,6 @@ public:
     ~DataMaintainer();
 
     // functions
-    void updateMetaData();
     void updateNumbers();
 
     int updateData(const FileList &updateFiles); // add new data to 'data_.filesData', returns number of added/updated items: updateFiles.size()
@@ -86,7 +84,7 @@ public slots:
     void cancelProcess();
 private:
     bool canceled = false;
-    int shaType(const FileList &fileList); // determines the shaType by the string length of the stored checksum
+    QCryptographicHash::Algorithm defineAlgorithm(const FileList &fileList); // determines the shaType by the string length of the stored checksum
     int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
     void updateFilesValues();
 

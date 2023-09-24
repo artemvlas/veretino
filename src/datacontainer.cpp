@@ -13,19 +13,9 @@ DataMaintainer::DataMaintainer(QObject *parent)
 DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
     : QObject(parent), data_(initData)
 {
-    updateMetaData();
-
-    qDebug() << "DataMaintainer created | " << data_.metaData.workDir;
-}
-
-void DataMaintainer::updateMetaData()
-{
-    //if (data_.metaData.shaType != 1 && data_.metaData.shaType != 256 && data_.metaData.shaType != 512)
-    //    data_.metaData.shaType = shaType(data_.filesData);
-
     updateNumbers();
 
-    data_.metaData.totalSize = format::dataSizeReadableExt(data_.numbers.totalSize);
+    qDebug() << "DataMaintainer created | " << data_.metaData.workDir;
 }
 
 void DataMaintainer::updateNumbers()
@@ -121,12 +111,6 @@ void DataMaintainer::updateFilesValues()
 int DataMaintainer::findNewFiles()
 {
     emit setStatusbarText("Looking for new files...");
-
-    //FilterRule filter = data_.metaData.filter;
-    /*if (filter.extensionsList.isEmpty() || !filter.include) {
-        filter.include = false;
-        filter.extensionsList.append({"ver.json", "sha1", "sha256", "sha512"}); // <-- ignore these types while looking for new files
-    }*/
 
     canceled = false;
     int number = 0;
@@ -372,7 +356,7 @@ QString DataMaintainer::itemContentsInfo(const QString &itemPath)
 
 void DataMaintainer::dbStatus()
 {
-    updateMetaData();
+    updateNumbers();
 
     QString result("DB filename: ");
     if (data_.metaData.databaseFileName.contains('/')) {
@@ -432,7 +416,7 @@ void DataMaintainer::dbStatus()
     emit showMessage(result, "Database status");
 }
 
-int DataMaintainer::shaType(const FileList &fileList)
+QCryptographicHash::Algorithm DataMaintainer::defineAlgorithm(const FileList &fileList)
 {
     int len = 0;
 
@@ -443,17 +427,17 @@ int DataMaintainer::shaType(const FileList &fileList)
     }
 
     if (len == 40) {
-        return 1;
+        return QCryptographicHash::Sha1;
     }
     else if (len == 64) {
-        return 256;
+        return QCryptographicHash::Sha256;
     }
     else if (len == 128) {
-        return 512;
+        return QCryptographicHash::Sha512;
     }
     else {
-        qDebug() << "DataMaintainer::shaType() | Failed to determine the Algorithm. Invalid string length:" << len;
-        return 0;
+        qDebug() << "DataMaintainer::defineAlgorithm() | Failed to determine the Algorithm. Invalid string length:" << len;
+        return QCryptographicHash::Sha256;
     }
 }
 
