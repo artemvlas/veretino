@@ -4,8 +4,8 @@
 #include <QFileInfo>
 #include <QDir>
 
-Manager::Manager(QObject *parent)
-    : QObject(parent)
+Manager::Manager(Settings *settings, QObject *parent)
+    : QObject(parent), settings_(settings)
 {
     connections();
 }
@@ -35,9 +35,9 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     calcData.metaData.workDir = folderPath;
     calcData.metaData.algorithm = algo;
 
-    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(settings_.dbPrefix, paths::folderName(folderPath));
+    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::folderName(folderPath));
 
-    calcData.metaData.filter = settings_.filter;
+    calcData.metaData.filter = settings_->filter;
 
     // create the filelist
     calcData.filesData = F.allFiles(calcData.metaData.filter);
@@ -464,7 +464,6 @@ void Manager::isViewFS(const bool isFS)
     isViewFileSysytem = isFS;
     if (isFS)
         deleteCurData();
-    //qDebug() << "Manager::isViewFS" << isViewFileSysytem;
 }
 
 //if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
@@ -477,11 +476,6 @@ void Manager::chooseMode()
     else {
         emit setMode(Mode::Model);
     }
-}
-
-void Manager::getSettings(const Settings &settings)
-{
-    settings_ = settings;
 }
 
 void Manager::deleteCurData()

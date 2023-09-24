@@ -14,9 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     QThread::currentThread()->setObjectName("MAIN Thread");
 
-    //setSettings(); // set initial values to <settings> Map. In future versions, values from file
-    //emit settingsChanged(settings_);
-
     if (!argumentInput())
         ui->treeView->setFileSystemModel();
 
@@ -72,7 +69,7 @@ void MainWindow::connections()
     connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == Mode::Processing) {emit cancelProcess();} ui->treeView->setFileSystemModel();});
 
     connect(ui->actionSettings, &QAction::triggered, this, [=]{settingDialog dialog (settings_); if (dialog.exec() == QDialog::Accepted){
-                settings_ = dialog.getSettings(); setMode(viewMode); emit settingsChanged(settings_);}}); // "setMode" changes the text on button
+                                                            dialog.updateSettings(); setMode(viewMode);}}); // "setMode" changes the text on button
 
     connect(ui->actionAbout, &QAction::triggered, this, [=]{aboutDialog about; about.exec();});
 
@@ -121,9 +118,7 @@ void MainWindow::connectManager()
 
     // transfer settings and modes
     qRegisterMetaType<Mode::Modes>("Mode::Modes");
-    qRegisterMetaType<Settings>("Settings");
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
-    connect(this, &MainWindow::settingsChanged, manager, &Manager::getSettings); // send settings Map
 
     // change view
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
@@ -154,8 +149,8 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             if (viewMode == Folder) {
                 contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(curPath);});
                 contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute %1 for all files in folder").arg(format::algoToStr(settings_.algorithm)), this,
-                                                      [=]{emit cancelProcess(); emit processFolderSha(curPath, settings_.algorithm);});
+                contextMenu->addAction(QString("Compute %1 for all files in folder").arg(format::algoToStr(settings_->algorithm)), this,
+                                                      [=]{emit cancelProcess(); emit processFolderSha(curPath, settings_->algorithm);});
             }
             else if (viewMode == File) {
                 QString clipboardText = QGuiApplication::clipboard()->text();
@@ -258,10 +253,10 @@ void MainWindow::setMode(Mode::Modes mode)
 
     switch (viewMode) {
     case Folder:
-        ui->button->setText(format::algoToStr(settings_.algorithm).append(": Folder"));
+        ui->button->setText(format::algoToStr(settings_->algorithm).append(": Folder"));
         break;
     case File:
-        ui->button->setText(format::algoToStr(settings_.algorithm).append(": File"));
+        ui->button->setText(format::algoToStr(settings_->algorithm).append(": File"));
         break;
     case DbFile:
         ui->button->setText("Open DataBase");
@@ -294,10 +289,10 @@ void MainWindow::doWork()
     switch (viewMode) {
     case Folder:
         emit cancelProcess();
-        emit processFolderSha(curPath, settings_.algorithm);
+        emit processFolderSha(curPath, settings_->algorithm);
         break;
     case File:
-        emit processFileSha(curPath, settings_.algorithm);
+        emit processFileSha(curPath, settings_->algorithm);
         break;
     case DbFile:
         emit parseJsonFile(curPath);
@@ -328,7 +323,7 @@ void MainWindow::quickAction()
     using namespace Mode;
     switch (viewMode) {
     case File:
-        emit processFileSha(curPath, settings_.algorithm, false, true);
+        emit processFileSha(curPath, settings_->algorithm, false, true);
         break;
     case DbFile:
         emit parseJsonFile(curPath);

@@ -15,13 +15,13 @@ class settingDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit settingDialog(const Settings &settings, QWidget *parent = nullptr);
+    explicit settingDialog(Settings *settings, QWidget *parent = nullptr);
     ~settingDialog();
-    Settings getSettings();
+    void updateSettings();
 private:
     Ui::settingDialog *ui;
-    Settings settings_;
     QStringList extensionsList(); // return a list of extensions from input
+    Settings *settings_;
 };
 
 #endif // SETTINGDIALOG_H

@@ -47,11 +47,11 @@ private:
     void keyPressEvent(QKeyEvent* event) override;
 
     Ui::MainWindow *ui;
+    Settings *settings_ = new Settings; // stores the app settings
     QThread *thread = new QThread;
-    Manager *manager = new Manager; // Manager performs the main tasks. Works in separate thread^
+    Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
     QLabel *permanentStatus = new QLabel;
-    QString homePath = QDir::homePath();
-    Settings settings_; // stores the app settings
+    QString homePath = QDir::homePath();   
     QString curPath; // current path from &View::pathChanged
     Mode::Modes viewMode = Mode::NoMode; // Folder, File, DbFile, SumFile, Model...
     Mode::Modes previousViewMode = Mode::NoMode; //^
@@ -69,7 +69,6 @@ signals:
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
     void copyStoredChecksum(const QString &path, bool clipboard = true);
-    void settingsChanged(const Settings &settings);
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
     void showNewLostOnly();

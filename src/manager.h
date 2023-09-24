@@ -12,7 +12,7 @@ class Manager : public QObject
 {
     Q_OBJECT
 public:
-    explicit Manager(QObject *parent = nullptr);
+    explicit Manager(Settings *settings, QObject *parent = nullptr);
     ~Manager();
 
 public slots:
@@ -27,7 +27,6 @@ public slots:
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
     void updateNewLost(); // remove lost files, add new files
     void updateMismatch(); // update json Database with new checksums for files with failed verification
-    void getSettings(const Settings &settings);
     void resetDatabase(); // reopening and reparsing current database
     void showNewLostOnly();
     void deleteCurData();
@@ -46,7 +45,7 @@ private:
 
     ShaCalculator *shaCalc = new ShaCalculator;
     DataMaintainer *curData = nullptr;
-    Settings settings_;
+    Settings *settings_;
     bool isViewFileSysytem;
 
 signals:
