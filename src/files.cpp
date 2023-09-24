@@ -302,16 +302,23 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 {
+    if (!filter.includeOnly) {
+        if (tools::isDatabaseFile(filePath))
+            return !filter.ignoreDbFiles;
+        if (tools::isSummaryFile(filePath))
+            return !filter.ignoreShaFiles;
+    }
+
     if (filter.extensionsList.isEmpty())
         return true;
 
     // if 'filter.include' = true, a file ('filePath') with any extension from 'extensionsList' is allowed
     // if 'filter.include' = false, than all files except these types allowed
 
-    bool allowed = !filter.include;
+    bool allowed = !filter.includeOnly;
     foreach (const QString &ext, filter.extensionsList) {
         if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
-            allowed = filter.include;
+            allowed = filter.includeOnly;
             break;
         }
     }

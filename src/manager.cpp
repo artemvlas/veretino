@@ -23,7 +23,7 @@ void Manager::connections()
     connect(shaCalc, &ShaCalculator::setStatusbarText, this, &Manager::setStatusbarText);
 }
 
-void Manager::processFolderSha(const QString &folderPath, int shatype)
+void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo)
 {
     emit setMode(Mode::Processing);
 
@@ -33,45 +33,14 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
 
     DataContainer calcData;
     calcData.metaData.workDir = folderPath;
-    calcData.metaData.shaType = shatype;
+    calcData.metaData.algorithm = algo;
 
-    // database filename
-    QString dbPrefix;
-    if (settings.value("dbPrefix").isValid())
-        dbPrefix = settings.value("dbPrefix").toString();
-    else
-        dbPrefix = "checksums";
+    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(settings_.dbPrefix, paths::folderName(folderPath));
 
-    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(dbPrefix, paths::folderName(folderPath));
-
-    // filter rule
-    if (settings.value("onlyExtensions").isValid() && !settings.value("onlyExtensions").toStringList().isEmpty()) {
-        calcData.metaData.filter.extensionsList = settings.value("onlyExtensions").toStringList();
-    }
-    else {
-        QStringList ignoreList;
-        if (settings.value("ignoredExtensions").isValid() && !settings.value("ignoredExtensions").toStringList().isEmpty()) {
-            ignoreList.append(settings.value("ignoredExtensions").toStringList());
-        }
-
-        // adding *.ver.json or *.shaX file types to ignore list, if needed
-        if (settings.value("ignoreDbFiles").isValid() && settings.value("ignoreDbFiles").toBool())
-            ignoreList.append("ver.json");
-        if (settings.value("ignoreShaFiles").isValid() && settings.value("ignoreShaFiles").toBool())
-            ignoreList.append({"sha1", "sha256", "sha512"});
-
-        calcData.metaData.filter.include = false;
-        calcData.metaData.filter.extensionsList = ignoreList;
-    }
+    calcData.metaData.filter = settings_.filter;
 
     // create the filelist
     calcData.filesData = F.allFiles(calcData.metaData.filter);
-
-    // clear unneeded filtering rules
-    calcData.metaData.filter.extensionsList.removeOne("ver.json");
-    calcData.metaData.filter.extensionsList.removeOne("sha1");
-    calcData.metaData.filter.extensionsList.removeOne("sha256");
-    calcData.metaData.filter.extensionsList.removeOne("sha512");
 
     // exception and cancelation handling
     if (calcData.filesData.isEmpty()) {
@@ -88,7 +57,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
         return;
     }
 
-    QString permStatus = QString("SHA-%1").arg(shatype);
+    QString permStatus = format::algoToStr(algo);
     if (!calcData.metaData.filter.extensionsList.isEmpty())
         permStatus.prepend("filters applied | ");
 
@@ -104,7 +73,7 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
     }
 
     // saving to json
-    calcData.metaData.about = QString("SHA-%1 Checksums for %2 files calculated").arg(shatype).arg(calcData.filesData.size());
+    calcData.metaData.about = QString("%1 Checksums for %2 files calculated").arg(format::algoToStr(algo)).arg(calcData.filesData.size());
 
     curData = new DataMaintainer(calcData);
     connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
@@ -116,11 +85,11 @@ void Manager::processFolderSha(const QString &folderPath, int shatype)
     emit setMode(Mode::EndProcess);
 }
 
-void Manager::processFileSha(const QString &filePath, int shatype, bool summaryFile, bool clipboard)
+void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
 {
     emit setMode(Mode::Processing);
 
-    QString sum = shaCalc->calculate(filePath, shatype);
+    QString sum = shaCalc->calculate(filePath, algo);
     if (sum.isEmpty()) {
         return;
     }
@@ -131,15 +100,23 @@ void Manager::processFileSha(const QString &filePath, int shatype, bool summaryF
     }
 
     if (summaryFile) {
-        QString summaryFile = QString("%1.sha%2").arg(filePath).arg(shatype);
-        QFile file(summaryFile);
+        QString ext;
+        if (algo == QCryptographicHash::Sha1)
+            ext = "sha1";
+        else if (algo == QCryptographicHash::Sha256)
+            ext = "sha256";
+        else if (algo == QCryptographicHash::Sha512)
+            ext = "sha512";
+
+        QString sumFile = QString("%1.%2").arg(filePath, ext);
+        QFile file(sumFile);
         if (file.open(QFile::WriteOnly)) {
             file.write(QString("%1 *%2").arg(sum, QFileInfo(filePath).fileName()).toUtf8());
-            emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(QFileInfo(summaryFile).fileName()));
+            emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(QFileInfo(sumFile).fileName()));
         }
         else {
             emit toClipboard(sum); // send checksum to clipboard
-            emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(summaryFile), "Warning");
+            emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(sumFile), "Warning");
         }
     }
 
@@ -309,8 +286,8 @@ void Manager::verifyFileList(const QString &subFolder)
                 emit showMessage(QString("%1 out of %2 files is changed or corrupted")
                                  .arg(curData->data_.numbers.numMismatched).arg(curData->data_.numbers.numMatched + curData->data_.numbers.numMismatched), "FAILED");
             else if (curData->data_.numbers.numMatched > 0)
-                emit showMessage(QString("ALL %1 files passed the verification.\nStored SHA-%2 checksums matched.")
-                                .arg(curData->data_.numbers.numMatched).arg(curData->data_.metaData.shaType), "Success");
+                emit showMessage(QString("ALL %1 files passed the verification.\nStored %2 checksums matched.")
+                                     .arg(curData->data_.numbers.numMatched).arg(format::algoToStr(curData->data_.metaData.algorithm)), "Success");
         }
         else if (subMismatched > 0)
             emit showMessage(QString("Subfolder: %1\n\n%2 out of %3 files in the Subfolder is changed or corrupted")
@@ -329,8 +306,7 @@ void Manager::verifyFileList(const QString &subFolder)
 void Manager::checkSummaryFile(const QString &path)
 {
     QFileInfo fileInfo(path);
-    QString ext = fileInfo.suffix().toLower();
-    int shatype = ext.remove("sha").toInt();
+    QCryptographicHash::Algorithm algo = tools::strToAlgo(fileInfo.suffix());
     QString checkSummaryFileName = fileInfo.completeBaseName();
     QString checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), checkSummaryFileName);
 
@@ -344,25 +320,25 @@ void Manager::checkSummaryFile(const QString &path)
     }
 
     if (!QFileInfo(checkSummaryFilePath).isFile()) {
-        checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), line.mid(tools::shaStrLen(shatype) + 2).remove("\n"));
+        checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), line.mid(tools::algoStrLen(algo) + 2).remove("\n"));
         if (!QFileInfo(checkSummaryFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
             return;
         }
     }
 
-    checkFile(checkSummaryFilePath, line.mid(0, tools::shaStrLen(shatype)).toLower(), shatype);
+    checkFile(checkSummaryFilePath, line.mid(0, tools::algoStrLen(algo)).toLower(), algo);
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)
 {
-    checkFile(filePath, checkSum, tools::shaTypeByLen(checkSum.length()));
+    checkFile(filePath, checkSum, tools::algorithmByStrLen(checkSum.length()));
 }
 
-void Manager::checkFile(const QString &filePath, const QString &checkSum, int shaType)
+void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
     emit setMode(Mode::Processing);
-    QString sum = shaCalc->calculate(filePath, shaType);
+    QString sum = shaCalc->calculate(filePath, algo);
     emit setMode(Mode::EndProcess);
 
     if (!sum.isEmpty())
@@ -376,7 +352,7 @@ void Manager::checkCurrentItemSum(const QString &path)
 
     if (!savedSum.isEmpty()) {
         emit setMode(Mode::Processing);
-        QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.shaType);
+        QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.algorithm);
         emit setMode(Mode::EndProcess);
 
         if (!sum.isEmpty()) {
@@ -503,10 +479,9 @@ void Manager::chooseMode()
     }
 }
 
-void Manager::getSettings(const QVariantMap &settingsMap)
+void Manager::getSettings(const Settings &settings)
 {
-    settings = settingsMap;
-    qDebug() << "Manager::getSettings | " << settings;
+    settings_ = settings;
 }
 
 void Manager::deleteCurData()

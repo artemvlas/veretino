@@ -9,30 +9,15 @@ ShaCalculator::ShaCalculator(QObject *parent)
     connect(this, &ShaCalculator::cancelProcess, this, [&]{canceled = true;});
 }
 
-ShaCalculator::ShaCalculator(int shatype, QObject *parent)
+ShaCalculator::ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent)
     : QObject(parent)
 {
-    initShaType = shatype;
+    initAlgo = algo;
 
     connect(this, &ShaCalculator::cancelProcess, this, [&]{canceled = true;});
 }
 
-QCryptographicHash::Algorithm ShaCalculator::algorithm()
-{
-    return algorithm(initShaType);
-}
-
-QCryptographicHash::Algorithm ShaCalculator::algorithm(int shatype)
-{
-    if (shatype == 1)
-        return QCryptographicHash::Sha1;
-    else if (shatype == 512)
-        return QCryptographicHash::Sha512;
-    else
-        return QCryptographicHash::Sha256;
-}
-
-FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
+FileValues ShaCalculator::computeChecksum(const QString &filePath, QCryptographicHash::Algorithm algo)
 {
     FileValues curFileValues;
     QFile file(filePath);
@@ -41,7 +26,7 @@ FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
         return curFileValues;
     }
 
-    QCryptographicHash hash(algorithm(shatype));
+    QCryptographicHash hash(algo);
     while (!file.atEnd() && !canceled) {
         const QByteArray &buf = file.read(chunk);
         hash.addData(buf);
@@ -60,25 +45,25 @@ FileValues ShaCalculator::computeChecksum(const QString &filePath, int shatype)
 
 QString ShaCalculator::calculate(const QString &filePath)
 {
-    return calculate(filePath, initShaType);
+    return calculate(filePath, initAlgo);
 }
 
-QString ShaCalculator::calculate(const QString &filePath, int shatype)
+QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
 {
     doneSize = 0;
     totalSize = QFileInfo(filePath).size();
 
     canceled = false;
 
-    emit setStatusbarText(QString("Calculating SHA-%1 checksum: %2").arg(shatype).arg(Files(filePath).contentStatus()));
+    emit setStatusbarText(QString("Calculating %1 checksum: %2").arg(format::algoToStr(algo), Files(filePath).contentStatus()));
 
-    FileValues curFileValues = computeChecksum(filePath, shatype);
+    FileValues curFileValues = computeChecksum(filePath, algo);
 
     if (canceled) {
         emit setStatusbarText("Canceled");
     }
     else if (curFileValues.status != FileValues::Unreadable && !curFileValues.checksum.isEmpty()) {
-        emit setStatusbarText(QString("SHA-%1 calculated").arg(shatype));
+        emit setStatusbarText(QString("%1 calculated").arg(format::algoToStr(algo)));
     }
     else {
         emit setStatusbarText("read error");
@@ -112,7 +97,7 @@ FileList ShaCalculator::calculate(const DataContainer &filesContainer)
                         .arg(filesContainer.filesData.size())
                         .arg(doneData));
 
-        FileValues curFileValues = computeChecksum(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.shaType);
+        FileValues curFileValues = computeChecksum(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
 
         curFileValues.size = iter.value().size;
         resultList.insert(iter.key(), curFileValues);

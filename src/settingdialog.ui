@@ -179,7 +179,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButtonOnly">
+   <widget class="QRadioButton" name="radioButtonIncludeOnly">
     <property name="geometry">
      <rect>
       <x>285</x>

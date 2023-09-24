@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QThread::currentThread()->setObjectName("MAIN Thread");
 
-    setSettings(); // set initial values to <settings> Map. In future versions, values from file
+    //setSettings(); // set initial values to <settings> Map. In future versions, values from file
+    //emit settingsChanged(settings_);
 
     if (!argumentInput())
         ui->treeView->setFileSystemModel();
@@ -70,8 +71,8 @@ void MainWindow::connections()
 
     connect(ui->actionShowFs, &QAction::triggered, this, [=]{if (viewMode == Mode::Processing) {emit cancelProcess();} ui->treeView->setFileSystemModel();});
 
-    connect(ui->actionSettings, &QAction::triggered, this, [=]{settingDialog dialog (settings); if (dialog.exec() == QDialog::Accepted){
-                settings = dialog.getSettings(); setMode(viewMode); emit settingsChanged(settings);}}); // "setMode" changes the text on button
+    connect(ui->actionSettings, &QAction::triggered, this, [=]{settingDialog dialog (settings_); if (dialog.exec() == QDialog::Accepted){
+                settings_ = dialog.getSettings(); setMode(viewMode); emit settingsChanged(settings_);}}); // "setMode" changes the text on button
 
     connect(ui->actionAbout, &QAction::triggered, this, [=]{aboutDialog about; about.exec();});
 
@@ -86,6 +87,7 @@ void MainWindow::connectManager()
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
     // signals for execution tasks
+    qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     connect(this, &MainWindow::parseJsonFile, manager, &Manager::createDataModel);
     connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
     connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
@@ -119,6 +121,7 @@ void MainWindow::connectManager()
 
     // transfer settings and modes
     qRegisterMetaType<Mode::Modes>("Mode::Modes");
+    qRegisterMetaType<Settings>("Settings");
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
     connect(this, &MainWindow::settingsChanged, manager, &Manager::getSettings); // send settings Map
 
@@ -151,8 +154,8 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             if (viewMode == Folder) {
                 contextMenu->addAction("Folder Contents By Type", this, [=]{emit folderContentsByType(curPath);});
                 contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute SHA-%1 for all files in folder").arg(settings.value("shaType").toInt()), this,
-                                       [=]{emit cancelProcess(); emit processFolderSha(curPath, settings.value("shaType").toInt());});
+                contextMenu->addAction(QString("Compute %1 for all files in folder").arg(format::algoToStr(settings_.algorithm)), this,
+                                                      [=]{emit cancelProcess(); emit processFolderSha(curPath, settings_.algorithm);});
             }
             else if (viewMode == File) {
                 QString clipboardText = QGuiApplication::clipboard()->text();
@@ -160,9 +163,9 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                     contextMenu->addAction("Check the file by checksum: " + format::shortenString(clipboardText), this, [=]{emit checkFile(curPath, clipboardText);});
                     contextMenu->addSeparator();
                 }
-                contextMenu->addAction("SHA-1 --> *.sha1", this, [=]{emit processFileSha(curPath, 1);});
-                contextMenu->addAction("SHA-256 --> *.sha256", this, [=]{emit processFileSha(curPath, 256);});
-                contextMenu->addAction("SHA-512 --> *.sha512", this, [=]{emit processFileSha(curPath, 512);});
+                contextMenu->addAction("SHA-1 --> *.sha1", this, [=]{emit processFileSha(curPath, QCryptographicHash::Sha1);});
+                contextMenu->addAction("SHA-256 --> *.sha256", this, [=]{emit processFileSha(curPath, QCryptographicHash::Sha256);});
+                contextMenu->addAction("SHA-512 --> *.sha512", this, [=]{emit processFileSha(curPath, QCryptographicHash::Sha512);});
             }
             else if (viewMode == DbFile)
                 contextMenu->addAction("Open DataBase", this, &MainWindow::doWork);
@@ -255,10 +258,10 @@ void MainWindow::setMode(Mode::Modes mode)
 
     switch (viewMode) {
     case Folder:
-        ui->button->setText(QString("SHA-%1: Folder").arg(settings.value("shaType").toInt()));
+        ui->button->setText(format::algoToStr(settings_.algorithm).append(": Folder"));
         break;
     case File:
-        ui->button->setText(QString("SHA-%1: File").arg(settings.value("shaType").toInt()));
+        ui->button->setText(format::algoToStr(settings_.algorithm).append(": File"));
         break;
     case DbFile:
         ui->button->setText("Open DataBase");
@@ -291,10 +294,10 @@ void MainWindow::doWork()
     switch (viewMode) {
     case Folder:
         emit cancelProcess();
-        emit processFolderSha(curPath, settings.value("shaType").toInt());
+        emit processFolderSha(curPath, settings_.algorithm);
         break;
     case File:
-        emit processFileSha(curPath, settings.value("shaType").toInt());
+        emit processFileSha(curPath, settings_.algorithm);
         break;
     case DbFile:
         emit parseJsonFile(curPath);
@@ -325,7 +328,7 @@ void MainWindow::quickAction()
     using namespace Mode;
     switch (viewMode) {
     case File:
-        emit processFileSha(curPath, settings.value("shaType").toInt(), false, true);
+        emit processFileSha(curPath, settings_.algorithm, false, true);
         break;
     case DbFile:
         emit parseJsonFile(curPath);
@@ -396,14 +399,6 @@ void MainWindow::showMessage(const QString &message, const QString &title)
 bool MainWindow::processAbortPrompt()
 {
     return (QMessageBox::Yes == QMessageBox::question(this, "Processing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No));
-}
-
-void MainWindow::setSettings()
-{
-    settings["shaType"] = 256;
-    settings["ignoreDbFiles"] = true;
-    settings["ignoreShaFiles"] = true;
-    emit settingsChanged(settings);
 }
 
 bool MainWindow::argumentInput()

@@ -20,8 +20,8 @@ DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
 
 void DataMaintainer::updateMetaData()
 {
-    if (data_.metaData.shaType != 1 && data_.metaData.shaType != 256 && data_.metaData.shaType != 512)
-        data_.metaData.shaType = shaType(data_.filesData);
+    //if (data_.metaData.shaType != 1 && data_.metaData.shaType != 256 && data_.metaData.shaType != 512)
+    //    data_.metaData.shaType = shaType(data_.filesData);
 
     updateNumbers();
 
@@ -93,12 +93,10 @@ void DataMaintainer::updateNumbers()
 
     QString checkStatus = QString("\t%1%2%3%4").arg(newmissing, mismatched, matched, sep);
 
-    emit setPermanentStatus(QString("%1%2 avail. | %3 | SHA-%4")
+    emit setPermanentStatus(QString("%1%2 avail. | %3 | %4")
                             .arg(checkStatus)
                             .arg(num.numAvailable)
-                            .arg(format::dataSizeReadable(num.totalSize))
-                            .arg(data_.metaData.shaType));
-
+                            .arg(format::dataSizeReadable(num.totalSize), format::algoToStr(data_.metaData.algorithm)));
 }
 
 void DataMaintainer::updateFilesValues()
@@ -124,11 +122,11 @@ int DataMaintainer::findNewFiles()
 {
     emit setStatusbarText("Looking for new files...");
 
-    FilterRule filter = data_.metaData.filter;
-    if (filter.extensionsList.isEmpty() || !filter.include) {
+    //FilterRule filter = data_.metaData.filter;
+    /*if (filter.extensionsList.isEmpty() || !filter.include) {
         filter.include = false;
         filter.extensionsList.append({"ver.json", "sha1", "sha256", "sha512"}); // <-- ignore these types while looking for new files
-    }
+    }*/
 
     canceled = false;
     int number = 0;
@@ -139,7 +137,7 @@ int DataMaintainer::findNewFiles()
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
-        if (paths::isFileAllowed(fullPath, filter) && !data_.filesData.contains(relPath)) {
+        if (paths::isFileAllowed(fullPath, data_.metaData.filter) && !data_.filesData.contains(relPath)) {
             QFileInfo fileInfo(fullPath);
             // unreadable files are ignored
             if (fileInfo.isReadable()) {
@@ -384,10 +382,10 @@ void DataMaintainer::dbStatus()
     else
         result.append(data_.metaData.databaseFileName);
 
-    result.append(QString("\nAlgorithm: SHA-%1").arg(data_.metaData.shaType));
+    result.append(QString("\nAlgorithm: %1").arg(format::algoToStr(data_.metaData.algorithm)));
 
     if (!data_.metaData.filter.extensionsList.isEmpty()) {
-        if (data_.metaData.filter.include)
+        if (data_.metaData.filter.includeOnly)
             result.append(QString("\nIncluded Only: %1").arg(data_.metaData.filter.extensionsList.join(", ")));
         else
             result.append(QString("\nIgnored: %1").arg(data_.metaData.filter.extensionsList.join(", ")));

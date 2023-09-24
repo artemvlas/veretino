@@ -16,18 +16,18 @@ public:
     ~Manager();
 
 public slots:
-    void processFolderSha(const QString &folderPath, int shatype);
-    void processFileSha(const QString &filePath, int shatype = 0, bool summaryFile = true, bool clipboard = false);
+    void processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo);
+    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);
-    void checkFile(const QString &filePath, const QString &checkSum, int shaType);
+    void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
     void checkCurrentItemSum(const QString &path); // check only selected file instead all database cheking
     QString copyStoredChecksum(const QString &path, bool clipboard = true);
     void getItemInfo(const QString &path); // info about folder contents or file (size)
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
     void updateNewLost(); // remove lost files, add new files
     void updateMismatch(); // update json Database with new checksums for files with failed verification
-    void getSettings(const QVariantMap &settingsMap);
+    void getSettings(const Settings &settings);
     void resetDatabase(); // reopening and reparsing current database
     void showNewLostOnly();
     void deleteCurData();
@@ -46,7 +46,7 @@ private:
 
     ShaCalculator *shaCalc = new ShaCalculator;
     DataMaintainer *curData = nullptr;
-    QVariantMap settings;
+    Settings settings_;
     bool isViewFileSysytem;
 
 signals:

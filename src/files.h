@@ -16,8 +16,10 @@ struct FileValues {
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
 
 struct FilterRule {
-    bool include = true; // if true, only files with any extension from the list included, else all files except these types
     QStringList extensionsList;
+    bool includeOnly = false; // if true, only files with any extension from the list included, else all files except these types
+    bool ignoreShaFiles = true;
+    bool ignoreDbFiles = true;
 }; // struct FilterRule
 
 namespace paths {

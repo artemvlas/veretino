@@ -1,45 +1,32 @@
 #include "settingdialog.h"
 #include "ui_settingdialog.h"
 
-settingDialog::settingDialog(const QVariantMap &settingsMap, QWidget *parent) :
+settingDialog::settingDialog(const Settings &settings, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::settingDialog)
+    ui(new Ui::settingDialog),
+    settings_(settings)
 {
     ui->setupUi(this);
     this->setFixedSize(440,300);
     this->setWindowIcon(QIcon(":/veretino.png"));
 
-    connect(ui->radioButtonOnly, &QRadioButton::toggled, this, [=](const bool &disable){ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
+    connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
+         {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
 
-    settings = settingsMap;
-
-    int shaType = settings.value("shaType").toInt();
-    if (shaType == 1)
+    if (settings.algorithm == QCryptographicHash::Sha1)
         ui->rbSha1->setChecked(true);
-    else if (shaType == 256)
+    else if (settings.algorithm == QCryptographicHash::Sha256)
         ui->rbSha256->setChecked(true);
-    else if (shaType == 512)
+    else if (settings.algorithm == QCryptographicHash::Sha512)
         ui->rbSha512->setChecked(true);
 
-    if (settings.value("ignoredExtensions").isValid() && !settings.value("ignoredExtensions").toStringList().isEmpty()) {
-        ui->inputExtensions->setText(settings.value("ignoredExtensions").toStringList().join(" "));
-        ui->radioButtonIgnore->setChecked(true);
-    }
-    else if (settings.value("onlyExtensions").isValid() && !settings.value("onlyExtensions").toStringList().isEmpty()) {
-        ui->inputExtensions->setText(settings.value("onlyExtensions").toStringList().join(" "));
-        ui->radioButtonOnly->setChecked(true);
-    }
+    ui->inputExtensions->setText(settings.filter.extensionsList.join(" "));
+    ui->radioButtonIncludeOnly->setChecked(settings.filter.includeOnly);
 
-    if (settings.value("ignoreDbFiles").isValid()) {
-        ui->ignoreDbFiles->setChecked(settings.value("ignoreDbFiles").toBool());
-    }
-    if (settings.value("ignoreShaFiles").isValid()){
-        ui->ignoreShaFiles->setChecked(settings.value("ignoreShaFiles").toBool());
-    }
+    ui->ignoreDbFiles->setChecked(settings_.filter.ignoreDbFiles);
+    ui->ignoreShaFiles->setChecked(settings_.filter.ignoreShaFiles);
 
-    if (settings.value("dbPrefix").isValid())
-        ui->inputJsonFileNamePrefix->setText(settings.value("dbPrefix").toString());
-
+    ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
 }
 
 settingDialog::~settingDialog()
@@ -67,15 +54,17 @@ QStringList settingDialog::extensionsList()
         return QStringList();
 }
 
-QVariantMap settingDialog::getSettings()
+Settings settingDialog::getSettings()
 {
+    // algorithm
     if (ui->rbSha1->isChecked())
-        settings["shaType"] = 1;
+        settings_.algorithm = QCryptographicHash::Sha1;
     else if (ui->rbSha256->isChecked())
-        settings["shaType"] = 256;
+        settings_.algorithm = QCryptographicHash::Sha256;
     else if (ui->rbSha512->isChecked())
-        settings["shaType"] = 512;
+        settings_.algorithm = QCryptographicHash::Sha512;
 
+    // dbPrefix
     if (!ui->inputJsonFileNamePrefix->text().isEmpty()) {
         QString fileNamePrefix = ui->inputJsonFileNamePrefix->text();
 
@@ -84,28 +73,18 @@ QVariantMap settingDialog::getSettings()
             fileNamePrefix.replace(forbSymb.at(i), '_');
         }
 
-        settings["dbPrefix"] = fileNamePrefix;
+        settings_.dbPrefix = fileNamePrefix;
     }
     else
-        settings.remove("dbPrefix");
+        settings_.dbPrefix = "checksums";
 
-    if (!ui->inputExtensions->text().isEmpty()) {
-        if (ui->radioButtonIgnore->isChecked()) {
-            settings["ignoredExtensions"] = extensionsList();
-            settings.remove("onlyExtensions");
-        }
-        else if (ui->radioButtonOnly->isChecked()) {
-            settings["onlyExtensions"] = extensionsList();
-            settings.remove("ignoredExtensions");
-        }
-    }
-    else {
-        settings.remove("ignoredExtensions");
-        settings.remove("onlyExtensions");
-    }
+    // filters
+    ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
+    settings_.filter.includeOnly = !ui->radioButtonIgnore->isChecked();
+    settings_.filter.extensionsList = extensionsList();
 
-    settings["ignoreDbFiles"] = ui->ignoreDbFiles->isChecked();
-    settings["ignoreShaFiles"] = ui->ignoreShaFiles->isChecked();
+    settings_.filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
+    settings_.filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
 
-    return settings;
+    return settings_;
 }

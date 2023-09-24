@@ -52,7 +52,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     header["Created with"] = "Veretino 0.2.4 https://github.com/artemvlas/veretino";
     header["Files number"] = data.numbers.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
-    header["Used algorithm"] = QString("SHA-%1").arg(data.metaData.shaType);
+    header["Used algorithm"] = format::algoToStr(data.metaData.algorithm);
     header["Total size"] = data.metaData.totalSize;
     header["Updated"] = data.metaData.saveDateTime;
     if (isWorkDirRelative)
@@ -61,7 +61,7 @@ bool JsonDb::makeJson(const DataContainer &data)
         header["Working folder"] = data.metaData.workDir;
 
     if (!data.metaData.filter.extensionsList.isEmpty()) {
-        if (data.metaData.filter.include)
+        if (data.metaData.filter.includeOnly)
             header["Included Only"] = data.metaData.filter.extensionsList.join(" "); // only files with extensions from this list are included in the database, others are ignored
         else
             header["Ignored"] = data.metaData.filter.extensionsList.join(" "); // files with extensions from this list are ignored (not included in the database)
@@ -167,21 +167,19 @@ DataContainer JsonDb::parseJson(const QString &filePath)
     }
 
     if (header.contains("Ignored")) {
-        parsedData.metaData.filter.include = false;
+        parsedData.metaData.filter.includeOnly = false;
         parsedData.metaData.filter.extensionsList = header.value("Ignored").toString().split(" ");
     }
     else if (header.contains("Included Only")) {
-        parsedData.metaData.filter.include = true;
+        parsedData.metaData.filter.includeOnly = true;
         parsedData.metaData.filter.extensionsList = header.value("Included Only").toString().split(" ");
     }
 
-    if (header.contains("Used algorithm")) {
-        QString shatype = header.value("Used algorithm").toString();
-        shatype.remove("SHA-");
-        int type = shatype.toInt();
-        if (type == 1 || type == 256 || type == 512)
-            parsedData.metaData.shaType = type;
-    }
+    parsedData.metaData.algorithm = tools::algorithmByStrLen(filelistData.begin().value().toString().length());
+
+    if (header.contains("Used algorithm")
+        && parsedData.metaData.algorithm != tools::strToAlgo(header.value("Used algorithm").toString()))
+        parsedData.metaData.algorithm = tools::strToAlgo(header.value("Used algorithm").toString());
 
     if (header.contains("Updated"))
         parsedData.metaData.saveDateTime = header.value("Updated").toString();

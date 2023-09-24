@@ -12,23 +12,21 @@ class ShaCalculator : public QObject
     Q_OBJECT
 public:
     explicit ShaCalculator(QObject *parent = nullptr);
-    explicit ShaCalculator(int shatype, QObject *parent = nullptr);
+    explicit ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent = nullptr);
     ~ShaCalculator();
 
 public slots:
     QString calculate(const QString &filePath);
-    QString calculate(const QString &filePath, int shatype);
+    QString calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
     FileList calculate(const DataContainer &filesContainer);
 
 private:
     int chunk = 1048576; // file read buffer size
     bool canceled = false; // if true, task should be aborted
-    int initShaType = 0;
+    QCryptographicHash::Algorithm initAlgo = QCryptographicHash::Sha256;
     qint64 totalSize; // total file or filelist size
     qint64 doneSize;
-    QCryptographicHash::Algorithm algorithm();
-    QCryptographicHash::Algorithm algorithm(int shatype);
-    FileValues computeChecksum(const QString &filePath, int shatype);
+    FileValues computeChecksum(const QString &filePath, QCryptographicHash::Algorithm algo);
     void toPercents(int bytes); // add this processed piece, calculate total done size and emit donePercents()
 
 signals:

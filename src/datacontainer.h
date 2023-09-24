@@ -8,13 +8,15 @@
 
 #include <QObject>
 #include <QMap>
+#include <QCryptographicHash>
 #include "files.h"
 #include "treemodel.h"
 
 class TreeModel;
 
 struct MetaData {
-    int shaType = 0; // 1 or 256 or 512
+    QCryptographicHash::Algorithm algorithm;
+    //int shaType = 0; // 1 or 256 or 512
     QString workDir; // current working folder
     QString databaseFileName;
     QString saveDateTime; // date and time the database was saved

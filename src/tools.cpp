@@ -6,32 +6,43 @@
 #include "files.h"
 
 namespace tools {
-int shaStrLen(int shatype)
+int algoStrLen(QCryptographicHash::Algorithm algo)
 {
-    if (shatype == 1)
+    if (algo == QCryptographicHash::Sha1)
         return 40;
-    else if (shatype == 256)
+    else if (algo == QCryptographicHash::Sha256)
         return 64;
-    else if (shatype == 512)
+    else if (algo == QCryptographicHash::Sha512)
         return 128;
     else {
-        qDebug() << "tools::shaStrLen | Wrong input shatype:" << shatype;
+        qDebug() << "tools::algoStrLen | Wrong input algo:" << algo;
         return 0;
     }
 }
 
-int shaTypeByLen(int length)
+QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
 {
-    if (length == 40)
-        return 1;
-    else if (length == 64)
-        return 256;
-    else if (length == 128)
-        return 512;
+    if (strLen == 40)
+        return QCryptographicHash::Sha1;
+    else if (strLen == 64)
+        return QCryptographicHash::Sha256;
+    else if (strLen == 128)
+        return QCryptographicHash::Sha512;
     else {
-        qDebug() << "tools::shaTypeByLen | Wrong input length:" << length;
-        return 0;
+        qDebug() << "tools::algorithmByStrLen | Wrong input strLen:" << strLen;
+        return QCryptographicHash::Sha256;
     }
+}
+
+QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
+{
+    int num = QString(strAlgo.toLower().remove("sha").remove("-")).toInt();
+    if (num == 1)
+        return QCryptographicHash::Sha1;
+    else if (num == 512)
+        return QCryptographicHash::Sha512;
+    else
+        return QCryptographicHash::Sha256;
 }
 
 bool isDatabaseFile(const QString &filePath) {
@@ -117,6 +128,18 @@ QString shortenString(const QString &string, int length)
         return string.mid(0, length).append("...");
     else
         return string;
+}
+
+QString algoToStr(QCryptographicHash::Algorithm algo)
+{
+    if (algo == QCryptographicHash::Sha1)
+        return "SHA-1";
+    else if (algo == QCryptographicHash::Sha256)
+        return "SHA-256";
+    else if (algo == QCryptographicHash::Sha512)
+        return "SHA-512";
+    else
+        return "Unknown";
 }
 
 QString filesNumberAndSize(int filesNumber, qint64 filesSize)
