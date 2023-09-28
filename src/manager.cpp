@@ -1,26 +1,22 @@
 #include "manager.h"
-#include "files.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QThread>
+#include <QDebug>
+#include "files.h"
+#include "shacalculator.h"
+#include "procstate.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)
 {
-    connections();
+    connect(this, &Manager::cancelProcess, this, [=]{canceled = true; emit setStatusbarText("Canceled");}, Qt::DirectConnection);
 }
 
 Manager::~Manager()
 {
-    delete shaCalc;
     deleteCurData();
-}
-
-void Manager::connections()
-{
-    connect(this, &Manager::cancelProcess, shaCalc, &ShaCalculator::cancelProcess);
-    connect(shaCalc, &ShaCalculator::donePercents, this, &Manager::donePercents);
-    connect(shaCalc, &ShaCalculator::setStatusbarText, this, &Manager::setStatusbarText);
 }
 
 void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo)
@@ -64,7 +60,7 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     emit setPermanentStatus(permStatus);
 
     // calculating checksums
-    calcData.filesData = shaCalc->calculate(calcData);
+    calcData.filesData = calculateChecksums(calcData);
 
     emit setPermanentStatus();
 
@@ -87,12 +83,9 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
 {
-    emit setMode(Mode::Processing);
-
-    QString sum = shaCalc->calculate(filePath, algo);
-    if (sum.isEmpty()) {
+    QString sum = calculateChecksum(filePath, algo);
+    if (sum.isEmpty())
         return;
-    }
 
     if (clipboard) {
         emit toClipboard(sum); // send checksum to clipboard
@@ -119,8 +112,6 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
             emit showMessage(QString("Unable to write to file: %1\nChecksum copied to clipboard").arg(sumFile), "Warning");
         }
     }
-
-    emit setMode(Mode::EndProcess);
 }
 
 void Manager::makeTreeModel(const FileList &data)
@@ -204,7 +195,7 @@ void Manager::updateNewLost()
         dataCont.filesData =  curData->listOf(FileValues::New);
 
         emit setMode(Mode::Processing);
-        if (curData->updateData(shaCalc->calculate(dataCont), FileValues::Added) == 0)
+        if (curData->updateData(calculateChecksums(dataCont), FileValues::Added) == 0)
             return;
         emit setMode(Mode::EndProcess);
 
@@ -252,7 +243,7 @@ void Manager::verifyFileList(const QString &subFolder)
     emit setMode(Mode::Processing);
     DataContainer dataCont(curData->data_.metaData);
     dataCont.filesData = curData->listOf(FileValues::NotChecked, fileList);
-    FileList recalculated = shaCalc->calculate(dataCont);
+    FileList recalculated = calculateChecksums(dataCont);
     emit setMode(Mode::EndProcess);
 
     // updating the Main data
@@ -337,9 +328,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    emit setMode(Mode::Processing);
-    QString sum = shaCalc->calculate(filePath, algo);
-    emit setMode(Mode::EndProcess);
+    QString sum = calculateChecksum(filePath, algo);
 
     if (!sum.isEmpty())
         showFileCheckResultMessage(sum == checkSum);
@@ -351,9 +340,7 @@ void Manager::checkCurrentItemSum(const QString &path)
     QString savedSum = copyStoredChecksum(path, false);
 
     if (!savedSum.isEmpty()) {
-        emit setMode(Mode::Processing);
-        QString sum = shaCalc->calculate(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.algorithm);
-        emit setMode(Mode::EndProcess);
+        QString sum = calculateChecksum(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.algorithm);
 
         if (!sum.isEmpty()) {
             showFileCheckResultMessage(curData->updateData(path, sum));
@@ -361,6 +348,81 @@ void Manager::checkCurrentItemSum(const QString &path)
             chooseMode();
         }
     }
+}
+
+QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo)
+{
+    ProcState state(QFileInfo(filePath).size());
+    ShaCalculator shaCalc(algo);
+
+    connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
+    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
+    connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
+
+    emit setStatusbarText(QString("Calculating %1 checksum: %2").arg(format::algoToStr(algo), format::fileNameAndSize(filePath)));
+
+    emit setMode(Mode::Processing);
+    QString checkSum = shaCalc.calculate(filePath, algo);
+    emit setMode(Mode::EndProcess);
+
+    if (canceled) {
+        canceled = false;
+    }
+    else if (!checkSum.isEmpty()) {
+        emit setStatusbarText(QString("%1 calculated").arg(format::algoToStr(algo)));
+    }
+    else {
+        emit setStatusbarText("read error");
+    }
+
+    return checkSum;
+}
+
+FileList Manager::calculateChecksums(const DataContainer &filesContainer)
+{
+    if (filesContainer.filesData.isEmpty())
+        return FileList();
+
+    qint64 totalSize = Files::dataSize(filesContainer.filesData);
+    QString totalSizeReadable = format::dataSizeReadable(totalSize);
+    ProcState state(totalSize);
+    ShaCalculator shaCalc(filesContainer.metaData.algorithm);
+    canceled = false;
+
+    connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
+    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
+    connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
+
+    FileList resultList;
+    FileList::const_iterator iter;
+
+    for (iter = filesContainer.filesData.constBegin(); iter != filesContainer.filesData.constEnd() && !canceled; ++iter) {
+        QString doneData;
+        if (state.doneSize_ == 0)
+            doneData = QString("(%1)").arg(totalSizeReadable);
+        else
+            doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize_), totalSizeReadable);
+
+        emit setStatusbarText(QString("Calculating %1 of %2 checksums %3")
+                                  .arg(resultList.size() + 1)
+                                  .arg(filesContainer.filesData.size())
+                                  .arg(doneData));
+
+        FileValues curFileValues;
+        curFileValues.checksum = shaCalc.calculate(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
+
+        curFileValues.size = iter.value().size;
+        resultList.insert(iter.key(), curFileValues);
+    }
+
+    if (canceled) {
+        qDebug() << "Manager::calculateChecksums | Canceled";
+        canceled = false;
+        return FileList();
+    }
+
+    emit setStatusbarText("Done");
+    return resultList;
 }
 
 void Manager::showFileCheckResultMessage(bool isMatched)
@@ -456,7 +518,8 @@ void Manager::showAll()
 
 void Manager::dbStatus()
 {
-    curData->dbStatus();
+    if (curData != nullptr)
+        curData->dbStatus();
 }
 
 void Manager::isViewFS(const bool isFS)

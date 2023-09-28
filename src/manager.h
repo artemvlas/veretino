@@ -3,10 +3,8 @@
 #define MANAGER_H
 
 #include <QObject>
-#include "shacalculator.h"
 #include "tools.h"
 #include "treemodel.h"
-#include "QThread"
 
 class Manager : public QObject
 {
@@ -18,6 +16,7 @@ public:
 public slots:
     void processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo);
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
+    void verifyFileList(const QString &subFolder = QString()); // checking the list of files against the checksums stored in the database
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
@@ -35,18 +34,17 @@ public slots:
     void showAll();
     void dbStatus();
 
-    void verifyFileList(const QString &subFolder = QString()); // checking the list of files against the checksums stored in the database
-
 private:
-    void connections();
     void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
     void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     void showFileCheckResultMessage(bool isMatched);
+    QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo);
+    FileList calculateChecksums(const DataContainer &filesContainer);
 
-    ShaCalculator *shaCalc = new ShaCalculator;
+    bool canceled = false;
+    bool isViewFileSysytem;
     DataMaintainer *curData = nullptr;
     Settings *settings_;
-    bool isViewFileSysytem;
 
 signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar

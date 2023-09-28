@@ -16,6 +16,7 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/manager.cpp \
+    src/procstate.cpp \
     src/settingdialog.cpp \
     src/shacalculator.cpp \
     src/tools.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     src/jsondb.h \
     src/mainwindow.h \
     src/manager.h \
+    src/procstate.h \
     src/settingdialog.h \
     src/shacalculator.h \
     src/tools.h \
