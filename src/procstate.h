@@ -3,6 +3,7 @@
 #define PROCSTATE_H
 
 #include <QObject>
+#include <QElapsedTimer>
 
 class ProcState : public QObject
 {
@@ -18,9 +19,12 @@ public slots:
 
 private:
     void toPercents(int bytes); // add this processed piece, calculate total done size and emit donePercents()
+    void calcLeftTime(const int percentsDone);
+    QElapsedTimer elapsedTimer;
 
 signals:
     void donePercents(int perc);
+    void timeLeft(const QString &timeStr);
 };
 
 #endif // PROCSTATE_H

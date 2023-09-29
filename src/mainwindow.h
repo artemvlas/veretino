@@ -39,7 +39,6 @@ private:
     void doWork();
     void quickAction(); // tasks for some items when double-clicking or pressing Enter
     bool argumentInput(); // using the path argument if it's provided
-    void timeLeft(const int percentsDone);
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
     void closeEvent(QCloseEvent *event);
@@ -55,7 +54,6 @@ private:
     QString curPath; // current path from &View::pathChanged
     Mode::Modes viewMode = Mode::NoMode; // Folder, File, DbFile, SumFile, Model...
     Mode::Modes previousViewMode = Mode::NoMode; //^
-    QElapsedTimer elapsedTimer;
 
 signals:
     void getItemInfo(const QString &path); //get file size or folder contents info

@@ -115,7 +115,7 @@ void MainWindow::connectManager()
 
     // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
-    connect(manager, &Manager::donePercents, this, &MainWindow::timeLeft);
+    connect(manager, &Manager::timeLeft, this, [=](const QString &str){ui->progressBar->setFormat(QString("%p% | %1").arg(str));});
 
     // transfer settings and modes
     qRegisterMetaType<Mode::Modes>("Mode::Modes");
@@ -346,38 +346,6 @@ void MainWindow::quickAction()
         break;
     default: break;
     }
-}
-
-void MainWindow::timeLeft(const int percentsDone)
-{
-    if (percentsDone == 0) {
-        elapsedTimer.start();
-        return;
-    }
-
-    qint64 timePassed = elapsedTimer.elapsed();
-    int leftPercents = 100 - percentsDone;
-
-    qint64 timeleft = (timePassed / percentsDone) * leftPercents;
-    int seconds = timeleft / 1000;
-    int minutes = seconds / 60;
-    seconds = seconds % 60;
-    int hours = minutes / 60;
-    minutes = minutes % 60;
-
-    QString estimatedTime;
-    if (hours > 0)
-        estimatedTime = QString("%1 h %2 min").arg(hours).arg(minutes);
-    else if (minutes > 0 && seconds > 10)
-        estimatedTime = QString("%1 min").arg(minutes + 1);
-    else if (minutes > 0)
-        estimatedTime = QString("%1 min").arg(minutes);
-    else if (seconds > 4)
-        estimatedTime = QString("%1 sec").arg(seconds);
-    else
-        estimatedTime = QString("few sec");
-
-    ui->progressBar->setFormat(QString("%p% | %1").arg(estimatedTime));
 }
 
 void MainWindow::showMessage(const QString &message, const QString &title)

@@ -50,6 +50,7 @@ signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
+    void timeLeft(const QString &timeStr);
     void setModel(TreeModel *model = nullptr);
     void workDirChanged(const QString &workDir);
     void showMessage(const QString &text, const QString &title = "Info");
