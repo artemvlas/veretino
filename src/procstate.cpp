@@ -75,9 +75,9 @@ QString ProcState::calcSpeed(int percDone)
         elapsedTimer.start();
     }
     else {
-        qint64 passedSec = elapsedTimer.elapsed() / 1000; // seconds
-        if (passedSec > 0)
-            result = QString("%1/sec").arg(format::dataSizeReadable(doneSize_ / passedSec)); // bytes per second
+        qint64 timePassed = elapsedTimer.elapsed(); // milliseconds
+        if (timePassed > 0)
+            result = QString("%1/sec").arg(format::dataSizeReadable((doneSize_ / timePassed) * 1000)); // bytes per second
     }
 
     return result;
