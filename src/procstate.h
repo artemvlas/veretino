@@ -18,12 +18,18 @@ public slots:
     void doneChunk(int chunk);
 
 private:
+    void start();
     void curStatus(int percDone);
     void toPercents(int bytes); // add this processed piece, calculate total done size and emit donePercents()
     QString calcLeftTime(const int percentsDone);
     QString calcSpeed(int percDone);
+    void donePiece();
 
     QElapsedTimer elapsedTimer;
+    qint64 prevTimePassed;
+    qint64 prevDoneSize;
+    qint64 pieceTime;
+    qint64 pieceSize;
 
 signals:
     void donePercents(int perc);

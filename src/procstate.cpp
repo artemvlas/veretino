@@ -13,12 +13,21 @@ void ProcState::doneChunk(int chunk)
     toPercents(chunk);
 }
 
+void ProcState::start()
+{
+    prevTimePassed = 0;
+    prevDoneSize = 0;
+    elapsedTimer.start();
+}
+
 void ProcState::curStatus(int percDone)
 {
     if (percDone == 0)
-        elapsedTimer.start();
-    else
+        start();
+    else {
+        donePiece();
         emit procStatus(QString("%1% | %2 | %3").arg(percDone).arg(calcSpeed(percDone), calcLeftTime(percDone)));
+    }
 }
 
 void ProcState::toPercents(int bytes)
@@ -38,14 +47,16 @@ void ProcState::toPercents(int bytes)
 QString ProcState::calcLeftTime(const int percentsDone)
 {
     if (percentsDone == 0) {
-        elapsedTimer.start();
+        start();
         return QString();
     }
 
-    qint64 timePassed = elapsedTimer.elapsed();
-    int leftPercents = 100 - percentsDone;
+    //qint64 timePassed = elapsedTimer.elapsed();
+    //int leftPercents = 100 - percentsDone;
+    //qint64 timeleft = (timePassed / percentsDone) * leftPercents;
 
-    qint64 timeleft = (timePassed / percentsDone) * leftPercents;
+    qint64 timeleft = ((totalSize_ - doneSize_) / pieceSize) * pieceTime;
+
     int seconds = timeleft / 1000;
     int minutes = seconds / 60;
     seconds = seconds % 60;
@@ -72,13 +83,20 @@ QString ProcState::calcSpeed(int percDone)
     QString result;
 
     if (percDone == 0) {
-        elapsedTimer.start();
+        start();
     }
     else {
-        qint64 timePassed = elapsedTimer.elapsed(); // milliseconds
-        if (timePassed > 0)
-            result = QString("%1/sec").arg(format::dataSizeReadable((doneSize_ / timePassed) * 1000)); // bytes per second
+        if (pieceTime > 0)
+            result = QString("%1/sec").arg(format::dataSizeReadable((pieceSize / pieceTime) * 1000)); // bytes per second
     }
 
     return result;
+}
+
+void ProcState::donePiece()
+{
+    pieceTime = elapsedTimer.elapsed() - prevTimePassed; // milliseconds
+    pieceSize = doneSize_ - prevDoneSize;
+    prevTimePassed += pieceTime;
+    prevDoneSize += pieceSize;
 }
