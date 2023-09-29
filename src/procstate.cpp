@@ -1,6 +1,6 @@
 #include "procstate.h"
-#include <QDebug>
 #include "tools.h"
+//#include <QDebug>
 
 ProcState::ProcState(qint64 totalSize, QObject *parent)
     : QObject{parent}, totalSize_(totalSize)
@@ -64,19 +64,21 @@ QString ProcState::calcLeftTime(const int percentsDone)
     else
         estimatedTime = QString("few sec");
 
-    //qDebug() << estimatedTime;
     return estimatedTime;
 }
 
 QString ProcState::calcSpeed(int percDone)
 {
+    QString result;
+
     if (percDone == 0) {
         elapsedTimer.start();
-        return QString();
+    }
+    else {
+        qint64 passedSec = elapsedTimer.elapsed() / 1000; // seconds
+        if (passedSec > 0)
+            result = QString("%1/sec").arg(format::dataSizeReadable(doneSize_ / passedSec)); // bytes per second
     }
 
-    qint64 timePassed = elapsedTimer.elapsed(); // milliseconds
-    qint64 speed = (doneSize_ / timePassed) * 1000; // bytes per second
-
-    return QString("%1/sec").arg(format::dataSizeReadable(speed));
+    return result;
 }
