@@ -115,7 +115,7 @@ void MainWindow::connectManager()
 
     // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
-    connect(manager, &Manager::timeLeft, this, [=](const QString &str){ui->progressBar->setFormat(QString("%p% | %1").arg(str));});
+    connect(manager, &Manager::procStatus, ui->progressBar, &QProgressBar::setFormat);
 
     // transfer settings and modes
     qRegisterMetaType<Mode::Modes>("Mode::Modes");

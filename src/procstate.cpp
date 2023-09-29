@@ -1,38 +1,45 @@
 #include "procstate.h"
-//#include <QDebug>
+#include <QDebug>
+#include "tools.h"
 
 ProcState::ProcState(qint64 totalSize, QObject *parent)
     : QObject{parent}, totalSize_(totalSize)
-{}
+{
+    connect(this, &ProcState::donePercents, this, &ProcState::curStatus);
+}
 
 void ProcState::doneChunk(int chunk)
 {
     toPercents(chunk);
 }
 
+void ProcState::curStatus(int percDone)
+{
+    if (percDone == 0)
+        elapsedTimer.start();
+    else
+        emit procStatus(QString("%1% | %2 | %3").arg(percDone).arg(calcSpeed(percDone), calcLeftTime(percDone)));
+}
+
 void ProcState::toPercents(int bytes)
 {
-    if (doneSize_ == 0) {
+    if (doneSize_ == 0)
         emit donePercents(0); // initial 0 to reset progressbar value
-        calcLeftTime(0);
-    }
 
     int lastPerc = (doneSize_ * 100) / totalSize_; // before current chunk added
 
     doneSize_ += bytes;
     int curPerc = (doneSize_ * 100) / totalSize_; // after
 
-    if (curPerc > lastPerc) {
+    if (curPerc > lastPerc)
         emit donePercents(curPerc);
-        calcLeftTime(curPerc);
-    }
 }
 
-void ProcState::calcLeftTime(const int percentsDone)
+QString ProcState::calcLeftTime(const int percentsDone)
 {
     if (percentsDone == 0) {
         elapsedTimer.start();
-        return;
+        return QString();
     }
 
     qint64 timePassed = elapsedTimer.elapsed();
@@ -58,5 +65,18 @@ void ProcState::calcLeftTime(const int percentsDone)
         estimatedTime = QString("few sec");
 
     //qDebug() << estimatedTime;
-    emit timeLeft(estimatedTime);
+    return estimatedTime;
+}
+
+QString ProcState::calcSpeed(int percDone)
+{
+    if (percDone == 0) {
+        elapsedTimer.start();
+        return QString();
+    }
+
+    qint64 timePassed = elapsedTimer.elapsed(); // milliseconds
+    qint64 speed = (doneSize_ / timePassed) * 1000; // bytes per second
+
+    return QString("%1/sec").arg(format::dataSizeReadable(speed));
 }

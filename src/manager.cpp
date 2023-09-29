@@ -358,7 +358,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
     connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
-    connect(&state, &ProcState::timeLeft, this, &Manager::timeLeft);
+    connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
     emit setStatusbarText(QString("Calculating %1 checksum: %2").arg(format::algoToStr(algo), format::fileNameAndSize(filePath)));
 
@@ -393,7 +393,7 @@ FileList Manager::calculateChecksums(const DataContainer &filesContainer)
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
     connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
-    connect(&state, &ProcState::timeLeft, this, &Manager::timeLeft);
+    connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
     FileList resultList;
     FileList::const_iterator iter;
