@@ -411,9 +411,11 @@ FileList Manager::calculateChecksums(DataContainer &filesContainer)
                                   .arg(doneData));
 
         iter.next();
-        iter.value().checksum = shaCalc.calculate(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
-        if (iter.value().checksum.isEmpty())
-            iter.value().status = FileValues::Unreadable;
+        if (iter.value().status != FileValues::Unreadable) {
+            iter.value().checksum = shaCalc.calculate(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
+            if (iter.value().checksum.isEmpty())
+                iter.value().status = FileValues::Unreadable;
+        }
     }
 
     if (canceled) {
