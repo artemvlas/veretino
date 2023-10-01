@@ -39,7 +39,7 @@ private:
     void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     void showFileCheckResultMessage(bool isMatched);
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo);
-    FileList calculateChecksums(const DataContainer &filesContainer);
+    FileList calculateChecksums(DataContainer &filesContainer);
 
     bool canceled = false;
     bool isViewFileSysytem;

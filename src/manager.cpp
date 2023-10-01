@@ -379,7 +379,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return checkSum;
 }
 
-FileList Manager::calculateChecksums(const DataContainer &filesContainer)
+FileList Manager::calculateChecksums(DataContainer &filesContainer)
 {
     if (filesContainer.filesData.isEmpty())
         return FileList();
@@ -389,16 +389,16 @@ FileList Manager::calculateChecksums(const DataContainer &filesContainer)
     ProcState state(totalSize);
     ShaCalculator shaCalc(filesContainer.metaData.algorithm);
     canceled = false;
+    int doneNum = 0;
 
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
     connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
     connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
-    FileList resultList;
-    FileList::const_iterator iter;
+    QMutableMapIterator<QString, FileValues> iter(filesContainer.filesData);
 
-    for (iter = filesContainer.filesData.constBegin(); iter != filesContainer.filesData.constEnd() && !canceled; ++iter) {
+    while (iter.hasNext() && !canceled) {
         QString doneData;
         if (state.doneSize_ == 0)
             doneData = QString("(%1)").arg(totalSizeReadable);
@@ -406,18 +406,14 @@ FileList Manager::calculateChecksums(const DataContainer &filesContainer)
             doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize_), totalSizeReadable);
 
         emit setStatusbarText(QString("Calculating %1 of %2 checksums %3")
-                                  .arg(resultList.size() + 1)
+                                  .arg(++doneNum)
                                   .arg(filesContainer.filesData.size())
                                   .arg(doneData));
 
-        FileValues curFileValues;
-        if (iter.value().status == FileValues::Unreadable)
-            curFileValues.status = FileValues::Unreadable;
-        else {
-            curFileValues.checksum = shaCalc.calculate(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
-            curFileValues.size = iter.value().size;
-        }
-        resultList.insert(iter.key(), curFileValues);
+        iter.next();
+        iter.value().checksum = shaCalc.calculate(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
+        if (iter.value().checksum.isEmpty())
+            iter.value().status = FileValues::Unreadable;
     }
 
     if (canceled) {
@@ -427,7 +423,7 @@ FileList Manager::calculateChecksums(const DataContainer &filesContainer)
     }
 
     emit setStatusbarText("Done");
-    return resultList;
+    return filesContainer.filesData;
 }
 
 void Manager::showFileCheckResultMessage(bool isMatched)
