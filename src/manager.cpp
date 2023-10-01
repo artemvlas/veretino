@@ -366,15 +366,13 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     QString checkSum = shaCalc.calculate(filePath, algo);
     emit setMode(Mode::EndProcess);
 
-    if (canceled) {
+    if (canceled)
         canceled = false;
-    }
-    else if (!checkSum.isEmpty()) {
+
+    if (!checkSum.isEmpty())
         emit setStatusbarText(QString("%1 calculated").arg(format::algoToStr(algo)));
-    }
-    else {
+    else
         emit setStatusbarText("read error");
-    }
 
     return checkSum;
 }
