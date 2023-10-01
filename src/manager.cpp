@@ -532,7 +532,6 @@ void Manager::isViewFS(const bool isFS)
         deleteCurData();
 }
 
-//if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
 void Manager::chooseMode()
 {
     if (curData->data_.numbers.numMismatched > 0)

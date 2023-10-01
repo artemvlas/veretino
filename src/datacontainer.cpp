@@ -426,30 +426,3 @@ DataMaintainer::~DataMaintainer()
     qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
     emit setPermanentStatus();
 }
-
-/*
-QCryptographicHash::Algorithm DataMaintainer::defineAlgorithm(const FileList &fileList)
-{
-    int len = 0;
-
-    FileList::const_iterator iter;
-    for (iter = fileList.constBegin(); len == 0 && iter != fileList.constEnd(); ++iter)  {
-        if (!iter.value().checksum.isEmpty())
-            len = iter.value().checksum.size();
-    }
-
-    if (len == 40) {
-        return QCryptographicHash::Sha1;
-    }
-    else if (len == 64) {
-        return QCryptographicHash::Sha256;
-    }
-    else if (len == 128) {
-        return QCryptographicHash::Sha512;
-    }
-    else {
-        qDebug() << "DataMaintainer::defineAlgorithm() | Failed to determine the Algorithm. Invalid string length:" << len;
-        return QCryptographicHash::Sha256;
-    }
-}
-*/

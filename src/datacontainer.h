@@ -83,7 +83,6 @@ public slots:
     void cancelProcess();
 private:
     bool canceled = false;
-    //QCryptographicHash::Algorithm defineAlgorithm(const FileList &fileList); // determines the shaType by the string length of the stored checksum
     int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
     void updateFilesValues();
 
