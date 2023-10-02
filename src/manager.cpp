@@ -318,7 +318,7 @@ void Manager::checkSummaryFile(const QString &path)
         }
     }
 
-    checkFile(checkSummaryFilePath, line.mid(0, tools::algoStrLen(algo)).toLower(), algo);
+    checkFile(checkSummaryFilePath, line.mid(0, tools::algoStrLen(algo)), algo);
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)
@@ -331,7 +331,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
     QString sum = calculateChecksum(filePath, algo);
 
     if (!sum.isEmpty())
-        showFileCheckResultMessage(sum == checkSum);
+        showFileCheckResultMessage(sum == checkSum.toLower());
 }
 
 //check only selected file instead all database cheking
