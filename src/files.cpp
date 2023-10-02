@@ -27,7 +27,7 @@ FileList Files::allFiles()
 
 FileList Files::allFiles(const QString &rootFolder)
 {
-    return allFiles(rootFolder, FilterRule()); // empty FilterRule with empty extensionsList simple returns true from 'isFileAllowed()' func
+    return allFiles(rootFolder, FilterRule());
 }
 
 FileList Files::allFiles(const FilterRule &filter)
@@ -144,7 +144,10 @@ QString Files::contentStatus(const FileList &fileList)
 QString Files::folderContentsByType()
 {
     if (!initFolderPath.isEmpty()) {
-        QString result = folderContentsByType(allFiles());
+        FilterRule filter;
+        filter.ignoreDbFiles = false;
+        filter.ignoreShaFiles = false;
+        QString result = folderContentsByType(allFiles(filter));
 
         if (canceled)
             result.clear();
