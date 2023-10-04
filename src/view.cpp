@@ -2,6 +2,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QKeyEvent>
+#include "treemodeliterator.h"
 
 View::View(QWidget *parent)
     : QTreeView(parent)
@@ -84,6 +85,8 @@ void View::setIndexByPath(const QString &path)
     }
     else if (model_ != nullptr){
         QModelIndex index = model_->getIndex(path);
+        if (!index.isValid())
+            index = TreeModelIterator(model_).nextFile(); // select the very first file
         if (index.isValid()) {
             this->expand(index);
             this->setCurrentIndex(index);
