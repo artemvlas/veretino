@@ -22,6 +22,7 @@ SOURCES += \
     src/tools.cpp \
     src/treeitem.cpp \
     src/treemodel.cpp \
+    src/treemodeliterator.cpp \
     src/view.cpp
 
 HEADERS += \
@@ -37,6 +38,7 @@ HEADERS += \
     src/tools.h \
     src/treeitem.h \
     src/treemodel.h \
+    src/treemodeliterator.h \
     src/view.h
 
 FORMS += \

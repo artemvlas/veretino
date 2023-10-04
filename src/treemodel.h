@@ -27,7 +27,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value,
                         int role = Qt::EditRole) override;
     void populate(const FileList &filesData);
-    QString getPath(const QModelIndex &curIndex); // build path by current index data
+    QString getPath(const QModelIndex &curIndex) const; // build path by current index data
     QModelIndex getIndex(const QString &path); // find index of specified 'path'
     void setItemStatus(const QString &itemPath, int status);
 

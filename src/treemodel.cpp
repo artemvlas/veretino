@@ -60,7 +60,7 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-QString TreeModel::getPath(const QModelIndex &curIndex)
+QString TreeModel::getPath(const QModelIndex &curIndex) const
 {
     QModelIndex newIndex = index(curIndex.row(), 0 , curIndex.parent());
     QString path = newIndex.data().toString();
