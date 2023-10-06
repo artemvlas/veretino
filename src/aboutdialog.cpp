@@ -1,3 +1,4 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 #include <QIcon>

@@ -1,3 +1,4 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
@@ -78,14 +79,17 @@ void MainWindow::connections()
 
 void MainWindow::connectManager()
 {
+    // qRegisterMetaType<QVector<int>>("QVector<int>"); // uncomment when building on Windows
+    qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
+    qRegisterMetaType<Mode::Modes>("Mode::Modes");
+
     manager->moveToThread(thread);
 
     // when closing the thread
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
-    // signals for execution tasks
-    qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
+    // signals for execution tasks    
     connect(this, &MainWindow::parseJsonFile, manager, &Manager::createDataModel);
     connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
     connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
@@ -118,7 +122,6 @@ void MainWindow::connectManager()
     connect(manager, &Manager::procStatus, ui->progressBar, &QProgressBar::setFormat);
 
     // transfer settings and modes
-    qRegisterMetaType<Mode::Modes>("Mode::Modes");
     connect(manager, &Manager::setMode, this, &MainWindow::setMode);
 
     // change view

@@ -47,7 +47,7 @@ private:
     Settings *settings_;
 
 signals:
-    void setStatusbarText(const QString &text = QString()); // text to statusbar
+    void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void procStatus(const QString &str);

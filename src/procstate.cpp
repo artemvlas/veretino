@@ -1,6 +1,6 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "procstate.h"
 #include "tools.h"
-//#include <QDebug>
 
 ProcState::ProcState(qint64 totalSize, QObject *parent)
     : QObject{parent}, totalSize_(totalSize)

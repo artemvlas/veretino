@@ -12,7 +12,7 @@ class View : public QTreeView
     Q_OBJECT
 public:
     explicit View(QWidget *parent = nullptr);
-    bool isViewFileSystem(); //"true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
+    bool isViewFileSystem(); // "true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
     void pathAnalyzer(const QString &path);
     QString workDir;
     TreeModel *model_ = nullptr;
@@ -33,7 +33,7 @@ private:
 
 signals:
     void indexChanged(const QModelIndex &index);
-    void pathChanged(const QString &path); //by indexToPath()
+    void pathChanged(const QString &path); // by indexToPath()
     void setMode(Mode::Modes mode);
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void showMessage(const QString &text, const QString &title = "Info");
