@@ -75,9 +75,10 @@ QString TreeModel::getPath(const QModelIndex &curIndex) const
 
 QModelIndex TreeModel::getIndex(const QString &path)
 {
-    QModelIndex curIndex = index(0, 0);
+    QModelIndex curIndex;
 
     if (!path.isEmpty()) {
+        curIndex = index(0, 0);
         QStringList parts = path.split('/');
         QModelIndex parentIndex;
 

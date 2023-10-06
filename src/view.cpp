@@ -83,7 +83,7 @@ void View::setIndexByPath(const QString &path)
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
-    else if (model_ != nullptr){
+    else if (model_ != nullptr) {
         QModelIndex index = model_->getIndex(path);
         if (!index.isValid())
             index = TreeModelIterator(model_).nextFile(); // select the very first file
