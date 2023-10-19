@@ -226,13 +226,20 @@ void Manager::updateNewLost()
             return;
         emit setMode(Mode::EndProcess);
 
+        curData->updateNumbers();
+
         itemsInfo = QString("added %1").arg(curData->data_.numbers.numNewFiles);
         if (curData->data_.numbers.numMissingFiles > 0)
             itemsInfo.append(", ");
     }
 
     if (curData->data_.numbers.numMissingFiles > 0) {
-        itemsInfo.append(QString("removed %1").arg(curData->clearDataFromLostFiles()));
+        if (curData->data_.numbers.numMissingFiles < curData->data_.numbers.numChecksums)
+            itemsInfo.append(QString("removed %1").arg(curData->clearDataFromLostFiles()));
+        else {
+            emit showMessage("Failure to delete all database items", "Warning");
+            return;
+        }
     }
 
     curData->data_.metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
