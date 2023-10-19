@@ -12,7 +12,7 @@ aboutDialog::aboutDialog(QWidget *parent) :
     this->setWindowIcon(QIcon(":/veretino.png"));
     ui->labelPix->setPixmap(QPixmap(":/veretino.png").scaled(100,100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
-    ui->labelInfo->setText("Veretino 0.2.4\n\nQt: 5.15\nFree and open-source software\nGNU General Public License v3");
+    ui->labelInfo->setText("Veretino dev_0.2.5\n\nQt: 5.15\nFree and open-source software\nGNU General Public License v3");
 
     ui->labelAuthor->setTextFormat(Qt::RichText);
     ui->labelAuthor->setOpenExternalLinks(true);

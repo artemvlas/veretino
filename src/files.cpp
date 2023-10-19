@@ -304,6 +304,11 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
         return QString("%1/%2").arg(absolutePath, addPath);
 }
 
+QString backupFilePath(const QString &filePath)
+{
+    return joinPath(parentFolder(filePath), ".tmp-backup_" + QFileInfo(filePath).fileName());
+}
+
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 {
     if (!filter.includeOnly) {

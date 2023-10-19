@@ -14,6 +14,11 @@ DataMaintainer::DataMaintainer(QObject *parent)
 DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
     : QObject(parent), data_(initData)
 {
+    if (data_.metaData.databaseFileName.contains('/'))
+        data_.metaData.databaseFilePath = data_.metaData.databaseFileName;
+    else
+        data_.metaData.databaseFilePath = paths::joinPath(data_.metaData.workDir, data_.metaData.databaseFileName);
+
     updateNumbers();
 
     qDebug() << "DataMaintainer created | " << data_.metaData.workDir;
@@ -272,6 +277,9 @@ void DataMaintainer::importJson(const QString &jsonFilePath)
 
 void DataMaintainer::exportToJson()
 {
+    if (QFileInfo::exists(data_.metaData.databaseFilePath) && !QFile::exists(paths::backupFilePath(data_.metaData.databaseFilePath)))
+        makeBackup();
+
     updateNumbers();
     data_.metaData.saveDateTime = format::currentDateTime();
 
@@ -417,6 +425,35 @@ void DataMaintainer::dbStatus()
     emit showMessage(result, "Database status");
 }
 
+bool DataMaintainer::makeBackup()
+{
+    QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);
+
+    return (!QFile::exists(backupFilePath) && QFile::copy(data_.metaData.databaseFilePath, backupFilePath));
+}
+
+bool DataMaintainer::restoreBackup()
+{
+    QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);
+
+    if (QFile::exists(backupFilePath)) {
+        if (QFile::exists(data_.metaData.databaseFilePath)) {
+            if (!QFile::remove(data_.metaData.databaseFilePath))
+                return false;
+        }
+
+        return QFile::rename(backupFilePath, data_.metaData.databaseFilePath);
+    }
+    return false;
+}
+
+void DataMaintainer::removeBackupFile()
+{
+    QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);
+    if (QFile::exists(backupFilePath))
+        QFile::remove(backupFilePath);
+}
+
 void DataMaintainer::cancelProcess()
 {
     canceled = true;
@@ -424,6 +461,7 @@ void DataMaintainer::cancelProcess()
 
 DataMaintainer::~DataMaintainer()
 {
-    qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
+    removeBackupFile();
     emit setPermanentStatus();
+    qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
 }

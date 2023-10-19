@@ -50,7 +50,7 @@ bool JsonDb::makeJson(const DataContainer &data)
     bool isWorkDirRelative = !data.metaData.databaseFileName.contains('/');
 
     QJsonObject header;
-    header["Created with"] = "Veretino 0.2.4 https://github.com/artemvlas/veretino";
+    header["Created with"] = "Veretino dev_0.2.5 https://github.com/artemvlas/veretino";
     header["Files number"] = data.numbers.numChecksums;
     header["Folder"] = paths::folderName(data.metaData.workDir);
     header["Used algorithm"] = format::algoToStr(data.metaData.algorithm);
@@ -158,6 +158,7 @@ DataContainer JsonDb::parseJson(const QString &filePath)
     DataContainer parsedData;
 
     // filling metadata
+    parsedData.metaData.databaseFilePath = filePath;
     if (header.contains("Working folder") && !(header.value("Working folder").toString() == "Relative")) {
         parsedData.metaData.databaseFileName = filePath;
         parsedData.metaData.workDir = header.value("Working folder").toString();

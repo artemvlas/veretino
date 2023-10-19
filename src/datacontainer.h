@@ -18,6 +18,7 @@ struct MetaData {
     QCryptographicHash::Algorithm algorithm;
     QString workDir; // current working folder
     QString databaseFileName;
+    QString databaseFilePath;
     QString saveDateTime; // date and time the database was saved
     QString about; // contains a brief description of the item changes or status, if any
     FilterRule filter;
@@ -74,6 +75,10 @@ public:
     QString itemContentsInfo(const QString &itemPath); // if file - file info, if folder - folder contents (availability, size etc.)
 
     void dbStatus(); // info about current DB
+
+    bool makeBackup();
+    bool restoreBackup();
+    void removeBackupFile();
 
     // variables
     DataContainer data_;
