@@ -432,21 +432,6 @@ bool DataMaintainer::makeBackup()
     return (!QFile::exists(backupFilePath) && QFile::copy(data_.metaData.databaseFilePath, backupFilePath));
 }
 
-bool DataMaintainer::restoreBackup()
-{
-    QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);
-
-    if (QFile::exists(backupFilePath)) {
-        if (QFile::exists(data_.metaData.databaseFilePath)) {
-            if (!QFile::remove(data_.metaData.databaseFilePath))
-                return false;
-        }
-
-        return QFile::rename(backupFilePath, data_.metaData.databaseFilePath);
-    }
-    return false;
-}
-
 void DataMaintainer::removeBackupFile()
 {
     QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);

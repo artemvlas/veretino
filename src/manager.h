@@ -27,6 +27,7 @@ public slots:
     void updateNewLost(); // remove lost files, add new files
     void updateMismatch(); // update json Database with new checksums for files with failed verification
     void resetDatabase(); // reopening and reparsing current database
+    void restoreDatabase();
     void showNewLostOnly();
     void deleteCurData();
     void isViewFS(const bool isFS);
@@ -40,6 +41,7 @@ private:
     void showFileCheckResultMessage(bool isMatched);
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo);
     FileList calculateChecksums(DataContainer &filesContainer);
+    bool restoreBackup(const QString &databaseFilePath);
 
     bool canceled = false;
     bool isViewFileSysytem;

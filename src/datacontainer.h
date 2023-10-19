@@ -77,7 +77,6 @@ public:
     void dbStatus(); // info about current DB
 
     bool makeBackup();
-    bool restoreBackup();
     void removeBackupFile();
 
     // variables

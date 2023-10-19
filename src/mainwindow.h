@@ -69,6 +69,7 @@ signals:
     void copyStoredChecksum(const QString &path, bool clipboard = true);
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
+    void restoreDatabase();
     void showNewLostOnly();
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);

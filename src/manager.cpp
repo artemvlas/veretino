@@ -145,6 +145,32 @@ void Manager::resetDatabase()
     createDataModel(dbFilePath);
 }
 
+void Manager::restoreDatabase()
+{
+    QString databaseFilePath;
+    if (curData != nullptr)
+        databaseFilePath = curData->data_.metaData.databaseFilePath;
+    if (restoreBackup(databaseFilePath))
+        createDataModel(databaseFilePath);
+    else
+        emit setStatusbarText("No saved changes");
+}
+
+bool Manager::restoreBackup(const QString &databaseFilePath)
+{
+    QString backupFilePath = paths::backupFilePath(databaseFilePath);
+
+    if (QFile::exists(backupFilePath)) {
+        if (QFile::exists(databaseFilePath)) {
+            if (!QFile::remove(databaseFilePath))
+                return false;
+        }
+
+        return QFile::rename(backupFilePath, databaseFilePath);
+    }
+    return false;
+}
+
 //making tree model | file paths : info about current availability on disk
 void Manager::createDataModel(const QString &databaseFilePath)
 {

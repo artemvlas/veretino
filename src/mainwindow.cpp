@@ -126,6 +126,7 @@ void MainWindow::connectManager()
 
     // change view
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
+    connect(this, &MainWindow::restoreDatabase, manager, &Manager::restoreDatabase);
     connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::isViewFS);
     connect(this, &MainWindow::showAll, manager, &Manager::showAll);
@@ -183,6 +184,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
         else {
             contextMenu->addAction("Status", this, &MainWindow::dbStatus);
             contextMenu->addAction("Reset", this, &MainWindow::resetDatabase);
+            contextMenu->addAction("Forget all changes", this, &MainWindow::restoreDatabase);
             contextMenu->addSeparator();
             contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
             contextMenu->addSeparator();
