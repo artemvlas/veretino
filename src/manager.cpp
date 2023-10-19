@@ -226,15 +226,13 @@ void Manager::updateNewLost()
             return;
         emit setMode(Mode::EndProcess);
 
-        curData->updateNumbers();
-
         itemsInfo = QString("added %1").arg(curData->data_.numbers.numNewFiles);
         if (curData->data_.numbers.numMissingFiles > 0)
             itemsInfo.append(", ");
     }
 
     if (curData->data_.numbers.numMissingFiles > 0) {
-        if (curData->data_.numbers.numMissingFiles < curData->data_.numbers.numChecksums)
+        if (curData->data_.numbers.numMissingFiles < (curData->data_.numbers.numChecksums + curData->data_.numbers.numNewFiles))
             itemsInfo.append(QString("removed %1").arg(curData->clearDataFromLostFiles()));
         else {
             emit showMessage("Failure to delete all database items", "Warning");
@@ -578,7 +576,7 @@ void Manager::chooseMode()
 void Manager::deleteCurData()
 {
     if (curData != nullptr) {
-        curData->deleteLater();
+        delete curData;
         curData = nullptr;
     }
 }
