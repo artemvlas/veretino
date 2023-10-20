@@ -281,6 +281,12 @@ QString folderName(const QString &folderPath)
     return dirName;
 }
 
+QString basicName(const QString &path)
+{
+    QStringList components = path.split(QRegExp("[/\\\\]"), Qt::SkipEmptyParts);
+    return components.isEmpty() ? QString() : components.last();
+}
+
 QString parentFolder(const QString &path)
 {
     int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'

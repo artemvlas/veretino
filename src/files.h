@@ -25,6 +25,7 @@ struct FilterRule {
 namespace paths {
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 QString folderName(const QString &folderPath); // returns folder name: "/home/user/folder" --> "folder"; if empty, returns 'Root'
+QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 QString backupFilePath(const QString &filePath);
 
