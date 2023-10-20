@@ -293,13 +293,11 @@ QString parentFolder(const QString &path)
     if (rootSepIndex == -1)
         return "/"; // if there is no '/' in 'path'
 
-    if (path.at(rootSepIndex + 1) == '/')
+    if (path.length() > rootSepIndex + 1 && path.at(rootSepIndex + 1) == '/')
         ++rootSepIndex; // if the path's root contains double '/' like 'ftp://folder' or 'smb://folder', increase index to next position
     int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
-    if (sepIndex > rootSepIndex)
-        return path.left(sepIndex);
-    else
-        return path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
+
+    return (sepIndex > rootSepIndex) ? path.left(sepIndex) : path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
 }
 
 QString joinPath(const QString &absolutePath, const QString &addPath)
