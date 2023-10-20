@@ -82,8 +82,17 @@ QString basicName(const QString &path)
     if (path.size() == 3 && path.at(0).isLetter() && path.at(1) == ':') // if Windows-style root path like C:
         return QString("Drive_%1").arg(path.at(0));
 
+    // #1 impl.
     QStringList components = path.split(QRegExp("[/\\\\]"), Qt::SkipEmptyParts);
     return components.isEmpty() ? QString() : components.last();
+
+    // #2 impl. (for single '/' only)
+    /*
+    QString result = path.mid(path.lastIndexOf(QRegExp("[/\\\\]"), -2) + 1);
+    if (result.endsWith('/') || result.endsWith("\\"))
+        result.chop(1);
+    return result;
+    */
 }
 
 QString parentFolder(const QString &path)
