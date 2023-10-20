@@ -5,6 +5,7 @@
 #include <cmath>
 #include <QDebug>
 #include "files.h"
+#include <QDir>
 
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
@@ -72,6 +73,81 @@ bool canBeChecksum(const QString &text)
     return isOK;
 }
 } // namespace tools
+
+namespace paths {
+QString folderName(const QString &folderPath)
+{
+    QString dirName = QDir(folderPath).dirName();
+
+    if (dirName.isEmpty()) {
+        QString rootPath = parentFolder(folderPath);
+        if (rootPath.size() == 3 && rootPath.at(1) == ':') // if Windows-style root path like C:
+            dirName = QString("Drive_%1").arg(rootPath.at(0));
+        else
+            dirName = "Root";
+    }
+
+    return dirName;
+}
+
+QString basicName(const QString &path)
+{
+    QStringList components = path.split(QRegExp("[/\\\\]"), Qt::SkipEmptyParts);
+    return components.isEmpty() ? QString() : components.last();
+}
+
+QString parentFolder(const QString &path)
+{
+    int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'
+    if (rootSepIndex == -1)
+        return "/"; // if there is no '/' in 'path'
+
+    if (path.length() > rootSepIndex + 1 && path.at(rootSepIndex + 1) == '/')
+        ++rootSepIndex; // if the path's root contains double '/' like 'ftp://folder' or 'smb://folder', increase index to next position
+    int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
+
+    return (sepIndex > rootSepIndex) ? path.left(sepIndex) : path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
+}
+
+QString joinPath(const QString &absolutePath, const QString &addPath)
+{
+    if (absolutePath.endsWith('/'))
+        return absolutePath + addPath;
+    else
+        return QString("%1/%2").arg(absolutePath, addPath);
+}
+
+QString backupFilePath(const QString &filePath)
+{
+    return joinPath(parentFolder(filePath), ".tmp-backup_" + QFileInfo(filePath).fileName());
+}
+
+bool isFileAllowed(const QString &filePath, const FilterRule &filter)
+{
+    if (!filter.includeOnly) {
+        if (tools::isDatabaseFile(filePath))
+            return !filter.ignoreDbFiles;
+        if (tools::isSummaryFile(filePath))
+            return !filter.ignoreShaFiles;
+    }
+
+    if (filter.extensionsList.isEmpty())
+        return true;
+
+    // if 'filter.include' = true, a file ('filePath') with any extension from 'extensionsList' is allowed
+    // if 'filter.include' = false, than all files except these types allowed
+
+    bool allowed = !filter.includeOnly;
+    foreach (const QString &ext, filter.extensionsList) {
+        if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
+            allowed = filter.includeOnly;
+            break;
+        }
+    }
+
+    return allowed;
+}
+} // namespace 'paths'
 
 namespace format {
 QString currentDateTime()

@@ -22,6 +22,16 @@ bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &text);
 } // namespace tools
 
+namespace paths {
+QString parentFolder(const QString &path); // returns the parent folder of the 'path'
+QString folderName(const QString &folderPath); // returns folder name: "/home/user/folder" --> "folder"; if empty, returns 'Root'
+QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
+QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
+QString backupFilePath(const QString &filePath);
+
+bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
+} // namespace paths
+
 namespace format {
 QString currentDateTime();
 
