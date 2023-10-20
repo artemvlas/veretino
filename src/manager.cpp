@@ -32,7 +32,7 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     calcData.metaData.workDir = folderPath;
     calcData.metaData.algorithm = algo;
 
-    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::folderName(folderPath));
+    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath));
 
     calcData.metaData.filter = settings_->filter;
 
@@ -105,8 +105,8 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
         QString sumFile = QString("%1.%2").arg(filePath, ext);
         QFile file(sumFile);
         if (file.open(QFile::WriteOnly)) {
-            file.write(QString("%1 *%2").arg(sum, QFileInfo(filePath).fileName()).toUtf8());
-            emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(QFileInfo(sumFile).fileName()));
+            file.write(QString("%1 *%2").arg(sum, paths::basicName(filePath)).toUtf8());
+            emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(paths::basicName(sumFile)));
         }
         else {
             emit toClipboard(sum); // send checksum to clipboard
@@ -521,7 +521,7 @@ void Manager::getItemInfo(const QString &path)
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
-        QString statusText(QString("Contents of <%1>").arg(paths::folderName(folderPath)));
+        QString statusText(QString("Contents of <%1>").arg(paths::basicName(folderPath)));
         emit setStatusbarText(statusText + ": processing...");
 
         QThread *thread = new QThread;

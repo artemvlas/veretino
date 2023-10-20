@@ -5,7 +5,6 @@
 #include <cmath>
 #include <QDebug>
 #include "files.h"
-#include <QDir>
 
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
@@ -75,23 +74,14 @@ bool canBeChecksum(const QString &text)
 } // namespace tools
 
 namespace paths {
-QString folderName(const QString &folderPath)
-{
-    QString dirName = QDir(folderPath).dirName();
-
-    if (dirName.isEmpty()) {
-        QString rootPath = parentFolder(folderPath);
-        if (rootPath.size() == 3 && rootPath.at(1) == ':') // if Windows-style root path like C:
-            dirName = QString("Drive_%1").arg(rootPath.at(0));
-        else
-            dirName = "Root";
-    }
-
-    return dirName;
-}
-
 QString basicName(const QString &path)
 {
+    if (path == "/")
+        return "Root";
+
+    if (path.size() == 3 && path.at(0).isLetter() && path.at(1) == ':') // if Windows-style root path like C:
+        return QString("Drive_%1").arg(path.at(0));
+
     QStringList components = path.split(QRegExp("[/\\\\]"), Qt::SkipEmptyParts);
     return components.isEmpty() ? QString() : components.last();
 }
@@ -119,7 +109,7 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
 
 QString backupFilePath(const QString &filePath)
 {
-    return joinPath(parentFolder(filePath), ".tmp-backup_" + QFileInfo(filePath).fileName());
+    return joinPath(parentFolder(filePath), ".tmp-backup_" + paths::basicName(filePath));
 }
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)

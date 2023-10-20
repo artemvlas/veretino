@@ -121,7 +121,7 @@ QString Files::contentStatus(const QString &path)
         }
 
         if (!canceled) {
-            result = QString("%1: %2").arg(paths::folderName(path), format::filesNumberAndSize(filesNumber, totalSize));
+            result = QString("%1: %2").arg(paths::basicName(path), format::filesNumberAndSize(filesNumber, totalSize));
         }
         else {
             qDebug()<< "Files::contentStatus(const QString &path) | Canceled" << path;
