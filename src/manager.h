@@ -5,6 +5,7 @@
 #include <QObject>
 #include "tools.h"
 #include "treemodel.h"
+#include "datacontainer.h"
 
 class Manager : public QObject
 {

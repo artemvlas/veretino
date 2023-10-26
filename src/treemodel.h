@@ -4,7 +4,7 @@
 
 #include <QAbstractItemModel>
 #include "treeitem.h"
-#include "datacontainer.h"
+#include "files.h"
 
 class TreeItem;
 
@@ -26,6 +26,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     bool setData(const QModelIndex &index, const QVariant &value,
                         int role = Qt::EditRole) override;
+    void addFile(const QString &filePath, const FileValues &values);
     void populate(const FileList &filesData);
     QString getPath(const QModelIndex &curIndex) const; // build path by current index data
     QModelIndex getIndex(const QString &path); // find index of specified 'path'

@@ -13,51 +13,56 @@ TreeModel::~TreeModel()
     delete rootItem;
 }
 
+void TreeModel::addFile(const QString &filePath, const FileValues &values)
+{
+    QStringList splitPath = filePath.split('/');
+    TreeItem *parentItem = rootItem;
+
+    for (int var = 0; var < splitPath.size(); ++var) {
+        bool not_exist = true;
+
+        for (int i = 0; i < parentItem->childCount(); ++i) {
+            if (parentItem->child(i)->data(0) == splitPath.at(var)) {
+                parentItem = parentItem->child(i);
+                not_exist = false;
+                break;
+            }
+        }
+
+        if (not_exist) {
+            QString avail, status;
+            if (var + 1 == splitPath.size()) {
+                // Size/Avail. column
+                switch (values.status) {
+                case FileValues::New:
+                    avail = QString("New file: %1").arg(format::dataSizeReadable(values.size));
+                    break;
+                case FileValues::Missing:
+                    avail = "Missing file";
+                    break;
+                case FileValues::Unreadable:
+                    avail = "Unreadable";
+                    break;
+                default:
+                    avail = format::dataSizeReadable(values.size);
+                }
+
+                // Status column
+                status = format::fileItemStatus(values.status);
+            }
+
+            TreeItem *ti = new TreeItem({splitPath.at(var), avail, status}, parentItem);
+            parentItem->appendChild(ti);
+            parentItem = ti;
+        }
+    }
+}
+
 void TreeModel::populate(const FileList &filesData)
 {
     FileList::const_iterator iter;
     for (iter = filesData.constBegin(); iter != filesData.constEnd(); ++iter) {
-        QStringList splitPath = iter.key().split('/');
-        TreeItem *parentItem = rootItem;
-
-        for (int var = 0; var < splitPath.size(); ++var) {
-            bool not_exist = true;
-
-            for (int i = 0; i < parentItem->childCount(); ++i) {
-                if (parentItem->child(i)->data(0) == splitPath.at(var)) {
-                    parentItem = parentItem->child(i);
-                    not_exist = false;
-                    break;
-                }
-            }
-
-            if (not_exist) {
-                QString avail, status;
-                if (var + 1 == splitPath.size()) {
-                    // Size/Avail. column
-                    switch (iter.value().status) {
-                    case FileValues::New:
-                        avail = QString("New file: %1").arg(format::dataSizeReadable(iter.value().size));
-                        break;
-                    case FileValues::Missing:
-                        avail = "Missing file";
-                        break;
-                    case FileValues::Unreadable:
-                        avail = "Unreadable";
-                        break;
-                    default:
-                        avail = format::dataSizeReadable(iter.value().size);
-                    }
-
-                    // Status column
-                    status = format::fileItemStatus(iter.value().status);
-                }
-
-                TreeItem *ti = new TreeItem({splitPath.at(var), avail, status}, parentItem);
-                parentItem->appendChild(ti);
-                parentItem = ti;
-            }
-        }
+        addFile(iter.key(), iter.value());
     }
 }
 
