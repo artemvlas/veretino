@@ -17,6 +17,7 @@ SOURCES += \
     src/mainwindow.cpp \
     src/manager.cpp \
     src/procstate.cpp \
+    src/proxymodel.cpp \
     src/settingdialog.cpp \
     src/shacalculator.cpp \
     src/tools.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     src/mainwindow.h \
     src/manager.h \
     src/procstate.h \
+    src/proxymodel.h \
     src/settingdialog.h \
     src/shacalculator.h \
     src/tools.h \

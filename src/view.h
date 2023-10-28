@@ -5,7 +5,9 @@
 #include <QTreeView>
 #include <QFileSystemModel>
 #include "tools.h"
+#include <QSortFilterProxyModel>
 #include "treemodel.h"
+#include "proxymodel.h"
 
 class View : public QTreeView
 {
@@ -15,7 +17,7 @@ public:
     bool isViewFileSystem(); // "true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
     void pathAnalyzer(const QString &path);
     QString workDir;
-    TreeModel *model_ = nullptr;
+    ProxyModel *proxyModel_ = new ProxyModel(this);
 
 public slots:
     void setFileSystemModel();

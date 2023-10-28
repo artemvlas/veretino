@@ -8,6 +8,8 @@
 View::View(QWidget *parent)
     : QTreeView(parent)
 {
+    this->sortByColumn(0, Qt::AscendingOrder);
+
     fileSystem->setObjectName("fileSystem");
     fileSystem->setRootPath(QDir::rootPath());
 
@@ -22,7 +24,7 @@ void View::setFileSystemModel()
     }
 
     saveLastPath();
-    deleteOldModel();
+    //deleteOldModel();
 
     this->setModel(fileSystem);
     emit modelChanged(true);
@@ -48,10 +50,10 @@ void View::setTreeModel(TreeModel *model)
     }
 
     saveLastPath();
-    model_ = model;
-    deleteOldModel();
+    proxyModel_->setSourceModel(model);
+    //deleteOldModel();
 
-    this->setModel(model);
+    this->setModel(proxyModel_);
     emit modelChanged(false);
 
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
@@ -84,10 +86,10 @@ void View::setIndexByPath(const QString &path)
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
-    else if (model_ != nullptr) {
-        QModelIndex index = paths::getIndex(path, model_);
+    else if (proxyModel_ != nullptr) {
+        QModelIndex index = paths::getIndex(path, proxyModel_);
         if (!index.isValid())
-            index = TreeModelIterator(model_).nextFile(); // select the very first file
+            index = TreeModelIterator(proxyModel_).nextFile(); // select the very first file
         if (index.isValid()) {
             this->expand(index);
             this->setCurrentIndex(index);
@@ -121,7 +123,7 @@ void View::saveLastPath()
 {
     if (isViewFileSystem())
         lastFileSystemPath = fileSystem->filePath(currentIndex);
-    else if (model_ != nullptr && currentIndex.isValid())
+    else if (proxyModel_ != nullptr && currentIndex.isValid())
         lastModelPath = paths::getPath(currentIndex);
 }
 
