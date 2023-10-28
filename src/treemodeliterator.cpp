@@ -2,7 +2,7 @@
 #include "treemodeliterator.h"
 #include "tools.h"
 
-TreeModelIterator::TreeModelIterator(const TreeModel *model, QModelIndex rootIndex)
+TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex)
     : model_(model)
 {
     if (rootIndex.isValid()) {
