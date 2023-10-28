@@ -66,48 +66,9 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-QString TreeModel::getPath(const QModelIndex &curIndex) const
-{
-    QModelIndex newIndex = index(curIndex.row(), 0 , curIndex.parent());
-    QString path = newIndex.data().toString();
-
-    while (newIndex.parent().isValid()) {
-        path = paths::joinPath(newIndex.parent().data().toString(), path);
-        newIndex = newIndex.parent();
-    }
-
-    return path;
-}
-
-QModelIndex TreeModel::getIndex(const QString &path)
-{
-    QModelIndex curIndex;
-
-    if (!path.isEmpty()) {
-        curIndex = index(0, 0);
-        QStringList parts = path.split('/');
-        QModelIndex parentIndex;
-
-        foreach (const QString &str, parts) {
-            for (int i = 0; curIndex.isValid(); ++i) {
-                curIndex = index(i, 0, parentIndex);
-                if (curIndex.data().toString() == str) {
-                    //qDebug() << "***" << str << "finded on" << i << "row";
-                    parentIndex = index(i, 0, parentIndex);
-                    break;
-                }
-                //qDebug() << "*** Looking for:" << str << curIndex.data();
-            }
-        }
-        //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
-    }
-
-    return curIndex;
-}
-
 void TreeModel::setItemStatus(const QString &itemPath, int status)
 {
-    QModelIndex curIndex = getIndex(itemPath);
+    QModelIndex curIndex = paths::getIndex(itemPath, this);
     if (curIndex.isValid()) {
         setData(index(curIndex.row(), 2, curIndex.parent()),
                 format::fileItemStatus(status));

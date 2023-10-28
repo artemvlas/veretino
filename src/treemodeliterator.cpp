@@ -1,5 +1,6 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "treemodeliterator.h"
+#include "tools.h"
 
 TreeModelIterator::TreeModelIterator(const TreeModel *model, QModelIndex rootIndex)
     : model_(model)
@@ -58,7 +59,7 @@ QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex)
 
 QString TreeModelIterator::path()
 {
-    return model_->getPath(index_);
+    return paths::getPath(index_);
 }
 
 bool TreeModelIterator::hasNext()

@@ -121,6 +121,49 @@ QString backupFilePath(const QString &filePath)
     return joinPath(parentFolder(filePath), ".tmp-backup_" + paths::basicName(filePath));
 }
 
+QString getPath(const QModelIndex &curIndex)
+{
+    if (!curIndex.isValid())
+        return QString();
+
+    const QAbstractItemModel *curModel = curIndex.model();
+    QModelIndex newIndex = curModel->index(curIndex.row(), 0 , curIndex.parent());
+    QString path = newIndex.data().toString();
+
+    while (newIndex.parent().isValid()) {
+        path = paths::joinPath(newIndex.parent().data().toString(), path);
+        newIndex = newIndex.parent();
+    }
+
+    return path;
+}
+
+QModelIndex getIndex(const QString &path, const QAbstractItemModel *model)
+{
+    QModelIndex curIndex;
+
+    if (!path.isEmpty()) {
+        QModelIndex parentIndex;
+        curIndex = model->index(0, 0);
+        QStringList parts = path.split('/');
+
+        foreach (const QString &str, parts) {
+            for (int i = 0; curIndex.isValid(); ++i) {
+                curIndex = model->index(i, 0, parentIndex);
+                if (curIndex.data().toString() == str) {
+                    //qDebug() << "***" << str << "finded on" << i << "row";
+                    parentIndex = model->index(i, 0, parentIndex);
+                    break;
+                }
+                //qDebug() << "*** Looking for:" << str << curIndex.data();
+            }
+        }
+        //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
+    }
+
+    return curIndex;
+}
+
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 {
     if (!filter.includeOnly) {

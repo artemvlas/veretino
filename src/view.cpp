@@ -56,7 +56,7 @@ void View::setTreeModel(TreeModel *model)
 
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
     connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
-                                           {currentIndex = index; emit pathChanged(model_->getPath(index));});
+                                            {currentIndex = index; emit pathChanged(paths::getPath(index));});
 
     this->setColumnWidth(0, 450);
     this->setColumnWidth(1, 130);
@@ -85,7 +85,7 @@ void View::setIndexByPath(const QString &path)
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
     else if (model_ != nullptr) {
-        QModelIndex index = model_->getIndex(path);
+        QModelIndex index = paths::getIndex(path, model_);
         if (!index.isValid())
             index = TreeModelIterator(model_).nextFile(); // select the very first file
         if (index.isValid()) {
@@ -122,7 +122,7 @@ void View::saveLastPath()
     if (isViewFileSystem())
         lastFileSystemPath = fileSystem->filePath(currentIndex);
     else if (model_ != nullptr && currentIndex.isValid())
-        lastModelPath = model_->getPath(currentIndex);
+        lastModelPath = paths::getPath(currentIndex);
 }
 
 void View::deleteOldModel()

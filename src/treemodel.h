@@ -28,8 +28,6 @@ public:
                         int role = Qt::EditRole) override;
     void addFile(const QString &filePath, const FileValues &values);
     void populate(const FileList &filesData);
-    QString getPath(const QModelIndex &curIndex) const; // build path by current index data
-    QModelIndex getIndex(const QString &path); // find index of specified 'path'
     void setItemStatus(const QString &itemPath, int status);
 
 
