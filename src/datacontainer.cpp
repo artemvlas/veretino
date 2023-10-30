@@ -9,7 +9,8 @@
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
 DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
     : QObject(parent), data_(initData)

@@ -70,10 +70,10 @@ signals:
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
-    void showNewLostOnly();
+    //void showNewLostOnly();
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);
-    void showAll();
+    //void showAll();
     void dbStatus();
 };
 #endif // MAINWINDOW_H

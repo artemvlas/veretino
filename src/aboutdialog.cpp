@@ -8,8 +8,8 @@ aboutDialog::aboutDialog(QWidget *parent) :
     ui(new Ui::aboutDialog)
 {
     ui->setupUi(this);
-    this->setFixedSize(400,200);
-    this->setWindowIcon(QIcon(":/veretino.png"));
+    setFixedSize(400,200);
+    setWindowIcon(QIcon(":/veretino.png"));
     ui->labelPix->setPixmap(QPixmap(":/veretino.png").scaled(100,100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
     ui->labelInfo->setText("Veretino dev_0.2.5\n\nQt: 5.15\nFree and open-source software\nGNU General Public License v3");

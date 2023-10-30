@@ -17,16 +17,21 @@ public:
     bool isViewFileSystem(); // "true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
     void pathAnalyzer(const QString &path);
     QString workDir;
-    ProxyModel *proxyModel_ = new ProxyModel(this);
+
+    ProxyModel *proxyModel_ = nullptr;
+    QItemSelectionModel *oldSelectionModel_ = nullptr;
 
 public slots:
     void setFileSystemModel();
-    void setTreeModel(TreeModel *model);
+    void setTreeModel(ProxyModel *model);
     void setIndexByPath(const QString &path);
+    void setFilter(const QList<int> status);
 
 private:
     void saveLastPath();
-    void deleteOldModel();
+    void deleteOldModels();
+    void connectModel();
+    void sendPathChanged(const QModelIndex &index);
     QFileSystemModel *fileSystem = new QFileSystemModel;
     QModelIndex currentIndex;
     QString lastFileSystemPath;
@@ -37,7 +42,7 @@ signals:
     void indexChanged(const QModelIndex &index);
     void pathChanged(const QString &path); // by indexToPath()
     void setMode(Mode::Modes mode);
-    void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
+    void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false; init. the clearing old data
     void showMessage(const QString &text, const QString &title = "Info");
     void keyEnterPressed();
 };

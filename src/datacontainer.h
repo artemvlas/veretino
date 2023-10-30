@@ -11,7 +11,7 @@
 #include <QCryptographicHash>
 #include "files.h"
 #include "treemodel.h"
-
+#include "proxymodel.h"
 class TreeModel;
 
 struct MetaData {
@@ -81,10 +81,12 @@ public:
 
     // variables
     DataContainer data_;
-    TreeModel *model_ = nullptr;
+    TreeModel *model_ = new TreeModel(this);
+    ProxyModel *proxyModel_ = new ProxyModel(this);
 
 public slots:
     void cancelProcess();
+
 private:
     bool canceled = false;
     int findNewFiles(); // Searches for new readable files regarding stored list and filters, returns the number of found
@@ -93,7 +95,7 @@ private:
 signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void setPermanentStatus(const QString &text = QString());
-    void showMessage(const QString &text, const QString &title = "Info");    
+    void showMessage(const QString &text, const QString &title = "Info");
 };
 
 #endif // DATACONTAINER_H

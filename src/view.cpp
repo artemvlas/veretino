@@ -8,12 +8,21 @@
 View::View(QWidget *parent)
     : QTreeView(parent)
 {
-    this->sortByColumn(0, Qt::AscendingOrder);
+    sortByColumn(0, Qt::AscendingOrder);
 
     fileSystem->setObjectName("fileSystem");
     fileSystem->setRootPath(QDir::rootPath());
 
     connect(this, &View::pathChanged, this, &View::pathAnalyzer);
+    connect(this, &View::modelChanged, this, &View::connectModel);
+    connect(this, &View::modelChanged, this, &View::deleteOldModels);
+}
+
+// called every time the model is changed
+void View::connectModel()
+{
+    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
+    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::sendPathChanged);
 }
 
 void View::setFileSystemModel()
@@ -24,50 +33,54 @@ void View::setFileSystemModel()
     }
 
     saveLastPath();
-    //deleteOldModel();
+    oldSelectionModel_ = selectionModel();
 
-    this->setModel(fileSystem);
+    setModel(fileSystem);
     emit modelChanged(true);
-
-    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
-    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
-                                      {currentIndex = index; emit pathChanged(fileSystem->filePath(index));});
 
     if (!QFileInfo::exists(lastFileSystemPath))
         lastFileSystemPath = QDir::homePath();
 
-    this->setColumnWidth(0, 450);
-    this->setColumnWidth(1, 100);
-    this->setIndexByPath(lastFileSystemPath);
-
+    setColumnWidth(0, 450);
+    setColumnWidth(1, 100);
+    setIndexByPath(lastFileSystemPath);
 }
 
-void View::setTreeModel(TreeModel *model)
+void View::setTreeModel(ProxyModel *model)
 {
-    if (model == nullptr) {
+    if (!model) {
         setFileSystemModel();
         return;
     }
 
     saveLastPath();
-    proxyModel_->setSourceModel(model);
-    //deleteOldModel();
+    oldSelectionModel_ = selectionModel();
+    proxyModel_ = model;
 
-    this->setModel(proxyModel_);
+    setModel(proxyModel_);
     emit modelChanged(false);
 
-    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
-    connect(this->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &index)
-                                            {currentIndex = index; emit pathChanged(paths::getPath(index));});
-
-    this->setColumnWidth(0, 450);
-    this->setColumnWidth(1, 130);
+    setColumnWidth(0, 450);
+    setColumnWidth(1, 100);
     setIndexByPath(lastModelPath);
+}
+
+void View::sendPathChanged(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return;
+
+    currentIndex = index;
+
+    if (isViewFileSystem())
+        emit pathChanged(fileSystem->filePath(index));
+    else if (proxyModel_)
+        emit pathChanged(paths::getPath(index));
 }
 
 bool View::isViewFileSystem()
 {
-    return (this->model() == fileSystem);
+    return (model() == fileSystem);
 }
 
 void View::setIndexByPath(const QString &path)
@@ -75,8 +88,8 @@ void View::setIndexByPath(const QString &path)
     if (isViewFileSystem()) {
         if (QFileInfo::exists(path)) {
             QModelIndex index = fileSystem->index(path);
-            this->expand(index);
-            this->setCurrentIndex(index);
+            expand(index);
+            setCurrentIndex(index);
             QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter);});
             // for better scrolling work, a timer^ is used
             // QFileSystemModel needs some time after setup to Scrolling be able
@@ -86,14 +99,14 @@ void View::setIndexByPath(const QString &path)
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
-    else if (proxyModel_ != nullptr) {
+    else if (proxyModel_) {
         QModelIndex index = paths::getIndex(path, proxyModel_);
         if (!index.isValid())
             index = TreeModelIterator(proxyModel_).nextFile(); // select the very first file
         if (index.isValid()) {
-            this->expand(index);
-            this->setCurrentIndex(index);
-            this->scrollTo(index, QAbstractItemView::PositionAtCenter);
+            expand(index);
+            setCurrentIndex(index);
+            scrollTo(index, QAbstractItemView::PositionAtCenter);
         }
     }
 }
@@ -119,37 +132,36 @@ void View::pathAnalyzer(const QString &path)
     }
 }
 
+void View::setFilter(const QList<int> status)
+{
+    if (proxyModel_)
+        proxyModel_->setFilter(status);
+}
+
 void View::saveLastPath()
 {
     if (isViewFileSystem())
         lastFileSystemPath = fileSystem->filePath(currentIndex);
-    else if (proxyModel_ != nullptr && currentIndex.isValid())
+    else if (currentIndex.isValid())
         lastModelPath = paths::getPath(currentIndex);
 }
 
-void View::deleteOldModel()
+void View::deleteOldModels()
 {
-    if (this->model() != nullptr && this->model() != fileSystem) {
-        qDebug() << "'oldModel' will be deleted...";
-        QAbstractItemModel *oldModel = this->model();
-        delete oldModel;
-        oldModel = nullptr;
-    }
-    if (this->selectionModel() != nullptr) {
+    if (oldSelectionModel_) {
         qDebug() << "'oldSelectionModel' will be deleted...";
-        QItemSelectionModel *oldSelectionModel = this->selectionModel();
-        delete oldSelectionModel;
-        oldSelectionModel = nullptr;
+        delete oldSelectionModel_;
+        oldSelectionModel_ = nullptr;
     }
 }
 
 void View::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-        if (this->isExpanded(currentIndex))
-            this->collapse(currentIndex);
+        if (isExpanded(currentIndex))
+            collapse(currentIndex);
         else
-            this->expand(currentIndex);
+            expand(currentIndex);
         emit keyEnterPressed();
     }
 

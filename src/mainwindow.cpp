@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowIcon(QIcon(":/veretino.png"));
+    setWindowIcon(QIcon(":/veretino.png"));
 
     ui->statusbar->addPermanentWidget(permanentStatus);
 
@@ -45,7 +45,7 @@ void MainWindow::connections()
 {
     connectManager();
 
-    connect(ui->button, &QPushButton::clicked, this , &MainWindow::doWork);
+    connect(ui->button, &QPushButton::clicked, this, &MainWindow::doWork);
     connect(this, &MainWindow::cancelProcess, this, [=]{if (viewMode == Mode::Processing) setMode(Mode::EndProcess);});
     connect(this, &MainWindow::getItemInfo, this, &MainWindow::cancelProcess);
     connect(this, &MainWindow::folderContentsByType, this, &MainWindow::cancelProcess);
@@ -79,7 +79,7 @@ void MainWindow::connections()
 
 void MainWindow::connectManager()
 {
-    // qRegisterMetaType<QVector<int>>("QVector<int>"); // uncomment when building on Windows
+    // qRegisterMetaType<QVector<int>>("QVector<int>"); // uncomment when building on Windows (qt 5.15.2)
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<Mode::Modes>("Mode::Modes");
 
@@ -127,9 +127,8 @@ void MainWindow::connectManager()
     // change view
     connect(this, &MainWindow::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(this, &MainWindow::restoreDatabase, manager, &Manager::restoreDatabase);
-    connect(this, &MainWindow::showNewLostOnly, manager, &Manager::showNewLostOnly);
-    connect(ui->treeView, &View::modelChanged, manager, &Manager::isViewFS);
-    connect(this, &MainWindow::showAll, manager, &Manager::showAll);
+    connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
+    connect(manager, &Manager::showFiltered, ui->treeView, &View::setFilter);
 
     thread->start();
 }
@@ -193,7 +192,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                 contextMenu->addAction("Update the Database with new checksums", this, &MainWindow::updateMismatch);
 
             else if (viewMode == ModelNewLost) {
-                contextMenu->addAction("Show New/Lost only", this, &MainWindow::showNewLostOnly);
+                contextMenu->addAction("Show New/Lost only", this, [=]{ui->treeView->proxyModel_->setFilter({FileValues::New, FileValues::Missing});});
                 contextMenu->addAction("Update the DataBase with New/Lost files", this, &MainWindow::updateNewLost);
                 contextMenu->addSeparator();
             }
@@ -212,8 +211,10 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
                 contextMenu->addAction("Check ALL files against stored checksums", this, [=]{emit verifyFileList();});
             }
-            contextMenu->addSeparator();
-            contextMenu->addAction("Show All", this, &MainWindow::showAll);
+            if (ui->treeView->proxyModel_->isFilterEnabled) {
+                contextMenu->addSeparator();
+                contextMenu->addAction("Show All", this, [=]{ui->treeView->proxyModel_->disableFilter();});
+            }
         }
         contextMenu->addSeparator();
         contextMenu->addAction("Collapse all", ui->treeView, &QTreeView::collapseAll);

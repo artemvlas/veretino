@@ -164,6 +164,15 @@ QModelIndex getIndex(const QString &path, const QAbstractItemModel *model)
     return curIndex;
 }
 
+bool isFileRow(const QModelIndex &curIndex)
+{
+    if (!curIndex.isValid())
+        return false;
+
+    const QAbstractItemModel *curModel = curIndex.model();
+    return !curModel->hasChildren(curModel->index(curIndex.row(), 0, curIndex.parent()));
+}
+
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 {
     if (!filter.includeOnly) {
@@ -284,14 +293,23 @@ QString fileItemStatus(int status)
 {
     QString result;
     switch (status) {
+    case FileValues::NotChecked:
+        result = "ready...";
+        break;
     case FileValues::Matched:
         result = "✓ OK";
         break;
     case FileValues::Mismatched:
         result = "☒ NOT match";
         break;
-    case FileValues::ChecksumUpdated:
-        result = "↻ stored checksum updated"; // 🗘
+    case FileValues::New:
+        result = "new file";
+        break;
+    case FileValues::Missing:
+        result = "missing";
+        break;
+    case FileValues::Unreadable:
+        result = "ureadable";
         break;
     case FileValues::Added:
         result = "→ added to DB"; // ➔
@@ -299,7 +317,13 @@ QString fileItemStatus(int status)
     case FileValues::Removed:
         result = "✂ removed from DB";
         break;
+    case FileValues::ChecksumUpdated:
+        result = "↻ stored checksum updated"; // 🗘
+        break;
+    default:
+        result = "unknown";
     }
+
     return result;
 }
 } // namespace 'format'

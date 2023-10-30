@@ -1,20 +1,23 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "treemodel.h"
 #include "tools.h"
+#include <QDebug>
 
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({"Path", "Size / Availability", "Status"});
+    rootItem = new TreeItem({"Path", "Size", "Status", "Checksums"}); // "Size / Availability"
 }
 
 TreeModel::~TreeModel()
 {
     delete rootItem;
+    qDebug() << this << "deleted";
 }
 
-void TreeModel::addFile(const QString &filePath, const FileValues &values)
+bool TreeModel::addFile(const QString &filePath, const FileValues &values)
 {
+    bool isAdded = false;
     QStringList splitPath = filePath.split('/');
     TreeItem *parentItem = rootItem;
 
@@ -30,32 +33,30 @@ void TreeModel::addFile(const QString &filePath, const FileValues &values)
         }
 
         if (not_exist) {
-            QString avail, status;
-            if (var + 1 == splitPath.size()) {
-                // Size/Avail. column
-                switch (values.status) {
-                case FileValues::New:
-                    avail = QString("New file: %1").arg(format::dataSizeReadable(values.size));
-                    break;
-                case FileValues::Missing:
-                    avail = "Missing file";
-                    break;
-                case FileValues::Unreadable:
-                    avail = "Unreadable";
-                    break;
-                default:
-                    avail = format::dataSizeReadable(values.size);
-                }
+            TreeItem *ti;
+            QVariant placebo;
+            QList<QVariant> iData {splitPath.at(var), placebo, placebo, placebo};
 
-                // Status column
-                status = format::fileItemStatus(values.status);
+            // the last item is considered a file
+            if (var + 1 == splitPath.size()) {
+                if (values.size > 0)
+                    iData.replace(1, values.size);
+
+                iData.replace(2, values.status);
+
+                if (!values.checksum.isEmpty())
+                    iData.replace(3, values.checksum);
+
+                isAdded = true;
             }
 
-            TreeItem *ti = new TreeItem({splitPath.at(var), avail, status}, parentItem);
+            ti = new TreeItem(iData, parentItem);
             parentItem->appendChild(ti);
             parentItem = ti;
         }
     }
+
+    return isAdded;
 }
 
 void TreeModel::populate(const FileList &filesData)
@@ -66,12 +67,11 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-void TreeModel::setItemStatus(const QString &itemPath, int status)
+void TreeModel::setItemStatus(const QString &itemPath, FileValues::FileStatus status)
 {
     QModelIndex curIndex = paths::getIndex(itemPath, this);
     if (curIndex.isValid()) {
-        setData(index(curIndex.row(), 2, curIndex.parent()),
-                format::fileItemStatus(status));
+        setData(index(curIndex.row(), 2, curIndex.parent()), status);
     }
 }
 
@@ -90,12 +90,12 @@ QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) con
     return QModelIndex();
 }
 
-QModelIndex TreeModel::parent(const QModelIndex &index) const
+QModelIndex TreeModel::parent(const QModelIndex &curIndex) const
 {
-    if (!index.isValid())
+    if (!curIndex.isValid())
         return QModelIndex();
 
-    TreeItem *childItem = getItem(index);
+    TreeItem *childItem = getItem(curIndex);
     TreeItem *parentItem = childItem ? childItem->parent() : nullptr;
 
     if (parentItem == rootItem || !parentItem)
@@ -120,39 +120,46 @@ int TreeModel::columnCount(const QModelIndex &parent) const
     return rootItem->columnCount();
 }
 
-QVariant TreeModel::data(const QModelIndex &index, int role) const
+QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 {
-    if (!index.isValid())
+    if (!curIndex.isValid())
         return QVariant();
 
-    if (role != Qt::DisplayRole && role != Qt::EditRole)
+    if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
         return QVariant();
 
-    TreeItem *item = getItem(index);
+    QVariant iData = getItem(curIndex)->data(curIndex.column());
 
-    return item->data(index.column());
+    if (iData.isValid() && role != RawDataRole) {
+        if (curIndex.column() == 1)
+            return format::dataSizeReadable(iData.toLongLong());
+        if (curIndex.column() == 2)
+            return format::fileItemStatus(iData.toInt());
+    }
+
+    return iData;
 }
 
-bool TreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int role)
 {
     if (role != Qt::EditRole)
         return false;
 
-    TreeItem *item = getItem(index);
-    bool result = item->setData(index.column(), value);
+    TreeItem *item = getItem(curIndex);
+    bool result = item->setData(curIndex.column(), value);
 
     if (result)
-        emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+        emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
 
     return result;
 }
 
-Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
+Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const
 {
-    if (!index.isValid())
+    if (!curIndex.isValid())
         return Qt::NoItemFlags;
 
-    return Qt::ItemIsEditable | QAbstractItemModel::flags(index);
+    return Qt::ItemIsEditable | QAbstractItemModel::flags(curIndex);
 }
 
 QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
@@ -164,10 +171,10 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-TreeItem *TreeModel::getItem(const QModelIndex &index) const
+TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
 {
-    if (index.isValid()) {
-        TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+    if (curIndex.isValid()) {
+        TreeItem *item = static_cast<TreeItem*>(curIndex.internalPointer());
         if (item)
             return item;
     }

@@ -29,12 +29,11 @@ public slots:
     void updateMismatch(); // update json Database with new checksums for files with failed verification
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
-    void showNewLostOnly();
-    void deleteCurData();
-    void isViewFS(const bool isFS);
+    void modelChanged(const bool isFileSystem); // recive the signal when Model has been changed, FileSystem = true, else = false;
     void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
-    void showAll();
     void dbStatus();
+    void deleteCurData();
+    void deleteOldData();
 
 private:
     void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
@@ -47,6 +46,7 @@ private:
     bool canceled = false;
     bool isViewFileSysytem;
     DataMaintainer *curData = nullptr;
+    DataMaintainer *oldData = nullptr; // curData backup
     Settings *settings_;
 
 signals:
@@ -54,12 +54,13 @@ signals:
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void procStatus(const QString &str);
-    void setModel(TreeModel *model = nullptr);
+    void setModel(ProxyModel *model = nullptr);
     void workDirChanged(const QString &workDir);
     void showMessage(const QString &text, const QString &title = "Info");
     void setButtonText(const QString &text);
     void setMode(Mode::Modes mode);
     void toClipboard(const QString &text);
+    void showFiltered(const QList<int> status = {});
     void cancelProcess();
 };
 

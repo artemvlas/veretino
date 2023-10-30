@@ -119,11 +119,11 @@ void Manager::makeTreeModel(const FileList &data)
 {
     if (!data.isEmpty()) {
         emit setStatusbarText("File tree creation...");
-        curData->model_ = new TreeModel;
-        curData->model_->setObjectName("treeModel");
         curData->model_->populate(data);
+        curData->proxyModel_->setSourceModel(curData->model_);
 
-        emit setModel(curData->model_);
+        emit setModel(curData->proxyModel_);
+
         emit workDirChanged(curData->data_.metaData.workDir);
         emit setStatusbarText(QString("%1 files listed")
                                       .arg(data.size()));
@@ -136,6 +136,9 @@ void Manager::makeTreeModel(const FileList &data)
 
 void Manager::resetDatabase()
 {
+    if (!curData)
+        return;
+
     QString dbFilePath;
     if (curData->data_.metaData.databaseFileName.contains('/'))
         dbFilePath = curData->data_.metaData.databaseFileName;
@@ -148,7 +151,7 @@ void Manager::resetDatabase()
 void Manager::restoreDatabase()
 {
     QString databaseFilePath;
-    if (curData != nullptr)
+    if (curData)
         databaseFilePath = curData->data_.metaData.databaseFilePath;
     if (restoreBackup(databaseFilePath))
         createDataModel(databaseFilePath);
@@ -180,7 +183,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
-    DataMaintainer *oldData = curData;
+    oldData = curData;
 
     curData = new DataMaintainer;
     connect(this, &Manager::cancelProcess, curData, &DataMaintainer::cancelProcess, Qt::DirectConnection);
@@ -199,22 +202,16 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
-    if (oldData != nullptr) {
-        delete oldData;
-    }
-
     dbStatus();
     makeTreeModel(curData->data_.filesData);
     chooseMode();
 }
 
-void Manager::showNewLostOnly()
-{
-    makeTreeModel(curData->listOf({FileValues::New, FileValues::Missing}));
-}
-
 void Manager::updateNewLost()
 {
+    if (!curData)
+        return;
+
     QString itemsInfo;
 
     if (curData->data_.numbers.numNewFiles > 0) {
@@ -245,21 +242,29 @@ void Manager::updateNewLost()
     curData->exportToJson();
 
     emit setMode(Mode::Model);
+    emit showFiltered();
 }
 
 // update the Database with new checksums for files with failed verification
 void Manager::updateMismatch()
 {
+    if (!curData)
+        return;
+
     curData->data_.metaData.about = QString("%1 checksums updated")
                         .arg(curData->updateMismatchedChecksums());
 
     curData->exportToJson();
     chooseMode();
+    emit showFiltered();
 }
 
 // checking the list of files against stored in the database checksums
 void Manager::verifyFileList(const QString &subFolder)
 {
+    if (!curData)
+        return;
+
     FileList fileList;
 
     if (!subFolder.isEmpty())
@@ -321,7 +326,7 @@ void Manager::verifyFileList(const QString &subFolder)
 
         if (curData->data_.numbers.numMismatched > 0 || subMismatched > 0) {
             emit setMode(Mode::UpdateMismatch);
-            makeTreeModel(curData->listOf(FileValues::Mismatched));
+            emit showFiltered({FileValues::Mismatched});
         }
     }
 }
@@ -369,6 +374,9 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
 //check only selected file instead all database cheking
 void Manager::checkCurrentItemSum(const QString &path)
 {
+    if (!curData)
+        return;
+
     QString savedSum = copyStoredChecksum(path, false);
 
     if (!savedSum.isEmpty()) {
@@ -514,7 +522,7 @@ void Manager::getItemInfo(const QString &path)
             thread->start();
         }
     }
-    else
+    else if (curData)
         emit setStatusbarText(curData->itemContentsInfo(path));
 }
 
@@ -544,26 +552,27 @@ void Manager::folderContentsByType(const QString &folderPath)
         qDebug()<< "Manager::folderContentsByType | Not a filesystem view";
     }
 }
-void Manager::showAll()
-{
-    makeTreeModel(curData->data_.filesData);
-}
 
 void Manager::dbStatus()
 {
-    if (curData != nullptr)
+    if (curData)
         curData->dbStatus();
 }
 
-void Manager::isViewFS(const bool isFS)
+void Manager::modelChanged(const bool isFileSystem)
 {
-    isViewFileSysytem = isFS;
-    if (isFS)
-        deleteCurData();
+    isViewFileSysytem = isFileSystem;
+    if (isFileSystem)
+        deleteCurData(); // if the View is switched to the filesystem, then curData is no longer needed
+
+    deleteOldData(); // delete backup of old curData if any
 }
 
 void Manager::chooseMode()
 {
+    if (!curData)
+        return;
+
     if (curData->data_.numbers.numMismatched > 0)
         emit setMode(Mode::UpdateMismatch);
     else if (curData->data_.numbers.numNewFiles > 0 || curData->data_.numbers.numMissingFiles > 0)
@@ -575,8 +584,18 @@ void Manager::chooseMode()
 
 void Manager::deleteCurData()
 {
-    if (curData != nullptr) {
+    if (curData) {
+        qDebug() << "Manager::deleteCurData()";
         delete curData;
         curData = nullptr;
+    }
+}
+
+void Manager::deleteOldData()
+{
+    if (oldData) {
+        qDebug() << "Manager::deleteOldData()";
+        delete oldData;
+        oldData = nullptr;
     }
 }

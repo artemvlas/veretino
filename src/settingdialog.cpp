@@ -8,8 +8,8 @@ settingDialog::settingDialog(Settings *settings, QWidget *parent) :
     settings_(settings)
 {
     ui->setupUi(this);
-    this->setFixedSize(440,300);
-    this->setWindowIcon(QIcon(":/veretino.png"));
+    setFixedSize(440,300);
+    setWindowIcon(QIcon(":/veretino.png"));
 
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
          {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
