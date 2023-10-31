@@ -1,10 +1,12 @@
 #include "proxymodel.h"
 #include <QDebug>
+
 ProxyModel::ProxyModel(QObject *parent)
     : QSortFilterProxyModel{parent}
 {
     setSortCaseSensitivity(Qt::CaseInsensitive);
     setRecursiveFilteringEnabled(true);
+    setSortRole(1000); // TreeModel::RawDataRole = 1000
 }
 
 ProxyModel::~ProxyModel()
