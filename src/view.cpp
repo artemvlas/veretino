@@ -143,7 +143,7 @@ void View::saveLastPath()
     if (isViewFileSystem())
         lastFileSystemPath = fileSystem->filePath(currentIndex);
     else if (currentIndex.isValid())
-        lastModelPath = paths::getPath(currentIndex);
+        lastModelPath = paths::getPath(proxyModel_->mapFromSource(currentIndex));
 }
 
 void View::deleteOldModels()
