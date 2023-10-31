@@ -18,16 +18,16 @@ TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelInde
     nextIndex_ = stepForward(index_);
 }
 
-QModelIndex TreeModelIterator::next()
+TreeModelIterator& TreeModelIterator::next()
 {
     index_ = nextIndex_;
     nextIndex_ = stepForward(index_);
-    return index_;
+    return *this;
 }
 
-QModelIndex TreeModelIterator::nextFile()
+TreeModelIterator& TreeModelIterator::nextFile()
 {
-    return model_->hasChildren(next()) ? nextFile() : index_;
+    return model_->hasChildren(next().index_) ? nextFile() : *this;
 }
 
 QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
@@ -55,6 +55,11 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
 QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex)
 {
     return model_->index(curIndex.row() + 1, 0, curIndex.parent());
+}
+
+const QModelIndex& TreeModelIterator::index()
+{
+    return index_;
 }
 
 QString TreeModelIterator::path()

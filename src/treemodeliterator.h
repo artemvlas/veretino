@@ -7,18 +7,18 @@ class TreeModelIterator
 {
 public:
     TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex = QModelIndex());
-    QModelIndex next();
-    QModelIndex nextFile();
+    TreeModelIterator& next();
+    TreeModelIterator& nextFile();
     bool hasNext();
+    const QModelIndex &index();
     QString path();
-
-    QModelIndex index_;
 
 private:
     QModelIndex nextRow(const QModelIndex &curIndex);
     QModelIndex stepForward(const QModelIndex &curIndex);
 
     const QAbstractItemModel *model_;
+    QModelIndex index_;
     QModelIndex rootIndex_;
     QModelIndex nextIndex_;
 };

@@ -102,7 +102,7 @@ void View::setIndexByPath(const QString &path)
     else if (proxyModel_) {
         QModelIndex index = paths::getIndex(path, proxyModel_);
         if (!index.isValid())
-            index = TreeModelIterator(proxyModel_).nextFile(); // select the very first file
+            index = TreeModelIterator(proxyModel_).nextFile().index(); // select the very first file
         if (index.isValid()) {
             expand(index);
             setCurrentIndex(index);
