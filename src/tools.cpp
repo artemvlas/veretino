@@ -151,16 +151,16 @@ bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 namespace ModelKit {
 QString getPath(const QModelIndex &curIndex)
 {
-    if (!curIndex.isValid())
-        return QString();
+    QString path;
+    QModelIndex newIndex = getRowItemIndex(curIndex, PathColumn);
 
-    const QAbstractItemModel *curModel = curIndex.model();
-    QModelIndex newIndex = curModel->index(curIndex.row(), 0 , curIndex.parent());
-    QString path = newIndex.data().toString();
+    if (newIndex.isValid()) {
+        path = newIndex.data().toString();
 
-    while (newIndex.parent().isValid()) {
-        path = paths::joinPath(newIndex.parent().data().toString(), path);
-        newIndex = newIndex.parent();
+        while (newIndex.parent().isValid()) {
+            path = paths::joinPath(newIndex.parent().data().toString(), path);
+            newIndex = newIndex.parent();
+        }
     }
 
     return path;
@@ -192,13 +192,22 @@ QModelIndex getIndex(const QString &path, const QAbstractItemModel *model)
     return curIndex;
 }
 
+QModelIndex getRowItemIndex(const QModelIndex &curIndex, Columns column)
+{
+    if (!curIndex.isValid())
+        return QModelIndex();
+
+    const QAbstractItemModel *curModel = curIndex.model();
+    return curModel->index(curIndex.row(), column, curIndex.parent());
+}
+
 bool isFileRow(const QModelIndex &curIndex)
 {
     if (!curIndex.isValid())
         return false;
 
     const QAbstractItemModel *curModel = curIndex.model();
-    return !curModel->hasChildren(curModel->index(curIndex.row(), 0, curIndex.parent()));
+    return !curModel->hasChildren(curModel->index(curIndex.row(), PathColumn, curIndex.parent()));
 }
 } // namespace ModelKit
 

@@ -35,8 +35,11 @@ bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whethe
 namespace ModelKit {
 enum ItemDataRoles {RawDataRole = 1000};
 enum Columns {PathColumn, SizeColumn, StatusColumn, ChecksumColumn};
+
 QString getPath(const QModelIndex &curIndex); // build path by current index data
 QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
+QModelIndex getRowItemIndex(const QModelIndex &curIndex, ModelKit::Columns column); // get the index of an item of the same row (curIndex row) and a specified column
+
 bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or folder(false)
 } // namespace ModelKit
 
