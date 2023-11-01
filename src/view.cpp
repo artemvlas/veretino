@@ -75,7 +75,7 @@ void View::sendPathChanged(const QModelIndex &index)
     if (isViewFileSystem())
         emit pathChanged(fileSystem->filePath(index));
     else if (proxyModel_)
-        emit pathChanged(paths::getPath(index));
+        emit pathChanged(ModelKit::getPath(index));
 }
 
 bool View::isViewFileSystem()
@@ -100,7 +100,7 @@ void View::setIndexByPath(const QString &path)
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
     else if (proxyModel_) {
-        QModelIndex index = paths::getIndex(path, proxyModel_);
+        QModelIndex index = ModelKit::getIndex(path, proxyModel_);
         if (!index.isValid())
             index = TreeModelIterator(proxyModel_).nextFile().index(); // select the very first file
         if (index.isValid()) {
@@ -143,7 +143,7 @@ void View::saveLastPath()
     if (isViewFileSystem())
         lastFileSystemPath = fileSystem->filePath(currentIndex);
     else if (currentIndex.isValid())
-        lastModelPath = paths::getPath(proxyModel_->mapFromSource(currentIndex));
+        lastModelPath = ModelKit::getPath(proxyModel_->mapFromSource(currentIndex));
 }
 
 void View::deleteOldModels()

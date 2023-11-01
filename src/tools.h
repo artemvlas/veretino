@@ -29,12 +29,14 @@ QString basicName(const QString &path); // returns file or folder name: "/home/u
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 QString backupFilePath(const QString &filePath);
 
+bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
+} // namespace paths
+
+namespace ModelKit {
 QString getPath(const QModelIndex &curIndex); // build path by current index data
 QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
 bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or folder(false)
-
-bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
-} // namespace paths
+} // namespace ModelKit
 
 namespace format {
 QString currentDateTime();

@@ -121,6 +121,34 @@ QString backupFilePath(const QString &filePath)
     return joinPath(parentFolder(filePath), ".tmp-backup_" + paths::basicName(filePath));
 }
 
+bool isFileAllowed(const QString &filePath, const FilterRule &filter)
+{
+    if (!filter.includeOnly) {
+        if (tools::isDatabaseFile(filePath))
+            return !filter.ignoreDbFiles;
+        if (tools::isSummaryFile(filePath))
+            return !filter.ignoreShaFiles;
+    }
+
+    if (filter.extensionsList.isEmpty())
+        return true;
+
+    // if 'filter.include' = true, a file ('filePath') with any extension from 'extensionsList' is allowed
+    // if 'filter.include' = false, than all files except these types allowed
+
+    bool allowed = !filter.includeOnly;
+    foreach (const QString &ext, filter.extensionsList) {
+        if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
+            allowed = filter.includeOnly;
+            break;
+        }
+    }
+
+    return allowed;
+}
+} // namespace paths
+
+namespace ModelKit {
 QString getPath(const QModelIndex &curIndex)
 {
     if (!curIndex.isValid())
@@ -172,33 +200,7 @@ bool isFileRow(const QModelIndex &curIndex)
     const QAbstractItemModel *curModel = curIndex.model();
     return !curModel->hasChildren(curModel->index(curIndex.row(), 0, curIndex.parent()));
 }
-
-bool isFileAllowed(const QString &filePath, const FilterRule &filter)
-{
-    if (!filter.includeOnly) {
-        if (tools::isDatabaseFile(filePath))
-            return !filter.ignoreDbFiles;
-        if (tools::isSummaryFile(filePath))
-            return !filter.ignoreShaFiles;
-    }
-
-    if (filter.extensionsList.isEmpty())
-        return true;
-
-    // if 'filter.include' = true, a file ('filePath') with any extension from 'extensionsList' is allowed
-    // if 'filter.include' = false, than all files except these types allowed
-
-    bool allowed = !filter.includeOnly;
-    foreach (const QString &ext, filter.extensionsList) {
-        if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
-            allowed = filter.includeOnly;
-            break;
-        }
-    }
-
-    return allowed;
-}
-} // namespace 'paths'
+} // namespace ModelKit
 
 namespace format {
 QString currentDateTime()
@@ -326,4 +328,4 @@ QString fileItemStatus(int status)
 
     return result;
 }
-} // namespace 'format'
+} // namespace format

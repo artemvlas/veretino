@@ -69,7 +69,7 @@ void TreeModel::populate(const FileList &filesData)
 
 void TreeModel::setItemStatus(const QString &itemPath, FileValues::FileStatus status)
 {
-    QModelIndex curIndex = paths::getIndex(itemPath, this);
+    QModelIndex curIndex = ModelKit::getIndex(itemPath, this);
     if (curIndex.isValid()) {
         setData(index(curIndex.row(), 2, curIndex.parent()), status);
     }

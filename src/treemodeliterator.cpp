@@ -64,7 +64,7 @@ const QModelIndex& TreeModelIterator::index()
 
 QString TreeModelIterator::path()
 {
-    return paths::getPath(index_);
+    return ModelKit::getPath(index_);
 }
 
 bool TreeModelIterator::hasNext()
