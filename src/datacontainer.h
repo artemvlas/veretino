@@ -12,6 +12,7 @@
 #include "files.h"
 #include "treemodel.h"
 #include "proxymodel.h"
+
 class TreeModel;
 
 struct MetaData {

@@ -194,10 +194,7 @@ QModelIndex getIndex(const QString &path, const QAbstractItemModel *model)
 
 QModelIndex siblingAtRow(const QModelIndex &curIndex, Columns column)
 {
-    if (!curIndex.isValid())
-        return QModelIndex();
-
-    return curIndex.model()->index(curIndex.row(), column, curIndex.parent());
+    return curIndex.isValid() ? curIndex.model()->index(curIndex.row(), column, curIndex.parent()) : QModelIndex();
 }
 
 // the TreeModel implies that if an item has children, then it is a folder, if not, then it is a file
@@ -205,7 +202,7 @@ bool isFileRow(const QModelIndex &curIndex)
 {
     QModelIndex index = siblingAtRow(curIndex, PathColumn);
 
-    return index.isValid() && !index.model()->hasChildren(index);
+    return (index.isValid() && !index.model()->hasChildren(index));
 }
 } // namespace ModelKit
 
