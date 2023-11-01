@@ -1,18 +1,17 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "treemodeliterator.h"
-#include "tools.h"
 
 TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex)
     : model_(model)
 {
+    rootIndex = ModelKit::siblingAtRow(rootIndex, ModelKit::PathColumn);
+
+    if (ModelKit::isFileRow(rootIndex))
+        rootIndex = rootIndex.parent();
+
     if (rootIndex.isValid()) {
-        rootIndex = model->index(rootIndex.row(), 0, rootIndex.parent());
-        if (!model_->hasChildren(rootIndex))
-            rootIndex = rootIndex.parent();
-        if (rootIndex.isValid()) {
-            rootIndex_ = rootIndex;
-            index_ = rootIndex;
-        }
+        rootIndex_ = rootIndex;
+        index_ = rootIndex;
     }
 
     nextIndex_ = stepForward(index_);
@@ -65,6 +64,11 @@ const QModelIndex& TreeModelIterator::index()
 QString TreeModelIterator::path()
 {
     return ModelKit::getPath(index_);
+}
+
+QVariant TreeModelIterator::data(ModelKit::Columns column, int role)
+{
+    return model_->data(model_->sibling(index_.row(), column, index_), role);
 }
 
 bool TreeModelIterator::hasNext()

@@ -2,6 +2,7 @@
 #ifndef TREEMODELITERATOR_H
 #define TREEMODELITERATOR_H
 #include <QAbstractItemModel>
+#include "tools.h"
 
 class TreeModelIterator
 {
@@ -12,6 +13,7 @@ public:
     bool hasNext();
     const QModelIndex &index();
     QString path();
+    QVariant data(ModelKit::Columns column = ModelKit::PathColumn, int role = ModelKit::RawDataRole);
 
 private:
     QModelIndex nextRow(const QModelIndex &curIndex);
