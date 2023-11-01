@@ -6,7 +6,7 @@
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({"Path", "Size", "Status", "Checksums"}); // "Size / Availability"
+    rootItem = new TreeItem({"Path", "Size", "Status", "Checksum"}); // "Size / Availability"
 }
 
 TreeModel::~TreeModel()
@@ -122,6 +122,8 @@ int TreeModel::columnCount(const QModelIndex &parent) const
 
 QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 {
+    using namespace ModelKit;
+
     if (!curIndex.isValid())
         return QVariant();
 
@@ -131,9 +133,9 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
     QVariant iData = getItem(curIndex)->data(curIndex.column());
 
     if (iData.isValid() && role != RawDataRole) {
-        if (curIndex.column() == 1)
+        if (curIndex.column() == SizeColumn)
             return format::dataSizeReadable(iData.toLongLong());
-        if (curIndex.column() == 2)
+        if (curIndex.column() == StatusColumn)
             return format::fileItemStatus(iData.toInt());
     }
 
@@ -149,7 +151,7 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     bool result = item->setData(curIndex.column(), value);
 
     if (result)
-        emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
+        emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, ModelKit::RawDataRole});
 
     return result;
 }

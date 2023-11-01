@@ -30,8 +30,6 @@ public:
     void populate(const FileList &filesData);
     void setItemStatus(const QString &itemPath, FileValues::FileStatus status);
 
-    enum ItemDataRoles {RawDataRole = 1000};
-
 public slots:
     bool addFile(const QString &filePath, const FileValues &values);
 
