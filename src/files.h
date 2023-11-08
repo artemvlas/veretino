@@ -4,6 +4,8 @@
 
 #include <QObject>
 #include <QMap>
+#include <QSet>
+#include <QAbstractItemModel>
 
 struct FileValues {
     QString checksum; // newly computed or imported from the database
@@ -40,6 +42,8 @@ public:
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
     qint64 dataSize(const QString &folder); // total size of allFiles('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
+    static qint64 dataSize(const QAbstractItemModel* model, const QSet<FileValues::FileStatus>& fileStatuses = QSet<FileValues::FileStatus>(),
+                                                                                                const QModelIndex& rootIndex = QModelIndex());
 
     QString contentStatus(const QString &path);
     static QString contentStatus(const FileList &filelist);

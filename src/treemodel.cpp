@@ -45,12 +45,12 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
             // the last item is considered a file
             if (var + 1 == splitPath.size()) {
                 if (values.size > 0)
-                    iData.replace(1, values.size);
+                    iData.replace(ModelKit::SizeColumn, values.size);
 
-                iData.replace(2, values.status);
+                iData.replace(ModelKit::StatusColumn, values.status);
 
                 if (!values.checksum.isEmpty())
-                    iData.replace(3, values.checksum);
+                    iData.replace(ModelKit::ChecksumColumn, values.checksum);
 
                 isAdded = true;
             }

@@ -3,6 +3,7 @@
 #include <QDirIterator>
 #include <QDebug>
 #include "tools.h"
+#include "treemodeliterator.h"
 
 Files::Files(QObject *parent)
     : QObject(parent)
@@ -258,6 +259,25 @@ qint64 Files::dataSize(const FileList &filelist)
     }
 
     return totalSize;
+}
+
+qint64 Files::dataSize(const QAbstractItemModel* model, const QSet<FileValues::FileStatus>& fileStatuses, const QModelIndex& rootIndex)
+{
+    qint64 result = 0;
+    TreeModelIterator it(model, rootIndex);
+
+    while (it.hasNext()) {
+        QVariant itData = it.nextFile().data(ModelKit::StatusColumn);
+
+        if (itData.isValid()
+            && (fileStatuses.isEmpty()
+                || fileStatuses.contains(static_cast<FileValues::FileStatus>(itData.toInt())))) {
+
+            result += it.data(ModelKit::SizeColumn).toLongLong();
+        }
+    }
+
+    return result;
 }
 
 void Files::cancelProcess()
