@@ -15,6 +15,11 @@ TreeModel::~TreeModel()
     qDebug() << this << "deleted";
 }
 
+bool TreeModel::isEmpty()
+{
+    return (rootItem->childCount() == 0);
+}
+
 bool TreeModel::addFile(const QString &filePath, const FileValues &values)
 {
     bool isAdded = false;

@@ -27,6 +27,8 @@ public:
     bool setData(const QModelIndex &curIndex, const QVariant &value,
                         int role = Qt::EditRole) override;
 
+    bool isEmpty();
+
     void populate(const FileList &filesData);
     void setItemStatus(const QString &itemPath, FileValues::FileStatus status);
 
