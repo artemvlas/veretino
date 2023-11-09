@@ -66,6 +66,7 @@ void DataMaintainer::updateNumbers()
             ++num.numMatched;
             num.totalSize += iter.value().size;
             break;
+        default: break;
         }
     }
 
