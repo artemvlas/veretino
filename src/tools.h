@@ -29,12 +29,13 @@ QString basicName(const QString &path); // returns file or folder name: "/home/u
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 QString backupFilePath(const QString &filePath);
 
+bool isBackupExists(const QString &dbFilePath);
 bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
 } // namespace paths
 
 namespace ModelKit {
 enum ItemDataRoles {RawDataRole = 1000};
-enum Columns {PathColumn, SizeColumn, StatusColumn, ChecksumColumn};
+enum Columns {ColumnPath, ColumnSize, ColumnStatus, ColumnChecksum, ColumnReChecksum};
 
 QString getPath(const QModelIndex &curIndex); // build path by current index data
 QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
@@ -47,6 +48,7 @@ namespace format {
 QString currentDateTime();
 
 QString numString(qint64 num); // Returns a string of numbers separated by commas: 1,234,567,890
+QString millisecToReadable(qint64 milliseconds, bool approx = false); // converts milliseconds to readable time like "1 min 23 sec"
 QString dataSizeReadable(qint64 sizeBytes); // converts size in bytes to human readable form like "129.17 GiB"
 QString dataSizeReadableExt(qint64 sizeBytes); // returning style example: "6.08 GiB (6,532,974,324 bytes)"
 QString shortenString(const QString &string, int length = 64);
@@ -55,7 +57,7 @@ QString algoToStr(QCryptographicHash::Algorithm algo);
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
 
-QString fileItemStatus(int status);
+QString fileItemStatus(FileStatus status);
 } // namespace format
 
 namespace Mode {

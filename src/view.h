@@ -8,6 +8,7 @@
 #include <QSortFilterProxyModel>
 #include "treemodel.h"
 #include "proxymodel.h"
+#include <QSet>
 
 class View : public QTreeView
 {
@@ -20,12 +21,13 @@ public:
 
     ProxyModel *proxyModel_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
+    QModelIndex currentIndex;
 
 public slots:
     void setFileSystemModel();
     void setTreeModel(ProxyModel *model);
     void setIndexByPath(const QString &path);
-    void setFilter(const QList<int> status);
+    void setFilter(const QSet<FileStatus> status);
 
 private:
     void saveLastPath();
@@ -33,13 +35,13 @@ private:
     void connectModel();
     void sendPathChanged(const QModelIndex &index);
     QFileSystemModel *fileSystem = new QFileSystemModel;
-    QModelIndex currentIndex;
+
     QString lastFileSystemPath;
     QString lastModelPath;
     void keyPressEvent(QKeyEvent* event) override;
 
 signals:
-    void indexChanged(const QModelIndex &index);
+    //void indexChanged(const QModelIndex &index);
     void pathChanged(const QString &path); // by indexToPath()
     void setMode(Mode::Modes mode);
     void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false; init. the clearing old data

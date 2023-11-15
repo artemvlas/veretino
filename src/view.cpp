@@ -21,7 +21,7 @@ View::View(QWidget *parent)
 // called every time the model is changed
 void View::connectModel()
 {
-    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
+    //connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::sendPathChanged);
 }
 
@@ -62,6 +62,7 @@ void View::setTreeModel(ProxyModel *model)
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
+    //hideColumn(ModelKit::ColumnReChecksum);
     setIndexByPath(lastModelPath);
 }
 
@@ -70,12 +71,14 @@ void View::sendPathChanged(const QModelIndex &index)
     if (!index.isValid())
         return;
 
-    currentIndex = index;
-
-    if (isViewFileSystem())
+    if (isViewFileSystem()) {
+        currentIndex = index;
         emit pathChanged(fileSystem->filePath(index));
-    else if (proxyModel_)
-        emit pathChanged(ModelKit::getPath(index));
+    }
+    else if (proxyModel_) {
+        currentIndex = proxyModel_->mapToSource(index);
+        emit pathChanged(ModelKit::getPath(currentIndex));
+    }
 }
 
 bool View::isViewFileSystem()
@@ -132,10 +135,13 @@ void View::pathAnalyzer(const QString &path)
     }
 }
 
-void View::setFilter(const QList<int> status)
+void View::setFilter(const QSet<FileStatus> status)
 {
-    if (proxyModel_)
+    if (proxyModel_) {
+        //saveLastPath();
         proxyModel_->setFilter(status);
+        //setIndexByPath(lastModelPath);
+    }
 }
 
 void View::saveLastPath()
@@ -143,7 +149,7 @@ void View::saveLastPath()
     if (isViewFileSystem())
         lastFileSystemPath = fileSystem->filePath(currentIndex);
     else if (currentIndex.isValid())
-        lastModelPath = ModelKit::getPath(proxyModel_->mapFromSource(currentIndex));
+        lastModelPath = ModelKit::getPath(currentIndex);
 }
 
 void View::deleteOldModels()
@@ -158,10 +164,8 @@ void View::deleteOldModels()
 void View::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-        if (isExpanded(currentIndex))
-            collapse(currentIndex);
-        else
-            expand(currentIndex);
+        isExpanded(currentIndex) ? collapse(currentIndex)
+                                 : expand(currentIndex);
         emit keyEnterPressed();
     }
 

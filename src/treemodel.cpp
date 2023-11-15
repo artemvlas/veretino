@@ -6,7 +6,7 @@
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({"Path", "Size", "Status", "Checksum"}); // "Size / Availability"
+    rootItem = new TreeItem({"Path", "Size", "Status", "Checksum", "ReChecksum"}); // "Size / Availability"
 }
 
 TreeModel::~TreeModel()
@@ -40,17 +40,17 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
         if (not_exist) {
             TreeItem *ti;
             QVariant placebo;
-            QList<QVariant> iData {splitPath.at(var), placebo, placebo, placebo};
+            QList<QVariant> iData {splitPath.at(var), placebo, placebo, placebo, placebo};
 
             // the last item is considered a file
             if (var + 1 == splitPath.size()) {
                 if (values.size > 0)
-                    iData.replace(ModelKit::SizeColumn, values.size);
+                    iData.replace(ModelKit::ColumnSize, values.size);
 
-                iData.replace(ModelKit::StatusColumn, values.status);
+                iData.replace(ModelKit::ColumnStatus, QVariant::fromValue(values.status));
 
                 if (!values.checksum.isEmpty())
-                    iData.replace(ModelKit::ChecksumColumn, values.checksum);
+                    iData.replace(ModelKit::ColumnChecksum, values.checksum);
 
                 isAdded = true;
             }
@@ -72,12 +72,16 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-void TreeModel::setItemStatus(const QString &itemPath, FileValues::FileStatus status)
-{
-    QModelIndex curIndex = ModelKit::getIndex(itemPath, this);
-    if (curIndex.isValid()) {
-        setData(index(curIndex.row(), 2, curIndex.parent()), status);
+bool TreeModel::setItemData(const QModelIndex &curIndex, ModelKit::Columns column, const QVariant &itemData)
+{   
+    if (!curIndex.isValid() || curIndex.model() != this) {
+        qDebug() << "TreeModel::setItemData | Wrong index";
+        return false;
     }
+
+    QModelIndex idx = ModelKit::siblingAtRow(curIndex, column);
+
+    return idx.isValid() && setData(idx, itemData);
 }
 
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const
@@ -90,9 +94,9 @@ QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) con
         return QModelIndex();
 
     TreeItem *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
-    return QModelIndex();
+
+    return childItem ? createIndex(row, column, childItem)
+                     : QModelIndex();
 }
 
 QModelIndex TreeModel::parent(const QModelIndex &curIndex) const
@@ -138,10 +142,10 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
     QVariant iData = getItem(curIndex)->data(curIndex.column());
 
     if (iData.isValid() && role != RawDataRole) {
-        if (curIndex.column() == SizeColumn)
+        if (curIndex.column() == ColumnSize)
             return format::dataSizeReadable(iData.toLongLong());
-        if (curIndex.column() == StatusColumn)
-            return format::fileItemStatus(iData.toInt());
+        if (curIndex.column() == ColumnStatus)
+            return format::fileItemStatus(iData.value<FileStatus>());
     }
 
     return iData;

@@ -9,41 +9,44 @@
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
 {
-    if (algo == QCryptographicHash::Sha1)
-        return 40;
-    else if (algo == QCryptographicHash::Sha256)
-        return 64;
-    else if (algo == QCryptographicHash::Sha512)
-        return 128;
-    else {
-        qDebug() << "tools::algoStrLen | Wrong input algo:" << algo;
-        return 0;
+    switch (algo) {
+        case QCryptographicHash::Sha1:
+            return 40;
+        case QCryptographicHash::Sha256:
+            return 64;
+        case QCryptographicHash::Sha512:
+            return 128;
+        default:
+            qDebug() << "tools::algoStrLen | Wrong input algo:" << algo;
+            return 0;
     }
 }
 
 QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
 {
-    if (strLen == 40)
-        return QCryptographicHash::Sha1;
-    else if (strLen == 64)
-        return QCryptographicHash::Sha256;
-    else if (strLen == 128)
-        return QCryptographicHash::Sha512;
-    else {
-        qDebug() << "tools::algorithmByStrLen | Wrong input strLen:" << strLen;
-        return QCryptographicHash::Sha256;
+    switch (strLen) {
+        case 40:
+            return QCryptographicHash::Sha1;
+        case 64:
+            return QCryptographicHash::Sha256;
+        case 128:
+            return QCryptographicHash::Sha512;
+        default:
+            qDebug() << "tools::algorithmByStrLen | Wrong input strLen:" << strLen;
+            return QCryptographicHash::Sha256;
     }
 }
 
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 {
-    int num = QString(strAlgo.toLower().remove("sha").remove("-")).toInt();
-    if (num == 1)
-        return QCryptographicHash::Sha1;
-    else if (num == 512)
-        return QCryptographicHash::Sha512;
-    else
-        return QCryptographicHash::Sha256;
+    switch (QString(strAlgo.toLower().remove("sha").remove("-")).toInt()) {
+        case 1:
+            return QCryptographicHash::Sha1;
+        case 512:
+            return QCryptographicHash::Sha512;
+        default:
+            return QCryptographicHash::Sha256;
+    }
 }
 
 bool isDatabaseFile(const QString &filePath) {
@@ -79,7 +82,7 @@ QString basicName(const QString &path)
     if (path == "/")
         return "Root";
 
-    if (path.size() == 3 && path.at(0).isLetter() && path.at(1) == ':') // if Windows-style root path like C:
+    if (path.size() == 3 && path.at(0).isLetter() && path.at(1) == ':') // if provided Windows-style root path like "C:"
         return QString("Drive_%1").arg(path.at(0));
 
     // #1 impl.
@@ -101,24 +104,31 @@ QString parentFolder(const QString &path)
     if (rootSepIndex == -1)
         return "/"; // if there is no '/' in 'path'
 
-    if (path.length() > rootSepIndex + 1 && path.at(rootSepIndex + 1) == '/')
-        ++rootSepIndex; // if the path's root contains double '/' like 'ftp://folder' or 'smb://folder', increase index to next position
+    // if the path's root contains double '/' like 'ftp://folder' or 'smb://folder', increase index to next position
+    if (path.length() > rootSepIndex + 1
+        && path.at(rootSepIndex + 1) == '/')
+        ++rootSepIndex;
+
     int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
 
-    return (sepIndex > rootSepIndex) ? path.left(sepIndex) : path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
+    return (sepIndex > rootSepIndex) ? path.left(sepIndex)
+                                     : path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
 }
 
 QString joinPath(const QString &absolutePath, const QString &addPath)
 {
-    if (absolutePath.endsWith('/'))
-        return absolutePath + addPath;
-    else
-        return QString("%1/%2").arg(absolutePath, addPath);
+    return absolutePath.endsWith('/') ? absolutePath + addPath
+                                      : QString("%1/%2").arg(absolutePath, addPath);
 }
 
 QString backupFilePath(const QString &filePath)
 {
     return joinPath(parentFolder(filePath), ".tmp-backup_" + paths::basicName(filePath));
+}
+
+bool isBackupExists(const QString &dbFilePath)
+{
+    return QFile::exists(backupFilePath(dbFilePath));
 }
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
@@ -152,7 +162,7 @@ namespace ModelKit {
 QString getPath(const QModelIndex &curIndex)
 {
     QString path;
-    QModelIndex newIndex = siblingAtRow(curIndex, PathColumn);
+    QModelIndex newIndex = siblingAtRow(curIndex, ColumnPath);
 
     if (newIndex.isValid()) {
         path = newIndex.data().toString();
@@ -194,13 +204,14 @@ QModelIndex getIndex(const QString &path, const QAbstractItemModel *model)
 
 QModelIndex siblingAtRow(const QModelIndex &curIndex, Columns column)
 {
-    return curIndex.isValid() ? curIndex.model()->index(curIndex.row(), column, curIndex.parent()) : QModelIndex();
+    return curIndex.isValid() ? curIndex.model()->index(curIndex.row(), column, curIndex.parent())
+                              : QModelIndex();
 }
 
 // the TreeModel implies that if an item has children, then it is a folder, if not, then it is a file
 bool isFileRow(const QModelIndex &curIndex)
 {
-    QModelIndex index = siblingAtRow(curIndex, PathColumn);
+    QModelIndex index = siblingAtRow(curIndex, ColumnPath);
 
     return (index.isValid() && !index.model()->hasChildren(index));
 }
@@ -221,6 +232,35 @@ QString numString(qint64 num)
     }
 
     return numstr;
+}
+
+QString millisecToReadable(qint64 milliseconds, bool approx)
+{
+    int seconds = milliseconds / 1000;
+    int minutes = seconds / 60;
+    seconds = seconds % 60;
+    int hours = minutes / 60;
+    minutes = minutes % 60;
+
+    if (hours > 0)
+        return approx ? QString("%1 h %2 min").arg(hours).arg(minutes)
+                      : QString("%1 h %2 min %3 sec").arg(hours).arg(minutes).arg(seconds);
+
+    if (approx && minutes > 0 && seconds > 15)
+        return QString("%1 min").arg(minutes + 1);
+
+    if (minutes > 0)
+        return approx ? QString("%1 min").arg(minutes)
+                      : QString("%1 min %2 sec").arg(minutes).arg(seconds);
+
+    if (approx && seconds > 4)
+        return QString("%1 sec").arg(seconds);
+
+    if (seconds > 0)
+        return approx ? QString("few sec")
+                      : QString("%1 sec").arg(seconds);
+    else
+        return QString("0 sec");
 }
 
 QString dataSizeReadable(qint64 sizeBytes)
@@ -258,22 +298,22 @@ QString dataSizeReadableExt(qint64 sizeBytes)
 
 QString shortenString(const QString &string, int length)
 {
-    if (string.length() > length)
-        return string.mid(0, length).append("...");
-    else
-        return string;
+    return (string.length() > length) ? string.mid(0, length).append("...")
+                                      : string;
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo)
 {
-    if (algo == QCryptographicHash::Sha1)
-        return "SHA-1";
-    else if (algo == QCryptographicHash::Sha256)
-        return "SHA-256";
-    else if (algo == QCryptographicHash::Sha512)
-        return "SHA-512";
-    else
-        return "Unknown";
+    switch (algo) {
+        case QCryptographicHash::Sha1:
+            return "SHA-1";
+        case QCryptographicHash::Sha256:
+            return "SHA-256";
+        case QCryptographicHash::Sha512:
+            return "SHA-512";
+        default:
+            return "Unknown";
+    }
 }
 
 QString filesNumberAndSize(int filesNumber, qint64 filesSize)
@@ -295,39 +335,47 @@ QString fileNameAndSize(const QString &filePath)
     return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
 }
 
-QString fileItemStatus(int status)
+QString fileItemStatus(FileStatus status)
 {
     QString result;
+
     switch (status) {
-    case FileValues::NotChecked:
+    case FileStatus::Queued:
+        result = "queued";
+        break;
+    case FileStatus::Processing:
+        result = "processing...";
+        break;
+    case FileStatus::NotChecked:
         result = "ready...";
         break;
-    case FileValues::Matched:
+    case FileStatus::Matched:
         result = "✓ OK";
         break;
-    case FileValues::Mismatched:
+    case FileStatus::Mismatched:
         result = "☒ NOT match";
         break;
-    case FileValues::New:
+    case FileStatus::New:
         result = "new file";
         break;
-    case FileValues::Missing:
+    case FileStatus::Missing:
         result = "missing";
         break;
-    case FileValues::Unreadable:
+    case FileStatus::Unreadable:
         result = "ureadable";
         break;
-    case FileValues::Added:
+    case FileStatus::Added:
         result = "→ added to DB"; // ➔
         break;
-    case FileValues::Removed:
+    case Files::Removed:
         result = "✂ removed from DB";
         break;
-    case FileValues::ChecksumUpdated:
+    case FileStatus::ChecksumUpdated:
         result = "↻ stored checksum updated"; // 🗘
         break;
     default:
         result = "unknown";
+        break;
     }
 
     return result;

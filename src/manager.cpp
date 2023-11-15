@@ -8,6 +8,7 @@
 #include "files.h"
 #include "shacalculator.h"
 #include "procstate.h"
+#include "treemodeliterator.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)
@@ -22,64 +23,71 @@ Manager::~Manager()
 
 void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo)
 {
-    emit setMode(Mode::Processing);
-
-    Files F(folderPath);
-    connect(this, &Manager::cancelProcess, &F, &Files::cancelProcess, Qt::DirectConnection);
-    connect(&F, &Files::setStatusbarText, this, &Manager::setStatusbarText);
-
-    DataContainer calcData;
-    calcData.metaData.workDir = folderPath;
-    calcData.metaData.algorithm = algo;
-
-    calcData.metaData.databaseFileName = QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath));
-
-    calcData.metaData.filter = settings_->filter;
-
-    // create the filelist
-    calcData.filesData = F.allFiles(calcData.metaData.filter);
-
-    // exception and cancelation handling
-    if (calcData.filesData.isEmpty()) {
-        if (!F.canceled) {
-            if (!calcData.metaData.filter.extensionsList.isEmpty())
-                emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
-            else
-                emit showMessage("Empty folder. Nothing to do");
-        }
-        else {
-            emit setStatusbarText("Canceled");
-        }
-        emit setMode(Mode::EndProcess);
+    if (!Files::containsFiles(folderPath)) {
+        emit showMessage("Empty folder. Nothing to do");
         return;
     }
 
+    if (!Files::containsFiles(folderPath, settings_->filter)) {
+        emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
+        return;
+    }
+
+    emit setMode(Mode::Processing);
+
+    curData = new DataMaintainer;
+    connect(this, &Manager::cancelProcess, curData, &DataMaintainer::cancelProcess, Qt::DirectConnection);
+    connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
+    connect(curData, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
+
+    curData->data_->metaData.workDir = folderPath;
+    curData->data_->metaData.algorithm = algo;
+    curData->data_->metaData.filter = settings_->filter;
+    curData->data_->metaData.databaseFilePath = paths::joinPath(folderPath, QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath)));
+
+    // create the filelist
+    curData->addActualFiles(Files::Queued);
+
+    // exception and cancelation handling
+    if (!curData->data_) {
+        if (curData->canceled)
+            emit setStatusbarText("Canceled");
+
+        emit setMode(Mode::EndProcess);
+        emit setModel();
+        return;
+    }
+
+    emit setModel(curData->data_->proxyModel_);
+    chooseMode();
+
     QString permStatus = format::algoToStr(algo);
-    if (!calcData.metaData.filter.extensionsList.isEmpty())
+    if (curData->data_->isFilterApplied())
         permStatus.prepend("filters applied | ");
 
     emit setPermanentStatus(permStatus);
 
     // calculating checksums
-    calcData.filesData = calculateChecksums(calcData);
+    int doneNumber = calculateChecksums(curData->data_);
 
-    emit setPermanentStatus();
-
-    if (calcData.filesData.isEmpty()) {
+    if (canceled || doneNumber == 0) {
+        emit setMode(Mode::EndProcess);
+        emit setModel();
         return;
     }
 
     // saving to json
-    calcData.metaData.about = QString("%1 Checksums for %2 files calculated").arg(format::algoToStr(algo)).arg(calcData.filesData.size());
+    curData->data_->metaData.about = QString("%1 Checksums for %2 files calculated")
+                                                    .arg(format::algoToStr(algo))
+                                                    .arg(doneNumber);
 
-    curData = new DataMaintainer(calcData);
-    connect(curData, &DataMaintainer::showMessage, this, &Manager::showMessage);
-    connect(curData, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     curData->exportToJson();
 
-    deleteCurData();
+    //emit setPermanentStatus();
+    //curData->updateNumbers();
 
     emit setMode(Mode::EndProcess);
+    emit setMode(Mode::Model);
 }
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
@@ -95,12 +103,21 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
 
     if (summaryFile) {
         QString ext;
-        if (algo == QCryptographicHash::Sha1)
-            ext = "sha1";
-        else if (algo == QCryptographicHash::Sha256)
-            ext = "sha256";
-        else if (algo == QCryptographicHash::Sha512)
-            ext = "sha512";
+
+        switch (algo) {
+            case QCryptographicHash::Sha1:
+                ext = "sha1";
+                break;
+            case QCryptographicHash::Sha256:
+                ext = "sha256";
+                break;
+            case QCryptographicHash::Sha512:
+                ext = "sha512";
+                break;
+            default:
+                ext = "checkSum";
+                break;
+        }
 
         QString sumFile = QString("%1.%2").arg(filePath, ext);
         QFile file(sumFile);
@@ -115,44 +132,19 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     }
 }
 
-void Manager::makeTreeModel(const FileList &data)
-{
-    if (!data.isEmpty()) {
-        emit setStatusbarText("File tree creation...");
-        curData->model_->populate(data);
-        curData->proxyModel_->setSourceModel(curData->model_);
-
-        emit setModel(curData->proxyModel_);
-
-        emit workDirChanged(curData->data_.metaData.workDir);
-        emit setStatusbarText(QString("%1 files listed")
-                                      .arg(data.size()));
-    }
-    else {
-        qDebug() << "Manager::makeTreeModel | Empty model";
-        emit setModel();
-    }
-}
-
 void Manager::resetDatabase()
 {
     if (!curData)
         return;
 
-    QString dbFilePath;
-    if (curData->data_.metaData.databaseFileName.contains('/'))
-        dbFilePath = curData->data_.metaData.databaseFileName;
-    else
-        dbFilePath = paths::joinPath(curData->data_.metaData.workDir, curData->data_.metaData.databaseFileName);
-
-    createDataModel(dbFilePath);
+    createDataModel(curData->data_->metaData.databaseFilePath);
 }
 
 void Manager::restoreDatabase()
 {
     QString databaseFilePath;
     if (curData)
-        databaseFilePath = curData->data_.metaData.databaseFilePath;
+        databaseFilePath = curData->data_->metaData.databaseFilePath;
     if (restoreBackup(databaseFilePath))
         createDataModel(databaseFilePath);
     else
@@ -193,7 +185,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
     curData->importJson(databaseFilePath);
 
-    if (curData->data_.filesData.isEmpty()) {
+    if (!curData->data_ || curData->data_->model_->isEmpty()) {
         delete curData;
         curData = oldData;
         qDebug() << "Manager::createDataModel | DataMaintainer 'oldData' restored" << databaseFilePath;
@@ -202,8 +194,9 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
+    emit setModel(curData->data_->proxyModel_);
+
     dbStatus();
-    makeTreeModel(curData->data_.filesData);
     chooseMode();
 }
 
@@ -214,22 +207,21 @@ void Manager::updateNewLost()
 
     QString itemsInfo;
 
-    if (curData->data_.numbers.numNewFiles > 0) {
-        DataContainer dataCont(curData->data_.metaData);
-        dataCont.filesData =  curData->listOf(FileValues::New);
-
-        emit setMode(Mode::Processing);
-        if (curData->updateData(calculateChecksums(dataCont), FileValues::Added) == 0)
+    if (curData->data_->numbers.numNewFiles > 0) {
+        //emit setMode(Mode::Processing);
+        curData->changeFilesStatuses(Files::New, Files::Queued);
+        if (calculateChecksums(curData->data_) == 0)
             return;
-        emit setMode(Mode::EndProcess);
 
-        itemsInfo = QString("added %1").arg(curData->data_.numbers.numNewFiles);
-        if (curData->data_.numbers.numMissingFiles > 0)
+        //emit setMode(Mode::EndProcess);
+
+        itemsInfo = QString("added %1").arg(curData->data_->numbers.numNewFiles);
+        if (curData->data_->numbers.numMissingFiles > 0)
             itemsInfo.append(", ");
     }
 
-    if (curData->data_.numbers.numMissingFiles > 0) {
-        if (curData->data_.numbers.numMissingFiles < (curData->data_.numbers.numChecksums + curData->data_.numbers.numNewFiles))
+    if (curData->data_->numbers.numMissingFiles > 0) {
+        if (curData->data_->numbers.numMissingFiles < (curData->data_->numbers.numChecksums + curData->data_->numbers.numNewFiles))
             itemsInfo.append(QString("removed %1").arg(curData->clearDataFromLostFiles()));
         else {
             emit showMessage("Failure to delete all database items", "Warning");
@@ -237,7 +229,7 @@ void Manager::updateNewLost()
         }
     }
 
-    curData->data_.metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
+    curData->data_->metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
 
     curData->exportToJson();
 
@@ -248,86 +240,83 @@ void Manager::updateNewLost()
 // update the Database with new checksums for files with failed verification
 void Manager::updateMismatch()
 {
-    if (!curData)
+    if (!curData || !curData->data_)
         return;
 
-    curData->data_.metaData.about = QString("%1 checksums updated")
+    emit showFiltered();
+
+    curData->data_->metaData.about = QString("%1 checksums updated")
                         .arg(curData->updateMismatchedChecksums());
 
     curData->exportToJson();
     chooseMode();
-    emit showFiltered();
 }
 
-// checking the list of files against stored in the database checksums
-void Manager::verifyFileList(const QString &subFolder)
+void Manager::verify(const QModelIndex &curIndex)
+{
+    ModelKit::isFileRow(curIndex) ? verifyFileItem(curIndex)
+                                  : verifyFolderItem(curData->sourceIndex(curIndex));
+}
+
+//check only selected file instead all database cheking
+void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 {
     if (!curData)
         return;
 
-    FileList fileList;
+    QString savedSum = curData->getStoredChecksum(fileItemIndex);
 
-    if (!subFolder.isEmpty())
-        fileList = curData->subfolderContent(subFolder);
-    else
-        fileList = curData->data_.filesData;
+    if (!savedSum.isEmpty()) {
+        QString sum = calculateChecksum(paths::joinPath(curData->data_->metaData.workDir, ModelKit::getPath(fileItemIndex)),  curData->data_->metaData.algorithm);
 
-    if (fileList.isEmpty()) {
-        qDebug() << "Manager::verifyFileList --> fileList is Empty";
+        if (!sum.isEmpty()) {
+            showFileCheckResultMessage(curData->updateChecksum(fileItemIndex, sum));
+            curData->updateNumbers();
+            chooseMode();
+        }
+    }
+}
+
+void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
+{
+    if (!curData)
         return;
-    }
 
-    emit setMode(Mode::Processing);
-    DataContainer dataCont(curData->data_.metaData);
-    dataCont.filesData = curData->listOf(FileValues::NotChecked, fileList);
-    FileList recalculated = calculateChecksums(dataCont);
-    emit setMode(Mode::EndProcess);
+    curData->changeFilesStatuses(Files::NotChecked, Files::Queued, folderItemIndex);
+    calculateChecksums(curData->data_, folderItemIndex);
 
-    // updating the Main data
-    if (!recalculated.isEmpty()) {
-        FileList::const_iterator iter;
-        for (iter = recalculated.constBegin(); iter != recalculated.constEnd(); ++iter) {
-            curData->updateData(iter.key(), iter.value().checksum);
-        }
-    }
+    if (canceled)
+        return;
 
-    // subfolder values
-    int subMatched = 0; // number of matched in subFolder
-    int subMismatched = 0; // number of mismatched in subFolder
-    if (!subFolder.isEmpty()) {
-        FileList::const_iterator iter;
-        for (iter = fileList.constBegin(); iter != fileList.constEnd(); ++iter) {
-            if (curData->data_.filesData.value(iter.key()).status == FileValues::Mismatched)
-                ++subMismatched;
-            else if (curData->data_.filesData.value(iter.key()).status == FileValues::Matched
-                     || curData->data_.filesData.value(iter.key()).status == FileValues::Added
-                     || curData->data_.filesData.value(iter.key()).status == FileValues::ChecksumUpdated)
-                ++subMatched;
-        }
-    }
+    curData->updateNumbers();
 
     // result
-    if (!recalculated.isEmpty() || dataCont.filesData.isEmpty()) {
-        curData->updateNumbers();
-        if (subFolder.isEmpty()) {
-            if (curData->data_.numbers.numMismatched > 0)
-                emit showMessage(QString("%1 out of %2 files is changed or corrupted")
-                                 .arg(curData->data_.numbers.numMismatched).arg(curData->data_.numbers.numMatched + curData->data_.numbers.numMismatched), "FAILED");
-            else if (curData->data_.numbers.numMatched > 0)
-                emit showMessage(QString("ALL %1 files passed the verification.\nStored %2 checksums matched.")
-                                     .arg(curData->data_.numbers.numMatched).arg(format::algoToStr(curData->data_.metaData.algorithm)), "Success");
-        }
-        else if (subMismatched > 0)
+    if (!folderItemIndex.isValid()) { // if root folder
+        int numMatched = curData->data_->numbers.numMatched + curData->data_->numbers.numAdded + curData->data_->numbers.numChecksumUpdated;
+        if (curData->data_->numbers.numMismatched > 0)
+            emit showMessage(QString("%1 out of %2 files is changed or corrupted")
+                                 .arg(curData->data_->numbers.numMismatched)
+                                 .arg(numMatched), "FAILED");
+        else if (numMatched > 0)
+            emit showMessage(QString("ALL %1 files passed the verification.\nStored %2 checksums matched.")
+                                 .arg(numMatched)
+                                 .arg(format::algoToStr(curData->data_->metaData.algorithm)), "Success");
+    }
+    else {// if subfolder
+        Numbers num = curData->updateNumbers(curData->data_->model_, folderItemIndex);
+        int subMatched = num.numMatched + num.numAdded + num.numChecksumUpdated;
+
+        if (num.numMismatched > 0)
             emit showMessage(QString("Subfolder: %1\n\n%2 out of %3 files in the Subfolder is changed or corrupted")
-                             .arg(subFolder).arg(subMismatched).arg(subMatched + subMismatched), "FAILED");
+                                 .arg("subFolder").arg(num.numMismatched).arg(subMatched + num.numMismatched), "FAILED");
         else
             emit showMessage(QString("Subfolder: %1\n\nAll %2 checked files passed the verification")
-                             .arg(subFolder).arg(subMatched), "Success");
+                                 .arg("subFolder").arg(subMatched), "Success");
+    }
 
-        if (curData->data_.numbers.numMismatched > 0 || subMismatched > 0) {
-            emit setMode(Mode::UpdateMismatch);
-            emit showFiltered({FileValues::Mismatched});
-        }
+    if (curData->data_->numbers.numMismatched > 0) {
+        emit setMode(Mode::UpdateMismatch);
+        emit showFiltered({FileStatus::Mismatched});
     }
 }
 
@@ -371,25 +360,6 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
         showFileCheckResultMessage(sum == checkSum.toLower());
 }
 
-//check only selected file instead all database cheking
-void Manager::checkCurrentItemSum(const QString &path)
-{
-    if (!curData)
-        return;
-
-    QString savedSum = copyStoredChecksum(path, false);
-
-    if (!savedSum.isEmpty()) {
-        QString sum = calculateChecksum(paths::joinPath(curData->data_.metaData.workDir, path),  curData->data_.metaData.algorithm);
-
-        if (!sum.isEmpty()) {
-            showFileCheckResultMessage(curData->updateData(path, sum));
-            curData->updateNumbers();
-            chooseMode();
-        }
-    }
-}
-
 QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo)
 {
     ProcState state(QFileInfo(filePath).size());
@@ -417,15 +387,18 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return checkSum;
 }
 
-FileList Manager::calculateChecksums(DataContainer &filesContainer)
+int Manager::calculateChecksums(DataContainer* container, QModelIndex rootIndex)
 {
-    if (filesContainer.filesData.isEmpty())
-        return FileList();
+    if (container->model_->isEmpty())
+        return 0;
 
-    qint64 totalSize = Files::dataSize(filesContainer.filesData);
+    if (rootIndex.isValid() && rootIndex.model() == container->proxyModel_)
+        rootIndex = container->proxyModel_->mapToSource(rootIndex);
+
+    qint64 totalSize = DataMaintainer::totalSizeOfListedFiles(container->model_, {Files::Queued}, rootIndex);
     QString totalSizeReadable = format::dataSizeReadable(totalSize);
     ProcState state(totalSize);
-    ShaCalculator shaCalc(filesContainer.metaData.algorithm);
+    ShaCalculator shaCalc(container->metaData.algorithm);
     canceled = false;
     int doneNum = 0;
 
@@ -434,8 +407,9 @@ FileList Manager::calculateChecksums(DataContainer &filesContainer)
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
     connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
-    QMutableMapIterator<QString, FileValues> iter(filesContainer.filesData);
+    TreeModelIterator iter(container->model_, rootIndex);
 
+    emit setMode(Mode::Processing);
     while (iter.hasNext() && !canceled) {
         QString doneData;
         if (state.doneSize_ == 0)
@@ -445,25 +419,30 @@ FileList Manager::calculateChecksums(DataContainer &filesContainer)
 
         emit setStatusbarText(QString("Calculating %1 of %2 checksums %3")
                                   .arg(++doneNum)
-                                  .arg(filesContainer.filesData.size())
+                                  .arg(container->numbers.numQueued)
                                   .arg(doneData));
 
-        iter.next();
-        if (iter.value().status != FileValues::Unreadable) {
-            iter.value().checksum = shaCalc.calculate(paths::joinPath(filesContainer.metaData.workDir, iter.key()), filesContainer.metaData.algorithm);
-            if (iter.value().checksum.isEmpty())
-                iter.value().status = FileValues::Unreadable;
+        iter.nextFile();
+        if (iter.status() == Files::Queued) {
+            container->model_->setItemData(iter.index(), ModelKit::ColumnStatus, Files::Processing);
+
+            QString checksum = shaCalc.calculate(paths::joinPath(container->metaData.workDir, iter.path()), container->metaData.algorithm);
+            if (checksum.isEmpty())
+                container->model_->setItemData(iter.index(), ModelKit::ColumnStatus, Files::Unreadable);
+            else
+                curData->updateChecksum(iter.index(), checksum);
         }
     }
+    emit setMode(Mode::EndProcess);
 
     if (canceled) {
         qDebug() << "Manager::calculateChecksums | Canceled";
         canceled = false;
-        return FileList();
+        return 0;
     }
 
     emit setStatusbarText("Done");
-    return filesContainer.filesData;
+    return doneNum;
 }
 
 void Manager::showFileCheckResultMessage(bool isMatched)
@@ -474,23 +453,12 @@ void Manager::showFileCheckResultMessage(bool isMatched)
         emit showMessage("Checksum does NOT match", "Failed");
 }
 
-QString Manager::copyStoredChecksum(const QString &path, bool clipboard)
+void Manager::copyStoredChecksum(const QModelIndex &fileItemIndex)
 {
-    QString savedSum;
+    if (!curData)
+        return;
 
-    if (curData->data_.filesData.value(path).status == FileValues::New)
-        emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
-    else if (curData->data_.filesData.value(path).status == FileValues::Unreadable)
-        emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
-    else {
-        savedSum = curData->data_.filesData.value(path).checksum;
-        if (savedSum.isEmpty())
-            emit showMessage("No checksum in the database.", "No checksum");
-        else if (clipboard)
-            emit toClipboard(savedSum); // send checksum to clipboard
-    }
-
-    return savedSum;
+    emit toClipboard(curData->getStoredChecksum(fileItemIndex));
 }
 
 // info about folder (number of files and total size) or file (size)
@@ -523,7 +491,8 @@ void Manager::getItemInfo(const QString &path)
         }
     }
     else if (curData)
-        emit setStatusbarText(curData->itemContentsInfo(path));
+        emit setStatusbarText(curData->itemContentsInfo(ModelKit::getIndex(path, curData->data_->model_)));
+        //emit setStatusbarText(curData->itemContentsInfo(path));
 }
 
 void Manager::folderContentsByType(const QString &folderPath)
@@ -573,9 +542,9 @@ void Manager::chooseMode()
     if (!curData)
         return;
 
-    if (curData->data_.numbers.numMismatched > 0)
+    if (curData->data_->numbers.numMismatched > 0)
         emit setMode(Mode::UpdateMismatch);
-    else if (curData->data_.numbers.numNewFiles > 0 || curData->data_.numbers.numMissingFiles > 0)
+    else if (curData->data_->numbers.numNewFiles > 0 || curData->data_->numbers.numMissingFiles > 0)
         emit setMode(Mode::ModelNewLost);
     else {
         emit setMode(Mode::Model);

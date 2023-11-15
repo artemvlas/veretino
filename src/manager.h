@@ -17,12 +17,12 @@ public:
 public slots:
     void processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo);
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
-    void verifyFileList(const QString &subFolder = QString()); // checking the list of files against the checksums stored in the database
+    void verify(const QModelIndex &curIndex);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
-    void checkCurrentItemSum(const QString &path); // check only selected file instead all database cheking
-    QString copyStoredChecksum(const QString &path, bool clipboard = true);
+
+    void copyStoredChecksum(const QModelIndex& fileItemIndex);
     void getItemInfo(const QString &path); // info about folder contents or file (size)
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
     void updateNewLost(); // remove lost files, add new files
@@ -36,11 +36,12 @@ public slots:
     void deleteOldData();
 
 private:
-    void makeTreeModel(const FileList &data); // populate AbstractItemModel from Map {file path : info}
+    void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
+    void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead all database cheking
     void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     void showFileCheckResultMessage(bool isMatched);
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo);
-    FileList calculateChecksums(DataContainer &filesContainer);
+    int calculateChecksums(DataContainer *container, QModelIndex rootIndex = QModelIndex());
     bool restoreBackup(const QString &databaseFilePath);
 
     bool canceled = false;
@@ -55,12 +56,12 @@ signals:
     void donePercents(int done);
     void procStatus(const QString &str);
     void setModel(ProxyModel *model = nullptr);
-    void workDirChanged(const QString &workDir);
+    //void workDirChanged(const QString &workDir);
     void showMessage(const QString &text, const QString &title = "Info");
-    void setButtonText(const QString &text);
+    //void setButtonText(const QString &text);
     void setMode(Mode::Modes mode);
     void toClipboard(const QString &text);
-    void showFiltered(const QList<int> status = {});
+    void showFiltered(const QSet<FileStatus> status = QSet<FileStatus>());
     void cancelProcess();
 };
 

@@ -5,6 +5,7 @@
 #include <QAbstractItemModel>
 #include "treeitem.h"
 #include "files.h"
+#include "tools.h"
 
 class TreeItem;
 
@@ -30,7 +31,9 @@ public:
     bool isEmpty();
 
     void populate(const FileList &filesData);
-    void setItemStatus(const QString &itemPath, FileValues::FileStatus status);
+
+    bool setItemData(const QModelIndex &curIndex, ModelKit::Columns column,
+                     const QVariant &itemData = QVariant());
 
 public slots:
     bool addFile(const QString &filePath, const FileValues &values);

@@ -62,7 +62,7 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
             if (fileInfo.isReadable())
                 curFileValues.size = fileInfo.size(); // If the file is unreadable, then its size is not needed
             else
-                curFileValues.status = FileValues::Unreadable;
+                curFileValues.status = Files::Unreadable;
 
             resultList.insert(relPath, curFileValues);
         }
@@ -89,6 +89,25 @@ FileList Files::allFiles(const FileList &fileList, const FilterRule &filter)
     }
 
     return filteredFiles;
+}
+
+bool Files::containsFiles(const QString &folderPath, const FilterRule &filter)
+{
+    bool result = false;
+
+    if (QFileInfo(folderPath).isDir()) {
+        QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            if (paths::isFileAllowed(it.next(), filter)) {
+                result = true;
+                break;
+            }
+        }
+    }
+    else
+        qDebug() << "Files::containsFiles | Not a folder path: " << folderPath;
+
+    return result;
 }
 
 QString Files::contentStatus()
@@ -143,13 +162,31 @@ QString Files::contentStatus(const FileList &fileList)
     return format::filesNumberAndSize(fileList.size(), dataSize(fileList));
 }
 
+QString Files::itemInfo(const QAbstractItemModel* model, const QSet<FileStatus>& fileStatuses, const QModelIndex& rootIndex)
+{
+    int filesNumber = 0;
+    qint64 dataSize = 0;
+    TreeModelIterator it(model, rootIndex);
+
+    while (it.hasNext()) {
+        QVariant itData = it.nextFile().data(ModelKit::ColumnStatus);
+
+        if (itData.isValid()
+            && (fileStatuses.isEmpty()
+                || fileStatuses.contains(static_cast<FileStatus>(itData.toInt())))) {
+
+            dataSize += it.data(ModelKit::ColumnSize).toLongLong();
+            ++filesNumber;
+        }
+    }
+
+    return format::filesNumberAndSize(filesNumber, dataSize);
+}
+
 QString Files::folderContentsByType()
 {
     if (!initFolderPath.isEmpty()) {
-        FilterRule filter;
-        filter.ignoreDbFiles = false;
-        filter.ignoreShaFiles = false;
-        QString result = folderContentsByType(allFiles(filter));
+        QString result = folderContentsByType(allFiles(FilterRule(false)));
 
         if (canceled)
             result.clear();
@@ -259,25 +296,6 @@ qint64 Files::dataSize(const FileList &filelist)
     }
 
     return totalSize;
-}
-
-qint64 Files::dataSize(const QAbstractItemModel* model, const QSet<FileValues::FileStatus>& fileStatuses, const QModelIndex& rootIndex)
-{
-    qint64 result = 0;
-    TreeModelIterator it(model, rootIndex);
-
-    while (it.hasNext()) {
-        QVariant itData = it.nextFile().data(ModelKit::StatusColumn);
-
-        if (itData.isValid()
-            && (fileStatuses.isEmpty()
-                || fileStatuses.contains(static_cast<FileValues::FileStatus>(itData.toInt())))) {
-
-            result += it.data(ModelKit::SizeColumn).toLongLong();
-        }
-    }
-
-    return result;
 }
 
 void Files::cancelProcess()

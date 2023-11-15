@@ -4,7 +4,7 @@
 TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex)
     : model_(model)
 {
-    rootIndex = ModelKit::siblingAtRow(rootIndex, ModelKit::PathColumn);
+    rootIndex = ModelKit::siblingAtRow(rootIndex, ModelKit::ColumnPath);
 
     if (ModelKit::isFileRow(rootIndex))
         rootIndex = rootIndex.parent();
@@ -15,6 +15,11 @@ TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelInde
     }
 
     nextIndex_ = stepForward(index_);
+}
+
+bool TreeModelIterator::hasNext()
+{
+    return nextIndex_.isValid();
 }
 
 TreeModelIterator& TreeModelIterator::next()
@@ -28,6 +33,11 @@ TreeModelIterator& TreeModelIterator::nextFile()
 {
     return model_->hasChildren(next().index_) ? nextFile() : *this;
 }
+/*
+TreeModelIterator& TreeModelIterator::nextFile(FileStatus status)
+{
+    return (nextFile().status() == status) ? *this : nextFile(status);
+}*/
 
 QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
 {
@@ -61,17 +71,17 @@ const QModelIndex& TreeModelIterator::index()
     return index_;
 }
 
-QString TreeModelIterator::path()
-{
-    return ModelKit::getPath(index_);
-}
-
 QVariant TreeModelIterator::data(ModelKit::Columns column, int role)
 {
     return model_->data(model_->sibling(index_.row(), column, index_), role);
 }
 
-bool TreeModelIterator::hasNext()
+QString TreeModelIterator::path()
 {
-    return nextIndex_.isValid();
+    return ModelKit::getPath(index_);
+}
+
+FileStatus TreeModelIterator::status()
+{
+    return data(ModelKit::ColumnStatus).value<FileStatus>();
 }

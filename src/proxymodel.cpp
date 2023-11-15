@@ -1,3 +1,4 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "proxymodel.h"
 #include "tools.h"
 #include <QDebug>
@@ -5,9 +6,14 @@
 ProxyModel::ProxyModel(QObject *parent)
     : QSortFilterProxyModel{parent}
 {
-    setSortCaseSensitivity(Qt::CaseInsensitive);
-    setRecursiveFilteringEnabled(true);
-    setSortRole(ModelKit::RawDataRole);
+    setInitSettings();
+}
+
+ProxyModel::ProxyModel(QAbstractItemModel *sourceModel, QObject *parent)
+    : QSortFilterProxyModel{parent}
+{
+    setInitSettings();
+    setSourceModel(sourceModel);
 }
 
 ProxyModel::~ProxyModel()
@@ -15,14 +21,21 @@ ProxyModel::~ProxyModel()
     qDebug() << this << "deleted:";
 }
 
+void ProxyModel::setInitSettings()
+{
+    setSortCaseSensitivity(Qt::CaseInsensitive);
+    setRecursiveFilteringEnabled(true);
+    setSortRole(ModelKit::RawDataRole);
+}
+
 bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     if (!isFilterEnabled || fileStatuses_.isEmpty())
         return true;
 
-    QModelIndex curIndex = sourceModel()->index(sourceRow, 2, sourceParent);
+    QModelIndex curIndex = sourceModel()->index(sourceRow, ModelKit::ColumnStatus, sourceParent);
 
-    return fileStatuses_.contains(curIndex.data(ModelKit::RawDataRole).toInt());
+    return fileStatuses_.contains(curIndex.data(ModelKit::RawDataRole).value<FileStatus>());
 }
 
 bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
@@ -36,14 +49,14 @@ bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) con
     return sourceModel()->hasChildren(left);
 }
 
-void ProxyModel::setFilter(QList<int> status)
+void ProxyModel::setFilter(QSet<FileStatus> statuses)
 {
-    if (status.isEmpty()) {
+    if (statuses.isEmpty()) {
         disableFilter();
         return;
     }
 
-    fileStatuses_ = status;
+    fileStatuses_ = statuses;
     isFilterEnabled = true;
     invalidateFilter();
 }

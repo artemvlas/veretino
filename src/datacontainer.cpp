@@ -6,254 +6,353 @@
 #include <QDebug>
 #include "jsondb.h"
 #include <QDirIterator>
+#include "treemodeliterator.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)
 {
+    setSourceData();
 }
 
-DataMaintainer::DataMaintainer(const DataContainer &initData, QObject *parent)
-    : QObject(parent), data_(initData)
+DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
+    : QObject(parent)
 {
-    if (data_.metaData.databaseFileName.contains('/'))
-        data_.metaData.databaseFilePath = data_.metaData.databaseFileName;
-    else
-        data_.metaData.databaseFilePath = paths::joinPath(data_.metaData.workDir, data_.metaData.databaseFileName);
+    setSourceData(initData);
+}
 
+void DataMaintainer::setSourceData()
+{
+    setSourceData(new DataContainer(this));
+}
+
+void DataMaintainer::setSourceData(DataContainer *sourceData)
+{
+    if (sourceData) {
+        clearData();
+        data_ = sourceData;
+        updateNumbers();
+    }
+}
+
+void DataMaintainer::clearData()
+{
+    if (data_) {
+        delete data_;
+        data_ = nullptr;
+    }
+}
+
+// add new files to data_->model_
+int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnreadable)
+{
+    if (!data_)
+        return 0;
+
+    if (!QFileInfo(data_->metaData.workDir).isDir()) {
+        qDebug() << "DataMaintainer::addActualFiles | Not a folder path: " << data_->metaData.workDir;
+        return 0;
+    }
+
+    emit setStatusbarText("Creating a list of files...");
+
+    canceled = false;
+    int numAdded = 0;
+
+    QDir dir(data_->metaData.workDir);
+    QDirIterator it(data_->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
+
+    while (it.hasNext() && !canceled) {
+        QString fullPath = it.next();
+        QString relPath = dir.relativeFilePath(fullPath);
+
+        if (paths::isFileAllowed(relPath, data_->metaData.filter)) {
+            FileValues curFileValues;
+            QFileInfo fileInfo(fullPath);
+            if (fileInfo.isReadable()) {
+                curFileValues.status = addedFileStatus;
+                curFileValues.size = fileInfo.size(); // If the file is unreadable, then its size is not needed
+            }
+            else if (!ignoreUnreadable)
+                curFileValues.status = FileStatus::Unreadable;
+            else
+                continue;
+
+            if (data_->model_->addFile(relPath, curFileValues))
+                ++numAdded;
+        }
+    }
+
+    if (canceled) {
+        qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
+        clearData();
+        emit setStatusbarText();
+        return 0;
+    }
+
+    //emit setStatusbarText(QString("%1 files found").arg(numAdded));
     updateNumbers();
 
-    qDebug() << "DataMaintainer created | " << data_.metaData.workDir;
+    return numAdded;
 }
 
 void DataMaintainer::updateNumbers()
 {
-    Numbers num;
-
-    FileList::const_iterator iter;
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (!iter.value().checksum.isEmpty())
-            ++num.numChecksums;
-
-        switch (iter.value().status) {
-        case FileValues::NotChecked:
-            ++num.numNotChecked;
-            num.totalSize += iter.value().size;
-            break;
-        case FileValues::Matched:
-            ++num.numMatched;
-            num.totalSize += iter.value().size;
-            break;
-        case FileValues::Mismatched:
-            ++num.numMismatched;
-            num.totalSize += iter.value().size;
-            break;
-        case FileValues::New:
-            ++num.numNewFiles;
-            break;
-        case FileValues::Missing:
-            ++num.numMissingFiles;
-            break;
-        case FileValues::Unreadable:
-            ++num.numUnreadable;
-            break;
-        case FileValues::Added:
-            ++num.numMatched;
-            num.totalSize += iter.value().size;
-            break;
-        case FileValues::Removed:
-            break;
-        case FileValues::ChecksumUpdated:
-            ++num.numMatched;
-            num.totalSize += iter.value().size;
-            break;
-        default: break;
-        }
+    if (!data_) {
+        qDebug() << "DataMaintainer::updateNumbers | NO data_";
+        return;
     }
 
-    num.numAvailable = num.numNotChecked + num.numMatched + num.numMismatched;
-    data_.numbers = num;
+    data_->numbers = updateNumbers(data_->model_);
 
     QString newmissing;
     QString mismatched;
     QString matched;
     QString sep;
 
-    if (num.numNewFiles > 0 || num.numMissingFiles > 0)
+    if (data_->numbers.numNewFiles > 0 || data_->numbers.numMissingFiles > 0)
         newmissing = "* ";
 
-    if (num.numMismatched > 0)
-        mismatched = QString("☒%1").arg(num.numMismatched);
-    if (num.numMatched > 0)
-        matched = QString(" ✓%1").arg(num.numMatched);
+    if (data_->numbers.numMismatched > 0)
+        mismatched = QString("☒%1").arg(data_->numbers.numMismatched);
+    if (data_->numbers.numMatched > 0)
+        matched = QString(" ✓%1").arg(data_->numbers.numMatched + data_->numbers.numAdded + data_->numbers.numChecksumUpdated);
 
-    if (num.numMismatched > 0 || num.numMatched > 0)
+    if (data_->numbers.numMismatched > 0 || data_->numbers.numMatched > 0)
         sep = " : ";
 
     QString checkStatus = QString("\t%1%2%3%4").arg(newmissing, mismatched, matched, sep);
 
     emit setPermanentStatus(QString("%1%2 avail. | %3 | %4")
                             .arg(checkStatus)
-                            .arg(num.numAvailable)
-                            .arg(format::dataSizeReadable(num.totalSize), format::algoToStr(data_.metaData.algorithm)));
+                            .arg(data_->numbers.numAvailable)
+                            .arg(format::dataSizeReadable(data_->numbers.totalSize), format::algoToStr(data_->metaData.algorithm)));
 }
 
-void DataMaintainer::updateFilesValues()
+Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
 {
-    emit setStatusbarText("Defining files values...");
-    canceled = false;
-    QMutableMapIterator<QString, FileValues> iter(data_.filesData);
+    Numbers num;
 
-    while (iter.hasNext() && !canceled) {
-        QString fullPath = paths::joinPath(data_.metaData.workDir, iter.next().key());
-        if (QFileInfo::exists(fullPath))
-            iter.value().size = QFileInfo(fullPath).size();
-        else
-            iter.value().status = FileValues::Missing;
-    }
+    TreeModelIterator iter(model, rootIndex);
 
-    if (canceled) {
-        qDebug() << "DataMaintainer::updateFilesValues() | Canceled:" << data_.metaData.workDir;
-    }
-}
+    while (iter.hasNext()) {
+        iter.nextFile();
 
-int DataMaintainer::findNewFiles()
-{
-    emit setStatusbarText("Looking for new files...");
+        if (iter.data(ModelKit::ColumnChecksum).isValid() && !iter.data(ModelKit::ColumnChecksum).toString().isEmpty()) {
+            ++num.numChecksums;
+            num.totalSize += iter.data(ModelKit::ColumnSize).toLongLong();
+        }
 
-    canceled = false;
-    int number = 0;
-    QDir dir(data_.metaData.workDir);
-    QDirIterator it(data_.metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
+        if (!iter.data(ModelKit::ColumnStatus).isValid())
+            continue;
 
-    while (it.hasNext() && !canceled) {
-        QString fullPath = it.next();
-        QString relPath = dir.relativeFilePath(fullPath);
-
-        if (paths::isFileAllowed(fullPath, data_.metaData.filter) && !data_.filesData.contains(relPath)) {
-            QFileInfo fileInfo(fullPath);
-            // unreadable files are ignored
-            if (fileInfo.isReadable()) {
-                FileValues curFileValues;
-                curFileValues.status = FileValues::New;
-                curFileValues.size = fileInfo.size();
-                data_.filesData.insert(relPath, curFileValues);
-                ++number;
-            }
+        switch (iter.status()) {
+            case FileStatus::Queued:
+                ++num.numQueued;
+                break;
+            case FileStatus::NotChecked:
+                ++num.numNotChecked;
+                break;
+            case FileStatus::Matched:
+                ++num.numMatched;
+                break;
+            case FileStatus::Mismatched:
+                ++num.numMismatched;
+                break;
+            case FileStatus::New:
+                ++num.numNewFiles;
+                break;
+            case FileStatus::Missing:
+                ++num.numMissingFiles;
+                break;
+            case FileStatus::Unreadable:
+                ++num.numUnreadable;
+                break;
+            case FileStatus::Added:
+                ++num.numAdded;
+                break;
+            case FileStatus::Removed:
+                break;
+            case FileStatus::ChecksumUpdated:
+                ++num.numChecksumUpdated;
+                break;
+            default: break;
         }
     }
 
-    if (canceled) {
-        number = 0;
-        qDebug() << "DataMaintainer::findNewFiles() | Canceled:" << data_.metaData.workDir;
+    num.numAvailable = num.numChecksums - num.numMissingFiles; //num.numNotChecked + num.numMatched + num.numMismatched;
+
+    return num;
+}
+
+qint64 DataMaintainer::totalSizeOfListedFiles(FileStatus fileStatus, const QModelIndex &rootIndex)
+{
+    if (!data_) {
+        qDebug() << "DataMaintainer::totalSizeOfListedFiles | NO data_";
+        return 0;
     }
+
+    return totalSizeOfListedFiles(data_->model_, {fileStatus}, rootIndex);
+}
+
+qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatuses, const QModelIndex &rootIndex)
+{
+    if (!data_) {
+        qDebug() << "DataMaintainer::totalSizeOfListedFiles | NO data_";
+        return 0;
+    }
+
+    return totalSizeOfListedFiles(data_->model_, fileStatuses, rootIndex);
+}
+
+qint64 DataMaintainer::totalSizeOfListedFiles(const QAbstractItemModel *model, const QSet<FileStatus> &fileStatuses, const QModelIndex &rootIndex)
+{
+    qint64 result = 0;
+    TreeModelIterator it(model, rootIndex);
+
+    while (it.hasNext()) {
+        QVariant itData = it.nextFile().data(ModelKit::ColumnStatus);
+
+        if (itData.isValid()
+            && (fileStatuses.isEmpty()
+                || fileStatuses.contains(static_cast<FileStatus>(itData.toInt())))) {
+
+            result += it.data(ModelKit::ColumnSize).toLongLong();
+        }
+    }
+
+    return result;
+}
+
+bool DataMaintainer::updateChecksum(QModelIndex fileRowIndex, const QString &computedChecksum)
+{
+    if (!data_ || !fileRowIndex.isValid()) {
+        qDebug() << "DataMaintainer::updateChecksum | NO data_ or invalid index";
+        return false;
+    }
+
+    if (fileRowIndex.model() == data_->proxyModel_)
+        fileRowIndex = data_->proxyModel_->mapToSource(fileRowIndex);
+
+    QString storedChecksum = siblingAtRow(fileRowIndex, ModelKit::ColumnChecksum).data().toString();
+
+    if (storedChecksum.isEmpty()) {
+        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnChecksum, computedChecksum);
+        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnStatus, FileStatus::Added);
+    }
+    else if (storedChecksum == computedChecksum)
+        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnStatus, FileStatus::Matched);
+    else {
+        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnReChecksum, computedChecksum);
+        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnStatus, FileStatus::Mismatched);
+    }
+
+    return (storedChecksum.isEmpty() || storedChecksum == computedChecksum);
+}
+
+int DataMaintainer::changeFilesStatuses(FileStatus currentStatus, FileStatus newStatus, const QModelIndex &rootIndex)
+{
+    if (!data_) {
+        qDebug() << "DataMaintainer::changeFilesStatuses | NO data_";
+        return 0;
+    }
+
+    int number = 0;
+    TreeModelIterator iter(data_->model_, rootIndex);
+
+    while (iter.hasNext()) {
+        if (iter.nextFile().status() == currentStatus) {
+            data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, newStatus);
+            ++number;
+        }
+    }
+
+    if (number > 0)
+        updateNumbers();
 
     return number;
 }
 
-FileList DataMaintainer::listOf(FileValues::FileStatus fileStatus)
+QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
 {
-    return listOf(fileStatus, data_.filesData);
-}
-
-FileList DataMaintainer::listOf(FileValues::FileStatus fileStatus, const FileList &originalList)
-{
-    FileList resultList;
-    FileList::const_iterator iter;
-
-    for (iter = originalList.constBegin(); iter != originalList.constEnd(); ++iter) {
-        if (iter.value().status == fileStatus)
-            resultList.insert(iter.key(), iter.value());
+    if (!data_) {
+        qDebug() << "DataMaintainer::getStoredChecksum | NO data_";
+        return QString();
     }
 
-    return resultList;
-}
-
-FileList DataMaintainer::listOf(QSet<FileValues::FileStatus> fileStatuses)
-{
-    FileList resultList;
-    FileList::const_iterator iter;
-
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (fileStatuses.contains(iter.value().status))
-            resultList.insert(iter.key(), iter.value());
+    if (!ModelKit::isFileRow(fileRowIndex)) {
+        qDebug() << "DataMaintainer::getStoredChecksum | Specified index does not belong to the file row";
+        return QString();
     }
 
-    return resultList;
+    FileStatus fileStatus = ModelKit::siblingAtRow(fileRowIndex, ModelKit::ColumnStatus)
+                                        .data(ModelKit::RawDataRole).value<FileStatus>();
+
+    QString savedSum;
+
+    if (fileStatus == FileStatus::New)
+        emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
+    else if (fileStatus == FileStatus::Unreadable)
+        emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
+    else {
+        savedSum = ModelKit::siblingAtRow(fileRowIndex, ModelKit::ColumnChecksum).data().toString();
+        if (savedSum.isEmpty())
+            emit showMessage("No checksum in the database.", "No checksum");
+    }
+
+    return savedSum;
 }
 
 int DataMaintainer::clearDataFromLostFiles()
 {
+    if (!data_) {
+        qDebug() << "DataMaintainer::clearDataFromLostFiles | NO data_";
+        return 0;
+    }
+
     int number = 0;
-    QMutableMapIterator<QString, FileValues> iter(data_.filesData);
+    TreeModelIterator iter(data_->model_);
 
     while (iter.hasNext()) {
-        iter.next();
-        if (iter.value().status == FileValues::Missing) {
-            iter.value().checksum.clear();
-            iter.value().status = FileValues::Removed;
-            model_->setItemStatus(iter.key(), FileValues::Removed);
+        if (iter.nextFile().status() == FileStatus::Missing) {
+            data_->model_->setItemData(iter.index(), ModelKit::ColumnChecksum);
+            data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, FileStatus::Removed);
             ++number;
         }
     }
+
+    if (number > 0)
+        updateNumbers();
+
     return number;
 }
 
 int DataMaintainer::updateMismatchedChecksums()
 {
+    if (!data_) {
+        qDebug() << "DataMaintainer::updateMismatchedChecksums | NO data_";
+        return 0;
+    }
+
     int number = 0;
-    QMutableMapIterator<QString, FileValues> iter(data_.filesData);
+    TreeModelIterator iter(data_->model_);
 
     while (iter.hasNext()) {
-        iter.next();
-        if (!iter.value().reChecksum.isEmpty()) {
-            iter.value().checksum = iter.value().reChecksum;
-            iter.value().reChecksum.clear();
-            iter.value().status = FileValues::ChecksumUpdated;
-            model_->setItemStatus(iter.key(), FileValues::ChecksumUpdated);
-            ++number;
+        if (iter.nextFile().status() == FileStatus::Mismatched) {
+            QString reChecksum = iter.data(ModelKit::ColumnReChecksum).toString();
+
+            if (!reChecksum.isEmpty()) {
+                data_->model_->setItemData(iter.index(), ModelKit::ColumnChecksum, reChecksum);
+                data_->model_->setItemData(iter.index(), ModelKit::ColumnReChecksum);
+                data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, FileStatus::ChecksumUpdated);
+                ++number;
+            }
         }
     }
 
+    if (number > 0)
+        updateNumbers();
+
     return number;
-}
-
-int DataMaintainer::updateData(const FileList &updateFiles)
-{
-    if (!updateFiles.isEmpty())
-        data_.filesData.insert(updateFiles);
-
-    return updateFiles.size();
-}
-
-int DataMaintainer::updateData(FileList updateFiles, FileValues::FileStatus status)
-{
-    QMutableMapIterator<QString, FileValues> iter(updateFiles);
-
-    while (iter.hasNext()) {
-        iter.next();
-        iter.value().status = status;
-        model_->setItemStatus(iter.key(), iter.value().status);
-    }
-
-    return updateData(updateFiles);
-}
-
-bool DataMaintainer::updateData(const QString &filePath, const QString &checksum)
-{
-    FileValues curFileValues = data_.filesData.value(filePath);
-
-    if (checksum == curFileValues.checksum) {
-        curFileValues.status = FileValues::Matched;
-    }
-    else {
-        curFileValues.reChecksum = checksum;
-        curFileValues.status = FileValues::Mismatched;
-    }
-
-    data_.filesData.insert(filePath, curFileValues);
-    model_->setItemStatus(filePath, curFileValues.status);
-
-    return (curFileValues.status == FileValues::Matched);
 }
 
 void DataMaintainer::importJson(const QString &jsonFilePath)
@@ -262,28 +361,24 @@ void DataMaintainer::importJson(const QString &jsonFilePath)
     connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
-    data_ = json->parseJson(jsonFilePath);
+    setSourceData(json->parseJson(jsonFilePath));
+
     json->deleteLater();
 
-    if (data_.filesData.isEmpty()) {
-        return;
-    }
-
-    if (!canceled)
-        updateFilesValues();
-    if (!canceled)
-        findNewFiles();
-    else
-        data_.filesData.clear();
+    if (canceled || data_->model_->isEmpty()) {
+        clearData();
+    }   
 }
 
 void DataMaintainer::exportToJson()
 {
-    if (QFileInfo::exists(data_.metaData.databaseFilePath) && !QFile::exists(paths::backupFilePath(data_.metaData.databaseFilePath)))
-        makeBackup();
+    if (!data_)
+        return;
 
     updateNumbers();
-    data_.metaData.saveDateTime = format::currentDateTime();
+    makeBackup();
+
+    data_->metaData.saveDateTime = format::currentDateTime();
 
     JsonDb *json = new JsonDb;
     connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
@@ -294,151 +389,139 @@ void DataMaintainer::exportToJson()
     json->deleteLater();
 }
 
-FileList DataMaintainer::subfolderContent(QString subFolder)
+QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 {
-    if (subFolder.isEmpty())
-        return data_.filesData;
+    QString text;
 
-    if (!subFolder.endsWith('/'))
-        subFolder.append('/');
+    if (ModelKit::isFileRow(curIndex)) {
+        QString result;
+        QVariant itemData = ModelKit::siblingAtRow(curIndex, ModelKit::ColumnSize).data(ModelKit::RawDataRole);
+        if (itemData.isValid()) {
+            result = QString("%1 (%2)").arg(ModelKit::siblingAtRow(curIndex, ModelKit::ColumnPath).data().toString(),
+                                                                    format::dataSizeReadable(itemData.toLongLong()));
+        }
+        return result;
+    }
+    // if curIndex is at folder row
+    else if (curIndex.isValid()) {
+        Numbers num = updateNumbers(curIndex.model(), curIndex);
+        qint64 newFilesDataSize = totalSizeOfListedFiles({FileStatus::New}, curIndex);
 
-    FileList content;
-    FileList::const_iterator iter;
+        if (num.numAvailable > 0) {
+            text = QString("Avail.: %1")
+                       .arg(format::filesNumberAndSize(num.numAvailable, num.totalSize - newFilesDataSize));
+        }
 
-    for (iter = data_.filesData.constBegin(); iter != data_.filesData.constEnd(); ++iter) {
-        if (iter.key().startsWith(subFolder))
-            content.insert(iter.key(), iter.value());
-        else if (!content.isEmpty()) {
-            break; // is Relative End; QMap is sorted by key, so there is no point in itering to the real end.
+        if (num.numMissingFiles > 0) {
+            QString pre;
+            if (num.numAvailable > 0)
+                pre = "; ";
+            text.append(QString("%1Missing: %2").arg(pre).arg(num.numMissingFiles));
+        }
+
+        if (num.numNewFiles > 0) {
+            QString pre;
+            if (num.numAvailable > 0 || num.numMissingFiles > 0)
+                pre = "; ";
+            text.append(QString("%1New: %2")
+                        .arg(pre, format::filesNumberAndSize(num.numNewFiles, newFilesDataSize)));
         }
     }
 
-    return content;
-}
-
-QString DataMaintainer::itemContentsInfo(const QString &itemPath)
-{
-    QString fullPath = paths::joinPath(data_.metaData.workDir, itemPath);
-    QFileInfo fileInfo(fullPath);
-    if (fileInfo.isFile())
-        return format::fileNameAndSize(fullPath);
-    else if (fileInfo.isDir()) {
-        FileList content = subfolderContent(itemPath);
-        FileList newfiles;
-        FileList ondisk;
-        int lost = 0;
-
-        FileList::const_iterator iterContent;
-        for (iterContent = content.constBegin(); iterContent != content.constEnd(); ++iterContent) {
-            if (iterContent.value().status == FileValues::New)
-                newfiles.insert(iterContent.key(), iterContent.value());
-            else if (iterContent.value().status == FileValues::Missing)
-                ++lost;
-            else if (iterContent.value().status != FileValues::Unreadable)
-                ondisk.insert(iterContent.key(), iterContent.value());
-            else
-                qDebug() << "DataMaintainer::itemContents | Ambiguous item: " << iterContent.key();
-        }
-
-        QString text;
-        if (ondisk.size() > 0) {
-            text = "on Disk: " + Files::contentStatus(ondisk);
-        }
-
-        if (lost > 0) {
-            QString pre;
-            if (ondisk.size() > 0)
-                pre = "; ";
-            text.append(QString("%1Lost files: %2").arg(pre).arg(lost));
-        }
-
-        if (newfiles.size() > 0) {
-            QString pre;
-            if (ondisk.size() > 0 || lost > 0)
-                pre = "; ";
-            text.append(QString("%1New: %2").arg(pre, Files::contentStatus(newfiles)));
-        }
-
-        return text;
-    }
-    else
-        return "The item actually not on a disk";
+    return text;
 }
 
 void DataMaintainer::dbStatus()
 {
     updateNumbers();
 
-    QString result("DB filename: ");
-    if (data_.metaData.databaseFileName.contains('/')) {
-        result.append(QFileInfo(data_.metaData.databaseFileName).fileName());
-        result.append("\nWorkDir: " + data_.metaData.workDir);
-    }
-    else
-        result.append(data_.metaData.databaseFileName);
+    QString result = "DB filename: " + data_->databaseFileName();
 
-    result.append(QString("\nAlgorithm: %1").arg(format::algoToStr(data_.metaData.algorithm)));
+    if (!data_->isWorkDirRelative())
+        result.append("\nWorkDir: " + data_->metaData.workDir);
 
-    if (!data_.metaData.filter.extensionsList.isEmpty()) {
-        if (data_.metaData.filter.includeOnly)
-            result.append(QString("\nIncluded Only: %1").arg(data_.metaData.filter.extensionsList.join(", ")));
+    result.append(QString("\nAlgorithm: %1").arg(format::algoToStr(data_->metaData.algorithm)));
+
+    if (data_->isFilterApplied()) {
+        if (data_->metaData.filter.includeOnly)
+            result.append(QString("\nIncluded Only: %1").arg(data_->metaData.filter.extensionsList.join(", ")));
         else
-            result.append(QString("\nIgnored: %1").arg(data_.metaData.filter.extensionsList.join(", ")));
+            result.append(QString("\nIgnored: %1").arg(data_->metaData.filter.extensionsList.join(", ")));
     }
 
-    result.append(QString("\nLast update: %1").arg(data_.metaData.saveDateTime));
+    result.append(QString("\nLast update: %1").arg(data_->metaData.saveDateTime));
 
-    if (data_.numbers.numChecksums != data_.numbers.numAvailable)
-        result.append(QString("\n\nStored checksums: %1").arg(data_.numbers.numChecksums));
+    if (data_->numbers.numChecksums != data_->numbers.numAvailable)
+        result.append(QString("\n\nStored checksums: %1").arg(data_->numbers.numChecksums));
     else
         result.append("\n");
 
-    if (data_.numbers.numAvailable > 0)
-        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_.numbers.numAvailable, data_.numbers.totalSize)));
+    if (data_->numbers.numAvailable > 0)
+        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_->numbers.numAvailable, data_->numbers.totalSize)));
     else
         result.append("\nNO FILES available to check");
 
-    if (data_.numbers.numUnreadable > 0)
-        result.append(QString("\nUnreadable files: %1").arg(data_.numbers.numUnreadable));
+    if (data_->numbers.numUnreadable > 0)
+        result.append(QString("\nUnreadable files: %1").arg(data_->numbers.numUnreadable));
 
-    if (data_.numbers.numNewFiles > 0)
-        result.append("\n\nNew: " + Files::contentStatus(listOf(FileValues::New)));
+    if (data_->numbers.numNewFiles > 0)
+        result.append("\n\nNew: " + Files::itemInfo(data_->model_, {FileStatus::New}));
     else
         result.append("\n\nNo New files found");
 
-    if (data_.numbers.numMissingFiles > 0)
-        result.append(QString("\nMissing: %1 files").arg(data_.numbers.numMissingFiles));
+    if (data_->numbers.numMissingFiles > 0)
+        result.append(QString("\nMissing: %1 files").arg(data_->numbers.numMissingFiles));
     else
         result.append("\nNo Missing files found");
 
-    if (data_.numbers.numAvailable > 0) {
-        if (data_.numbers.numNotChecked == 0) {
-            if (data_.numbers.numMismatched > 0)
-                result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_.numbers.numMismatched).arg(data_.numbers.numChecksums));
-            else if (data_.numbers.numChecksums == data_.numbers.numAvailable)
-                result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_.numbers.numChecksums));
+    if (data_->numbers.numAvailable > 0) {
+        if (data_->numbers.numNotChecked == 0) {
+            if (data_->numbers.numMismatched > 0)
+                result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_->numbers.numMismatched).arg(data_->numbers.numChecksums));
+            else if (data_->numbers.numChecksums == data_->numbers.numAvailable)
+                result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_->numbers.numChecksums));
             else
-                result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_.numbers.numAvailable));
+                result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_->numbers.numAvailable));
         }
-        else if (data_.numbers.numNewFiles > 0 || data_.numbers.numMissingFiles > 0)
+        else if (data_->numbers.numNewFiles > 0 || data_->numbers.numMissingFiles > 0)
             result.append("\n\nUse context menu for more options");
     }
 
     emit showMessage(result, "Database status");
 }
 
-bool DataMaintainer::makeBackup()
+bool DataMaintainer::makeBackup(bool forceOverwrite)
 {
-    QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);
+    if (!data_ || !QFile::exists(data_->metaData.databaseFilePath))
+        return false;
 
-    return (!QFile::exists(backupFilePath) && QFile::copy(data_.metaData.databaseFilePath, backupFilePath));
+    if (forceOverwrite)
+        removeBackupFile();
+
+    return QFile::copy(data_->metaData.databaseFilePath,
+                       paths::backupFilePath(data_->metaData.databaseFilePath));
 }
 
 void DataMaintainer::removeBackupFile()
 {
-    QString backupFilePath = paths::backupFilePath(data_.metaData.databaseFilePath);
+    if (!data_)
+        return;
+
+    QString backupFilePath = paths::backupFilePath(data_->metaData.databaseFilePath);
+
     if (QFile::exists(backupFilePath))
         QFile::remove(backupFilePath);
+}
+
+QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)
+{
+    if (!data_ || !curIndex.isValid())
+        return QModelIndex();
+
+    if (curIndex.model() == data_->proxyModel_)
+        return data_->proxyModel_->mapToSource(curIndex);
+
+    return curIndex;
 }
 
 void DataMaintainer::cancelProcess()
@@ -449,6 +532,7 @@ void DataMaintainer::cancelProcess()
 DataMaintainer::~DataMaintainer()
 {
     removeBackupFile();
+    clearData();
     emit setPermanentStatus();
-    qDebug()<< "DataMaintainer deleted | " << data_.metaData.workDir;
+    qDebug() << "DataMaintainer deleted";
 }

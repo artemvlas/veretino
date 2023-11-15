@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "datacontainer.h"
+#include <QElapsedTimer>
 
 class JsonDb : public QObject
 {
@@ -16,14 +17,16 @@ public:
     explicit JsonDb(QObject *parent = nullptr);
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
-    DataContainer parseJson(const QString &filePath);
-    bool makeJson(const DataContainer &data);
+    DataContainer* parseJson(const QString &filePath);
+    bool makeJson(const DataContainer* data);
 
 private:
     QString jsonFilePath;
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
+
+    QElapsedTimer elapsedTimer;
 
 signals:
     void showMessage(const QString &text, const QString &title = "Info");

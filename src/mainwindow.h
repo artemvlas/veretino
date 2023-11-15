@@ -60,20 +60,17 @@ signals:
     void processFolderSha(const QString &path, QCryptographicHash::Algorithm algo);
     void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
     void parseJsonFile(const QString &path);
-    void verifyFileList(const QString &subFolder = QString());
+    void verify(const QModelIndex& index = QModelIndex());
     void updateNewLost();
     void updateMismatch(); // update json Database with new checksums for files with failed verification
-    void checkCurrentItemSum(const QString &path); // check the selected file only instead of all database cheking
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
-    void copyStoredChecksum(const QString &path, bool clipboard = true);
+    void copyStoredChecksum(const QModelIndex& fileItemIndex);
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
-    //void showNewLostOnly();
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);
-    //void showAll();
     void dbStatus();
 };
 #endif // MAINWINDOW_H

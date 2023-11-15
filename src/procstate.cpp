@@ -57,25 +57,7 @@ QString ProcState::calcLeftTime(const int percentsDone)
 
     qint64 timeleft = ((totalSize_ - doneSize_) / pieceSize) * pieceTime;
 
-    int seconds = timeleft / 1000;
-    int minutes = seconds / 60;
-    seconds = seconds % 60;
-    int hours = minutes / 60;
-    minutes = minutes % 60;
-
-    QString estimatedTime;
-    if (hours > 0)
-        estimatedTime = QString("%1 h %2 min").arg(hours).arg(minutes);
-    else if (minutes > 0 && seconds > 10)
-        estimatedTime = QString("%1 min").arg(minutes + 1);
-    else if (minutes > 0)
-        estimatedTime = QString("%1 min").arg(minutes);
-    else if (seconds > 4)
-        estimatedTime = QString("%1 sec").arg(seconds);
-    else
-        estimatedTime = QString("few sec");
-
-    return estimatedTime;
+    return format::millisecToReadable(timeleft, true);
 }
 
 QString ProcState::calcSpeed(int percDone)

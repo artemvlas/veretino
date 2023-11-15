@@ -80,6 +80,7 @@ void MainWindow::connections()
 void MainWindow::connectManager()
 {
     // qRegisterMetaType<QVector<int>>("QVector<int>"); // uncomment when building on Windows (qt 5.15.2)
+    qRegisterMetaType<QSet<FileStatus>>("QSet<FileStatus>");
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<Mode::Modes>("Mode::Modes");
 
@@ -93,12 +94,11 @@ void MainWindow::connectManager()
     connect(this, &MainWindow::parseJsonFile, manager, &Manager::createDataModel);
     connect(this, &MainWindow::processFolderSha, manager, &Manager::processFolderSha);
     connect(this, &MainWindow::processFileSha, manager, &Manager::processFileSha);
-    connect(this, &MainWindow::verifyFileList, manager, &Manager::verifyFileList);
+    connect(this, &MainWindow::verify, manager, &Manager::verify);
     connect(this, &MainWindow::updateNewLost, manager, &Manager::updateNewLost);
     connect(this, &MainWindow::updateMismatch, manager, &Manager::updateMismatch);
     connect(this, &MainWindow::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(this, &MainWindow::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
-    connect(this, &MainWindow::checkCurrentItemSum, manager, &Manager::checkCurrentItemSum);
     connect(this, &MainWindow::copyStoredChecksum, manager, &Manager::copyStoredChecksum);
 
     // cancel process
@@ -115,7 +115,7 @@ void MainWindow::connectManager()
     // results processing
     connect(manager, &Manager::setModel, ui->treeView, &View::setTreeModel); //set the tree model created by Manager
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
-    connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
+    //connect(manager, &Manager::workDirChanged, this, [=](const QString &path){ui->treeView->workDir = path;});
 
     // process status
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
@@ -192,24 +192,23 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                 contextMenu->addAction("Update the Database with new checksums", this, &MainWindow::updateMismatch);
 
             else if (viewMode == ModelNewLost) {
-                contextMenu->addAction("Show New/Lost only", this, [=]{ui->treeView->proxyModel_->setFilter({FileValues::New, FileValues::Missing});});
+                contextMenu->addAction("Show New/Lost only", this, [=]{ui->treeView->proxyModel_->setFilter({Files::New, Files::Missing});});
                 contextMenu->addAction("Update the DataBase with New/Lost files", this, &MainWindow::updateNewLost);
                 contextMenu->addSeparator();
             }
 
             if (viewMode == Model || viewMode == ModelNewLost) {
                 if (index.isValid()) {
-                    QFileInfo pathInfo (paths::joinPath(ui->treeView->workDir, curPath));
-                    if (pathInfo.isFile()) {
-                        contextMenu->addAction("Check current file", this, [=]{emit checkCurrentItemSum(curPath);});
-                        contextMenu->addAction("Copy stored checksum to clipboard", this, [=]{emit copyStoredChecksum(curPath);});
+                    if (ModelKit::isFileRow(index)) {
+                        contextMenu->addAction("Check current file", this, [=]{emit verify(ui->treeView->currentIndex);});
+                        contextMenu->addAction("Copy stored checksum to clipboard", this, [=]{emit copyStoredChecksum(ui->treeView->currentIndex);});
                     }
-                    else if (pathInfo.isDir()) {
-                        contextMenu->addAction("Check current Subfolder", this, [=]{emit verifyFileList(curPath);});
+                    else {
+                        contextMenu->addAction("Check current Subfolder", this, [=]{emit verify(ui->treeView->currentIndex);});
                     }
                 }
 
-                contextMenu->addAction("Check ALL files against stored checksums", this, [=]{emit verifyFileList();});
+                contextMenu->addAction("Check ALL files against stored checksums", this, [=]{emit verify();});
             }
             if (ui->treeView->proxyModel_->isFilterEnabled) {
                 contextMenu->addSeparator();
@@ -308,7 +307,7 @@ void MainWindow::doWork()
         emit checkSummaryFile(curPath);
         break;
     case Model:
-        emit verifyFileList();
+        emit verify();
         break;
     case ModelNewLost:
         emit updateNewLost();
@@ -339,16 +338,16 @@ void MainWindow::quickAction()
         emit checkSummaryFile(curPath);
         break;
     case Model:
-        if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
-            emit checkCurrentItemSum(curPath);
+        if (ModelKit::isFileRow(ui->treeView->currentIndex))
+            emit verify(ui->treeView->currentIndex);
         break;
     case ModelNewLost:
-        if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
-            emit checkCurrentItemSum(curPath);
+        if (ModelKit::isFileRow(ui->treeView->currentIndex))
+            emit verify(ui->treeView->currentIndex);
         break;
     case UpdateMismatch:
-        if (QFileInfo(paths::joinPath(ui->treeView->workDir, curPath)).isFile())
-            emit checkCurrentItemSum(curPath);
+        if (ModelKit::isFileRow(ui->treeView->currentIndex))
+            emit verify(ui->treeView->currentIndex);
         break;
     default: break;
     }
