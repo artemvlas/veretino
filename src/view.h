@@ -9,6 +9,7 @@
 #include "treemodel.h"
 #include "proxymodel.h"
 #include <QSet>
+#include "datacontainer.h"
 
 class View : public QTreeView
 {
@@ -16,24 +17,33 @@ class View : public QTreeView
 public:
     explicit View(QWidget *parent = nullptr);
     bool isViewFileSystem(); // "true" if treeView's model is "*fs(QFileSystemModel)" or "false" if not
-    void pathAnalyzer(const QString &path);
-    QString workDir;
+    //void pathAnalyzer(const QString &path);
 
-    ProxyModel *proxyModel_ = nullptr;
+    DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
-    QModelIndex currentIndex;
+
+    QString curPathFileSystem;
+    QString curPathModel;
+
+    QModelIndex curIndexFileSystem;
+    QModelIndex curIndexSource;
+    QModelIndex curIndexProxy;
+
 
 public slots:
     void setFileSystemModel();
-    void setTreeModel(ProxyModel *model);
+    void setData(DataContainer *data = nullptr, ModelSelect modelSel = ModelSelect::ModelProxy);
+    void setTreeModel(ModelSelect modelSel = ModelSelect::ModelProxy); // proxy = true -->> set data_->proxyModel_, else set data_->model_
     void setIndexByPath(const QString &path);
     void setFilter(const QSet<FileStatus> status);
+    void toHome();
 
-private:
-    void saveLastPath();
-    void deleteOldModels();
+private:   
+    //void saveLastPath();
+    void changeCurIndexAndPath(const QModelIndex &curIndex);
+    void deleteOldSelModel();
     void connectModel();
-    void sendPathChanged(const QModelIndex &index);
+    //void sendPathChanged(const QModelIndex &index);
     QFileSystemModel *fileSystem = new QFileSystemModel;
 
     QString lastFileSystemPath;
@@ -43,8 +53,9 @@ private:
 signals:
     //void indexChanged(const QModelIndex &index);
     void pathChanged(const QString &path); // by indexToPath()
-    void setMode(Mode::Modes mode);
-    void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false; init. the clearing old data
+    //void setMode(Mode::Modes mode);
+    void modelChanged(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
+    void dataSetted();
     void showMessage(const QString &text, const QString &title = "Info");
     void keyEnterPressed();
 };

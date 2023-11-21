@@ -5,6 +5,7 @@
 #include <QSortFilterProxyModel>
 #include <QSet>
 #include "files.h"
+#include "tools.h"
 
 class ProxyModel : public QSortFilterProxyModel
 {

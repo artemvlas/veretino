@@ -5,14 +5,15 @@
 #include <QObject>
 #include "tools.h"
 #include "treemodel.h"
-#include "datacontainer.h"
+#include "datamaintainer.h"
 
 class Manager : public QObject
 {
     Q_OBJECT
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
-    ~Manager();
+
+    DataMaintainer *dataMaintainer = new DataMaintainer(this);
 
 public slots:
     void processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo);
@@ -23,7 +24,8 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
     void copyStoredChecksum(const QModelIndex& fileItemIndex);
-    void getItemInfo(const QString &path); // info about folder contents or file (size)
+    void getPathInfo(const QString &path); // info about folder contents or file (size)
+    void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
     void updateNewLost(); // remove lost files, add new files
     void updateMismatch(); // update json Database with new checksums for files with failed verification
@@ -31,35 +33,33 @@ public slots:
     void restoreDatabase();
     void modelChanged(const bool isFileSystem); // recive the signal when Model has been changed, FileSystem = true, else = false;
     void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
-    void dbStatus();
-    void deleteCurData();
-    void deleteOldData();
 
 private:
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead all database cheking
-    void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
+    //void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     void showFileCheckResultMessage(bool isMatched);
-    QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo);
-    int calculateChecksums(DataContainer *container, QModelIndex rootIndex = QModelIndex());
-    bool restoreBackup(const QString &databaseFilePath);
+
+    QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
+                              bool independentProcess = true); // <independentProcess> -->> whether it sends a process end signal or not
+    int calculateChecksums(DataContainer *container, QModelIndex rootIndex = QModelIndex(),
+                           FileStatus status = FileStatus::Queued, bool independentProcess = true);
 
     bool canceled = false;
     bool isViewFileSysytem;
-    DataMaintainer *curData = nullptr;
-    DataMaintainer *oldData = nullptr; // curData backup
+
+    //DataContainer *oldData = nullptr; // dataMaintainer->data_ backup
     Settings *settings_;
 
 signals:
+    void processing(bool isProcessing, bool visibleProgress = false);
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void procStatus(const QString &str);
-    void setModel(ProxyModel *model = nullptr);
-    //void workDirChanged(const QString &workDir);
+    void setViewData(DataContainer *data = nullptr, ModelSelect modelSel = ModelSelect::ModelProxy);
+    void setTreeModel(ModelSelect modelSel = ModelSelect::ModelProxy);
     void showMessage(const QString &text, const QString &title = "Info");
-    //void setButtonText(const QString &text);
-    void setMode(Mode::Modes mode);
     void toClipboard(const QString &text);
     void showFiltered(const QSet<FileStatus> status = QSet<FileStatus>());
     void cancelProcess();

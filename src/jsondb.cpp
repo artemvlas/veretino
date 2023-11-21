@@ -46,14 +46,14 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 }
 
 // making "checksums... .ver.json" database
-bool JsonDb::makeJson(const DataContainer* data)
+JsonDb::Result JsonDb::makeJson(const DataContainer* data)
 {
     if (!data || data->model_->isEmpty()) {
         qDebug() << "JsonDb::makeJson | no data to make json db";
-        return false;
+        return NotSaved;
     }
 
-    emit setStatusbarText("Exporting data to json...");
+    //emit setStatusbarText("Exporting data to json...");
     bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
 
     QJsonObject header;
@@ -105,17 +105,21 @@ bool JsonDb::makeJson(const DataContainer* data)
     QJsonDocument doc;
     doc.setArray(mainArray);
 
+    /*
     QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
                                     .arg(data->numbers.numChecksums)
                                     .arg(format::dataSizeReadable(data->numbers.totalSize));
+    */
 
 
     QString pathToSave;
 
     if (saveJsonFile(doc, data->metaData.databaseFilePath)) {
+        return Saved;
+        /*
         emit setStatusbarText("Saved");
         emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity")
-                             .arg(data->metaData.about, databaseStatus, data->databaseFileName()), "Success");
+                             .arg(data->metaData.about, databaseStatus, data->databaseFileName()), "Success");*/
     }
     else {
         header["Working folder"] = data->metaData.workDir;
@@ -126,18 +130,22 @@ bool JsonDb::makeJson(const DataContainer* data)
                                                                              data->databaseFileName());
 
         if (saveJsonFile(doc, pathToSave)) {
+            return SavedToDesktop;
+            /*
             emit setStatusbarText("Saved to Desktop");
             emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
-                                                .arg(data->metaData.about, databaseStatus, data->metaData.workDir, data->databaseFileName()), "Warning");
+                                                .arg(data->metaData.about, databaseStatus, data->metaData.workDir, data->databaseFileName()), "Warning");*/
         }
+        /*
         else {
-            emit setStatusbarText("NOT Saved");
-            emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
-            return false;
-        }
+            return NotSaved;
+            //emit setStatusbarText("NOT Saved");
+            //emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
+            //return false;
+        }*/
     }
 
-    return true;
+    return NotSaved;
 }
 
 DataContainer* JsonDb::parseJson(const QString &filePath)

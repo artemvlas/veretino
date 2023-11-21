@@ -9,76 +9,99 @@ View::View(QWidget *parent)
     : QTreeView(parent)
 {
     sortByColumn(0, Qt::AscendingOrder);
-
     fileSystem->setObjectName("fileSystem");
     fileSystem->setRootPath(QDir::rootPath());
 
-    connect(this, &View::pathChanged, this, &View::pathAnalyzer);
+    //connect(this, &View::pathChanged, this, &View::pathAnalyzer);
     connect(this, &View::modelChanged, this, &View::connectModel);
-    connect(this, &View::modelChanged, this, &View::deleteOldModels);
+    connect(this, &View::modelChanged, this, &View::deleteOldSelModel);
 }
 
 // called every time the model is changed
 void View::connectModel()
 {
-    //connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::indexChanged);
-    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::sendPathChanged);
+    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
+    //connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::sendPathChanged);
 }
 
 void View::setFileSystemModel()
 {
     if (isViewFileSystem()) {
-        setIndexByPath(fileSystem->filePath(currentIndex));
+        setIndexByPath(fileSystem->filePath(curIndexFileSystem));
         return;
     }
 
-    saveLastPath();
     oldSelectionModel_ = selectionModel();
 
     setModel(fileSystem);
     emit modelChanged(true);
 
-    if (!QFileInfo::exists(lastFileSystemPath))
-        lastFileSystemPath = QDir::homePath();
+    data_ = nullptr;
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
-    setIndexByPath(lastFileSystemPath);
+
+    QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 }
 
-void View::setTreeModel(ProxyModel *model)
+void View::setTreeModel(ModelSelect modelSel)
 {
-    if (!model) {
+    if (!data_) {
         setFileSystemModel();
         return;
     }
 
-    saveLastPath();
-    oldSelectionModel_ = selectionModel();
-    proxyModel_ = model;
+    if ((modelSel == ModelSelect::ModelSource && model() == data_->model_)
+        || (modelSel == ModelSelect::ModelProxy && model() == data_->proxyModel_))
+        return; // if current model remains the same
 
-    setModel(proxyModel_);
+    oldSelectionModel_ = selectionModel();
+
+    modelSel == ModelSelect::ModelSource ? setModel(data_->model_) : setModel(data_->proxyModel_);
+
     emit modelChanged(false);
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
+    setIndexByPath(curPathModel);
+
     //hideColumn(ModelKit::ColumnReChecksum);
-    setIndexByPath(lastModelPath);
 }
 
-void View::sendPathChanged(const QModelIndex &index)
+void View::setData(DataContainer *data, ModelSelect modelSel)
 {
-    if (!index.isValid())
+    if (!data) {
+        setFileSystemModel();
         return;
+    }
 
+    data_ = data;
+    setTreeModel(modelSel);
+    emit dataSetted();
+}
+
+void View::changeCurIndexAndPath(const QModelIndex &curIndex)
+{
     if (isViewFileSystem()) {
-        currentIndex = index;
-        emit pathChanged(fileSystem->filePath(index));
+        curIndexFileSystem = curIndex;
+        curPathFileSystem = fileSystem->filePath(curIndex);
+        emit pathChanged(curPathFileSystem);
     }
-    else if (proxyModel_) {
-        currentIndex = proxyModel_->mapToSource(index);
-        emit pathChanged(ModelKit::getPath(currentIndex));
+    else if (data_ && (model() == data_->model_ || model() == data_->proxyModel_)) {
+        if (model() == data_->model_) {
+            curIndexSource = curIndex;
+            curIndexProxy = data_->proxyModel_->mapFromSource(curIndexSource);
+        }
+        else if (model() == data_->proxyModel_) {
+            curIndexProxy = curIndex;
+            curIndexSource = data_->proxyModel_->mapToSource(curIndexProxy);
+        }
+
+        curPathModel = ModelKit::getPath(curIndexSource);
+        emit pathChanged(curPathModel);
     }
+    else
+        qDebug() << "View::changeCurIndexAndPath | FAILURE";
 }
 
 bool View::isViewFileSystem()
@@ -102,10 +125,12 @@ void View::setIndexByPath(const QString &path)
         else
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
-    else if (proxyModel_) {
-        QModelIndex index = ModelKit::getIndex(path, proxyModel_);
+    else if (data_) {
+        QModelIndex index = ModelKit::getIndex(path, model());
+
         if (!index.isValid())
-            index = TreeModelIterator(proxyModel_).nextFile().index(); // select the very first file
+            index = TreeModelIterator(model()).nextFile().index(); // select the very first file
+
         if (index.isValid()) {
             expand(index);
             setCurrentIndex(index);
@@ -114,47 +139,25 @@ void View::setIndexByPath(const QString &path)
     }
 }
 
-void View::pathAnalyzer(const QString &path)
-{
-    if (isViewFileSystem()) {
-        QFileInfo i(path);
-        if (i.isFile()) {
-            if (tools::isDatabaseFile(path)) {
-                emit setMode(Mode::DbFile);
-            }
-            else if (tools::isSummaryFile(path)) {
-                emit setMode(Mode::SumFile);
-            }
-            else {
-                emit setMode(Mode::File);
-            }
-        }
-        else if (i.isDir()) {
-            emit setMode(Mode::Folder);
-        }
-    }
-}
-
 void View::setFilter(const QSet<FileStatus> status)
 {
-    if (proxyModel_) {
-        //saveLastPath();
-        proxyModel_->setFilter(status);
-        //setIndexByPath(lastModelPath);
+    if (this->model() == data_->proxyModel_) {
+        data_->proxyModel_->setFilter(status);
+        setIndexByPath(curPathModel);
     }
 }
 
-void View::saveLastPath()
+void View::toHome()
 {
-    if (isViewFileSystem())
-        lastFileSystemPath = fileSystem->filePath(currentIndex);
-    else if (currentIndex.isValid())
-        lastModelPath = ModelKit::getPath(currentIndex);
+    if (isViewFileSystem()) {
+        curPathFileSystem = QDir::homePath();
+        setIndexByPath(curPathFileSystem);
+    }
 }
 
-void View::deleteOldModels()
+void View::deleteOldSelModel()
 {
-    if (oldSelectionModel_) {
+    if (oldSelectionModel_ && (oldSelectionModel_ != selectionModel())) {
         qDebug() << "'oldSelectionModel' will be deleted...";
         delete oldSelectionModel_;
         oldSelectionModel_ = nullptr;
@@ -164,8 +167,8 @@ void View::deleteOldModels()
 void View::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-        isExpanded(currentIndex) ? collapse(currentIndex)
-                                 : expand(currentIndex);
+        isExpanded(currentIndex()) ? collapse(currentIndex())
+                                   : expand(currentIndex());
         emit keyEnterPressed();
     }
 

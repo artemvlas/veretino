@@ -26,6 +26,7 @@ void ProxyModel::setInitSettings()
     setSortCaseSensitivity(Qt::CaseInsensitive);
     setRecursiveFilteringEnabled(true);
     setSortRole(ModelKit::RawDataRole);
+    //setDynamicSortFilter(false);
 }
 
 bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const

@@ -11,11 +11,13 @@ CONFIG += c++17
 SOURCES += \
     src/aboutdialog.cpp \
     src/datacontainer.cpp \
+    src/datamaintainer.cpp \
     src/files.cpp \
     src/jsondb.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/manager.cpp \
+    src/modeselector.cpp \
     src/procstate.cpp \
     src/proxymodel.cpp \
     src/settingdialog.cpp \
@@ -29,10 +31,12 @@ SOURCES += \
 HEADERS += \
     src/aboutdialog.h \
     src/datacontainer.h \
+    src/datamaintainer.h \
     src/files.h \
     src/jsondb.h \
     src/mainwindow.h \
     src/manager.h \
+    src/modeselector.h \
     src/procstate.h \
     src/proxymodel.h \
     src/settingdialog.h \

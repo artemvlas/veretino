@@ -33,11 +33,6 @@ TreeModelIterator& TreeModelIterator::nextFile()
 {
     return model_->hasChildren(next().index_) ? nextFile() : *this;
 }
-/*
-TreeModelIterator& TreeModelIterator::nextFile(FileStatus status)
-{
-    return (nextFile().status() == status) ? *this : nextFile(status);
-}*/
 
 QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
 {

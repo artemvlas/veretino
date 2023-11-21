@@ -27,9 +27,7 @@ namespace paths {
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
-QString backupFilePath(const QString &filePath);
 
-bool isBackupExists(const QString &dbFilePath);
 bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
 } // namespace paths
 
@@ -59,7 +57,7 @@ QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "numbe
 
 QString fileItemStatus(FileStatus status);
 } // namespace format
-
+/*
 namespace Mode {
 enum Modes {
     NoMode,
@@ -74,5 +72,5 @@ enum Modes {
     EndProcess
 };
 } // namespace Mode
-
+*/
 #endif // TOOLS_H

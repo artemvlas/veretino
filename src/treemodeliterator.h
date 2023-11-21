@@ -10,7 +10,6 @@ public:
     TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex = QModelIndex());
     TreeModelIterator& next();
     TreeModelIterator& nextFile();
-    //TreeModelIterator& nextFile(FileStatus status);
     bool hasNext();
     const QModelIndex& index();
     QVariant data(ModelKit::Columns column = ModelKit::ColumnPath, int role = ModelKit::RawDataRole);

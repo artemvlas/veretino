@@ -17,8 +17,11 @@ public:
     explicit JsonDb(QObject *parent = nullptr);
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
+    enum Result {Saved, SavedToDesktop, NotSaved};
+    Q_ENUM(Result)
+
     DataContainer* parseJson(const QString &filePath);
-    bool makeJson(const DataContainer* data);
+    Result makeJson(const DataContainer* data);
 
 private:
     QString jsonFilePath;
@@ -29,6 +32,7 @@ private:
     QElapsedTimer elapsedTimer;
 
 signals:
+    //void processing(bool isProcessing, bool visibleProgress = false);
     void showMessage(const QString &text, const QString &title = "Info");
     void setStatusbarText(const QString &text = QString()); // text to statusbar
 };
