@@ -58,7 +58,6 @@ private:
 
 signals:
     void setButtonText(const QString &buttonText);
-    void setProgressBar(bool visible = true);
 
     /////////
     void getPathInfo(const QString &path); // info about folder contents or file (size)
@@ -78,6 +77,7 @@ signals:
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);
     void dbStatus();
-};
+}; // class ModeSelector
 
+using Mode = ModeSelector::Mode;
 #endif // MODESELECTOR_H

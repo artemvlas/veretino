@@ -1,5 +1,6 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "datacontainer.h"
+#include <QDebug>
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}
@@ -32,4 +33,9 @@ bool DataContainer::isWorkDirRelative() const
 bool DataContainer::isFilterApplied() const
 {
     return !metaData.filter.extensionsList.isEmpty();
+}
+
+DataContainer::~DataContainer()
+{
+    qDebug() << "DataContainer deleted" << databaseFileName();
 }

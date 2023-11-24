@@ -8,7 +8,6 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 {
     connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::folderContentsByType, this, &ModeSelector::cancelProcess);
-    connect(this, &ModeSelector::cancelProcess, this, [=]{processing(false);});
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -21,36 +20,6 @@ void ModeSelector::processing(bool isProcessing)
 
 void ModeSelector::setMode()
 {
-    /*
-    if (viewMode == Processing && mode != EndProcess)
-        return;
-
-    if (mode == EndProcess) {
-        viewMode = NoMode;
-        ui->progressBar->setVisible(false);
-        ui->progressBar->resetFormat();
-        ui->progressBar->setValue(0);
-        if (ui->treeView->isViewFileSystem()) {
-            ui->treeView->pathAnalyzer(curPath);
-            return;
-        }
-        else {
-            if (previousViewMode == Model) {
-                viewMode = Model;
-                qDebug()<< "previousViewMode setted:" << previousViewMode;
-            }
-            else if (previousViewMode == ModelNewLost) {
-                viewMode = ModelNewLost;
-                qDebug()<< "previousViewMode setted:" << previousViewMode;
-            }
-        }
-    }
-    else {
-        if (viewMode != NoMode)
-            previousViewMode = viewMode;
-        viewMode = mode;
-    }*/
-
     if (isProcessing_) {
         emit setButtonText("Cancel");
         return;
@@ -93,7 +62,7 @@ void ModeSelector::setMode()
     }
 }
 
-ModeSelector::Mode ModeSelector::selectMode(const QString &path)
+Mode ModeSelector::selectMode(const QString &path)
 {
     QFileInfo pathInfo(path);
     if (pathInfo.isDir())
@@ -112,7 +81,7 @@ ModeSelector::Mode ModeSelector::selectMode(const QString &path)
     return curMode;
 }
 
-ModeSelector::Mode ModeSelector::selectMode(const Numbers &numbers)
+Mode ModeSelector::selectMode(const Numbers &numbers)
 {
     if (numbers.numberOf(FileStatus::Mismatched) > 0)
         curMode = UpdateMismatch;
@@ -125,7 +94,7 @@ ModeSelector::Mode ModeSelector::selectMode(const Numbers &numbers)
     return curMode;
 }
 
-ModeSelector::Mode ModeSelector::currentMode()
+Mode ModeSelector::currentMode()
 {
     return curMode;
 }
@@ -176,8 +145,15 @@ void ModeSelector::showFileSystem()
 
 void ModeSelector::doWork()
 {
+    if (isProcessing()) {
+        emit cancelProcess();
+        return;
+    }
+
     switch (curMode) {
         case Folder:
+            // if a very large folder is selected, the file system iteration (info about folder contents process) may continue for some time,
+            // so cancelation is needed before starting a new process
             emit cancelProcess();
             emit processFolderSha(view_->curPathFileSystem, settings_->algorithm);
             break;
@@ -207,6 +183,9 @@ void ModeSelector::doWork()
 
 void ModeSelector::quickAction()
 {
+    if (isProcessing())
+            return;
+
     switch (curMode) {
         case File:
             emit processFileSha(view_->curPathFileSystem, settings_->algorithm, false, true);

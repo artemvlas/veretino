@@ -12,7 +12,6 @@ View::View(QWidget *parent)
     fileSystem->setObjectName("fileSystem");
     fileSystem->setRootPath(QDir::rootPath());
 
-    //connect(this, &View::pathChanged, this, &View::pathAnalyzer);
     connect(this, &View::modelChanged, this, &View::connectModel);
     connect(this, &View::modelChanged, this, &View::deleteOldSelModel);
 }
@@ -21,7 +20,6 @@ View::View(QWidget *parent)
 void View::connectModel()
 {
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
-    //connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::sendPathChanged);
 }
 
 void View::setFileSystemModel()
@@ -34,7 +32,8 @@ void View::setFileSystemModel()
     oldSelectionModel_ = selectionModel();
 
     setModel(fileSystem);
-    emit modelChanged(true);
+
+    emit modelChanged(FileSystem);
 
     data_ = nullptr;
 
@@ -44,22 +43,22 @@ void View::setFileSystemModel()
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 }
 
-void View::setTreeModel(ModelSelect modelSel)
+void View::setTreeModel(ModelView modelSel)
 {
-    if (!data_) {
+    if (!data_ && (modelSel != ModelSource || modelSel != ModelProxy)) {
         setFileSystemModel();
         return;
     }
 
-    if ((modelSel == ModelSelect::ModelSource && model() == data_->model_)
-        || (modelSel == ModelSelect::ModelProxy && model() == data_->proxyModel_))
+    if ((modelSel == ModelSource && model() == data_->model_)
+        || (modelSel == ModelProxy && model() == data_->proxyModel_))
         return; // if current model remains the same
 
     oldSelectionModel_ = selectionModel();
 
-    modelSel == ModelSelect::ModelSource ? setModel(data_->model_) : setModel(data_->proxyModel_);
+    modelSel == ModelSource ? setModel(data_->model_) : setModel(data_->proxyModel_);
 
-    emit modelChanged(false);
+    emit modelChanged(modelSel);
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
@@ -68,7 +67,7 @@ void View::setTreeModel(ModelSelect modelSel)
     //hideColumn(ModelKit::ColumnReChecksum);
 }
 
-void View::setData(DataContainer *data, ModelSelect modelSel)
+void View::setData(DataContainer *data, ModelView modelSel)
 {
     if (!data) {
         setFileSystemModel();
@@ -141,10 +140,15 @@ void View::setIndexByPath(const QString &path)
 
 void View::setFilter(const QSet<FileStatus> status)
 {
-    if (this->model() == data_->proxyModel_) {
+    if (currentViewModel() == ModelProxy) {
         data_->proxyModel_->setFilter(status);
         setIndexByPath(curPathModel);
     }
+}
+
+void View::disableFilter()
+{
+    setFilter();
 }
 
 void View::toHome()
@@ -153,6 +157,18 @@ void View::toHome()
         curPathFileSystem = QDir::homePath();
         setIndexByPath(curPathFileSystem);
     }
+}
+
+ModelView View::currentViewModel()
+{
+    if (model() == fileSystem)
+        return FileSystem;
+    else if (data_ && model() == data_->model_)
+        return ModelSource;
+    else if (data_ && model() == data_->proxyModel_)
+        return ModelProxy;
+    else
+        return NotSetted;
 }
 
 void View::deleteOldSelModel()

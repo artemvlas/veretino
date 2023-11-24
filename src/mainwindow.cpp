@@ -43,8 +43,6 @@ void MainWindow::connections()
 {
     connectManager();
 
-    //connect(this, &MainWindow::cancelProcess, this, [=]{if (viewMode == Mode::Processing) setMode(Mode::EndProcess);});
-
     // ModeSelector
     connect(ui->button, &QPushButton::clicked, modeSelect, &ModeSelector::doWork);
     connect(modeSelect, &ModeSelector::setButtonText, ui->button, &QPushButton::setText);
@@ -55,8 +53,6 @@ void MainWindow::connections()
     connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
     connect(ui->treeView, &View::pathChanged, ui->lineEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
-    //connect(ui->treeView, &View::pathChanged, this, [=](const QString &path){curPath = path; ui->lineEdit->setText(path); if (viewMode != Mode::Processing) emit getItemInfo(path);});
-    //connect(ui->treeView, &View::setMode, this, &MainWindow::setMode);
     connect(ui->treeView, &View::modelChanged, ui->lineEdit, &QLineEdit::setEnabled);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
 
@@ -68,7 +64,6 @@ void MainWindow::connections()
     connect(ui->actionOpenJson, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionShowFs, &QAction::triggered, modeSelect, &ModeSelector::showFileSystem);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{aboutDialog about; about.exec();});
-
 }
 
 void MainWindow::connectManager()
@@ -76,7 +71,7 @@ void MainWindow::connectManager()
     // qRegisterMetaType<QVector<int>>("QVector<int>"); // uncomment when building on Windows (qt 5.15.2)
     qRegisterMetaType<QSet<FileStatus>>("QSet<FileStatus>");
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
-    qRegisterMetaType<ModelSelect>("ModelSelect");
+    qRegisterMetaType<ModelView>("ModelView");
 
     manager->moveToThread(thread);
 
@@ -119,9 +114,6 @@ void MainWindow::connectManager()
     connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
     connect(manager, &Manager::procStatus, ui->progressBar, &QProgressBar::setFormat);
 
-    // transfer settings and modes
-    //connect(manager, &Manager::setMode, this, &MainWindow::setMode);
-
     // change view
     connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
@@ -134,7 +126,6 @@ void MainWindow::connectManager()
 
 void MainWindow::onCustomContextMenu(const QPoint &point)
 {
-    //using namespace Mode;
     QModelIndex index = ui->treeView->indexAt(point);
 
     QMenu *contextMenu = new QMenu(ui->treeView);
@@ -194,9 +185,12 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
                 contextMenu->addAction("Update the Database with new checksums", modeSelect, &ModeSelector::updateMismatch);
 
             else if (modeSelect->currentMode() == ModeSelector::ModelNewLost) {
-                if (ui->treeView->data_ && ui->treeView->model() == ui->treeView->data_->proxyModel_)
-                    contextMenu->addAction("Show New/Lost only", this, [=]{ui->treeView->data_->proxyModel_->setFilter({Files::New, Files::Missing});});
-                contextMenu->addAction("Update the DataBase with New/Lost files", modeSelect, &ModeSelector::updateNewLost);
+
+                if (ui->treeView->currentViewModel() == ModelView::ModelProxy
+                    && !ui->treeView->data_->proxyModel_->isFilterEnabled)
+                    contextMenu->addAction("Show New/Lost only", this, [=]{ui->treeView->setFilter({FileStatus::New, FileStatus::Missing});});
+
+                contextMenu->addAction("Update the Database with New/Lost files", modeSelect, &ModeSelector::updateNewLost);
                 contextMenu->addSeparator();
             }
 
@@ -213,12 +207,11 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
                 contextMenu->addAction("Check ALL files against stored checksums", modeSelect, &ModeSelector::verifyDb);
             }
-            if (ui->treeView->data_
-                && ui->treeView->model() == ui->treeView->data_->proxyModel_
+            if (ui->treeView->currentViewModel() == ModelView::ModelProxy
                 && ui->treeView->data_->proxyModel_->isFilterEnabled) {
 
                 contextMenu->addSeparator();
-                contextMenu->addAction("Show All", this, [=]{ui->treeView->data_->proxyModel_->disableFilter();});
+                contextMenu->addAction("Show All", ui->treeView, &View::disableFilter);
             }
         }
         contextMenu->addSeparator();
@@ -266,138 +259,6 @@ void MainWindow::dialogOpenJson()
     }
 }
 
-/*
-void MainWindow::setMode(Mode::Modes mode)
-{
-    //qDebug() << "MainWindow::setMode | mode:" << mode;
-    using namespace Mode;
-
-    if (viewMode == Processing && mode != EndProcess)
-        return;
-
-    if (mode == EndProcess) {
-        viewMode = NoMode;
-        ui->progressBar->setVisible(false);
-        ui->progressBar->resetFormat();
-        ui->progressBar->setValue(0);
-        if (ui->treeView->isViewFileSystem()) {
-            ui->treeView->pathAnalyzer(curPath);
-            return;
-        }
-        else {
-            if (previousViewMode == Model) {
-                viewMode = Model;
-                qDebug()<< "previousViewMode setted:" << previousViewMode;
-            }
-            else if (previousViewMode == ModelNewLost) {
-                viewMode = ModelNewLost;
-                qDebug()<< "previousViewMode setted:" << previousViewMode;
-            }
-        }
-    }
-    else {
-        if (viewMode != NoMode)
-            previousViewMode = viewMode;
-        viewMode = mode;
-    }
-
-    switch (viewMode) {
-    case Folder:
-        ui->button->setText(format::algoToStr(settings_->algorithm).append(": Folder"));
-        break;
-    case File:
-        ui->button->setText(format::algoToStr(settings_->algorithm).append(": File"));
-        break;
-    case DbFile:
-        ui->button->setText("Open DataBase");
-        break;
-    case SumFile:
-        ui->button->setText("Check");
-        break;
-    case Model:
-        ui->button->setText("Verify All");
-        break;
-    case ModelNewLost:
-        ui->button->setText("Update New/Lost");
-        break;
-    case UpdateMismatch:
-        ui->button->setText("Update");
-        break;
-    case Processing:
-        ui->progressBar->setVisible(true);
-        ui->button->setText("Cancel");
-        break;
-    default:
-        qDebug() << "MainWindow::setMode | WRONG MODE" << mode;
-        break;
-    }
-}
-*/
-/*
-void MainWindow::doWork()
-{
-    using namespace Mode;
-    switch (viewMode) {
-        case Folder:
-            emit cancelProcess();
-            emit processFolderSha(curPath, settings_->algorithm);
-            break;
-        case File:
-            emit processFileSha(curPath, settings_->algorithm);
-            break;
-        case DbFile:
-            emit parseJsonFile(curPath);
-            break;
-        case SumFile:
-            emit checkSummaryFile(curPath);
-            break;
-        case Model:
-            emit verify();
-            break;
-        case ModelNewLost:
-            emit updateNewLost();
-            break;
-        case UpdateMismatch:
-            emit updateMismatch();
-            break;
-        case Processing:
-            emit cancelProcess();
-            break;
-        default:
-            qDebug() << "MainWindow::doWork() | Wrong viewMode:" << viewMode;
-            break;
-    }
-}
-
-void MainWindow::quickAction()
-{
-    using namespace Mode;
-    switch (viewMode) {
-        case File:
-            emit processFileSha(curPath, settings_->algorithm, false, true);
-            break;
-        case DbFile:
-            emit parseJsonFile(curPath);
-            break;
-        case SumFile:
-            emit checkSummaryFile(curPath);
-            break;
-        case Model:
-            if (ModelKit::isFileRow(ui->treeView->currentIndex))
-                emit verify(ui->treeView->currentIndex);
-            break;
-        case ModelNewLost:
-            if (ModelKit::isFileRow(ui->treeView->currentIndex))
-                emit verify(ui->treeView->currentIndex);
-            break;
-        case UpdateMismatch:
-            if (ModelKit::isFileRow(ui->treeView->currentIndex))
-                emit verify(ui->treeView->currentIndex);
-            break;
-        default: break;
-    }
-}
-*/
 void MainWindow::showMessage(const QString &message, const QString &title)
 {
     QMessageBox messageBox;
@@ -415,14 +276,6 @@ void MainWindow::setProgressBar(bool processing, bool visible)
     ui->progressBar->setVisible(processing && visible);
     ui->progressBar->setValue(0);
     ui->progressBar->resetFormat();
-
-    /*if (processing && visible && !ui->progressBar->isVisible())
-        ui->progressBar->setVisible(true);
-    else if (!processing) {
-        ui->progressBar->setVisible(false);
-        ui->progressBar->resetFormat();
-        ui->progressBar->setValue(0);
-    }*/
 }
 
 bool MainWindow::processAbortPrompt()

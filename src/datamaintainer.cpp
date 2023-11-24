@@ -98,7 +98,6 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
         return 0;
     }
 
-    //emit setStatusbarText(QString("%1 files found").arg(numAdded));
     updateNumbers();
 
     if (independentProcess)
@@ -152,13 +151,12 @@ Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QMo
     while (iter.hasNext()) {
         iter.nextFile();
 
-        if (iter.data(ModelKit::ColumnChecksum).isValid() && !iter.data(ModelKit::ColumnChecksum).toString().isEmpty()) {
+        if (iter.data(ModelKit::ColumnChecksum).isValid()
+            && !iter.data(ModelKit::ColumnChecksum).toString().isEmpty()) {
+
             ++num.numChecksums;
             num.totalSize += iter.data(ModelKit::ColumnSize).toLongLong();
         }
-
-        //if (!iter.data(ModelKit::ColumnStatus).isValid())
-        //    continue;
 
         if (!num.holder.contains(iter.status())) {
             num.holder.insert(iter.status(), 1);
@@ -384,8 +382,6 @@ void DataMaintainer::exportToJson()
     updateNumbers();
     makeBackup();
 
-
-
     //JsonDb *json = new JsonDb;
     //connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     //connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
@@ -580,6 +576,5 @@ DataMaintainer::~DataMaintainer()
 {
     removeBackupFile();
     clearData();
-    //emit setPermanentStatus();
     qDebug() << "DataMaintainer deleted";
 }

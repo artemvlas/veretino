@@ -6,6 +6,7 @@
 #include "tools.h"
 #include "treemodel.h"
 #include "datamaintainer.h"
+#include "view.h"
 
 class Manager : public QObject
 {
@@ -31,7 +32,7 @@ public slots:
     void updateMismatch(); // update json Database with new checksums for files with failed verification
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
-    void modelChanged(const bool isFileSystem); // recive the signal when Model has been changed, FileSystem = true, else = false;
+    void modelChanged(ModelView modelView); // recive the signal when Model has been changed
     void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
 
 private:
@@ -42,8 +43,8 @@ private:
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool independentProcess = true); // <independentProcess> -->> whether it sends a process end signal or not
-    int calculateChecksums(DataContainer *container, QModelIndex rootIndex = QModelIndex(),
-                           FileStatus status = FileStatus::Queued, bool independentProcess = true);
+    int calculateChecksums(FileStatus status = FileStatus::Queued,
+                           QModelIndex rootIndex = QModelIndex(), bool independentProcess = true);
 
     bool canceled = false;
     bool isViewFileSysytem;
@@ -57,8 +58,8 @@ signals:
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void procStatus(const QString &str);
-    void setViewData(DataContainer *data = nullptr, ModelSelect modelSel = ModelSelect::ModelProxy);
-    void setTreeModel(ModelSelect modelSel = ModelSelect::ModelProxy);
+    void setViewData(DataContainer *data = nullptr, ModelView modelSel = ModelView::ModelProxy);
+    void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text);
     void showFiltered(const QSet<FileStatus> status = QSet<FileStatus>());

@@ -40,6 +40,7 @@ class DataContainer : public QObject
     Q_OBJECT
 public:
     explicit DataContainer(QObject *parent = nullptr);
+    ~DataContainer();
 
     ProxyModel* setProxyModel();
     QString databaseFileName() const;
@@ -47,15 +48,10 @@ public:
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
 
-    enum ModelSelect {ModelSource, ModelProxy};
-    //Q_ENUM(ModelSelect)
-
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
     MetaData metaData;
     Numbers numbers;
 }; // class DataContainer
-
-using ModelSelect = DataContainer::ModelSelect;
 
 #endif // DATACONTAINER_H
