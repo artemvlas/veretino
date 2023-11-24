@@ -53,7 +53,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
     connect(ui->treeView, &View::pathChanged, ui->lineEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
-    connect(ui->treeView, &View::modelChanged, ui->lineEdit, &QLineEdit::setEnabled);
+    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->lineEdit->setEnabled(modelView == ModelView::FileSystem);});
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
 
     connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text().replace("\\", "/"));});
