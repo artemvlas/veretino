@@ -17,19 +17,23 @@ public:
     explicit JsonDb(QObject *parent = nullptr);
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
-    enum Result {Saved, SavedToDesktop, NotSaved};
+    enum Result {Saved, SavedToDesktop, NotSaved, Canceled};
     Q_ENUM(Result)
 
     DataContainer* parseJson(const QString &filePath);
     Result makeJson(const DataContainer* data);
 
-private:
-    QString jsonFilePath;
+public slots:
+    void cancelProcess();
+
+private:   
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
 
+    QString jsonFilePath;
     QElapsedTimer elapsedTimer;
+    bool canceled = false;
 
 signals:
     //void processing(bool isProcessing, bool visibleProgress = false);

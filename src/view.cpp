@@ -174,7 +174,7 @@ ModelView View::currentViewModel()
 void View::deleteOldSelModel()
 {
     if (oldSelectionModel_ && (oldSelectionModel_ != selectionModel())) {
-        qDebug() << "'oldSelectionModel' will be deleted...";
+        //qDebug() << "'oldSelectionModel' will be deleted...";
         delete oldSelectionModel_;
         oldSelectionModel_ = nullptr;
     }

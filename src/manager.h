@@ -42,9 +42,12 @@ private:
     void showFileCheckResultMessage(bool isMatched);
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
-                              bool independentProcess = true); // <independentProcess> -->> whether it sends a process end signal or not
+                              bool finalProcess = true); // <finalProcess> -->> whether it sends a process end signal or not
     int calculateChecksums(FileStatus status = FileStatus::Queued,
-                           QModelIndex rootIndex = QModelIndex(), bool independentProcess = true);
+                           bool finalProcess = true);
+    int calculateChecksums(QModelIndex rootIndex,
+                           FileStatus status = FileStatus::Queued,
+                           bool finalProcess = true);
 
     bool canceled = false;
     bool isViewFileSysytem;

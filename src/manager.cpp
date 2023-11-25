@@ -127,7 +127,7 @@ void Manager::resetDatabase()
 
 void Manager::restoreDatabase()
 {
-    if (dataMaintainer->restoreBackupFile())
+    if (dataMaintainer->data_ && dataMaintainer->data_->restoreBackupFile())
         createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
     else
         emit setStatusbarText("No saved changes");
@@ -151,27 +151,10 @@ void Manager::updateNewLost()
     if (!dataMaintainer->data_)
         return;
 
-    emit showFiltered();
-
     QString itemsInfo;
 
     int numNew = dataMaintainer->data_->numbers.numberOf(FileStatus::New);
     int numMissing = dataMaintainer->data_->numbers.numberOf(FileStatus::Missing);
-
-    if (numNew > 0) {
-        emit setTreeModel(ModelView::ModelSource);
-
-        calculateChecksums(FileStatus::New);
-
-        if (canceled) {
-            emit setTreeModel(ModelView::ModelProxy);
-            return;
-        }
-
-        itemsInfo = QString("added %1").arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Added));
-        if (numMissing > 0)
-            itemsInfo.append(", ");
-    }
 
     if (numMissing > 0) {
         if (numMissing < (dataMaintainer->data_->numbers.numChecksums + numNew))
@@ -180,13 +163,23 @@ void Manager::updateNewLost()
             emit showMessage("Failure to delete all database items", "Warning");
             return;
         }
+
+        if (numMissing > 0)
+            itemsInfo.prepend(", ");
+    }
+
+    if (numNew > 0) {
+        calculateChecksums(FileStatus::New);
+
+        if (canceled)
+            return;
+
+        itemsInfo.prepend(QString("added %1").arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Added)));
     }
 
     dataMaintainer->data_->metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
 
     dataMaintainer->exportToJson();
-
-    emit setTreeModel(ModelView::ModelProxy);
 }
 
 // update the Database with new checksums for files with failed verification
@@ -195,14 +188,10 @@ void Manager::updateMismatch()
     if (!dataMaintainer->data_)
         return;
 
-    emit showFiltered();
-    emit setTreeModel(ModelView::ModelSource);
-
     dataMaintainer->data_->metaData.about = QString("%1 checksums updated")
                                             .arg(dataMaintainer->updateMismatchedChecksums());
 
     dataMaintainer->exportToJson();
-    emit setTreeModel(ModelView::ModelProxy);
 }
 
 void Manager::verify(const QModelIndex &curIndex)
@@ -247,13 +236,9 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     if (!dataMaintainer)
         return;
 
-    emit showFiltered(); // if proxy model filtering is enabled, starting a Big Data verification is very slow, even if switching to Source Model, so disable filtering
-    emit setTreeModel(ModelView::ModelSource);
-
-    calculateChecksums(FileStatus::NotChecked, folderItemIndex);
+    calculateChecksums(folderItemIndex, FileStatus::NotChecked);
 
     if (canceled) {
-        emit setTreeModel(ModelView::ModelProxy);
         return;
     }
 
@@ -287,8 +272,6 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
                                  .arg(subfolderName)
                                  .arg(subMatched), "Success");
     }
-
-    emit setTreeModel(ModelView::ModelProxy);
 
     if (dataMaintainer->data_->numbers.numberOf(FileStatus::Mismatched) > 0) {
         emit showFiltered({FileStatus::Mismatched});
@@ -335,7 +318,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
         showFileCheckResultMessage(sum == checkSum.toLower());
 }
 
-QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool independentProcess)
+QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess)
 {
     ProcState state(QFileInfo(filePath).size());
     ShaCalculator shaCalc(algo);
@@ -355,13 +338,18 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     else if (!canceled)
         emit setStatusbarText("read error");
 
-    if (independentProcess)
+    if (finalProcess)
         emit processing(false);
 
     return checkSum;
 }
 
-int Manager::calculateChecksums(FileStatus status, QModelIndex rootIndex, bool independentProcess)
+int Manager::calculateChecksums(FileStatus status, bool finalProcess)
+{
+    return calculateChecksums(QModelIndex(), status, finalProcess);
+}
+
+int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool finalProcess)
 {
     if (!dataMaintainer->data_) {
         qDebug() << "Manager::calculateChecksums | No data";
@@ -439,7 +427,7 @@ int Manager::calculateChecksums(FileStatus status, QModelIndex rootIndex, bool i
 
     dataMaintainer->updateNumbers();
 
-    if (independentProcess)
+    if (finalProcess)
         emit processing(false); // set Mode view, hide progress bar
 
     return doneNum;

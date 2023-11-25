@@ -8,6 +8,10 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 {
     connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::folderContentsByType, this, &ModeSelector::cancelProcess);
+
+    connect(this, &ModeSelector::updateNewLost, this, &ModeSelector::prepareView);
+    connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
+    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!ModelKit::isFileRow(ind)) prepareView();});
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -15,6 +19,21 @@ void ModeSelector::processing(bool isProcessing)
     if (isProcessing_ != isProcessing) {
         isProcessing_ = isProcessing;
         setMode();
+
+        // when the process is completed, return to the Proxy Model view
+        if (!isProcessing && view_->currentViewModel() == ModelView::ModelSource)
+            view_->setTreeModel(ModelView::ModelProxy);
+    }
+}
+
+void ModeSelector::prepareView()
+{
+    if (view_->currentViewModel() == ModelView::ModelProxy) {
+        view_->disableFilter(); // if proxy model filtering is enabled, starting a Big Data queuing/verification may be very slow,
+                                // even if switching to Source Model, so disable filtering first
+
+        view_->setTreeModel(ModelView::ModelSource); // set the Source Model for the duration of the process,
+                                                    // because the Proxy Model is not friendly with Big Data
     }
 }
 

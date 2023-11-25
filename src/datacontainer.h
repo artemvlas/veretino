@@ -48,6 +48,11 @@ public:
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
 
+    bool isBackupExists();
+    bool makeBackup(bool forceOverwrite = false);
+    bool restoreBackupFile();
+    void removeBackupFile();
+
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
     MetaData metaData;

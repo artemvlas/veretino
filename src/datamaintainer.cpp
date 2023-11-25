@@ -3,17 +3,30 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
-#include "jsondb.h"
 #include <QDirIterator>
 #include "treemodeliterator.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
-    : QObject(parent) {}
+    : QObject(parent)
+{
+    connections();
+}
 
 DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
     : QObject(parent)
 {
+    connections();
     setSourceData(initData);
+}
+
+void DataMaintainer::connections()
+{
+    connect(this, &DataMaintainer::cancelProcess, this, [=]{canceled = true;}, Qt::DirectConnection);
+
+    // JsonDb
+    connect(this, &DataMaintainer::cancelProcess, json, &JsonDb::cancelProcess, Qt::DirectConnection);
+    connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
+    connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 }
 
 void DataMaintainer::setSourceData()
@@ -51,7 +64,7 @@ void DataMaintainer::clearOldData()
 }
 
 // add new files to data_->model_
-int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnreadable, bool independentProcess)
+int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnreadable, bool finalProcess)
 {
     if (!data_)
         return 0;
@@ -91,6 +104,9 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
         }
     }
 
+    if (finalProcess || canceled)
+        emit processing(false);
+
     if (canceled) {
         qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
         clearData();
@@ -99,9 +115,6 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
     }
 
     updateNumbers();
-
-    if (independentProcess)
-        emit processing(false);
 
     return numAdded;
 }
@@ -301,7 +314,7 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
     return savedSum;
 }
 
-int DataMaintainer::clearDataFromLostFiles()
+int DataMaintainer::clearDataFromLostFiles(bool finalProcess)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::clearDataFromLostFiles | NO data_";
@@ -310,6 +323,8 @@ int DataMaintainer::clearDataFromLostFiles()
 
     int number = 0;
     TreeModelIterator iter(data_->model_);
+
+    emit processing(true);
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Missing) {
@@ -322,10 +337,13 @@ int DataMaintainer::clearDataFromLostFiles()
     if (number > 0)
         updateNumbers();
 
+    if (finalProcess)
+        emit processing(false);
+
     return number;
 }
 
-int DataMaintainer::updateMismatchedChecksums()
+int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::updateMismatchedChecksums | NO data_";
@@ -334,6 +352,8 @@ int DataMaintainer::updateMismatchedChecksums()
 
     int number = 0;
     TreeModelIterator iter(data_->model_);
+
+    emit processing(true);
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Mismatched) {
@@ -351,18 +371,15 @@ int DataMaintainer::updateMismatchedChecksums()
     if (number > 0)
         updateNumbers();
 
+    if (finalProcess)
+        emit processing(false);
+
     return number;
 }
 
 bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
-    JsonDb *json = new JsonDb;
-    connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
-    connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
-
     bool result = setSourceData(json->parseJson(jsonFilePath));
-
-    json->deleteLater();
 
     /*if (canceled || data_->model_->isEmpty()) {
         clearData();
@@ -374,50 +391,23 @@ bool DataMaintainer::importJson(const QString &jsonFilePath)
     return result;
 }
 
-void DataMaintainer::exportToJson()
+void DataMaintainer::exportToJson(bool finalProcess)
 {
     if (!data_)
         return;
 
     updateNumbers();
-    makeBackup();
-
-    //JsonDb *json = new JsonDb;
-    //connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
-    //connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
-
-    //JsonDb::Result result = json->makeJson(data_);
-
-    //json->deleteLater();
-
-    QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
-                                    .arg(data_->numbers.numChecksums)
-                                    .arg(format::dataSizeReadable(data_->numbers.totalSize));
-
+    data_->makeBackup();
     data_->metaData.saveDateTime = format::currentDateTime();
 
-    emit setStatusbarText("Exporting data to json...");
+    emit processing(true);
 
-    switch (JsonDb().makeJson(data_)) {
-    case JsonDb::Saved:
-        emit setStatusbarText("Saved");
-        emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity")
-                             .arg(data_->metaData.about, databaseStatus, data_->databaseFileName()), "Success");
-        break;
-    case JsonDb::SavedToDesktop:
-        emit setStatusbarText("Saved to Desktop");
-        emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
-                                            .arg(data_->metaData.about, databaseStatus, data_->metaData.workDir, data_->databaseFileName()), "Warning");
-        break;
-    case JsonDb::NotSaved:
-        emit setStatusbarText("NOT Saved");
-        emit showMessage(QString("Unable to save json file: %1").arg(data_->metaData.databaseFilePath), "Error");
-        break;
-    default:
-        break;
-    }
+    json->makeJson(data_);
 
     emit dataUpdated();
+
+    if (finalProcess)
+        emit processing(false);
 }
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
@@ -521,41 +511,6 @@ void DataMaintainer::dbStatus()
     emit showMessage(result, "Database status");
 }
 
-bool DataMaintainer::isBackupExists()
-{
-    return (data_ && QFile::exists(data_->backupFilePath()));
-}
-
-bool DataMaintainer::makeBackup(bool forceOverwrite)
-{
-    if (!data_ || !QFile::exists(data_->metaData.databaseFilePath))
-        return false;
-
-    if (forceOverwrite)
-        removeBackupFile();
-
-    return QFile::copy(data_->metaData.databaseFilePath,
-                       data_->backupFilePath());
-}
-
-bool DataMaintainer::restoreBackupFile()
-{
-    if (isBackupExists()) {
-        if (QFile::exists(data_->metaData.databaseFilePath)) {
-            if (!QFile::remove(data_->metaData.databaseFilePath))
-                return false;
-        }
-        return QFile::rename(data_->backupFilePath(), data_->metaData.databaseFilePath);
-    }
-    return false;
-}
-
-void DataMaintainer::removeBackupFile()
-{
-    if (isBackupExists())
-        QFile::remove(data_->backupFilePath());
-}
-
 QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)
 {
     if (!data_ || !curIndex.isValid())
@@ -567,14 +522,8 @@ QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)
     return curIndex;
 }
 
-void DataMaintainer::cancelProcess()
-{
-    canceled = true;
-}
-
 DataMaintainer::~DataMaintainer()
 {
-    removeBackupFile();
     clearData();
     qDebug() << "DataMaintainer deleted";
 }

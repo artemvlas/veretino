@@ -20,8 +20,6 @@ public:
         Model,
         ModelNewLost,
         UpdateMismatch,
-        //Processing,
-        //EndProcess
     };
     Q_ENUM(Mode)
 
@@ -29,6 +27,8 @@ public:
     void setMode();
     Mode currentMode();
     bool isProcessing();
+    //QSet<Mode> fsModes {Folder, File, DbFile, SumFile};
+    //QSet<Mode> dbModes {Model, ModelNewLost, UpdateMismatch};
 
     // tasks execution
     void quickAction();
@@ -46,6 +46,7 @@ public:
 
 public slots:
     void processing(bool isProcessing);
+    void prepareView();
 
 private:
     Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct

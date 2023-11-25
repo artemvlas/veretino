@@ -53,7 +53,9 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
         return NotSaved;
     }
 
-    //emit setStatusbarText("Exporting data to json...");
+    canceled = false;
+    emit setStatusbarText("Exporting data to json...");
+
     bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
 
     QJsonObject header;
@@ -80,7 +82,7 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
 
     TreeModelIterator iter(data->model_);
 
-    while (iter.hasNext()) {
+    while (iter.hasNext() && !canceled) {
         iter.nextFile();
         if (iter.data(ModelKit::ColumnStatus).value<FileStatus>() == FileStatus::Unreadable) {
             unreadableFiles.append(iter.path());
@@ -105,21 +107,22 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
     QJsonDocument doc;
     doc.setArray(mainArray);
 
-    /*
     QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
                                     .arg(data->numbers.numChecksums)
                                     .arg(format::dataSizeReadable(data->numbers.totalSize));
-    */
 
+    if (canceled) {
+        qDebug() << "JsonDb::makeJson | Canceled";
+        return Canceled;
+    }
 
     QString pathToSave;
 
     if (saveJsonFile(doc, data->metaData.databaseFilePath)) {
-        return Saved;
-        /*
         emit setStatusbarText("Saved");
         emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity")
-                             .arg(data->metaData.about, databaseStatus, data->databaseFileName()), "Success");*/
+                             .arg(data->metaData.about, databaseStatus, data->databaseFileName()), "Success");
+        return Saved;
     }
     else {
         header["Working folder"] = data->metaData.workDir;
@@ -130,22 +133,18 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
                                                                              data->databaseFileName());
 
         if (saveJsonFile(doc, pathToSave)) {
-            return SavedToDesktop;
-            /*
             emit setStatusbarText("Saved to Desktop");
             emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
-                                                .arg(data->metaData.about, databaseStatus, data->metaData.workDir, data->databaseFileName()), "Warning");*/
+                                 .arg(data->metaData.about, databaseStatus, data->metaData.workDir, data->databaseFileName()), "Warning");
+            return SavedToDesktop;
         }
-        /*
-        else {
-            return NotSaved;
-            //emit setStatusbarText("NOT Saved");
-            //emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
-            //return false;
-        }*/
-    }
 
-    return NotSaved;
+        else {
+            emit setStatusbarText("NOT Saved");
+            emit showMessage(QString("Unable to save json file: %1").arg(data->metaData.databaseFilePath), "Error");
+            return NotSaved;
+        }
+    }
 }
 
 DataContainer* JsonDb::parseJson(const QString &filePath)
@@ -169,6 +168,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
+    canceled = false;
     QJsonObject header(mainArray.at(0).toObject());
     DataContainer* parsedData = new DataContainer;
 
@@ -210,7 +210,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     QDir dir(parsedData->metaData.workDir);
     QDirIterator it(parsedData->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext()) {
+    while (it.hasNext() && !canceled) {
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
@@ -230,16 +230,16 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     // populating the main data
     emit setStatusbarText("Parsing Json database...");
     QJsonObject::const_iterator i;
-    for (i = filelistData.constBegin(); i != filelistData.constEnd(); ++i) {
+    for (i = filelistData.constBegin(); !canceled && i != filelistData.constEnd(); ++i) {
         FileValues curFileValues;
 
         QString fullPath = paths::joinPath(parsedData->metaData.workDir, i.key());
         if (QFileInfo::exists(fullPath)) {
             curFileValues.size = QFileInfo(fullPath).size();
-            curFileValues.status = Files::NotChecked;
+            curFileValues.status = FileStatus::NotChecked;
         }
         else
-            curFileValues.status = Files::Missing;
+            curFileValues.status = FileStatus::Missing;
 
         curFileValues.checksum = i.value().toString();
 
@@ -250,17 +250,28 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
-            for (int var = 0; var < unreadableFiles.size(); ++var) {
+            for (int var = 0; !canceled && var < unreadableFiles.size(); ++var) {
                 FileValues curFileValues;
-                curFileValues.status = Files::Unreadable;
+                curFileValues.status = FileStatus::Unreadable;
                 parsedData->model_->addFile(unreadableFiles.at(var).toString(), curFileValues);
             }
         }
     }
 
-    emit setStatusbarText("done");
+    emit setStatusbarText();
+
+    if (canceled) {
+        qDebug() << "JsonDb::parseJson | Canceled:" << paths::basicName(filePath);
+        delete parsedData;
+        return nullptr;
+    }
 
     qDebug() << "JsonDb::parseJson | parsing took" << format::millisecToReadable(elapsedTimer.elapsed(), false);
 
     return parsedData;
+}
+
+void JsonDb::cancelProcess()
+{
+    canceled = true;
 }
