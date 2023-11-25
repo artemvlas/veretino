@@ -52,7 +52,7 @@ void View::setFileSystemModel()
 
 void View::setTreeModel(ModelView modelSel)
 {
-    if (!data_ && (modelSel != ModelSource || modelSel != ModelProxy)) {
+    if (!data_ || (modelSel != ModelSource && modelSel != ModelProxy)) {
         setFileSystemModel();
         return;
     }
@@ -67,7 +67,10 @@ void View::setTreeModel(ModelView modelSel)
 
     emit modelChanged(modelSel);
 
-    hideColumn(ModelKit::ColumnReChecksum);
+    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
+        showAllColumns();
+    else
+        hideColumn(ModelKit::ColumnReChecksum);
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
