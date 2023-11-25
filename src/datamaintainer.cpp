@@ -454,6 +454,9 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 
 void DataMaintainer::dbStatus()
 {
+    if (!data_)
+        return;
+
     updateNumbers();
 
     QString result = "DB filename: " + data_->databaseFileName();

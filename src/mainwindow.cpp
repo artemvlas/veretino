@@ -163,7 +163,8 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             }
         }
     }
-
+    else if (ui->treeView->currentViewModel() == ModelView::NotSetted)
+        contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
     else {
         if (modeSelect->isProcessing()) {
             contextMenu->addAction("Cancel operation", modeSelect, &ModeSelector::cancelProcess);
