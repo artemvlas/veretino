@@ -131,7 +131,9 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
     QMenu *contextMenu = new QMenu(ui->treeView);
     connect(contextMenu, &QMenu::aboutToHide, contextMenu, &QMenu::deleteLater);
 
-    if (ui->treeView->isViewFileSystem()) {
+    if (ui->treeView->currentViewModel() == ModelView::NotSetted)
+        contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
+    else if (ui->treeView->isViewFileSystem()) {
         contextMenu->addAction("to Home", ui->treeView, &View::toHome);
         contextMenu->addSeparator();
 
@@ -163,8 +165,6 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
             }
         }
     }
-    else if (ui->treeView->currentViewModel() == ModelView::NotSetted)
-        contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
     else {
         if (modeSelect->isProcessing()) {
             contextMenu->addAction("Cancel operation", modeSelect, &ModeSelector::cancelProcess);

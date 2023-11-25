@@ -75,6 +75,9 @@ void ModeSelector::setMode()
         case UpdateMismatch:
             emit setButtonText("Update");
             break;
+        case NoMode:
+            emit setButtonText("Browse");
+            break;
         default:
             qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode;
             break;
@@ -193,6 +196,9 @@ void ModeSelector::doWork()
             break;
         case UpdateMismatch:
             emit updateMismatch();
+            break;
+        case NoMode:
+            showFileSystem();
             break;
         default:
             qDebug() << "MainWindow::doWork() | Wrong MODE:" << curMode;

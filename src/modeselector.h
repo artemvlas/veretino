@@ -52,7 +52,7 @@ private:
     Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct
     Mode selectMode(const QString &path); // select Mode based on file system path
 
-    Mode curMode;
+    Mode curMode = NoMode;
     bool isProcessing_ = false;
     View *view_;
     Settings *settings_;

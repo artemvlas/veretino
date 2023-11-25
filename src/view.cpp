@@ -76,6 +76,8 @@ void View::setData(DataContainer *data, ModelView modelSel)
 
     data_ = data;
     setTreeModel(modelSel);
+    curPathFileSystem = data->metaData.databaseFilePath;
+
     emit dataSetted();
 }
 
