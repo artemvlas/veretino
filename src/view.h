@@ -42,10 +42,14 @@ public slots:
 
     ModelView currentViewModel();
 
+    void headerContextMenuRequested(const QPoint &point);
+
 private:
     void changeCurIndexAndPath(const QModelIndex &curIndex);
     void deleteOldSelModel();
     void connectModel();
+    void toggleColumnVisibility(int column);
+    void showAllColumns();
 
     QFileSystemModel *fileSystem = new QFileSystemModel;
 

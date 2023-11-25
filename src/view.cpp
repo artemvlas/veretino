@@ -4,6 +4,9 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include "treemodeliterator.h"
+#include <QHeaderView>
+#include <QAction>
+#include <QMenu>
 
 View::View(QWidget *parent)
     : QTreeView(parent)
@@ -11,6 +14,9 @@ View::View(QWidget *parent)
     sortByColumn(0, Qt::AscendingOrder);
     fileSystem->setObjectName("fileSystem");
     fileSystem->setRootPath(QDir::rootPath());
+
+    header()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(header(), &QHeaderView::customContextMenuRequested, this, &View::headerContextMenuRequested);
 
     connect(this, &View::modelChanged, this, &View::connectModel);
     connect(this, &View::modelChanged, this, &View::deleteOldSelModel);
@@ -37,6 +43,7 @@ void View::setFileSystemModel()
 
     data_ = nullptr;
 
+    showAllColumns();
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
 
@@ -60,11 +67,11 @@ void View::setTreeModel(ModelView modelSel)
 
     emit modelChanged(modelSel);
 
+    hideColumn(ModelKit::ColumnReChecksum);
+
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
-    setIndexByPath(curPathModel);
-
-    //hideColumn(ModelKit::ColumnReChecksum);
+    setIndexByPath(curPathModel);   
 }
 
 void View::setData(DataContainer *data, ModelView modelSel)
@@ -191,4 +198,44 @@ void View::keyPressEvent(QKeyEvent* event)
     }
 
     QTreeView::keyPressEvent(event);
+}
+
+void View::toggleColumnVisibility(int column)
+{
+    setColumnHidden(column, !isColumnHidden(column));
+}
+
+void View::showAllColumns()
+{
+    if (!model())
+        return;
+
+    for (int i = 0; i < model()->columnCount(); ++i) {
+        showColumn(i);
+    }
+}
+
+void View::headerContextMenuRequested(const QPoint &point)
+{
+    if (currentViewModel() != ModelSource && currentViewModel() != ModelProxy)
+        return;
+
+    QMenu *headerContextMenu = new QMenu(this);
+    QAction *showChecksumColumn = new QAction("Checksums", headerContextMenu);
+    QAction *showReChecksumColumn = new QAction("ReChecksums", headerContextMenu);
+
+    showChecksumColumn->setCheckable(true);
+    showReChecksumColumn->setCheckable(true);
+
+    showChecksumColumn->setChecked(!isColumnHidden(ModelKit::ColumnChecksum));
+    showReChecksumColumn->setChecked(!isColumnHidden(ModelKit::ColumnReChecksum));
+
+    connect(headerContextMenu, &QMenu::aboutToHide, headerContextMenu, &QMenu::deleteLater);
+    connect(showChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ModelKit::ColumnChecksum);});
+    connect(showReChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ModelKit::ColumnReChecksum);});
+
+    headerContextMenu->addAction(showChecksumColumn);
+    headerContextMenu->addAction(showReChecksumColumn);
+
+    headerContextMenu->exec(header()->mapToGlobal(point));
 }
