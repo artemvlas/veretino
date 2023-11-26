@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>About</string>
+   <string>About Veretino</string>
   </property>
   <widget class="QLabel" name="labelAuthor">
    <property name="geometry">

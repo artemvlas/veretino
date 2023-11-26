@@ -59,7 +59,7 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
     bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
 
     QJsonObject header;
-    header["Created with"] = "Veretino dev_0.3.0 https://github.com/artemvlas/veretino";
+    header["Created with"] = QString("Veretino %1 https://github.com/artemvlas/veretino").arg(APP_VERSION);
     header["Files number"] = data->numbers.numChecksums;
     header["Folder"] = paths::basicName(data->metaData.workDir);
     header["Used algorithm"] = format::algoToStr(data->metaData.algorithm);
