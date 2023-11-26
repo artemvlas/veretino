@@ -88,10 +88,12 @@ signals:
 using FileStatus = Files::FileStatus;
 
 struct FileValues {
+    FileValues(FileStatus initStatus = FileStatus::New) : status(initStatus) {}
+
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
     qint64 size = 0; // file size in bytes
-    FileStatus status = FileStatus::New;
+    FileStatus status;
 }; // struct FileValues
 
 #endif // FILES_H

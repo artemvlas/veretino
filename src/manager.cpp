@@ -44,7 +44,7 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
                                                        QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath)));
 
     // create the filelist
-    dataMaintainer->addActualFiles(FileStatus::Queued);
+    dataMaintainer->addActualFiles(FileStatus::Queued, false);
 
     // exception and cancelation handling
     if (canceled || !dataMaintainer->data_) {
