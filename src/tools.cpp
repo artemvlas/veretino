@@ -148,65 +148,6 @@ bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 }
 } // namespace paths
 
-namespace ModelKit {
-QString getPath(const QModelIndex &curIndex)
-{
-    QString path;
-    QModelIndex newIndex = siblingAtRow(curIndex, ColumnPath);
-
-    if (newIndex.isValid()) {
-        path = newIndex.data().toString();
-
-        while (newIndex.parent().isValid()) {
-            path = paths::joinPath(newIndex.parent().data().toString(), path);
-            newIndex = newIndex.parent();
-        }
-    }
-
-    return path;
-}
-
-QModelIndex getIndex(const QString &path, const QAbstractItemModel *model)
-{
-    QModelIndex curIndex;
-
-    if (!path.isEmpty()) {
-        QModelIndex parentIndex;
-        curIndex = model->index(0, 0);
-        QStringList parts = path.split('/');
-
-        foreach (const QString &str, parts) {
-            for (int i = 0; curIndex.isValid(); ++i) {
-                curIndex = model->index(i, 0, parentIndex);
-                if (curIndex.data().toString() == str) {
-                    //qDebug() << "***" << str << "finded on" << i << "row";
-                    parentIndex = model->index(i, 0, parentIndex);
-                    break;
-                }
-                //qDebug() << "*** Looking for:" << str << curIndex.data();
-            }
-        }
-        //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
-    }
-
-    return curIndex;
-}
-
-QModelIndex siblingAtRow(const QModelIndex &curIndex, Columns column)
-{
-    return curIndex.isValid() ? curIndex.model()->index(curIndex.row(), column, curIndex.parent())
-                              : QModelIndex();
-}
-
-// the TreeModel implies that if an item has children, then it is a folder, if not, then it is a file
-bool isFileRow(const QModelIndex &curIndex)
-{
-    QModelIndex index = siblingAtRow(curIndex, ColumnPath);
-
-    return (index.isValid() && !index.model()->hasChildren(index));
-}
-} // namespace ModelKit
-
 namespace format {
 QString currentDateTime()
 {

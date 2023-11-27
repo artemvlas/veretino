@@ -2,6 +2,7 @@
 #include "proxymodel.h"
 #include "tools.h"
 #include <QDebug>
+#include "treemodel.h"
 
 ProxyModel::ProxyModel(QObject *parent)
     : QSortFilterProxyModel{parent}
@@ -25,7 +26,7 @@ void ProxyModel::setInitSettings()
 {
     setSortCaseSensitivity(Qt::CaseInsensitive);
     setRecursiveFilteringEnabled(true);
-    setSortRole(ModelKit::RawDataRole);
+    setSortRole(TreeModel::RawDataRole);
     //setDynamicSortFilter(false);
 }
 
@@ -34,9 +35,9 @@ bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent
     if (!isFilterEnabled || fileStatuses_.isEmpty())
         return true;
 
-    QModelIndex curIndex = sourceModel()->index(sourceRow, ModelKit::ColumnStatus, sourceParent);
+    QModelIndex curIndex = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
 
-    return fileStatuses_.contains(curIndex.data(ModelKit::RawDataRole).value<FileStatus>());
+    return fileStatuses_.contains(curIndex.data(TreeModel::RawDataRole).value<FileStatus>());
 }
 
 bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const

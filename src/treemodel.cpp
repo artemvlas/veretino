@@ -15,7 +15,7 @@ TreeModel::~TreeModel()
     qDebug() << this << "deleted";
 }
 
-bool TreeModel::isEmpty()
+bool TreeModel::isEmpty() const
 {
     return (rootItem->childCount() == 0);
 }
@@ -45,12 +45,12 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
             // the last item is considered a file
             if (var + 1 == splitPath.size()) {
                 if (values.size > 0)
-                    iData.replace(ModelKit::ColumnSize, values.size);
+                    iData.replace(ColumnSize, values.size);
 
-                iData.replace(ModelKit::ColumnStatus, QVariant::fromValue(values.status));
+                iData.replace(ColumnStatus, QVariant::fromValue(values.status));
 
                 if (!values.checksum.isEmpty())
-                    iData.replace(ModelKit::ColumnChecksum, values.checksum);
+                    iData.replace(ColumnChecksum, values.checksum);
 
                 isAdded = true;
             }
@@ -72,14 +72,14 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-bool TreeModel::setItemData(const QModelIndex &curIndex, ModelKit::Columns column, const QVariant &itemData)
+bool TreeModel::setItemData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
 {   
     if (!curIndex.isValid() || curIndex.model() != this) {
         qDebug() << "TreeModel::setItemData | Wrong index";
         return false;
     }
 
-    QModelIndex idx = ModelKit::siblingAtRow(curIndex, column);
+    QModelIndex idx = siblingAtRow(curIndex, column);
 
     return idx.isValid() && setData(idx, itemData);
 }
@@ -131,8 +131,6 @@ int TreeModel::columnCount(const QModelIndex &parent) const
 
 QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 {
-    using namespace ModelKit;
-
     if (!curIndex.isValid())
         return QVariant();
 
@@ -160,7 +158,7 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     bool result = item->setData(curIndex.column(), value);
 
     if (result)
-        emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, ModelKit::RawDataRole});
+        emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
 
     return result;
 }
@@ -190,4 +188,61 @@ TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
             return item;
     }
     return rootItem;
+}
+
+QString TreeModel::getPath(const QModelIndex &curIndex)
+{
+    QString path;
+    QModelIndex newIndex = siblingAtRow(curIndex, ColumnPath);
+
+    if (newIndex.isValid()) {
+        path = newIndex.data().toString();
+
+        while (newIndex.parent().isValid()) {
+            path = paths::joinPath(newIndex.parent().data().toString(), path);
+            newIndex = newIndex.parent();
+        }
+    }
+
+    return path;
+}
+
+QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *model)
+{
+    QModelIndex curIndex;
+
+    if (!path.isEmpty()) {
+        QModelIndex parentIndex;
+        curIndex = model->index(0, 0);
+        QStringList parts = path.split('/');
+
+        foreach (const QString &str, parts) {
+            for (int i = 0; curIndex.isValid(); ++i) {
+                curIndex = model->index(i, 0, parentIndex);
+                if (curIndex.data().toString() == str) {
+                    //qDebug() << "***" << str << "finded on" << i << "row";
+                    parentIndex = model->index(i, 0, parentIndex);
+                    break;
+                }
+                //qDebug() << "*** Looking for:" << str << curIndex.data();
+            }
+        }
+        //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
+    }
+
+    return curIndex;
+}
+
+QModelIndex TreeModel::siblingAtRow(const QModelIndex &curIndex, Column column)
+{
+    return curIndex.isValid() ? curIndex.model()->index(curIndex.row(), column, curIndex.parent())
+                              : QModelIndex();
+}
+
+// the TreeModel implies that if an item has children, then it is a folder, if not, then it is a file
+bool TreeModel::isFileRow(const QModelIndex &curIndex)
+{
+    QModelIndex index = siblingAtRow(curIndex, ColumnPath);
+
+    return (index.isValid() && !index.model()->hasChildren(index));
 }

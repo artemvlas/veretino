@@ -84,11 +84,11 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
 
     while (iter.hasNext() && !canceled) {
         iter.nextFile();
-        if (iter.data(ModelKit::ColumnStatus).value<FileStatus>() == FileStatus::Unreadable) {
+        if (iter.data(Column::ColumnStatus).value<FileStatus>() == FileStatus::Unreadable) {
             unreadableFiles.append(iter.path());
         }
         else {
-            QString checksum = iter.data(ModelKit::ColumnChecksum).toString();
+            QString checksum = iter.data(Column::ColumnChecksum).toString();
             if (!checksum.isEmpty())
                 storedData.insert(iter.path(), checksum);
         }

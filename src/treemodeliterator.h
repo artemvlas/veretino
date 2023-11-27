@@ -3,6 +3,7 @@
 #define TREEMODELITERATOR_H
 #include <QAbstractItemModel>
 #include "tools.h"
+#include "treemodel.h"
 
 class TreeModelIterator
 {
@@ -12,7 +13,7 @@ public:
     TreeModelIterator& nextFile();
     bool hasNext();
     const QModelIndex& index();
-    QVariant data(ModelKit::Columns column = ModelKit::ColumnPath, int role = ModelKit::RawDataRole);
+    QVariant data(Column column = Column::ColumnPath, int role = TreeModel::RawDataRole);
     QString path();
     FileStatus status();
 

@@ -196,8 +196,8 @@ void Manager::updateMismatch()
 
 void Manager::verify(const QModelIndex &curIndex)
 {
-    ModelKit::isFileRow(curIndex) ? verifyFileItem(curIndex)
-                                  : verifyFolderItem(dataMaintainer->sourceIndex(curIndex));
+    TreeModel::isFileRow(curIndex) ? verifyFileItem(curIndex)
+                                   : verifyFolderItem(dataMaintainer->sourceIndex(curIndex));
 }
 
 //check only selected file instead all database cheking
@@ -206,7 +206,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     if (!dataMaintainer)
         return;
 
-    FileStatus storedStatus = ModelKit::siblingAtRow(fileItemIndex, ModelKit::ColumnStatus).data(ModelKit::RawDataRole).value<FileStatus>();
+    FileStatus storedStatus = TreeModel::siblingAtRow(fileItemIndex, Column::ColumnStatus).data(TreeModel::RawDataRole).value<FileStatus>();
 
     if (storedStatus == FileStatus::Missing) {
         emit showMessage("File does not exist", "Missing file");
@@ -216,13 +216,13 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     QString savedSum = dataMaintainer->getStoredChecksum(fileItemIndex);
 
     if (!savedSum.isEmpty()) {
-        dataMaintainer->data_->model_->setItemData(fileItemIndex, ModelKit::ColumnStatus, FileStatus::Processing);
+        dataMaintainer->data_->model_->setItemData(fileItemIndex, Column::ColumnStatus, FileStatus::Processing);
 
-        QString sum = calculateChecksum(paths::joinPath(dataMaintainer->data_->metaData.workDir, ModelKit::getPath(fileItemIndex)),
+        QString sum = calculateChecksum(paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex)),
                                         dataMaintainer->data_->metaData.algorithm);
 
         if (sum.isEmpty()) {
-            dataMaintainer->data_->model_->setItemData(fileItemIndex, ModelKit::ColumnStatus, storedStatus);
+            dataMaintainer->data_->model_->setItemData(fileItemIndex, Column::ColumnStatus, storedStatus);
         }
         else {
             showFileCheckResultMessage(dataMaintainer->updateChecksum(fileItemIndex, sum));
@@ -258,7 +258,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
                                  .arg(format::algoToStr(dataMaintainer->data_->metaData.algorithm)), "Success");
     }
     else {// if subfolder
-        QString subfolderName = ModelKit::siblingAtRow(folderItemIndex, ModelKit::ColumnPath).data().toString();
+        QString subfolderName = TreeModel::siblingAtRow(folderItemIndex, Column::ColumnPath).data().toString();
         Numbers num = dataMaintainer->updateNumbers(dataMaintainer->data_->model_, folderItemIndex);
         int subMatched = num.numberOf(FileStatus::Matched) + num.numberOf(FileStatus::Added) + num.numberOf(FileStatus::ChecksumUpdated);
 
@@ -401,13 +401,13 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                                       .arg(numQueued)
                                       .arg(doneData));
 
-            dataMaintainer->data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, FileStatus::Processing);
+            dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::Processing);
 
             QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()),
                                                  dataMaintainer->data_->metaData.algorithm);
 
             if (canceled) {
-                dataMaintainer->data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, status);
+                dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, status);
 
                 if (status != FileStatus::Queued)
                     dataMaintainer->changeFilesStatuses(FileStatus::Queued, status, rootIndex);
@@ -417,7 +417,7 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
             }
 
             if (checksum.isEmpty())
-                dataMaintainer->data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, FileStatus::Unreadable);
+                dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
             else {
                 dataMaintainer->updateChecksum(iter.index(), checksum);
                 ++doneNum;

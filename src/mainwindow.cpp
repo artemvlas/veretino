@@ -68,7 +68,7 @@ void MainWindow::connections()
 
 void MainWindow::connectManager()
 {
-    // qRegisterMetaType<QVector<int>>("QVector<int>"); // uncomment when building on Windows (qt 5.15.2)
+    qRegisterMetaType<QVector<int>>("QVector<int>"); // for building on Windows (qt 5.15.2)
     qRegisterMetaType<QSet<FileStatus>>("QSet<FileStatus>");
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<ModelView>("ModelView");
@@ -197,7 +197,7 @@ void MainWindow::onCustomContextMenu(const QPoint &point)
 
             if (modeSelect->currentMode() == ModeSelector::Model || modeSelect->currentMode() == ModeSelector::ModelNewLost) {
                 if (index.isValid()) {
-                    if (ModelKit::isFileRow(index)) {
+                    if (TreeModel::isFileRow(index)) {
                         contextMenu->addAction("Check current file", modeSelect, &ModeSelector::verifyItem);
                         contextMenu->addAction("Copy stored checksum to clipboard", modeSelect, &ModeSelector::copyStoredChecksumToClipboard);
                     }

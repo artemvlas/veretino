@@ -31,17 +31,6 @@ QString joinPath(const QString &absolutePath, const QString &addPath); // return
 bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
 } // namespace paths
 
-namespace ModelKit {
-enum ItemDataRoles {RawDataRole = 1000};
-enum Columns {ColumnPath, ColumnSize, ColumnStatus, ColumnChecksum, ColumnReChecksum};
-
-QString getPath(const QModelIndex &curIndex); // build path by current index data
-QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
-QModelIndex siblingAtRow(const QModelIndex &curIndex, ModelKit::Columns column); // get the index of an item of the same row (curIndex row) and a specified column
-
-bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or folder(false)
-} // namespace ModelKit
-
 namespace format {
 QString currentDateTime();
 
@@ -57,20 +46,5 @@ QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "numbe
 
 QString fileItemStatus(FileStatus status);
 } // namespace format
-/*
-namespace Mode {
-enum Modes {
-    NoMode,
-    Folder,
-    File,
-    DbFile,
-    SumFile,
-    Model,
-    ModelNewLost,
-    UpdateMismatch,
-    Processing,
-    EndProcess
-};
-} // namespace Mode
-*/
+
 #endif // TOOLS_H

@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "tools.h"
 #include "treemodeliterator.h"
+#include "treemodel.h"
 
 Files::Files(QObject *parent)
     : QObject(parent)
@@ -169,13 +170,13 @@ QString Files::itemInfo(const QAbstractItemModel* model, const QSet<FileStatus>&
     TreeModelIterator it(model, rootIndex);
 
     while (it.hasNext()) {
-        QVariant itData = it.nextFile().data(ModelKit::ColumnStatus);
+        QVariant itData = it.nextFile().data(Column::ColumnStatus);
 
         if (itData.isValid()
             && (fileStatuses.isEmpty()
                 || fileStatuses.contains(static_cast<FileStatus>(itData.toInt())))) {
 
-            dataSize += it.data(ModelKit::ColumnSize).toLongLong();
+            dataSize += it.data(Column::ColumnSize).toLongLong();
             ++filesNumber;
         }
     }

@@ -16,6 +16,10 @@ public:
     explicit TreeModel(QObject *parent = nullptr);
     ~TreeModel();
 
+    enum ItemDataRoles {RawDataRole = 1000};
+    enum Column {ColumnPath, ColumnSize, ColumnStatus, ColumnChecksum, ColumnReChecksum};
+    Q_ENUM(Column)
+
     QVariant data(const QModelIndex &curIndex, int role) const override;
     Qt::ItemFlags flags(const QModelIndex &curIndex) const override;
     QVariant headerData(int section, Qt::Orientation orientation,
@@ -28,12 +32,15 @@ public:
     bool setData(const QModelIndex &curIndex, const QVariant &value,
                         int role = Qt::EditRole) override;
 
-    bool isEmpty();
-
+    bool isEmpty() const;
     void populate(const FileList &filesData);
-
-    bool setItemData(const QModelIndex &curIndex, ModelKit::Columns column,
+    bool setItemData(const QModelIndex &curIndex, Column column,
                      const QVariant &itemData = QVariant());
+
+    static QString getPath(const QModelIndex &curIndex); // build path by current index data
+    static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
+    static QModelIndex siblingAtRow(const QModelIndex &curIndex, Column column); // get the index of an item of the same row (curIndex row) and a specified column
+    static bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or folder(false)
 
 public slots:
     bool addFile(const QString &filePath, const FileValues &values);
@@ -41,6 +48,8 @@ public slots:
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *rootItem;
-};
+}; // class TreeModel
+
+using Column = TreeModel::Column;
 
 #endif // TREEMODEL_H

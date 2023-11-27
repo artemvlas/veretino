@@ -11,7 +11,7 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 
     connect(this, &ModeSelector::updateNewLost, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
-    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!ModelKit::isFileRow(ind)) prepareView();});
+    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!TreeModel::isFileRow(ind)) prepareView();});
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -222,15 +222,15 @@ void ModeSelector::quickAction()
             emit checkSummaryFile(view_->curPathFileSystem);
             break;
         case Model:
-            if (ModelKit::isFileRow(view_->curIndexSource))
+            if (TreeModel::isFileRow(view_->curIndexSource))
                 emit verify(view_->curIndexSource);
             break;
         case ModelNewLost:
-            if (ModelKit::isFileRow(view_->curIndexSource))
+            if (TreeModel::isFileRow(view_->curIndexSource))
                 emit verify(view_->curIndexSource);
             break;
         case UpdateMismatch:
-            if (ModelKit::isFileRow(view_->curIndexSource))
+            if (TreeModel::isFileRow(view_->curIndexSource))
                 emit verify(view_->curIndexSource);
             break;
         default: break;

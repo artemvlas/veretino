@@ -4,9 +4,9 @@
 TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex)
     : model_(model)
 {
-    rootIndex = ModelKit::siblingAtRow(rootIndex, ModelKit::ColumnPath);
+    rootIndex = TreeModel::siblingAtRow(rootIndex, Column::ColumnPath);
 
-    if (ModelKit::isFileRow(rootIndex))
+    if (TreeModel::isFileRow(rootIndex))
         rootIndex = rootIndex.parent();
 
     if (rootIndex.isValid()) {
@@ -66,17 +66,17 @@ const QModelIndex& TreeModelIterator::index()
     return index_;
 }
 
-QVariant TreeModelIterator::data(ModelKit::Columns column, int role)
+QVariant TreeModelIterator::data(Column column, int role)
 {
     return model_->data(model_->sibling(index_.row(), column, index_), role);
 }
 
 QString TreeModelIterator::path()
 {
-    return ModelKit::getPath(index_);
+    return TreeModel::getPath(index_);
 }
 
 FileStatus TreeModelIterator::status()
 {
-    return data(ModelKit::ColumnStatus).value<FileStatus>();
+    return data(Column::ColumnStatus).value<FileStatus>();
 }

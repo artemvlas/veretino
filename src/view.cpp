@@ -70,7 +70,7 @@ void View::setTreeModel(ModelView modelSel)
     if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
         showAllColumns();
     else
-        hideColumn(ModelKit::ColumnReChecksum);
+        hideColumn(Column::ColumnReChecksum);
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
@@ -108,7 +108,7 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
             curIndexSource = data_->proxyModel_->mapToSource(curIndexProxy);
         }
 
-        curPathModel = ModelKit::getPath(curIndexSource);
+        curPathModel = TreeModel::getPath(curIndexSource);
         emit pathChanged(curPathModel);
     }
     else
@@ -137,7 +137,7 @@ void View::setIndexByPath(const QString &path)
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
     else if (data_) {
-        QModelIndex index = ModelKit::getIndex(path, model());
+        QModelIndex index = TreeModel::getIndex(path, model());
 
         if (!index.isValid())
             index = TreeModelIterator(model()).nextFile().index(); // select the very first file
@@ -230,12 +230,12 @@ void View::headerContextMenuRequested(const QPoint &point)
     showChecksumColumn->setCheckable(true);
     showReChecksumColumn->setCheckable(true);
 
-    showChecksumColumn->setChecked(!isColumnHidden(ModelKit::ColumnChecksum));
-    showReChecksumColumn->setChecked(!isColumnHidden(ModelKit::ColumnReChecksum));
+    showChecksumColumn->setChecked(!isColumnHidden(Column::ColumnChecksum));
+    showReChecksumColumn->setChecked(!isColumnHidden(Column::ColumnReChecksum));
 
     connect(headerContextMenu, &QMenu::aboutToHide, headerContextMenu, &QMenu::deleteLater);
-    connect(showChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ModelKit::ColumnChecksum);});
-    connect(showReChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ModelKit::ColumnReChecksum);});
+    connect(showChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnChecksum);});
+    connect(showReChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnReChecksum);});
 
     headerContextMenu->addAction(showChecksumColumn);
     headerContextMenu->addAction(showReChecksumColumn);

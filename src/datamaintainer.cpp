@@ -164,11 +164,11 @@ Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QMo
     while (iter.hasNext()) {
         iter.nextFile();
 
-        if (iter.data(ModelKit::ColumnChecksum).isValid()
-            && !iter.data(ModelKit::ColumnChecksum).toString().isEmpty()) {
+        if (iter.data(Column::ColumnChecksum).isValid()
+            && !iter.data(Column::ColumnChecksum).toString().isEmpty()) {
 
             ++num.numChecksums;
-            num.totalSize += iter.data(ModelKit::ColumnSize).toLongLong();
+            num.totalSize += iter.data(Column::ColumnSize).toLongLong();
         }
 
         if (!num.holder.contains(iter.status())) {
@@ -211,13 +211,13 @@ qint64 DataMaintainer::totalSizeOfListedFiles(const QAbstractItemModel *model, c
     TreeModelIterator it(model, rootIndex);
 
     while (it.hasNext()) {
-        QVariant itData = it.nextFile().data(ModelKit::ColumnStatus);
+        QVariant itData = it.nextFile().data(Column::ColumnStatus);
 
         if (itData.isValid()
             && (fileStatuses.isEmpty()
                 || fileStatuses.contains(static_cast<FileStatus>(itData.toInt())))) {
 
-            result += it.data(ModelKit::ColumnSize).toLongLong();
+            result += it.data(Column::ColumnSize).toLongLong();
         }
     }
 
@@ -234,17 +234,17 @@ bool DataMaintainer::updateChecksum(QModelIndex fileRowIndex, const QString &com
     if (fileRowIndex.model() == data_->proxyModel_)
         fileRowIndex = data_->proxyModel_->mapToSource(fileRowIndex);
 
-    QString storedChecksum = siblingAtRow(fileRowIndex, ModelKit::ColumnChecksum).data().toString();
+    QString storedChecksum = TreeModel::siblingAtRow(fileRowIndex, Column::ColumnChecksum).data().toString();
 
     if (storedChecksum.isEmpty()) {
-        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnChecksum, computedChecksum);
-        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnStatus, FileStatus::Added);
+        data_->model_->setItemData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
+        data_->model_->setItemData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
     }
     else if (storedChecksum == computedChecksum)
-        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnStatus, FileStatus::Matched);
+        data_->model_->setItemData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
     else {
-        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnReChecksum, computedChecksum);
-        data_->model_->setItemData(fileRowIndex, ModelKit::ColumnStatus, FileStatus::Mismatched);
+        data_->model_->setItemData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
+        data_->model_->setItemData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
     }
 
     return (storedChecksum.isEmpty() || storedChecksum == computedChecksum);
@@ -262,7 +262,7 @@ int DataMaintainer::changeFilesStatuses(FileStatus currentStatus, FileStatus new
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == currentStatus) {
-            data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, newStatus);
+            data_->model_->setItemData(iter.index(), Column::ColumnStatus, newStatus);
             ++number;
         }
     }
@@ -291,13 +291,13 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
         return QString();
     }
 
-    if (!ModelKit::isFileRow(fileRowIndex)) {
+    if (!TreeModel::isFileRow(fileRowIndex)) {
         qDebug() << "DataMaintainer::getStoredChecksum | Specified index does not belong to the file row";
         return QString();
     }
 
-    FileStatus fileStatus = ModelKit::siblingAtRow(fileRowIndex, ModelKit::ColumnStatus)
-                                        .data(ModelKit::RawDataRole).value<FileStatus>();
+    FileStatus fileStatus = TreeModel::siblingAtRow(fileRowIndex, TreeModel::ColumnStatus)
+                                        .data(TreeModel::RawDataRole).value<FileStatus>();
 
     QString savedSum;
 
@@ -306,7 +306,7 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
     else if (fileStatus == FileStatus::Unreadable)
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
     else {
-        savedSum = ModelKit::siblingAtRow(fileRowIndex, ModelKit::ColumnChecksum).data().toString();
+        savedSum = TreeModel::siblingAtRow(fileRowIndex, Column::ColumnChecksum).data().toString();
         if (savedSum.isEmpty())
             emit showMessage("No checksum in the database.", "No checksum");
     }
@@ -328,8 +328,8 @@ int DataMaintainer::clearDataFromLostFiles(bool finalProcess)
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Missing) {
-            data_->model_->setItemData(iter.index(), ModelKit::ColumnChecksum);
-            data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, FileStatus::Removed);
+            data_->model_->setItemData(iter.index(), Column::ColumnChecksum);
+            data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::Removed);
             ++number;
         }
     }
@@ -357,12 +357,12 @@ int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Mismatched) {
-            QString reChecksum = iter.data(ModelKit::ColumnReChecksum).toString();
+            QString reChecksum = iter.data(Column::ColumnReChecksum).toString();
 
             if (!reChecksum.isEmpty()) {
-                data_->model_->setItemData(iter.index(), ModelKit::ColumnChecksum, reChecksum);
-                data_->model_->setItemData(iter.index(), ModelKit::ColumnReChecksum);
-                data_->model_->setItemData(iter.index(), ModelKit::ColumnStatus, FileStatus::ChecksumUpdated);
+                data_->model_->setItemData(iter.index(), Column::ColumnChecksum, reChecksum);
+                data_->model_->setItemData(iter.index(), Column::ColumnReChecksum);
+                data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::ChecksumUpdated);
                 ++number;
             }
         }
@@ -414,11 +414,11 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 {
     QString text;
 
-    if (ModelKit::isFileRow(curIndex)) {
+    if (TreeModel::isFileRow(curIndex)) {
         QString result;
-        QVariant itemData = ModelKit::siblingAtRow(curIndex, ModelKit::ColumnSize).data(ModelKit::RawDataRole);
+        QVariant itemData = TreeModel::siblingAtRow(curIndex, Column::ColumnSize).data(TreeModel::RawDataRole);
         if (itemData.isValid()) {
-            result = QString("%1 (%2)").arg(ModelKit::siblingAtRow(curIndex, ModelKit::ColumnPath).data().toString(),
+            result = QString("%1 (%2)").arg(TreeModel::siblingAtRow(curIndex, Column::ColumnPath).data().toString(),
                                                                     format::dataSizeReadable(itemData.toLongLong()));
         }
         return result;
