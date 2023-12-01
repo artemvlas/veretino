@@ -119,7 +119,6 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
-    connect(manager, &Manager::showFiltered, ui->treeView, &View::setFilter);
 
     thread->start();
 }

@@ -272,10 +272,6 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
                                  .arg(subfolderName)
                                  .arg(subMatched), "Success");
     }
-
-    if (dataMaintainer->data_->numbers.numberOf(FileStatus::Mismatched) > 0) {
-        emit showFiltered({FileStatus::Mismatched});
-    }
 }
 
 void Manager::checkSummaryFile(const QString &path)

@@ -51,8 +51,6 @@ private:
 
     bool canceled = false;
     bool isViewFileSysytem;
-
-    //DataContainer *oldData = nullptr; // dataMaintainer->data_ backup
     Settings *settings_;
 
 signals:
@@ -65,7 +63,6 @@ signals:
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text);
-    void showFiltered(const QSet<FileStatus> status = QSet<FileStatus>());
     void cancelProcess();
 };
 
