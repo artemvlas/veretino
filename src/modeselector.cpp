@@ -43,7 +43,7 @@ void ModeSelector::connectActions()
     connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, &ModeSelector::updateMismatch);
     connect(actionUpdateDbWithNewLost, &QAction::triggered, this, &ModeSelector::updateNewLost);
     connect(actionShowNewLostOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
-    connect(actionShowMismatchesOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::Mismatched}); else view_->disableFilter();});
+    connect(actionShowMismatchesOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter(FileStatus::Mismatched); else view_->disableFilter();});
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
@@ -66,7 +66,7 @@ void ModeSelector::processing(bool isProcessing)
 
             // if there are Mismatches in the Model, filter them
             if (view_->data_->numbers.numberOf(FileStatus::Mismatched) > 0)
-                view_->setFilter({FileStatus::Mismatched});
+                view_->setFilter(FileStatus::Mismatched);
         }
     }
 }

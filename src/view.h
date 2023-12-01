@@ -36,7 +36,7 @@ public slots:
     void setData(DataContainer *data = nullptr, ModelView modelSel = ModelProxy);
     void setTreeModel(ModelView modelSel = ModelProxy);
     void setIndexByPath(const QString &path);
-    //void setFilter(const FileStatus status);
+    void setFilter(const FileStatus status);
     void setFilter(const QSet<FileStatus> statuses = QSet<FileStatus>());
     void disableFilter();
     void toHome();

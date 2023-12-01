@@ -149,11 +149,11 @@ void View::setIndexByPath(const QString &path)
         }
     }
 }
-/*
+
 void View::setFilter(const FileStatus status)
 {
-    setFilter({status});
-}*/
+    setFilter(QSet<FileStatus>({status}));
+}
 
 void View::setFilter(const QSet<FileStatus> statuses)
 {
