@@ -16,6 +16,7 @@ public:
     ~ProxyModel();
     void setFilter(QSet<FileStatus> statuses);
     void disableFilter();
+    QSet<FileStatus> currentlyFiltered();
     bool isFilterEnabled = false;
 
 protected:

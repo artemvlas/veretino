@@ -65,6 +65,7 @@ public:
     QAction *actionUpdateDbWithReChecksums = new QAction("Update the Database with new checksums", this);
     QAction *actionUpdateDbWithNewLost = new QAction("Update the Database with New/Lost files", this);
     QAction *actionShowNewLostOnly = new QAction("Show New/Lost only", this);
+    QAction *actionShowMismatchesOnly = new QAction("Show only Mismatches", this);
     QAction *actionShowAll = new QAction("Show All", this);
     QAction *actionCheckCurFileFromModel = new QAction("Check current file", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check current Subfolder", this);

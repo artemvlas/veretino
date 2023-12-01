@@ -9,6 +9,9 @@
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), settings_(settings)
 {
+    actionShowNewLostOnly->setCheckable(true);
+    actionShowMismatchesOnly->setCheckable(true);
+
     connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::folderContentsByType, this, &ModeSelector::cancelProcess);
 
@@ -39,7 +42,8 @@ void ModeSelector::connectActions()
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
     connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, &ModeSelector::updateMismatch);
     connect(actionUpdateDbWithNewLost, &QAction::triggered, this, &ModeSelector::updateNewLost);
-    connect(actionShowNewLostOnly, &QAction::triggered, this, [=]{view_->setFilter({FileStatus::New, FileStatus::Missing});});
+    connect(actionShowNewLostOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
+    connect(actionShowMismatchesOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::Mismatched}); else view_->disableFilter();});
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
@@ -328,14 +332,24 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
 
             viewContextMenu->addSeparator();
             viewContextMenu->addAction(actionShowFS);
+            if (view_->currentViewModel() == ModelView::ModelProxy
+                && view_->data_->proxyModel_->isFilterEnabled) {
+                viewContextMenu->addAction(actionShowAll);
+            }
             viewContextMenu->addSeparator();
 
-            if (currentMode() == ModeSelector::UpdateMismatch)
+            if (currentMode() == ModeSelector::UpdateMismatch) {
+                if (view_->currentViewModel() == ModelView::ModelProxy) {
+                    actionShowMismatchesOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::Mismatched));
+                    viewContextMenu->addAction(actionShowMismatchesOnly);
+                }
                 viewContextMenu->addAction(actionUpdateDbWithReChecksums);
+            }
             else if (currentMode() == ModeSelector::ModelNewLost) {
-                if (view_->currentViewModel() == ModelView::ModelProxy
-                    && !view_->data_->proxyModel_->isFilterEnabled)
+                if (view_->currentViewModel() == ModelView::ModelProxy) {
+                    actionShowNewLostOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::New));
                     viewContextMenu->addAction(actionShowNewLostOnly);
+                }
 
                 viewContextMenu->addAction(actionUpdateDbWithNewLost);
                 viewContextMenu->addSeparator();
@@ -351,12 +365,6 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                         viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
                 }
                 viewContextMenu->addAction(actionCheckAll);
-            }
-            if (view_->currentViewModel() == ModelView::ModelProxy
-                && view_->data_->proxyModel_->isFilterEnabled) {
-
-                viewContextMenu->addSeparator();
-                viewContextMenu->addAction(actionShowAll);
             }
         }
         viewContextMenu->addSeparator();

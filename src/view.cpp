@@ -149,11 +149,16 @@ void View::setIndexByPath(const QString &path)
         }
     }
 }
+/*
+void View::setFilter(const FileStatus status)
+{
+    setFilter({status});
+}*/
 
-void View::setFilter(const QSet<FileStatus> status)
+void View::setFilter(const QSet<FileStatus> statuses)
 {
     if (currentViewModel() == ModelProxy) {
-        data_->proxyModel_->setFilter(status);
+        data_->proxyModel_->setFilter(statuses);
         setIndexByPath(curPathModel);
     }
 }

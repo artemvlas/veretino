@@ -69,3 +69,8 @@ void ProxyModel::disableFilter()
     fileStatuses_.clear();
     invalidateFilter();
 }
+
+QSet<FileStatus> ProxyModel::currentlyFiltered()
+{
+    return fileStatuses_;
+}
