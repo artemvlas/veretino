@@ -88,7 +88,6 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::updateMismatch, manager, &Manager::updateMismatch);
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
-    connect(modeSelect, &ModeSelector::copyStoredChecksum, manager, &Manager::copyStoredChecksum);
 
     // cancel process
     connect(modeSelect, &ModeSelector::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);

@@ -48,7 +48,8 @@ void ModeSelector::connectActions()
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
-    connect(actionCopyStoredChecksumFromModel, &QAction::triggered, this, &ModeSelector::copyStoredChecksumToClipboard);
+    connect(actionCopyStoredChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnChecksum);});
+    connect(actionCopyReChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnReChecksum);});
 
     connect(actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -187,11 +188,6 @@ void ModeSelector::verifyDb()
     emit verify();
 }
 
-void ModeSelector::copyStoredChecksumToClipboard()
-{
-    emit copyStoredChecksum(view_->curIndexSource);
-}
-
 void ModeSelector::showFolderContentTypes()
 {
     emit folderContentsByType(view_->curPathFileSystem);
@@ -208,6 +204,17 @@ void ModeSelector::showFileSystem()
         emit cancelProcess();
 
     view_->setFileSystemModel();
+}
+
+void ModeSelector::copyDataToClipboard(Column column)
+{
+    if ((view_->currentViewModel() == ModelView::ModelSource || view_->currentViewModel() == ModelView::ModelProxy)
+        && view_->curIndexSource.isValid()) {
+
+        QString strData = TreeModel::siblingAtRow(view_->curIndexSource, column).data().toString();
+        if (!strData.isEmpty())
+            QGuiApplication::clipboard()->setText(strData);
+    }
 }
 
 void ModeSelector::doWork()
@@ -349,6 +356,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionShowMismatchesOnly);
                 }
                 viewContextMenu->addAction(actionUpdateDbWithReChecksums);
+                if (TreeModel::isFileRow(index) && TreeModel::siblingAtRow(index, Column::ColumnReChecksum).data().isValid()) {
+                    viewContextMenu->addAction(actionCopyReChecksum);
+                }
             }
             else if (currentMode() == ModeSelector::ModelNewLost) {
                 if (view_->currentViewModel() == ModelView::ModelProxy) {
@@ -364,7 +374,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 if (index.isValid()) {
                     if (TreeModel::isFileRow(index)) {
                         viewContextMenu->addAction(actionCheckCurFileFromModel);
-                        viewContextMenu->addAction(actionCopyStoredChecksumFromModel);
+                        viewContextMenu->addAction(actionCopyStoredChecksum);
                     }
                     else
                         viewContextMenu->addAction(actionCheckCurSubfolderFromModel);

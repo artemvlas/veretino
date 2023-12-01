@@ -436,12 +436,12 @@ void Manager::showFileCheckResultMessage(bool isMatched)
     else
         emit showMessage("Checksum does NOT match", "Failed");
 }
-
+/*
 void Manager::copyStoredChecksum(const QModelIndex &fileItemIndex)
 {
     if (dataMaintainer)
         emit toClipboard(dataMaintainer->getStoredChecksum(fileItemIndex));
-}
+}*/
 
 // info about folder (number of files and total size) or file (size)
 void Manager::getPathInfo(const QString &path)

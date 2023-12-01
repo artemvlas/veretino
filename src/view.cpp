@@ -57,9 +57,8 @@ void View::setTreeModel(ModelView modelSel)
         return;
     }
 
-    if ((modelSel == ModelSource && model() == data_->model_)
-        || (modelSel == ModelProxy && model() == data_->proxyModel_))
-        return; // if current model remains the same
+    if (modelSel == currentViewModel())
+        return; // if the current model remains the same
 
     oldSelectionModel_ = selectionModel();
 
@@ -67,10 +66,8 @@ void View::setTreeModel(ModelView modelSel)
 
     emit modelChanged(modelSel);
 
-    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
-        showAllColumns();
-    else
-        hideColumn(Column::ColumnReChecksum);
+    data_->numbers.numberOf(FileStatus::Mismatched) == 0 ? hideColumn(Column::ColumnReChecksum)
+                                                         : showAllColumns();
 
     setColumnWidth(0, 450);
     setColumnWidth(1, 100);
@@ -98,12 +95,12 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
         curPathFileSystem = fileSystem->filePath(curIndex);
         emit pathChanged(curPathFileSystem);
     }
-    else if (data_ && (model() == data_->model_ || model() == data_->proxyModel_)) {
-        if (model() == data_->model_) {
+    else if (isCurrentViewModel(ModelSource) || isCurrentViewModel(ModelProxy)) {
+        if (isCurrentViewModel(ModelSource)) {
             curIndexSource = curIndex;
             curIndexProxy = data_->proxyModel_->mapFromSource(curIndexSource);
         }
-        else if (model() == data_->proxyModel_) {
+        else if (isCurrentViewModel(ModelProxy)) {
             curIndexProxy = curIndex;
             curIndexSource = data_->proxyModel_->mapToSource(curIndexProxy);
         }
@@ -157,7 +154,7 @@ void View::setFilter(const FileStatus status)
 
 void View::setFilter(const QSet<FileStatus> statuses)
 {
-    if (currentViewModel() == ModelProxy) {
+    if (isCurrentViewModel(ModelProxy)) {
         QString prePathModel = curPathModel;
         data_->proxyModel_->setFilter(statuses);
         setIndexByPath(prePathModel);
@@ -187,6 +184,11 @@ ModelView View::currentViewModel()
         return ModelProxy;
     else
         return NotSetted;
+}
+
+bool View::isCurrentViewModel(const ModelView modelView)
+{
+    return modelView == currentViewModel();
 }
 
 void View::deleteOldSelModel()

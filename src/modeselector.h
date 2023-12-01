@@ -39,7 +39,6 @@ public:
     void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
     void verifyItem();
     void verifyDb();
-    void copyStoredChecksumToClipboard();
     void showFolderContentTypes();
     void checkFileChecksum(const QString &checkSum);
 
@@ -70,7 +69,8 @@ public:
     QAction *actionCheckCurFileFromModel = new QAction("Check current file", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check current Subfolder", this);
     QAction *actionCheckAll = new QAction("Check ALL files against stored checksums", this);
-    QAction *actionCopyStoredChecksumFromModel = new QAction("Copy stored checksum to clipboard", this);
+    QAction *actionCopyStoredChecksum = new QAction("Copy stored checksum to clipboard", this);
+    QAction *actionCopyReChecksum = new QAction("Copy ReChecksum to clipboard", this);
 
     QAction *actionCollapseAll = new QAction("Collapse all", this);
     QAction *actionExpandAll = new QAction("Expand all", this);
@@ -84,6 +84,8 @@ private:
     void connectActions();
     Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct
     Mode selectMode(const QString &path); // select Mode based on file system path
+
+    void copyDataToClipboard(Column column);
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;
@@ -105,7 +107,6 @@ signals:
     void updateMismatch(); // update json Database with new checksums for files with failed verification
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
-    void copyStoredChecksum(const QModelIndex &fileItemIndex);
     void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();

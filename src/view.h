@@ -21,6 +21,9 @@ public:
     enum ModelView {NotSetted, FileSystem, ModelSource, ModelProxy};
     Q_ENUM(ModelView)
 
+    ModelView currentViewModel();
+    bool isCurrentViewModel(const ModelView modelView);
+
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
 
@@ -40,8 +43,6 @@ public slots:
     void setFilter(const QSet<FileStatus> statuses = QSet<FileStatus>());
     void disableFilter();
     void toHome();
-
-    ModelView currentViewModel();
 
     void headerContextMenuRequested(const QPoint &point);
 
