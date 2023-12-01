@@ -50,7 +50,7 @@ void MainWindow::connections()
     //TreeView
     connect(ui->treeView, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
-    connect(ui->treeView, &View::customContextMenuRequested, this, &MainWindow::onCustomContextMenu);
+    connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
     connect(ui->treeView, &View::pathChanged, ui->lineEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->lineEdit->setEnabled(modelView == ModelView::FileSystem);});
@@ -122,105 +122,6 @@ void MainWindow::connectManager()
     connect(manager, &Manager::showFiltered, ui->treeView, &View::setFilter);
 
     thread->start();
-}
-
-void MainWindow::onCustomContextMenu(const QPoint &point)
-{
-    QModelIndex index = ui->treeView->indexAt(point);
-
-    QMenu *contextMenu = new QMenu(ui->treeView);
-    connect(contextMenu, &QMenu::aboutToHide, contextMenu, &QMenu::deleteLater);
-
-    if (ui->treeView->currentViewModel() == ModelView::NotSetted)
-        contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
-    else if (ui->treeView->isViewFileSystem()) {
-        contextMenu->addAction("to Home", ui->treeView, &View::toHome);
-        contextMenu->addSeparator();
-
-        if (modeSelect->isProcessing())
-            contextMenu->addAction("Cancel operation", modeSelect, &ModeSelector::cancelProcess);
-
-        else if (index.isValid()) {
-
-            if (modeSelect->currentMode() == ModeSelector::Folder) {
-                contextMenu->addAction("Folder Contents By Type", modeSelect, &ModeSelector::showFolderContentTypes);
-                contextMenu->addSeparator();
-                contextMenu->addAction(QString("Compute %1 for all files in folder")
-                                      .arg(format::algoToStr(settings_->algorithm)), modeSelect, &ModeSelector::doWork);
-            }
-            else if (modeSelect->currentMode() == ModeSelector::File) {
-                QString clipboardText = QGuiApplication::clipboard()->text();
-                if (tools::canBeChecksum(clipboardText)) {
-                    contextMenu->addAction("Check the file by checksum: " + format::shortenString(clipboardText), this, [=]{modeSelect->checkFileChecksum(clipboardText);});
-                    contextMenu->addSeparator();
-                }
-                contextMenu->addAction("SHA-1 --> *.sha1", this, [=]{modeSelect->computeFileChecksum(QCryptographicHash::Sha1);});
-                contextMenu->addAction("SHA-256 --> *.sha256", this, [=]{modeSelect->computeFileChecksum(QCryptographicHash::Sha256);});
-                contextMenu->addAction("SHA-512 --> *.sha512", this, [=]{modeSelect->computeFileChecksum(QCryptographicHash::Sha512);});
-            }
-            else if (modeSelect->currentMode() == ModeSelector::DbFile)
-                contextMenu->addAction("Open DataBase", modeSelect, &ModeSelector::doWork);
-            else if (modeSelect->currentMode() == ModeSelector::SumFile) {
-                contextMenu->addAction("Check the Checksum", modeSelect, &ModeSelector::doWork);
-            }
-        }
-    }
-    else {
-        if (modeSelect->isProcessing()) {
-            contextMenu->addAction("Cancel operation", modeSelect, &ModeSelector::cancelProcess);
-            contextMenu->addAction("Cancel and Back to FileSystem View", this, [=]{emit modeSelect->cancelProcess(); ui->treeView->setFileSystemModel();});
-        }
-
-        else {
-            contextMenu->addAction("Status", modeSelect, &ModeSelector::dbStatus);
-            contextMenu->addAction("Reset", modeSelect, &ModeSelector::resetDatabase);
-
-            if (ui->treeView->data_ && QFile::exists(ui->treeView->data_->backupFilePath()))
-                contextMenu->addAction("Forget all changes", modeSelect, &ModeSelector::restoreDatabase);
-
-            contextMenu->addSeparator();
-            contextMenu->addAction("Show FileSystem", ui->treeView, &View::setFileSystemModel);
-            contextMenu->addSeparator();
-
-            if (modeSelect->currentMode() == ModeSelector::UpdateMismatch)
-                contextMenu->addAction("Update the Database with new checksums", modeSelect, &ModeSelector::updateMismatch);
-
-            else if (modeSelect->currentMode() == ModeSelector::ModelNewLost) {
-
-                if (ui->treeView->currentViewModel() == ModelView::ModelProxy
-                    && !ui->treeView->data_->proxyModel_->isFilterEnabled)
-                    contextMenu->addAction("Show New/Lost only", this, [=]{ui->treeView->setFilter({FileStatus::New, FileStatus::Missing});});
-
-                contextMenu->addAction("Update the Database with New/Lost files", modeSelect, &ModeSelector::updateNewLost);
-                contextMenu->addSeparator();
-            }
-
-            if (modeSelect->currentMode() == ModeSelector::Model || modeSelect->currentMode() == ModeSelector::ModelNewLost) {
-                if (index.isValid()) {
-                    if (TreeModel::isFileRow(index)) {
-                        contextMenu->addAction("Check current file", modeSelect, &ModeSelector::verifyItem);
-                        contextMenu->addAction("Copy stored checksum to clipboard", modeSelect, &ModeSelector::copyStoredChecksumToClipboard);
-                    }
-                    else {
-                        contextMenu->addAction("Check current Subfolder", modeSelect, &ModeSelector::verifyItem);
-                    }
-                }
-
-                contextMenu->addAction("Check ALL files against stored checksums", modeSelect, &ModeSelector::verifyDb);
-            }
-            if (ui->treeView->currentViewModel() == ModelView::ModelProxy
-                && ui->treeView->data_->proxyModel_->isFilterEnabled) {
-
-                contextMenu->addSeparator();
-                contextMenu->addAction("Show All", ui->treeView, &View::disableFilter);
-            }
-        }
-        contextMenu->addSeparator();
-        contextMenu->addAction("Collapse all", ui->treeView, &QTreeView::collapseAll);
-        contextMenu->addAction("Expand all", ui->treeView, &QTreeView::expandAll);
-    }
-
-    contextMenu->exec(ui->treeView->viewport()->mapToGlobal(point));
 }
 
 void MainWindow::dialogSettings()

@@ -3,6 +3,7 @@
 #define MODESELECTOR_H
 
 #include <QObject>
+#include <QAction>
 #include "view.h"
 
 class ModeSelector : public QObject
@@ -44,11 +45,42 @@ public:
 
     void showFileSystem();
 
+    // Actions
+    QAction *actionShowFS = new QAction("Show FileSystem", this);
+    QAction *actionToHome = new QAction("to Home", this);
+    QAction *actionCancel = new QAction("Cancel operation", this);
+    QAction *actionShowFolderContentsTypes = new QAction("Folder Contents By Type", this);
+    QAction *actionProcessFolderChecksums = new QAction("Compute checksums for all files in folder", this);
+    QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
+    QAction *actionProcessSha1File = new QAction("SHA-1 --> *.sha1", this);
+    QAction *actionProcessSha256File = new QAction("SHA-256 --> *.sha256", this);
+    QAction *actionProcessSha512File = new QAction("SHA-512 --> *.sha512", this);
+    QAction *actionOpenDatabase = new QAction("Open Database", this);
+    QAction *actionCheckSumFile = new QAction("Check the Checksum", this);
+
+    QAction *actionCancelBackToFS = new QAction("Cancel and Back to FileSystem view", this);
+    QAction *actionShowDbStatus = new QAction("Status", this);
+    QAction *actionResetDb = new QAction("Reset", this);
+    QAction *actionForgetChanges = new QAction("Forget all changes", this);
+    QAction *actionUpdateDbWithReChecksums = new QAction("Update the Database with new checksums", this);
+    QAction *actionUpdateDbWithNewLost = new QAction("Update the Database with New/Lost files", this);
+    QAction *actionShowNewLostOnly = new QAction("Show New/Lost only", this);
+    QAction *actionShowAll = new QAction("Show All", this);
+    QAction *actionCheckCurFileFromModel = new QAction("Check current file", this);
+    QAction *actionCheckCurSubfolderFromModel = new QAction("Check current Subfolder", this);
+    QAction *actionCheckAll = new QAction("Check ALL files against stored checksums", this);
+    QAction *actionCopyStoredChecksumFromModel = new QAction("Copy stored checksum to clipboard", this);
+
+    QAction *actionCollapseAll = new QAction("Collapse all", this);
+    QAction *actionExpandAll = new QAction("Expand all", this);
+
 public slots:
     void processing(bool isProcessing);
     void prepareView();
+    void createContextMenu_View(const QPoint &point);
 
 private:
+    void connectActions();
     Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct
     Mode selectMode(const QString &path); // select Mode based on file system path
 
@@ -58,9 +90,10 @@ private:
     Settings *settings_;
 
 signals:
+    // ui
     void setButtonText(const QString &buttonText);
 
-    /////////
+    // tasks
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void processFolderSha(const QString &path, QCryptographicHash::Algorithm algo);

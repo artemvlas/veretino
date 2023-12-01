@@ -1,6 +1,9 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "modeselector.h"
 #include <QFileInfo>
+#include <QGuiApplication>
+#include <QClipboard>
+#include <QMenu>
 #include <QDebug>
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
@@ -12,6 +15,39 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     connect(this, &ModeSelector::updateNewLost, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!TreeModel::isFileRow(ind)) prepareView();});
+
+    connectActions();
+}
+
+void ModeSelector::connectActions()
+{
+    connect(actionShowFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
+    connect(actionToHome, &QAction::triggered, view_, &View::toHome);
+    connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
+    connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
+    connect(actionProcessFolderChecksums, &QAction::triggered, this, &ModeSelector::doWork);
+    connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
+    connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1);});
+    connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256);});
+    connect(actionProcessSha512File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha512);});
+    connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
+    connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
+
+    connect(actionCancelBackToFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
+    connect(actionShowDbStatus, &QAction::triggered, this, &ModeSelector::dbStatus);
+    connect(actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
+    connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
+    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, &ModeSelector::updateMismatch);
+    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, &ModeSelector::updateNewLost);
+    connect(actionShowNewLostOnly, &QAction::triggered, this, [=]{view_->setFilter({FileStatus::New, FileStatus::Missing});});
+    connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
+    connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
+    connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
+    connect(actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
+    connect(actionCopyStoredChecksumFromModel, &QAction::triggered, this, &ModeSelector::copyStoredChecksumToClipboard);
+
+    connect(actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
+    connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -235,4 +271,98 @@ void ModeSelector::quickAction()
             break;
         default: break;
     }
+}
+
+void ModeSelector::createContextMenu_View(const QPoint &point)
+{
+    QModelIndex index = view_->indexAt(point);
+    QMenu *viewContextMenu = new QMenu(view_);
+    connect(viewContextMenu, &QMenu::aboutToHide, viewContextMenu, &QMenu::deleteLater);
+
+    if (view_->currentViewModel() == ModelView::NotSetted) {
+        viewContextMenu->addAction(actionShowFS);
+    }
+    // Filesystem View
+    else if (view_->isViewFileSystem()) {
+        viewContextMenu->addAction(actionToHome);
+        viewContextMenu->addSeparator();
+
+        if (isProcessing())
+            viewContextMenu->addAction(actionCancel);
+        else if (index.isValid()) {
+            if (currentMode() == ModeSelector::Folder) {
+                viewContextMenu->addAction(actionShowFolderContentsTypes);
+                viewContextMenu->addSeparator();
+                actionProcessFolderChecksums->setText(QString("Compute %1 for all files in folder")
+                                                     .arg(format::algoToStr(settings_->algorithm)));
+                viewContextMenu->addAction(actionProcessFolderChecksums);
+            }
+            else if (currentMode() == ModeSelector::File) {
+                QString clipboardText = QGuiApplication::clipboard()->text();
+                if (tools::canBeChecksum(clipboardText)) {
+                    actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText));
+                    viewContextMenu->addAction(actionCheckFileByClipboardChecksum);
+                    viewContextMenu->addSeparator();
+                }
+                viewContextMenu->addAction(actionProcessSha1File);
+                viewContextMenu->addAction(actionProcessSha256File);
+                viewContextMenu->addAction(actionProcessSha512File);
+            }
+            else if (currentMode() == ModeSelector::DbFile)
+                viewContextMenu->addAction(actionOpenDatabase);
+            else if (currentMode() == ModeSelector::SumFile)
+                viewContextMenu->addAction(actionCheckSumFile);
+        }
+    }
+    // TreeModel or ProxyModel View
+    else {
+        if (isProcessing()) {
+            viewContextMenu->addAction(actionCancel);
+            viewContextMenu->addAction(actionCancelBackToFS);
+        }
+        else {
+            viewContextMenu->addAction(actionShowDbStatus);
+            viewContextMenu->addAction(actionResetDb);
+            if (view_->data_ && QFile::exists(view_->data_->backupFilePath()))
+                viewContextMenu->addAction(actionForgetChanges);
+
+            viewContextMenu->addSeparator();
+            viewContextMenu->addAction(actionShowFS);
+            viewContextMenu->addSeparator();
+
+            if (currentMode() == ModeSelector::UpdateMismatch)
+                viewContextMenu->addAction(actionUpdateDbWithReChecksums);
+            else if (currentMode() == ModeSelector::ModelNewLost) {
+                if (view_->currentViewModel() == ModelView::ModelProxy
+                    && !view_->data_->proxyModel_->isFilterEnabled)
+                    viewContextMenu->addAction(actionShowNewLostOnly);
+
+                viewContextMenu->addAction(actionUpdateDbWithNewLost);
+                viewContextMenu->addSeparator();
+            }
+
+            if (currentMode() == ModeSelector::Model || currentMode() == ModeSelector::ModelNewLost) {
+                if (index.isValid()) {
+                    if (TreeModel::isFileRow(index)) {
+                        viewContextMenu->addAction(actionCheckCurFileFromModel);
+                        viewContextMenu->addAction(actionCopyStoredChecksumFromModel);
+                    }
+                    else
+                        viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
+                }
+                viewContextMenu->addAction(actionCheckAll);
+            }
+            if (view_->currentViewModel() == ModelView::ModelProxy
+                && view_->data_->proxyModel_->isFilterEnabled) {
+
+                viewContextMenu->addSeparator();
+                viewContextMenu->addAction(actionShowAll);
+            }
+        }
+        viewContextMenu->addSeparator();
+        viewContextMenu->addAction(actionCollapseAll);
+        viewContextMenu->addAction(actionExpandAll);
+    }
+
+    viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
 }
