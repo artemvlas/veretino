@@ -158,8 +158,9 @@ void View::setFilter(const FileStatus status)
 void View::setFilter(const QSet<FileStatus> statuses)
 {
     if (currentViewModel() == ModelProxy) {
+        QString prePathModel = curPathModel;
         data_->proxyModel_->setFilter(statuses);
-        setIndexByPath(curPathModel);
+        setIndexByPath(prePathModel);
     }
 }
 
