@@ -228,7 +228,7 @@ void View::showAllColumns()
 
 void View::headerContextMenuRequested(const QPoint &point)
 {
-    if (currentViewModel() != ModelSource && currentViewModel() != ModelProxy)
+    if (!isCurrentViewModel(ModelSource) && !isCurrentViewModel(ModelProxy))
         return;
 
     QMenu *headerContextMenu = new QMenu(this);

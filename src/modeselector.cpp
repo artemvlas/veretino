@@ -435,7 +435,7 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
     actionSetAlgoSha256->setChecked(settings_->algorithm == QCryptographicHash::Sha256);
     actionSetAlgoSha512->setChecked(settings_->algorithm == QCryptographicHash::Sha512);
 
-    QMenu *buttonContextMenu = new QMenu;
+    QMenu *buttonContextMenu = new QMenu(button_);
     connect(buttonContextMenu, &QMenu::aboutToHide, buttonContextMenu, &QMenu::deleteLater);
     buttonContextMenu->addActions(actionsSetAlgo);
 
