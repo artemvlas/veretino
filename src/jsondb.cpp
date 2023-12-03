@@ -71,9 +71,9 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
         header["Working folder"] = data->metaData.workDir;
 
     if (data->isFilterApplied()) {
-        if (data->metaData.filter.includeOnly)
+        if (data->metaData.filter.isFilter(FilterRule::Include))
             header["Included Only"] = data->metaData.filter.extensionsList.join(" "); // only files with extensions from this list are included in the database, others are ignored
-        else
+        else if (data->metaData.filter.isFilter(FilterRule::Ignore))
             header["Ignored"] = data->metaData.filter.extensionsList.join(" "); // files with extensions from this list are ignored (not included in the database)
     }
 
@@ -175,21 +175,17 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     // filling metadata
     parsedData->metaData.databaseFilePath = filePath;
     if (header.contains("Working folder") && !(header.value("Working folder").toString() == "Relative")) {
-        //parsedData.metaData.databaseFileName = filePath;
         parsedData->metaData.workDir = header.value("Working folder").toString();
     }
     else {
-        //parsedData.metaData.databaseFileName = paths::basicName(filePath);
         parsedData->metaData.workDir = paths::parentFolder(filePath);
     }
 
     if (header.contains("Ignored")) {
-        parsedData->metaData.filter.includeOnly = false;
-        parsedData->metaData.filter.extensionsList = header.value("Ignored").toString().split(" ");
+        parsedData->metaData.filter.setFilter(FilterRule::Ignore, header.value("Ignored").toString().split(" "));
     }
     else if (header.contains("Included Only")) {
-        parsedData->metaData.filter.includeOnly = true;
-        parsedData->metaData.filter.extensionsList = header.value("Included Only").toString().split(" ");
+        parsedData->metaData.filter.setFilter(FilterRule::Include, header.value("Included Only").toString().split(" "));
     }
 
     if (header.contains("Used algorithm")) {

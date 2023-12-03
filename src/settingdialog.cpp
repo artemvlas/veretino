@@ -22,7 +22,7 @@ settingDialog::settingDialog(Settings *settings, QWidget *parent) :
         ui->rbSha512->setChecked(true);
 
     ui->inputExtensions->setText(settings->filter.extensionsList.join(" "));
-    ui->radioButtonIncludeOnly->setChecked(settings->filter.includeOnly);
+    ui->radioButtonIncludeOnly->setChecked(settings->filter.isFilter(FilterRule::Include));
 
     ui->ignoreDbFiles->setChecked(settings->filter.ignoreDbFiles);
     ui->ignoreShaFiles->setChecked(settings->filter.ignoreShaFiles);
@@ -57,8 +57,13 @@ void settingDialog::updateSettings()
 
     // filters
     ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
-    settings_->filter.includeOnly = !ui->radioButtonIgnore->isChecked();
-    settings_->filter.extensionsList = extensionsList();
+
+    if (ui->inputExtensions->text().isEmpty())
+        settings_->filter.clearFilter();
+    else
+        ui->radioButtonIgnore->isChecked() ? settings_->filter.setFilter(FilterRule::Ignore, extensionsList())
+                                           : settings_->filter.setFilter(FilterRule::Include, extensionsList());
+
 
     settings_->filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
     settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();

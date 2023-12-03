@@ -11,13 +11,31 @@ struct FileValues;
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
 
 struct FilterRule {
-    FilterRule(bool ignoreSummaries = true) : ignoreShaFiles(ignoreSummaries), ignoreDbFiles(ignoreSummaries) {}
-    FilterRule(const QStringList& extensions, bool include) : extensionsList(extensions), includeOnly(include) {}
+    enum ExtensionsFilter {NotSet, Include, Ignore};
+    void setFilter(const ExtensionsFilter filterType, const QStringList &extensions)
+    {
+        extensionsFilter_ = filterType;
+        extensionsList = extensions;
+    }
 
+    void clearFilter()
+    {
+        extensionsFilter_ = NotSet;
+        extensionsList.clear();
+    }
+
+    bool isFilter(const ExtensionsFilter filterType) const
+    {
+        return (filterType == extensionsFilter_);
+    }
+
+    ExtensionsFilter extensionsFilter_ = NotSet;
     QStringList extensionsList;
-    bool includeOnly = false; // if true, only files with any extension from the list included, else all files except these types
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
+
+    FilterRule(bool ignoreSummaries = true) : ignoreShaFiles(ignoreSummaries), ignoreDbFiles(ignoreSummaries) {}
+    FilterRule(const ExtensionsFilter filterType, const QStringList &extensions) : extensionsFilter_(filterType), extensionsList(extensions) {}
 }; // struct FilterRule
 
 class Files : public QObject

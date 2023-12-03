@@ -123,23 +123,24 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 {
-    if (!filter.includeOnly) {
+    if (filter.isFilter(FilterRule::Ignore)) {
         if (tools::isDatabaseFile(filePath))
             return !filter.ignoreDbFiles;
         if (tools::isSummaryFile(filePath))
             return !filter.ignoreShaFiles;
     }
 
-    if (filter.extensionsList.isEmpty())
+    if (filter.isFilter(FilterRule::NotSet)) // or filter.extensionsList.isEmpty()
         return true;
 
-    // if 'filter.include' = true, a file ('filePath') with any extension from 'extensionsList' is allowed
-    // if 'filter.include' = false, than all files except these types allowed
+    // if 'filter.isFilter(FilterRule::Include)': a file ('filePath') with any extension from 'extensionsList' is allowed
+    // if 'filter.isFilter(FilterRule::Ignore)': than all files except these types allowed
 
-    bool allowed = !filter.includeOnly;
+    bool allowed = filter.isFilter(FilterRule::Ignore);
+
     foreach (const QString &ext, filter.extensionsList) {
         if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
-            allowed = filter.includeOnly;
+            allowed = filter.isFilter(FilterRule::Include);
             break;
         }
     }

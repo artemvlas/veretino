@@ -467,7 +467,7 @@ void DataMaintainer::dbStatus()
     result.append(QString("\nAlgorithm: %1").arg(format::algoToStr(data_->metaData.algorithm)));
 
     if (data_->isFilterApplied()) {
-        if (data_->metaData.filter.includeOnly)
+        if (data_->metaData.filter.isFilter(FilterRule::Include))
             result.append(QString("\nIncluded Only: %1").arg(data_->metaData.filter.extensionsList.join(", ")));
         else
             result.append(QString("\nIgnored: %1").arg(data_->metaData.filter.extensionsList.join(", ")));
