@@ -43,7 +43,8 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     dataMaintainer->data_->metaData.algorithm = algo;
     dataMaintainer->data_->metaData.filter = settings_->filter;
     dataMaintainer->data_->metaData.databaseFilePath = paths::joinPath(folderPath,
-                                                       QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath)));
+                                                       QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath)) // database filename
+                                                                                .replace(' ', '_'));
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, false);

@@ -14,12 +14,20 @@ settingDialog::settingDialog(Settings *settings, QWidget *parent) :
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
          {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
 
-    if (settings->algorithm == QCryptographicHash::Sha1)
+    switch (settings->algorithm)
+    {
+    case QCryptographicHash::Sha1:
         ui->rbSha1->setChecked(true);
-    else if (settings->algorithm == QCryptographicHash::Sha256)
+        break;
+    case QCryptographicHash::Sha256:
         ui->rbSha256->setChecked(true);
-    else if (settings->algorithm == QCryptographicHash::Sha512)
+        break;
+    case QCryptographicHash::Sha512:
         ui->rbSha512->setChecked(true);
+        break;
+    default:
+        break;
+    }
 
     ui->inputExtensions->setText(settings->filter.extensionsList.join(" "));
     ui->radioButtonIncludeOnly->setChecked(settings->filter.isFilter(FilterRule::Include));
