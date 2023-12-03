@@ -113,7 +113,8 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
         QFile file(sumFile);
         if (file.open(QFile::WriteOnly)) {
             file.write(QString("%1 *%2").arg(sum, paths::basicName(filePath)).toUtf8());
-            emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(paths::basicName(sumFile)));
+            emit showMessage(QString("The checksum is saved in the summary file:\n\n%1").arg(paths::basicName(sumFile)), // Message body
+                             QString("%1 computed").arg(format::algoToStr(algo))); // Message header
         }
         else {
             QGuiApplication::clipboard()->setText(sum); // if unable to write summary, send the checksum to clipboard

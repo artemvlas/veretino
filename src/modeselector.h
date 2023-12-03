@@ -4,13 +4,14 @@
 
 #include <QObject>
 #include <QAction>
+#include <QPushButton>
 #include "view.h"
 
 class ModeSelector : public QObject
 {
     Q_OBJECT
 public:
-    explicit ModeSelector(View *view, Settings *settings, QObject *parent = nullptr);
+    explicit ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent = nullptr);
 
     enum Mode {
         NoMode,
@@ -27,7 +28,10 @@ public:
     // modes
     void setMode();
     Mode currentMode();
+    bool isCurrentMode(const Mode mode);
     bool isProcessing();
+    void selectButtonText(); // select the Button text according to current Mode
+    void setAlgorithm(QCryptographicHash::Algorithm algo);
     //QSet<Mode> fsModes {Folder, File, DbFile, SumFile};
     //QSet<Mode> dbModes {Model, ModelNewLost, UpdateMismatch};
 
@@ -44,7 +48,8 @@ public:
 
     void showFileSystem();
 
-    // Actions
+    // Actions --->>
+    // File system View
     QAction *actionShowFS = new QAction("Show FileSystem", this);
     QAction *actionToHome = new QAction("to Home", this);
     QAction *actionCancel = new QAction("Cancel operation", this);
@@ -57,6 +62,7 @@ public:
     QAction *actionOpenDatabase = new QAction("Open Database", this);
     QAction *actionCheckSumFile = new QAction("Check the Checksum", this);
 
+    // DB Model View
     QAction *actionCancelBackToFS = new QAction("Cancel and Back to FileSystem view", this);
     QAction *actionShowDbStatus = new QAction("Status", this);
     QAction *actionResetDb = new QAction("Reset", this);
@@ -75,10 +81,17 @@ public:
     QAction *actionCollapseAll = new QAction("Collapse all", this);
     QAction *actionExpandAll = new QAction("Expand all", this);
 
+    // Algorithm selection
+    QAction *actionSetAlgoSha1 = new QAction("SHA-1", this);
+    QAction *actionSetAlgoSha256 = new QAction("SHA-256", this);
+    QAction *actionSetAlgoSha512 = new QAction("SHA-512", this);
+    QList<QAction*> actionsSetAlgo {actionSetAlgoSha1, actionSetAlgoSha256, actionSetAlgoSha512};
+
 public slots:
     void processing(bool isProcessing);
     void prepareView();
     void createContextMenu_View(const QPoint &point);
+    void createContextMenu_Button(const QPoint &point);
 
 private:
     void connectActions();
@@ -90,11 +103,11 @@ private:
     Mode curMode = NoMode;
     bool isProcessing_ = false;
     View *view_;
+    QPushButton *button_;
     Settings *settings_;
 
 signals:
-    // ui
-    void setButtonText(const QString &buttonText);
+    //void setButtonText(const QString &buttonText);
 
     // tasks
     void getPathInfo(const QString &path); // info about folder contents or file (size)

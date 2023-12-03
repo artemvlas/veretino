@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/veretino.png"));
     QThread::currentThread()->setObjectName("MAIN Thread");
 
-    modeSelect = new ModeSelector(ui->treeView, settings_, this);
+    modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
     ui->statusbar->addPermanentWidget(permanentStatus);
 
     connections();
@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->progressBar->setVisible(false);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 MainWindow::~MainWindow()
@@ -43,9 +44,10 @@ void MainWindow::connections()
 {
     connectManager();
 
-    // ModeSelector
+    // Push Button
     connect(ui->button, &QPushButton::clicked, modeSelect, &ModeSelector::doWork);
-    connect(modeSelect, &ModeSelector::setButtonText, ui->button, &QPushButton::setText);
+    //connect(modeSelect, &ModeSelector::setButtonText, ui->button, &QPushButton::setText);
+    connect(ui->button, &QPushButton::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_Button);
 
     //TreeView
     connect(ui->treeView, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);

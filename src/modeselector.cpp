@@ -6,12 +6,9 @@
 #include <QMenu>
 #include <QDebug>
 
-ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
-    : QObject{parent}, view_(view), settings_(settings)
+ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent)
+    : QObject{parent}, view_(view), button_(button), settings_(settings)
 {
-    actionShowNewLostOnly->setCheckable(true);
-    actionShowMismatchesOnly->setCheckable(true);
-
     connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::folderContentsByType, this, &ModeSelector::cancelProcess);
 
@@ -19,11 +16,19 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!TreeModel::isFileRow(ind)) prepareView();});
 
+    actionShowNewLostOnly->setCheckable(true);
+    actionShowMismatchesOnly->setCheckable(true);
+
+    actionSetAlgoSha1->setCheckable(true);
+    actionSetAlgoSha256->setCheckable(true);
+    actionSetAlgoSha512->setCheckable(true);
+
     connectActions();
 }
 
 void ModeSelector::connectActions()
 {
+    // File system View
     connect(actionShowFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
@@ -36,6 +41,7 @@ void ModeSelector::connectActions()
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
+    // DB Model View
     connect(actionCancelBackToFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
     connect(actionShowDbStatus, &QAction::triggered, this, &ModeSelector::dbStatus);
     connect(actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
@@ -53,6 +59,11 @@ void ModeSelector::connectActions()
 
     connect(actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
+
+    // Algorithm selection
+    connect(actionSetAlgoSha1, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha1);});
+    connect(actionSetAlgoSha256, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha256);});
+    connect(actionSetAlgoSha512, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha512);});
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -86,7 +97,8 @@ void ModeSelector::prepareView()
 void ModeSelector::setMode()
 {
     if (isProcessing_) {
-        emit setButtonText("Cancel");
+        //emit setButtonText("Cancel");
+        button_->setText("Cancel");
         return;
     }
 
@@ -99,34 +111,47 @@ void ModeSelector::setMode()
         return;
     }
 
+    selectButtonText();
+}
+
+void ModeSelector::selectButtonText()
+{
     switch (curMode) {
-        case Folder:
-            emit setButtonText(format::algoToStr(settings_->algorithm).append(": Folder"));
-            break;
-        case File:
-            emit setButtonText(format::algoToStr(settings_->algorithm).append(": File"));
-            break;
-        case DbFile:
-            emit setButtonText("Open DataBase");
-            break;
-        case SumFile:
-            emit setButtonText("Check");
-            break;
-        case Model:
-            emit setButtonText("Verify All");
-            break;
-        case ModelNewLost:
-            emit setButtonText("Update New/Lost");
-            break;
-        case UpdateMismatch:
-            emit setButtonText("Update");
-            break;
-        case NoMode:
-            emit setButtonText("Browse");
-            break;
-        default:
-            qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode;
-            break;
+    case Folder:
+        //emit setButtonText(format::algoToStr(settings_->algorithm).append(": Folder"));
+        button_->setText(format::algoToStr(settings_->algorithm).append(": Folder"));
+        break;
+    case File:
+        //emit setButtonText(format::algoToStr(settings_->algorithm).append(": File"));
+        button_->setText(format::algoToStr(settings_->algorithm).append(": File"));
+        break;
+    case DbFile:
+        //emit setButtonText("Open DataBase");
+        button_->setText("Open DataBase");
+        break;
+    case SumFile:
+        //emit setButtonText("Check");
+        button_->setText("Check");
+        break;
+    case Model:
+        //emit setButtonText("Verify All");
+        button_->setText("Verify All");
+        break;
+    case ModelNewLost:
+        //emit setButtonText("Update New/Lost");
+        button_->setText("Update New/Lost");
+        break;
+    case UpdateMismatch:
+        //emit setButtonText("Update");
+        button_->setText("Update");
+        break;
+    case NoMode:
+        //emit setButtonText("Browse");
+        button_->setText("Browse");
+        break;
+    default:
+        qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode;
+        break;
     }
 }
 
@@ -167,9 +192,20 @@ Mode ModeSelector::currentMode()
     return curMode;
 }
 
+bool ModeSelector::isCurrentMode(const Mode mode)
+{
+    return mode == curMode;
+}
+
 bool ModeSelector::isProcessing()
 {
     return isProcessing_;
+}
+
+void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
+{
+    settings_->algorithm = algo;
+    selectButtonText();
 }
 
 // tasks execution --->>>
@@ -208,7 +244,7 @@ void ModeSelector::showFileSystem()
 
 void ModeSelector::copyDataToClipboard(Column column)
 {
-    if ((view_->currentViewModel() == ModelView::ModelSource || view_->currentViewModel() == ModelView::ModelProxy)
+    if ((view_->isCurrentViewModel(ModelView::ModelSource) || view_->isCurrentViewModel(ModelView::ModelProxy))
         && view_->curIndexSource.isValid()) {
 
         QString strData = TreeModel::siblingAtRow(view_->curIndexSource, column).data().toString();
@@ -295,7 +331,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     QMenu *viewContextMenu = new QMenu(view_);
     connect(viewContextMenu, &QMenu::aboutToHide, viewContextMenu, &QMenu::deleteLater);
 
-    if (view_->currentViewModel() == ModelView::NotSetted) {
+    if (view_->isCurrentViewModel(ModelView::NotSetted)) {
         viewContextMenu->addAction(actionShowFS);
     }
     // Filesystem View
@@ -306,14 +342,14 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         if (isProcessing())
             viewContextMenu->addAction(actionCancel);
         else if (index.isValid()) {
-            if (currentMode() == ModeSelector::Folder) {
+            if (isCurrentMode(Folder)) {
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
                 viewContextMenu->addSeparator();
                 actionProcessFolderChecksums->setText(QString("Compute %1 for all files in folder")
                                                      .arg(format::algoToStr(settings_->algorithm)));
                 viewContextMenu->addAction(actionProcessFolderChecksums);
             }
-            else if (currentMode() == ModeSelector::File) {
+            else if (isCurrentMode(File)) {
                 QString clipboardText = QGuiApplication::clipboard()->text();
                 if (tools::canBeChecksum(clipboardText)) {
                     actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText));
@@ -324,9 +360,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionProcessSha256File);
                 viewContextMenu->addAction(actionProcessSha512File);
             }
-            else if (currentMode() == ModeSelector::DbFile)
+            else if (isCurrentMode(DbFile))
                 viewContextMenu->addAction(actionOpenDatabase);
-            else if (currentMode() == ModeSelector::SumFile)
+            else if (isCurrentMode(SumFile))
                 viewContextMenu->addAction(actionCheckSumFile);
         }
     }
@@ -344,14 +380,14 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
 
             viewContextMenu->addSeparator();
             viewContextMenu->addAction(actionShowFS);
-            if (view_->currentViewModel() == ModelView::ModelProxy
+            if (view_->isCurrentViewModel(ModelView::ModelProxy)
                 && view_->data_->proxyModel_->isFilterEnabled) {
                 viewContextMenu->addAction(actionShowAll);
             }
             viewContextMenu->addSeparator();
 
-            if (currentMode() == ModeSelector::UpdateMismatch) {
-                if (view_->currentViewModel() == ModelView::ModelProxy) {
+            if (isCurrentMode(UpdateMismatch)) {
+                if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
                     actionShowMismatchesOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::Mismatched));
                     viewContextMenu->addAction(actionShowMismatchesOnly);
                 }
@@ -360,8 +396,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionCopyReChecksum);
                 }
             }
-            else if (currentMode() == ModeSelector::ModelNewLost) {
-                if (view_->currentViewModel() == ModelView::ModelProxy) {
+            else if (isCurrentMode(ModelNewLost)) {
+                if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
                     actionShowNewLostOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::New));
                     viewContextMenu->addAction(actionShowNewLostOnly);
                 }
@@ -370,7 +406,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addSeparator();
             }
 
-            if (currentMode() == ModeSelector::Model || currentMode() == ModeSelector::ModelNewLost) {
+            if (isCurrentMode(Model) || isCurrentMode(ModelNewLost)) {
                 if (index.isValid()) {
                     if (TreeModel::isFileRow(index)) {
                         viewContextMenu->addAction(actionCheckCurFileFromModel);
@@ -388,4 +424,20 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     }
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+}
+
+void ModeSelector::createContextMenu_Button(const QPoint &point)
+{
+    if (!isCurrentMode(File) && !isCurrentMode(Folder))
+        return;
+
+    actionSetAlgoSha1->setChecked(settings_->algorithm == QCryptographicHash::Sha1);
+    actionSetAlgoSha256->setChecked(settings_->algorithm == QCryptographicHash::Sha256);
+    actionSetAlgoSha512->setChecked(settings_->algorithm == QCryptographicHash::Sha512);
+
+    QMenu *buttonContextMenu = new QMenu;
+    connect(buttonContextMenu, &QMenu::aboutToHide, buttonContextMenu, &QMenu::deleteLater);
+    buttonContextMenu->addActions(actionsSetAlgo);
+
+    buttonContextMenu->exec(button_->mapToGlobal(point));
 }
