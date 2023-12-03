@@ -4,6 +4,8 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QThread>
+#include <QGuiApplication>
+#include <QClipboard>
 #include <QDebug>
 #include "files.h"
 #include "shacalculator.h"
@@ -84,8 +86,9 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
         return;
 
     if (clipboard) {
-        emit toClipboard(sum); // send checksum to clipboard
-        emit showMessage("Computed checksum is copied to clipboard");
+        QGuiApplication::clipboard()->setText(sum);
+        emit showMessage(QString("Computed checksum is copied to clipboard\n\n%1: %2")
+                        .arg(format::algoToStr(algo), format::shortenString(sum, 40)), paths::basicName(filePath));
     }
 
     if (summaryFile) {
@@ -113,8 +116,9 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
             emit showMessage(QString("The checksum is saved in the summary file:\n%1").arg(paths::basicName(sumFile)));
         }
         else {
-            emit toClipboard(sum); // send checksum to clipboard
-            emit showMessage(QString("Unable to write to file: %1\nChecksum is copied to clipboard").arg(sumFile), "Warning");
+            QGuiApplication::clipboard()->setText(sum); // if unable to write summary, send the checksum to clipboard
+            emit showMessage(QString("Unable to create summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
+                                  .arg(sumFile, format::algoToStr(algo), format::shortenString(sum, 40)), "Warning");
         }
     }
 }
@@ -436,12 +440,6 @@ void Manager::showFileCheckResultMessage(bool isMatched)
     else
         emit showMessage("Checksum does NOT match", "Failed");
 }
-/*
-void Manager::copyStoredChecksum(const QModelIndex &fileItemIndex)
-{
-    if (dataMaintainer)
-        emit toClipboard(dataMaintainer->getStoredChecksum(fileItemIndex));
-}*/
 
 // info about folder (number of files and total size) or file (size)
 void Manager::getPathInfo(const QString &path)

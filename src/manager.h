@@ -24,7 +24,6 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
-    //void copyStoredChecksum(const QModelIndex& fileItemIndex);
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
@@ -38,7 +37,6 @@ public slots:
 private:
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead all database cheking
-    //void chooseMode(); // if there are New Files or Lost Files --> setMode("modelNewLost"); else setMode("model");
     void showFileCheckResultMessage(bool isMatched);
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
@@ -62,7 +60,6 @@ signals:
     void setViewData(DataContainer *data = nullptr, ModelView modelSel = ModelView::ModelProxy);
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void showMessage(const QString &text, const QString &title = "Info");
-    void toClipboard(const QString &text);
     void cancelProcess();
 };
 

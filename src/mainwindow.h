@@ -6,7 +6,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QClipboard>
+//#include <QClipboard>
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QLabel>

@@ -104,7 +104,6 @@ void MainWindow::connectManager()
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
-    connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);}); //send text to system clipboard
     connect(manager->dataMaintainer, &DataMaintainer::dataUpdated, modeSelect, &ModeSelector::setMode);
 
     // process status
