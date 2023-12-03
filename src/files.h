@@ -14,8 +14,8 @@ struct FilterRule {
     enum ExtensionsFilter {NotSet, Include, Ignore};
     void setFilter(const ExtensionsFilter filterType, const QStringList &extensions)
     {
-        extensionsFilter_ = filterType;
         extensionsList = extensions;
+        extensionsList.isEmpty() ? extensionsFilter_ = NotSet : extensionsFilter_ = filterType;
     }
 
     void clearFilter()
