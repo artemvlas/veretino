@@ -46,7 +46,6 @@ void MainWindow::connections()
 
     // Push Button
     connect(ui->button, &QPushButton::clicked, modeSelect, &ModeSelector::doWork);
-    //connect(modeSelect, &ModeSelector::setButtonText, ui->button, &QPushButton::setText);
     connect(ui->button, &QPushButton::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_Button);
 
     //TreeView

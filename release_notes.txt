@@ -7,4 +7,4 @@ Veretino 0.3.0
 * Added a context menu for the "SHA-Button", allowing to quickly change the Algorithm (SHA-1 : SHA-256 : SHA-512).
 * Added the ability to copy a recomputed checksum (ReChecksum) to the clipboard
 * Now file statuses are always displayed
-* Many small improvements
+* Multiple small improvements

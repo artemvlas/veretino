@@ -97,7 +97,6 @@ void ModeSelector::prepareView()
 void ModeSelector::setMode()
 {
     if (isProcessing_) {
-        //emit setButtonText("Cancel");
         button_->setText("Cancel");
         return;
     }
@@ -118,35 +117,27 @@ void ModeSelector::selectButtonText()
 {
     switch (curMode) {
     case Folder:
-        //emit setButtonText(format::algoToStr(settings_->algorithm).append(": Folder"));
         button_->setText(format::algoToStr(settings_->algorithm).append(": Folder"));
         break;
     case File:
-        //emit setButtonText(format::algoToStr(settings_->algorithm).append(": File"));
         button_->setText(format::algoToStr(settings_->algorithm).append(": File"));
         break;
     case DbFile:
-        //emit setButtonText("Open DataBase");
-        button_->setText("Open DataBase");
+        button_->setText("Open Database");
         break;
     case SumFile:
-        //emit setButtonText("Check");
         button_->setText("Check");
         break;
     case Model:
-        //emit setButtonText("Verify All");
         button_->setText("Verify All");
         break;
     case ModelNewLost:
-        //emit setButtonText("Update New/Lost");
         button_->setText("Update New/Lost");
         break;
     case UpdateMismatch:
-        //emit setButtonText("Update");
         button_->setText("Update");
         break;
     case NoMode:
-        //emit setButtonText("Browse");
         button_->setText("Browse");
         break;
     default:

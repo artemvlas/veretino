@@ -107,9 +107,6 @@ private:
     Settings *settings_;
 
 signals:
-    //void setButtonText(const QString &buttonText);
-
-    // tasks
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void processFolderSha(const QString &path, QCryptographicHash::Algorithm algo);
