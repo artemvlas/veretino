@@ -1,0 +1,10 @@
+Veretino 0.3.0
+* The internal data architecture has been redesigned.
+* Added menu item "Forget all changes". Now, when a database is overwritten, a temporary backup copy is created. This makes it possible to undo all changes by restoring the original database from a backup.
+* The program now prevents all items from being deleted from the database. For example, in the case when all the listed files are missing on the disk.
+* Added sorting feature. Also, now when viewing the database model, folders are grouped top/bottom.
+* In database browsing mode, the saved checksums are now displayed, and, if mismatches are detected, the newly calculated checksums (ReChecksums) are also displayed. Both of these columns can be hidden.
+* Added a context menu for the "SHA-Button", allowing to quickly change the Algorithm (SHA-1 : SHA-256 : SHA-512).
+* Added the ability to copy a recomputed checksum (ReChecksum) to the clipboard
+* Now file statuses are always displayed
+* Many small improvements
