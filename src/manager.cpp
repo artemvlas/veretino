@@ -360,13 +360,16 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
     if (rootIndex.isValid() && rootIndex.model() == dataMaintainer->data_->proxyModel_)
         rootIndex = dataMaintainer->data_->proxyModel_->mapToSource(rootIndex);
 
-    int numQueued = 0;
+    emit processing(true); // The main signal is located below, and this one is needed for the correct return to the ProxyModel in case numQueued == 0
+                           // This signal can be removed by adding the same to the functions below (numberOf() and addToQueue()/changeFilesStatus())
 
-    numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
-                                               : dataMaintainer->addToQueue(status, rootIndex);
+    int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
+                                                   : dataMaintainer->addToQueue(status, rootIndex);
 
     if (numQueued == 0) {
         qDebug() << "Manager::calculateChecksums | No files in queue";
+        if (finalProcess)
+            emit processing(false);
         return 0;
     }
 
@@ -382,9 +385,9 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
     connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
-    TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
-
     emit processing(true, true); // set processing view, show progress bar
+
+    TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
