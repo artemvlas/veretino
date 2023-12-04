@@ -333,6 +333,11 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         if (isProcessing())
             viewContextMenu->addAction(actionCancel);
         else if (index.isValid()) {
+            if (isCurrentMode(File) || isCurrentMode(Folder)) {
+                setCheckedState_ActionsAlgo();
+                viewContextMenu->addMenu("Algorithm")->addActions(actionsSetAlgo);
+            }
+
             if (isCurrentMode(Folder)) {
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
                 viewContextMenu->addSeparator();
@@ -422,13 +427,18 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
     if (!isCurrentMode(File) && !isCurrentMode(Folder))
         return;
 
-    actionSetAlgoSha1->setChecked(settings_->algorithm == QCryptographicHash::Sha1);
-    actionSetAlgoSha256->setChecked(settings_->algorithm == QCryptographicHash::Sha256);
-    actionSetAlgoSha512->setChecked(settings_->algorithm == QCryptographicHash::Sha512);
+    setCheckedState_ActionsAlgo();
 
     QMenu *buttonContextMenu = new QMenu(button_);
     connect(buttonContextMenu, &QMenu::aboutToHide, buttonContextMenu, &QMenu::deleteLater);
     buttonContextMenu->addActions(actionsSetAlgo);
 
     buttonContextMenu->exec(button_->mapToGlobal(point));
+}
+
+void ModeSelector::setCheckedState_ActionsAlgo()
+{
+    actionSetAlgoSha1->setChecked(settings_->algorithm == QCryptographicHash::Sha1);
+    actionSetAlgoSha256->setChecked(settings_->algorithm == QCryptographicHash::Sha256);
+    actionSetAlgoSha512->setChecked(settings_->algorithm == QCryptographicHash::Sha512);
 }

@@ -99,6 +99,7 @@ private:
     Mode selectMode(const QString &path); // select Mode based on file system path
 
     void copyDataToClipboard(Column column);
+    void setCheckedState_ActionsAlgo();
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;
