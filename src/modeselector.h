@@ -56,11 +56,14 @@ public:
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents By Type", this);
     QAction *actionProcessFolderChecksums = new QAction("Compute checksums for all files in folder", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
+    QAction *actionProcessSha_toClipboard = new QAction("Calculate Checksum --> Clipboard", this);
     QAction *actionProcessSha1File = new QAction("SHA-1 --> *.sha1", this);
     QAction *actionProcessSha256File = new QAction("SHA-256 --> *.sha256", this);
     QAction *actionProcessSha512File = new QAction("SHA-512 --> *.sha512", this);
     QAction *actionOpenDatabase = new QAction("Open Database", this);
     QAction *actionCheckSumFile = new QAction("Check the Checksum", this);
+
+    QList<QAction*> actionsMakeSummaries {actionProcessSha1File, actionProcessSha256File, actionProcessSha512File};
 
     // DB Model View
     QAction *actionCancelBackToFS = new QAction("Cancel and Back to FileSystem view", this);

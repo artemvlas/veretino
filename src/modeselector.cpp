@@ -38,6 +38,7 @@ void ModeSelector::connectActions()
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1);});
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256);});
     connect(actionProcessSha512File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha512);});
+    connect(actionProcessSha_toClipboard, &QAction::triggered, this, &ModeSelector::quickAction);
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -346,15 +347,16 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionProcessFolderChecksums);
             }
             else if (isCurrentMode(File)) {
+                viewContextMenu->addMenu("Store checksum to summary")->addActions(actionsMakeSummaries);
+                actionProcessSha_toClipboard->setText(QString("Calculate %1 checksum --> Clipboard").arg(format::algoToStr(settings_->algorithm)));
+                viewContextMenu->addAction(actionProcessSha_toClipboard);
+
                 QString clipboardText = QGuiApplication::clipboard()->text();
                 if (tools::canBeChecksum(clipboardText)) {
-                    actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText));
-                    viewContextMenu->addAction(actionCheckFileByClipboardChecksum);
+                    actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText, 20));
                     viewContextMenu->addSeparator();
+                    viewContextMenu->addAction(actionCheckFileByClipboardChecksum);
                 }
-                viewContextMenu->addAction(actionProcessSha1File);
-                viewContextMenu->addAction(actionProcessSha256File);
-                viewContextMenu->addAction(actionProcessSha512File);
             }
             else if (isCurrentMode(DbFile))
                 viewContextMenu->addAction(actionOpenDatabase);
