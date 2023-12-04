@@ -362,8 +362,8 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
 
     int numQueued = 0;
 
-    numQueued = (status != FileStatus::Queued) ? dataMaintainer->addToQueue(status, rootIndex)
-                                               : dataMaintainer->data_->numbers.numberOf(status);
+    numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
+                                               : dataMaintainer->addToQueue(status, rootIndex);
 
     if (numQueued == 0) {
         qDebug() << "Manager::calculateChecksums | No files in queue";
