@@ -37,7 +37,7 @@ public slots:
 private:
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead all database cheking
-    void showFileCheckResultMessage(bool isMatched);
+    void showFileCheckResultMessage(bool isMatched, const QString &fileName = QString());
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool finalProcess = true); // <finalProcess> -->> whether it sends a process end signal or not

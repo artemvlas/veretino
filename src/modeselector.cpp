@@ -342,8 +342,10 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
             if (isCurrentMode(Folder)) {
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
                 viewContextMenu->addSeparator();
-                actionProcessFolderChecksums->setText(QString("Compute %1 for all files in folder")
-                                                     .arg(format::algoToStr(settings_->algorithm)));
+                QString argAllFiltered = settings_->filter.isFilter(FilterRule::NotSet) ? QString("of all") : QString("of filtered");
+                QString actProcFolderText = QString("Calculate %1 %2 files in the folder").arg(format::algoToStr(settings_->algorithm), argAllFiltered);
+
+                actionProcessFolderChecksums->setText(actProcFolderText);
                 viewContextMenu->addAction(actionProcessFolderChecksums);
             }
             else if (isCurrentMode(File)) {

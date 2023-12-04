@@ -316,7 +316,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
     QString sum = calculateChecksum(filePath, algo);
 
     if (!sum.isEmpty())
-        showFileCheckResultMessage(sum == checkSum.toLower());
+        showFileCheckResultMessage(sum == checkSum.toLower(), paths::basicName(filePath));
 }
 
 QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess)
@@ -432,12 +432,16 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
     return doneNum;
 }
 
-void Manager::showFileCheckResultMessage(bool isMatched)
+void Manager::showFileCheckResultMessage(bool isMatched, const QString &fileName)
 {
+    QString file_name;
+    if (!fileName.isEmpty())
+        file_name = "\n\n" + fileName;
+
     if (isMatched)
-        emit showMessage("Checksum Match", "Success");
+        emit showMessage(QString("Checksum Match%1").arg(file_name), "Success");
     else
-        emit showMessage("Checksum does NOT match", "Failed");
+        emit showMessage(QString("Checksum does NOT match%1").arg(file_name), "Failed");
 }
 
 // info about folder (number of files and total size) or file (size)
