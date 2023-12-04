@@ -62,7 +62,7 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
     header["Created with"] = QString("Veretino %1 https://github.com/artemvlas/veretino").arg(APP_VERSION);
     header["Files number"] = data->numbers.numChecksums;
     header["Folder"] = paths::basicName(data->metaData.workDir);
-    header["Used algorithm"] = format::algoToStr(data->metaData.algorithm);
+    header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
     header["Total size"] = format::dataSizeReadableExt(data->numbers.totalSize);
     header["Updated"] = data->metaData.saveDateTime;
     if (isWorkDirRelative)
@@ -72,9 +72,9 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
 
     if (data->isFilterApplied()) {
         if (data->metaData.filter.isFilter(FilterRule::Include))
-            header["Included Only"] = data->metaData.filter.extensionsList.join(" "); // only files with extensions from this list are included in the database, others are ignored
+            header[strHeaderIncluded] = data->metaData.filter.extensionsList.join(" "); // only files with extensions from this list are included in the database, others are ignored
         else if (data->metaData.filter.isFilter(FilterRule::Ignore))
-            header["Ignored"] = data->metaData.filter.extensionsList.join(" "); // files with extensions from this list are ignored (not included in the database)
+            header[strHeaderIgnored] = data->metaData.filter.extensionsList.join(" "); // files with extensions from this list are ignored (not included in the database)
     }
 
     QJsonObject storedData;   
@@ -181,20 +181,23 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         parsedData->metaData.workDir = paths::parentFolder(filePath);
     }
 
-    if (header.contains("Ignored")) {
-        parsedData->metaData.filter.setFilter(FilterRule::Ignore, header.value("Ignored").toString().split(" "));
+    QString strIgnored = tools::findCompleteString(header.keys(), strHeaderIgnored);
+    QString strIncluded = tools::findCompleteString(header.keys(), strHeaderIncluded);
+
+    if (!strIgnored.isEmpty()) {
+        parsedData->metaData.filter.setFilter(FilterRule::Ignore, header.value(strIgnored).toString().split(" "));
     }
-    else if (header.contains("Included Only")) {
-        parsedData->metaData.filter.setFilter(FilterRule::Include, header.value("Included Only").toString().split(" "));
+    else if (!strIncluded.isEmpty()) {
+        parsedData->metaData.filter.setFilter(FilterRule::Include, header.value(strIncluded).toString().split(" "));
     }
 
-    if (header.contains("Used algorithm")) {
-        parsedData->metaData.algorithm = tools::strToAlgo(header.value("Used algorithm").toString());
-        qDebug() << "JsonDb::parseJson | Used algorithm from header data";
+    if (header.contains(strHeaderAlgo)) {
+        parsedData->metaData.algorithm = tools::strToAlgo(header.value(strHeaderAlgo).toString());
+        qDebug() << "JsonDb::parseJson | Used algorithm from header data:" << parsedData->metaData.algorithm;
     }
     else {
         parsedData->metaData.algorithm = tools::algorithmByStrLen(filelistData.begin().value().toString().length());
-        qDebug() << "JsonDb::parseJson | The algorithm is determined by the length of the checksum string";
+        qDebug() << "JsonDb::parseJson | The algorithm is determined by the length of the checksum string:" << parsedData->metaData.algorithm;
     }
 
     if (header.contains("Updated"))

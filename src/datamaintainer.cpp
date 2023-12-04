@@ -467,10 +467,9 @@ void DataMaintainer::dbStatus()
     result.append(QString("\nAlgorithm: %1").arg(format::algoToStr(data_->metaData.algorithm)));
 
     if (data_->isFilterApplied()) {
-        if (data_->metaData.filter.isFilter(FilterRule::Include))
-            result.append(QString("\nIncluded Only: %1").arg(data_->metaData.filter.extensionsList.join(", ")));
-        else
-            result.append(QString("\nIgnored: %1").arg(data_->metaData.filter.extensionsList.join(", ")));
+        QString extensions = data_->metaData.filter.extensionsList.join(", ");
+        data_->metaData.filter.isFilter(FilterRule::Include) ? result.append(QString("\nIncluded Only: %1").arg(extensions))
+                                                             : result.append(QString("\nIgnored: %1").arg(extensions));
     }
 
     result.append(QString("\nLast update: %1").arg(data_->metaData.saveDateTime));

@@ -31,12 +31,15 @@ private:
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
 
+    QString strHeaderIgnored = "Ignored";
+    QString strHeaderIncluded = "Included";
+    QString strHeaderAlgo = "Used algorithm";
+
     QString jsonFilePath;
     QElapsedTimer elapsedTimer;
     bool canceled = false;
 
 signals:
-    //void processing(bool isProcessing, bool visibleProgress = false);
     void showMessage(const QString &text, const QString &title = "Info");
     void setStatusbarText(const QString &text = QString()); // text to statusbar
 };
