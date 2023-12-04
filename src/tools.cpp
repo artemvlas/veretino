@@ -49,6 +49,20 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
     }
 }
 
+QString findCompleteString(const QStringList &strList, const QString &sample, int sampleLength)
+{
+    QString result;
+
+    foreach (const QString &str, strList) {
+        if (str.contains(sample.left(sampleLength), Qt::CaseInsensitive)) {
+            result = str;
+            break;
+        }
+    }
+
+    return result;
+}
+
 bool isDatabaseFile(const QString &filePath) {
     return filePath.endsWith(".ver.json", Qt::CaseInsensitive);
 }
