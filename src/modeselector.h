@@ -54,7 +54,7 @@ public:
     QAction *actionToHome = new QAction("to Home", this);
     QAction *actionCancel = new QAction("Cancel operation", this);
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents By Type", this);
-    QAction *actionProcessFolderChecksums = new QAction("Compute checksums for all files in folder", this);
+    QAction *actionProcessFolderChecksums = new QAction("Compute checksums for all files in the folder", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
     QAction *actionProcessSha_toClipboard = new QAction("Calculate Checksum --> Clipboard", this);
     QAction *actionProcessSha1File = new QAction("SHA-1 --> *.sha1", this);
