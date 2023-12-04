@@ -12,6 +12,9 @@ using FileList = QMap<QString, FileValues>; // {relative path to file : FileValu
 
 struct FilterRule {
     enum ExtensionsFilter {NotSet, Include, Ignore};
+    FilterRule(bool ignoreSummaries = true) : ignoreShaFiles(ignoreSummaries), ignoreDbFiles(ignoreSummaries) {}
+    FilterRule(const ExtensionsFilter filterType, const QStringList &extensions) : extensionsFilter_(filterType), extensionsList(extensions) {}
+
     void setFilter(const ExtensionsFilter filterType, const QStringList &extensions)
     {
         extensionsList = extensions;
@@ -33,9 +36,6 @@ struct FilterRule {
     QStringList extensionsList;
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
-
-    FilterRule(bool ignoreSummaries = true) : ignoreShaFiles(ignoreSummaries), ignoreDbFiles(ignoreSummaries) {}
-    FilterRule(const ExtensionsFilter filterType, const QStringList &extensions) : extensionsFilter_(filterType), extensionsList(extensions) {}
 }; // struct FilterRule
 
 class Files : public QObject

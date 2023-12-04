@@ -137,7 +137,7 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)
 {
-    if (filter.isFilter(FilterRule::Ignore)) {
+    if (!filter.isFilter(FilterRule::Include)) {
         if (tools::isDatabaseFile(filePath))
             return !filter.ignoreDbFiles;
         if (tools::isSummaryFile(filePath))
