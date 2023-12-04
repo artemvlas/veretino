@@ -242,6 +242,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     if (!dataMaintainer)
         return;
 
+    dataMaintainer->changeFilesStatus({FileStatus::Added, FileStatus::ChecksumUpdated}, FileStatus::Matched, folderItemIndex);
     calculateChecksums(folderItemIndex, FileStatus::NotChecked);
 
     if (canceled) {
@@ -250,9 +251,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        int numMatched = dataMaintainer->data_->numbers.numberOf(FileStatus::Matched)
-                         + dataMaintainer->data_->numbers.numberOf(FileStatus::Added)
-                         + dataMaintainer->data_->numbers.numberOf(FileStatus::ChecksumUpdated);
+        int numMatched = dataMaintainer->data_->numbers.numberOf(FileStatus::Matched);
 
         if (dataMaintainer->data_->numbers.numberOf(FileStatus::Mismatched) > 0)
             emit showMessage(QString("%1 out of %2 files is changed or corrupted")
@@ -266,7 +265,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     else {// if subfolder
         QString subfolderName = TreeModel::siblingAtRow(folderItemIndex, Column::ColumnPath).data().toString();
         Numbers num = dataMaintainer->updateNumbers(dataMaintainer->data_->model_, folderItemIndex);
-        int subMatched = num.numberOf(FileStatus::Matched) + num.numberOf(FileStatus::Added) + num.numberOf(FileStatus::ChecksumUpdated);
+        int subMatched = num.numberOf(FileStatus::Matched);
 
         if (num.numberOf(FileStatus::Mismatched) > 0)
             emit showMessage(QString("Subfolder: %1\n\n%2 out of %3 files in the Subfolder is changed or corrupted")
@@ -363,10 +362,8 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
 
     int numQueued = 0;
 
-    if (status != FileStatus::Queued)
-        numQueued = dataMaintainer->addToQueue(status, rootIndex);
-    else
-        numQueued = dataMaintainer->data_->numbers.numberOf(status);
+    numQueued = (status != FileStatus::Queued) ? dataMaintainer->addToQueue(status, rootIndex)
+                                               : dataMaintainer->data_->numbers.numberOf(status);
 
     if (numQueued == 0) {
         qDebug() << "Manager::calculateChecksums | No files in queue";
@@ -412,7 +409,7 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                 dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, status);
 
                 if (status != FileStatus::Queued)
-                    dataMaintainer->changeFilesStatuses(FileStatus::Queued, status, rootIndex);
+                    dataMaintainer->changeFilesStatus(FileStatus::Queued, status, rootIndex);
 
                 qDebug() << "Manager::calculateChecksums | CANCELED | Done" << doneNum;
                 break;

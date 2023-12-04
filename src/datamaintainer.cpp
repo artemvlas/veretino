@@ -185,7 +185,7 @@ Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QMo
     return num;
 }
 
-qint64 DataMaintainer::totalSizeOfListedFiles(FileStatus fileStatus, const QModelIndex &rootIndex)
+qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex &rootIndex)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::totalSizeOfListedFiles | NO data_";
@@ -250,18 +250,26 @@ bool DataMaintainer::updateChecksum(QModelIndex fileRowIndex, const QString &com
     return (storedChecksum.isEmpty() || storedChecksum == computedChecksum);
 }
 
-int DataMaintainer::changeFilesStatuses(FileStatus currentStatus, FileStatus newStatus, const QModelIndex &rootIndex)
+int DataMaintainer::changeFilesStatus(const FileStatus currentStatus, const FileStatus newStatus, const QModelIndex &rootIndex)
+{
+    return changeFilesStatus(QSet<FileStatus>({currentStatus}), newStatus, rootIndex);
+}
+
+int DataMaintainer::changeFilesStatus(const QSet<FileStatus> curStatuses, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
     if (!data_) {
-        qDebug() << "DataMaintainer::changeFilesStatuses | NO data_";
+        qDebug() << "DataMaintainer::changeFilesStatus | NO data_";
         return 0;
     }
+
+    if (newStatus == FileStatus::Queued)
+        qDebug() << "adding to queue...";
 
     int number = 0;
     TreeModelIterator iter(data_->model_, rootIndex);
 
     while (iter.hasNext()) {
-        if (iter.nextFile().status() == currentStatus) {
+        if (curStatuses.contains(iter.nextFile().status())) {
             data_->model_->setItemData(iter.index(), Column::ColumnStatus, newStatus);
             ++number;
         }
@@ -270,18 +278,20 @@ int DataMaintainer::changeFilesStatuses(FileStatus currentStatus, FileStatus new
     if (number > 0)
         updateNumbers();
 
+    if (newStatus == FileStatus::Queued)
+        qDebug() << QString("%1 files added to queue").arg(number);
+
     return number;
 }
 
-int DataMaintainer::addToQueue(FileStatus currentStatus, const QModelIndex &rootIndex)
+int DataMaintainer::addToQueue(const FileStatus currentStatus, const QModelIndex &rootIndex)
 {
-    qDebug() << "adding to queue...";
+    return changeFilesStatus(currentStatus, FileStatus::Queued, rootIndex);
+}
 
-    int added = changeFilesStatuses(currentStatus, FileStatus::Queued, rootIndex);
-
-    qDebug() << QString("%1 files added to queue").arg(added);
-
-    return added;
+int DataMaintainer::addToQueue(const QSet<FileStatus> curStatuses, const QModelIndex &rootIndex)
+{
+    return changeFilesStatus(curStatuses, FileStatus::Queued, rootIndex);
 }
 
 QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)

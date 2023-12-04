@@ -29,7 +29,7 @@ public:
     Numbers updateNumbers(const QAbstractItemModel* model,
                           const QModelIndex& rootIndex = QModelIndex());
 
-    qint64 totalSizeOfListedFiles(FileStatus fileStatus, const QModelIndex& rootIndex = QModelIndex());
+    qint64 totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex& rootIndex = QModelIndex());
     qint64 totalSizeOfListedFiles(const QSet<FileStatus>& fileStatuses = QSet<FileStatus>(),
                                   const QModelIndex& rootIndex = QModelIndex());
     static qint64 totalSizeOfListedFiles(const QAbstractItemModel* model,
@@ -39,12 +39,17 @@ public:
     bool updateChecksum(QModelIndex fileRowIndex,
                         const QString &computedChecksum); // returns 'true' if Added or Matched. returns false if Mismatched
 
-    int changeFilesStatuses(FileStatus currentStatus,
-                            FileStatus newStatus,
-                            const QModelIndex &rootIndex = QModelIndex());
+    int changeFilesStatus(const FileStatus currentStatus,
+                          const FileStatus newStatus,
+                          const QModelIndex &rootIndex = QModelIndex());
+    int changeFilesStatus(const QSet<FileStatus> curStatuses,
+                          const FileStatus newStatus,
+                          const QModelIndex &rootIndex = QModelIndex());
 
-    int addToQueue(FileStatus currentStatus,
+    int addToQueue(const FileStatus currentStatus,
                    const QModelIndex &rootIndex = QModelIndex()); // changes statuses of files in data_->model_ from <currentStatus> to FileStatus::Queued
+    int addToQueue(const QSet<FileStatus> curStatuses,
+                   const QModelIndex &rootIndex = QModelIndex());
 
     QString getStoredChecksum(const QModelIndex &fileRowIndex);
 
