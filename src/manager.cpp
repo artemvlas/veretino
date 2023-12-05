@@ -163,6 +163,7 @@ void Manager::updateNewLost()
     int numMissing = dataMaintainer->data_->numbers.numberOf(FileStatus::Missing);
 
     if (numMissing > 0 && numMissing >= (dataMaintainer->data_->numbers.numChecksums + numNew)) {
+        emit processing(false);
         emit showMessage("Failure to delete all database items", "Warning");
         return;
     }
@@ -360,8 +361,10 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
     if (rootIndex.isValid() && rootIndex.model() == dataMaintainer->data_->proxyModel_)
         rootIndex = dataMaintainer->data_->proxyModel_->mapToSource(rootIndex);
 
+    /* testing: ModeSelector::prepareView() override this signal
     emit processing(true); // The main signal is located below, and this one is needed for the correct return to the ProxyModel in case numQueued == 0
                            // This signal can be removed by adding the same to the functions below (numberOf() and addToQueue()/changeFilesStatus())
+    */
 
     int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);
