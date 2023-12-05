@@ -86,8 +86,6 @@ void ModeSelector::processing(bool isProcessing)
 
 void ModeSelector::prepareView()
 {
-    processing(true);
-
     if (view_->currentViewModel() == ModelView::ModelProxy) {
         view_->disableFilter(); // if proxy model filtering is enabled, starting a Big Data queuing/verification may be very slow,
                                 // even if switching to Source Model, so disable filtering first
@@ -95,6 +93,8 @@ void ModeSelector::prepareView()
         view_->setTreeModel(ModelView::ModelSource); // set the Source Model for the duration of the process,
                                                     // because the Proxy Model is not friendly with Big Data
     }
+
+    processing(true);
 }
 
 void ModeSelector::setMode()

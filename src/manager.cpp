@@ -164,17 +164,19 @@ void Manager::updateNewLost()
     int numNew = dataMaintainer->data_->numbers.numberOf(FileStatus::New);
     int numMissing = dataMaintainer->data_->numbers.numberOf(FileStatus::Missing);
 
-    if (numMissing > 0 && numMissing >= (dataMaintainer->data_->numbers.numChecksums + numNew)) {
+    if (numMissing >= (dataMaintainer->data_->numbers.numChecksums + numNew)) {
         emit processing(false);
         emit showMessage("Failure to delete all database items", "Warning");
         return;
     }
 
     if (numNew > 0) {
-        calculateChecksums(FileStatus::New);
+        calculateChecksums(FileStatus::New, false);
 
-        if (canceled)
+        if (canceled) {
+            emit processing(false);
             return;
+        }
 
         itemsInfo.append(QString("added %1").arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Added)));
 

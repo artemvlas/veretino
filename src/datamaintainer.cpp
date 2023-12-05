@@ -416,10 +416,6 @@ bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
     bool result = setSourceData(json->parseJson(jsonFilePath));
 
-    /*if (canceled || data_->model_->isEmpty()) {
-        clearData();
-    }*/
-
     if (result)
         dbStatus();
 
