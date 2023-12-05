@@ -215,7 +215,6 @@ void Manager::verify(const QModelIndex &curIndex)
 void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 {
     if (!dataMaintainer->data_) {
-        emit processing(false);
         return;
     }
 
@@ -363,16 +362,13 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
 {
     if (!dataMaintainer->data_) {
         qDebug() << "Manager::calculateChecksums | No data";
+        if (finalProcess)
+            emit processing(false);
         return 0;
     }
 
     if (rootIndex.isValid() && rootIndex.model() == dataMaintainer->data_->proxyModel_)
         rootIndex = dataMaintainer->data_->proxyModel_->mapToSource(rootIndex);
-
-    /* testing: ModeSelector::prepareView() override this signal
-    emit processing(true); // The main signal is located below, and this one is needed for the correct return to the ProxyModel in case numQueued == 0
-                           // This signal can be removed by adding the same to the functions below (numberOf() and addToQueue()/changeFilesStatus())
-    */
 
     int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);
@@ -423,7 +419,9 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                 dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, status);
 
                 if (status != FileStatus::Queued) {
-                    dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
+                    if (status == FileStatus::New)
+                        dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
+
                     dataMaintainer->changeFilesStatus({FileStatus::Queued, FileStatus::Added}, status, rootIndex);
                 }
 
