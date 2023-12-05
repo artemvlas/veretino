@@ -154,8 +154,10 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
 void Manager::updateNewLost()
 {
-    if (!dataMaintainer->data_)
+    if (!dataMaintainer->data_) {
+        emit processing(false);
         return;
+    }
 
     QString itemsInfo;
 
@@ -192,8 +194,10 @@ void Manager::updateNewLost()
 // update the Database with new checksums for files with failed verification
 void Manager::updateMismatch()
 {
-    if (!dataMaintainer->data_)
+    if (!dataMaintainer->data_) {
+        emit processing(false);
         return;
+    }
 
     dataMaintainer->data_->metaData.about = QString("%1 checksums updated")
                                             .arg(dataMaintainer->updateMismatchedChecksums());
@@ -210,8 +214,10 @@ void Manager::verify(const QModelIndex &curIndex)
 //check only selected file instead all database cheking
 void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 {
-    if (!dataMaintainer)
+    if (!dataMaintainer->data_) {
+        emit processing(false);
         return;
+    }
 
     FileStatus storedStatus = TreeModel::siblingAtRow(fileItemIndex, Column::ColumnStatus).data(TreeModel::RawDataRole).value<FileStatus>();
 
@@ -240,8 +246,10 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
 void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 {
-    if (!dataMaintainer)
+    if (!dataMaintainer->data_) {
+        emit processing(false);
         return;
+    }
 
     dataMaintainer->changeFilesStatus({FileStatus::Added, FileStatus::ChecksumUpdated}, FileStatus::Matched, folderItemIndex);
     calculateChecksums(folderItemIndex, FileStatus::NotChecked);
