@@ -1,6 +1,7 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QClipboard>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -80,6 +81,9 @@ void MainWindow::connectManager()
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
+    // cancel process
+    connect(modeSelect, &ModeSelector::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);
+
     // signals for execution tasks
     connect(modeSelect, &ModeSelector::parseJsonFile, manager, &Manager::createDataModel);
     connect(modeSelect, &ModeSelector::processFolderSha, manager, &Manager::processFolderSha);
@@ -90,13 +94,11 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
 
-    // cancel process
-    connect(modeSelect, &ModeSelector::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);
-
     // info and notifications
     connect(manager, SIGNAL(setStatusbarText(QString)), ui->statusbar, SLOT(showMessage(QString)));
     connect(manager, &Manager::setPermanentStatus, permanentStatus, &QLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
+    connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
     connect(modeSelect, &ModeSelector::folderContentsByType, manager, &Manager::folderContentsByType);

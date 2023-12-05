@@ -53,6 +53,7 @@ private:
 
 signals:
     void processing(bool isProcessing, bool visibleProgress = false);
+    void cancelProcess();
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
@@ -60,7 +61,8 @@ signals:
     void setViewData(DataContainer *data = nullptr, ModelView modelSel = ModelView::ModelProxy);
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void showMessage(const QString &text, const QString &title = "Info");
-    void cancelProcess();
+    void toClipboard(const QString &text); // Sending directly to QGuiApplication::clipboard()->setText works great on Linux,
+                                           // but does NOT work on older QT builds on Windows. So this signal is used for compatibility.
 };
 
 #endif // MANAGER_H

@@ -4,8 +4,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QThread>
-#include <QGuiApplication>
-#include <QClipboard>
 #include <QDebug>
 #include "files.h"
 #include "shacalculator.h"
@@ -87,7 +85,7 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
         return;
 
     if (clipboard) {
-        QGuiApplication::clipboard()->setText(sum);
+        emit toClipboard(sum);
         emit showMessage(QString("Computed checksum is copied to clipboard\n\n%1: %2")
                         .arg(format::algoToStr(algo), format::shortenString(sum, 40)), paths::basicName(filePath));
     }
@@ -118,7 +116,7 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
                              QString("%1 computed").arg(format::algoToStr(algo))); // Message header
         }
         else {
-            QGuiApplication::clipboard()->setText(sum); // if unable to write summary, send the checksum to clipboard
+            emit toClipboard(sum); // if unable to write summary, send the checksum to clipboard
             emit showMessage(QString("Unable to create summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
                                   .arg(sumFile, format::algoToStr(algo), format::shortenString(sum, 40)), "Warning");
         }
