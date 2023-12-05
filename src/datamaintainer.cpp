@@ -294,6 +294,31 @@ int DataMaintainer::addToQueue(const QSet<FileStatus> curStatuses, const QModelI
     return changeFilesStatus(curStatuses, FileStatus::Queued, rootIndex);
 }
 
+int DataMaintainer::clearChecksums(const FileStatus curStatus, const QModelIndex &rootIndex)
+{
+    return clearChecksums(QSet<FileStatus>({curStatus}), rootIndex);
+}
+
+int DataMaintainer::clearChecksums(const QSet<FileStatus> curStatuses, const QModelIndex &rootIndex)
+{
+    if (!data_) {
+        qDebug() << "DataMaintainer::clearChecksums | NO data_";
+        return 0;
+    }
+
+    int number = 0;
+    TreeModelIterator iter(data_->model_, rootIndex);
+
+    while (iter.hasNext()) {
+        if (curStatuses.contains(iter.nextFile().status())) {
+            data_->model_->setItemData(iter.index(), Column::ColumnChecksum);
+            ++number;
+        }
+    }
+
+    return number;
+}
+
 QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
 {
     if (!data_) {

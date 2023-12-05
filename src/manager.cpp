@@ -411,8 +411,10 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
             if (canceled) {
                 dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, status);
 
-                if (status != FileStatus::Queued)
-                    dataMaintainer->changeFilesStatus(FileStatus::Queued, status, rootIndex);
+                if (status != FileStatus::Queued) {
+                    dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
+                    dataMaintainer->changeFilesStatus({FileStatus::Queued, FileStatus::Added}, status, rootIndex);
+                }
 
                 qDebug() << "Manager::calculateChecksums | CANCELED | Done" << doneNum;
                 break;

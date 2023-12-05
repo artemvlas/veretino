@@ -51,6 +51,11 @@ public:
     int addToQueue(const QSet<FileStatus> curStatuses,
                    const QModelIndex &rootIndex = QModelIndex());
 
+    int clearChecksums(const FileStatus curStatus,
+                       const QModelIndex &rootIndex = QModelIndex());
+    int clearChecksums(const QSet<FileStatus> curStatuses,
+                       const QModelIndex &rootIndex = QModelIndex());
+
     QString getStoredChecksum(const QModelIndex &fileRowIndex);
 
     int clearDataFromLostFiles(bool finalProcess = false); // returns the number of cleared
