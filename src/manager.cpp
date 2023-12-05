@@ -162,16 +162,9 @@ void Manager::updateNewLost()
     int numNew = dataMaintainer->data_->numbers.numberOf(FileStatus::New);
     int numMissing = dataMaintainer->data_->numbers.numberOf(FileStatus::Missing);
 
-    if (numMissing > 0) {
-        if (numMissing < (dataMaintainer->data_->numbers.numChecksums + numNew))
-            itemsInfo.append(QString("removed %1").arg(dataMaintainer->clearDataFromLostFiles()));
-        else {
-            emit showMessage("Failure to delete all database items", "Warning");
-            return;
-        }
-
-        if (numMissing > 0)
-            itemsInfo.prepend(", ");
+    if (numMissing > 0 && numMissing >= (dataMaintainer->data_->numbers.numChecksums + numNew)) {
+        emit showMessage("Failure to delete all database items", "Warning");
+        return;
     }
 
     if (numNew > 0) {
@@ -180,7 +173,14 @@ void Manager::updateNewLost()
         if (canceled)
             return;
 
-        itemsInfo.prepend(QString("added %1").arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Added)));
+        itemsInfo.append(QString("added %1").arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Added)));
+
+        if (numMissing > 0)
+            itemsInfo.append(", ");
+    }
+
+    if (numMissing > 0) {
+        itemsInfo.append(QString("removed %1").arg(dataMaintainer->clearDataFromLostFiles()));
     }
 
     dataMaintainer->data_->metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
