@@ -6,6 +6,7 @@
 * Calculation a list of checksums for all files in the specified folder and store it in a local database. Verification the integrity of all files in a certain folder by comparing their checksums with those calculated and stored earlier in the database.
 * This can also be done with only selected file types by applying filters.
 * Looking for new or missing files in the folder by comparing the current contents with the previously saved list.
+* Comparing files by checksum.
 * Evaluation of files contained in the selected folder by types (extensions), their number and size.
 
 <p align="center">
