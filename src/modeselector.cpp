@@ -23,6 +23,10 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     actionSetAlgoSha256->setCheckable(true);
     actionSetAlgoSha512->setCheckable(true);
 
+    actionGroupSetAlgo->addAction(actionSetAlgoSha1);
+    actionGroupSetAlgo->addAction(actionSetAlgoSha256);
+    actionGroupSetAlgo->addAction(actionSetAlgoSha512);
+
     connectActions();
 }
 
@@ -338,7 +342,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         else if (index.isValid()) {
             if (isCurrentMode(File) || isCurrentMode(Folder)) {
                 setCheckedState_ActionsAlgo();
-                viewContextMenu->addMenu("Algorithm")->addActions(actionsSetAlgo);
+                viewContextMenu->addMenu("Algorithm")->addActions(actionGroupSetAlgo->actions());
             }
 
             if (isCurrentMode(Folder)) {
@@ -437,7 +441,7 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
 
     QMenu *buttonContextMenu = new QMenu(button_);
     connect(buttonContextMenu, &QMenu::aboutToHide, buttonContextMenu, &QMenu::deleteLater);
-    buttonContextMenu->addActions(actionsSetAlgo);
+    buttonContextMenu->addActions(actionGroupSetAlgo->actions());
 
     buttonContextMenu->exec(button_->mapToGlobal(point));
 }

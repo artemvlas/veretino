@@ -88,7 +88,8 @@ public:
     QAction *actionSetAlgoSha1 = new QAction("SHA-1", this);
     QAction *actionSetAlgoSha256 = new QAction("SHA-256", this);
     QAction *actionSetAlgoSha512 = new QAction("SHA-512", this);
-    QList<QAction*> actionsSetAlgo {actionSetAlgoSha1, actionSetAlgoSha256, actionSetAlgoSha512};
+    //QList<QAction*> actionsSetAlgo {actionSetAlgoSha1, actionSetAlgoSha256, actionSetAlgoSha512};
+    QActionGroup *actionGroupSetAlgo = new QActionGroup(this);
 
 public slots:
     void processing(bool isProcessing);
