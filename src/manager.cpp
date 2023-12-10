@@ -228,13 +228,13 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     QString savedSum = dataMaintainer->getStoredChecksum(fileItemIndex);
 
     if (!savedSum.isEmpty()) {
-        dataMaintainer->data_->model_->setItemData(fileItemIndex, Column::ColumnStatus, FileStatus::Processing);
+        dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Processing);
 
         QString sum = calculateChecksum(paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex)),
                                         dataMaintainer->data_->metaData.algorithm);
 
         if (sum.isEmpty()) {
-            dataMaintainer->data_->model_->setItemData(fileItemIndex, Column::ColumnStatus, storedStatus);
+            dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
         }
         else {
             showFileCheckResultMessage(dataMaintainer->updateChecksum(fileItemIndex, sum));
@@ -410,13 +410,13 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                                       .arg(numQueued)
                                       .arg(doneData));
 
-            dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::Processing);
+            dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Processing);
 
             QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()),
                                                  dataMaintainer->data_->metaData.algorithm);
 
             if (canceled) {
-                dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, status);
+                dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, status);
 
                 if (status != FileStatus::Queued) {
                     if (status == FileStatus::New)
@@ -430,7 +430,7 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
             }
 
             if (checksum.isEmpty())
-                dataMaintainer->data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
+                dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
             else {
                 dataMaintainer->updateChecksum(iter.index(), checksum);
                 ++doneNum;

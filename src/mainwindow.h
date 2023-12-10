@@ -40,9 +40,9 @@ private:
     void connectManager(); // connections with Manager separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
-    void dragEnterEvent(QDragEnterEvent *e);
-    void dropEvent(QDropEvent *e);
-    void closeEvent(QCloseEvent *event);
+    void dragEnterEvent(QDragEnterEvent *e) override;
+    void dropEvent(QDropEvent *e) override;
+    void closeEvent(QCloseEvent *event) override;
     bool processAbortPrompt();
     void keyPressEvent(QKeyEvent* event) override;
 

@@ -237,14 +237,14 @@ bool DataMaintainer::updateChecksum(QModelIndex fileRowIndex, const QString &com
     QString storedChecksum = TreeModel::siblingAtRow(fileRowIndex, Column::ColumnChecksum).data().toString();
 
     if (storedChecksum.isEmpty()) {
-        data_->model_->setItemData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
-        data_->model_->setItemData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+        data_->model_->setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
+        data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
     }
     else if (storedChecksum == computedChecksum)
-        data_->model_->setItemData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
+        data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
     else {
-        data_->model_->setItemData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
-        data_->model_->setItemData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
+        data_->model_->setRowData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
+        data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
     }
 
     return (storedChecksum.isEmpty() || storedChecksum == computedChecksum);
@@ -270,7 +270,7 @@ int DataMaintainer::changeFilesStatus(const QSet<FileStatus> curStatuses, const 
 
     while (iter.hasNext()) {
         if (curStatuses.contains(iter.nextFile().status())) {
-            data_->model_->setItemData(iter.index(), Column::ColumnStatus, newStatus);
+            data_->model_->setRowData(iter.index(), Column::ColumnStatus, newStatus);
             ++number;
         }
     }
@@ -311,7 +311,7 @@ int DataMaintainer::clearChecksums(const QSet<FileStatus> curStatuses, const QMo
 
     while (iter.hasNext()) {
         if (curStatuses.contains(iter.nextFile().status())) {
-            data_->model_->setItemData(iter.index(), Column::ColumnChecksum);
+            data_->model_->setRowData(iter.index(), Column::ColumnChecksum);
             ++number;
         }
     }
@@ -363,8 +363,8 @@ int DataMaintainer::clearDataFromLostFiles(bool finalProcess)
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Missing) {
-            data_->model_->setItemData(iter.index(), Column::ColumnChecksum);
-            data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::Removed);
+            data_->model_->setRowData(iter.index(), Column::ColumnChecksum);
+            data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Removed);
             ++number;
         }
     }
@@ -395,9 +395,9 @@ int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
             QString reChecksum = iter.data(Column::ColumnReChecksum).toString();
 
             if (!reChecksum.isEmpty()) {
-                data_->model_->setItemData(iter.index(), Column::ColumnChecksum, reChecksum);
-                data_->model_->setItemData(iter.index(), Column::ColumnReChecksum);
-                data_->model_->setItemData(iter.index(), Column::ColumnStatus, FileStatus::ChecksumUpdated);
+                data_->model_->setRowData(iter.index(), Column::ColumnChecksum, reChecksum);
+                data_->model_->setRowData(iter.index(), Column::ColumnReChecksum);
+                data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::ChecksumUpdated);
                 ++number;
             }
         }
@@ -457,7 +457,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     // if curIndex is at folder row
     else if (curIndex.isValid()) {
         Numbers num = updateNumbers(curIndex.model(), curIndex);
-        qint64 newFilesDataSize = totalSizeOfListedFiles({FileStatus::New}, curIndex);
+        qint64 newFilesDataSize = totalSizeOfListedFiles(QSet<FileStatus>({FileStatus::New}), curIndex);
 
         if (num.available() > 0) {
             text = QString("Avail.: %1")

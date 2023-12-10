@@ -72,10 +72,10 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-bool TreeModel::setItemData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
+bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
 {   
     if (!curIndex.isValid() || curIndex.model() != this) {
-        qDebug() << "TreeModel::setItemData | Wrong index";
+        qDebug() << "TreeModel::setRowData | Wrong index";
         return false;
     }
 

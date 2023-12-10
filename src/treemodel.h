@@ -34,8 +34,8 @@ public:
 
     bool isEmpty() const;
     void populate(const FileList &filesData);
-    bool setItemData(const QModelIndex &curIndex, Column column,
-                     const QVariant &itemData = QVariant());
+    bool setRowData(const QModelIndex &curIndex, Column column,
+                    const QVariant &itemData = QVariant());
 
     static QString getPath(const QModelIndex &curIndex); // build path by current index data
     static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
