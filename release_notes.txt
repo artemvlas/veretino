@@ -1,3 +1,6 @@
+Veretino 0.3.1 (in dev currently)
+* pressing Enter again in the path edit field performs a quick action (compute/verify file's checksum or open database)
+
 Veretino 0.3.0
 * The internal data architecture has been redesigned.
 * Now, when calculating checksums for a list of files (selected folder), a visual model is created that displays the details of the process: which files are in the queue and which have already been processed. The checksum and, if verification is running, the result of the compliance check are immediately visible.

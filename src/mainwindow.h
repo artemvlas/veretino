@@ -31,6 +31,7 @@ public:
 public slots:
     void showMessage(const QString &message, const QString &title = "Info");
     void setProgressBar(bool processing, bool visible);
+    void handlePathEdit();
 
     void dialogSettings();
     void dialogOpenFolder();

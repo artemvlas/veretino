@@ -53,12 +53,12 @@ void MainWindow::connections()
     connect(ui->treeView, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
-    connect(ui->treeView, &View::pathChanged, ui->lineEdit, &QLineEdit::setText);
+    connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
-    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->lineEdit->setEnabled(modelView == ModelView::FileSystem);});
+    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);});
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
 
-    connect(ui->lineEdit, &QLineEdit::returnPressed, this, [=]{ui->treeView->setIndexByPath(ui->lineEdit->text().replace("\\", "/"));});
+    connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
 
     //menu actions
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -178,6 +178,12 @@ void MainWindow::setProgressBar(bool processing, bool visible)
     ui->progressBar->setVisible(processing && visible);
     ui->progressBar->setValue(0);
     ui->progressBar->resetFormat();
+}
+
+void MainWindow::handlePathEdit()
+{
+    (ui->pathEdit->text() == ui->treeView->curPathFileSystem) ? modeSelect->quickAction()
+                                                              : ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
 }
 
 bool MainWindow::processAbortPrompt()
