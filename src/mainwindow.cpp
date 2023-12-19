@@ -126,7 +126,7 @@ void MainWindow::connectManager()
 
 void MainWindow::dialogSettings()
 {
-    settingDialog dialog(settings_);
+    SettingsDialog dialog(settings_);
 
     if (dialog.exec() == QDialog::Accepted) {
         dialog.updateSettings();

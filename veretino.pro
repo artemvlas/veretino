@@ -23,7 +23,7 @@ SOURCES += \
     src/modeselector.cpp \
     src/procstate.cpp \
     src/proxymodel.cpp \
-    src/settingdialog.cpp \
+    src/settingsdialog.cpp \
     src/shacalculator.cpp \
     src/tools.cpp \
     src/treeitem.cpp \
@@ -42,7 +42,7 @@ HEADERS += \
     src/modeselector.h \
     src/procstate.h \
     src/proxymodel.h \
-    src/settingdialog.h \
+    src/settingsdialog.h \
     src/shacalculator.h \
     src/tools.h \
     src/treeitem.h \
@@ -53,7 +53,7 @@ HEADERS += \
 FORMS += \
     src/aboutdialog.ui \
     src/mainwindow.ui \
-    src/settingdialog.ui
+    src/settingsdialog.ui
 
 RESOURCES += \
     res/resources.qrc

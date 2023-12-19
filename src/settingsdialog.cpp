@@ -1,10 +1,10 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
-#include "settingdialog.h"
+#include "settingsdialog.h"
 #include "ui_settingdialog.h"
 
-settingDialog::settingDialog(Settings *settings, QWidget *parent) :
+SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::settingDialog),
+    ui(new Ui::SettingsDialog),
     settings_(settings)
 {
     ui->setupUi(this);
@@ -39,7 +39,7 @@ settingDialog::settingDialog(Settings *settings, QWidget *parent) :
         ui->inputJsonFileNamePrefix->setText(settings->dbPrefix);
 }
 
-void settingDialog::updateSettings()
+void SettingsDialog::updateSettings()
 {
     // algorithm
     if (ui->rbSha1->isChecked())
@@ -77,7 +77,7 @@ void settingDialog::updateSettings()
     settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
 }
 
-QStringList settingDialog::extensionsList()
+QStringList SettingsDialog::extensionsList()
 {
     if (!ui->inputExtensions->text().isEmpty()) {
         QString ignoreExtensions = ui->inputExtensions->text().toLower();
@@ -97,7 +97,7 @@ QStringList settingDialog::extensionsList()
         return QStringList();
 }
 
-settingDialog::~settingDialog()
+SettingsDialog::~SettingsDialog()
 {
     delete ui;
 }

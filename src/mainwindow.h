@@ -12,7 +12,7 @@
 #include <QCryptographicHash>
 #include "treemodel.h"
 #include "manager.h"
-#include "settingdialog.h"
+#include "settingsdialog.h"
 #include "aboutdialog.h"
 #include "modeselector.h"
 
