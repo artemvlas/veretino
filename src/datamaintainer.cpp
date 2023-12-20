@@ -114,7 +114,8 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
         return 0;
     }
 
-    updateNumbers();
+    if (numAdded > 0)
+        updateNumbers();
 
     return numAdded;
 }

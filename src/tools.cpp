@@ -199,14 +199,8 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
         return approx ? QString("%1 min").arg(minutes)
                       : QString("%1 min %2 sec").arg(minutes).arg(seconds);
 
-    if (approx && seconds > 4)
-        return QString("%1 sec").arg(seconds);
-
-    if (seconds > 0)
-        return approx ? QString("few sec")
-                      : QString("%1 sec").arg(seconds);
-    else
-        return QString("0 sec");
+    return (approx && seconds < 5) ? QString("few sec")
+                                   : QString("%1 sec").arg(seconds);
 }
 
 QString dataSizeReadable(qint64 sizeBytes)
