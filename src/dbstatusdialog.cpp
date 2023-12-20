@@ -12,9 +12,9 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
 
     ui->labelDbFileName->setText(data->databaseFileName());
     ui->labelAlgo->setText(QString("Algorithm: %1").arg(format::algoToStr(data->metaData.algorithm)));
-    ui->labelUpdateDateTime->setText("Updated: " + data->metaData.saveDateTime);
-
     data->isWorkDirRelative() ? ui->labelWorkDir->clear() : ui->labelWorkDir->setText("WorkDir: " + data->metaData.workDir);
+    ui->labelDateTime_Update->setText("Updated: " + data->metaData.saveDateTime);
+    ui->labelDateTime_Check->clear(); // not yet implemented
 
     // tab Content
     ui->labelContentNumbers->setText(infoContent(data).join("\n"));
