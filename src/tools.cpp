@@ -236,10 +236,13 @@ QString dataSizeReadableExt(qint64 sizeBytes)
     return QString("%1 (%2 bytes)").arg(dataSizeReadable(sizeBytes), numString(sizeBytes));
 }
 
-QString shortenString(const QString &string, int length)
+QString shortenString(const QString &string, int length, bool cutEnd)
 {
-    return (string.length() > length) ? string.mid(0, length).append("...")
-                                      : string;
+    if (string.length() <= length)
+        return string;
+
+    return cutEnd ? string.left(length).append("...")
+                  : string.right(length).prepend("...");
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo)
