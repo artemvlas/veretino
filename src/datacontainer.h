@@ -29,7 +29,7 @@ struct Numbers {
         return holder.contains(status) ? holder.value(status) : 0;
     }
 
-    int available()
+    int available() const
     {
         return numChecksums - numberOf(FileStatus::Missing);
     }
@@ -47,6 +47,8 @@ public:
     QString backupFilePath() const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
+    bool containsChecked() const;
+    bool isAllChecked() const;
 
     bool isBackupExists();
     bool makeBackup(bool forceOverwrite = false);

@@ -77,9 +77,6 @@ private:
     void connections();
     DataContainer *oldData_ = nullptr; // backup for the duration of data_ setup, deleted by a signal after setting the data_ to View
 
-public slots:
-    void dbStatus(); // info about current DB
-
 signals:
     void processing(bool isProcessing, bool visibleProgress = false);
     void dataUpdated();

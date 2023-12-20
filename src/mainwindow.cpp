@@ -57,6 +57,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);});
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
+    connect(ui->treeView, &View::dataSetted, modeSelect, &ModeSelector::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
 
@@ -102,7 +103,6 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
     connect(modeSelect, &ModeSelector::folderContentsByType, manager, &Manager::folderContentsByType);
-    connect(modeSelect, &ModeSelector::dbStatus, manager->dataMaintainer, &DataMaintainer::dbStatus);
 
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);

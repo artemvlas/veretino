@@ -1,6 +1,6 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "settingsdialog.h"
-#include "ui_settingdialog.h"
+#include "ui_settingsdialog.h"
 
 SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     QDialog(parent),

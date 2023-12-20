@@ -94,6 +94,7 @@ public:
 public slots:
     void processing(bool isProcessing);
     void prepareView();
+    void showDbStatus();
     void createContextMenu_View(const QPoint &point);
     void createContextMenu_Button(const QPoint &point);
 
@@ -127,7 +128,6 @@ signals:
     void restoreDatabase();
     void dbItemContents(const QString &itemPath);
     void folderContentsByType(const QString &folderPath);
-    void dbStatus();
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

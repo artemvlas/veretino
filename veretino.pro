@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 
-VERSION = 0.3.0
+VERSION = 0.3.1
 DEFINES += APP_VERSION=\\\"$${VERSION}\\\"
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -15,6 +15,7 @@ SOURCES += \
     src/aboutdialog.cpp \
     src/datacontainer.cpp \
     src/datamaintainer.cpp \
+    src/dbstatusdialog.cpp \
     src/files.cpp \
     src/jsondb.cpp \
     src/main.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     src/aboutdialog.h \
     src/datacontainer.h \
     src/datamaintainer.h \
+    src/dbstatusdialog.h \
     src/files.h \
     src/jsondb.h \
     src/mainwindow.h \
@@ -52,6 +54,7 @@ HEADERS += \
 
 FORMS += \
     src/aboutdialog.ui \
+    src/dbstatusdialog.ui \
     src/mainwindow.ui \
     src/settingsdialog.ui
 

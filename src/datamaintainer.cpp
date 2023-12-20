@@ -414,12 +414,7 @@ int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
 
 bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
-    bool result = setSourceData(json->parseJson(jsonFilePath));
-
-    if (result)
-        dbStatus();
-
-    return result;
+    return setSourceData(json->parseJson(jsonFilePath));
 }
 
 void DataMaintainer::exportToJson(bool finalProcess)
@@ -481,67 +476,6 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
 
     return text;
-}
-
-void DataMaintainer::dbStatus()
-{
-    if (!data_)
-        return;
-
-    updateNumbers();
-
-    QString result = "DB filename: " + data_->databaseFileName();
-
-    if (!data_->isWorkDirRelative())
-        result.append("\nWorkDir: " + data_->metaData.workDir);
-
-    result.append(QString("\nAlgorithm: %1").arg(format::algoToStr(data_->metaData.algorithm)));
-
-    if (data_->isFilterApplied()) {
-        QString extensions = data_->metaData.filter.extensionsList.join(", ");
-        data_->metaData.filter.isFilter(FilterRule::Include) ? result.append(QString("\nIncluded Only: %1").arg(extensions))
-                                                             : result.append(QString("\nIgnored: %1").arg(extensions));
-    }
-
-    result.append(QString("\nLast update: %1").arg(data_->metaData.saveDateTime));
-
-    if (data_->numbers.numChecksums != data_->numbers.available())
-        result.append(QString("\n\nStored checksums: %1").arg(data_->numbers.numChecksums));
-    else
-        result.append("\n");
-
-    if (data_->numbers.available() > 0)
-        result.append(QString("\nAvailable: %1").arg(format::filesNumberAndSize(data_->numbers.available(), data_->numbers.totalSize)));
-    else
-        result.append("\nNO FILES available to check");
-
-    if (data_->numbers.numberOf(FileStatus::Unreadable) > 0)
-        result.append(QString("\nUnreadable files: %1").arg(data_->numbers.numberOf(FileStatus::Unreadable)));
-
-    if (data_->numbers.numberOf(FileStatus::New) > 0)
-        result.append("\n\nNew: " + Files::itemInfo(data_->model_, {FileStatus::New}));
-    else
-        result.append("\n\nNo New files found");
-
-    if (data_->numbers.numberOf(FileStatus::Missing) > 0)
-        result.append(QString("\nMissing: %1 files").arg(data_->numbers.numberOf(FileStatus::Missing)));
-    else
-        result.append("\nNo Missing files found");
-
-    if (data_->numbers.available() > 0) {
-        if (data_->numbers.numberOf(FileStatus::NotChecked) == 0) {
-            if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
-                result.append(QString("\n\n☒ %1 mismatches of %2 checksums").arg(data_->numbers.numberOf(FileStatus::Mismatched)).arg(data_->numbers.numChecksums));
-            else if (data_->numbers.numChecksums == data_->numbers.available())
-                result.append(QString("\n\n✓ ALL %1 stored checksums matched").arg(data_->numbers.numChecksums));
-            else
-                result.append(QString("\n\n✓ All %1 available files matched the stored checksums").arg(data_->numbers.available()));
-        }
-        else if (data_->numbers.numberOf(FileStatus::New) > 0 || data_->numbers.numberOf(FileStatus::Missing) > 0)
-            result.append("\n\nUse context menu for more options");
-    }
-
-    emit showMessage(result, "Database status");
 }
 
 QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)

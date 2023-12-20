@@ -36,6 +36,16 @@ bool DataContainer::isFilterApplied() const
     return !metaData.filter.extensionsList.isEmpty();
 }
 
+bool DataContainer::containsChecked() const
+{
+    return (numbers.numberOf(FileStatus::Matched) > 0 || numbers.numberOf(FileStatus::Mismatched) > 0);
+}
+
+bool DataContainer::isAllChecked() const
+{
+    return (containsChecked() && numbers.numberOf(FileStatus::NotChecked) == 0);
+}
+
 bool DataContainer::isBackupExists()
 {
     return (QFile::exists(backupFilePath()));
