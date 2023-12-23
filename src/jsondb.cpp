@@ -65,10 +65,7 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
     header["Total size"] = format::dataSizeReadableExt(data->numbers.totalSize);
     header["Updated"] = data->metaData.saveDateTime;
-    if (isWorkDirRelative)
-        header["Working folder"] = "Relative";
-    else
-        header["Working folder"] = data->metaData.workDir;
+    header[strHeaderWorkDir] = isWorkDirRelative ? "Current" : data->metaData.workDir;
 
     if (data->isFilterApplied()) {
         if (data->metaData.filter.isFilter(FilterRule::Include))
@@ -125,7 +122,7 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
         return Saved;
     }
     else {
-        header["Working folder"] = data->metaData.workDir;
+        header[strHeaderWorkDir] = data->metaData.workDir;
         mainArray[0] = header;
         doc.setArray(mainArray);
 
@@ -174,15 +171,14 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     // filling metadata
     parsedData->metaData.databaseFilePath = filePath;
-    if (header.contains("Working folder") && !(header.value("Working folder").toString() == "Relative")) {
-        parsedData->metaData.workDir = header.value("Working folder").toString();
-    }
-    else {
-        parsedData->metaData.workDir = paths::parentFolder(filePath);
-    }
 
     QString strIgnored = tools::findCompleteString(header.keys(), strHeaderIgnored);
     QString strIncluded = tools::findCompleteString(header.keys(), strHeaderIncluded);
+    QString strWorkDir = tools::findCompleteString(header.keys(), strHeaderWorkDir);
+
+    parsedData->metaData.workDir = (!strWorkDir.isEmpty() && header.value(strWorkDir).toString().contains('/'))
+                                       ? header.value(strWorkDir).toString()
+                                       : paths::parentFolder(filePath);
 
     if (!strIgnored.isEmpty()) {
         parsedData->metaData.filter.setFilter(FilterRule::Ignore, header.value(strIgnored).toString().split(" "));

@@ -34,6 +34,7 @@ private:
     QString strHeaderIgnored = "Ignored";
     QString strHeaderIncluded = "Included";
     QString strHeaderAlgo = "Used algorithm";
+    QString strHeaderWorkDir = "Working folder";
 
     QString jsonFilePath;
     QElapsedTimer elapsedTimer;
