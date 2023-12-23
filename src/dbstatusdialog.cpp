@@ -11,8 +11,13 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     setWindowIcon(QIcon(":/veretino.png"));
 
     ui->labelDbFileName->setText(data->databaseFileName());
+    ui->labelDbFileName->setToolTip(data->metaData.databaseFilePath);
     ui->labelAlgo->setText(QString("Algorithm: %1").arg(format::algoToStr(data->metaData.algorithm)));
-    data->isWorkDirRelative() ? ui->labelWorkDir->clear() : ui->labelWorkDir->setText("WorkDir: " + data->metaData.workDir);
+    ui->labelWorkDir->setToolTip(data->metaData.workDir);
+
+    if (!data->isWorkDirRelative())
+        ui->labelWorkDir->setText("WorkDir: Predefined");
+
     ui->labelDateTime_Update->setText("Updated: " + data->metaData.saveDateTime);
     ui->labelDateTime_Check->clear(); // not yet implemented
 

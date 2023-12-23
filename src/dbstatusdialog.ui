@@ -116,7 +116,7 @@
      <item row="1" column="1">
       <widget class="QLabel" name="labelWorkDir">
        <property name="text">
-        <string>workdir</string>
+        <string>WorkDir: Current</string>
        </property>
       </widget>
      </item>
