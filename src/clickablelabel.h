@@ -1,8 +1,8 @@
+// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #ifndef CLICKABLELABEL_H
 #define CLICKABLELABEL_H
 
 #include <QLabel>
-#include <QObject>
 
 class ClickableLabel : public QLabel
 {
@@ -16,8 +16,8 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 signals:
-    void clicked(ClickableLabel *label);
-    void doubleClicked(ClickableLabel *label);
+    void clicked();
+    void doubleClicked();
 };
 
 #endif // CLICKABLELABEL_H

@@ -135,7 +135,7 @@
   <customwidget>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>
-   <header>clickablelabel.h</header>
+   <header>src/clickablelabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

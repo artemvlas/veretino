@@ -21,7 +21,7 @@ public:
     Q_ENUM(Result)
 
     DataContainer* parseJson(const QString &filePath);
-    Result makeJson(const DataContainer* data);
+    Result makeJson(DataContainer* data);
 
 public slots:
     void cancelProcess();

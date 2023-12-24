@@ -19,12 +19,8 @@ JsonDb::JsonDb(const QString &filePath, QObject *parent)
 QJsonDocument JsonDb::readJsonFile(const QString &filePath)
 {
     QFile jsonFile(filePath);
-    if (jsonFile.open(QFile::ReadOnly))
-        return QJsonDocument().fromJson(jsonFile.readAll());
-    else {
-        emit showMessage("Error while reading the Json File", "Error");
-        return QJsonDocument();
-    }
+
+    return jsonFile.open(QFile::ReadOnly) ? QJsonDocument().fromJson(jsonFile.readAll()) : QJsonDocument();
 }
 
 bool JsonDb::saveJsonFile(const QJsonDocument &document, const QString &filePath)
@@ -35,18 +31,25 @@ bool JsonDb::saveJsonFile(const QJsonDocument &document, const QString &filePath
 
 QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 {
-    if (readJsonFile(filePath).isArray()) {
-        QJsonArray dataArray = readJsonFile(filePath).array();
-        if (dataArray.size() > 1 && dataArray.at(0).isObject() && dataArray.at(1).isObject())
-            return readJsonFile(filePath).array();
+    if (!QFile::exists(filePath)) {
+        emit showMessage("File not found:\n" + filePath, "Error");
+        return QJsonArray();
     }
 
-    emit showMessage("Corrupted Json/Database", "Error");
+    QJsonDocument readedDoc = readJsonFile(filePath);
+
+    if (readedDoc.isArray()) {
+        QJsonArray dataArray = readedDoc.array();
+        if (dataArray.size() > 1 && dataArray.at(0).isObject() && dataArray.at(1).isObject())
+            return dataArray;
+    }
+
+    emit showMessage("Corrupted or unredable Json Database", "Error");
     return QJsonArray();
 }
 
 // making "checksums... .ver.json" database
-JsonDb::Result JsonDb::makeJson(const DataContainer* data)
+JsonDb::Result JsonDb::makeJson(DataContainer* data)
 {
     if (!data || data->model_->isEmpty()) {
         qDebug() << "JsonDb::makeJson | no data to make json db";
@@ -133,6 +136,7 @@ JsonDb::Result JsonDb::makeJson(const DataContainer* data)
             emit setStatusbarText("Saved to Desktop");
             emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
                                  .arg(data->metaData.about, databaseStatus, data->metaData.workDir, data->databaseFileName()), "Warning");
+            data->metaData.databaseFilePath = pathToSave;
             return SavedToDesktop;
         }
 
