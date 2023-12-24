@@ -60,6 +60,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::dataSetted, modeSelect, &ModeSelector::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
+    connect(permanentStatus, &ClickableLabel::doubleClicked, modeSelect, &ModeSelector::showDbStatus);
 
     //menu actions
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -211,16 +212,16 @@ bool MainWindow::argumentInput()
     return false;
 }
 
-void MainWindow::dragEnterEvent(QDragEnterEvent *e)
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (e->mimeData()->hasUrls()) {
-        e->acceptProposedAction();
+    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
     }
 }
 
-void MainWindow::dropEvent(QDropEvent *e)
+void MainWindow::dropEvent(QDropEvent *event)
 {
-    QString path = e->mimeData()->urls().first().toLocalFile();
+    QString path = event->mimeData()->urls().first().toLocalFile();
 
     if (QFileInfo::exists(path)) {
         if (modeSelect->isProcessing()) {

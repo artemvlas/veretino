@@ -1,14 +1,21 @@
 #include "dbstatusdialog.h"
 #include "ui_dbstatusdialog.h"
+#include <QFile>
+#include <QDesktopServices>
+#include <QUrl>
 
 DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DbStatusDialog)
+    , data_(data)
 {
     ui->setupUi(this);
 
     //setFixedSize(400,300);
     setWindowIcon(QIcon(":/veretino.png"));
+
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{browsePath(paths::parentFolder(data_->metaData.databaseFilePath));});
+    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, &DbStatusDialog::browseWorkDir);
 
     ui->labelDbFileName->setText(data->databaseFileName());
     ui->labelDbFileName->setToolTip(data->metaData.databaseFilePath);
@@ -111,6 +118,18 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
     }
 
     return result;
+}
+
+void DbStatusDialog::browsePath(const QString &path)
+{
+    if (QFile::exists(path)) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    }
+}
+
+void DbStatusDialog::browseWorkDir()
+{
+    browsePath(data_->metaData.workDir);
 }
 
 DbStatusDialog::~DbStatusDialog()

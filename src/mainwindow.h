@@ -15,6 +15,7 @@
 #include "settingsdialog.h"
 #include "aboutdialog.h"
 #include "modeselector.h"
+#include "clickablelabel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,17 +42,17 @@ private:
     void connectManager(); // connections with Manager separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
-    void dragEnterEvent(QDragEnterEvent *e) override;
-    void dropEvent(QDropEvent *e) override;
-    void closeEvent(QCloseEvent *event) override;
     bool processAbortPrompt();
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent* event) override;
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings; // stores the app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
-    QLabel *permanentStatus = new QLabel;
+    ClickableLabel *permanentStatus = new ClickableLabel(this);
     ModeSelector *modeSelect = nullptr;
 };
 #endif // MAINWINDOW_H

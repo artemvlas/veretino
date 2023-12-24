@@ -43,7 +43,7 @@
       </widget>
      </item>
      <item row="0" column="0" colspan="2">
-      <widget class="QLabel" name="labelDbFileName">
+      <widget class="ClickableLabel" name="labelDbFileName">
        <property name="text">
         <string>database</string>
        </property>
@@ -64,7 +64,7 @@
         <attribute name="title">
          <string>Content</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QLabel" name="labelContentNumbers">
            <property name="text">
@@ -114,7 +114,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="labelWorkDir">
+      <widget class="ClickableLabel" name="labelWorkDir">
        <property name="text">
         <string>WorkDir: Current</string>
        </property>
@@ -131,6 +131,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header>clickablelabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

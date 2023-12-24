@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "datacontainer.h"
+#include "clickablelabel.h"
 
 namespace Ui {
 class DbStatusDialog;
@@ -17,11 +18,14 @@ public:
     ~DbStatusDialog();
 
 private:
+    Ui::DbStatusDialog *ui;
+    const DataContainer *data_;
+
     enum Tabs{TabContent, TabFilters, TabVerification};
     QStringList infoContent(const DataContainer *data);
     QStringList infoVerification(const DataContainer *data);
-private:
-    Ui::DbStatusDialog *ui;
+    void browsePath(const QString &path);
+    void browseWorkDir();
 };
 
 #endif // DBSTATUSDIALOG_H
