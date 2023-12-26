@@ -36,7 +36,7 @@ public:
 
 public slots:
     void setFileSystemModel();
-    void setData(DataContainer *data = nullptr, ModelView modelSel = ModelProxy);
+    void setData(DataContainer *data, bool isImported); // isImported == true, if the data is obtained from a database file
     void setTreeModel(ModelView modelSel = ModelProxy);
     void setIndexByPath(const QString &path);
     void setFilter(const FileStatus status);

@@ -53,7 +53,7 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
         return;
     }
 
-    emit setViewData(dataMaintainer->data_, ModelView::ModelSource);
+    emit setViewData(dataMaintainer->data_, false);
 
     QString permStatus = format::algoToStr(algo);
     if (dataMaintainer->data_->isFilterApplied())
