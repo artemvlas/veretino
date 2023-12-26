@@ -5,7 +5,6 @@
 #include <QClipboard>
 #include <QMenu>
 #include <QDebug>
-#include "dbstatusdialog.h"
 
 ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), button_(button), settings_(settings)
@@ -49,7 +48,7 @@ void ModeSelector::connectActions()
 
     // DB Model View
     connect(actionCancelBackToFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
-    connect(actionShowDbStatus, &QAction::triggered, this, &ModeSelector::showDbStatus);
+    connect(actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
     connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, &ModeSelector::updateMismatch);
@@ -100,14 +99,6 @@ void ModeSelector::prepareView()
     }
 
     processing(true);
-}
-
-void ModeSelector::showDbStatus()
-{
-    if (view_->data_ && view_->isCurrentViewModel(ModelView::ModelProxy)) { // if just imported --> ModelView::ModelProxy
-        DbStatusDialog dbStatusDialog(view_->data_);
-        dbStatusDialog.exec();
-    }
 }
 
 void ModeSelector::setMode()

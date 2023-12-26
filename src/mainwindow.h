@@ -34,6 +34,7 @@ public slots:
     void setProgressBar(bool processing, bool visible);
     void handlePathEdit();
 
+    void showDbStatus();
     void dialogSettings();
     void dialogOpenFolder();
     void dialogOpenJson();

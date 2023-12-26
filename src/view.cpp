@@ -85,6 +85,9 @@ void View::setData(DataContainer *data, ModelView modelSel)
     setTreeModel(modelSel);
     curPathFileSystem = data->metaData.databaseFilePath;
 
+    if (modelSel == ModelView::ModelProxy) // if just imported --> ModelView::ModelProxy
+        emit showDbStatus();
+
     emit dataSetted();
 }
 

@@ -94,7 +94,6 @@ public:
 public slots:
     void processing(bool isProcessing);
     void prepareView();
-    void showDbStatus();
     void createContextMenu_View(const QPoint &point);
     void createContextMenu_Button(const QPoint &point);
 

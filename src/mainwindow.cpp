@@ -1,6 +1,7 @@
 // This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "dbstatusdialog.h"
 #include <QClipboard>
 #include <QDebug>
 
@@ -57,10 +58,10 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);});
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
-    connect(ui->treeView, &View::dataSetted, modeSelect, &ModeSelector::showDbStatus);
+    connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
-    connect(permanentStatus, &ClickableLabel::doubleClicked, modeSelect, &ModeSelector::showDbStatus);
+    connect(permanentStatus, &ClickableLabel::doubleClicked, this, &MainWindow::showDbStatus);
 
     //menu actions
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -123,6 +124,14 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
 
     thread->start();
+}
+
+void MainWindow::showDbStatus()
+{
+    if (ui->treeView->data_) {
+        DbStatusDialog dbStatusDialog(ui->treeView->data_);
+        dbStatusDialog.exec();
+    }
 }
 
 void MainWindow::dialogSettings()

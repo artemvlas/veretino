@@ -63,6 +63,7 @@ signals:
     void pathChanged(const QString &path);
     void modelChanged(ModelView modelView); //(const bool isFileSystem); // send signal when Model has been changed, FileSystem = true, else = false;
     void dataSetted();
+    void showDbStatus();
     void showMessage(const QString &text, const QString &title = "Info");
     void keyEnterPressed();
 }; // class View
