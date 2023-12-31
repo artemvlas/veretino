@@ -18,9 +18,14 @@ JsonDb::JsonDb(const QString &filePath, QObject *parent)
 
 QJsonDocument JsonDb::readJsonFile(const QString &filePath)
 {
+    if (!QFile::exists(filePath)) {
+        qDebug() << "JsonDb::readJsonFile | File not found:" << filePath;
+        return QJsonDocument();
+    }
+
     QFile jsonFile(filePath);
 
-    return jsonFile.open(QFile::ReadOnly) ? QJsonDocument().fromJson(jsonFile.readAll()) : QJsonDocument();
+    return jsonFile.open(QFile::ReadOnly) ? QJsonDocument::fromJson(jsonFile.readAll()) : QJsonDocument();
 }
 
 bool JsonDb::saveJsonFile(const QJsonDocument &document, const QString &filePath)
@@ -48,6 +53,19 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
     return QJsonArray();
 }
 
+bool JsonDb::updateSuccessfulCheckDateTime(const QString &filePath)
+{
+    QJsonArray dataArray = loadJsonDB(filePath);
+    if (dataArray.isEmpty())
+        return false;
+
+    QJsonObject header = dataArray.at(0).toObject();
+    header.insert("Verified", format::currentDateTime());
+    dataArray[0] = header;
+
+    return saveJsonFile(QJsonDocument(dataArray), filePath);
+}
+
 // making "checksums... .ver.json" database
 JsonDb::Result JsonDb::makeJson(DataContainer* data)
 {
@@ -69,6 +87,9 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
     header["Total size"] = format::dataSizeReadableExt(data->numbers.totalSize);
     header["Updated"] = data->metaData.saveDateTime;
     header[strHeaderWorkDir] = isWorkDirRelative ? "Current" : data->metaData.workDir;
+
+    if (!data->metaData.successfulCheckDateTime.isEmpty())
+        header.insert("Verified", data->metaData.successfulCheckDateTime);
 
     if (data->isFilterApplied()) {
         if (data->metaData.filter.isFilter(FilterRule::Include))
@@ -104,8 +125,7 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
     if (!excludedFiles.isEmpty())
         mainArray.append(excludedFiles);
 
-    QJsonDocument doc;
-    doc.setArray(mainArray);
+    QJsonDocument doc(mainArray);
 
     QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
                                     .arg(data->numbers.numChecksums)
@@ -202,6 +222,9 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     if (header.contains("Updated"))
         parsedData->metaData.saveDateTime = header.value("Updated").toString();
+
+    if (header.contains("Verified"))
+        parsedData->metaData.successfulCheckDateTime = header.value("Verified").toString();
 
     // with very big Data, it is faster to add new files first, and then the main ones
     emit setStatusbarText("Looking for new files...");

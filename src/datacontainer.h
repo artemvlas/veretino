@@ -14,6 +14,7 @@ struct MetaData {
     QString workDir; // current working folder
     QString databaseFilePath;
     QString saveDateTime; // date and time the database was saved
+    QString successfulCheckDateTime; // date and time of the last completely successful check (all files from the list are exists and match the checksums)
     QString about; // contains a brief description of the item changes or status, if any
     FilterRule filter;
 }; // struct MetaData

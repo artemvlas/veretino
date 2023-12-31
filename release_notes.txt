@@ -1,4 +1,5 @@
 Veretino 0.3.1 (in dev currently)
+* Now the database stores not only the update time, but also the time of the last successful check (when all files from the list are present on the disk and their current checksums have been calculated and match).
 * Added an improved Dialog displaying the database status.
 * Pressing Enter again in the path edit field performs a quick action (compute/verify file's checksum or open database).
 

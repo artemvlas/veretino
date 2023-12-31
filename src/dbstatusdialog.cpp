@@ -27,7 +27,8 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
         ui->labelWorkDir->setText("WorkDir: Predefined");
 
     ui->labelDateTime_Update->setText("Updated: " + data->metaData.saveDateTime);
-    ui->labelDateTime_Check->clear(); // not yet implemented
+    data->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()
+                                                     : ui->labelDateTime_Check->setText("Verified: " + data->metaData.successfulCheckDateTime);
 
     // tab Content
     ui->labelContentNumbers->setText(infoContent(data).join("\n"));

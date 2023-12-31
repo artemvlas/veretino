@@ -63,6 +63,16 @@ void DataMaintainer::clearOldData()
     }
 }
 
+void DataMaintainer::updateSuccessfulCheckDateTime()
+{
+    if (data_
+        && data_->numbers.numberOf(FileStatus::Missing) == 0
+        && json->updateSuccessfulCheckDateTime(data_->metaData.databaseFilePath)) {
+
+        data_->metaData.successfulCheckDateTime = format::currentDateTime();
+    }
+}
+
 // add new files to data_->model_
 int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnreadable, bool finalProcess)
 {
@@ -129,6 +139,9 @@ void DataMaintainer::updateNumbers()
 
     emit setPermanentStatus("updating...");
     data_->numbers = updateNumbers(data_->model_);
+
+    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0 || data_->numbers.numberOf(FileStatus::Missing) > 0)
+        data_->metaData.successfulCheckDateTime.clear();
 
     QString newmissing;
     QString mismatched;

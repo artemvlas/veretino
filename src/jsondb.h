@@ -22,6 +22,7 @@ public:
 
     DataContainer* parseJson(const QString &filePath);
     Result makeJson(DataContainer* data);
+    bool updateSuccessfulCheckDateTime(const QString &filePath);
 
 public slots:
     void cancelProcess();

@@ -19,6 +19,7 @@ public:
     bool setSourceData(DataContainer *sourceData);
     void clearData();
     void clearOldData();
+    void updateSuccessfulCheckDateTime();
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
     int addActualFiles(FileStatus addedFileStatus = FileStatus::New,
