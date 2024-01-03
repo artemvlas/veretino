@@ -66,7 +66,7 @@ void DataMaintainer::clearOldData()
 void DataMaintainer::updateSuccessfulCheckDateTime()
 {
     if (data_
-        && data_->numbers.numberOf(FileStatus::Missing) == 0
+        && !data_->contains(FileStatus::Missing)
         && json->updateSuccessfulCheckDateTime(data_->metaData.databaseFilePath)) {
 
         data_->metaData.successfulCheckDateTime = format::currentDateTime();
@@ -140,7 +140,7 @@ void DataMaintainer::updateNumbers()
     emit setPermanentStatus("updating...");
     data_->numbers = updateNumbers(data_->model_);
 
-    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0 || data_->numbers.numberOf(FileStatus::Missing) > 0)
+    if (data_->contains({FileStatus::Mismatched, FileStatus::Missing}))
         data_->metaData.successfulCheckDateTime.clear();
 
     QString newmissing;
@@ -438,6 +438,7 @@ void DataMaintainer::exportToJson(bool finalProcess)
 
     updateNumbers();
     data_->makeBackup();
+    data_->metaData.successfulCheckDateTime.clear();
     data_->metaData.saveDateTime = format::currentDateTime();
 
     emit processing(true);
