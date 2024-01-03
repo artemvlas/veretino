@@ -86,7 +86,9 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
     header["Total size"] = format::dataSizeReadableExt(data->numbers.totalSize);
     header["Updated"] = data->metaData.saveDateTime;
-    header[strHeaderWorkDir] = isWorkDirRelative ? "Current" : data->metaData.workDir;
+
+    if (!isWorkDirRelative)
+        header.insert(strHeaderWorkDir, data->metaData.workDir);
 
     if (!data->metaData.successfulCheckDateTime.isEmpty())
         header.insert("Verified", data->metaData.successfulCheckDateTime);
