@@ -244,15 +244,13 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        int numMatched = dataMaintainer->data_->numbers.numberOf(FileStatus::Matched);
-
-        if (dataMaintainer->data_->numbers.numberOf(FileStatus::Mismatched) > 0)
+        if (dataMaintainer->data_->contains(FileStatus::Mismatched))
             emit showMessage(QString("%1 out of %2 files is changed or corrupted")
                                  .arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Mismatched))
                                  .arg(dataMaintainer->data_->numbers.available()), "FAILED");
-        else if (numMatched > 0) {
+        else if (dataMaintainer->data_->contains(FileStatus::Matched)) {
             emit showMessage(QString("ALL %1 files passed the verification.\nStored %2 checksums matched.")
-                                 .arg(numMatched)
+                                 .arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Matched))
                                  .arg(format::algoToStr(dataMaintainer->data_->metaData.algorithm)), "Success");
 
             dataMaintainer->updateSuccessfulCheckDateTime();
