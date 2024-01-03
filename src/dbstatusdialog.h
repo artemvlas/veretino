@@ -28,6 +28,7 @@ private:
     QStringList infoChanges();
     void browsePath(const QString &path);
     void browseWorkDir();
+    bool isJustCreated();
 };
 
 #endif // DBSTATUSDIALOG_H

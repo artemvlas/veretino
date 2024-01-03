@@ -49,7 +49,8 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 
     // tab Result
-    ui->tabWidget->setTabVisible(TabChanges, data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
+    ui->tabWidget->setTabVisible(TabChanges, !isJustCreated()
+                                             && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
     if (ui->tabWidget->isTabVisible(TabChanges)) {
         ui->labelResult->setText(infoChanges().join("\n"));
     }
@@ -67,17 +68,24 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
 QStringList DbStatusDialog::infoContent(const DataContainer *data)
 {
     QStringList contentNumbers;
+    QString createdDataSize;
 
-    if (data->numbers.numChecksums != data->numbers.available())
-        contentNumbers.append(QString("Stored checksums: %1").arg(data->numbers.numChecksums));
+    if (isJustCreated())
+        createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(data->numbers.totalSize));
+
+    if (isJustCreated() || (data->numbers.numChecksums != data->numbers.available()))
+        contentNumbers.append(QString("Stored checksums: %1%2").arg(data->numbers.numChecksums).arg(createdDataSize));
+
+    if (data->contains(FileStatus::Unreadable))
+        contentNumbers.append(QString("Unreadable files: %1").arg(data->numbers.numberOf(FileStatus::Unreadable)));
+
+    if (isJustCreated())
+        return contentNumbers;
 
     if (data->numbers.available() > 0)
         contentNumbers.append(QString("Available: %1").arg(format::filesNumberAndSize(data->numbers.available(), data->numbers.totalSize)));
     else
         contentNumbers.append("NO FILES available to check");
-
-    if (data->contains(FileStatus::Unreadable))
-        contentNumbers.append(QString("Unreadable files: %1").arg(data->numbers.numberOf(FileStatus::Unreadable)));
 
     contentNumbers.append(QString());
     contentNumbers.append("***");
@@ -121,7 +129,6 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
                           .arg(data->numbers.available()));
 
         result.append(QString());
-        //result.append("Current check result:");
         if (data->contains(FileStatus::Mismatched))
             result.append(QString("%1 files MISMATCHED").arg(data->numbers.numberOf(FileStatus::Mismatched)));
         else
@@ -160,6 +167,12 @@ void DbStatusDialog::browsePath(const QString &path)
 void DbStatusDialog::browseWorkDir()
 {
     browsePath(data_->metaData.workDir);
+}
+
+bool DbStatusDialog::isJustCreated()
+{
+    return (!data_->metaData.isImported
+            && data_->numbers.numberOf({FileStatus::Added, FileStatus::Matched, FileStatus::Mismatched}) == data_->numbers.numChecksums);
 }
 
 DbStatusDialog::~DbStatusDialog()

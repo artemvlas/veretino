@@ -16,6 +16,7 @@ struct MetaData {
     QString saveDateTime; // date and time the database was saved
     QString successfulCheckDateTime; // date and time of the last completely successful check (all files from the list are exists and match the checksums)
     FilterRule filter;
+    bool isImported = false; // from db(json) file
 }; // struct MetaData
 
 struct Numbers {
@@ -27,6 +28,15 @@ struct Numbers {
     int numberOf(FileStatus status) const
     {
         return holder.contains(status) ? holder.value(status) : 0;
+    }
+
+    int numberOf(QList<FileStatus> statuses) const
+    {
+        int result = 0;
+        foreach (FileStatus status, statuses) {
+            result += numberOf(status);
+        }
+        return result;
     }
 
     int available() const

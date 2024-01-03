@@ -189,6 +189,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     // filling metadata
     parsedData->metaData.databaseFilePath = filePath;
+    parsedData->metaData.isImported = true;
 
     QString strIgnored = tools::findCompleteString(header.keys(), strHeaderIgnored);
     QString strIncluded = tools::findCompleteString(header.keys(), strHeaderIncluded);
