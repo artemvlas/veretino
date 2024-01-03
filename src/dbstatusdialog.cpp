@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QDebug>
 
 DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     : QDialog(parent)
@@ -47,8 +48,19 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
 
+    // tab Result
+    ui->tabWidget->setTabVisible(TabChanges, data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
+    if (ui->tabWidget->isTabVisible(TabChanges)) {
+        ui->labelResult->setText(infoChanges().join("\n"));
+    }
+
     // selecting the tab to open
-    Tabs curTab = data->containsChecked() ? TabVerification : TabContent;
+    Tabs curTab = TabContent;
+    if (ui->tabWidget->isTabVisible(TabChanges))
+        curTab = TabChanges;
+    else if (ui->tabWidget->isTabVisible(TabVerification))
+        curTab = TabVerification;
+
     ui->tabWidget->setCurrentIndex(curTab);
 }
 
@@ -64,23 +76,23 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
     else
         contentNumbers.append("NO FILES available to check");
 
-    if (data->numbers.numberOf(FileStatus::Unreadable) > 0)
+    if (data->contains(FileStatus::Unreadable))
         contentNumbers.append(QString("Unreadable files: %1").arg(data->numbers.numberOf(FileStatus::Unreadable)));
 
     contentNumbers.append(QString());
     contentNumbers.append("***");
 
-    if (data->numbers.numberOf(FileStatus::New) > 0)
+    if (data->contains(FileStatus::New))
         contentNumbers.append("New: " + Files::itemInfo(data->model_, {FileStatus::New}));
     else
         contentNumbers.append("No New files found");
 
-    if (data->numbers.numberOf(FileStatus::Missing) > 0)
+    if (data->contains(FileStatus::Missing))
         contentNumbers.append(QString("Missing: %1 files").arg(data->numbers.numberOf(FileStatus::Missing)));
     else
         contentNumbers.append("No Missing files found");
 
-    if (data->numbers.numberOf(FileStatus::New) > 0 || data->numbers.numberOf(FileStatus::Missing) > 0) {
+    if (data->contains({FileStatus::New, FileStatus::Missing})) {
         contentNumbers.append(QString());
         contentNumbers.append("Use a context menu for more options");
     }
@@ -93,7 +105,7 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
     QStringList result;
 
     if (data->isAllChecked()) {
-        if (data->numbers.numberOf(FileStatus::Mismatched) > 0)
+        if (data->contains(FileStatus::Mismatched))
             result.append(QString("☒ %1 mismatches of %2 checksums")
                               .arg(data->numbers.numberOf(FileStatus::Mismatched))
                               .arg(data->numbers.numChecksums));
@@ -110,14 +122,30 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
 
         result.append(QString());
         //result.append("Current check result:");
-        if (data->numbers.numberOf(FileStatus::Mismatched) > 0)
+        if (data->contains(FileStatus::Mismatched))
             result.append(QString("%1 files MISMATCHED").arg(data->numbers.numberOf(FileStatus::Mismatched)));
         else
             result.append("No Mismatches found");
 
-        if (data->numbers.numberOf(FileStatus::Matched) > 0)
+        if (data->contains(FileStatus::Matched))
             result.append(QString("%1 files matched").arg(data->numbers.numberOf(FileStatus::Matched)));
     }
+
+    return result;
+}
+
+QStringList DbStatusDialog::infoChanges()
+{
+    QStringList result;
+
+    if (data_->contains(FileStatus::Added))
+        result.append(QString("Added: %1").arg(Files::itemInfo(data_->model_, {FileStatus::Added})));
+
+    if (data_->contains(FileStatus::Removed))
+        result.append(QString("Removed: %1").arg(data_->numbers.numberOf(FileStatus::Removed)));
+
+    if (data_->contains(FileStatus::ChecksumUpdated))
+        result.append(QString("Updated: %1").arg(data_->numbers.numberOf(FileStatus::ChecksumUpdated)));
 
     return result;
 }

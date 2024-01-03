@@ -36,14 +36,30 @@ bool DataContainer::isFilterApplied() const
     return !metaData.filter.extensionsList.isEmpty();
 }
 
+bool DataContainer::contains(const FileStatus status) const
+{
+    return (numbers.numberOf(status) != 0);
+}
+
+bool DataContainer::contains(const QSet<FileStatus> statuses) const
+{
+    QSet<FileStatus>::const_iterator it;
+    for (it = statuses.constBegin(); it != statuses.constEnd(); ++it) {
+        if (contains(*it))
+            return true;
+    }
+
+    return false;
+}
+
 bool DataContainer::containsChecked() const
 {
-    return (numbers.numberOf(FileStatus::Matched) > 0 || numbers.numberOf(FileStatus::Mismatched) > 0);
+    return (contains(FileStatus::Matched) || contains(FileStatus::Mismatched));
 }
 
 bool DataContainer::isAllChecked() const
 {
-    return (containsChecked() && numbers.numberOf(FileStatus::NotChecked) == 0);
+    return (containsChecked() && !contains(FileStatus::NotChecked));
 }
 
 bool DataContainer::isBackupExists()

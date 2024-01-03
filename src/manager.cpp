@@ -62,7 +62,7 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     emit setPermanentStatus(permStatus);
 
     // calculating checksums
-    int doneNumber = calculateChecksums();
+    calculateChecksums();
 
     if (canceled) {
         emit setViewData();
@@ -71,10 +71,6 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     }
 
     // saving to json
-    dataMaintainer->data_->metaData.about = QString("%1 Checksums for %2 files calculated")
-                                                    .arg(format::algoToStr(algo))
-                                                    .arg(doneNumber);
-
     dataMaintainer->exportToJson();
 }
 
@@ -157,8 +153,6 @@ void Manager::updateNewLost()
         return;
     }
 
-    QString itemsInfo;
-
     int numNew = dataMaintainer->data_->numbers.numberOf(FileStatus::New);
     int numMissing = dataMaintainer->data_->numbers.numberOf(FileStatus::Missing);
 
@@ -168,25 +162,18 @@ void Manager::updateNewLost()
         return;
     }
 
-    if (numNew > 0) {
+    if (dataMaintainer->data_->contains(FileStatus::New)) {
         calculateChecksums(FileStatus::New, false);
 
         if (canceled) {
             emit processing(false);
             return;
         }
-
-        itemsInfo.append(QString("added %1").arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Added)));
-
-        if (numMissing > 0)
-            itemsInfo.append(", ");
     }
 
-    if (numMissing > 0) {
-        itemsInfo.append(QString("removed %1").arg(dataMaintainer->clearDataFromLostFiles()));
+    if (dataMaintainer->data_->contains(FileStatus::Missing)) {
+        dataMaintainer->clearDataFromLostFiles();
     }
-
-    dataMaintainer->data_->metaData.about = QString("Database updated: %1 items").arg(itemsInfo);
 
     dataMaintainer->exportToJson();
 }
@@ -199,9 +186,7 @@ void Manager::updateMismatch()
         return;
     }
 
-    dataMaintainer->data_->metaData.about = QString("%1 checksums updated")
-                                            .arg(dataMaintainer->updateMismatchedChecksums());
-
+    dataMaintainer->updateMismatchedChecksums();
     dataMaintainer->exportToJson();
 }
 

@@ -110,6 +110,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
     connect(manager->dataMaintainer, &DataMaintainer::dataUpdated, modeSelect, &ModeSelector::setMode);
+    connect(manager->dataMaintainer, &DataMaintainer::dataUpdated, this, &MainWindow::showDbStatus);
 
     // process status
     connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);

@@ -127,10 +127,6 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
 
     QJsonDocument doc(mainArray);
 
-    QString databaseStatus = QString("Checksums stored: %1\nTotal size: %2")
-                                    .arg(data->numbers.numChecksums)
-                                    .arg(format::dataSizeReadable(data->numbers.totalSize));
-
     if (canceled) {
         qDebug() << "JsonDb::makeJson | Canceled";
         return Canceled;
@@ -140,8 +136,6 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
 
     if (saveJsonFile(doc, data->metaData.databaseFilePath)) {
         emit setStatusbarText("Saved");
-        emit showMessage(QString("%1\n\n%2\n\nDatabase: %3\nuse it to check the data integrity")
-                             .arg(data->metaData.about, databaseStatus, data->databaseFileName()), "Success");
         return Saved;
     }
     else {
@@ -154,8 +148,6 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
 
         if (saveJsonFile(doc, pathToSave)) {
             emit setStatusbarText("Saved to Desktop");
-            emit showMessage(QString("%1\n\n%2\n\nUnable to save in: %3\n!!! Saved to Desktop folder !!!\nDatabase: %4\nuse it to check the data integrity")
-                                 .arg(data->metaData.about, databaseStatus, data->metaData.workDir, data->databaseFileName()), "Warning");
             data->metaData.databaseFilePath = pathToSave;
             return SavedToDesktop;
         }

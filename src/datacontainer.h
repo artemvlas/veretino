@@ -15,7 +15,6 @@ struct MetaData {
     QString databaseFilePath;
     QString saveDateTime; // date and time the database was saved
     QString successfulCheckDateTime; // date and time of the last completely successful check (all files from the list are exists and match the checksums)
-    QString about; // contains a brief description of the item changes or status, if any
     FilterRule filter;
 }; // struct MetaData
 
@@ -48,6 +47,8 @@ public:
     QString backupFilePath() const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
+    bool contains(const FileStatus status) const;
+    bool contains(const QSet<FileStatus> statuses) const;
     bool containsChecked() const;
     bool isAllChecked() const;
 

@@ -111,6 +111,23 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="tabChanges">
+        <attribute name="title">
+         <string>Changes</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLabel" name="labelResult">
+           <property name="text">
+            <string>Result</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item row="1" column="1">

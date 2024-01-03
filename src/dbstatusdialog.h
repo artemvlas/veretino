@@ -22,9 +22,10 @@ private:
     Ui::DbStatusDialog *ui;
     const DataContainer *data_;
 
-    enum Tabs{TabContent, TabFilters, TabVerification};
+    enum Tabs{TabContent, TabFilters, TabVerification, TabChanges};
     QStringList infoContent(const DataContainer *data);
     QStringList infoVerification(const DataContainer *data);
+    QStringList infoChanges();
     void browsePath(const QString &path);
     void browseWorkDir();
 };
