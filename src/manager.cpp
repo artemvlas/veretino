@@ -24,12 +24,12 @@ Manager::Manager(Settings *settings, QObject *parent)
 
 void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo)
 {
-    if (!Files::containsFiles(folderPath)) {
+    if (Files::isEmptyFolder(folderPath)) {
         emit showMessage("Empty folder. Nothing to do");
         return;
     }
 
-    if (!Files::containsFiles(folderPath, settings_->filter)) {
+    if (Files::isEmptyFolder(folderPath, settings_->filter)) {
         emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
         return;
     }

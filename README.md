@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <br><em>Some settings available</em>
+  <br><em>Some settings are available</em>
   <br><img src="screenshots/veretino_settings.png">
 </p>
 

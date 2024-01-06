@@ -92,15 +92,15 @@ FileList Files::allFiles(const FileList &fileList, const FilterRule &filter)
     return filteredFiles;
 }
 
-bool Files::containsFiles(const QString &folderPath, const FilterRule &filter)
+bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 {
-    bool result = false;
+    bool result = true;
 
     if (QFileInfo(folderPath).isDir()) {
         QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()) {
             if (paths::isFileAllowed(it.next(), filter)) {
-                result = true;
+                result = false;
                 break;
             }
         }

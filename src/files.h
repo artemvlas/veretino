@@ -69,7 +69,7 @@ public:
     FileList allFiles(const QString &rootFolder, const FilterRule &filter);
     FileList allFiles(const FileList &fileList, const FilterRule &filter);
 
-    static bool containsFiles(const QString &folderPath, const FilterRule &filter = FilterRule(false)); // checks whether there are any (or filtered) files the folder/subfolders
+    static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false)); // checks whether there are any (or filtered) files the folder/subfolders
 
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
     qint64 dataSize(const QString &folder); // total size of allFiles('folder')
