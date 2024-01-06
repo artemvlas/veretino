@@ -14,6 +14,7 @@ SOURCES += \
     src/datamaintainer.cpp \
     src/dbstatusdialog.cpp \
     src/files.cpp \
+    src/foldercontentsdialog.cpp \
     src/jsondb.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
@@ -36,6 +37,7 @@ HEADERS += \
     src/datamaintainer.h \
     src/dbstatusdialog.h \
     src/files.h \
+    src/foldercontentsdialog.h \
     src/jsondb.h \
     src/mainwindow.h \
     src/manager.h \
@@ -53,6 +55,7 @@ HEADERS += \
 FORMS += \
     src/aboutdialog.ui \
     src/dbstatusdialog.ui \
+    src/foldercontentsdialog.ui \
     src/mainwindow.ui \
     src/settingsdialog.ui
 

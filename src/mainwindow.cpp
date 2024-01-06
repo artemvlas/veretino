@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dbstatusdialog.h"
+#include "foldercontentsdialog.h"
 #include <QClipboard>
 #include <QDebug>
 
@@ -77,6 +78,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<QSet<FileStatus>>("QSet<FileStatus>");
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<ModelView>("ModelView");
+    qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");
 
     manager->moveToThread(thread);
 
@@ -105,6 +107,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
     connect(modeSelect, &ModeSelector::folderContentsByType, manager, &Manager::folderContentsByType);
+    connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showFolderContentsDialog);
 
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
@@ -133,6 +136,12 @@ void MainWindow::showDbStatus()
         DbStatusDialog dbStatusDialog(ui->treeView->data_);
         dbStatusDialog.exec();
     }
+}
+
+void MainWindow::showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList)
+{
+    FolderContentsDialog dialog(folderName, extList);
+    dialog.exec();
 }
 
 void MainWindow::dialogSettings()

@@ -184,32 +184,22 @@ QString Files::itemInfo(const QAbstractItemModel* model, const QSet<FileStatus>&
     return format::filesNumberAndSize(filesNumber, dataSize);
 }
 
-QString Files::folderContentsByType()
+void Files::folderContentsByType()
 {
-    if (!initFolderPath.isEmpty()) {
-        QString result = folderContentsByType(allFiles(FilterRule(false)));
-
-        if (canceled)
-            result.clear();
-
-        emit sendText(result);
-        return result;
+    if (initFolderPath.isEmpty()) {
+        qDebug() << "Files::folderContentsByType | No initial data";
+        return;
     }
-    else if (!initFileList.isEmpty())
-        return folderContentsByType(initFileList);
-    else
-        return "Files::folderContentsByType | No initial data";
-}
 
-QString Files::folderContentsByType(const QString &folder)
-{
-    return folderContentsByType(allFiles(folder));
-}
+    FileList fileList = allFiles(FilterRule(false));
 
-QString Files::folderContentsByType(const FileList &fileList)
-{
-    if (fileList.isEmpty())
-        return "Empty folder. No file types to display.";
+    if (canceled)
+        return;
+
+    if (fileList.isEmpty()) {
+        qDebug() << "Empty folder. No file types to display.";
+        return;
+    }
 
     QHash<QString, FileList> listsByType; // key = extension, value = list of files with that extension
 
@@ -221,51 +211,18 @@ QString Files::folderContentsByType(const FileList &fileList)
         listsByType[ext].insert(filesIter.key(), filesIter.value());
     }
 
-    struct combinedByType {
-        QString extension;
-        FileList filelist;
-        qint64 filesSize;
-    };
-
-    QList<combinedByType> combList;
+    QList<ExtNumSize> combList;
 
     QHash<QString, FileList>::const_iterator iter;
     for (iter = listsByType.constBegin(); iter != listsByType.constEnd(); ++iter) {
-        combinedByType t;
+        ExtNumSize t;
         t.extension = iter.key();
-        t.filelist = iter.value();
-        t.filesSize = dataSize(t.filelist);
+        t.filesNumber = iter.value().size();
+        t.filesSize = dataSize(iter.value());
         combList.append(t);
     }
 
-    std::sort(combList.begin(), combList.end(), [](const combinedByType &t1, const combinedByType &t2) {return (t1.filesSize > t2.filesSize);});
-
-    QString text;
-    if (combList.size() > 10) {
-        text.append(QString("Top sized file types:\n%1\n").arg(QString('-').repeated(30)));
-        qint64 excSize = 0; // total size of files whose types are not displayed
-        int excNumber = 0; // the number of these files
-        for (int var = 0; var < combList.size(); ++var) {
-            if (var < 10) {
-                text.append(QString("%1: %2\n").arg(combList.at(var).extension, contentStatus(combList.at(var).filelist)));
-            }
-            else {
-                excSize += combList.at(var).filesSize;
-                excNumber += combList.at(var).filelist.size();
-            }
-        }
-        text.append(QString("...\nOther %1 types: %2\n").arg(combList.size() - 10).arg(format::filesNumberAndSize(excNumber, excSize)));
-    }
-    else {
-        foreach (const combinedByType &t, combList) {
-            text.append(QString("%1: %2\n").arg(t.extension, contentStatus(t.filelist)));
-        }
-    }
-
-    QString totalInfo = QString(" Total: %1 types, %2").arg(combList.size()).arg(contentStatus(fileList));
-    text.append(QString("%1\n%2").arg(QString('_').repeated(totalInfo.length()), totalInfo));
-
-    return text;
+    emit folderContentsListCreated(paths::basicName(initFolderPath), combList);
 }
 
 qint64 Files::dataSize()

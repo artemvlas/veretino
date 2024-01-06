@@ -484,19 +484,24 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
 void Manager::folderContentsByType(const QString &folderPath)
 {
     if (isViewFileSysytem) {
-        QString statusText(QString("Contents of <%1>").arg(paths::basicName(folderPath)));
-        emit setStatusbarText(statusText + ": processing...");
+        if (Files::isEmptyFolder(folderPath)) {
+            emit showMessage("There are no file types to display.", "Empty folder");
+        }
 
         QThread *thread = new QThread;
         Files *files = new Files(folderPath);
         files->moveToThread(thread);
 
         connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
+        connect(this, &Manager::cancelProcess, thread, &QThread::quit);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
-        connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
-                        {emit showMessage(text, statusText); emit setStatusbarText(QStringList(text.split("\n")).last());}});
+        connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
+        connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsListCreated);
+        connect(files, &Files::folderContentsListCreated, thread, &QThread::quit);
+        //connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
+        //                {emit showMessage(text, statusText); emit setStatusbarText(QStringList(text.split("\n")).last());}});
 
         // ***debug***
         connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});

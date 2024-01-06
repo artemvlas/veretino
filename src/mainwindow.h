@@ -35,6 +35,7 @@ public slots:
     void handlePathEdit();
 
     void showDbStatus();
+    void showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList);
     void dialogSettings();
     void dialogOpenFolder();
     void dialogOpenJson();

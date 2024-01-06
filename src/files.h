@@ -62,6 +62,12 @@ public:
     };
     Q_ENUM(FileStatus)
 
+    struct ExtNumSize {
+        QString extension; // for example: txt (pdf, mkv, 7z, flac...)
+        int filesNumber = 0; // number of files with this extension
+        qint64 filesSize = 0; // total size of these files
+    }; // struct ExtNumSize
+
     // functions
     FileList allFiles(); // 'initFolderPath' --> allFiles(const QString &rootFolder)
     FileList allFiles(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
@@ -80,16 +86,13 @@ public:
     static QString itemInfo(const QAbstractItemModel *model, const QSet<FileStatus> &fileStatuses = QSet<FileStatus>(),
                             const QModelIndex& rootIndex = QModelIndex());
 
-    QString folderContentsByType(const QString &folder);
-    static QString folderContentsByType(const FileList &fileList);
-
     // variables
     bool canceled = false;
 
 public slots:
     void cancelProcess();
     QString contentStatus(); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
-    QString folderContentsByType(); // returns sorted by data size list of extensions, files number and their size
+    void folderContentsByType(); // returns sorted by data size list of extensions, files number and their size
 
 private:
     // variables
@@ -101,9 +104,11 @@ signals:
     void processing(bool isProcessing, bool visibleProgress = false);
     void setStatusbarText(const QString &text = QString());
     void sendText(const QString &text = QString());
+    void folderContentsListCreated(const QString &folderName, const QList<ExtNumSize> &extList);
 }; // class Files
 
 using FileStatus = Files::FileStatus;
+using ExtNumSize = Files::ExtNumSize;
 
 struct FileValues {
     FileValues(FileStatus initStatus = FileStatus::New) : status(initStatus) {}
