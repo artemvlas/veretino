@@ -10,6 +10,7 @@
 * Comparing files by checksum.
 * Evaluation of files contained in the selected folder by types (extensions), their number and size.
 
+### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 <p align="center">
   <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
   <br><img src="screenshots/veretino_mainview.png">
@@ -36,7 +37,6 @@ The App allows to avoid unexpected data loss*, for example, in the event of a di
 
 #### *Please note that the Veretino app does not repair the data and is not able to prevent the data loss, but only serves to data integrity verification
 ---
-### The program can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 Veretino App is Qt based and cross platform. Prebuilt packages for Linux and Windows are available [here](https://github.com/artemvlas/veretino/releases)
 For users of Arch-based distros, Veretino also is available on the [AUR](https://aur.archlinux.org/packages/veretino)  
 
