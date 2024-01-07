@@ -60,7 +60,7 @@ signals:
     void procStatus(const QString &str);
     void setViewData(DataContainer *data = nullptr, bool isImported = true); // isImported == true, if the data is obtained from a database file
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
-    void folderContentsListCreated(const QString &folderName, const QList<ExtNumSize> &extList);
+    void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text); // Sending directly to QGuiApplication::clipboard()->setText works great on Linux,
                                            // but does NOT work on older QT builds on Windows. So this signal is used for compatibility.

@@ -486,6 +486,7 @@ void Manager::folderContentsByType(const QString &folderPath)
     if (isViewFileSysytem) {
         if (Files::isEmptyFolder(folderPath)) {
             emit showMessage("There are no file types to display.", "Empty folder");
+            return;
         }
 
         QThread *thread = new QThread;

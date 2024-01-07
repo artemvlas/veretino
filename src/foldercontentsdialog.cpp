@@ -2,7 +2,7 @@
 #include "ui_foldercontentsdialog.h"
 #include "tools.h"
 
-FolderContentsDialog::FolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList, QWidget *parent)
+FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::FolderContentsDialog)
     , extList_(extList)
@@ -13,7 +13,8 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderName, const QLis
     ui->treeWidget->setColumnWidth(ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(ColumnTotalSize, Qt::DescendingOrder);
 
-    ui->labelFolderName->setText(".../" + folderName);
+    ui->labelFolderName->setText(".../" + paths::basicName(folderPath));
+    ui->labelFolderName->setToolTip(folderPath);
     ui->checkBox_Top10->setVisible(extList.size() > 15);
 
     connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &FolderContentsDialog::populate);
@@ -48,18 +49,22 @@ void FolderContentsDialog::populate()
         else
             std::sort(list.begin(), list.end(), [](const ExtNumSize &t1, const ExtNumSize &t2) {return (t1.filesSize > t2.filesSize);});
 
-        qint64 excSize = 0; // total size of files whose types are not displayed
-        int excNumber = 0; // the number of these files
+        int top10FilesNumber = 0; // total number of files in the Top10 list
+        qint64 top10FilesSize = 0; // total size of these files
+
         for (int i = 0; i < list.size(); ++i) {
-            if (i < 10)
+            if (i < 10) {
                 addItemToTreeWidget(list.at(i));
-            else {
-                excSize += list.at(i).filesSize;
-                excNumber += list.at(i).filesNumber;
+                top10FilesNumber += list.at(i).filesNumber;
+                top10FilesSize += list.at(i).filesSize;
             }
+            else
+                break;
         }
 
-        ui->checkBox_Top10->setText(QString("Top10, Excluded: %1 types, %2").arg(list.size() - 10).arg(format::filesNumberAndSize(excNumber, excSize)));
+            ui->checkBox_Top10->setText(QString("Top10: %1 files (%2)")
+                                                .arg(top10FilesNumber)
+                                                .arg(format::dataSizeReadable(top10FilesSize)));
         return;
     }
 
@@ -80,7 +85,7 @@ void FolderContentsDialog::setTotalInfo()
         totalFilesNumber += extList_.at(i).filesNumber;
     }
 
-    ui->labelTotal->setText(QString("Total: %1 types, %2 files (%3)  ")
+    ui->labelTotal->setText(QString("Total: %1 types, %2 files (%3) ")
                                 .arg(extList_.size())
                                 .arg(totalFilesNumber)
                                 .arg(format::dataSizeReadable(totalSize)));

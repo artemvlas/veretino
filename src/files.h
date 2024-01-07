@@ -104,7 +104,7 @@ signals:
     void processing(bool isProcessing, bool visibleProgress = false);
     void setStatusbarText(const QString &text = QString());
     void sendText(const QString &text = QString());
-    void folderContentsListCreated(const QString &folderName, const QList<ExtNumSize> &extList);
+    void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
 }; // class Files
 
 using FileStatus = Files::FileStatus;

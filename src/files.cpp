@@ -222,7 +222,7 @@ void Files::folderContentsByType()
         combList.append(t);
     }
 
-    emit folderContentsListCreated(paths::basicName(initFolderPath), combList);
+    emit folderContentsListCreated(initFolderPath, combList);
 }
 
 qint64 Files::dataSize()

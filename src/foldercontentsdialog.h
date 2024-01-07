@@ -14,7 +14,7 @@ class FolderContentsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit FolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
+    explicit FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
     ~FolderContentsDialog();
     enum ColumnFCD {ColumnExtension, ColumnFilesNumber, ColumnTotalSize};
 
