@@ -25,12 +25,12 @@ Manager::Manager(Settings *settings, QObject *parent)
 void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo)
 {
     if (Files::isEmptyFolder(folderPath)) {
-        emit showMessage("Empty folder. Nothing to do");
+        emit showMessage("Nothing to do.", "Empty folder");
         return;
     }
 
     if (Files::isEmptyFolder(folderPath, settings_->filter)) {
-        emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.");
+        emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.", "No proper files");
         return;
     }
 
@@ -456,6 +456,11 @@ void Manager::getPathInfo(const QString &path)
             emit setStatusbarText(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
+            if (Files::isEmptyFolder(path)) {
+                emit setStatusbarText(QString("%1: no files").arg(paths::basicName(path)));
+                return;
+            }
+
             QThread *thread = new QThread;
             Files *files = new Files(path);
             files->moveToThread(thread);

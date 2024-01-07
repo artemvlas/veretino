@@ -198,6 +198,7 @@ void Files::folderContentsByType()
 
     if (fileList.isEmpty()) {
         qDebug() << "Empty folder. No file types to display.";
+        //emit folderContentsListCreated(initFolderPath, QList<ExtNumSize>());
         return;
     }
 

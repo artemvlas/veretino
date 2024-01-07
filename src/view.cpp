@@ -125,9 +125,6 @@ bool View::isViewFileSystem()
 
 void View::setIndexByPath(const QString &path)
 {
-    if (path.isEmpty())
-        return;
-
     if (isViewFileSystem()) {
         if (QFileInfo::exists(path)) {
             QModelIndex index = fileSystem->index(path);
@@ -139,7 +136,7 @@ void View::setIndexByPath(const QString &path)
             // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
             // 'index' (wich is =fileSystem->index(path)) is NOT working good
         }
-        else
+        else if (!path.isEmpty())
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
     else if (data_) {
