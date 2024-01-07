@@ -52,19 +52,15 @@ void FolderContentsDialog::populate()
         int top10FilesNumber = 0; // total number of files in the Top10 list
         qint64 top10FilesSize = 0; // total size of these files
 
-        for (int i = 0; i < list.size(); ++i) {
-            if (i < 10) {
-                addItemToTreeWidget(list.at(i));
-                top10FilesNumber += list.at(i).filesNumber;
-                top10FilesSize += list.at(i).filesSize;
-            }
-            else
-                break;
+        for (int i = 0; i < 10; ++i) {
+            addItemToTreeWidget(list.at(i));
+            top10FilesNumber += list.at(i).filesNumber;
+            top10FilesSize += list.at(i).filesSize;
         }
 
-            ui->checkBox_Top10->setText(QString("Top10: %1 files (%2)")
-                                                .arg(top10FilesNumber)
-                                                .arg(format::dataSizeReadable(top10FilesSize)));
+        ui->checkBox_Top10->setText(QString("Top10: %1 files (%2)")
+                                            .arg(top10FilesNumber)
+                                            .arg(format::dataSizeReadable(top10FilesSize)));
         return;
     }
 

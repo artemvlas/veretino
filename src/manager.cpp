@@ -501,8 +501,6 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
         connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsListCreated);
         connect(files, &Files::folderContentsListCreated, thread, &QThread::quit);
-        //connect(files, &Files::sendText, this, [=](const QString &text){thread->quit(); if (!text.isEmpty())
-        //                {emit showMessage(text, statusText); emit setStatusbarText(QStringList(text.split("\n")).last());}});
 
         // ***debug***
         connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});

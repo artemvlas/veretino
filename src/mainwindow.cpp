@@ -140,8 +140,10 @@ void MainWindow::showDbStatus()
 
 void MainWindow::showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList)
 {
-    FolderContentsDialog dialog(folderName, extList);
-    dialog.exec();
+    if (!extList.isEmpty()) {
+        FolderContentsDialog dialog(folderName, extList);
+        dialog.exec();
+    }
 }
 
 void MainWindow::dialogSettings()
