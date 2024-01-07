@@ -125,6 +125,9 @@ bool View::isViewFileSystem()
 
 void View::setIndexByPath(const QString &path)
 {
+    if (path.isEmpty())
+        return;
+
     if (isViewFileSystem()) {
         if (QFileInfo::exists(path)) {
             QModelIndex index = fileSystem->index(path);
