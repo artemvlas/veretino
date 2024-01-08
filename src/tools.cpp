@@ -101,7 +101,7 @@ QString basicName(const QString &path)
         return "Root";
 
     if (path.size() == 3 && path.at(0).isLetter() && path.at(1) == ':') // if provided Windows-style root path like "C:"
-        return QString("Drive_%1").arg(path.at(0));
+        return QString("Drive_%1").arg(path.at(0).toUpper());
 
     // #1 impl.
     QStringList components = path.split(QRegExp("[/\\\\]"), Qt::SkipEmptyParts);
@@ -118,6 +118,9 @@ QString basicName(const QString &path)
 
 QString parentFolder(const QString &path)
 {
+    if (isRoot(path))
+        return path;
+
     int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'
     if (rootSepIndex == -1)
         return "/"; // if there is no '/' in 'path'
@@ -164,6 +167,12 @@ bool isFileAllowed(const QString &filePath, const FilterRule &filter)
     }
 
     return allowed;
+}
+
+bool isRoot(const QString &path)
+{
+    return (path == "/")
+           || ((path.length() == 2 || path.length() == 3) && path.at(0).isLetter() && path.at(1) == ':');
 }
 } // namespace paths
 

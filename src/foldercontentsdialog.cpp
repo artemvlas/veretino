@@ -18,8 +18,9 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QLis
     ui->treeWidget->setColumnWidth(ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(ColumnTotalSize, Qt::DescendingOrder);
 
-    QString prefix = (paths::parentFolder(folderPath) == "/") ? "/" : ".../";
-    ui->labelFolderName->setText(prefix + paths::basicName(folderPath));
+    QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
+                                                                        : ".../" + paths::basicName(folderPath);
+    ui->labelFolderName->setText(folderName);
     ui->labelFolderName->setToolTip(folderPath);
     ui->checkBox_Top10->setVisible(extList.size() > 15);
 

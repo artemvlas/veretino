@@ -35,6 +35,7 @@ QString basicName(const QString &path); // returns file or folder name: "/home/u
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
+bool isRoot(const QString &path); // true: "/" or "C:/" or "C:"; else false
 } // namespace paths
 
 namespace format {
