@@ -136,7 +136,7 @@ void MainWindow::connectManager()
 
 void MainWindow::showDbStatus()
 {
-    if (ui->treeView->data_) {
+    if (ui->treeView->data_ && !modeSelect->isProcessing()) {
         DbStatusDialog dbStatusDialog(ui->treeView->data_);
         dbStatusDialog.exec();
     }
