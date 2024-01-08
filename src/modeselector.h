@@ -57,7 +57,7 @@ public:
     QAction *actionShowFS = new QAction("Show FileSystem", this);
     QAction *actionToHome = new QAction("to Home", this);
     QAction *actionCancel = new QAction("Cancel operation", this);
-    QAction *actionShowFolderContentsTypes = new QAction("Folder Contents By Type", this);
+    QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);
     QAction *actionProcessFolderChecksums = new QAction("Calculate checksums of all files in the folder", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
     QAction *actionProcessSha_toClipboard = new QAction("Calculate Checksum --> Clipboard", this);

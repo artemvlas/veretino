@@ -149,14 +149,14 @@ QString Files::contentStatus(const QString &path)
             result = QString("%1: %2").arg(paths::basicName(path), format::filesNumberAndSize(filesNumber, totalSize));
         }
         else {
-            qDebug() << "Files::contentStatus(const QString &path) | Canceled" << path;
+            qDebug() << "Files::contentStatus | Canceled" << path;
         }
     }
     else if (fileInfo.isFile()) {
         result = format::fileNameAndSize(path);
     }
     else
-        qDebug() << "Files::contentStatus(const QString &path) | The 'path' doesn't exist";
+        qDebug() << "Files::contentStatus | The 'path' doesn't exist";
 
     emit setStatusbarText(result);
     return result;
