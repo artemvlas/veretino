@@ -1,4 +1,8 @@
-// This file is part of the Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef PROCSTATE_H
 #define PROCSTATE_H
 

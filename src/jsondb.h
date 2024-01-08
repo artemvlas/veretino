@@ -1,5 +1,8 @@
-// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
-// Used to create json databases from Veretino DataContainer objects and vice versa
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef JSONDB_H
 #define JSONDB_H
 
@@ -32,10 +35,10 @@ private:
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
 
-    QString strHeaderIgnored = "Ignored";
-    QString strHeaderIncluded = "Included";
-    QString strHeaderAlgo = "Used algorithm";
-    QString strHeaderWorkDir = "Working folder";
+    const QString strHeaderIgnored = "Ignored";
+    const QString strHeaderIncluded = "Included";
+    const QString strHeaderAlgo = "Used algorithm";
+    const QString strHeaderWorkDir = "Working folder";
 
     QString jsonFilePath;
     QElapsedTimer elapsedTimer;

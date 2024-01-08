@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef TREEITEM_H
 #define TREEITEM_H
 #include <QVariant>

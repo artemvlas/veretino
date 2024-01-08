@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #include "treeitem.h"
 
 TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent)

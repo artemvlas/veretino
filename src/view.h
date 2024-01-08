@@ -1,4 +1,8 @@
-// This file is part of Veretino project under the GNU GPLv3 license. https://github.com/artemvlas/veretino
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef VIEW_H
 #define VIEW_H
 

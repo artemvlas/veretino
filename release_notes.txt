@@ -1,8 +1,7 @@
-Veretino 0.3.1 (in dev currently)
-* Added new and improved folder content analyzer.
+Veretino 0.3.1
+* Added a new universal Database Status dialog. Now information about database changes and verification results are also displayed in this dialog box.
+* Added new and improved Folder Content analyzer. There is now support for sorting the list of extensions by total size or number of files, as well as filtering the Top10 of the largest or most numerous file types.
 * Now the database stores not only the update time, but also the time of the last successful check (when all files from the list are present on the disk and their current checksums have been calculated and match).
-* Added an improved database status display window.
-* The results of database changes are now also displayed in the universal database status window.
 * Pressing Enter again in the path edit field performs a quick action (compute/verify file's checksum or open database).
 
 Veretino 0.3.0
