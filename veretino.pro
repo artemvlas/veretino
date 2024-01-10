@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 
-VERSION = 0.3.1
+VERSION = 0.3.2
 DEFINES += APP_VERSION=\\\"$${VERSION}\\\"
 
 SOURCES += \

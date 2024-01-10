@@ -1,3 +1,6 @@
+Veretino 0.3.2
+* Added the ability to create a Filter based on the Folder Content analyzer.
+
 Veretino 0.3.1
 * Added a new universal Database Status dialog. Now information about database changes and verification results are also displayed in this dialog box.
 * Added an improved Folder Content analyzer. There is now support for sorting the list of extensions by total size or number of files, as well as filtering the Top10 of the largest or most numerous file types.

@@ -6,6 +6,8 @@
 #include "foldercontentsdialog.h"
 #include "ui_foldercontentsdialog.h"
 #include "tools.h"
+#include <QPushButton>
+#include <QDebug>
 
 FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
     : QDialog(parent)
@@ -14,9 +16,14 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QLis
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(":/veretino.png"));
-    ui->treeWidget->setColumnWidth(ColumnExtension, 130);
-    ui->treeWidget->setColumnWidth(ColumnFilesNumber, 130);
-    ui->treeWidget->sortByColumn(ColumnTotalSize, Qt::DescendingOrder);
+    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnExtension, 130);
+    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
+    ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
+
+    ui->rbIgnore->setVisible(false);
+    ui->rbInclude->setVisible(false);
+    ui->frame_filterExtensions->setVisible(false);
+    ui->buttonBox->setVisible(false);
 
     QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
                                                                         : ".../" + paths::basicName(folderPath);
@@ -24,10 +31,21 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QLis
     ui->labelFolderName->setToolTip(folderPath);
     ui->checkBox_Top10->setVisible(extList.size() > 15);
 
-    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &FolderContentsDialog::populate);
-
     setTotalInfo();
-    populate();
+    makeItemsList(extList);
+
+    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &FolderContentsDialog::setItemsVisibility);
+    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &FolderContentsDialog::updateFilterExtensionsList);
+    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &FolderContentsDialog::handleDoubleClickedItem);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frame_filterExtensions, &QFrame::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, [=](bool isChecked){isChecked ? enableFilterCreating() : disableFilterCreating();});
+
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &FolderContentsDialog::accept);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &FolderContentsDialog::reject);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FolderContentsDialog::resetFilter);
 }
 
 FolderContentsDialog::~FolderContentsDialog()
@@ -35,47 +53,50 @@ FolderContentsDialog::~FolderContentsDialog()
     delete ui;
 }
 
-void FolderContentsDialog::addItemToTreeWidget(const ExtNumSize &itemData)
+void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)
 {
-    TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
-    item->setData(ColumnExtension, Qt::DisplayRole, itemData.extension);
-    item->setData(ColumnFilesNumber, Qt::DisplayRole, itemData.filesNumber);
-    item->setData(ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(itemData.filesSize));
-    item->setData(ColumnTotalSize, Qt::UserRole, itemData.filesSize);
-    ui->treeWidget->addTopLevelItem(item);
+    for (int i = 0; i < extList.size(); ++i) {
+        TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
+        item->setData(TreeWidgetItem::ColumnExtension, Qt::DisplayRole, extList.at(i).extension);
+        item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
+        item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
+        item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
+        items.append(item);
+    }
 }
 
-void FolderContentsDialog::populate()
+void FolderContentsDialog::setItemsVisibility(bool isTop10Checked)
 {
-    ui->treeWidget->clear();
+    if (!isTop10Checked) {
+        ui->checkBox_Top10->setText("Top10");
 
-    if (ui->checkBox_Top10->isVisible() && ui->checkBox_Top10->isChecked()) {
-        QList<ExtNumSize> list = extList_;
-        if (ui->treeWidget->sortColumn() == ColumnFilesNumber)
-            std::sort(list.begin(), list.end(), [](const ExtNumSize &t1, const ExtNumSize &t2) {return (t1.filesNumber > t2.filesNumber);});
+        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+            ui->treeWidget->topLevelItem(i)->setHidden(false);
+    }
+    else {
+        if (ui->treeWidget->sortColumn() == TreeWidgetItem::ColumnFilesNumber)
+            ui->treeWidget->sortItems(TreeWidgetItem::ColumnFilesNumber, Qt::DescendingOrder);
         else
-            std::sort(list.begin(), list.end(), [](const ExtNumSize &t1, const ExtNumSize &t2) {return (t1.filesSize > t2.filesSize);});
+            ui->treeWidget->sortItems(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
 
         int top10FilesNumber = 0; // total number of files in the Top10 list
         qint64 top10FilesSize = 0; // total size of these files
 
-        for (int i = 0; i < 10; ++i) {
-            addItemToTreeWidget(list.at(i));
-            top10FilesNumber += list.at(i).filesNumber;
-            top10FilesSize += list.at(i).filesSize;
+        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i) {
+            QTreeWidgetItem *item = ui->treeWidget->topLevelItem(i);
+            item->setHidden(i > 9);
+            if (!item->isHidden()) {
+                top10FilesNumber += item->data(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole).toInt();
+                top10FilesSize += item->data(TreeWidgetItem::ColumnTotalSize, Qt::UserRole).toLongLong();
+            }
         }
 
         ui->checkBox_Top10->setText(QString("Top10: %1 files (%2)")
                                             .arg(top10FilesNumber)
                                             .arg(format::dataSizeReadable(top10FilesSize)));
-        return;
     }
 
-    ui->checkBox_Top10->setText("Top10");
-
-    for (int i = 0; i < extList_.size(); ++i) {
-        addItemToTreeWidget(extList_.at(i));
-    }
+    updateFilterExtensionsList();
 }
 
 void FolderContentsDialog::setTotalInfo()
@@ -92,4 +113,78 @@ void FolderContentsDialog::setTotalInfo()
                                 .arg(extList_.size())
                                 .arg(totalFilesNumber)
                                 .arg(format::dataSizeReadable(totalSize)));
+}
+
+void FolderContentsDialog::enableFilterCreating()
+{
+    ui->labelFilterExtensions->clear();
+
+    for (int i = 0; i < items.size(); ++i) {
+        if (items.at(i)->extension() != "No type")
+            items.at(i)->setCheckBoxVisible(true);
+    }
+
+    if (geometry().height() < 450)
+        setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
+}
+
+void FolderContentsDialog::disableFilterCreating()
+{
+    ui->labelFilterExtensions->clear();
+    filterExtensions.clear();
+
+    for (int i = 0; i < items.size(); ++i) {
+        items.at(i)->setCheckBoxVisible(false);
+    }
+}
+
+void FolderContentsDialog::handleDoubleClickedItem(QTreeWidgetItem *item)
+{
+    if (!ui->checkBox_CreateFilter->isChecked()) {
+        ui->checkBox_CreateFilter->setChecked(true);
+        return;
+    }
+
+    if (!item->data(TreeWidgetItem::ColumnExtension, Qt::CheckStateRole).isValid())
+        return;
+
+    (item->checkState(TreeWidgetItem::ColumnExtension) == Qt::Unchecked) ? item->setCheckState(0, Qt::Checked)
+                                                                         : item->setCheckState(0, Qt::Unchecked);
+}
+
+void FolderContentsDialog::updateFilterExtensionsList()
+{
+    if (!ui->checkBox_CreateFilter->isChecked())
+        return;
+
+    filterExtensions.clear();
+
+    for (int i = 0; i < items.size(); ++i) {
+        if (!items.at(i)->isHidden() && items.at(i)->isChecked()) {
+            filterExtensions.append(items.at(i)->extension());
+        }
+    }
+
+    ui->labelFilterExtensions->setText(filterExtensions.join(" "));
+}
+
+void FolderContentsDialog::resetFilter()
+{
+    ui->rbIgnore->setChecked(true);
+
+    for (int i = 0; i < items.size(); ++i) {
+        items.at(i)->setChecked(false);
+    }
+
+    updateFilterExtensionsList();
+}
+
+FilterRule FolderContentsDialog::resultFilter() const
+{
+    if (ui->checkBox_CreateFilter->isChecked() && !ui->labelFilterExtensions->text().isEmpty()) {
+        FilterRule::ExtensionsFilter filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
+        return FilterRule(filterType, ui->labelFilterExtensions->text().split(" "));
+    }
+
+    return FilterRule(true);
 }
