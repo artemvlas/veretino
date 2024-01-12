@@ -206,12 +206,13 @@ void FolderContentsDialog::updateTotalFiltered()
 void FolderContentsDialog::resetFilter()
 {
     ui->rbIgnore->setChecked(true);
+    ui->labelTotalFiltered->clear();
+    ui->labelFilterExtensions->clear();
+    filterExtensions.clear();
 
     for (int i = 0; i < items.size(); ++i) {
         items.at(i)->setChecked(false);
     }
-
-    updateFilterExtensionsList();
 }
 
 FilterRule FolderContentsDialog::resultFilter() const
