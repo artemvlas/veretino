@@ -73,6 +73,7 @@ public:
 
 private:
     Ui::FolderContentsDialog *ui;
+    void connections();
     void setTotalInfo();
     void makeItemsList(const QList<ExtNumSize> &extList);
     void setItemsVisibility(bool isTop10Checked);
@@ -80,6 +81,7 @@ private:
     void disableFilterCreating();
     void handleDoubleClickedItem(QTreeWidgetItem *item);
     void updateFilterExtensionsList();
+    void updateTotalFiltered();
     void resetFilter();
 
     QList<ExtNumSize> extList_;

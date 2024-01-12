@@ -23,6 +23,7 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QLis
     ui->rbIgnore->setVisible(false);
     ui->rbInclude->setVisible(false);
     ui->frame_filterExtensions->setVisible(false);
+    ui->labelTotalFiltered->setVisible(false);
     ui->buttonBox->setVisible(false);
 
     QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
@@ -33,24 +34,33 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QLis
 
     setTotalInfo();
     makeItemsList(extList);
-
-    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &FolderContentsDialog::setItemsVisibility);
-    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &FolderContentsDialog::updateFilterExtensionsList);
-    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &FolderContentsDialog::handleDoubleClickedItem);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frame_filterExtensions, &QFrame::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, [=](bool isChecked){isChecked ? enableFilterCreating() : disableFilterCreating();});
-
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &FolderContentsDialog::accept);
-    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &FolderContentsDialog::reject);
-    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FolderContentsDialog::resetFilter);
+    connections();
 }
 
 FolderContentsDialog::~FolderContentsDialog()
 {
     delete ui;
+}
+
+void FolderContentsDialog::connections()
+{
+    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &FolderContentsDialog::setItemsVisibility);
+
+    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &FolderContentsDialog::updateFilterExtensionsList);
+    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &FolderContentsDialog::handleDoubleClickedItem);
+
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frame_filterExtensions, &QFrame::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->labelTotalFiltered, &QLabel::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, [=](bool isChecked){isChecked ? enableFilterCreating() : disableFilterCreating();});
+
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &FolderContentsDialog::updateTotalFiltered);
+
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &FolderContentsDialog::accept);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &FolderContentsDialog::reject);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FolderContentsDialog::resetFilter);
 }
 
 void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)
@@ -118,6 +128,7 @@ void FolderContentsDialog::setTotalInfo()
 void FolderContentsDialog::enableFilterCreating()
 {
     ui->labelFilterExtensions->clear();
+    ui->labelTotalFiltered->clear();
 
     for (int i = 0; i < items.size(); ++i) {
         if (items.at(i)->extension() != "No type")
@@ -166,6 +177,30 @@ void FolderContentsDialog::updateFilterExtensionsList()
     }
 
     ui->labelFilterExtensions->setText(filterExtensions.join(" "));
+    updateTotalFiltered();
+}
+
+void FolderContentsDialog::updateTotalFiltered()
+{
+    if (!ui->checkBox_CreateFilter->isChecked())
+        return;
+
+    int filteredFilesNumber = 0;
+    qint64 filteredFilesSize = 0;
+
+    for (int i = 0; i < items.size(); ++i) {
+        if (!items.at(i)->isHidden()
+            && ((ui->rbInclude->isChecked() && items.at(i)->isChecked())
+                || (ui->rbIgnore->isChecked() && !items.at(i)->isChecked()))) {
+
+            filteredFilesNumber += items.at(i)->filesNumber();
+            filteredFilesSize += items.at(i)->filesSize();
+        }
+    }
+
+    filterExtensions.isEmpty() ? ui->labelTotalFiltered->clear()
+                               : ui->labelTotalFiltered->setText(QString("Filtered: %1")
+                                                                 .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
 }
 
 void FolderContentsDialog::resetFilter()
