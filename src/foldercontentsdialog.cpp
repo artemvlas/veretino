@@ -22,7 +22,7 @@ FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QLis
 
     ui->rbIgnore->setVisible(false);
     ui->rbInclude->setVisible(false);
-    ui->frame_filterExtensions->setVisible(false);
+    ui->frameFilterExtensions->setVisible(false);
     ui->labelTotalFiltered->setVisible(false);
     ui->buttonBox->setVisible(false);
 
@@ -51,7 +51,7 @@ void FolderContentsDialog::connections()
 
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frame_filterExtensions, &QFrame::setVisible);
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frameFilterExtensions, &QFrame::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->labelTotalFiltered, &QLabel::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, [=](bool isChecked){isChecked ? enableFilterCreating() : disableFilterCreating();});
