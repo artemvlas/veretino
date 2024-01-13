@@ -189,9 +189,8 @@ void FolderContentsDialog::updateTotalFiltered()
     qint64 filteredFilesSize = 0;
 
     for (int i = 0; i < items.size(); ++i) {
-        if (!items.at(i)->isHidden()
-            && ((ui->rbInclude->isChecked() && items.at(i)->isChecked())
-                || (ui->rbIgnore->isChecked() && !items.at(i)->isChecked()))) {
+        if ((ui->rbInclude->isChecked() && !items.at(i)->isHidden() && items.at(i)->isChecked()) // Include only visible and checked
+            || (ui->rbIgnore->isChecked() && (items.at(i)->isHidden() || !items.at(i)->isChecked()))) { // Include all except visible and checked
 
             filteredFilesNumber += items.at(i)->filesNumber();
             filteredFilesSize += items.at(i)->filesSize();
