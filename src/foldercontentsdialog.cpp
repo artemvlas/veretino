@@ -60,7 +60,7 @@ void FolderContentsDialog::connections()
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &FolderContentsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &FolderContentsDialog::reject);
-    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FolderContentsDialog::resetFilter);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FolderContentsDialog::enableFilterCreating);
 }
 
 void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)
@@ -127,8 +127,11 @@ void FolderContentsDialog::setTotalInfo()
 
 void FolderContentsDialog::enableFilterCreating()
 {
+    ui->rbIgnore->setChecked(true);
+    filterExtensions.clear();
     ui->labelFilterExtensions->clear();
     ui->labelTotalFiltered->clear();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
 
     for (int i = 0; i < items.size(); ++i) {
         if (items.at(i)->extension() != "No type")
@@ -197,21 +200,11 @@ void FolderContentsDialog::updateTotalFiltered()
         }
     }
 
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!filterExtensions.isEmpty() && filteredFilesNumber > 0);
+
     filterExtensions.isEmpty() ? ui->labelTotalFiltered->clear()
                                : ui->labelTotalFiltered->setText(QString("Filtered: %1")
                                                                  .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
-}
-
-void FolderContentsDialog::resetFilter()
-{
-    ui->rbIgnore->setChecked(true);
-    ui->labelTotalFiltered->clear();
-    ui->labelFilterExtensions->clear();
-    filterExtensions.clear();
-
-    for (int i = 0; i < items.size(); ++i) {
-        items.at(i)->setChecked(false);
-    }
 }
 
 FilterRule FolderContentsDialog::resultFilter() const

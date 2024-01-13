@@ -82,7 +82,6 @@ private:
     void handleDoubleClickedItem(QTreeWidgetItem *item);
     void updateFilterExtensionsList();
     void updateTotalFiltered();
-    void resetFilter();
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items;
