@@ -42,6 +42,8 @@ public:
     // tasks execution
     void quickAction();
     void doWork();
+    void processFolderChecksums();
+    void processFolderChecksums(const FilterRule &filter);
 
     //---->>>
     void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
@@ -58,7 +60,8 @@ public:
     QAction *actionToHome = new QAction("to Home", this);
     QAction *actionCancel = new QAction("Cancel operation", this);
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);
-    QAction *actionProcessFolderChecksums = new QAction("Calculate checksums of all files in the folder", this);
+    QAction *actionProcessContainedChecksums = new QAction("Calculate checksums of Contained files", this);
+    QAction *actionProcessFilteredChecksums = new QAction("Calculate checksums of Filtered files", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
     QAction *actionProcessSha_toClipboard = new QAction("Calculate Checksum --> Clipboard", this);
     QAction *actionProcessSha1File = new QAction("SHA-1 --> *.sha1", this);
@@ -118,7 +121,7 @@ private:
 signals:
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
-    void processFolderSha(const QString &path, QCryptographicHash::Algorithm algo);
+    void processFolderSha(const MetaData &metaData);
     void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
     void parseJsonFile(const QString &path);
     void verify(const QModelIndex& index = QModelIndex());
@@ -130,7 +133,8 @@ signals:
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void dbItemContents(const QString &itemPath);
-    void folderContentsByType(const QString &folderPath);
+    void makeFolderContentsList(const QString &folderPath);
+    void makeFolderContentsFilter(const QString &folderPath);
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

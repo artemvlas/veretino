@@ -84,7 +84,7 @@ private:
 
 signals:
     void processing(bool isProcessing, bool visibleProgress = false);
-    void dataUpdated();
+    void databaseUpdated();
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void setPermanentStatus(const QString &text = QString());
     void showMessage(const QString &text, const QString &title = "Info");

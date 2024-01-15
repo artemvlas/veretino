@@ -26,14 +26,14 @@ Manager::Manager(Settings *settings, QObject *parent)
     connect(dataMaintainer, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
 }
 
-void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo)
+void Manager::processFolderSha(const MetaData &metaData)
 {
-    if (Files::isEmptyFolder(folderPath)) {
+    if (Files::isEmptyFolder(metaData.workDir)) {
         emit showMessage("Nothing to do.", "Empty folder");
         return;
     }
 
-    if (Files::isEmptyFolder(folderPath, settings_->filter)) {
+    if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
         emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.", "No proper files");
         return;
     }
@@ -41,11 +41,9 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
     canceled = false;
 
     dataMaintainer->setSourceData();
-    dataMaintainer->data_->metaData.workDir = folderPath;
-    dataMaintainer->data_->metaData.algorithm = algo;
-    dataMaintainer->data_->metaData.filter = settings_->filter;
-    dataMaintainer->data_->metaData.databaseFilePath = paths::joinPath(folderPath,
-                                                       QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(folderPath)) // database filename
+    dataMaintainer->data_->metaData = metaData;
+    dataMaintainer->data_->metaData.databaseFilePath = paths::joinPath(metaData.workDir,
+                                                       QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(metaData.workDir)) // database filename
                                                                                 .replace(' ', '_'));
 
     // create the filelist
@@ -59,7 +57,7 @@ void Manager::processFolderSha(const QString &folderPath, QCryptographicHash::Al
 
     emit setViewData(dataMaintainer->data_, false);
 
-    QString permStatus = format::algoToStr(algo);
+    QString permStatus = format::algoToStr(metaData.algorithm);
     if (dataMaintainer->data_->isFilterApplied())
         permStatus.prepend("filters applied | ");
 
@@ -490,7 +488,17 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
         emit setStatusbarText(dataMaintainer->itemContentsInfo(curIndex));
 }
 
-void Manager::folderContentsByType(const QString &folderPath)
+void Manager::makeFolderContentsList(const QString &folderPath)
+{
+    folderContentsList(folderPath, false);
+}
+
+void Manager::makeFolderContentsFilter(const QString &folderPath)
+{
+    folderContentsList(folderPath, true);
+}
+
+void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 {
     if (isViewFileSysytem) {
         if (Files::isEmptyFolder(folderPath)) {
@@ -508,11 +516,15 @@ void Manager::folderContentsByType(const QString &folderPath)
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
-        connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsListCreated);
         connect(files, &Files::folderContentsListCreated, thread, &QThread::quit);
 
+        if (filterCreation)
+            connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsFilterCreated);
+        else
+            connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsListCreated);
+
         // ***debug***
-        connect(thread, &QThread::destroyed, this, [=]{qDebug()<< "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});
+        connect(thread, &QThread::destroyed, this, [=]{qDebug() << "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});
 
         thread->start();
     }

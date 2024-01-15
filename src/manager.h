@@ -21,7 +21,7 @@ public:
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
 
 public slots:
-    void processFolderSha(const QString &folderPath, QCryptographicHash::Algorithm algo);
+    void processFolderSha(const MetaData &metaData);
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
     void verify(const QModelIndex &curIndex);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
@@ -36,12 +36,14 @@ public slots:
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
-    void folderContentsByType(const QString &folderPath); // show info message with files number and size by extensions
+    void makeFolderContentsList(const QString &folderPath);
+    void makeFolderContentsFilter(const QString &folderPath);
 
 private:
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead all database cheking
     void showFileCheckResultMessage(bool isMatched, const QString &fileName = QString());
+    void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, with their number and size
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool finalProcess = true); // <finalProcess> -->> whether it sends a process end signal or not
@@ -65,6 +67,7 @@ signals:
     void setViewData(DataContainer *data = nullptr, bool isImported = true); // isImported == true, if the data is obtained from a database file
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
+    void folderContentsFilterCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text); // Sending directly to QGuiApplication::clipboard()->setText works great on Linux,
                                            // but does NOT work on older QT builds on Windows. So this signal is used for compatibility.

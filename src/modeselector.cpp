@@ -14,7 +14,8 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     : QObject{parent}, view_(view), button_(button), settings_(settings)
 {
     connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
-    connect(this, &ModeSelector::folderContentsByType, this, &ModeSelector::cancelProcess);
+    connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::cancelProcess);
+    connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::cancelProcess);
 
     connect(this, &ModeSelector::updateNewLost, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
@@ -41,7 +42,8 @@ void ModeSelector::connectActions()
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
-    connect(actionProcessFolderChecksums, &QAction::triggered, this, &ModeSelector::doWork);
+    connect(actionProcessContainedChecksums, &QAction::triggered, this, &ModeSelector::doWork);
+    connect(actionProcessFilteredChecksums, &QAction::triggered, this, [=]{emit makeFolderContentsFilter(view_->curPathFileSystem);});
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1);});
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256);});
@@ -228,7 +230,7 @@ void ModeSelector::verifyDb()
 
 void ModeSelector::showFolderContentTypes()
 {
-    emit folderContentsByType(view_->curPathFileSystem);
+    emit makeFolderContentsList(view_->curPathFileSystem);
 }
 
 void ModeSelector::checkFileChecksum(const QString &checkSum)
@@ -255,6 +257,24 @@ void ModeSelector::copyDataToClipboard(Column column)
     }
 }
 
+void ModeSelector::processFolderChecksums()
+{
+    processFolderChecksums(settings_->filter);
+}
+
+void ModeSelector::processFolderChecksums(const FilterRule &filter)
+{
+    // if a very large folder is selected, the file system iteration (info about folder contents process) may continue for some time,
+    // so cancelation is needed before starting a new process
+    emit cancelProcess();
+
+    MetaData metaData;
+    metaData.workDir = view_->curPathFileSystem;
+    metaData.algorithm = settings_->algorithm;
+    metaData.filter = filter;
+    emit processFolderSha(metaData);
+}
+
 void ModeSelector::doWork()
 {
     if (isProcessing()) {
@@ -264,10 +284,7 @@ void ModeSelector::doWork()
 
     switch (curMode) {
         case Folder:
-            // if a very large folder is selected, the file system iteration (info about folder contents process) may continue for some time,
-            // so cancelation is needed before starting a new process
-            emit cancelProcess();
-            emit processFolderSha(view_->curPathFileSystem, settings_->algorithm);
+            processFolderChecksums();
             break;
         case File:
             emit processFileSha(view_->curPathFileSystem, settings_->algorithm);
@@ -346,17 +363,20 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         else if (index.isValid()) {
             if (isCurrentMode(File) || isCurrentMode(Folder)) {
                 setCheckedState_ActionsAlgo();
-                viewContextMenu->addMenu("Algorithm")->addActions(actionGroupSetAlgo->actions());
+                viewContextMenu->addMenu("Algorithm " + format::algoToStr(settings_->algorithm))->addActions(actionGroupSetAlgo->actions());
             }
 
             if (isCurrentMode(Folder)) {
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
                 viewContextMenu->addSeparator();
-                QString argAllFiltered = settings_->filter.isFilter(FilterRule::NotSet) ? QString("of all") : QString("of filtered");
-                QString actProcFolderText = QString("Calculate %1 %2 files in the folder").arg(format::algoToStr(settings_->algorithm), argAllFiltered);
+                //QString argAllFiltered = settings_->filter.isFilter(FilterRule::NotSet) ? QString("of all") : QString("of filtered");
+                //QString actProcFolderText = QString("Calculate %1 %2 files in the folder").arg(format::algoToStr(settings_->algorithm), argAllFiltered);
+                //actionProcessContainedChecksums->setText(actionProcessContainedChecksums->text().replace("checksums", format::algoToStr(settings_->algorithm)));
+                //actionProcessFilteredChecksums->setText(actionProcessFilteredChecksums->text().replace("checksums", format::algoToStr(settings_->algorithm)));
+                //actionProcessFolderChecksums->setText(actProcFolderText);
 
-                actionProcessFolderChecksums->setText(actProcFolderText);
-                viewContextMenu->addAction(actionProcessFolderChecksums);
+                viewContextMenu->addAction(actionProcessContainedChecksums);
+                viewContextMenu->addAction(actionProcessFilteredChecksums);
             }
             else if (isCurrentMode(File)) {
                 viewContextMenu->addMenu("Store checksum to summary")->addActions(actionsMakeSummaries);

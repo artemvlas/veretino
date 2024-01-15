@@ -1,5 +1,6 @@
 Veretino 0.3.2
-* Added the ability to create a Filter based on the Folder Content analyzer.
+* Added the ability to create a global Filter based on the Folder Content analyzer.
+* Added the ability to quickly create an independent Filter when calculating checksums for folder contents.
 
 Veretino 0.3.1
 * Added a new universal Database Status dialog. Now information about database changes and verification results are also displayed in this dialog box.

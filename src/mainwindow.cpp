@@ -83,6 +83,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<ModelView>("ModelView");
     qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");
+    qRegisterMetaType<MetaData>("MetaData");
 
     manager->moveToThread(thread);
 
@@ -110,14 +111,16 @@ void MainWindow::connectManager()
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
-    connect(modeSelect, &ModeSelector::folderContentsByType, manager, &Manager::folderContentsByType);
+    connect(modeSelect, &ModeSelector::makeFolderContentsList, manager, &Manager::makeFolderContentsList);
+    connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showFolderContentsDialog);
+    connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
 
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
-    connect(manager->dataMaintainer, &DataMaintainer::dataUpdated, modeSelect, &ModeSelector::setMode);
-    connect(manager->dataMaintainer, &DataMaintainer::dataUpdated, this, &MainWindow::showDbStatus);
+    connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, modeSelect, &ModeSelector::setMode);
+    connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
 
     // process status
     connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);
@@ -151,6 +154,21 @@ void MainWindow::showFolderContentsDialog(const QString &folderName, const QList
             if (!filter.isFilter(FilterRule::NotSet))
                 settings_->filter = filter;
         }
+    }
+}
+
+void MainWindow::showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList)
+{
+    if (!extList.isEmpty()) {
+        FolderContentsDialog dialog(folderName, extList);
+        dialog.setFilterCreatingEnabled();
+        FilterRule filter;
+
+        if (dialog.exec() == QDialog::Accepted) {
+            filter = dialog.resultFilter();
+        }
+
+        modeSelect->processFolderChecksums(filter);
     }
 }
 

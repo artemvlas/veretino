@@ -449,10 +449,10 @@ void DataMaintainer::exportToJson(bool finalProcess)
 
     json->makeJson(data_);
 
-    emit dataUpdated();
-
     if (finalProcess)
         emit processing(false);
+
+    emit databaseUpdated();
 }
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)

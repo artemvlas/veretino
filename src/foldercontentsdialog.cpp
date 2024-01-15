@@ -138,7 +138,7 @@ void FolderContentsDialog::enableFilterCreating()
             items.at(i)->setCheckBoxVisible(true);
     }
 
-    if (geometry().height() < 450)
+    if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
 }
 
@@ -154,21 +154,21 @@ void FolderContentsDialog::disableFilterCreating()
 
 void FolderContentsDialog::handleDoubleClickedItem(QTreeWidgetItem *item)
 {
-    if (!ui->checkBox_CreateFilter->isChecked()) {
-        ui->checkBox_CreateFilter->setChecked(true);
+    if (!isFilterCreatingEnabled()) {
+        setFilterCreatingEnabled();
         return;
     }
 
     if (!item->data(TreeWidgetItem::ColumnExtension, Qt::CheckStateRole).isValid())
         return;
 
-    (item->checkState(TreeWidgetItem::ColumnExtension) == Qt::Unchecked) ? item->setCheckState(0, Qt::Checked)
-                                                                         : item->setCheckState(0, Qt::Unchecked);
+    Qt::CheckState checkState = (item->checkState(TreeWidgetItem::ColumnExtension) == Qt::Unchecked) ? Qt::Checked : Qt::Unchecked;
+    item->setCheckState(TreeWidgetItem::ColumnExtension, checkState);
 }
 
 void FolderContentsDialog::updateFilterExtensionsList()
 {
-    if (!ui->checkBox_CreateFilter->isChecked())
+    if (!isFilterCreatingEnabled())
         return;
 
     filterExtensions.clear();
@@ -185,7 +185,7 @@ void FolderContentsDialog::updateFilterExtensionsList()
 
 void FolderContentsDialog::updateTotalFiltered()
 {
-    if (!ui->checkBox_CreateFilter->isChecked())
+    if (!isFilterCreatingEnabled())
         return;
 
     int filteredFilesNumber = 0;
@@ -207,12 +207,22 @@ void FolderContentsDialog::updateTotalFiltered()
                                                                  .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
 }
 
-FilterRule FolderContentsDialog::resultFilter() const
+FilterRule FolderContentsDialog::resultFilter()
 {
-    if (ui->checkBox_CreateFilter->isChecked() && !ui->labelFilterExtensions->text().isEmpty()) {
+    if (isFilterCreatingEnabled() && !ui->labelFilterExtensions->text().isEmpty()) {
         FilterRule::ExtensionsFilter filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
         return FilterRule(filterType, ui->labelFilterExtensions->text().split(" "));
     }
 
     return FilterRule(true);
+}
+
+void FolderContentsDialog::setFilterCreatingEnabled(bool enabled)
+{
+    ui->checkBox_CreateFilter->setChecked(enabled);
+}
+
+bool FolderContentsDialog::isFilterCreatingEnabled()
+{
+    return ui->checkBox_CreateFilter->isChecked();
 }

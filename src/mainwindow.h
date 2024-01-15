@@ -39,7 +39,8 @@ public slots:
     void handlePathEdit();
 
     void showDbStatus();
-    void showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList);
+    void showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
+    void showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList); // the same^ dialog, but with filter creation mode enabled
     void dialogSettings();
     void dialogOpenFolder();
     void dialogOpenJson();

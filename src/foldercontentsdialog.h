@@ -69,7 +69,8 @@ class FolderContentsDialog : public QDialog
 public:
     explicit FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
     ~FolderContentsDialog();
-    FilterRule resultFilter() const;
+    FilterRule resultFilter();
+    void setFilterCreatingEnabled(bool enabled = true);
 
 private:
     Ui::FolderContentsDialog *ui;
@@ -82,6 +83,7 @@ private:
     void handleDoubleClickedItem(QTreeWidgetItem *item);
     void updateFilterExtensionsList();
     void updateTotalFiltered();
+    bool isFilterCreatingEnabled();
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items;
