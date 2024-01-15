@@ -8,7 +8,6 @@
 
 #include <QDialog>
 #include "datacontainer.h"
-#include "clickablelabel.h"
 
 namespace Ui {
 class DbStatusDialog;
@@ -30,8 +29,6 @@ private:
     QStringList infoContent(const DataContainer *data);
     QStringList infoVerification(const DataContainer *data);
     QStringList infoChanges();
-    void browsePath(const QString &path);
-    void browseWorkDir();
     bool isJustCreated();
 };
 

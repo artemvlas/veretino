@@ -63,7 +63,7 @@ public:
     QAction *actionProcessContainedChecksums = new QAction("Calculate checksums of Contained files", this);
     QAction *actionProcessFilteredChecksums = new QAction("Calculate checksums of Filtered files", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
-    QAction *actionProcessSha_toClipboard = new QAction("Calculate Checksum --> Clipboard", this);
+    QAction *actionProcessSha_toClipboard = new QAction("Calculate checksum --> Clipboard", this);
     QAction *actionProcessSha1File = new QAction("SHA-1 --> *.sha1", this);
     QAction *actionProcessSha256File = new QAction("SHA-256 --> *.sha256", this);
     QAction *actionProcessSha512File = new QAction("SHA-512 --> *.sha512", this);
@@ -95,8 +95,7 @@ public:
     QAction *actionSetAlgoSha1 = new QAction("SHA-1", this);
     QAction *actionSetAlgoSha256 = new QAction("SHA-256", this);
     QAction *actionSetAlgoSha512 = new QAction("SHA-512", this);
-    //QList<QAction*> actionsSetAlgo {actionSetAlgoSha1, actionSetAlgoSha256, actionSetAlgoSha512};
-    QActionGroup *actionGroupSetAlgo = new QActionGroup(this);
+    QActionGroup *actionGroupSelectAlgo = new QActionGroup(this);
 
 public slots:
     void processing(bool isProcessing);
@@ -110,7 +109,7 @@ private:
     Mode selectMode(const QString &path); // select Mode based on file system path
 
     void copyDataToClipboard(Column column);
-    void setCheckedState_ActionsAlgo();
+    QList<QAction *> getActionsAlgo(); // set checked state and return actionGroupSelectAlgo->actions()
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;

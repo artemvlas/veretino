@@ -33,6 +33,7 @@ namespace paths {
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
+void browsePath(const QString &path);
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter); // whether the file extension matches the filter rules
 bool isRoot(const QString &path); // true: "/" or "C:/" or "C:"; else false

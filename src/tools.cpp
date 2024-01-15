@@ -7,6 +7,8 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <cmath>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QDebug>
 #include "files.h"
 
@@ -140,6 +142,13 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
 {
     return absolutePath.endsWith('/') ? absolutePath + addPath
                                       : QString("%1/%2").arg(absolutePath, addPath);
+}
+
+void browsePath(const QString &path)
+{
+    if (QFile::exists(path)) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    }
 }
 
 bool isFileAllowed(const QString &filePath, const FilterRule &filter)

@@ -61,6 +61,8 @@ void FolderContentsDialog::connections()
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &FolderContentsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &FolderContentsDialog::reject);
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &FolderContentsDialog::enableFilterCreating);
+
+    connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(ui->labelFolderName->toolTip());});
 }
 
 void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)

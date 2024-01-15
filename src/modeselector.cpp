@@ -28,9 +28,9 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     actionSetAlgoSha256->setCheckable(true);
     actionSetAlgoSha512->setCheckable(true);
 
-    actionGroupSetAlgo->addAction(actionSetAlgoSha1);
-    actionGroupSetAlgo->addAction(actionSetAlgoSha256);
-    actionGroupSetAlgo->addAction(actionSetAlgoSha512);
+    actionGroupSelectAlgo->addAction(actionSetAlgoSha1);
+    actionGroupSelectAlgo->addAction(actionSetAlgoSha256);
+    actionGroupSelectAlgo->addAction(actionSetAlgoSha512);
 
     connectActions();
 }
@@ -361,13 +361,12 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         if (isProcessing())
             viewContextMenu->addAction(actionCancel);
         else if (index.isValid()) {
-            if (isCurrentMode(File) || isCurrentMode(Folder)) {
-                setCheckedState_ActionsAlgo();
-                viewContextMenu->addMenu("Algorithm " + format::algoToStr(settings_->algorithm))->addActions(actionGroupSetAlgo->actions());
-            }
+            //if (isCurrentMode(File) || isCurrentMode(Folder))
+            //    viewContextMenu->addMenu("Algorithm: " + format::algoToStr(settings_->algorithm))->addActions(getActionsAlgo());
 
             if (isCurrentMode(Folder)) {
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
+                viewContextMenu->addMenu("Algorithm: " + format::algoToStr(settings_->algorithm))->addActions(getActionsAlgo());
                 viewContextMenu->addSeparator();
                 //QString argAllFiltered = settings_->filter.isFilter(FilterRule::NotSet) ? QString("of all") : QString("of filtered");
                 //QString actProcFolderText = QString("Calculate %1 %2 files in the folder").arg(format::algoToStr(settings_->algorithm), argAllFiltered);
@@ -380,7 +379,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
             }
             else if (isCurrentMode(File)) {
                 viewContextMenu->addMenu("Store checksum to summary")->addActions(actionsMakeSummaries);
-                actionProcessSha_toClipboard->setText(QString("Calculate %1 checksum --> Clipboard").arg(format::algoToStr(settings_->algorithm)));
+                viewContextMenu->addMenu("Algorithm: " + format::algoToStr(settings_->algorithm))->addActions(getActionsAlgo());
+                //actionProcessSha_toClipboard->setText(QString("Calculate %1 checksum --> Clipboard").arg(format::algoToStr(settings_->algorithm)));
                 viewContextMenu->addAction(actionProcessSha_toClipboard);
 
                 QString clipboardText = QGuiApplication::clipboard()->text();
@@ -461,18 +461,18 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
     if (!isCurrentMode(File) && !isCurrentMode(Folder))
         return;
 
-    setCheckedState_ActionsAlgo();
-
     QMenu *buttonContextMenu = new QMenu(button_);
     connect(buttonContextMenu, &QMenu::aboutToHide, buttonContextMenu, &QMenu::deleteLater);
-    buttonContextMenu->addActions(actionGroupSetAlgo->actions());
 
+    buttonContextMenu->addActions(getActionsAlgo());
     buttonContextMenu->exec(button_->mapToGlobal(point));
 }
 
-void ModeSelector::setCheckedState_ActionsAlgo()
+QList<QAction *> ModeSelector::getActionsAlgo()
 {
     actionSetAlgoSha1->setChecked(settings_->algorithm == QCryptographicHash::Sha1);
     actionSetAlgoSha256->setChecked(settings_->algorithm == QCryptographicHash::Sha256);
     actionSetAlgoSha512->setChecked(settings_->algorithm == QCryptographicHash::Sha512);
+
+    return actionGroupSelectAlgo->actions();
 }
