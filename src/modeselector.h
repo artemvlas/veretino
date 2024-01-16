@@ -7,6 +7,7 @@
 #define MODESELECTOR_H
 
 #include <QObject>
+#include <QMenu>
 #include <QAction>
 #include <QPushButton>
 #include "view.h"
@@ -53,6 +54,7 @@ public:
     void checkFileChecksum(const QString &checkSum);
 
     void showFileSystem();
+    QMenu* menuAlgorithm(); // QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
 
     // Actions --->>
     // File system View
@@ -97,6 +99,9 @@ public:
     QAction *actionSetAlgoSha512 = new QAction("SHA-512", this);
     QActionGroup *actionGroupSelectAlgo = new QActionGroup(this);
 
+    // Menu
+    QMenu *menuAlgo = new QMenu;
+
 public slots:
     void processing(bool isProcessing);
     void prepareView();
@@ -109,7 +114,6 @@ private:
     Mode selectMode(const QString &path); // select Mode based on file system path
 
     void copyDataToClipboard(Column column);
-    QList<QAction *> getActionsAlgo(); // set checked state and return actionGroupSelectAlgo->actions()
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;
