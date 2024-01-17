@@ -65,10 +65,10 @@ public:
     QAction *actionProcessContainedChecksums = new QAction("Calculate checksums of Contained files", this);
     QAction *actionProcessFilteredChecksums = new QAction("Calculate checksums of Filtered files", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
-    QAction *actionProcessSha_toClipboard = new QAction("Calculate checksum --> Clipboard", this);
-    QAction *actionProcessSha1File = new QAction("SHA-1 --> *.sha1", this);
-    QAction *actionProcessSha256File = new QAction("SHA-256 --> *.sha256", this);
-    QAction *actionProcessSha512File = new QAction("SHA-512 --> *.sha512", this);
+    QAction *actionProcessSha_toClipboard = new QAction("Calculate checksum → Clipboard", this);
+    QAction *actionProcessSha1File = new QAction("SHA-1 → *.sha1", this);
+    QAction *actionProcessSha256File = new QAction("SHA-256 → *.sha256", this);
+    QAction *actionProcessSha512File = new QAction("SHA-512 → *.sha512", this);
     QAction *actionOpenDatabase = new QAction("Open Database", this);
     QAction *actionCheckSumFile = new QAction("Check the Checksum", this);
 
