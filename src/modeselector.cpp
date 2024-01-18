@@ -203,10 +203,12 @@ void ModeSelector::setButtonInfo()
     case Model:
         button_->setText("Verify");
         button_->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(themeFolder())));
+        button_->setToolTip(QString("Check ALL files against stored checksums"));
         break;
     case ModelNewLost:
-        button_->setText("Update New/Lost");
+        button_->setText("New/Lost");
         button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder())));
+        button_->setToolTip(QString("Update the Database: add new files, remove missing"));
         break;
     case UpdateMismatch:
         button_->setText("Update");
