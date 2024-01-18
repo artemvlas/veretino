@@ -35,7 +35,7 @@ public:
     Mode currentMode();
     bool isCurrentMode(const Mode mode);
     bool isProcessing();
-    void selectButtonText(); // select the Button text according to current Mode
+    void setButtonInfo(); // sets the Button icon and text according the current Mode
     void setAlgorithm(QCryptographicHash::Algorithm algo);
     //QSet<Mode> fsModes {Folder, File, DbFile, SumFile};
     //QSet<Mode> dbModes {Model, ModelNewLost, UpdateMismatch};
@@ -116,6 +116,8 @@ private:
 
     void copyDataToClipboard(Column column);
     void setActionsIcons();
+    bool isDarkTheme();
+    QString themeFolder();
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;

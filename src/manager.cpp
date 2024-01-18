@@ -89,24 +89,9 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     }
 
     if (summaryFile) {
-        QString ext;
-
-        switch (algo) {
-            case QCryptographicHash::Sha1:
-                ext = "sha1";
-                break;
-            case QCryptographicHash::Sha256:
-                ext = "sha256";
-                break;
-            case QCryptographicHash::Sha512:
-                ext = "sha512";
-                break;
-            default:
-                ext = "checkSum";
-                break;
-        }
-
+        QString ext = format::algoToStr(algo, false);
         QString sumFile = QString("%1.%2").arg(filePath, ext);
+
         QFile file(sumFile);
         if (file.open(QFile::WriteOnly)) {
             file.write(QString("%1 *%2").arg(sum, paths::basicName(filePath)).toUtf8());

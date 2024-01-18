@@ -267,15 +267,15 @@ QString shortenString(const QString &string, int length, bool cutEnd)
                   : string.right(length).prepend("...");
 }
 
-QString algoToStr(QCryptographicHash::Algorithm algo)
+QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 {
     switch (algo) {
         case QCryptographicHash::Sha1:
-            return "SHA-1";
+            return capitalLetters ? "SHA-1" : "sha1";
         case QCryptographicHash::Sha256:
-            return "SHA-256";
+            return capitalLetters ? "SHA-256" : "sha256";
         case QCryptographicHash::Sha512:
-            return "SHA-512";
+            return capitalLetters ? "SHA-512" : "sha512";
         default:
             return "Unknown";
     }

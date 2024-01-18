@@ -82,9 +82,7 @@ void ModeSelector::connectActions()
 
 void ModeSelector::setActionsIcons()
 {
-    int curLightness = button_->palette().color(QPalette::Active, QPalette::Base).lightness();
-    bool isDark = (curLightness < 120);
-    QString theme = isDark ? "dark" : "light";
+    QString theme = themeFolder();
 
     // File system View
     actionShowFS->setIcon(QIcon(QString(":/icons/%1/filesystem.svg").arg(theme)));
@@ -93,7 +91,7 @@ void ModeSelector::setActionsIcons()
     actionShowFolderContentsTypes->setIcon(QIcon(QString(":/icons/%1/chart-pie.svg").arg(theme)));
     actionProcessContainedChecksums->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(theme)));
     actionProcessFilteredChecksums->setIcon(QIcon(QString(":/icons/%1/filter.svg").arg(theme)));
-    actionCheckFileByClipboardChecksum->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
+    actionCheckFileByClipboardChecksum->setIcon(QIcon(QString(":/icons/%1/paste.svg").arg(theme)));
     actionProcessSha_toClipboard->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
     actionOpenDatabase->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
     actionCheckSumFile->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
@@ -102,7 +100,7 @@ void ModeSelector::setActionsIcons()
     menuStoreSummary->menuAction()->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(theme)));
 
     // DB Model View
-    actionCancelBackToFS->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
+    //actionCancelBackToFS->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
     actionShowDbStatus->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
     actionResetDb->setIcon(QIcon(QString(":/icons/%1/undo.svg").arg(theme)));
     actionForgetChanges->setIcon(QIcon(QString(":/icons/%1/backup.svg").arg(theme)));
@@ -115,6 +113,17 @@ void ModeSelector::setActionsIcons()
     actionCheckAll->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(theme)));
     actionCopyStoredChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
     actionCopyReChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
+}
+
+bool ModeSelector::isDarkTheme()
+{
+    int curLightness = button_->palette().color(QPalette::Active, QPalette::Base).lightness();
+    return (curLightness < 120);
+}
+
+QString ModeSelector::themeFolder()
+{
+    return isDarkTheme() ? "dark" : "light";
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -151,6 +160,8 @@ void ModeSelector::setMode()
 {
     if (isProcessing_) {
         button_->setText("Cancel");
+        button_->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(themeFolder())));
+        button_->setToolTip("");
         return;
     }
 
@@ -163,32 +174,44 @@ void ModeSelector::setMode()
         return;
     }
 
-    selectButtonText();
+    setButtonInfo();
 }
 
-void ModeSelector::selectButtonText()
+void ModeSelector::setButtonInfo()
 {
+    button_->setToolTip("");
+
     switch (curMode) {
     case Folder:
-        button_->setText(format::algoToStr(settings_->algorithm).append(": Folder"));
+        button_->setText(format::algoToStr(settings_->algorithm));
+        button_->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(themeFolder())));
+        button_->setToolTip(QString("Calculate checksums of contained files and save the result to a local database"));
         break;
     case File:
-        button_->setText(format::algoToStr(settings_->algorithm).append(": File"));
+        button_->setText(format::algoToStr(settings_->algorithm, false).prepend("*."));
+        button_->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder())));
+        button_->setToolTip(QString("Calculate %1 checksum and store it in the Summary").arg(format::algoToStr(settings_->algorithm)));
         break;
     case DbFile:
-        button_->setText("Open Database");
+        button_->setText("Open");
+        button_->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(themeFolder())));
         break;
     case SumFile:
         button_->setText("Check");
+        button_->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(themeFolder())));
         break;
     case Model:
-        button_->setText("Verify All");
+        button_->setText("Verify");
+        button_->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(themeFolder())));
         break;
     case ModelNewLost:
         button_->setText("Update New/Lost");
+        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder())));
         break;
     case UpdateMismatch:
         button_->setText("Update");
+        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder())));
+        button_->setToolTip(QString("Update mismatched checksums with newly calculated ones"));
         break;
     case NoMode:
         button_->setText("Browse");
@@ -249,7 +272,7 @@ bool ModeSelector::isProcessing()
 void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
 {
     settings_->algorithm = algo;
-    selectButtonText();
+    setButtonInfo();
 }
 
 // tasks execution --->>>
