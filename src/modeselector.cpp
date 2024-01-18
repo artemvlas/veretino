@@ -7,7 +7,6 @@
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QClipboard>
-//#include <QMenu>
 #include <QDebug>
 
 ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent)
@@ -32,9 +31,10 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     actionGroupSelectAlgo->addAction(actionSetAlgoSha256);
     actionGroupSelectAlgo->addAction(actionSetAlgoSha512);
 
-    connect(menuAlgo, &QMenu::destroyed, this, []{qDebug() << "menuAlgo DESTROYED";});
     menuAlgo->addActions(actionGroupSelectAlgo->actions());
+    menuStoreSummary->addActions(actionsMakeSummaries);
 
+    setActionsIcons();
     connectActions();
 }
 
@@ -78,6 +78,43 @@ void ModeSelector::connectActions()
     connect(actionSetAlgoSha1, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha1);});
     connect(actionSetAlgoSha256, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha256);});
     connect(actionSetAlgoSha512, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha512);});
+}
+
+void ModeSelector::setActionsIcons()
+{
+    int curLightness = button_->palette().color(QPalette::Active, QPalette::Base).lightness();
+    bool isDark = (curLightness < 120);
+    QString theme = isDark ? "dark" : "light";
+
+    // File system View
+    actionShowFS->setIcon(QIcon(QString(":/icons/%1/filesystem.svg").arg(theme)));
+    actionToHome->setIcon(QIcon(QString(":/icons/%1/go-home.svg").arg(theme)));
+    actionCancel->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
+    actionShowFolderContentsTypes->setIcon(QIcon(QString(":/icons/%1/chart-pie.svg").arg(theme)));
+    actionProcessContainedChecksums->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(theme)));
+    actionProcessFilteredChecksums->setIcon(QIcon(QString(":/icons/%1/filter.svg").arg(theme)));
+    actionCheckFileByClipboardChecksum->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
+    actionProcessSha_toClipboard->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
+    actionOpenDatabase->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
+    actionCheckSumFile->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
+
+    menuAlgo->menuAction()->setIcon(QIcon(QString(":/icons/%1/double-gear.svg").arg(theme)));
+    menuStoreSummary->menuAction()->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(theme)));
+
+    // DB Model View
+    actionCancelBackToFS->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
+    actionShowDbStatus->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
+    actionResetDb->setIcon(QIcon(QString(":/icons/%1/undo.svg").arg(theme)));
+    actionForgetChanges->setIcon(QIcon(QString(":/icons/%1/backup.svg").arg(theme)));
+    actionUpdateDbWithReChecksums->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(theme)));
+    actionUpdateDbWithNewLost->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(theme)));
+    actionShowNewLostOnly->setIcon(QIcon(QString(":/icons/%1/newfile.svg").arg(theme)));
+    actionShowMismatchesOnly->setIcon(QIcon(QString(":/icons/%1/document-close.svg").arg(theme)));
+    actionCheckCurFileFromModel->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
+    actionCheckCurSubfolderFromModel->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(theme)));
+    actionCheckAll->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(theme)));
+    actionCopyStoredChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
+    actionCopyReChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -372,7 +409,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionProcessFilteredChecksums);
             }
             else if (isCurrentMode(File)) {
-                viewContextMenu->addMenu("Store checksum to summary")->addActions(actionsMakeSummaries);
+                viewContextMenu->addMenu(menuStoreSummary);
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addAction(actionProcessSha_toClipboard);
 

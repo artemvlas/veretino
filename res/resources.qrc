@@ -1,5 +1,47 @@
 <RCC>
     <qresource prefix="/">
         <file>veretino.png</file>
+        <file>icons/dark/backup.svg</file>
+        <file>icons/dark/cancel.svg</file>
+        <file>icons/dark/chart-pie.svg</file>
+        <file>icons/dark/configure.svg</file>
+        <file>icons/dark/copy.svg</file>
+        <file>icons/dark/database.svg</file>
+        <file>icons/dark/document-close.svg</file>
+        <file>icons/dark/double-gear.svg</file>
+        <file>icons/dark/filesystem.svg</file>
+        <file>icons/dark/filter.svg</file>
+        <file>icons/dark/folder-sync.svg</file>
+        <file>icons/dark/folder.svg</file>
+        <file>icons/dark/gear.svg</file>
+        <file>icons/dark/go-home.svg</file>
+        <file>icons/dark/newfile.svg</file>
+        <file>icons/dark/paste.svg</file>
+        <file>icons/dark/save.svg</file>
+        <file>icons/dark/scan.svg</file>
+        <file>icons/dark/start.svg</file>
+        <file>icons/dark/undo.svg</file>
+        <file>icons/dark/update.svg</file>
+        <file>icons/light/backup.svg</file>
+        <file>icons/light/cancel.svg</file>
+        <file>icons/light/chart-pie.svg</file>
+        <file>icons/light/configure.svg</file>
+        <file>icons/light/copy.svg</file>
+        <file>icons/light/database.svg</file>
+        <file>icons/light/document-close.svg</file>
+        <file>icons/light/double-gear.svg</file>
+        <file>icons/light/filesystem.svg</file>
+        <file>icons/light/filter.svg</file>
+        <file>icons/light/folder-sync.svg</file>
+        <file>icons/light/folder.svg</file>
+        <file>icons/light/gear.svg</file>
+        <file>icons/light/go-home.svg</file>
+        <file>icons/light/newfile.svg</file>
+        <file>icons/light/paste.svg</file>
+        <file>icons/light/save.svg</file>
+        <file>icons/light/scan.svg</file>
+        <file>icons/light/start.svg</file>
+        <file>icons/light/undo.svg</file>
+        <file>icons/light/update.svg</file>
     </qresource>
 </RCC>

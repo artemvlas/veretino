@@ -101,6 +101,7 @@ public:
 
     // Menu
     QMenu *menuAlgo = new QMenu;
+    QMenu *menuStoreSummary = new QMenu("Store checksum to summary");
 
 public slots:
     void processing(bool isProcessing);
@@ -114,6 +115,7 @@ private:
     Mode selectMode(const QString &path); // select Mode based on file system path
 
     void copyDataToClipboard(Column column);
+    void setActionsIcons();
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;
