@@ -57,8 +57,15 @@ public:
     QMenu* menuAlgorithm(); // QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
 
     // Actions --->>
-    // File system View
-    QAction *actionShowFS = new QAction("Show FileSystem", this);
+    // MainWindow menu
+    QAction *actionOpenFolder = new QAction("Open folder", this);
+    QAction *actionOpenDatabaseFile = new QAction("Open database", this);
+    QAction *actionOpenSettingsDialog = new QAction("Settings", this);
+    QAction *actionShowFilesystem = new QAction("Show file system", this);
+
+    QList<QAction*> menuFileActions {actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenSettingsDialog};
+
+    // File system View    
     QAction *actionToHome = new QAction("to Home", this);
     QAction *actionCancel = new QAction("Cancel operation", this);
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);

@@ -40,8 +40,10 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
 
 void ModeSelector::connectActions()
 {
+    // MainWindow menu
+    connect(actionShowFilesystem, &QAction::triggered, this, &ModeSelector::showFileSystem);
+
     // File system View
-    connect(actionShowFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
@@ -84,8 +86,13 @@ void ModeSelector::setActionsIcons()
 {
     QString theme = themeFolder();
 
+    // MainWindow menu
+    actionOpenFolder->setIcon(QIcon(QString(":/icons/%1/folder.svg").arg(theme)));
+    actionOpenDatabaseFile->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
+    actionShowFilesystem->setIcon(QIcon(QString(":/icons/%1/filesystem.svg").arg(theme)));
+    actionOpenSettingsDialog->setIcon(QIcon(QString(":/icons/%1/configure.svg").arg(theme)));
+
     // File system View
-    actionShowFS->setIcon(QIcon(QString(":/icons/%1/filesystem.svg").arg(theme)));
     actionToHome->setIcon(QIcon(QString(":/icons/%1/go-home.svg").arg(theme)));
     actionCancel->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
     actionShowFolderContentsTypes->setIcon(QIcon(QString(":/icons/%1/chart-pie.svg").arg(theme)));
@@ -179,18 +186,18 @@ void ModeSelector::setMode()
 
 void ModeSelector::setButtonInfo()
 {
-    button_->setToolTip("");
+    button_->setToolTip(QString());
 
     switch (curMode) {
     case Folder:
         button_->setText(format::algoToStr(settings_->algorithm));
         button_->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(themeFolder())));
-        button_->setToolTip(QString("Calculate checksums of contained files and save the result to a local database"));
+        button_->setToolTip(QString("Calculate checksums of contained files\nand save the result to the local database"));
         break;
     case File:
         button_->setText(format::algoToStr(settings_->algorithm, false).prepend("*."));
         button_->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder())));
-        button_->setToolTip(QString("Calculate %1 checksum and store it in the Summary").arg(format::algoToStr(settings_->algorithm)));
+        button_->setToolTip(QString("Calculate %1 checksum\nand store it in the summary file").arg(format::algoToStr(settings_->algorithm)));
         break;
     case DbFile:
         button_->setText("Open");
@@ -208,7 +215,7 @@ void ModeSelector::setButtonInfo()
     case ModelNewLost:
         button_->setText("New/Lost");
         button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder())));
-        button_->setToolTip(QString("Update the Database: add new files, remove missing"));
+        button_->setToolTip(QString("Update the Database:\nadd new files, delete missing ones"));
         break;
     case UpdateMismatch:
         button_->setText("Update");
@@ -416,7 +423,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     connect(viewContextMenu, &QMenu::aboutToHide, viewContextMenu, &QMenu::deleteLater);
 
     if (view_->isCurrentViewModel(ModelView::NotSetted)) {
-        viewContextMenu->addAction(actionShowFS);
+        viewContextMenu->addAction(actionShowFilesystem);
     }
     // Filesystem View
     else if (view_->isViewFileSystem()) {
@@ -464,7 +471,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionForgetChanges);
 
             viewContextMenu->addSeparator();
-            viewContextMenu->addAction(actionShowFS);
+            viewContextMenu->addAction(actionShowFilesystem);
             if (view_->isCurrentViewModel(ModelView::ModelProxy)
                 && view_->data_->proxyModel_->isFilterEnabled) {
                 viewContextMenu->addAction(actionShowAll);

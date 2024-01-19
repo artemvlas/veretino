@@ -29,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar->setVisible(false);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    ui->menuFile->addActions(modeSelect->menuFileActions);
+    ui->menuFile->insertSeparator(modeSelect->actionOpenSettingsDialog);
 }
 
 MainWindow::~MainWindow()
@@ -69,10 +72,9 @@ void MainWindow::connections()
     connect(permanentStatus, &ClickableLabel::doubleClicked, this, &MainWindow::showDbStatus);
 
     //menu actions
-    connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
-    connect(ui->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
-    connect(ui->actionOpenJson, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(ui->actionShowFs, &QAction::triggered, modeSelect, &ModeSelector::showFileSystem);
+    connect(modeSelect->actionOpenSettingsDialog, &QAction::triggered, this, &MainWindow::dialogSettings);
+    connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
+    connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{aboutDialog about; about.exec();});
 }
 
