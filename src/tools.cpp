@@ -70,7 +70,8 @@ QString findCompleteString(const QStringList &strList, const QString &sample, in
 }
 
 bool isDatabaseFile(const QString &filePath) {
-    return filePath.endsWith(".ver.json", Qt::CaseInsensitive);
+    return filePath.endsWith(".ver", Qt::CaseInsensitive)
+           || filePath.endsWith(".ver.json", Qt::CaseInsensitive);
 }
 
 bool isSummaryFile(const QString &filePath)

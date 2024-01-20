@@ -15,6 +15,8 @@ struct Settings {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
     FilterRule filter;
     QString dbPrefix = "checksums";
+    bool addWorkDirToFilename = true;
+    bool isLongExtension = true;
 };
 
 namespace tools {

@@ -12,9 +12,12 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     settings_(settings)
 {
     ui->setupUi(this);
-    setFixedSize(440,300);
+    setFixedSize(440, 300);
     setWindowIcon(QIcon(":/veretino.png"));
 
+    connect(ui->rbExtVer, &QRadioButton::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
+    connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
+    connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
          {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
 
@@ -41,6 +44,11 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
 
     if (settings->dbPrefix != "checksums")
         ui->inputJsonFileNamePrefix->setText(settings->dbPrefix);
+
+    ui->cbAddFolderName->setChecked(settings->addWorkDirToFilename);
+    ui->rbExtVer->setChecked(!settings->isLongExtension);
+
+    updateLabelDatabaseFilename();
 }
 
 void SettingsDialog::updateSettings()
@@ -53,7 +61,7 @@ void SettingsDialog::updateSettings()
     else if (ui->rbSha512->isChecked())
         settings_->algorithm = QCryptographicHash::Sha512;
 
-    // dbPrefix
+    // database filename
     if (!ui->inputJsonFileNamePrefix->text().isEmpty()) {
         QString fileNamePrefix = ui->inputJsonFileNamePrefix->text();
 
@@ -66,6 +74,9 @@ void SettingsDialog::updateSettings()
     }
     else
         settings_->dbPrefix = "checksums";
+
+    settings_->isLongExtension = ui->rbExtVerJson->isChecked();
+    settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
 
     // filters
     ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
@@ -99,6 +110,15 @@ QStringList SettingsDialog::extensionsList()
     }
     else
         return QStringList();
+}
+
+void SettingsDialog::updateLabelDatabaseFilename()
+{
+    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums" : ui->inputJsonFileNamePrefix->text();
+    QString folderName = ui->cbAddFolderName->isChecked() ? "_<FolderName>" : QString();
+    QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
+
+    ui->labelDatabaseFilename->setText(QString("%1%2%3").arg(prefix, folderName, extension));
 }
 
 SettingsDialog::~SettingsDialog()

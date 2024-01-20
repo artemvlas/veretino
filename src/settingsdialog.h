@@ -23,6 +23,8 @@ public:
     ~SettingsDialog();
     void updateSettings();
 private:
+    void updateLabelDatabaseFilename();
+
     Ui::SettingsDialog *ui;
     QStringList extensionsList(); // return a list of extensions from input
     Settings *settings_;

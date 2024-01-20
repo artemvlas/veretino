@@ -341,8 +341,9 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     // so cancelation is needed before starting a new process
     emit cancelProcess();
 
-    QString databaseFileName = QString("%1_%2.ver.json")
-                                   .arg(settings_->dbPrefix, paths::basicName(view_->curPathFileSystem).replace(' ', '_'));
+    QString folderName = settings_->addWorkDirToFilename ? "_" + paths::basicName(view_->curPathFileSystem).replace(' ', '_') : QString();
+    QString fileExtension = settings_->isLongExtension ? ".ver.json" : ".ver";
+    QString databaseFileName = QString("%1%2%3").arg(settings_->dbPrefix, folderName, fileExtension);
 
     MetaData metaData;
     metaData.workDir = view_->curPathFileSystem;
