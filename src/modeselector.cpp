@@ -6,6 +6,7 @@
 #include "modeselector.h"
 #include <QFileInfo>
 #include <QGuiApplication>
+#include <QMessageBox>
 #include <QClipboard>
 #include <QDebug>
 
@@ -340,11 +341,41 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     // so cancelation is needed before starting a new process
     emit cancelProcess();
 
+    QString databaseFileName = QString("%1_%2.ver.json")
+                                   .arg(settings_->dbPrefix, paths::basicName(view_->curPathFileSystem).replace(' ', '_'));
+
     MetaData metaData;
     metaData.workDir = view_->curPathFileSystem;
     metaData.algorithm = settings_->algorithm;
     metaData.filter = filter;
-    emit processFolderSha(metaData);
+    metaData.databaseFilePath = paths::joinPath(metaData.workDir, databaseFileName);
+
+    if (!QFileInfo(metaData.databaseFilePath).isFile()) {
+        emit processFolderSha(metaData);
+        return;
+    }
+
+    // if the folder already contains a database file with the same name, display a prompt
+    QMessageBox msgBox;
+    msgBox.setText(QString("The folder already contains the database file:\n%1").arg(databaseFileName));
+    msgBox.setInformativeText("Do you want to open it or overwrite it?");
+    msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Open);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.button(QMessageBox::Save)->setText("Overwrite");
+    int ret = msgBox.exec();
+
+    switch (ret) {
+        case QMessageBox::Open:
+            emit parseJsonFile(metaData.databaseFilePath);
+            break;
+        case QMessageBox::Save:
+            emit processFolderSha(metaData);
+            break;
+        default:
+            return;
+            break;
+    }
 }
 
 void ModeSelector::doWork()

@@ -42,9 +42,6 @@ void Manager::processFolderSha(const MetaData &metaData)
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
-    dataMaintainer->data_->metaData.databaseFilePath = paths::joinPath(metaData.workDir,
-                                                       QString("%1_%2.ver.json").arg(settings_->dbPrefix, paths::basicName(metaData.workDir)) // database filename
-                                                                                .replace(' ', '_'));
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, false);
