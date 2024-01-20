@@ -201,7 +201,7 @@ void MainWindow::dialogOpenFolder()
 
 void MainWindow::dialogOpenJson()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open Veretino database", QDir::homePath(), "DB Files (*.ver.json)");
+    QString path = QFileDialog::getOpenFileName(this, "Open Veretino database", QDir::homePath(), "Veretino database (*.ver *.ver.json)");
 
     if (!path.isEmpty()) {
         if (modeSelect->isProcessing())
