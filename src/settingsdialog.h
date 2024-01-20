@@ -22,6 +22,7 @@ public:
     explicit SettingsDialog(Settings *settings, QWidget *parent = nullptr);
     ~SettingsDialog();
     void updateSettings();
+    enum Tabs{TabDatabase, TabFilter};
 private:
     void updateLabelDatabaseFilename();
 

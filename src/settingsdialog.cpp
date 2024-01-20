@@ -12,7 +12,7 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     settings_(settings)
 {
     ui->setupUi(this);
-    setFixedSize(440, 300);
+    //setFixedSize(440, 300);
     setWindowIcon(QIcon(":/veretino.png"));
 
     connect(ui->rbExtVer, &QRadioButton::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
@@ -51,6 +51,9 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     ui->cbSaveVerificationDateTime->setChecked(settings_->saveVerificationDateTime);
 
     updateLabelDatabaseFilename();
+
+    Tabs curTab = ui->inputExtensions->text().isEmpty() ? TabDatabase : TabFilter;
+    ui->tabWidget->setCurrentIndex(curTab);
 }
 
 void SettingsDialog::updateSettings()
@@ -64,18 +67,8 @@ void SettingsDialog::updateSettings()
         settings_->algorithm = QCryptographicHash::Sha512;
 
     // database filename
-    if (!ui->inputJsonFileNamePrefix->text().isEmpty()) {
-        QString fileNamePrefix = ui->inputJsonFileNamePrefix->text();
-
-        QString forbSymb(":*/\?|<>");
-        for (int i = 0; i < forbSymb.size(); ++i) {
-            fileNamePrefix.replace(forbSymb.at(i), '_');
-        }
-
-        settings_->dbPrefix = fileNamePrefix;
-    }
-    else
-        settings_->dbPrefix = "checksums";
+    settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums"
+                                                                        : format::clearIncompatibleChars(ui->inputJsonFileNamePrefix->text());
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
@@ -121,7 +114,7 @@ void SettingsDialog::updateLabelDatabaseFilename()
     QString folderName = ui->cbAddFolderName->isChecked() ? "_<FolderName>" : QString();
     QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
 
-    ui->labelDatabaseFilename->setText(QString("%1%2%3").arg(prefix, folderName, extension));
+    ui->labelDatabaseFilename->setText(QString("%1%2%3").arg(format::clearIncompatibleChars(prefix), folderName, extension));
 }
 
 SettingsDialog::~SettingsDialog()

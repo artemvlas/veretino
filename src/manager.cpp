@@ -28,11 +28,6 @@ Manager::Manager(Settings *settings, QObject *parent)
 
 void Manager::processFolderSha(const MetaData &metaData)
 {
-    if (Files::isEmptyFolder(metaData.workDir)) {
-        emit showMessage("Nothing to do.", "Empty folder");
-        return;
-    }
-
     if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
         emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.", "No proper files");
         return;

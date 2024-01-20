@@ -341,6 +341,12 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     // so cancelation is needed before starting a new process
     emit cancelProcess();
 
+    if (Files::isEmptyFolder(view_->curPathFileSystem)) {
+        QMessageBox messageBox;
+        messageBox.information(nullptr, "Empty folder", "Nothing to do.");
+        return;
+    }
+
     QString folderName = settings_->addWorkDirToFilename ? "_" + paths::basicName(view_->curPathFileSystem).replace(' ', '_') : QString();
     QString fileExtension = settings_->isLongExtension ? ".ver.json" : ".ver";
     QString databaseFileName = QString("%1%2%3").arg(settings_->dbPrefix, folderName, fileExtension);

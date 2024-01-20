@@ -268,6 +268,20 @@ QString shortenString(const QString &string, int length, bool cutEnd)
                   : string.right(length).prepend("...");
 }
 
+QString clearIncompatibleChars(QString str)
+{
+    QString forbSymb(":*/\?|<>");
+    for (int i = 0; i < forbSymb.size(); ++i) {
+        str.replace(forbSymb.at(i), '_');
+    }
+
+    str.replace("__", "_");
+    if (str.endsWith('_'))
+        str.chop(1);
+
+    return str;
+}
+
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 {
     switch (algo) {

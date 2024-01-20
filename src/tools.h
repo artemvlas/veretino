@@ -50,11 +50,11 @@ QString millisecToReadable(qint64 milliseconds, bool approx = false); // convert
 QString dataSizeReadable(qint64 sizeBytes); // converts size in bytes to human readable form like "129.17 GiB"
 QString dataSizeReadableExt(qint64 sizeBytes); // returning style example: "6.08 GiB (6,532,974,324 bytes)"
 QString shortenString(const QString &string, int length = 64, bool cutEnd = true);
+QString clearIncompatibleChars(QString str);
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true);
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
-
 QString fileItemStatus(FileStatus status);
 } // namespace format
 
