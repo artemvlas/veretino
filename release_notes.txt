@@ -1,8 +1,9 @@
 Veretino 0.3.2
 * Added the ability to create a global Filter based on the Folder Content analyzer.
-* Added the ability to quickly create an independent Filter when calculating checksums for folder contents.
-* UI improved, added icons to the Button and menu items.
+* Added the ability to quickly create an independent Filter directly when working with a folder.
+* Improved Settings dialog: the databases file name config is now more flexible, enabling/disabling saving the date and time of successful verification to the database.
 * Added an Open/Overwrite prompt when an existing database is found in a folder.
+* UI improved, added icons to the Button and menu items.
 
 Veretino 0.3.1
 * Added a new universal Database Status dialog. Now information about database changes and verification results are also displayed in this dialog box.

@@ -48,6 +48,8 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     ui->cbAddFolderName->setChecked(settings->addWorkDirToFilename);
     ui->rbExtVer->setChecked(!settings->isLongExtension);
 
+    ui->cbSaveVerificationDateTime->setChecked(settings_->saveVerificationDateTime);
+
     updateLabelDatabaseFilename();
 }
 
@@ -90,6 +92,7 @@ void SettingsDialog::updateSettings()
 
     settings_->filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
     settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
+    settings_->saveVerificationDateTime = ui->cbSaveVerificationDateTime->isChecked();
 }
 
 QStringList SettingsDialog::extensionsList()

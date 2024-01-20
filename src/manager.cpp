@@ -237,7 +237,8 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
                                  .arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Matched))
                                  .arg(format::algoToStr(dataMaintainer->data_->metaData.algorithm)), "Success");
 
-            dataMaintainer->updateSuccessfulCheckDateTime();
+            if (settings_->saveVerificationDateTime)
+                dataMaintainer->updateSuccessfulCheckDateTime();
         }
     }
     else {// if subfolder

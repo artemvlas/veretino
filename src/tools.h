@@ -17,6 +17,7 @@ struct Settings {
     QString dbPrefix = "checksums";
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;
+    bool saveVerificationDateTime = true;
 };
 
 namespace tools {

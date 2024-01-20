@@ -70,10 +70,30 @@
        <string>Database</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="0" colspan="2">
+        <widget class="QLineEdit" name="inputJsonFileNamePrefix">
+         <property name="placeholderText">
+          <string>Input a prefix for the DB filename. Default: checksums</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="labelDatabaseFilename">
+         <property name="text">
+          <string>labelDatabaseFilename</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <widget class="QCheckBox" name="cbAddFolderName">
          <property name="text">
-          <string>add folder name</string>
+          <string>Add folder name</string>
          </property>
          <property name="checked">
           <bool>false</bool>
@@ -112,23 +132,20 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QLineEdit" name="inputJsonFileNamePrefix">
-         <property name="placeholderText">
-          <string>Input a prefix for the DB filename. Default: checksums</string>
-         </property>
-         <property name="clearButtonEnabled">
-          <bool>true</bool>
+       <item row="3" column="0" colspan="2">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="labelDatabaseFilename">
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="cbSaveVerificationDateTime">
          <property name="text">
-          <string>labelDatabaseFilename</string>
+          <string>Save the verification datetime</string>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
