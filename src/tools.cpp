@@ -152,33 +152,6 @@ void browsePath(const QString &path)
     }
 }
 
-bool isFileAllowed(const QString &filePath, const FilterRule &filter)
-{
-    if (!filter.isFilter(FilterRule::Include)) {
-        if (tools::isDatabaseFile(filePath))
-            return !filter.ignoreDbFiles;
-        if (tools::isSummaryFile(filePath))
-            return !filter.ignoreShaFiles;
-    }
-
-    if (filter.isFilter(FilterRule::NotSet)) // or filter.extensionsList.isEmpty()
-        return true;
-
-    // if 'filter.isFilter(FilterRule::Include)': a file ('filePath') with any extension from 'extensionsList' is allowed
-    // if 'filter.isFilter(FilterRule::Ignore)': than all files except these types allowed
-
-    bool allowed = filter.isFilter(FilterRule::Ignore);
-
-    foreach (const QString &ext, filter.extensionsList) {
-        if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
-            allowed = filter.isFilter(FilterRule::Include);
-            break;
-        }
-    }
-
-    return allowed;
-}
-
 bool isRoot(const QString &path)
 {
     return (path == "/")
@@ -290,6 +263,12 @@ QString joinStrings(const QString &str1, const QString &str2, const QString join
         return str1 + str2;
 
     return QString("%1%2%3").arg(str1, joint, str2);
+}
+
+QString composeDatabaseFilename(const QString &prefix, const QString &folderName, const QString &extension)
+{
+    return folderName.isEmpty() ? joinStrings(prefix, extension, ".")
+                                : joinStrings(joinStrings(prefix, folderName, "_"), extension, ".");
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)

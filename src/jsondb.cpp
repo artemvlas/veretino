@@ -235,7 +235,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
-        if (paths::isFileAllowed(relPath, parsedData->metaData.filter) && !filelistData.contains(relPath)) {
+        if (parsedData->metaData.filter.isFileAllowed(relPath) && !filelistData.contains(relPath)) {
             QFileInfo fileInfo(fullPath);
             if (fileInfo.isReadable()) {
                 FileValues curFileValues(FileStatus::New);

@@ -10,37 +10,10 @@
 #include <QMap>
 #include <QSet>
 #include <QAbstractItemModel>
+#include "filterrule.h"
 
 struct FileValues;
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
-
-struct FilterRule {
-    enum ExtensionsFilter {NotSet, Include, Ignore};
-    FilterRule(bool ignoreSummaries = true) : ignoreShaFiles(ignoreSummaries), ignoreDbFiles(ignoreSummaries) {}
-    FilterRule(const ExtensionsFilter filterType, const QStringList &extensions) : extensionsFilter_(filterType), extensionsList(extensions) {}
-
-    void setFilter(const ExtensionsFilter filterType, const QStringList &extensions)
-    {
-        extensionsList = extensions;
-        extensionsList.isEmpty() ? extensionsFilter_ = NotSet : extensionsFilter_ = filterType;
-    }
-
-    void clearFilter()
-    {
-        extensionsFilter_ = NotSet;
-        extensionsList.clear();
-    }
-
-    bool isFilter(const ExtensionsFilter filterType) const
-    {
-        return (filterType == extensionsFilter_);
-    }
-
-    ExtensionsFilter extensionsFilter_ = NotSet;
-    QStringList extensionsList;
-    bool ignoreShaFiles = true;
-    bool ignoreDbFiles = true;
-}; // struct FilterRule
 
 class Files : public QObject
 {

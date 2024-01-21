@@ -61,7 +61,7 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
-        if (paths::isFileAllowed(relPath, filter)) {
+        if (filter.isFileAllowed(relPath)) {
             FileValues curFileValues;
             QFileInfo fileInfo(fullPath);
             if (fileInfo.isReadable())
@@ -89,7 +89,7 @@ FileList Files::allFiles(const FileList &fileList, const FilterRule &filter)
     FileList::const_iterator iter;
 
     for (iter = fileList.constBegin(); iter != fileList.constEnd(); ++iter) {
-        if (paths::isFileAllowed(iter.key(), filter))
+        if (filter.isFileAllowed(iter.key()))
             filteredFiles.insert(iter.key(), iter.value());
     }
 
@@ -103,7 +103,7 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
     if (QFileInfo(folderPath).isDir()) {
         QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()) {
-            if (paths::isFileAllowed(it.next(), filter)) {
+            if (filter.isFileAllowed(it.next())) {
                 result = false;
                 break;
             }

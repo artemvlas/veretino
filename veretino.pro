@@ -14,6 +14,7 @@ SOURCES += \
     src/datamaintainer.cpp \
     src/dbstatusdialog.cpp \
     src/files.cpp \
+    src/filterrule.cpp \
     src/foldercontentsdialog.cpp \
     src/jsondb.cpp \
     src/main.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     src/datamaintainer.h \
     src/dbstatusdialog.h \
     src/files.h \
+    src/filterrule.h \
     src/foldercontentsdialog.h \
     src/jsondb.h \
     src/mainwindow.h \

@@ -101,7 +101,7 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
-        if (paths::isFileAllowed(relPath, data_->metaData.filter)) {
+        if (data_->metaData.filter.isFileAllowed(relPath)) {
             FileValues curFileValues;
             QFileInfo fileInfo(fullPath);
             if (fileInfo.isReadable()) {
