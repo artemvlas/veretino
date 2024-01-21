@@ -10,7 +10,7 @@ public:
     FilterRule(const ExtensionsFilter filterType, const QStringList &extensions);
 
     void setFilter(const ExtensionsFilter filterType, const QStringList &extensions);
-    void clearFilter();
+    void clearFilter(); // set defaults
     bool isFilter(const ExtensionsFilter filterType) const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
 

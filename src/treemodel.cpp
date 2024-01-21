@@ -250,3 +250,8 @@ bool TreeModel::isFileRow(const QModelIndex &curIndex)
 
     return (index.isValid() && !index.model()->hasChildren(index));
 }
+
+bool TreeModel::isChecksumStored(const QModelIndex &curIndex)
+{
+    return siblingAtRow(curIndex, ColumnChecksum).data().isValid();
+}

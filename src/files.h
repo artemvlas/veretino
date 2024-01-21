@@ -26,7 +26,9 @@ public:
     enum FileStatus {
         Undefined,
         Queued, // added to the processing queue
-        Processing, // checksum is being calculated
+        //Processing, // checksum is being calculated
+        Calculating, // checksum is being calculated
+        Verifying, // // checksum is being verified
         NotChecked, // available for verification
         Matched, // checked, checksum matched
         Mismatched, // checked, checksum did not match

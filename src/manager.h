@@ -28,11 +28,11 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
-    void getPathInfo(const QString &path); // info about folder contents or file (size)
-    void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
-    void createDataModel(const QString &databaseFilePath); // making tree model | file paths : info about current availability on disk
+    void getPathInfo(const QString &path); // info about file (size) or folder contents
+    void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
+    void createDataModel(const QString &databaseFilePath); // making the tree data model
     void updateNewLost(); // remove lost files, add new files
-    void updateMismatch(); // update json Database with new checksums for files with failed verification
+    void updateMismatch(); // update the Database with newly calculated checksums for failed verification files
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
@@ -41,9 +41,9 @@ public slots:
 
 private:
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
-    void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead all database cheking
+    void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
     void showFileCheckResultMessage(bool isMatched, const QString &fileName = QString());
-    void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, with their number and size
+    void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool finalProcess = true); // <finalProcess> -->> whether it sends a process end signal or not

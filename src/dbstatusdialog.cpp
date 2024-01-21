@@ -32,7 +32,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     ui->labelWorkDir->setToolTip(data->metaData.workDir);
 
     if (!data->isWorkDirRelative())
-        ui->labelWorkDir->setText("WorkDir: Predefined");
+        ui->labelWorkDir->setText("WorkDir: Specified");
 
     ui->labelDateTime_Update->setText("Updated: " + data->metaData.saveDateTime);
     data->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()

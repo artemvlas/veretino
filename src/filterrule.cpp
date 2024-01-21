@@ -21,6 +21,8 @@ void FilterRule::clearFilter()
 {
     extensionsFilter_ = NotSet;
     extensionsList.clear();
+    ignoreShaFiles = true;
+    ignoreDbFiles = true;
 }
 
 bool FilterRule::isFilter(const ExtensionsFilter filterType) const

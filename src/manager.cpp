@@ -112,7 +112,6 @@ void Manager::restoreDatabase()
         emit setStatusbarText("No saved changes");
 }
 
-//making tree model | file paths : info about current availability on disk
 void Manager::createDataModel(const QString &databaseFilePath)
 {
     if (!tools::isDatabaseFile(databaseFilePath)) {
@@ -157,7 +156,7 @@ void Manager::updateNewLost()
     dataMaintainer->exportToJson();
 }
 
-// update the Database with new checksums for files with failed verification
+// update the Database with newly calculated checksums for failed verification files
 void Manager::updateMismatch()
 {
     if (!dataMaintainer->data_) {
@@ -175,7 +174,7 @@ void Manager::verify(const QModelIndex &curIndex)
                                    : verifyFolderItem(dataMaintainer->sourceIndex(curIndex));
 }
 
-//check only selected file instead all database cheking
+// check only selected file instead of full database verification
 void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 {
     if (!dataMaintainer->data_) {
@@ -192,7 +191,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     QString savedSum = dataMaintainer->getStoredChecksum(fileItemIndex);
 
     if (!savedSum.isEmpty()) {
-        dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Processing);
+        dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
 
         QString sum = calculateChecksum(paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex)),
                                         dataMaintainer->data_->metaData.algorithm);
@@ -376,7 +375,8 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                                       .arg(numQueued)
                                       .arg(doneData));
 
-            dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Processing);
+            FileStatus procStatus = TreeModel::isChecksumStored(iter.index()) ? FileStatus::Verifying : FileStatus::Calculating;
+            dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
             QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()),
                                                  dataMaintainer->data_->metaData.algorithm);
