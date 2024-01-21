@@ -49,7 +49,7 @@ void ModeSelector::connectActions()
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
     connect(actionProcessContainedChecksums, &QAction::triggered, this, &ModeSelector::doWork);
-    connect(actionProcessFilteredChecksums, &QAction::triggered, this, [=]{emit makeFolderContentsFilter(view_->curPathFileSystem);});
+    connect(actionProcessFilteredChecksums, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1);});
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256);});
@@ -382,6 +382,19 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
             return;
             break;
     }
+}
+
+void ModeSelector::processFolderFilteredChecksums()
+{
+    emit cancelProcess();
+
+    if (Files::isEmptyFolder(view_->curPathFileSystem)) {
+            QMessageBox messageBox;
+            messageBox.information(nullptr, "Empty folder", "Nothing to do.");
+            return;
+    }
+
+    emit makeFolderContentsFilter(view_->curPathFileSystem);
 }
 
 void ModeSelector::doWork()

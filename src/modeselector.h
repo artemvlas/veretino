@@ -45,6 +45,7 @@ public:
     void doWork();
     void processFolderChecksums();
     void processFolderChecksums(const FilterRule &filter);
+    void processFolderFilteredChecksums();
 
     //---->>>
     void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
