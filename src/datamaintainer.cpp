@@ -447,7 +447,7 @@ void DataMaintainer::exportToJson(bool finalProcess)
 
     emit processing(true);
 
-    json->makeJson(data_);
+    data_->metaData.savingResult = json->makeJson(data_);
 
     if (finalProcess)
         emit processing(false);

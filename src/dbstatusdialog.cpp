@@ -22,7 +22,11 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath));});
     connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(data_->metaData.workDir);});
 
-    ui->labelDbFileName->setText(data->databaseFileName());
+    QString dbFileName = data->databaseFileName();
+    if (data->metaData.savingResult == MetaData::SavedToDesktop)
+        dbFileName.prepend(".../DESKTOP/");
+
+    ui->labelDbFileName->setText(dbFileName);
     ui->labelDbFileName->setToolTip(data->metaData.databaseFilePath);
     ui->labelAlgo->setText(QString("Algorithm: %1").arg(format::algoToStr(data->metaData.algorithm)));
     ui->labelWorkDir->setToolTip(data->metaData.workDir);
@@ -81,6 +85,12 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
 
     if (data->contains(FileStatus::Unreadable))
         contentNumbers.append(QString("Unreadable files: %1").arg(data->numbers.numberOf(FileStatus::Unreadable)));
+
+    if (data->metaData.savingResult == MetaData::SavedToDesktop) {
+        contentNumbers.append(QString());
+        contentNumbers.append("Unable to save to working folder!");
+        contentNumbers.append("The database is saved in the Desktop folder.");
+    }
 
     if (isJustCreated())
         return contentNumbers;

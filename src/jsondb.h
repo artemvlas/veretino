@@ -20,11 +20,8 @@ public:
     explicit JsonDb(QObject *parent = nullptr);
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
-    enum Result {Saved, SavedToDesktop, NotSaved, Canceled};
-    Q_ENUM(Result)
-
     DataContainer* parseJson(const QString &filePath);
-    Result makeJson(DataContainer* data);
+    MetaData::SavingResult makeJson(DataContainer* data);
     bool updateSuccessfulCheckDateTime(const QString &filePath);
 
 public slots:

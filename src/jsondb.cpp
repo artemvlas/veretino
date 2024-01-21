@@ -71,11 +71,11 @@ bool JsonDb::updateSuccessfulCheckDateTime(const QString &filePath)
 }
 
 // making "checksums... .ver.json" database
-JsonDb::Result JsonDb::makeJson(DataContainer* data)
+MetaData::SavingResult JsonDb::makeJson(DataContainer* data)
 {
     if (!data || data->model_->isEmpty()) {
         qDebug() << "JsonDb::makeJson | no data to make json db";
-        return NotSaved;
+        return MetaData::NotSaved;
     }
 
     canceled = false;
@@ -135,14 +135,14 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
 
     if (canceled) {
         qDebug() << "JsonDb::makeJson | Canceled";
-        return Canceled;
+        return MetaData::NotSaved;
     }
 
     QString pathToSave;
 
     if (saveJsonFile(doc, data->metaData.databaseFilePath)) {
         emit setStatusbarText("Saved");
-        return Saved;
+        return MetaData::Saved;
     }
     else {
         header[strHeaderWorkDir] = data->metaData.workDir;
@@ -155,13 +155,13 @@ JsonDb::Result JsonDb::makeJson(DataContainer* data)
         if (saveJsonFile(doc, pathToSave)) {
             emit setStatusbarText("Saved to Desktop");
             data->metaData.databaseFilePath = pathToSave;
-            return SavedToDesktop;
+            return MetaData::SavedToDesktop;
         }
 
         else {
             emit setStatusbarText("NOT Saved");
             emit showMessage(QString("Unable to save json file: %1").arg(data->metaData.databaseFilePath), "Error");
-            return NotSaved;
+            return MetaData::NotSaved;
         }
     }
 }

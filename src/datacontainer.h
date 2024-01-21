@@ -21,6 +21,8 @@ struct MetaData {
     QString successfulCheckDateTime; // date and time of the last completely successful check (all files from the list are exists and match the checksums)
     FilterRule filter;
     bool isImported = false; // from db(json) file
+    enum SavingResult {NotSaved, Saved, SavedToDesktop};
+    SavingResult savingResult = NotSaved;
 }; // struct MetaData
 
 struct Numbers {
