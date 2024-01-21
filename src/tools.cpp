@@ -268,18 +268,28 @@ QString shortenString(const QString &string, int length, bool cutEnd)
                   : string.right(length).prepend("...");
 }
 
-QString clearIncompatibleChars(QString str)
+QString simplifiedChars(QString str)
 {
-    QString forbSymb(":*/\?|<>");
-    for (int i = 0; i < forbSymb.size(); ++i) {
-        str.replace(forbSymb.at(i), '_');
+    QString forbSymb(":*/\\%?|<>^");
+
+    for (int i = 0; i < str.size(); ++i) {
+        if (forbSymb.contains(str.at(i))) {
+            str[i] = '_';
+        }
     }
 
-    str.replace("__", "_");
-    if (str.endsWith('_'))
-        str.chop(1);
+    return str.simplified();
+}
 
-    return str;
+QString joinStrings(const QString &str1, const QString &str2, const QString joint)
+{
+    if (str1.endsWith(joint) && str2.startsWith(joint))
+        return str1.left(str1.length() - joint.length()) + str2;
+
+    if (str1.endsWith(joint) || str2.startsWith(joint))
+        return str1 + str2;
+
+    return QString("%1%2%3").arg(str1, joint, str2);
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)

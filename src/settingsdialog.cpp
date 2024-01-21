@@ -68,7 +68,7 @@ void SettingsDialog::updateSettings()
 
     // database filename
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums"
-                                                                        : format::clearIncompatibleChars(ui->inputJsonFileNamePrefix->text());
+                                                                        : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
@@ -110,11 +110,12 @@ QStringList SettingsDialog::extensionsList()
 
 void SettingsDialog::updateLabelDatabaseFilename()
 {
-    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums" : ui->inputJsonFileNamePrefix->text();
-    QString folderName = ui->cbAddFolderName->isChecked() ? "_<FolderName>" : QString();
+    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums" : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
+    QString folderName = ui->cbAddFolderName->isChecked() ? "<FolderName>" : QString();
     QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
+    QString resultStr = folderName.isEmpty() ? prefix + extension : format::joinStrings(prefix, folderName) + extension;
 
-    ui->labelDatabaseFilename->setText(QString("%1%2%3").arg(format::clearIncompatibleChars(prefix), folderName, extension));
+    ui->labelDatabaseFilename->setText(resultStr);
 }
 
 SettingsDialog::~SettingsDialog()

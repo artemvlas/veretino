@@ -347,9 +347,9 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
         return;
     }
 
-    QString folderName = settings_->addWorkDirToFilename ? "_" + paths::basicName(view_->curPathFileSystem).replace(' ', '_') : QString();
     QString fileExtension = settings_->isLongExtension ? ".ver.json" : ".ver";
-    QString databaseFileName = QString("%1%2%3").arg(settings_->dbPrefix, folderName, fileExtension);
+    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem).replace(' ', '_') : QString();
+    QString databaseFileName = folderName.isEmpty() ? settings_->dbPrefix + fileExtension : format::joinStrings(settings_->dbPrefix, folderName) + fileExtension;
 
     MetaData metaData;
     metaData.workDir = view_->curPathFileSystem;
