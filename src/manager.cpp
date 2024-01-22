@@ -363,6 +363,8 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
+            FileStatus procStatus = TreeModel::isChecksumStored(iter.index()) ? FileStatus::Verifying : FileStatus::Calculating;
+            dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
             QString doneData;
             if (state.doneSize_ == 0)
@@ -370,13 +372,11 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
             else
                 doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize_), totalSizeReadable);
 
-            emit setStatusbarText(QString("Calculating %1 of %2 checksums %3")
+            emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
+                                      .arg(procStatus == FileStatus::Verifying ? "Verifying" : "Calculating")
                                       .arg(doneNum + 1)
                                       .arg(numQueued)
                                       .arg(doneData));
-
-            FileStatus procStatus = TreeModel::isChecksumStored(iter.index()) ? FileStatus::Verifying : FileStatus::Calculating;
-            dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
             QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()),
                                                  dataMaintainer->data_->metaData.algorithm);
