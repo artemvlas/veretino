@@ -304,8 +304,6 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
     connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
-    //emit setStatusbarText(QString("Calculating %1 checksum: %2").arg(format::algoToStr(algo), format::fileNameAndSize(filePath)));
-
     emit processing(true, true);
     QString checkSum = shaCalc.calculate(filePath, algo);
 

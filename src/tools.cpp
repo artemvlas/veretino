@@ -312,9 +312,6 @@ QString fileItemStatus(FileStatus status)
     case FileStatus::Queued:
         result = "queued";
         break;
-    //case FileStatus::Processing:
-    //    result = "processing...";
-    //    break;
     case FileStatus::Calculating:
         result = "calculating...";
         break;

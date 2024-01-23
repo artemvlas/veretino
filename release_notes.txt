@@ -1,8 +1,8 @@
 Veretino 0.3.2
 * Added the ability to create a global Filter based on the Folder Content analyzer.
-* Added the ability to quickly create an independent Filter directly when working with a folder.
-* Improved Settings dialog: the databases file name config is now more flexible, enabling/disabling saving the date and time of successful verification to the database.
-* Added an Open/Overwrite prompt when an existing database is found in a folder.
+* It is now possible to quickly create an independent filter as part of a holistic process of checksums handling for a selected folder.
+* Improved Settings dialog: the database file name config is now more flexible, added config for enabling/disabling saving the verification datetime.
+* Added open/overwrite prompt when detecting an existing database in the folder being processed.
 * UI improved, added icons to the Button and menu items.
 
 Veretino 0.3.1
