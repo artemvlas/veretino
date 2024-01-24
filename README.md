@@ -12,7 +12,7 @@
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 <p align="center">
   <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
-  <br><img src="screenshots/veretino_mainview.png">
+  <br><img src="screenshots/veretino_mainview_dark1.png">
   <br><em>Filters also can be applied to exclude unnecessary files.</em>
   <br>
   <br><em>The resulting database is a local json file containing a list of paths and checksums.
