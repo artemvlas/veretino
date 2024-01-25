@@ -255,11 +255,6 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 
 void Manager::checkSummaryFile(const QString &path)
 {
-    QFileInfo fileInfo(path);
-    QCryptographicHash::Algorithm algo = tools::strToAlgo(fileInfo.suffix());
-    QString checkSummaryFileName = fileInfo.completeBaseName();
-    QString checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), checkSummaryFileName);
-
     QFile sumFile(path);
     QString line;
     if (sumFile.open(QFile::ReadOnly))
@@ -269,15 +264,33 @@ void Manager::checkSummaryFile(const QString &path)
         return;
     }
 
-    if (!QFileInfo(checkSummaryFilePath).isFile()) {
-        checkSummaryFilePath = paths::joinPath(paths::parentFolder(path), line.mid(tools::algoStrLen(algo) + 2).remove("\n"));
-        if (!QFileInfo(checkSummaryFilePath).isFile()) {
+    QFileInfo fileInfo(path);
+    QString storedChecksum;
+
+    if (line.contains("  ") && tools::canBeChecksum(line.left(line.indexOf("  "))))
+        storedChecksum = line.left(line.indexOf("  "));
+    else if (line.contains(" *") && tools::canBeChecksum(line.left(line.indexOf(" *"))))
+        storedChecksum = line.left(line.indexOf(" *"));
+    else if (tools::canBeChecksum(line.left(tools::algoStrLen(tools::strToAlgo(fileInfo.suffix())))))
+        storedChecksum = line.left(tools::algoStrLen(tools::strToAlgo(fileInfo.suffix())));
+
+    if (storedChecksum.isEmpty()) {
+        emit showMessage("Checksum not found", "Warning");
+        return;
+    }
+
+    QString checkFileName = fileInfo.completeBaseName();
+    QString checkFilePath = paths::joinPath(paths::parentFolder(path), checkFileName);
+
+    if (!QFileInfo(checkFilePath).isFile()) {
+        checkFilePath = paths::joinPath(paths::parentFolder(path), line.mid(storedChecksum.length() + 2).remove("\n"));
+        if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
             return;
         }
     }
 
-    checkFile(checkSummaryFilePath, line.mid(0, tools::algoStrLen(algo)), algo);
+    checkFile(checkFilePath, storedChecksum);
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)
