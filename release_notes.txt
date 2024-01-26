@@ -1,3 +1,7 @@
+Veretino 0.3.3 (dev)
+* Added icons for database items.
+* Improved checksum summary file handling.
+
 Veretino 0.3.2
 * Added the ability to create a global Filter based on the Folder Content analyzer.
 * It is now possible to quickly create an independent filter as part of a holistic process of checksums handling for a selected folder.

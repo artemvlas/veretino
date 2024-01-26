@@ -138,6 +138,11 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
     if (!curIndex.isValid())
         return QVariant();
 
+    if (role == Qt::DecorationRole && curIndex.column() == ColumnPath) {
+        return isFileRow(curIndex) ? iconProvider.icon(QFileInfo(curIndex.data().toString()))
+                                   : iconProvider.icon(QFileIconProvider::Folder);
+    }
+
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
         return QVariant();
 
