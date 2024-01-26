@@ -7,6 +7,7 @@
 #include "ui_foldercontentsdialog.h"
 #include "tools.h"
 #include <QPushButton>
+#include <QFileIconProvider>
 #include <QDebug>
 
 FolderContentsDialog::FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
@@ -67,12 +68,15 @@ void FolderContentsDialog::connections()
 
 void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)
 {
+    QFileIconProvider iconProvider;
+
     for (int i = 0; i < extList.size(); ++i) {
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
         item->setData(TreeWidgetItem::ColumnExtension, Qt::DisplayRole, extList.at(i).extension);
         item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
+        item->setIcon(TreeWidgetItem::ColumnExtension, iconProvider.icon(QFileInfo("file." + item->extension())));
         items.append(item);
     }
 }
