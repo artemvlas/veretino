@@ -50,13 +50,15 @@ private:
     void connections();
     bool argumentInput(); // using the path argument if it's provided
     bool processAbortPrompt();
+    void saveSettings();
+    void loadSettings();
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent* event) override;
 
     Ui::MainWindow *ui;
-    Settings *settings_ = new Settings; // stores the app settings
+    Settings *settings_ = new Settings; // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
     ClickableLabel *permanentStatus = new ClickableLabel(this);

@@ -1,5 +1,6 @@
 Veretino 0.3.3 (dev)
 * Added icons to database items and to the list of file types in the Folder Content analyzer.
+* Settings are now saved between sessions.
 * Improved checksum summary file handling.
 
 Veretino 0.3.2

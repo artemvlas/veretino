@@ -8,6 +8,7 @@
 #include "dbstatusdialog.h"
 #include "foldercontentsdialog.h"
 #include <QClipboard>
+#include <QSettings>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/veretino.png"));
     QThread::currentThread()->setObjectName("MAIN Thread");
 
+    loadSettings();
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
     ui->statusbar->addPermanentWidget(permanentStatus);
 
@@ -38,6 +40,7 @@ MainWindow::~MainWindow()
 {
     emit modeSelect->cancelProcess();
 
+    saveSettings();
     thread->quit();
     thread->wait();
 
@@ -137,6 +140,53 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
 
     thread->start();
+}
+
+void MainWindow::saveSettings()
+{
+    QSettings storedSettings("veretino", QCoreApplication::applicationName());
+    storedSettings.setDefaultFormat(QSettings::IniFormat);
+    qDebug() << "Save settings:" << storedSettings.fileName()<< storedSettings.defaultFormat();
+
+    storedSettings.setValue("algorithm", settings_->algorithm);
+    storedSettings.setValue("dbPrefix", settings_->dbPrefix);
+    storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
+    storedSettings.setValue("isLongExtension", settings_->isLongExtension);
+    storedSettings.setValue("saveVerificationDateTime", settings_->saveVerificationDateTime);
+
+    // FilterRule
+    storedSettings.setValue("filter/ignoreDbFiles", settings_->filter.ignoreDbFiles);
+    storedSettings.setValue("filter/ignoreShaFiles", settings_->filter.ignoreShaFiles);
+
+    if (!settings_->filter.isFilter(FilterRule::NotSet)) {
+        storedSettings.setValue("filter/filterType", settings_->filter.extensionsFilter_);
+        storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
+    }
+
+    // geometry
+    //storedSettings.setValue("geometry", saveGeometry());
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings storedSettings("veretino", QApplication::applicationName());
+    storedSettings.setDefaultFormat(QSettings::IniFormat);
+    qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.defaultFormat();
+
+    settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", QCryptographicHash::Sha256).toInt());
+    settings_->dbPrefix = storedSettings.value("dbPrefix", "checksums").toString();
+    settings_->addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", true).toBool();
+    settings_->isLongExtension = storedSettings.value("isLongExtension", true).toBool();
+    settings_->saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", true).toBool();
+
+    // FilterRule
+    settings_->filter.setFilter(static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()),
+                                storedSettings.value("filter/filterExtensionsList", QStringList()).toStringList());
+    settings_->filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", true).toBool();
+    settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", true).toBool();
+
+    // geometry
+    //restoreGeometry(storedSettings.value("geometry").toByteArray());
 }
 
 void MainWindow::showDbStatus()
