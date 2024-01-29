@@ -144,7 +144,7 @@ void MainWindow::connectManager()
 
 void MainWindow::saveSettings()
 {
-    QSettings storedSettings("veretino", QCoreApplication::applicationName());
+    QSettings storedSettings("veretino", "veretino");
     storedSettings.setDefaultFormat(QSettings::IniFormat);
     qDebug() << "Save settings:" << storedSettings.fileName()<< storedSettings.defaultFormat();
 
@@ -164,12 +164,12 @@ void MainWindow::saveSettings()
     }
 
     // geometry
-    //storedSettings.setValue("geometry", saveGeometry());
+    storedSettings.setValue("view/geometry", saveGeometry());
 }
 
 void MainWindow::loadSettings()
 {
-    QSettings storedSettings("veretino", QApplication::applicationName());
+    QSettings storedSettings("veretino", "veretino");
     storedSettings.setDefaultFormat(QSettings::IniFormat);
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.defaultFormat();
 
@@ -186,7 +186,7 @@ void MainWindow::loadSettings()
     settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", true).toBool();
 
     // geometry
-    //restoreGeometry(storedSettings.value("geometry").toByteArray());
+    restoreGeometry(storedSettings.value("view/geometry").toByteArray());
 }
 
 void MainWindow::showDbStatus()
