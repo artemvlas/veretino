@@ -9,19 +9,20 @@
 #include <QDialog>
 
 namespace Ui {
-class aboutDialog;
+class AboutDialog;
 }
 
-class aboutDialog : public QDialog
+class AboutDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit aboutDialog(QWidget *parent = nullptr);
-    ~aboutDialog();
+    explicit AboutDialog(QWidget *parent = nullptr);
+    ~AboutDialog();
+    void showEvent(QShowEvent*) override; // for centering
 
 private:
-    Ui::aboutDialog *ui;
+    Ui::AboutDialog *ui;
 };
 
 #endif // ABOUTDIALOG_H

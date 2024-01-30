@@ -69,6 +69,7 @@ class FolderContentsDialog : public QDialog
 public:
     explicit FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
     ~FolderContentsDialog();
+    void showEvent(QShowEvent*) override; // for centering
     FilterRule resultFilter();
     void setFilterCreatingEnabled(bool enabled = true);
 

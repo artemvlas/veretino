@@ -7,9 +7,9 @@
 #include "ui_aboutdialog.h"
 #include <QIcon>
 
-aboutDialog::aboutDialog(QWidget *parent) :
+AboutDialog::AboutDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::aboutDialog)
+    ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
     setFixedSize(400,200);
@@ -26,7 +26,10 @@ aboutDialog::aboutDialog(QWidget *parent) :
 
 }
 
-aboutDialog::~aboutDialog()
+AboutDialog::~AboutDialog()
 {
     delete ui;
 }
+
+void AboutDialog::showEvent(QShowEvent*)
+{}

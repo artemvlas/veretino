@@ -232,3 +232,6 @@ bool FolderContentsDialog::isFilterCreatingEnabled()
 {
     return ui->checkBox_CreateFilter->isChecked();
 }
+
+void FolderContentsDialog::showEvent(QShowEvent*)
+{}
