@@ -74,16 +74,13 @@ void View::setTreeModel(ModelView modelSel)
 
     emit modelChanged(modelSel);
 
-    //data_->numbers.numberOf(FileStatus::Mismatched) == 0 ? hideColumn(Column::ColumnReChecksum)
-    //                                                     : showAllColumns();
-
     if (!headerStateDb.isEmpty())
         header()->restoreState(headerStateDb);
     else
         setDefaultColumnsWidth();
 
-    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
-        showAllColumns();
+    data_->numbers.numberOf(FileStatus::Mismatched) == 0 ? hideColumn(Column::ColumnReChecksum)
+                                                         : showAllColumns();
 
     setIndexByPath(curPathModel);   
 }
