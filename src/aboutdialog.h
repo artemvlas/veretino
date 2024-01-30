@@ -19,8 +19,8 @@ class AboutDialog : public QDialog
 public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog();
+protected:
     void showEvent(QShowEvent*) override; // for centering
-
 private:
     Ui::AboutDialog *ui;
 };

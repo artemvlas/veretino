@@ -21,9 +21,10 @@ class SettingsDialog : public QDialog
 public:
     explicit SettingsDialog(Settings *settings, QWidget *parent = nullptr);
     ~SettingsDialog();
-    void showEvent(QShowEvent*) override; // for centering
     void updateSettings();
     enum Tabs{TabDatabase, TabFilter};
+protected:
+    void showEvent(QShowEvent*) override; // for centering
 private:
     void updateLabelDatabaseFilename();
 
