@@ -267,25 +267,44 @@ void View::saveHeaderState()
 
 void View::headerContextMenuRequested(const QPoint &point)
 {
-    if (!isCurrentViewModel(ModelSource) && !isCurrentViewModel(ModelProxy))
+    if (isCurrentViewModel(NotSetted))
         return;
 
     QMenu *headerContextMenu = new QMenu(this);
-    QAction *showChecksumColumn = new QAction("Checksums", headerContextMenu);
-    QAction *showReChecksumColumn = new QAction("ReChecksums", headerContextMenu);
-
-    showChecksumColumn->setCheckable(true);
-    showReChecksumColumn->setCheckable(true);
-
-    showChecksumColumn->setChecked(!isColumnHidden(Column::ColumnChecksum));
-    showReChecksumColumn->setChecked(!isColumnHidden(Column::ColumnReChecksum));
-
     connect(headerContextMenu, &QMenu::aboutToHide, headerContextMenu, &QMenu::deleteLater);
-    connect(showChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnChecksum);});
-    connect(showReChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnReChecksum);});
 
-    headerContextMenu->addAction(showChecksumColumn);
-    headerContextMenu->addAction(showReChecksumColumn);
+    if (isViewFileSystem()) {
+        QAction *showTypeColumn = new QAction("Type", headerContextMenu);
+        QAction *showDateModifiedColumn = new QAction("Date Modified", headerContextMenu);
+        showTypeColumn->setCheckable(true);
+        showDateModifiedColumn->setCheckable(true);
+
+        showTypeColumn->setChecked(!isColumnHidden(ColumnFsType));
+        showDateModifiedColumn->setChecked(!isColumnHidden(ColumnFsDateModified));
+
+        connect(showTypeColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ColumnFsType);});
+        connect(showDateModifiedColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ColumnFsDateModified);});
+
+        headerContextMenu->addAction(showTypeColumn);
+        headerContextMenu->addAction(showDateModifiedColumn);
+    }
+
+    else if (isViewDatabase()) {
+        QAction *showChecksumColumn = new QAction("Checksums", headerContextMenu);
+        QAction *showReChecksumColumn = new QAction("ReChecksums", headerContextMenu);
+
+        showChecksumColumn->setCheckable(true);
+        showReChecksumColumn->setCheckable(true);
+
+        showChecksumColumn->setChecked(!isColumnHidden(Column::ColumnChecksum));
+        showReChecksumColumn->setChecked(!isColumnHidden(Column::ColumnReChecksum));
+
+        connect(showChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnChecksum);});
+        connect(showReChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnReChecksum);});
+
+        headerContextMenu->addAction(showChecksumColumn);
+        headerContextMenu->addAction(showReChecksumColumn);
+    }
 
     headerContextMenu->exec(header()->mapToGlobal(point));
 }

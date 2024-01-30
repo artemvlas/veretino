@@ -21,6 +21,7 @@ class View : public QTreeView
 public:
     explicit View(QWidget *parent = nullptr);
     enum ModelView {NotSetted, FileSystem, ModelSource, ModelProxy};
+    enum ColumnFileSystem {ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified};
     Q_ENUM(ModelView)
 
     ModelView currentViewModel();
