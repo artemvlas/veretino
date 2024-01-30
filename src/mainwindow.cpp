@@ -146,39 +146,27 @@ void MainWindow::saveSettings()
 {
     QSettings storedSettings("veretino", "veretino");
     storedSettings.setDefaultFormat(QSettings::IniFormat);
-    qDebug() << "Save settings:" << storedSettings.fileName()<< storedSettings.defaultFormat();
+    qDebug() << "Save settings:" << storedSettings.fileName() << storedSettings.defaultFormat();
 
-    if (settings_->algorithm != static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", QCryptographicHash::Sha256).toInt()))
-        storedSettings.setValue("algorithm", settings_->algorithm);
-    if (settings_->dbPrefix != storedSettings.value("dbPrefix", "checksums").toString())
-        storedSettings.setValue("dbPrefix", settings_->dbPrefix);
-    if (settings_->addWorkDirToFilename != storedSettings.value("addWorkDirToFilename", true).toBool())
-        storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
-    if (settings_->isLongExtension != storedSettings.value("isLongExtension", true).toBool())
-        storedSettings.setValue("isLongExtension", settings_->isLongExtension);
-    if (settings_->saveVerificationDateTime != storedSettings.value("saveVerificationDateTime", true).toBool())
-        storedSettings.setValue("saveVerificationDateTime", settings_->saveVerificationDateTime);
+    storedSettings.setValue("algorithm", settings_->algorithm);
+    storedSettings.setValue("dbPrefix", settings_->dbPrefix);
+    storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
+    storedSettings.setValue("isLongExtension", settings_->isLongExtension);
+    storedSettings.setValue("saveVerificationDateTime", settings_->saveVerificationDateTime);
 
     // FilterRule
-    if (settings_->filter.ignoreDbFiles != storedSettings.value("filter/ignoreDbFiles", true).toBool())
-        storedSettings.setValue("filter/ignoreDbFiles", settings_->filter.ignoreDbFiles);
-    if (settings_->filter.ignoreShaFiles != storedSettings.value("filter/ignoreShaFiles", true).toBool())
-        storedSettings.setValue("filter/ignoreShaFiles", settings_->filter.ignoreShaFiles);
-
-    if (settings_->filter.extensionsFilter_ != static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()))
-        storedSettings.setValue("filter/filterType", settings_->filter.extensionsFilter_);
-
-    if (settings_->filter.extensionsList != storedSettings.value("filter/filterExtensionsList", QStringList()).toStringList())
-        storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
-    /*
-    if (!settings_->filter.isFilter(FilterRule::NotSet)) {
-        storedSettings.setValue("filter/filterType", settings_->filter.extensionsFilter_);
-        storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
-    }*/
+    storedSettings.setValue("filter/ignoreDbFiles", settings_->filter.ignoreDbFiles);
+    storedSettings.setValue("filter/ignoreShaFiles", settings_->filter.ignoreShaFiles);
+    storedSettings.setValue("filter/filterType", settings_->filter.extensionsFilter_);
+    storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
 
     // geometry
-    if (saveGeometry() != storedSettings.value("view/geometry").toByteArray())
-        storedSettings.setValue("view/geometry", saveGeometry());
+    storedSettings.setValue("view/geometry", saveGeometry());
+
+    // TreeView header(columns) state
+    ui->treeView->saveHeaderState();
+    storedSettings.setValue("view/columnStateFs", ui->treeView->headerStateFs);
+    storedSettings.setValue("view/columnStateDb", ui->treeView->headerStateDb);
 }
 
 void MainWindow::loadSettings()
@@ -201,6 +189,10 @@ void MainWindow::loadSettings()
 
     // geometry
     restoreGeometry(storedSettings.value("view/geometry").toByteArray());
+
+    // TreeView header(columns) state
+    ui->treeView->headerStateFs = storedSettings.value("view/columnStateFs").toByteArray();
+    ui->treeView->headerStateDb = storedSettings.value("view/columnStateDb").toByteArray();
 }
 
 void MainWindow::showDbStatus()

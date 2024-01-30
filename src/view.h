@@ -20,13 +20,13 @@ class View : public QTreeView
     Q_OBJECT
 public:
     explicit View(QWidget *parent = nullptr);
-    bool isViewFileSystem(); // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
-
     enum ModelView {NotSetted, FileSystem, ModelSource, ModelProxy};
     Q_ENUM(ModelView)
 
     ModelView currentViewModel();
     bool isCurrentViewModel(const ModelView modelView);
+    bool isViewFileSystem(); // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
+    bool isViewDatabase();
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
@@ -38,6 +38,9 @@ public:
     QModelIndex curIndexSource;
     QModelIndex curIndexProxy;
 
+    QByteArray headerStateFs;
+    QByteArray headerStateDb;
+
 public slots:
     void setFileSystemModel();
     void setData(DataContainer *data, bool isImported); // isImported == true, if the data is obtained from a database file
@@ -46,6 +49,7 @@ public slots:
     void setFilter(const FileStatus status);
     void setFilter(const QSet<FileStatus> statuses = QSet<FileStatus>());
     void disableFilter();
+    void saveHeaderState();
     void toHome();
 
     void headerContextMenuRequested(const QPoint &point);
@@ -56,6 +60,7 @@ private:
     void connectModel();
     void toggleColumnVisibility(int column);
     void showAllColumns();
+    void setDefaultColumnsWidth();
 
     QFileSystemModel *fileSystem = new QFileSystemModel;
 

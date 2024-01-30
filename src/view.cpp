@@ -40,6 +40,7 @@ void View::setFileSystemModel()
     }
 
     oldSelectionModel_ = selectionModel();
+    saveHeaderState();
 
     setModel(fileSystem);
 
@@ -48,8 +49,10 @@ void View::setFileSystemModel()
     data_ = nullptr;
 
     showAllColumns();
-    setColumnWidth(0, 450);
-    setColumnWidth(1, 100);
+    if (!headerStateFs.isEmpty())
+        header()->restoreState(headerStateFs);
+    else
+        setDefaultColumnsWidth();
 
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 }
@@ -65,16 +68,23 @@ void View::setTreeModel(ModelView modelSel)
         return; // if the current model remains the same
 
     oldSelectionModel_ = selectionModel();
+    saveHeaderState();
 
     modelSel == ModelSource ? setModel(data_->model_) : setModel(data_->proxyModel_);
 
     emit modelChanged(modelSel);
 
-    data_->numbers.numberOf(FileStatus::Mismatched) == 0 ? hideColumn(Column::ColumnReChecksum)
-                                                         : showAllColumns();
+    //data_->numbers.numberOf(FileStatus::Mismatched) == 0 ? hideColumn(Column::ColumnReChecksum)
+    //                                                     : showAllColumns();
 
-    setColumnWidth(0, 450);
-    setColumnWidth(1, 100);
+    if (!headerStateDb.isEmpty())
+        header()->restoreState(headerStateDb);
+    else
+        setDefaultColumnsWidth();
+
+    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
+        showAllColumns();
+
     setIndexByPath(curPathModel);   
 }
 
@@ -120,11 +130,6 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
     }
     else
         qDebug() << "View::changeCurIndexAndPath | FAILURE";
-}
-
-bool View::isViewFileSystem()
-{
-    return (model() == fileSystem);
 }
 
 void View::setIndexByPath(const QString &path)
@@ -201,6 +206,16 @@ bool View::isCurrentViewModel(const ModelView modelView)
     return modelView == currentViewModel();
 }
 
+bool View::isViewFileSystem()
+{
+    return (model() == fileSystem);
+}
+
+bool View::isViewDatabase()
+{
+    return isCurrentViewModel(ModelProxy) || isCurrentViewModel(ModelSource);
+}
+
 void View::deleteOldSelModel()
 {
     if (oldSelectionModel_ && (oldSelectionModel_ != selectionModel())) {
@@ -234,6 +249,20 @@ void View::showAllColumns()
     for (int i = 0; i < model()->columnCount(); ++i) {
         showColumn(i);
     }
+}
+
+void View::setDefaultColumnsWidth()
+{
+    setColumnWidth(0, 450);
+    setColumnWidth(1, 100);
+}
+
+void View::saveHeaderState()
+{
+    if (isViewFileSystem())
+        headerStateFs = header()->saveState();
+    else if (isViewDatabase())
+        headerStateDb = header()->saveState();
 }
 
 void View::headerContextMenuRequested(const QPoint &point)

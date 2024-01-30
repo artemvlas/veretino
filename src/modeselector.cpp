@@ -21,6 +21,8 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!TreeModel::isFileRow(ind)) prepareView();});
 
+    connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
+
     actionShowNewLostOnly->setCheckable(true);
     actionShowMismatchesOnly->setCheckable(true);
 
