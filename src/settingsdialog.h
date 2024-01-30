@@ -23,8 +23,7 @@ public:
     ~SettingsDialog();
     void updateSettings();
     enum Tabs{TabDatabase, TabFilter};
-protected:
-    void showEvent(QShowEvent*) override; // for centering
+
 private:
     void updateLabelDatabaseFilename();
 

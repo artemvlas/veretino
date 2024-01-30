@@ -71,8 +71,7 @@ public:
     ~FolderContentsDialog();
     FilterRule resultFilter();
     void setFilterCreatingEnabled(bool enabled = true);
-protected:
-    void showEvent(QShowEvent*) override; // for centering
+
 private:
     Ui::FolderContentsDialog *ui;
     void connections();

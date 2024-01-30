@@ -78,7 +78,7 @@ void MainWindow::connections()
     connect(modeSelect->actionOpenSettingsDialog, &QAction::triggered, this, &MainWindow::dialogSettings);
     connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about; about.exec();});
+    connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about(this); about.exec();});
 }
 
 void MainWindow::connectManager()
@@ -198,7 +198,7 @@ void MainWindow::loadSettings()
 void MainWindow::showDbStatus()
 {
     if (ui->treeView->data_ && !modeSelect->isProcessing()) {
-        DbStatusDialog dbStatusDialog(ui->treeView->data_);
+        DbStatusDialog dbStatusDialog(ui->treeView->data_, this);
         dbStatusDialog.exec();
     }
 }
@@ -206,7 +206,7 @@ void MainWindow::showDbStatus()
 void MainWindow::showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        FolderContentsDialog dialog(folderName, extList);
+        FolderContentsDialog dialog(folderName, extList, this);
         if (dialog.exec() == QDialog::Accepted) {
             FilterRule filter = dialog.resultFilter();
             if (!filter.isFilter(FilterRule::NotSet))
@@ -218,7 +218,7 @@ void MainWindow::showFolderContentsDialog(const QString &folderName, const QList
 void MainWindow::showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        FolderContentsDialog dialog(folderName, extList);
+        FolderContentsDialog dialog(folderName, extList, this);
         dialog.setFilterCreatingEnabled();
         FilterRule filter;
 
@@ -232,7 +232,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
 
 void MainWindow::dialogSettings()
 {
-    SettingsDialog dialog(settings_);
+    SettingsDialog dialog(settings_, this);
 
     if (dialog.exec() == QDialog::Accepted) {
         dialog.updateSettings();
@@ -272,11 +272,11 @@ void MainWindow::showMessage(const QString &message, const QString &title)
     QMessageBox messageBox;
 
     if (title.toLower() == "error" || title.toLower() == "failed")
-        messageBox.critical(0, title, message);
+        messageBox.critical(this, title, message);
     else if (title.toLower() == "warning")
-        messageBox.warning(0, title, message);
+        messageBox.warning(this, title, message);
     else
-        messageBox.information(0, title, message);
+        messageBox.information(this, title, message);
 }
 
 void MainWindow::setProgressBar(bool processing, bool visible)

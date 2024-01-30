@@ -20,8 +20,6 @@ class DbStatusDialog : public QDialog
 public:
     explicit DbStatusDialog(const DataContainer *data, QWidget *parent = nullptr);
     ~DbStatusDialog();
-protected:
-    void showEvent(QShowEvent*) override; // for centering
 private:
     Ui::DbStatusDialog *ui;
     const DataContainer *data_;

@@ -30,6 +30,3 @@ AboutDialog::~AboutDialog()
 {
     delete ui;
 }
-
-void AboutDialog::showEvent(QShowEvent*)
-{}

@@ -121,6 +121,3 @@ SettingsDialog::~SettingsDialog()
 {
     delete ui;
 }
-
-void SettingsDialog::showEvent(QShowEvent*)
-{}

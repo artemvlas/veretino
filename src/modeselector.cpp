@@ -345,7 +345,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
 
     if (Files::isEmptyFolder(view_->curPathFileSystem)) {
         QMessageBox messageBox;
-        messageBox.information(nullptr, "Empty folder", "Nothing to do.");
+        messageBox.information(view_, "Empty folder", "Nothing to do.");
         return;
     }
 
@@ -364,7 +364,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     }
 
     // if the folder already contains a database file with the same name, display a prompt
-    QMessageBox msgBox;
+    QMessageBox msgBox(view_);
     msgBox.setText(QString("The folder already contains the database file:\n%1").arg(databaseFileName));
     msgBox.setInformativeText("Do you want to open it or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
@@ -392,7 +392,7 @@ void ModeSelector::processFolderFilteredChecksums()
 
     if (Files::isEmptyFolder(view_->curPathFileSystem)) {
             QMessageBox messageBox;
-            messageBox.information(nullptr, "Empty folder", "Nothing to do.");
+            messageBox.information(view_, "Empty folder", "Nothing to do.");
             return;
     }
 
