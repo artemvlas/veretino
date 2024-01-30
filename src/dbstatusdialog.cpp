@@ -180,3 +180,6 @@ DbStatusDialog::~DbStatusDialog()
 {
     delete ui;
 }
+
+void DbStatusDialog::showEvent(QShowEvent*)
+{}
