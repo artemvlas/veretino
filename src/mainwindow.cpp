@@ -144,9 +144,8 @@ void MainWindow::connectManager()
 
 void MainWindow::saveSettings()
 {
-    QSettings storedSettings("veretino", "veretino");
-    storedSettings.setDefaultFormat(QSettings::IniFormat);
-    qDebug() << "Save settings:" << storedSettings.fileName() << storedSettings.defaultFormat();
+    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
+    qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
     storedSettings.setValue("algorithm", settings_->algorithm);
     storedSettings.setValue("dbPrefix", settings_->dbPrefix);
@@ -171,9 +170,8 @@ void MainWindow::saveSettings()
 
 void MainWindow::loadSettings()
 {
-    QSettings storedSettings("veretino", "veretino");
-    storedSettings.setDefaultFormat(QSettings::IniFormat);
-    qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.defaultFormat();
+    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
+    qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
     settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", QCryptographicHash::Sha256).toInt());
     settings_->dbPrefix = storedSettings.value("dbPrefix", "checksums").toString();
