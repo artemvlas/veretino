@@ -2,12 +2,12 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="1000"
-   height="1000"
-   viewBox="0 0 264.58333 264.58333"
+   width="256"
+   height="256"
+   viewBox="0 0 67.733332 67.733332"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
    sodipodi:docname="veretino.svg"
    inkscape:export-filename="fcc.jpg"
    inkscape:export-xdpi="97.692314"
@@ -27,11 +27,11 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.28819094"
-     inkscape:cx="619.38102"
-     inkscape:cy="548.24762"
-     inkscape:window-width="1600"
-     inkscape:window-height="827"
+     inkscape:zoom="2.3055275"
+     inkscape:cx="171.978"
+     inkscape:cy="131.85703"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -43,29 +43,33 @@
      inkscape:groupmode="layer"
      id="layer1">
     <g
-       id="g334"
-       transform="matrix(0.54166667,0.54166667,-0.54166667,0.54166667,132,-5.5833334)">
+       id="g1"
+       transform="matrix(0.25384615,0,0,0.25384615,0.49230752,0.49230769)">
+      <g
+         id="g334"
+         transform="matrix(0.54166667,0.54166667,-0.54166667,0.54166667,132,-5.5833334)">
+        <rect
+           style="fill:#999999;stroke-width:0.253999"
+           id="rect274"
+           width="240"
+           height="240"
+           x="7"
+           y="7" />
+        <rect
+           style="fill:#333333;stroke-width:0.384468"
+           id="rect330"
+           width="210"
+           height="210"
+           x="7"
+           y="7" />
+      </g>
       <rect
-         style="fill:#999999;stroke-width:0.253999"
-         id="rect274"
-         width="240"
-         height="240"
-         x="7"
-         y="7" />
-      <rect
-         style="fill:#333333;stroke-width:0.384468"
-         id="rect330"
-         width="210"
-         height="210"
-         x="7"
-         y="7" />
+         style="fill:#cccccc;stroke-width:0.293323"
+         id="rect221"
+         width="70"
+         height="70"
+         x="97.324516"
+         y="86.882256" />
     </g>
-    <rect
-       style="fill:#cccccc;stroke-width:0.293323"
-       id="rect221"
-       width="70"
-       height="70"
-       x="97.324516"
-       y="86.882256" />
   </g>
 </svg>

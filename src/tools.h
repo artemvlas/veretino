@@ -9,6 +9,7 @@
 #include <QString>
 #include <QCryptographicHash>
 #include <QAbstractItemModel>
+#include <QIcon>
 #include "files.h"
 
 struct Settings {
@@ -61,6 +62,7 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
 QString fileItemStatus(FileStatus status);
+QIcon fileItemStatusIcon(FileStatus status);
 } // namespace format
 
 #endif // TOOLS_H

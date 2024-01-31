@@ -26,7 +26,6 @@ public:
     enum FileStatus {
         Undefined,
         Queued, // added to the processing queue
-        //Processing, // checksum is being calculated
         Calculating, // checksum is being calculated
         Verifying, // // checksum is being verified
         NotChecked, // available for verification
@@ -42,7 +41,7 @@ public:
     Q_ENUM(FileStatus)
 
     struct ExtNumSize {
-        QString extension; // for example: txt (pdf, mkv, 7z, flac...)
+        QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
         int filesNumber = 0; // number of files with this extension
         qint64 filesSize = 0; // total size of these files
     }; // struct ExtNumSize

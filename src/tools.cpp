@@ -322,10 +322,10 @@ QString fileItemStatus(FileStatus status)
         result = "ready...";
         break;
     case FileStatus::Matched:
-        result = "✓ OK";
+        result = "OK";
         break;
     case FileStatus::Mismatched:
-        result = "☒ NOT match";
+        result = "NOT match";
         break;
     case FileStatus::New:
         result = "new file";
@@ -337,13 +337,13 @@ QString fileItemStatus(FileStatus status)
         result = "ureadable";
         break;
     case FileStatus::Added:
-        result = "→ added to DB"; // ➔
+        result = "added to DB";
         break;
     case Files::Removed:
-        result = "✂ removed from DB";
+        result = "removed from DB";
         break;
     case FileStatus::ChecksumUpdated:
-        result = "↻ stored checksum updated"; // 🗘
+        result = "checksum updated";
         break;
     default:
         result = "unknown";
@@ -352,4 +352,37 @@ QString fileItemStatus(FileStatus status)
 
     return result;
 }
+
+QIcon fileItemStatusIcon(FileStatus status)
+{
+    switch (status) {
+        case FileStatus::Queued:
+            return QIcon(":/icons/filestatus/queued.svg");
+        case FileStatus::Calculating:
+            return QIcon(":/icons/filestatus/processing.svg");
+        case FileStatus::Verifying:
+            return QIcon(":/icons/filestatus/processing.svg");
+        case FileStatus::NotChecked:
+            return QIcon(":/icons/filestatus/notchecked.svg");
+        case FileStatus::Matched:
+            return QIcon(":/icons/filestatus/matched.svg");
+        case FileStatus::Mismatched:
+            return QIcon(":/icons/filestatus/mismatched.svg");
+        case FileStatus::New:
+            return QIcon(":/icons/filestatus/new.svg");
+        case FileStatus::Missing:
+            return QIcon(":/icons/filestatus/missing.svg");
+        case FileStatus::Unreadable:
+            return QIcon(":/icons/filestatus/unknown.svg");
+        case FileStatus::Added:
+            return QIcon(":/icons/filestatus/added.svg");
+        case Files::Removed:
+            return QIcon(":/icons/filestatus/removed.svg");
+        case FileStatus::ChecksumUpdated:
+            return QIcon(":/icons/filestatus/updated.svg");
+        default:
+            return QIcon(":/icons/filestatus/unknown.svg");
+    }
+}
+
 } // namespace format

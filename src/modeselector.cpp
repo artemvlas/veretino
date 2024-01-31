@@ -110,7 +110,6 @@ void ModeSelector::setActionsIcons()
     menuStoreSummary->menuAction()->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(theme)));
 
     // DB Model View
-    //actionCancelBackToFS->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
     actionShowDbStatus->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
     actionResetDb->setIcon(QIcon(QString(":/icons/%1/undo.svg").arg(theme)));
     actionForgetChanges->setIcon(QIcon(QString(":/icons/%1/backup.svg").arg(theme)));

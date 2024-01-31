@@ -43,5 +43,16 @@
         <file>icons/light/start.svg</file>
         <file>icons/light/undo.svg</file>
         <file>icons/light/update.svg</file>
+        <file>icons/filestatus/added.svg</file>
+        <file>icons/filestatus/matched.svg</file>
+        <file>icons/filestatus/mismatched.svg</file>
+        <file>icons/filestatus/missing.svg</file>
+        <file>icons/filestatus/new.svg</file>
+        <file>icons/filestatus/notchecked.svg</file>
+        <file>icons/filestatus/processing.svg</file>
+        <file>icons/filestatus/queued.svg</file>
+        <file>icons/filestatus/removed.svg</file>
+        <file>icons/filestatus/unknown.svg</file>
+        <file>icons/filestatus/updated.svg</file>
     </qresource>
 </RCC>
