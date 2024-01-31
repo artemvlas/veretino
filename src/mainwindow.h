@@ -37,7 +37,6 @@ public slots:
     void showMessage(const QString &message, const QString &title = "Info");
     void setProgressBar(bool processing, bool visible);
     void handlePathEdit();
-
     void showDbStatus();
     void showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
     void showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList); // the same^ dialog, but with filter creation mode enabled
@@ -52,16 +51,16 @@ private:
     bool processAbortPrompt();
     void saveSettings();
     void loadSettings();
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
-    void keyPressEvent(QKeyEvent* event) override;
-
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings; // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
     ClickableLabel *permanentStatus = new ClickableLabel(this);
     ModeSelector *modeSelect = nullptr;
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+    void keyPressEvent(QKeyEvent* event) override;
 };
 #endif // MAINWINDOW_H

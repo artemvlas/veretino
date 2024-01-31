@@ -22,6 +22,10 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
          {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
 
+    ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
+                                               "(if all files exist and match the saved checksums),\n"
+                                               "the current datetime will be saved in the database file");
+
     loadSettings(*settings);
 }
 

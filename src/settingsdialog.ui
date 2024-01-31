@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>300</height>
+    <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,7 +61,7 @@ Unchecked: to Home folder</string>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabDatabase">
       <attribute name="title">
@@ -177,7 +177,7 @@ Unchecked: to Home folder</string>
        <item row="3" column="2" colspan="2">
         <widget class="QCheckBox" name="ignoreShaFiles">
          <property name="toolTip">
-          <string>Exclude checksum summary files from the filelist</string>
+          <string>Exclude the summary files from the filelist</string>
          </property>
          <property name="text">
           <string>Ignore sha files (*.sha1/256/512)</string>
