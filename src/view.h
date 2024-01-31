@@ -65,8 +65,8 @@ private:
 
     QFileSystemModel *fileSystem = new QFileSystemModel;
 
-    QString lastFileSystemPath;
-    QString lastModelPath;
+    //QString lastFileSystemPath;
+    //QString lastModelPath;
     void keyPressEvent(QKeyEvent* event) override;
 
 signals:

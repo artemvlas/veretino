@@ -48,6 +48,17 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="cbLastPath">
+     <property name="toolTip">
+      <string>Checked: on startup go to last path
+Unchecked: to Home folder</string>
+     </property>
+     <property name="text">
+      <string>On startup go to last path</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>

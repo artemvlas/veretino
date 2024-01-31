@@ -42,6 +42,8 @@ void SettingsDialog::loadSettings(const Settings &settings)
             break;
     }
 
+    ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
+
     // Tab Database
     if (settings.dbPrefix == "checksums")
         ui->inputJsonFileNamePrefix->clear();
@@ -75,6 +77,8 @@ void SettingsDialog::updateSettings()
         settings_->algorithm = QCryptographicHash::Sha256;
     else if (ui->rbSha512->isChecked())
         settings_->algorithm = QCryptographicHash::Sha512;
+
+    settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
 
     // database filename
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums"

@@ -147,6 +147,9 @@ void MainWindow::saveSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
+    QString lastPath = settings_->restoreLastPathOnStartup ? ui->treeView->curPathFileSystem : QString();
+    storedSettings.setValue("lastFsPath", lastPath);
+
     storedSettings.setValue("algorithm", settings_->algorithm);
     storedSettings.setValue("dbPrefix", settings_->dbPrefix);
     storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
@@ -172,6 +175,9 @@ void MainWindow::loadSettings()
 {
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
+
+    ui->treeView->curPathFileSystem = storedSettings.value("lastFsPath").toString();
+    settings_->restoreLastPathOnStartup = !ui->treeView->curPathFileSystem.isEmpty();
 
     settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", QCryptographicHash::Sha256).toInt());
     settings_->dbPrefix = storedSettings.value("dbPrefix", "checksums").toString();
