@@ -1,5 +1,6 @@
-Veretino 0.3.3 (dev)
+Veretino 0.3.3
 * Settings and layout are now saved between sessions.
+* Added a button to reset default settings.
 * Added icons to database items and to the list of file types in the Folder Content analyzer.
 * Added the ability to hide some columns (now also for the file system view).
 * Improved checksum summary file handling.

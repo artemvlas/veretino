@@ -5,6 +5,7 @@
 */
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include <QPushButton>
 
 SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     QDialog(parent),
@@ -12,46 +13,55 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     settings_(settings)
 {
     ui->setupUi(this);
-    //setFixedSize(440, 300);
     setWindowIcon(QIcon(":/veretino.png"));
 
+    connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &SettingsDialog::restoreDefaults);
     connect(ui->rbExtVer, &QRadioButton::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
          {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
 
-    switch (settings->algorithm)
+    loadSettings(*settings);
+}
+
+void SettingsDialog::loadSettings(const Settings &settings)
+{
+    switch (settings.algorithm)
     {
-    case QCryptographicHash::Sha1:
-        ui->rbSha1->setChecked(true);
-        break;
-    case QCryptographicHash::Sha256:
-        ui->rbSha256->setChecked(true);
-        break;
-    case QCryptographicHash::Sha512:
-        ui->rbSha512->setChecked(true);
-        break;
-    default:
-        break;
+        case QCryptographicHash::Sha1:
+            ui->rbSha1->setChecked(true);
+            break;
+        case QCryptographicHash::Sha256:
+            ui->rbSha256->setChecked(true);
+            break;
+        case QCryptographicHash::Sha512:
+            ui->rbSha512->setChecked(true);
+            break;
+        default:
+            break;
     }
 
-    ui->inputExtensions->setText(settings->filter.extensionsList.join(" "));
-    ui->radioButtonIncludeOnly->setChecked(settings->filter.isFilter(FilterRule::Include));
+    // Tab Database
+    if (settings.dbPrefix == "checksums")
+        ui->inputJsonFileNamePrefix->clear();
+    else
+        ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
 
-    ui->ignoreDbFiles->setChecked(settings->filter.ignoreDbFiles);
-    ui->ignoreShaFiles->setChecked(settings->filter.ignoreShaFiles);
-
-    if (settings->dbPrefix != "checksums")
-        ui->inputJsonFileNamePrefix->setText(settings->dbPrefix);
-
-    ui->cbAddFolderName->setChecked(settings->addWorkDirToFilename);
-    ui->rbExtVer->setChecked(!settings->isLongExtension);
-
-    ui->cbSaveVerificationDateTime->setChecked(settings_->saveVerificationDateTime);
+    ui->cbAddFolderName->setChecked(settings.addWorkDirToFilename);
+    ui->cbSaveVerificationDateTime->setChecked(settings.saveVerificationDateTime);
+    settings.isLongExtension ? ui->rbExtVerJson->setChecked(true) : ui->rbExtVer->setChecked(true);
 
     updateLabelDatabaseFilename();
 
+    // Tab Filter
+    ui->inputExtensions->setText(settings.filter.extensionsList.join(" "));
+    settings.filter.isFilter(FilterRule::Include) ? ui->radioButtonIncludeOnly->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
+
+    ui->ignoreDbFiles->setChecked(settings.filter.ignoreDbFiles);
+    ui->ignoreShaFiles->setChecked(settings.filter.ignoreShaFiles);
+
+    // Select open Tab
     Tabs curTab = ui->inputExtensions->text().isEmpty() ? TabDatabase : TabFilter;
     ui->tabWidget->setCurrentIndex(curTab);
 }
@@ -81,7 +91,6 @@ void SettingsDialog::updateSettings()
     else
         ui->radioButtonIgnore->isChecked() ? settings_->filter.setFilter(FilterRule::Ignore, extensionsList())
                                            : settings_->filter.setFilter(FilterRule::Include, extensionsList());
-
 
     settings_->filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
     settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
@@ -115,6 +124,11 @@ void SettingsDialog::updateLabelDatabaseFilename()
     QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
 
     ui->labelDatabaseFilename->setText(format::composeDatabaseFilename(prefix, folderName, extension));
+}
+
+void SettingsDialog::restoreDefaults()
+{
+    loadSettings(Settings());
 }
 
 SettingsDialog::~SettingsDialog()
