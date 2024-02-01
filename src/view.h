@@ -62,6 +62,7 @@ private:
     void toggleColumnVisibility(int column);
     void showAllColumns();
     void setDefaultColumnsWidth();
+    QString headerText(int column);
 
     QFileSystemModel *fileSystem = new QFileSystemModel;
 

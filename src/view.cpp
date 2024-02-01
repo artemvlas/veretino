@@ -222,15 +222,9 @@ void View::deleteOldSelModel()
     }
 }
 
-void View::keyPressEvent(QKeyEvent* event)
+QString View::headerText(int column)
 {
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-        isExpanded(currentIndex()) ? collapse(currentIndex())
-                                   : expand(currentIndex());
-        emit keyEnterPressed();
-    }
-
-    QTreeView::keyPressEvent(event);
+    return model()->headerData(column, Qt::Horizontal).toString();
 }
 
 void View::toggleColumnVisibility(int column)
@@ -271,37 +265,48 @@ void View::headerContextMenuRequested(const QPoint &point)
     connect(headerContextMenu, &QMenu::aboutToHide, headerContextMenu, &QMenu::deleteLater);
 
     if (isViewFileSystem()) {
-        QAction *showTypeColumn = new QAction("Type", headerContextMenu);
-        QAction *showDateModifiedColumn = new QAction("Date Modified", headerContextMenu);
-        showTypeColumn->setCheckable(true);
-        showDateModifiedColumn->setCheckable(true);
+        QAction *showColumnType = new QAction(headerText(ColumnFsType), headerContextMenu);
+        QAction *showColumnDateModified = new QAction(headerText(ColumnFsDateModified), headerContextMenu);
+        showColumnType->setCheckable(true);
+        showColumnDateModified->setCheckable(true);
 
-        showTypeColumn->setChecked(!isColumnHidden(ColumnFsType));
-        showDateModifiedColumn->setChecked(!isColumnHidden(ColumnFsDateModified));
+        showColumnType->setChecked(!isColumnHidden(ColumnFsType));
+        showColumnDateModified->setChecked(!isColumnHidden(ColumnFsDateModified));
 
-        connect(showTypeColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ColumnFsType);});
-        connect(showDateModifiedColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(ColumnFsDateModified);});
+        connect(showColumnType, &QAction::toggled, this, [=]{toggleColumnVisibility(ColumnFsType);});
+        connect(showColumnDateModified, &QAction::toggled, this, [=]{toggleColumnVisibility(ColumnFsDateModified);});
 
-        headerContextMenu->addAction(showTypeColumn);
-        headerContextMenu->addAction(showDateModifiedColumn);
+        headerContextMenu->addAction(showColumnType);
+        headerContextMenu->addAction(showColumnDateModified);
     }
 
     else if (isViewDatabase()) {
-        QAction *showChecksumColumn = new QAction("Checksum", headerContextMenu);
-        QAction *showReChecksumColumn = new QAction("ReChecksum", headerContextMenu);
+        QAction *showColumnChecksum = new QAction(headerText(Column::ColumnChecksum), headerContextMenu);
+        QAction *showColumnReChecksum = new QAction(headerText(Column::ColumnReChecksum), headerContextMenu);
 
-        showChecksumColumn->setCheckable(true);
-        showReChecksumColumn->setCheckable(true);
+        showColumnChecksum->setCheckable(true);
+        showColumnReChecksum->setCheckable(true);
 
-        showChecksumColumn->setChecked(!isColumnHidden(Column::ColumnChecksum));
-        showReChecksumColumn->setChecked(!isColumnHidden(Column::ColumnReChecksum));
+        showColumnChecksum->setChecked(!isColumnHidden(Column::ColumnChecksum));
+        showColumnReChecksum->setChecked(!isColumnHidden(Column::ColumnReChecksum));
 
-        connect(showChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnChecksum);});
-        connect(showReChecksumColumn, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnReChecksum);});
+        connect(showColumnChecksum, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnChecksum);});
+        connect(showColumnReChecksum, &QAction::toggled, this, [=]{toggleColumnVisibility(Column::ColumnReChecksum);});
 
-        headerContextMenu->addAction(showChecksumColumn);
-        headerContextMenu->addAction(showReChecksumColumn);
+        headerContextMenu->addAction(showColumnChecksum);
+        headerContextMenu->addAction(showColumnReChecksum);
     }
 
     headerContextMenu->exec(header()->mapToGlobal(point));
+}
+
+void View::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        isExpanded(currentIndex()) ? collapse(currentIndex())
+                                   : expand(currentIndex());
+        emit keyEnterPressed();
+    }
+
+    QTreeView::keyPressEvent(event);
 }
