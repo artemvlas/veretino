@@ -287,8 +287,8 @@ void View::headerContextMenuRequested(const QPoint &point)
     }
 
     else if (isViewDatabase()) {
-        QAction *showChecksumColumn = new QAction("Checksums", headerContextMenu);
-        QAction *showReChecksumColumn = new QAction("ReChecksums", headerContextMenu);
+        QAction *showChecksumColumn = new QAction("Checksum", headerContextMenu);
+        QAction *showReChecksumColumn = new QAction("ReChecksum", headerContextMenu);
 
         showChecksumColumn->setCheckable(true);
         showReChecksumColumn->setCheckable(true);

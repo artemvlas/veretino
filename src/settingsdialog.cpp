@@ -15,6 +15,8 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     ui->setupUi(this);
     setWindowIcon(QIcon(":/veretino.png"));
 
+    ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText("Defaults");
+
     connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &SettingsDialog::restoreDefaults);
     connect(ui->rbExtVer, &QRadioButton::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
