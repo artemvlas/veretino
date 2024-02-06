@@ -42,7 +42,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     ui->labelContentNumbers->setText(infoContent(data).join("\n"));
 
     // tab Filter
-    ui->tabWidget->setTabVisible(TabFilters, data->isFilterApplied());
+    ui->tabWidget->setTabEnabled(TabFilters, data->isFilterApplied());
     if (data->isFilterApplied()) {
         QString extensions = data->metaData.filter.extensionsList.join(", ");
         data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included Only:\n%1").arg(extensions))
@@ -50,26 +50,32 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 
     // tab Verification
-    ui->tabWidget->setTabVisible(TabVerification, data->containsChecked());
+    ui->tabWidget->setTabEnabled(TabVerification, data->containsChecked());
     if (data->containsChecked()) {
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
 
     // tab Result
-    ui->tabWidget->setTabVisible(TabChanges, !isJustCreated()
+    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated()
                                              && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
-    if (ui->tabWidget->isTabVisible(TabChanges)) {
+    if (ui->tabWidget->isTabEnabled(TabChanges)) {
         ui->labelResult->setText(infoChanges().join("\n"));
     }
 
     // selecting the tab to open
     Tabs curTab = TabContent;
-    if (ui->tabWidget->isTabVisible(TabChanges))
+    if (ui->tabWidget->isTabEnabled(TabChanges))
         curTab = TabChanges;
-    else if (ui->tabWidget->isTabVisible(TabVerification))
+    else if (ui->tabWidget->isTabEnabled(TabVerification))
         curTab = TabVerification;
 
     ui->tabWidget->setCurrentIndex(curTab);
+
+    // hide disabled tabs
+    for (int var = 0; var < ui->tabWidget->count(); ++var) {
+        if (!ui->tabWidget->isTabEnabled(var))
+            ui->tabWidget->setTabVisible(var, false);
+    }
 }
 
 QStringList DbStatusDialog::infoContent(const DataContainer *data)
