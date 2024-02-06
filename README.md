@@ -1,7 +1,9 @@
-# Veretino — multiple checksums calculator
+# Veretino: folder-wide data audit and integrity verification
 ### The app allows to verify folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
+* Multiple checksums calculator.
+* Analysis and verification of folder contents.
 * Calculation a list of checksums for all files in the specified folder and store it in a local database. Verification the integrity of all files in a certain folder by comparing their checksums with those calculated and stored earlier in the database. This can also be done with only selected file types by applying filters.
 * Calculation a checksum of the specified file and store it in a summary (*.sha1/256/512). Verification the integrity of the file against a previously saved summary (or checksum from the clipboard).
 * Finding damaged files in a folder.
