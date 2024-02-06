@@ -73,8 +73,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
 
     // hide disabled tabs
     for (int var = 0; var < ui->tabWidget->count(); ++var) {
-        if (!ui->tabWidget->isTabEnabled(var))
-            ui->tabWidget->setTabVisible(var, false);
+        ui->tabWidget->setTabVisible(var, ui->tabWidget->isTabEnabled(var));
     }
 }
 
