@@ -38,12 +38,17 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     data->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()
                                                      : ui->labelDateTime_Check->setText("Verified: " + data->metaData.successfulCheckDateTime);
 
+    QString themeFolder = tools::themeFolder(palette()); // to set tabs icons
+
     // tab Content
     ui->labelContentNumbers->setText(infoContent(data).join("\n"));
+    ui->tabWidget->setTabIcon(TabContent, QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
 
     // tab Filter
     ui->tabWidget->setTabEnabled(TabFilters, data->isFilterApplied());
     if (data->isFilterApplied()) {
+        ui->tabWidget->setTabIcon(TabFilters, QIcon(QString(":/icons/%1/filter.svg").arg(themeFolder)));
+
         QString extensions = data->metaData.filter.extensionsList.join(", ");
         data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included Only:\n%1").arg(extensions))
                                                             : ui->labelFiltersInfo->setText(QString("Ignored:\n%1").arg(extensions));
@@ -52,6 +57,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     // tab Verification
     ui->tabWidget->setTabEnabled(TabVerification, data->containsChecked());
     if (data->containsChecked()) {
+        ui->tabWidget->setTabIcon(TabVerification, QIcon(QString(":/icons/%1/double-gear.svg").arg(themeFolder)));
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
 
@@ -59,6 +65,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated()
                                              && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
+        ui->tabWidget->setTabIcon(TabChanges, QIcon(QString(":/icons/%1/update.svg").arg(themeFolder)));
         ui->labelResult->setText(infoChanges().join("\n"));
     }
 

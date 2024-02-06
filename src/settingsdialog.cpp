@@ -29,6 +29,11 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
                                                "the current datetime will be saved in the database file");
 
     loadSettings(*settings);
+
+    // set tabs icons
+    QString themeFolder = tools::themeFolder(palette());
+    ui->tabWidget->setTabIcon(TabDatabase, QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
+    ui->tabWidget->setTabIcon(TabFilter, QIcon(QString(":/icons/%1/filter.svg").arg(themeFolder)));
 }
 
 void SettingsDialog::loadSettings(const Settings &settings)

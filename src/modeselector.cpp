@@ -87,7 +87,7 @@ void ModeSelector::connectActions()
 
 void ModeSelector::setActionsIcons()
 {
-    QString theme = themeFolder();
+    QString theme = tools::themeFolder(view_->palette());
 
     // MainWindow menu
     actionOpenFolder->setIcon(QIcon(QString(":/icons/%1/folder.svg").arg(theme)));
@@ -124,17 +124,6 @@ void ModeSelector::setActionsIcons()
     actionCopyReChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
 }
 
-bool ModeSelector::isDarkTheme()
-{
-    int curLightness = button_->palette().color(QPalette::Active, QPalette::Base).lightness();
-    return (curLightness < 120);
-}
-
-QString ModeSelector::themeFolder()
-{
-    return isDarkTheme() ? "dark" : "light";
-}
-
 void ModeSelector::processing(bool isProcessing)
 {
     if (isProcessing_ != isProcessing) {
@@ -169,7 +158,7 @@ void ModeSelector::setMode()
 {
     if (isProcessing_) {
         button_->setText("Cancel");
-        button_->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(tools::themeFolder(view_->palette()))));
         button_->setToolTip("");
         return;
     }
@@ -189,39 +178,40 @@ void ModeSelector::setMode()
 void ModeSelector::setButtonInfo()
 {
     button_->setToolTip(QString());
+    QString themeFolder = tools::themeFolder(view_->palette());
 
     switch (curMode) {
     case Folder:
         button_->setText(format::algoToStr(settings_->algorithm));
-        button_->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(themeFolder)));
         button_->setToolTip(QString("Calculate checksums of contained files\nand save the result to the local database"));
         break;
     case File:
         button_->setText(format::algoToStr(settings_->algorithm, false).prepend("*."));
-        button_->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder)));
         button_->setToolTip(QString("Calculate %1 checksum\nand store it in the summary file").arg(format::algoToStr(settings_->algorithm)));
         break;
     case DbFile:
         button_->setText("Open");
-        button_->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
         break;
     case SumFile:
         button_->setText("Check");
-        button_->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(themeFolder)));
         break;
     case Model:
         button_->setText("Verify");
-        button_->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(themeFolder)));
         button_->setToolTip(QString("Check ALL files against stored checksums"));
         break;
     case ModelNewLost:
         button_->setText("New/Lost");
-        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder)));
         button_->setToolTip(QString("Update the Database:\nadd new files, delete missing ones"));
         break;
     case UpdateMismatch:
         button_->setText("Update");
-        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder())));
+        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder)));
         button_->setToolTip(QString("Update mismatched checksums with newly calculated ones"));
         break;
     case NoMode:

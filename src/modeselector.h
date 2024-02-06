@@ -124,8 +124,6 @@ private:
 
     void copyDataToClipboard(Column column);
     void setActionsIcons();
-    bool isDarkTheme();
-    QString themeFolder();
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;

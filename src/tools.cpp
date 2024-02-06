@@ -69,6 +69,22 @@ QString findCompleteString(const QStringList &strList, const QString &sample, in
     return result;
 }
 
+QString themeFolder(bool isDarkTheme)
+{
+    return isDarkTheme ? "dark" : "light";
+}
+
+QString themeFolder(const QPalette &palette)
+{
+    return themeFolder(isDarkTheme(palette));
+}
+
+bool isDarkTheme(const QPalette &palette)
+{
+    int curLightness = palette.color(QPalette::Active, QPalette::Base).lightness();
+    return (curLightness < 120);
+}
+
 bool isDatabaseFile(const QString &filePath) {
     return filePath.endsWith(".ver", Qt::CaseInsensitive)
            || filePath.endsWith(".ver.json", Qt::CaseInsensitive);
