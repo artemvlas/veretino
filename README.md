@@ -1,4 +1,4 @@
-# Veretino: folder-wide data audit and integrity verification
+# Veretino: folder data audit and integrity verification
 ### The app allows to verify folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
