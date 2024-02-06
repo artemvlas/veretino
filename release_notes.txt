@@ -1,3 +1,6 @@
+Veretino 0.3.4 (dev)
+* Minor UI improvements
+
 Veretino 0.3.3
 * Settings and layout are now saved between sessions.
 * Added a button to reset default settings.
