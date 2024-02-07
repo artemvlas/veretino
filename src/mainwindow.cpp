@@ -68,7 +68,8 @@ void MainWindow::connections()
     connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
     connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
-    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);});
+    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
+                                                        modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem);});
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
@@ -81,7 +82,7 @@ void MainWindow::connections()
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about(this); about.exec();});
 
-    connect(ui->menuFile, &QMenu::aboutToShow, this, &MainWindow::prepareMenuFile);
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
 }
 
 void MainWindow::connectManager()
@@ -152,7 +153,7 @@ void MainWindow::saveSettings()
     qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
     QString lastPath = settings_->restoreLastPathOnStartup ? ui->treeView->curPathFileSystem : QString();
-    storedSettings.setValue("lastFsPath", lastPath);
+    storedSettings.setValue("history/lastFsPath", lastPath);
 
     storedSettings.setValue("algorithm", settings_->algorithm);
     storedSettings.setValue("dbPrefix", settings_->dbPrefix);
@@ -183,7 +184,7 @@ void MainWindow::loadSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
-    ui->treeView->curPathFileSystem = storedSettings.value("lastFsPath").toString();
+    ui->treeView->curPathFileSystem = storedSettings.value("history/lastFsPath").toString();
     settings_->restoreLastPathOnStartup = !ui->treeView->curPathFileSystem.isEmpty();
 
     settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", QCryptographicHash::Sha256).toInt());
@@ -304,12 +305,6 @@ void MainWindow::handlePathEdit()
 {
     (ui->pathEdit->text() == ui->treeView->curPathFileSystem) ? modeSelect->quickAction()
                                                               : ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
-}
-
-void MainWindow::prepareMenuFile()
-{
-    modeSelect->updateMenuOpenRecent();
-    modeSelect->actionShowFilesystem->setEnabled(ui->treeView->isViewDatabase());
 }
 
 bool MainWindow::processAbortPrompt()
