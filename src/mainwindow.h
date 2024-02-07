@@ -51,6 +51,8 @@ private:
     bool processAbortPrompt();
     void saveSettings();
     void loadSettings();
+    void prepareMenuFile();
+
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings; // current app settings
     QThread *thread = new QThread;

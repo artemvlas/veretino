@@ -81,7 +81,7 @@ void MainWindow::connections()
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about(this); about.exec();});
 
-    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
+    connect(ui->menuFile, &QMenu::aboutToShow, this, &MainWindow::prepareMenuFile);
 }
 
 void MainWindow::connectManager()
@@ -304,6 +304,12 @@ void MainWindow::handlePathEdit()
 {
     (ui->pathEdit->text() == ui->treeView->curPathFileSystem) ? modeSelect->quickAction()
                                                               : ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
+}
+
+void MainWindow::prepareMenuFile()
+{
+    modeSelect->updateMenuOpenRecent();
+    modeSelect->actionShowFilesystem->setEnabled(ui->treeView->isViewDatabase());
 }
 
 bool MainWindow::processAbortPrompt()
