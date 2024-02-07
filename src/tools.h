@@ -32,6 +32,16 @@ struct Settings {
     {
         if (!recentFiles.contains(filePath))
             recentFiles.prepend(filePath);
+        else if (recentFiles.size() > 1 && recentFiles.first() != filePath) { // move the recent file to the top
+            //recentFiles.move(recentFiles.indexOf(filePath), 0);
+
+            for (int i = 1; i < recentFiles.size(); ++i) {
+                if (recentFiles.at(i) == filePath) {
+                    recentFiles.move(i, 0);
+                    break;
+                }
+            }
+        }
 
         if (recentFiles.size() > 10)
             recentFiles.removeLast();

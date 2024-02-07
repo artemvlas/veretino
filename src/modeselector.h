@@ -68,7 +68,7 @@ public:
     QList<QAction*> menuFileActions {actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenSettingsDialog};
 
     QMenu *menuOpenRecent = new QMenu("Open Recent");
-    QAction *actionClearRecent = new QAction("Clear");
+    QAction *actionClearRecent = new QAction("Clear List");
 
     // File system View    
     QAction *actionToHome = new QAction("to Home", this);
