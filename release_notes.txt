@@ -1,5 +1,6 @@
 Veretino 0.3.4 (dev)
-* Minor UI improvements
+* Added "Open Recent" menu.
+* Minor UI improvements.
 
 Veretino 0.3.3
 * Settings and layout are now saved between sessions.

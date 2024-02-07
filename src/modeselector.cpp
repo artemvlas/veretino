@@ -23,6 +23,8 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
 
     connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
 
+    menuOpenRecent->setToolTipsVisible(true);
+
     actionShowNewLostOnly->setCheckable(true);
     actionShowMismatchesOnly->setCheckable(true);
 
@@ -45,6 +47,7 @@ void ModeSelector::connectActions()
 {
     // MainWindow menu
     connect(actionShowFilesystem, &QAction::triggered, this, &ModeSelector::showFileSystem);
+    connect(actionClearRecent, &QAction::triggered, this, [=]{settings_->recentFiles.clear();});
 
     // File system View
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
@@ -94,6 +97,9 @@ void ModeSelector::setActionsIcons()
     actionOpenDatabaseFile->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
     actionShowFilesystem->setIcon(QIcon(QString(":/icons/%1/filesystem.svg").arg(theme)));
     actionOpenSettingsDialog->setIcon(QIcon(QString(":/icons/%1/configure.svg").arg(theme)));
+
+    menuOpenRecent->menuAction()->setIcon(QIcon(QString(":/icons/%1/clock.svg").arg(theme)));
+    actionClearRecent->setIcon(QIcon(QString(":/icons/%1/clear-history.svg").arg(theme)));
 
     // File system View
     actionToHome->setIcon(QIcon(QString(":/icons/%1/go-home.svg").arg(theme)));
@@ -557,6 +563,28 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     }
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+}
+
+void ModeSelector::updateMenuOpenRecent()
+{
+    menuOpenRecent->clear();
+    menuOpenRecent->setDisabled(settings_->recentFiles.isEmpty());
+
+    if (!menuOpenRecent->isEnabled())
+        return;
+
+    QIcon dbIcon = QIcon(QString(":/icons/%1/database.svg").arg(tools::themeFolder(view_->palette())));
+
+    foreach (const QString &recentFilePath, settings_->recentFiles) {
+        if (QFileInfo::exists(recentFilePath)) {
+            QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
+            act->setToolTip(recentFilePath);
+            connect(act, &QAction::triggered, this, [=]{emit parseJsonFile(recentFilePath);});
+        }
+    }
+
+    menuOpenRecent->addSeparator();
+    menuOpenRecent->addAction(actionClearRecent);
 }
 
 QMenu* ModeSelector::menuAlgorithm()

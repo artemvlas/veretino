@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->menuFile->addActions(modeSelect->menuFileActions);
     ui->menuFile->insertSeparator(modeSelect->actionOpenSettingsDialog);
+    ui->menuFile->insertMenu(modeSelect->actionShowFilesystem, modeSelect->menuOpenRecent);
 }
 
 MainWindow::~MainWindow()
@@ -61,7 +62,7 @@ void MainWindow::connections()
     connect(ui->button, &QPushButton::clicked, modeSelect, &ModeSelector::doWork);
     connect(ui->button, &QPushButton::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_Button);
 
-    //TreeView
+    // TreeView
     connect(ui->treeView, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
@@ -74,11 +75,13 @@ void MainWindow::connections()
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
     connect(permanentStatus, &ClickableLabel::doubleClicked, this, &MainWindow::showDbStatus);
 
-    //menu actions
+    // menu actions
     connect(modeSelect->actionOpenSettingsDialog, &QAction::triggered, this, &MainWindow::dialogSettings);
     connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about(this); about.exec();});
+
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
 }
 
 void MainWindow::connectManager()
@@ -138,6 +141,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
+    connect(ui->treeView, &View::dataSetted, this, [=]{settings_->addRecentFile(ui->treeView->curPathFileSystem);});
 
     thread->start();
 }
@@ -161,6 +165,9 @@ void MainWindow::saveSettings()
     storedSettings.setValue("filter/ignoreShaFiles", settings_->filter.ignoreShaFiles);
     storedSettings.setValue("filter/filterType", settings_->filter.extensionsFilter_);
     storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
+
+    // recent files
+    storedSettings.setValue("history/recentDbFiles", settings_->recentFiles);
 
     // geometry
     storedSettings.setValue("view/geometry", saveGeometry());
@@ -187,9 +194,12 @@ void MainWindow::loadSettings()
 
     // FilterRule
     settings_->filter.setFilter(static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()),
-                                storedSettings.value("filter/filterExtensionsList", QStringList()).toStringList());
+                                storedSettings.value("filter/filterExtensionsList").toStringList());
     settings_->filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", true).toBool();
     settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", true).toBool();
+
+    // recent files
+    settings_->recentFiles = storedSettings.value("history/recentDbFiles").toStringList();
 
     // geometry
     restoreGeometry(storedSettings.value("view/geometry").toByteArray());

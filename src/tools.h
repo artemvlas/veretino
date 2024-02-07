@@ -16,14 +16,25 @@
 struct Settings {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
     FilterRule filter;
+    QStringList recentFiles;
     QString dbPrefix = "checksums";
     bool restoreLastPathOnStartup = false;
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;
     bool saveVerificationDateTime = true;
+
     QString databaseFileExtension() const
     {
         return isLongExtension ? ".ver.json" : ".ver";
+    }
+
+    void addRecentFile(const QString &filePath)
+    {
+        if (!recentFiles.contains(filePath))
+            recentFiles.prepend(filePath);
+
+        if (recentFiles.size() > 10)
+            recentFiles.removeLast();
     }
 };
 

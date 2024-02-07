@@ -55,6 +55,7 @@ public:
     void checkFileChecksum(const QString &checkSum);
 
     void showFileSystem();
+    void updateMenuOpenRecent();
     QMenu* menuAlgorithm(); // QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
 
     // Actions --->>
@@ -65,6 +66,9 @@ public:
     QAction *actionShowFilesystem = new QAction("Show file system", this);
 
     QList<QAction*> menuFileActions {actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenSettingsDialog};
+
+    QMenu *menuOpenRecent = new QMenu("Open Recent");
+    QAction *actionClearRecent = new QAction("Clear");
 
     // File system View    
     QAction *actionToHome = new QAction("to Home", this);

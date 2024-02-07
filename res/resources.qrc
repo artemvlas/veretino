@@ -54,5 +54,9 @@
         <file>icons/filestatus/removed.svg</file>
         <file>icons/filestatus/unknown.svg</file>
         <file>icons/filestatus/updated.svg</file>
+        <file>icons/dark/clear-history.svg</file>
+        <file>icons/light/clear-history.svg</file>
+        <file>icons/dark/clock.svg</file>
+        <file>icons/light/clock.svg</file>
     </qresource>
 </RCC>
