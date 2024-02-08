@@ -1,17 +1,22 @@
-# Veretino — folder data audit and verification
+# Veretino: folder data audit and verification
 ### The app allows to verify folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
+* Folder/filelist audit: analysis and verification of folder contents, looking for folder-wide data changes.
 * Multiple checksums calculator.
-* Analysis and verification of folder contents.
-* Calculation a list of checksums for all files in the specified folder and store it in a local database. Verification the integrity of all files in a certain folder by comparing their checksums with those calculated and stored earlier in the database. This can also be done with only selected file types by applying filters.
-* Calculation a checksum of the specified file and store it in a summary (*.sha1/256/512). Verification the integrity of the file against a previously saved summary (or checksum from the clipboard).
 * Finding damaged files in a folder.
-* Looking for new or missing files in the folder by comparing the current contents with the previously saved list.
+* Checksums calculation, store and verification for individual files.
 * Comparing files by checksum.
-* Analysis of folder contents by file types, their number and size. Finding the largest and most numerous file types, which is convenient when creating a database with a specific filter.
 
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
+
+### How it works:
+* To begin with, the program calculates a list of checksums for all files (or for certain types of files) in the specified folder and saves it in the local database.
+* Once the list is ready, you can check the integrity of the data in this folder by comparing their checksums with those calculated and saved earlier. This can also be done only with selected file types by applying filters.
+* Also, the saved list (a database of folder contents) makes it possible to find new or missing files in a folder by comparing the current contents with a previously saved list.
+* The program allows to analyze the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
+* And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
+
 <p align="center">
   <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
   <br><img src="screenshots/veretino_mainview.png">
