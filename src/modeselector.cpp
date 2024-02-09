@@ -579,7 +579,7 @@ void ModeSelector::updateMenuOpenRecent()
         if (QFileInfo::exists(recentFilePath)) {
             QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
             act->setToolTip(recentFilePath);
-            connect(act, &QAction::triggered, this, [=]{emit parseJsonFile(recentFilePath);});
+            connect(act, &QAction::triggered, this, [=]{emit cancelProcess(); emit parseJsonFile(recentFilePath);});
         }
     }
 
