@@ -327,6 +327,15 @@ void ModeSelector::copyDataToClipboard(Column column)
     }
 }
 
+//void ModeSelector::openJsonDatabase()
+//{}
+
+void ModeSelector::openJsonDatabase(const QString &filePath)
+{
+    if (processAbortPrompt())
+        emit parseJsonFile(filePath);
+}
+
 void ModeSelector::processFolderChecksums()
 {
     processFolderChecksums(settings_->filter);
@@ -579,7 +588,7 @@ void ModeSelector::updateMenuOpenRecent()
         if (QFileInfo::exists(recentFilePath)) {
             QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
             act->setToolTip(recentFilePath);
-            connect(act, &QAction::triggered, this, [=]{emit cancelProcess(); emit parseJsonFile(recentFilePath);});
+            connect(act, &QAction::triggered, this, [=]{openJsonDatabase(recentFilePath);});
         }
     }
 
@@ -613,4 +622,19 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
 {
     if (!isProcessing() && (isCurrentMode(File) || isCurrentMode(Folder)))
         menuAlgorithm()->exec(button_->mapToGlobal(point));
+}
+
+bool ModeSelector::processAbortPrompt()
+{
+    if (!isProcessing())
+        return true;
+
+    int ret = QMessageBox::question(view_, "Processing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No);
+
+    if (ret == QMessageBox::Yes) {
+        emit cancelProcess();
+        return true;
+    }
+    else
+        return false;
 }
