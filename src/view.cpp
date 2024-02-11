@@ -44,15 +44,16 @@ void View::setFileSystemModel()
 
     setModel(fileSystem);
 
-    emit modelChanged(FileSystem);
-
     data_ = nullptr;
 
-    //showAllColumns();
-    if (!headerStateFs.isEmpty())
-        header()->restoreState(headerStateFs);
-    else
+    emit modelChanged(FileSystem);
+
+    if (headerStateFs.isEmpty()) {
+        showAllColumns();
         setDefaultColumnsWidth();
+    }
+    else
+        header()->restoreState(headerStateFs);
 
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 }
