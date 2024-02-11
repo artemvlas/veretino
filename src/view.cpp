@@ -112,7 +112,7 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
         curPathFileSystem = fileSystem->filePath(curIndex);
         emit pathChanged(curPathFileSystem);
     }
-    else if (isCurrentViewModel(ModelSource) || isCurrentViewModel(ModelProxy)) {
+    else if (isViewDatabase()) {
         if (isCurrentViewModel(ModelSource)) {
             curIndexSource = curIndex;
             curIndexProxy = data_->proxyModel_->mapFromSource(curIndexSource);
@@ -145,7 +145,7 @@ void View::setIndexByPath(const QString &path)
         else if (!path.isEmpty())
             emit showMessage(QString("Wrong path: %1").arg(path), "Error");
     }
-    else if (data_) {
+    else if (isViewDatabase()) {
         QModelIndex index = TreeModel::getIndex(path, model());
 
         if (!index.isValid())
