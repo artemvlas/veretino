@@ -260,10 +260,8 @@ void MainWindow::dialogOpenFolder()
     QString path = QFileDialog::getExistingDirectory(this, "Open folder", QDir::homePath());
 
     if (!path.isEmpty() && modeSelect->processAbortPrompt()) {
-        if (!ui->treeView->isViewFileSystem())
-            ui->treeView->setFileSystemModel();
-
-        ui->treeView->setIndexByPath(path);
+        ui->treeView->curPathFileSystem = path;
+        ui->treeView->setFileSystemModel();
     }
 }
 
