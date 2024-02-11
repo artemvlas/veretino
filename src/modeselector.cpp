@@ -406,7 +406,10 @@ void ModeSelector::processFolderFilteredChecksums()
 void ModeSelector::doWork()
 {
     if (isProcessing()) {
-        emit cancelProcess();
+        if (view_->data_ && !view_->data_->metaData.isImported)
+            showFileSystem();
+        else
+            emit cancelProcess();
         return;
     }
 
@@ -517,7 +520,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     // TreeModel or ProxyModel View
     else {
         if (isProcessing()) {
-            viewContextMenu->addAction(actionCancel);
+            if (view_->data_->metaData.isImported)
+                viewContextMenu->addAction(actionCancel);
             viewContextMenu->addAction(actionCancelBackToFS);
         }
         else {

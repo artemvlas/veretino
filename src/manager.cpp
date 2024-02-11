@@ -59,7 +59,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     calculateChecksums();
 
     if (canceled) {
-        emit setViewData();
+        //emit setViewData();
         emit setPermanentStatus();
         return;
     }
