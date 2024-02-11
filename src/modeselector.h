@@ -46,7 +46,6 @@ public:
     void processFolderChecksums();
     void processFolderChecksums(const FilterRule &filter);
     void processFolderFilteredChecksums();
-    //void openJsonDatabase();
     void openJsonDatabase(const QString &filePath);
     bool processAbortPrompt(); // allow further execution (true) or cancel (false)
 

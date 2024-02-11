@@ -138,7 +138,7 @@ void ModeSelector::processing(bool isProcessing)
         setMode();
 
         // when the process is completed, return to the Proxy Model view
-        if (!isProcessing && view_->currentViewModel() == ModelView::ModelSource) {
+        if (!isProcessing && view_->isCurrentViewModel(ModelView::ModelSource)) {
             view_->setTreeModel(ModelView::ModelProxy);
 
             // if there are Mismatches in the Model, filter them
@@ -172,7 +172,7 @@ void ModeSelector::setMode()
 
     if (view_->isViewFileSystem())
         selectMode(view_->curPathFileSystem);
-    else if (view_->data_)
+    else if (view_->isViewDatabase())
         selectMode(view_->data_->numbers);
     else {
         qDebug() << "ModeSelector | Insufficient data to set mode";
@@ -327,9 +327,6 @@ void ModeSelector::copyDataToClipboard(Column column)
             QGuiApplication::clipboard()->setText(strData);
     }
 }
-
-//void ModeSelector::openJsonDatabase()
-//{}
 
 void ModeSelector::openJsonDatabase(const QString &filePath)
 {
@@ -519,7 +516,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         }
     }
     // TreeModel or ProxyModel View
-    else {
+    else if (view_->isViewDatabase()) {
         if (isProcessing()) {
             if (view_->data_->metaData.isImported)
                 viewContextMenu->addAction(actionCancel);
