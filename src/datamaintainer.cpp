@@ -48,7 +48,7 @@ bool DataMaintainer::setSourceData(DataContainer *sourceData)
         updateNumbers();
     }
 
-    return sourceData; // false if sourceData = nullptr, else true
+    return sourceData; // false if sourceData == nullptr, else true
 }
 
 void DataMaintainer::clearData()

@@ -35,7 +35,7 @@ void View::connectModel()
 void View::setFileSystemModel()
 {
     if (isViewFileSystem()) {
-        setIndexByPath(fileSystem->filePath(curIndexFileSystem));
+        setIndexByPath(curPathFileSystem);
         return;
     }
 
@@ -48,7 +48,7 @@ void View::setFileSystemModel()
 
     data_ = nullptr;
 
-    showAllColumns();
+    //showAllColumns();
     if (!headerStateFs.isEmpty())
         header()->restoreState(headerStateFs);
     else
