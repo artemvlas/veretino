@@ -58,5 +58,7 @@
         <file>icons/light/clear-history.svg</file>
         <file>icons/dark/clock.svg</file>
         <file>icons/light/clock.svg</file>
+        <file>icons/dark/process-stop.svg</file>
+        <file>icons/light/process-stop.svg</file>
     </qresource>
 </RCC>
