@@ -64,7 +64,7 @@ signals:
     void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void procStatus(const QString &str);
-    void setViewData(DataContainer *data = nullptr, bool isImported = true); // isImported == true, if the data is obtained from a database file
+    void setViewData(DataContainer *data = nullptr);
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderContentsFilterCreated(const QString &folderPath, const QList<ExtNumSize> &extList);

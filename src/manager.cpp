@@ -37,6 +37,7 @@ void Manager::processFolderSha(const MetaData &metaData)
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
+    dataMaintainer->data_->metaData.isImported = false;
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, false);
@@ -47,7 +48,7 @@ void Manager::processFolderSha(const MetaData &metaData)
         return;
     }
 
-    emit setViewData(dataMaintainer->data_, false);
+    emit setViewData(dataMaintainer->data_);
 
     QString permStatus = format::algoToStr(metaData.algorithm);
     if (dataMaintainer->data_->isFilterApplied())

@@ -85,7 +85,7 @@ void View::setTreeModel(ModelView modelSel)
     setIndexByPath(curPathModel);   
 }
 
-void View::setData(DataContainer *data, bool isImported)
+void View::setData(DataContainer *data)
 {
     if (!data) {
         setFileSystemModel();
@@ -93,9 +93,9 @@ void View::setData(DataContainer *data, bool isImported)
     }
 
     data_ = data;
-    curPathFileSystem = data->metaData.databaseFilePath;
+    curPathFileSystem = data->metaData.isImported ? data->metaData.databaseFilePath : data->metaData.workDir;
 
-    if (isImported) {
+    if (data->metaData.isImported) {
         setTreeModel(ModelView::ModelProxy);
         emit showDbStatus();
     }

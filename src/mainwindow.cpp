@@ -50,8 +50,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)  // if a computing process is running, show a hint when user wants to close the app
 {
-    //modeSelect->isProcessing() && !modeSelect->processAbortPrompt() ? event->ignore()
-    //                                                                : event->accept();
     modeSelect->processAbortPrompt() ? event->accept()
                                      : event->ignore();
 }
@@ -262,9 +260,6 @@ void MainWindow::dialogOpenFolder()
     QString path = QFileDialog::getExistingDirectory(this, "Open folder", QDir::homePath());
 
     if (!path.isEmpty() && modeSelect->processAbortPrompt()) {
-        //if (modeSelect->isProcessing())
-        //    emit modeSelect->cancelProcess();
-
         if (!ui->treeView->isViewFileSystem())
             ui->treeView->setFileSystemModel();
 
@@ -278,11 +273,6 @@ void MainWindow::dialogOpenJson()
 
     if (!path.isEmpty()) {
         modeSelect->openJsonDatabase(path);
-        /*
-        if (modeSelect->isProcessing())
-            emit modeSelect->cancelProcess();
-
-        emit modeSelect->parseJsonFile(path);*/
     }
 }
 
@@ -343,14 +333,6 @@ void MainWindow::dropEvent(QDropEvent *event)
     QString path = event->mimeData()->urls().first().toLocalFile();
 
     if (QFileInfo::exists(path)) {
-        /*
-        if (modeSelect->isProcessing()) {
-            if (processAbortPrompt())
-                emit modeSelect->cancelProcess();
-            else
-                return;
-        }*/
-
         if (!modeSelect->processAbortPrompt())
             return;
 
@@ -369,13 +351,6 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape) {
-        /*
-        if (modeSelect->isProcessing()) {
-            if (processAbortPrompt())
-                emit modeSelect->cancelProcess();
-        }
-        else if (!ui->treeView->isViewFileSystem())
-            ui->treeView->setFileSystemModel();*/
         if (modeSelect->processAbortPrompt() && !ui->treeView->isViewFileSystem())
             ui->treeView->setFileSystemModel();
     }
