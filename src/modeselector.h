@@ -46,8 +46,10 @@ public:
     void processFolderChecksums();
     void processFolderChecksums(const FilterRule &filter);
     void processFolderFilteredChecksums();
+    void openFsPath(const QString &path);
     void openJsonDatabase(const QString &filePath);
-    bool processAbortPrompt(); // allow further execution (true) or cancel (false)
+    bool processAbortPrompt(const bool sendCancelation = true); // abort process if any and allow further execution (true)
+                                                                // or do not abort the process, cancel execution (false)
 
     //---->>>
     void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);

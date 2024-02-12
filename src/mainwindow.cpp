@@ -259,9 +259,8 @@ void MainWindow::dialogOpenFolder()
 {
     QString path = QFileDialog::getExistingDirectory(this, "Open folder", QDir::homePath());
 
-    if (!path.isEmpty() && modeSelect->processAbortPrompt()) {
-        ui->treeView->curPathFileSystem = path;
-        ui->treeView->setFileSystemModel();
+    if (!path.isEmpty()) {
+        modeSelect->openFsPath(path);
     }
 }
 
@@ -331,17 +330,11 @@ void MainWindow::dropEvent(QDropEvent *event)
     QString path = event->mimeData()->urls().first().toLocalFile();
 
     if (QFileInfo::exists(path)) {
-        if (!modeSelect->processAbortPrompt())
-            return;
-
         if (tools::isDatabaseFile(path)) {
-            emit modeSelect->parseJsonFile(path);
+            modeSelect->openJsonDatabase(path);
         }
         else {
-            if (!ui->treeView->isViewFileSystem())
-                ui->treeView->setFileSystemModel();
-
-            ui->treeView->setIndexByPath(path);
+            modeSelect->openFsPath(path);
         }
     }
 }
