@@ -460,13 +460,14 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     QString text;
 
     if (TreeModel::isFileRow(curIndex)) {
-        QString result;
-        QVariant itemData = TreeModel::siblingAtRow(curIndex, Column::ColumnSize).data(TreeModel::RawDataRole);
-        if (itemData.isValid()) {
-            result = QString("%1 (%2)").arg(TreeModel::siblingAtRow(curIndex, Column::ColumnPath).data().toString(),
-                                                                    format::dataSizeReadable(itemData.toLongLong()));
-        }
-        return result;
+        QString itemFileNameStr = TreeModel::siblingAtRow(curIndex, Column::ColumnPath).data().toString();
+        QString itemFileStatusStr = format::fileItemStatus(TreeModel::siblingAtRow(curIndex, Column::ColumnStatus)
+                                                                  .data(TreeModel::RawDataRole).value<FileStatus>());
+        QVariant itemFileSize = TreeModel::siblingAtRow(curIndex, Column::ColumnSize).data(TreeModel::RawDataRole);
+        QString itemFileSizeStr = itemFileSize.isValid() ? QString("%1, ").arg(format::dataSizeReadable(itemFileSize.toLongLong()))
+                                                         : QString();
+
+        return QString("%1 (%2%3)").arg(itemFileNameStr, itemFileSizeStr, itemFileStatusStr);
     }
     // if curIndex is at folder row
     else if (curIndex.isValid()) {
