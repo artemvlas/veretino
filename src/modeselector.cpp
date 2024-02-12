@@ -311,10 +311,14 @@ void ModeSelector::checkFileChecksum(const QString &checkSum)
 
 void ModeSelector::showFileSystem()
 {
-    if (isProcessing())
+    // without abort prompt
+    /*if (isProcessing())
         emit cancelProcess();
 
-    view_->setFileSystemModel();
+    view_->setFileSystemModel();*/
+
+    // with abort prompt
+    openFsPath(QString());
 }
 
 void ModeSelector::copyDataToClipboard(Column column)
@@ -334,9 +338,12 @@ void ModeSelector::openFsPath(const QString &path)
     // the busy state of another [Manager] thread as a timer
     // (to defer data cleanup and prevent segmentation faults)
 
-    if (QFileInfo::exists(path) && processAbortPrompt(false)) {
-        view_->curPathFileSystem = path;
+    if (processAbortPrompt(false)) {
+        if (QFileInfo::exists(path))
+            view_->curPathFileSystem = path;
+
         view_->setFileSystemModel();
+
         if (isProcessing())
             emit cancelProcess();
     }
