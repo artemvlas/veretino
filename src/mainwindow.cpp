@@ -21,6 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadSettings();
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
+
+    statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+    statusTextLabel->setContentsMargins(5, 0, 0, 0);
+    ui->statusbar->addWidget(statusTextLabel, 1);
     ui->statusbar->addPermanentWidget(permanentStatus);
 
     connections();
@@ -114,7 +118,8 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
 
     // info and notifications
-    connect(manager, SIGNAL(setStatusbarText(QString)), ui->statusbar, SLOT(showMessage(QString)));
+    //connect(manager, SIGNAL(setStatusbarText(QString)), ui->statusbar, SLOT(showMessage(QString)));
+    connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
     connect(manager, &Manager::setPermanentStatus, permanentStatus, &QLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});

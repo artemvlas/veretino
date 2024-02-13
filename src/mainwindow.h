@@ -55,7 +55,8 @@ private:
     Settings *settings_ = new Settings; // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
-    ClickableLabel *permanentStatus = new ClickableLabel(this);
+    ClickableLabel *statusTextLabel = new ClickableLabel;
+    ClickableLabel *permanentStatus = new ClickableLabel;
     ModeSelector *modeSelect = nullptr;
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
