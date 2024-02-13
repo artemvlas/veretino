@@ -118,7 +118,6 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
 
     // info and notifications
-    //connect(manager, SIGNAL(setStatusbarText(QString)), ui->statusbar, SLOT(showMessage(QString)));
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
     connect(manager, &Manager::setPermanentStatus, permanentStatus, &QLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
