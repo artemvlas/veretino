@@ -202,8 +202,8 @@ void MainWindow::loadSettings()
     // FilterRule
     settings_->filter.setFilter(static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()),
                                 storedSettings.value("filter/filterExtensionsList").toStringList());
-    settings_->filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", true).toBool();
-    settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", true).toBool();
+    settings_->filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", defaults.filter.ignoreDbFiles).toBool();
+    settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", defaults.filter.ignoreShaFiles).toBool();
 
     // recent files
     settings_->recentFiles = storedSettings.value("history/recentDbFiles").toStringList();
