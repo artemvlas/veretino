@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusTextLabel->setContentsMargins(5, 0, 0, 0);
+    permanentStatus->setContentsMargins(20, 0, 0, 0);
     ui->statusbar->addWidget(statusTextLabel, 1);
     ui->statusbar->addPermanentWidget(permanentStatus);
 

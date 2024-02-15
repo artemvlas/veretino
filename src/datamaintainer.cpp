@@ -165,7 +165,7 @@ void DataMaintainer::updateNumbers()
     if (data_->numbers.numberOf(FileStatus::Mismatched) > 0 || data_->numbers.numberOf(FileStatus::Matched) > 0)
         sep = " : ";
 
-    QString checkStatus = QString("\t%1%2%3%4").arg(newmissing, mismatched, matched, sep);
+    QString checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
 
     emit setPermanentStatus(QString("%1%2 avail. | %3 | %4")
                             .arg(checkStatus)
