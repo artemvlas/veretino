@@ -18,10 +18,10 @@ struct Settings {
     FilterRule filter;
     QStringList recentFiles;
     QString dbPrefix = "checksums";
-    bool restoreLastPathOnStartup = false;
+    bool restoreLastPathOnStartup = true;
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;
-    bool saveVerificationDateTime = true;
+    bool saveVerificationDateTime = false;
 
     QString databaseFileExtension() const
     {

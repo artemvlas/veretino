@@ -189,13 +189,14 @@ void MainWindow::loadSettings()
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
     ui->treeView->curPathFileSystem = storedSettings.value("history/lastFsPath").toString();
-    settings_->restoreLastPathOnStartup = !ui->treeView->curPathFileSystem.isEmpty();
 
-    settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", QCryptographicHash::Sha256).toInt());
-    settings_->dbPrefix = storedSettings.value("dbPrefix", "checksums").toString();
-    settings_->addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", true).toBool();
-    settings_->isLongExtension = storedSettings.value("isLongExtension", true).toBool();
-    settings_->saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", true).toBool();
+    Settings defaults;
+    settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm).toInt());
+    settings_->dbPrefix = storedSettings.value("dbPrefix", defaults.dbPrefix).toString();
+    settings_->restoreLastPathOnStartup = storedSettings.value("restoreLastPathOnStartup", defaults.restoreLastPathOnStartup).toBool();
+    settings_->addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", defaults.addWorkDirToFilename).toBool();
+    settings_->isLongExtension = storedSettings.value("isLongExtension", defaults.isLongExtension).toBool();
+    settings_->saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", defaults.saveVerificationDateTime).toBool();
 
     // FilterRule
     settings_->filter.setFilter(static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()),

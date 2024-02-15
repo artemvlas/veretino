@@ -54,7 +54,7 @@
 Unchecked: to Home folder</string>
      </property>
      <property name="text">
-      <string>On startup go to last path</string>
+      <string>Open last path on startup</string>
      </property>
     </widget>
    </item>
@@ -140,7 +140,7 @@ Unchecked: to Home folder</string>
        <item row="4" column="0">
         <widget class="QCheckBox" name="cbSaveVerificationDateTime">
          <property name="text">
-          <string>Save the verification datetime</string>
+          <string>Save the verification date</string>
          </property>
          <property name="checked">
           <bool>false</bool>
