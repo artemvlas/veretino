@@ -161,6 +161,7 @@ void MainWindow::saveSettings()
 
     storedSettings.setValue("algorithm", settings_->algorithm);
     storedSettings.setValue("dbPrefix", settings_->dbPrefix);
+    storedSettings.setValue("restoreLastPathOnStartup", settings_->restoreLastPathOnStartup);
     storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
     storedSettings.setValue("isLongExtension", settings_->isLongExtension);
     storedSettings.setValue("saveVerificationDateTime", settings_->saveVerificationDateTime);
