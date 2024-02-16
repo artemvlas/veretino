@@ -16,7 +16,7 @@ public:
     explicit ClickableLabel(const QString &text, QWidget *parent = nullptr);
 
 protected:
-    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 signals:

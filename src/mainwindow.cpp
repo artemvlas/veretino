@@ -82,7 +82,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
-    connect(permanentStatus, &ClickableLabel::doubleClicked, this, &MainWindow::handlePermanentStatusClick);
+    connect(permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
     connect(modeSelect->actionOpenSettingsDialog, &QAction::triggered, this, &MainWindow::dialogSettings);

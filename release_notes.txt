@@ -5,7 +5,8 @@ Veretino 0.3.4
     added icons to the Settings and Database Status window tabs, as well as to some other elements,
     the status bar text no longer disappears when the pointer moves to the menu,
     it is now possible to hide any columns except the first one,
-    now the status bar displays the presence of a global filter if any
+    now the status bar displays the presence of a global filter if any,
+    permanent status now triggers a Database Status or Settings dialog on a single click
 
 Veretino 0.3.3
 * Settings and layout are now saved between sessions.
