@@ -36,6 +36,7 @@ public:
 public slots:
     void showMessage(const QString &message, const QString &title = "Info");
     void setProgressBar(bool processing, bool visible);
+    void updatePermanentStatus();
     void handlePathEdit();
     void showDbStatus();
     void showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
@@ -50,6 +51,7 @@ private:
     bool argumentInput(); // using the path argument if it's provided
     void saveSettings();
     void loadSettings();
+    QString getDatabaseStatusSummary();
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings; // current app settings

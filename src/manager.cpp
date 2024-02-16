@@ -23,7 +23,6 @@ Manager::Manager(Settings *settings, QObject *parent)
     connect(dataMaintainer, &DataMaintainer::processing, this, &Manager::processing);
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
-    connect(dataMaintainer, &DataMaintainer::setPermanentStatus, this, &Manager::setPermanentStatus);
 }
 
 void Manager::processFolderSha(const MetaData &metaData)
@@ -50,22 +49,13 @@ void Manager::processFolderSha(const MetaData &metaData)
 
     emit setViewData(dataMaintainer->data_);
 
-    QString permStatus = format::algoToStr(metaData.algorithm);
-    if (dataMaintainer->data_->isFilterApplied())
-        permStatus.prepend("filters applied | ");
-
-    emit setPermanentStatus(permStatus);
-
     // calculating checksums
     calculateChecksums();
 
-    if (canceled) {
-        emit setPermanentStatus();
-        return;
+    if (!canceled) {
+        // saving to json
+        dataMaintainer->exportToJson();
     }
-
-    // saving to json
-    dataMaintainer->exportToJson();
 }
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
@@ -530,6 +520,5 @@ void Manager::modelChanged(ModelView modelView)
 
     if (isViewFileSysytem) {
         dataMaintainer->clearData(); // if the View is switched to the filesystem, then main data is no longer needed
-        emit setPermanentStatus();
     }
 }

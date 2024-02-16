@@ -141,36 +141,11 @@ void DataMaintainer::updateNumbers()
         return;
     }
 
-    emit setPermanentStatus("updating...");
     data_->numbers = updateNumbers(data_->model_);
+    emit numbersUpdated();
 
     if (data_->contains({FileStatus::Mismatched, FileStatus::Missing}))
         data_->metaData.successfulCheckDateTime.clear();
-
-    QString newmissing;
-    QString mismatched;
-    QString matched;
-    QString sep;
-
-    if (data_->numbers.numberOf(FileStatus::New) > 0 || data_->numbers.numberOf(FileStatus::Missing) > 0)
-        newmissing = "* ";
-
-    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0)
-        mismatched = QString("☒%1").arg(data_->numbers.numberOf(FileStatus::Mismatched));
-    if (data_->numbers.numberOf(FileStatus::Matched) > 0)
-        matched = QString(" ✓%1").arg(data_->numbers.numberOf(FileStatus::Matched)
-                                      + data_->numbers.numberOf(FileStatus::Added)
-                                      + data_->numbers.numberOf(FileStatus::ChecksumUpdated));
-
-    if (data_->numbers.numberOf(FileStatus::Mismatched) > 0 || data_->numbers.numberOf(FileStatus::Matched) > 0)
-        sep = " : ";
-
-    QString checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
-
-    emit setPermanentStatus(QString("%1%2 avail. | %3 | %4")
-                            .arg(checkStatus)
-                            .arg(data_->numbers.available())
-                            .arg(format::dataSizeReadable(data_->numbers.totalSize), format::algoToStr(data_->metaData.algorithm)));
 }
 
 Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)

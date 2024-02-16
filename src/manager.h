@@ -61,7 +61,6 @@ signals:
     void processing(bool isProcessing, bool visibleProgress = false);
     void cancelProcess();
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
-    void setPermanentStatus(const QString &text = QString());
     void donePercents(int done);
     void procStatus(const QString &str);
     void setViewData(DataContainer *data = nullptr);

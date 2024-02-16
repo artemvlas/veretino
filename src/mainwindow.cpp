@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->menuFile->addActions(modeSelect->menuFileActions);
     ui->menuFile->insertSeparator(modeSelect->actionOpenSettingsDialog);
     ui->menuFile->insertMenu(modeSelect->actionShowFilesystem, modeSelect->menuOpenRecent);
+
+    updatePermanentStatus();
 }
 
 MainWindow::~MainWindow()
@@ -75,6 +77,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
                                                         modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem);});
+    connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
@@ -120,7 +123,6 @@ void MainWindow::connectManager()
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
-    connect(manager, &Manager::setPermanentStatus, permanentStatus, &QLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
@@ -135,6 +137,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, modeSelect, &ModeSelector::setMode);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
+    connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
 
     // process status
     connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);
@@ -259,6 +262,7 @@ void MainWindow::dialogSettings()
     if (dialog.exec() == QDialog::Accepted) {
         dialog.updateSettings();
         modeSelect->setMode(); // "setMode" changes the text on button
+        updatePermanentStatus();
     }
 }
 
@@ -297,6 +301,57 @@ void MainWindow::setProgressBar(bool processing, bool visible)
     ui->progressBar->setVisible(processing && visible);
     ui->progressBar->setValue(0);
     ui->progressBar->resetFormat();
+}
+
+void MainWindow::updatePermanentStatus()
+{
+    if (ui->treeView->isViewDatabase()) {
+        if (modeSelect->isProcessing() && !ui->treeView->data_->metaData.isImported) {
+            QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
+            if (ui->treeView->data_->isFilterApplied())
+                permStatus.prepend("filters applied | ");
+            permanentStatus->setText(permStatus);
+        }
+        else
+            permanentStatus->setText(getDatabaseStatusSummary());
+    }
+    else if (ui->treeView->isViewFileSystem()) {
+        settings_->filter.extensionsList.isEmpty() ? permanentStatus->clear() : permanentStatus->setText("filters applied");
+    }
+    else
+        permanentStatus->clear();
+}
+
+QString MainWindow::getDatabaseStatusSummary()
+{
+    if (!ui->treeView->data_)
+        return QString();
+
+    const Numbers &numbers = ui->treeView->data_->numbers;
+    QString newmissing;
+    QString mismatched;
+    QString matched;
+    QString sep;
+
+    if (numbers.numberOf(FileStatus::New) > 0 || numbers.numberOf(FileStatus::Missing) > 0)
+        newmissing = "* ";
+
+    if (numbers.numberOf(FileStatus::Mismatched) > 0)
+        mismatched = QString("☒%1").arg(numbers.numberOf(FileStatus::Mismatched));
+    if (numbers.numberOf(FileStatus::Matched) > 0)
+        matched = QString(" ✓%1").arg(numbers.numberOf(FileStatus::Matched)
+                                      + numbers.numberOf(FileStatus::Added)
+                                      + numbers.numberOf(FileStatus::ChecksumUpdated));
+
+    if (numbers.numberOf(FileStatus::Mismatched) > 0 || numbers.numberOf(FileStatus::Matched) > 0)
+        sep = " : ";
+
+    QString checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
+
+    return QString("%1%2 avail. | %3 | %4")
+                    .arg(checkStatus)
+                    .arg(numbers.available())
+                    .arg(format::dataSizeReadable(numbers.totalSize), format::algoToStr(ui->treeView->data_->metaData.algorithm));
 }
 
 void MainWindow::handlePathEdit()
