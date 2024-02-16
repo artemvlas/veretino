@@ -52,6 +52,7 @@ private:
     void saveSettings();
     void loadSettings();
     QString getDatabaseStatusSummary();
+    void handlePermanentStatusClick();
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings; // current app settings

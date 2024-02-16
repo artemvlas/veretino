@@ -82,7 +82,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
-    connect(permanentStatus, &ClickableLabel::doubleClicked, this, &MainWindow::showDbStatus);
+    connect(permanentStatus, &ClickableLabel::doubleClicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
     connect(modeSelect->actionOpenSettingsDialog, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -316,7 +316,9 @@ void MainWindow::updatePermanentStatus()
             permanentStatus->setText(getDatabaseStatusSummary());
     }
     else if (ui->treeView->isViewFileSystem()) {
-        settings_->filter.extensionsList.isEmpty() ? permanentStatus->clear() : permanentStatus->setText("filters applied");
+        settings_->filter.extensionsList.isEmpty() ? permanentStatus->clear()
+                                                   : permanentStatus->setPixmap(QIcon(QString(":/icons/%1/filter.svg")
+                                                                  .arg(tools::themeFolder(palette()))).pixmap(16, 16));
     }
     else
         permanentStatus->clear();
@@ -352,6 +354,14 @@ QString MainWindow::getDatabaseStatusSummary()
                     .arg(checkStatus)
                     .arg(numbers.available())
                     .arg(format::dataSizeReadable(numbers.totalSize), format::algoToStr(ui->treeView->data_->metaData.algorithm));
+}
+
+void MainWindow::handlePermanentStatusClick()
+{
+    if (ui->treeView->isViewFileSystem() && !settings_->filter.extensionsList.isEmpty())
+        dialogSettings();
+    else if (ui->treeView->isViewDatabase())
+        showDbStatus();
 }
 
 void MainWindow::handlePathEdit()
