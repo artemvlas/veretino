@@ -236,8 +236,10 @@ void MainWindow::showFolderContentsDialog(const QString &folderName, const QList
         FolderContentsDialog dialog(folderName, extList, this);
         if (dialog.exec() == QDialog::Accepted) {
             FilterRule filter = dialog.resultFilter();
-            if (!filter.isFilter(FilterRule::NotSet))
+            if (!filter.isFilter(FilterRule::NotSet)) {
                 settings_->filter = filter;
+                updatePermanentStatus();
+            }
         }
     }
 }
