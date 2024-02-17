@@ -144,7 +144,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
                                        : iconProvider.icon(QFileIconProvider::Folder);
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
-            return format::fileItemStatusIcon(static_cast<FileStatus>(curIndex.data(RawDataRole).toInt()));
+            return format::fileItemStatusIcon(curIndex.data(RawDataRole).value<FileStatus>());
         }
     }
 
@@ -264,4 +264,9 @@ bool TreeModel::isFileRow(const QModelIndex &curIndex)
 bool TreeModel::isChecksumStored(const QModelIndex &curIndex)
 {
     return siblingAtRow(curIndex, ColumnChecksum).data().isValid();
+}
+
+FileStatus TreeModel::itemFileStatus(const QModelIndex &curIndex)
+{
+    return siblingAtRow(curIndex, ColumnStatus).data(RawDataRole).value<FileStatus>();
 }

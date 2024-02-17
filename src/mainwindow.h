@@ -53,11 +53,13 @@ private:
     void loadSettings();
     QString getDatabaseStatusSummary();
     void handlePermanentStatusClick();
+    void updateStatusIcon();
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings; // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
+    ClickableLabel *statusIconLabel = new ClickableLabel;
     ClickableLabel *statusTextLabel = new ClickableLabel;
     ClickableLabel *permanentStatus = new ClickableLabel;
     ModeSelector *modeSelect = nullptr;

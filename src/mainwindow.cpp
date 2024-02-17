@@ -23,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
 
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
-    statusTextLabel->setContentsMargins(5, 0, 0, 0);
+    statusIconLabel->setContentsMargins(5, 0, 0, 0);
     permanentStatus->setContentsMargins(20, 0, 0, 0);
+    ui->statusbar->addWidget(statusIconLabel);
     ui->statusbar->addWidget(statusTextLabel, 1);
     ui->statusbar->addPermanentWidget(permanentStatus);
 
@@ -123,6 +124,7 @@ void MainWindow::connectManager()
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
+    connect(manager, &Manager::setStatusbarText, this, &MainWindow::updateStatusIcon);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
@@ -301,6 +303,25 @@ void MainWindow::setProgressBar(bool processing, bool visible)
     ui->progressBar->setVisible(processing && visible);
     ui->progressBar->setValue(0);
     ui->progressBar->resetFormat();
+}
+
+void MainWindow::updateStatusIcon()
+{
+    QIcon statusIcon;
+    if (modeSelect->isProcessing()) {
+        statusIcon = QIcon(":/icons/filestatus/processing.svg");
+    }
+    else if (ui->treeView->isViewFileSystem()) {
+        statusIcon = QFileIconProvider().icon(QFileInfo(ui->treeView->curPathFileSystem));
+    }
+    else if (ui->treeView->isViewDatabase()) {
+        if (TreeModel::isFileRow(ui->treeView->curIndexSource))
+            statusIcon = format::fileItemStatusIcon(TreeModel::itemFileStatus(ui->treeView->curIndexSource));
+        else
+            statusIcon = QFileIconProvider().icon(QFileIconProvider::Folder);
+    }
+
+    statusIconLabel->setPixmap(statusIcon.pixmap(16, 16));
 }
 
 void MainWindow::updatePermanentStatus()

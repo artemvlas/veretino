@@ -2,7 +2,7 @@ Veretino 0.3.4
 * UI improvements:
     added "Open Recent" menu,
     added a process abort prompt if a transition to other actions (or another DB) is requested,
-    added icons to the Settings and Database Status window tabs, as well as to some other elements,
+    added icons to some interface elements,
     the status bar text no longer disappears when the pointer moves to the menu,
     it is now possible to hide any columns except the first one,
     now the status bar displays the presence of a global filter if any,
