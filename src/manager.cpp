@@ -60,7 +60,6 @@ void Manager::processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
 {
-    emit setStatusbarText(QString("Calculating %1 checksum: %2").arg(format::algoToStr(algo), format::fileNameAndSize(filePath)));
     QString sum = calculateChecksum(filePath, algo);
     if (sum.isEmpty())
         return;
@@ -185,7 +184,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
 
         QString sum = calculateChecksum(paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex)),
-                                        dataMaintainer->data_->metaData.algorithm);
+                                        dataMaintainer->data_->metaData.algorithm, true, true);
 
         if (sum.isEmpty()) {
             dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
@@ -290,14 +289,13 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    emit setStatusbarText(QString("Verifying %1 checksum: %2").arg(format::algoToStr(algo), format::fileNameAndSize(filePath)));
-    QString sum = calculateChecksum(filePath, algo);
+    QString sum = calculateChecksum(filePath, algo, true, true);
 
     if (!sum.isEmpty())
         showFileCheckResultMessage(sum == checkSum.toLower(), paths::basicName(filePath));
 }
 
-QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess)
+QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess, bool isVerification)
 {
     ProcState state(QFileInfo(filePath).size());
     ShaCalculator shaCalc(algo);
@@ -308,6 +306,10 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
     emit processing(true, true);
+    emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
+                                                    format::algoToStr(algo),
+                                                    format::fileNameAndSize(filePath)));
+
     QString checkSum = shaCalc.calculate(filePath, algo);
 
     if (!checkSum.isEmpty())
