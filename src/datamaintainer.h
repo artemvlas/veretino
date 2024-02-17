@@ -37,9 +37,6 @@ public:
     qint64 totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex& rootIndex = QModelIndex());
     qint64 totalSizeOfListedFiles(const QSet<FileStatus>& fileStatuses = QSet<FileStatus>(),
                                   const QModelIndex& rootIndex = QModelIndex());
-    static qint64 totalSizeOfListedFiles(const QAbstractItemModel* model,
-                                         const QSet<FileStatus>& fileStatuses = QSet<FileStatus>(),
-                                         const QModelIndex& rootIndex = QModelIndex());
 
     bool updateChecksum(QModelIndex fileRowIndex,
                         const QString &computedChecksum); // returns 'true' if Added or Matched. returns false if Mismatched

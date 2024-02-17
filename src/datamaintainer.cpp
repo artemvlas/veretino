@@ -173,19 +173,12 @@ Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QMo
         }
     }
 
-    //qDebug() << "DataMaintainer::updateNumbers |" << num.holder;
-
     return num;
 }
 
 qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex &rootIndex)
 {
-    if (!data_) {
-        qDebug() << "DataMaintainer::totalSizeOfListedFiles | NO data_";
-        return 0;
-    }
-
-    return totalSizeOfListedFiles(data_->model_, {fileStatus}, rootIndex);
+    return totalSizeOfListedFiles(QSet<FileStatus>({fileStatus}), rootIndex);
 }
 
 qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatuses, const QModelIndex &rootIndex)
@@ -195,13 +188,8 @@ qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatus
         return 0;
     }
 
-    return totalSizeOfListedFiles(data_->model_, fileStatuses, rootIndex);
-}
-
-qint64 DataMaintainer::totalSizeOfListedFiles(const QAbstractItemModel *model, const QSet<FileStatus> &fileStatuses, const QModelIndex &rootIndex)
-{
     qint64 result = 0;
-    TreeModelIterator it(model, rootIndex);
+    TreeModelIterator it(data_->model_, rootIndex);
 
     while (it.hasNext()) {
         QVariant itData = it.nextFile().data(Column::ColumnStatus);
@@ -445,7 +433,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     // if curIndex is at folder row
     else if (curIndex.isValid()) {
         Numbers num = updateNumbers(curIndex.model(), curIndex);
-        qint64 newFilesDataSize = totalSizeOfListedFiles(QSet<FileStatus>({FileStatus::New}), curIndex);
+        qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
 
         if (num.available() > 0) {
             text = QString("Avail.: %1")
