@@ -76,7 +76,7 @@ public:
 
     // File system View    
     QAction *actionToHome = new QAction("to Home", this);
-    QAction *actionCancel = new QAction("Cancel operation", this);
+    QAction *actionCancel = new QAction("Cancel", this);
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);
     QAction *actionProcessContainedChecksums = new QAction("Calculate checksums of Contained files", this);
     QAction *actionProcessFilteredChecksums = new QAction("Calculate checksums of Filtered files", this);
