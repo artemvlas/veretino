@@ -29,6 +29,8 @@ private:
     QModelIndex index_;
     QModelIndex rootIndex_;
     QModelIndex nextIndex_;
+
+    bool endReached = false;
 };
 
 #endif // TREEMODELITERATOR_H

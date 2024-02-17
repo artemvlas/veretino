@@ -83,7 +83,7 @@ void View::setTreeModel(ModelView modelSel)
     data_->numbers.numberOf(FileStatus::Mismatched) == 0 ? hideColumn(Column::ColumnReChecksum)
                                                          : showAllColumns();
 
-    setIndexByPath(curPathModel);   
+    setIndexByPath(curPathModel);
 }
 
 void View::setData(DataContainer *data)
