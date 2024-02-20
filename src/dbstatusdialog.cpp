@@ -42,12 +42,12 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
 
     // tab Content
     ui->labelContentNumbers->setText(infoContent(data).join("\n"));
-    ui->tabWidget->setTabIcon(TabContent, QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
+    ui->tabWidget->setTabIcon(TabListed, QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
 
     // tab Filter
-    ui->tabWidget->setTabEnabled(TabFilters, data->isFilterApplied());
+    ui->tabWidget->setTabEnabled(TabFilter, data->isFilterApplied());
     if (data->isFilterApplied()) {
-        ui->tabWidget->setTabIcon(TabFilters, QIcon(QString(":/icons/%1/filter.svg").arg(themeFolder)));
+        ui->tabWidget->setTabIcon(TabFilter, QIcon(QString(":/icons/%1/filter.svg").arg(themeFolder)));
 
         QString extensions = data->metaData.filter.extensionsList.join(", ");
         data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included Only:\n%1").arg(extensions))
@@ -70,7 +70,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 
     // selecting the tab to open
-    Tabs curTab = TabContent;
+    Tabs curTab = TabListed;
     if (ui->tabWidget->isTabEnabled(TabChanges))
         curTab = TabChanges;
     else if (ui->tabWidget->isTabEnabled(TabVerification))

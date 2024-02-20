@@ -24,7 +24,7 @@ private:
     Ui::DbStatusDialog *ui;
     const DataContainer *data_;
 
-    enum Tabs{TabContent, TabFilters, TabVerification, TabChanges};
+    enum Tabs{TabListed, TabFilter, TabVerification, TabChanges};
     QStringList infoContent(const DataContainer *data);
     QStringList infoVerification(const DataContainer *data);
     QStringList infoChanges();

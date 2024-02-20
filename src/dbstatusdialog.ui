@@ -60,9 +60,9 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tabContent">
+       <widget class="QWidget" name="tabListed">
         <attribute name="title">
-         <string>Content</string>
+         <string>Listed</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
@@ -77,9 +77,9 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tabFilters">
+       <widget class="QWidget" name="tabFilter">
         <attribute name="title">
-         <string>Filters</string>
+         <string>Filter</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
