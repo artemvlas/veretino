@@ -83,9 +83,9 @@ QVariant TreeModelIterator::data(Column column, int role)
     return model_->data(model_->sibling(index_.row(), column, index_), role);
 }
 
-QString TreeModelIterator::path()
+QString TreeModelIterator::path(const QModelIndex &root)
 {
-    return TreeModel::getPath(index_);
+    return TreeModel::getPath(index_, root);
 }
 
 FileStatus TreeModelIterator::status()

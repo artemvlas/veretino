@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include "treemodeliterator.h"
+#include "datamaintainer.h"
 #include <QDirIterator>
 
 JsonDb::JsonDb(QObject *parent)
@@ -70,31 +71,23 @@ bool JsonDb::updateSuccessfulCheckDateTime(const QString &filePath)
     return saveJsonFile(QJsonDocument(dataArray), filePath);
 }
 
-// making "checksums... .ver.json" database
-MetaData::SavingResult JsonDb::makeJson(DataContainer* data)
+QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
-    if (!data || data->model_->isEmpty()) {
-        qDebug() << "JsonDb::makeJson | no data to make json db";
-        return MetaData::NotSaved;
-    }
-
-    canceled = false;
-    emit setStatusbarText("Exporting data to json...");
-
-    bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
-
     QJsonObject header;
+    bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
+    Numbers numbers = DataMaintainer::getNumbers(data->model_, rootFolder);
+
     header["Created with"] = QString("Veretino %1 https://github.com/artemvlas/veretino").arg(APP_VERSION);
-    header["Files number"] = data->numbers.numChecksums;
-    header["Folder"] = paths::basicName(data->metaData.workDir);
+    header["Files number"] = numbers.numChecksums;
+    header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(data->metaData.workDir);
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
-    header["Total size"] = format::dataSizeReadableExt(data->numbers.totalSize);
+    header["Total size"] = format::dataSizeReadableExt(numbers.totalSize);
     header["Updated"] = data->metaData.saveDateTime;
 
-    if (!isWorkDirRelative)
+    if (!isWorkDirRelative && !rootFolder.isValid())
         header.insert(strHeaderWorkDir, data->metaData.workDir);
 
-    if (!data->metaData.successfulCheckDateTime.isEmpty())
+    if (!data->metaData.successfulCheckDateTime.isEmpty() && !rootFolder.isValid())
         header.insert("Verified", data->metaData.successfulCheckDateTime);
 
     if (data->isFilterApplied()) {
@@ -104,20 +97,35 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data)
             header[strHeaderIgnored] = data->metaData.filter.extensionsList.join(" "); // files with extensions from this list are ignored (not included in the database)
     }
 
+    return header;
+}
+
+MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &rootFolder)
+{
+    if (!data || data->model_->isEmpty()) {
+        qDebug() << "JsonDb::makeJson | no data to make json db";
+        return MetaData::NotSaved;
+    }
+
+    QJsonObject header = dbHeader(data, rootFolder);
+
+    canceled = false;
+    emit setStatusbarText("Exporting data to json...");
+
     QJsonObject storedData;   
     QJsonArray unreadableFiles;
 
-    TreeModelIterator iter(data->model_);
+    TreeModelIterator iter(data->model_, rootFolder);
 
     while (iter.hasNext() && !canceled) {
         iter.nextFile();
         if (iter.data(Column::ColumnStatus).value<FileStatus>() == FileStatus::Unreadable) {
-            unreadableFiles.append(iter.path());
+            unreadableFiles.append(iter.path(rootFolder));
         }
         else {
             QString checksum = iter.data(Column::ColumnChecksum).toString();
             if (!checksum.isEmpty())
-                storedData.insert(iter.path(), checksum);
+                storedData.insert(iter.path(rootFolder), checksum);
         }
     }
 
@@ -139,28 +147,38 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data)
     }
 
     QString pathToSave;
+    QString subFolderPath;
 
-    if (saveJsonFile(doc, data->metaData.databaseFilePath)) {
+    if (rootFolder.isValid()) {
+        subFolderPath = paths::joinPath(data->metaData.workDir, TreeModel::getPath(rootFolder));
+        QString subFolderDbFileName = QString("checksums_%1.ver.json").arg(rootFolder.data().toString());
+        pathToSave = paths::joinPath(subFolderPath, subFolderDbFileName);
+    }
+    else
+        pathToSave = data->metaData.databaseFilePath;
+
+    if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText("Saved");
         return MetaData::Saved;
     }
     else {
-        header[strHeaderWorkDir] = data->metaData.workDir;
+        header[strHeaderWorkDir] = rootFolder.isValid() ? subFolderPath : data->metaData.workDir;
         mainArray[0] = header;
         doc.setArray(mainArray);
 
         pathToSave = paths::joinPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
-                                                                             data->databaseFileName());
+                                     paths::basicName(pathToSave));
 
         if (saveJsonFile(doc, pathToSave)) {
             emit setStatusbarText("Saved to Desktop");
-            data->metaData.databaseFilePath = pathToSave;
+            if (!rootFolder.isValid())
+                data->metaData.databaseFilePath = pathToSave;
             return MetaData::SavedToDesktop;
         }
 
         else {
             emit setStatusbarText("NOT Saved");
-            emit showMessage(QString("Unable to save json file: %1").arg(data->metaData.databaseFilePath), "Error");
+            emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
             return MetaData::NotSaved;
         }
     }

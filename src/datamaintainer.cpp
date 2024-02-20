@@ -141,14 +141,14 @@ void DataMaintainer::updateNumbers()
         return;
     }
 
-    data_->numbers = updateNumbers(data_->model_);
+    data_->numbers = getNumbers(data_->model_);
     emit numbersUpdated();
 
     if (data_->contains({FileStatus::Mismatched, FileStatus::Missing}))
         data_->metaData.successfulCheckDateTime.clear();
 }
 
-Numbers DataMaintainer::updateNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
+Numbers DataMaintainer::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
 {
     Numbers num;
 
@@ -403,7 +403,7 @@ void DataMaintainer::exportToJson(bool finalProcess)
     if (!data_)
         return;
 
-    updateNumbers();
+    //updateNumbers();
     data_->makeBackup();
     data_->metaData.successfulCheckDateTime.clear();
     data_->metaData.saveDateTime = format::currentDateTime();
@@ -416,6 +416,25 @@ void DataMaintainer::exportToJson(bool finalProcess)
         emit processing(false);
 
     emit databaseUpdated();
+}
+
+void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
+{
+    if (!data_)
+        return;
+
+    if (!TreeModel::isFolderRow(rootFolder)) {
+        qDebug() << "DataMaintainer::forkJsonDb | wrong folder index";
+        return;
+    }
+
+    emit processing(true);
+
+    MetaData::SavingResult result = json->makeJson(data_, rootFolder);
+    if (result == MetaData::Saved)
+        emit showMessage("Subfolder database forked");
+
+    emit processing(false);
 }
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
@@ -432,7 +451,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (curIndex.isValid()) {
-        Numbers num = updateNumbers(curIndex.model(), curIndex);
+        Numbers num = getNumbers(curIndex.model(), curIndex);
         qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
 
         if (num.available() > 0) {

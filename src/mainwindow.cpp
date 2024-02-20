@@ -121,6 +121,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::updateMismatch, manager, &Manager::updateMismatch);
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
+    connect(modeSelect, &ModeSelector::forkSubfolder, manager->dataMaintainer, &DataMaintainer::forkJsonDb);
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);

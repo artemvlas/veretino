@@ -227,7 +227,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     }
     else {// if subfolder
         QString subfolderName = TreeModel::siblingAtRow(folderItemIndex, Column::ColumnPath).data().toString();
-        Numbers num = dataMaintainer->updateNumbers(dataMaintainer->data_->model_, folderItemIndex);
+        Numbers num = dataMaintainer->getNumbers(dataMaintainer->data_->model_, folderItemIndex);
         int subMatched = num.numberOf(FileStatus::Matched);
 
         if (num.numberOf(FileStatus::Mismatched) > 0)

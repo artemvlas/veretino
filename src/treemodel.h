@@ -42,11 +42,13 @@ public:
     bool setRowData(const QModelIndex &curIndex, Column column,
                     const QVariant &itemData = QVariant());
 
-    static QString getPath(const QModelIndex &curIndex); // build path by current index data
+    static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex()); // build path by current index data
     static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
     static QModelIndex siblingAtRow(const QModelIndex &curIndex, Column column); // get the index of an item of the same row (curIndex row) and a specified column
-    static bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or folder(false)
+    static bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or (folder(false) || invalid(false))
+    static bool isFolderRow(const QModelIndex &curIndex); // same^, but folder(true); (file(false) || invalid(false))
     static bool isChecksumStored(const QModelIndex &curIndex);
+    static bool containsChecksums(const QModelIndex &folderIndex); // checks whether the specified subfolder contains files with saved checksums
     static FileStatus itemFileStatus(const QModelIndex &curIndex);
 
 public slots:

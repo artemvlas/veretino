@@ -21,7 +21,7 @@ public:
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
 
     DataContainer* parseJson(const QString &filePath);
-    MetaData::SavingResult makeJson(DataContainer* data);
+    MetaData::SavingResult makeJson(DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
     bool updateSuccessfulCheckDateTime(const QString &filePath);
 
 public slots:
@@ -31,6 +31,7 @@ private:
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
+    QJsonObject dbHeader(const DataContainer *data, const QModelIndex &rootFolder);
 
     const QString strHeaderIgnored = "Ignored";
     const QString strHeaderIncluded = "Included";

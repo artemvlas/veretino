@@ -102,6 +102,7 @@ public:
     QAction *actionShowAll = new QAction("Show All", this);
     QAction *actionCheckCurFileFromModel = new QAction("Check current file", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check current Subfolder", this);
+    QAction *actionForkSubfolder = new QAction("Fork as a separate list", this);
     QAction *actionCheckAll = new QAction("Check ALL files against stored checksums", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored checksum to clipboard", this);
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum to clipboard", this);
@@ -156,6 +157,7 @@ signals:
     void dbItemContents(const QString &itemPath);
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);
+    void forkSubfolder(const QModelIndex &subfolder);
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

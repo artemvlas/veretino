@@ -31,8 +31,8 @@ public:
                        bool finalProcess = false); // <finalProcess> -->> whether it sends a process end signal or not
 
     void updateNumbers();
-    Numbers updateNumbers(const QAbstractItemModel* model,
-                          const QModelIndex& rootIndex = QModelIndex());
+    static Numbers getNumbers(const QAbstractItemModel* model,
+                              const QModelIndex& rootIndex = QModelIndex());
 
     qint64 totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex& rootIndex = QModelIndex());
     qint64 totalSizeOfListedFiles(const QSet<FileStatus>& fileStatuses = QSet<FileStatus>(),
@@ -65,9 +65,9 @@ public:
 
     bool importJson(const QString &jsonFilePath);
     void exportToJson(bool finalProcess = true);
+    void forkJsonDb(const QModelIndex &rootFolder);
 
     QString itemContentsInfo(const QModelIndex &curIndex); // if file - "filename (size)", if folder - folder contents (availability, size etc.)
-
     QModelIndex sourceIndex(const QModelIndex &curIndex); // checks whether the curIndex belongs to the data_->proxyModel, if so, returns the mapToSource
 
     // variables

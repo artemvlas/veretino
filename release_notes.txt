@@ -1,3 +1,6 @@
+Veretino 0.3.5
+* Added the ability to create separate databases for subfolders based on existing checksum lists.
+
 Veretino 0.3.4
 * UI improvements:
     added "Open Recent" menu,

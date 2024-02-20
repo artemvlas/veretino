@@ -4,6 +4,7 @@
  * https://github.com/artemvlas/veretino
 */
 #include "treemodel.h"
+#include "treemodeliterator.h"
 #include "tools.h"
 #include <QDebug>
 
@@ -204,7 +205,7 @@ TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
     return rootItem;
 }
 
-QString TreeModel::getPath(const QModelIndex &curIndex)
+QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
 {
     QString path;
     QModelIndex newIndex = siblingAtRow(curIndex, ColumnPath);
@@ -212,7 +213,7 @@ QString TreeModel::getPath(const QModelIndex &curIndex)
     if (newIndex.isValid()) {
         path = newIndex.data().toString();
 
-        while (newIndex.parent().isValid()) {
+        while (newIndex.parent().isValid() && newIndex.parent() != root) {
             path = paths::joinPath(newIndex.parent().data().toString(), path);
             newIndex = newIndex.parent();
         }
@@ -253,7 +254,7 @@ QModelIndex TreeModel::siblingAtRow(const QModelIndex &curIndex, Column column)
                               : QModelIndex();
 }
 
-// the TreeModel implies that if an item has children, then it is a folder, if not, then it is a file
+// the TreeModel implies that if an item has children, then it is a folder (or invalid-root); if not, then it is a file
 bool TreeModel::isFileRow(const QModelIndex &curIndex)
 {
     QModelIndex index = siblingAtRow(curIndex, ColumnPath);
@@ -261,9 +262,33 @@ bool TreeModel::isFileRow(const QModelIndex &curIndex)
     return (index.isValid() && !index.model()->hasChildren(index));
 }
 
+bool TreeModel::isFolderRow(const QModelIndex &curIndex)
+{
+    QModelIndex index = siblingAtRow(curIndex, ColumnPath);
+
+    return (index.isValid() && index.model()->hasChildren(index));
+}
+
 bool TreeModel::isChecksumStored(const QModelIndex &curIndex)
 {
     return siblingAtRow(curIndex, ColumnChecksum).data().isValid();
+}
+
+bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
+{
+    bool isAny = false;
+
+    if (isFolderRow(folderIndex)) {
+        TreeModelIterator it(folderIndex.model(), folderIndex);
+        while (it.hasNext()) {
+            if (isChecksumStored(it.nextFile().index())) {
+                isAny = true;
+                break;
+            }
+        }
+    }
+
+    return isAny;
 }
 
 FileStatus TreeModel::itemFileStatus(const QModelIndex &curIndex)

@@ -78,6 +78,7 @@ void ModeSelector::connectActions()
     connect(actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
     connect(actionCopyStoredChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnChecksum);});
     connect(actionCopyReChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnReChecksum);});
+    connect(actionForkSubfolder, &QAction::triggered, this, [=]{emit forkSubfolder(view_->curIndexSource);});
 
     connect(actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -129,6 +130,7 @@ void ModeSelector::setActionsIcons()
     actionCheckAll->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(theme)));
     actionCopyStoredChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
     actionCopyReChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
+    actionForkSubfolder->setIcon(QIcon(QString(":/icons/%1/add-fork.svg").arg(theme)));
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -583,8 +585,10 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                         viewContextMenu->addAction(actionCheckCurFileFromModel);
                         viewContextMenu->addAction(actionCopyStoredChecksum);
                     }
-                    else
+                    else if (TreeModel::containsChecksums(index)) {
+                        viewContextMenu->addAction(actionForkSubfolder);
                         viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
+                    }
                 }
                 viewContextMenu->addAction(actionCheckAll);
             }

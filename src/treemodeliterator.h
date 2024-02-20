@@ -18,7 +18,7 @@ public:
     bool hasNext();
     const QModelIndex& index();
     QVariant data(Column column = Column::ColumnPath, int role = TreeModel::RawDataRole);
-    QString path();
+    QString path(const QModelIndex &root = QModelIndex());
     FileStatus status();
 
 private:
