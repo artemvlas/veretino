@@ -256,7 +256,22 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
             filter = dialog.resultFilter();
         }
 
-        modeSelect->processFolderChecksums(filter);
+        if (!filter.isFilter(FilterRule::NotSet)) {
+            modeSelect->processFolderChecksums(filter);
+        }
+        else {
+            QMessageBox msgBox(this);
+            msgBox.setWindowTitle("No filter specified");
+            msgBox.setText("File filtering is not set.");
+            msgBox.setInformativeText("Continue for all files?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
+            msgBox.setDefaultButton(QMessageBox::Abort);
+            msgBox.setIcon(QMessageBox::Question);
+            msgBox.button(QMessageBox::Yes)->setText("Continue");
+
+            if (msgBox.exec() == QMessageBox::Yes)
+                modeSelect->processFolderChecksums(filter);
+        }
     }
 }
 

@@ -390,6 +390,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
 
     // if the folder already contains a database file with the same name, display a prompt
     QMessageBox msgBox(view_);
+    msgBox.setWindowTitle("Existing database detected");
     msgBox.setText(QString("The folder already contains the database file:\n%1").arg(databaseFileName));
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
