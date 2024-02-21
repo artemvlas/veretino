@@ -259,7 +259,9 @@ QString shortenString(const QString &string, int length, bool cutEnd)
 
 QString simplifiedChars(QString str)
 {
-    QString forbSymb(":*/\\%?|<>^");
+    str = str.simplified();
+
+    QString forbSymb(" :*/\\%?|<>^&#");
 
     for (int i = 0; i < str.size(); ++i) {
         if (forbSymb.contains(str.at(i))) {
@@ -267,7 +269,7 @@ QString simplifiedChars(QString str)
         }
     }
 
-    return str.simplified();
+    return str;
 }
 
 QString joinStrings(const QString &str1, const QString &str2, const QString joint)
@@ -281,10 +283,10 @@ QString joinStrings(const QString &str1, const QString &str2, const QString join
     return QString("%1%2%3").arg(str1, joint, str2);
 }
 
-QString composeDatabaseFilename(const QString &prefix, const QString &folderName, const QString &extension)
+QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension)
 {
     return folderName.isEmpty() ? joinStrings(prefix, extension, ".")
-                                : joinStrings(joinStrings(prefix, folderName, "_"), extension, ".");
+                                : joinStrings(joinStrings(prefix, simplifiedChars(folderName), "_"), extension, ".");
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)

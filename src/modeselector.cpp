@@ -374,8 +374,8 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
         return;
     }
 
-    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem).replace(' ', '_') : QString();
-    QString databaseFileName = format::composeDatabaseFilename(settings_->dbPrefix, folderName, settings_->databaseFileExtension());
+    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem) : QString();
+    QString databaseFileName = format::composeDbFileName(settings_->dbPrefix, folderName, settings_->databaseFileExtension());
 
     MetaData metaData;
     metaData.workDir = view_->curPathFileSystem;

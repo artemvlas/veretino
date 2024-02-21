@@ -135,10 +135,10 @@ QStringList SettingsDialog::extensionsList()
 void SettingsDialog::updateLabelDatabaseFilename()
 {
     QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums" : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
-    QString folderName = ui->cbAddFolderName->isChecked() ? "<FolderName>" : QString();
+    QString folderName = ui->cbAddFolderName->isChecked() ? "@FolderName" : QString();
     QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
 
-    ui->labelDatabaseFilename->setText(format::composeDatabaseFilename(prefix, folderName, extension));
+    ui->labelDatabaseFilename->setText(format::composeDbFileName(prefix, folderName, extension));
 }
 
 void SettingsDialog::restoreDefaults()

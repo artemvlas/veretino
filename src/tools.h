@@ -81,7 +81,7 @@ QString dataSizeReadableExt(qint64 sizeBytes); // returning style example: "6.08
 QString shortenString(const QString &string, int length = 64, bool cutEnd = true);
 QString simplifiedChars(QString str);
 QString joinStrings(const QString &str1, const QString &str2, const QString joint = "_");
-QString composeDatabaseFilename(const QString &prefix, const QString &folderName, const QString &extension);
+QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension);
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true);
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
