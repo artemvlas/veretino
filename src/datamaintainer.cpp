@@ -431,7 +431,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
     emit processing(true);
 
     MetaData::SavingResult result = json->makeJson(data_, rootFolder);
-    if (result == MetaData::Saved) {
+    if (result == MetaData::Saved || result == MetaData::SavedToDesktop) {
         emit subDbForked(data_->dbSubFolderDbFilePath(rootFolder));
     }
 
