@@ -269,6 +269,9 @@ QString simplifiedChars(QString str)
         }
     }
 
+    while (str.contains("__"))
+        str.replace("__", "_");
+
     return str;
 }
 
