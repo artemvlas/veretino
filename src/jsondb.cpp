@@ -151,7 +151,7 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &
 
     if (rootFolder.isValid()) {
         subFolderPath = paths::joinPath(data->metaData.workDir, TreeModel::getPath(rootFolder));
-        QString subFolderDbFileName = QString("checksums_%1.ver.json").arg(rootFolder.data().toString());
+        QString subFolderDbFileName = format::composeDbFileName("checksums", rootFolder.data().toString(), ".ver.json");
         pathToSave = paths::joinPath(subFolderPath, subFolderDbFileName);
     }
     else

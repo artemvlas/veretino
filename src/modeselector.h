@@ -101,7 +101,7 @@ public:
     QAction *actionShowMismatchesOnly = new QAction("Show only Mismatches", this);
     QAction *actionShowAll = new QAction("Show All", this);
     QAction *actionCheckCurFileFromModel = new QAction("Check current file", this);
-    QAction *actionCheckCurSubfolderFromModel = new QAction("Check current Subfolder", this);
+    QAction *actionCheckCurSubfolderFromModel = new QAction("Check the subfolder", this);
     QAction *actionBranchSubfolder = new QAction("Branch the subfolder checksums", this);
     QAction *actionCheckAll = new QAction("Check ALL files against stored checksums", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored checksum to clipboard", this);
