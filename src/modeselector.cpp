@@ -587,7 +587,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                         viewContextMenu->addAction(actionCopyStoredChecksum);
                     }
                     else if (TreeModel::containsChecksums(index)) {
-                        viewContextMenu->addAction(actionBranchSubfolder);
+                        if (!QFileInfo::exists(view_->data_->dbSubFolderDbFilePath(index))) // preventing accidental overwriting
+                            viewContextMenu->addAction(actionBranchSubfolder);
+
                         viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
                     }
                 }

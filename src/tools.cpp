@@ -289,7 +289,7 @@ QString joinStrings(const QString &str1, const QString &str2, const QString join
 QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension)
 {
     return folderName.isEmpty() ? joinStrings(prefix, extension, ".")
-                                : joinStrings(joinStrings(prefix, simplifiedChars(folderName), "_"), extension, ".");
+                                : joinStrings(joinStrings(prefix, simplifiedChars(paths::basicName(folderName)), "_"), extension, ".");
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)

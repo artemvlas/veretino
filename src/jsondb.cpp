@@ -147,32 +147,26 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &
     }
 
     QString pathToSave;
-    QString subFolderPath;
 
-    if (rootFolder.isValid()) {
-        subFolderPath = paths::joinPath(data->metaData.workDir, TreeModel::getPath(rootFolder));
-        QString subFolderDbFileName = format::composeDbFileName("checksums", rootFolder.data().toString(), ".ver.json");
-        pathToSave = paths::joinPath(subFolderPath, subFolderDbFileName);
-    }
-    else
-        pathToSave = data->metaData.databaseFilePath;
+    pathToSave = rootFolder.isValid() ? data->dbSubFolderDbFilePath(rootFolder) // branching
+                                      : data->metaData.databaseFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText("Saved");
         return MetaData::Saved;
     }
     else {
-        header[strHeaderWorkDir] = rootFolder.isValid() ? subFolderPath : data->metaData.workDir;
+        header[strHeaderWorkDir] = rootFolder.isValid() ? paths::parentFolder(pathToSave) : data->metaData.workDir;
         mainArray[0] = header;
         doc.setArray(mainArray);
 
-        pathToSave = paths::joinPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
-                                     paths::basicName(pathToSave));
+        QString resPathToSave = paths::joinPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
+                                                paths::basicName(pathToSave));
 
-        if (saveJsonFile(doc, pathToSave)) {
+        if (saveJsonFile(doc, resPathToSave)) {
             emit setStatusbarText("Saved to Desktop");
             if (!rootFolder.isValid())
-                data->metaData.databaseFilePath = pathToSave;
+                data->metaData.databaseFilePath = resPathToSave; // only if main database
             return MetaData::SavedToDesktop;
         }
 
