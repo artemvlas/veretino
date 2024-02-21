@@ -100,11 +100,12 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     return header;
 }
 
-MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &rootFolder)
+// returns the path to the file if the write was successful, otherwise an empty string
+QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolder)
 {
     if (!data || data->model_->isEmpty()) {
         qDebug() << "JsonDb::makeJson | no data to make json db";
-        return MetaData::NotSaved;
+        return QString();
     }
 
     QJsonObject header = dbHeader(data, rootFolder);
@@ -143,7 +144,7 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &
 
     if (canceled) {
         qDebug() << "JsonDb::makeJson | Canceled";
-        return MetaData::NotSaved;
+        return QString();
     }
 
     QString pathToSave;
@@ -153,7 +154,7 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &
 
     if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText("Saved");
-        return MetaData::Saved;
+        return pathToSave;
     }
     else {
         header[strHeaderWorkDir] = rootFolder.isValid() ? paths::parentFolder(pathToSave) : data->metaData.workDir;
@@ -165,15 +166,13 @@ MetaData::SavingResult JsonDb::makeJson(DataContainer* data, const QModelIndex &
 
         if (saveJsonFile(doc, resPathToSave)) {
             emit setStatusbarText("Saved to Desktop");
-            if (!rootFolder.isValid())
-                data->metaData.databaseFilePath = resPathToSave; // only if main database
-            return MetaData::SavedToDesktop;
+            return resPathToSave;
         }
 
         else {
             emit setStatusbarText("NOT Saved");
             emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
-            return MetaData::NotSaved;
+            return QString();
         }
     }
 }

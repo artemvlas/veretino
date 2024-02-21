@@ -6,6 +6,7 @@
 #include "datacontainer.h"
 #include <QDebug>
 #include <QFile>
+#include <QStandardPaths>
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}
@@ -117,6 +118,19 @@ void DataContainer::removeBackupFile()
 {
     if (isBackupExists())
         QFile::remove(backupFilePath());
+}
+
+void DataContainer::setSavingResult(const QString &dbFilePath)
+{
+    if (dbFilePath.isEmpty() || !tools::isDatabaseFile(dbFilePath))
+        metaData.savingResult = MetaData::NotSaved;
+    else if (paths::parentFolder(dbFilePath) == QStandardPaths::writableLocation(QStandardPaths::DesktopLocation))
+        metaData.savingResult = MetaData::SavedToDesktop;
+    else
+        metaData.savingResult = MetaData::Saved;
+
+    if (metaData.savingResult == MetaData::Saved || metaData.savingResult == MetaData::SavedToDesktop)
+        metaData.databaseFilePath = dbFilePath;
 }
 
 DataContainer::~DataContainer()

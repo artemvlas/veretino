@@ -403,14 +403,13 @@ void DataMaintainer::exportToJson(bool finalProcess)
     if (!data_)
         return;
 
-    //updateNumbers();
     data_->makeBackup();
     data_->metaData.successfulCheckDateTime.clear();
     data_->metaData.saveDateTime = format::currentDateTime();
 
     emit processing(true);
 
-    data_->metaData.savingResult = json->makeJson(data_);
+    data_->setSavingResult(json->makeJson(data_));
 
     if (finalProcess)
         emit processing(false);
@@ -430,10 +429,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
 
     emit processing(true);
 
-    MetaData::SavingResult result = json->makeJson(data_, rootFolder);
-    if (result == MetaData::Saved || result == MetaData::SavedToDesktop) {
-        emit subDbForked(data_->dbSubFolderDbFilePath(rootFolder));
-    }
+    emit subDbForked(json->makeJson(data_, rootFolder));
 
     emit processing(false);
 }

@@ -74,6 +74,7 @@ public:
     bool makeBackup(bool forceOverwrite = false);
     bool restoreBackupFile();
     void removeBackupFile();
+    void setSavingResult(const QString &dbFilePath);
 
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
