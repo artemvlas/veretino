@@ -409,7 +409,7 @@ void DataMaintainer::exportToJson(bool finalProcess)
 
     emit processing(true);
 
-    data_->setSavingResult(json->makeJson(data_));
+    data_->setSaveResult(json->makeJson(data_));
 
     if (finalProcess)
         emit processing(false);

@@ -21,8 +21,8 @@ struct MetaData {
     QString successfulCheckDateTime; // date and time of the last completely successful check (all files from the list are exists and match the checksums)
     FilterRule filter;
     bool isImported = false; // from db(json) file
-    enum SavingResult {NotSaved, Saved, SavedToDesktop};
-    SavingResult savingResult = NotSaved;
+    enum SaveResult {NotSaved, Saved, SavedToDesktop};
+    SaveResult saveResult = NotSaved;
 }; // struct MetaData
 
 struct Numbers {
@@ -74,7 +74,7 @@ public:
     bool makeBackup(bool forceOverwrite = false);
     bool restoreBackupFile();
     void removeBackupFile();
-    void setSavingResult(const QString &dbFilePath);
+    void setSaveResult(const QString &dbFilePath);
 
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);

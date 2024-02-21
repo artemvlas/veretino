@@ -120,16 +120,16 @@ void DataContainer::removeBackupFile()
         QFile::remove(backupFilePath());
 }
 
-void DataContainer::setSavingResult(const QString &dbFilePath)
+void DataContainer::setSaveResult(const QString &dbFilePath)
 {
-    if (dbFilePath.isEmpty() || !tools::isDatabaseFile(dbFilePath))
-        metaData.savingResult = MetaData::NotSaved;
+    if (!tools::isDatabaseFile(dbFilePath))
+        metaData.saveResult = MetaData::NotSaved;
     else if (paths::parentFolder(dbFilePath) == QStandardPaths::writableLocation(QStandardPaths::DesktopLocation))
-        metaData.savingResult = MetaData::SavedToDesktop;
+        metaData.saveResult = MetaData::SavedToDesktop;
     else
-        metaData.savingResult = MetaData::Saved;
+        metaData.saveResult = MetaData::Saved;
 
-    if (metaData.savingResult == MetaData::Saved || metaData.savingResult == MetaData::SavedToDesktop)
+    if (metaData.saveResult == MetaData::Saved || metaData.saveResult == MetaData::SavedToDesktop)
         metaData.databaseFilePath = dbFilePath;
 }
 
