@@ -1,5 +1,7 @@
 Veretino 0.3.5
 * Added the ability to create separate databases for subfolders based on an existing list of checksums.
+* Added a request to continue the process if the filter creation is cancelled.
+* minor UI improvements
 
 Veretino 0.3.4
 * UI improvements:
