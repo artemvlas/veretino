@@ -85,6 +85,7 @@ signals:
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void numbersUpdated();
     void showMessage(const QString &text, const QString &title = "Info");
+    void subDbForked(const QString &forkedDbFilePath);
     void cancelProcess();
 };
 

@@ -141,6 +141,7 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, modeSelect, &ModeSelector::setMode);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
+    connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
 
     // process status
     connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);
@@ -314,6 +315,25 @@ void MainWindow::showMessage(const QString &message, const QString &title)
         messageBox.warning(this, title, message);
     else
         messageBox.information(this, title, message);
+}
+
+void MainWindow::promptOpenBranch(const QString &dbFilePath)
+{
+    if (!tools::isDatabaseFile(dbFilePath))
+        return;
+
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("A new Branch has been created");
+    msgBox.setText(QString("The subfolder data is forked:\n%1").arg(".../" + paths::basicName(dbFilePath)));
+    msgBox.setInformativeText("Do you want to open it or stay in the current one?");
+    msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.button(QMessageBox::No)->setText("Stay");
+
+    if (msgBox.exec() == QMessageBox::Open) {
+        modeSelect->openJsonDatabase(dbFilePath);
+    }
 }
 
 void MainWindow::setProgressBar(bool processing, bool visible)

@@ -432,8 +432,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
 
     MetaData::SavingResult result = json->makeJson(data_, rootFolder);
     if (result == MetaData::Saved) {
-        emit showMessage(QString("Subfolder database forked:\n%1")
-                         .arg(".../" + paths::basicName(data_->dbSubFolderDbFilePath(rootFolder))));
+        emit subDbForked(data_->dbSubFolderDbFilePath(rootFolder));
     }
 
     emit processing(false);
