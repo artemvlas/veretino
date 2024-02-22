@@ -97,15 +97,15 @@ public:
     QAction *actionForgetChanges = new QAction("Forget all changes", this);
     QAction *actionUpdateDbWithReChecksums = new QAction("Update the Database with new checksums", this);
     QAction *actionUpdateDbWithNewLost = new QAction("Update the Database with New/Lost files", this);
-    QAction *actionShowNewLostOnly = new QAction("Show New/Lost only", this);
+    QAction *actionShowNewLostOnly = new QAction("Show only New/Lost", this);
     QAction *actionShowMismatchesOnly = new QAction("Show only Mismatches", this);
     QAction *actionShowAll = new QAction("Show All", this);
-    QAction *actionCheckCurFileFromModel = new QAction("Check current file", this);
-    QAction *actionCheckCurSubfolderFromModel = new QAction("Check the subfolder", this);
-    QAction *actionBranchSubfolder = new QAction("Branch the subfolder checksums", this);
-    QAction *actionCheckAll = new QAction("Check ALL files against stored checksums", this);
-    QAction *actionCopyStoredChecksum = new QAction("Copy stored checksum to clipboard", this);
-    QAction *actionCopyReChecksum = new QAction("Copy ReChecksum to clipboard", this);
+    QAction *actionCheckCurFileFromModel = new QAction("Check the File", this);
+    QAction *actionCheckCurSubfolderFromModel = new QAction("Check the Subfolder", this);
+    QAction *actionBranchSubfolder = new QAction("Branch the Subfolder", this);
+    QAction *actionCheckAll = new QAction("Check ALL available files", this);
+    QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
+    QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
 
     QAction *actionCollapseAll = new QAction("Collapse all", this);
     QAction *actionExpandAll = new QAction("Expand all", this);
