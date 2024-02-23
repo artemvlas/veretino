@@ -32,6 +32,7 @@ private:
     Ui::SettingsDialog *ui;
     QStringList extensionsList(); // return a list of extensions from input
     Settings *settings_;
+    const Settings defaults;
 };
 
 #endif // SETTINGSDIALOG_H

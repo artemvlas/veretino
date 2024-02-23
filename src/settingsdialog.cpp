@@ -56,7 +56,7 @@ void SettingsDialog::loadSettings(const Settings &settings)
     ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
 
     // Tab Database
-    if (settings.dbPrefix == "checksums")
+    if (settings.dbPrefix == defaults.dbPrefix)
         ui->inputJsonFileNamePrefix->clear();
     else
         ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
@@ -92,7 +92,7 @@ void SettingsDialog::updateSettings()
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
 
     // database filename
-    settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums"
+    settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix
                                                                         : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
@@ -134,7 +134,7 @@ QStringList SettingsDialog::extensionsList()
 
 void SettingsDialog::updateLabelDatabaseFilename()
 {
-    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? "checksums" : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
+    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
     QString folderName = ui->cbAddFolderName->isChecked() ? "@FolderName" : QString();
     QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
 
@@ -143,7 +143,7 @@ void SettingsDialog::updateLabelDatabaseFilename()
 
 void SettingsDialog::restoreDefaults()
 {
-    loadSettings(Settings());
+    loadSettings(defaults);
 }
 
 SettingsDialog::~SettingsDialog()
