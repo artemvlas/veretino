@@ -23,9 +23,14 @@ struct Settings {
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
 
-    QString databaseFileExtension() const
+    QString dbFileExtension() const
     {
-        return isLongExtension ? ".ver.json" : ".ver";
+        return dbFileExtension(isLongExtension);
+    }
+
+    static QString dbFileExtension(bool isLong)
+    {
+        return isLong ? ".ver.json" : ".ver";
     }
 
     void addRecentFile(const QString &filePath)

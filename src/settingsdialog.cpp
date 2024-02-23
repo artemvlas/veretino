@@ -136,7 +136,7 @@ void SettingsDialog::updateLabelDatabaseFilename()
 {
     QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
     QString folderName = ui->cbAddFolderName->isChecked() ? "@FolderName" : QString();
-    QString extension = ui->rbExtVerJson->isChecked() ? ".ver.json" : ".ver";
+    QString extension = defaults.dbFileExtension(ui->rbExtVerJson->isChecked());
 
     ui->labelDatabaseFilename->setText(format::composeDbFileName(prefix, folderName, extension));
 }

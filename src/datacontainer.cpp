@@ -43,8 +43,9 @@ QString DataContainer::dbSubFolderDbFilePath(const QModelIndex &subfolder) const
     if (!subfolder.isValid())
         return QString();
 
-    QString extension = metaData.databaseFilePath.endsWith(".ver") ? ".ver" : ".ver.json";
-    QString subFolderDbFileName = format::composeDbFileName("checksums", subfolder.data().toString(), extension);
+    const Settings defaults;
+    QString extension = defaults.dbFileExtension(!metaData.databaseFilePath.endsWith(".ver"));
+    QString subFolderDbFileName = format::composeDbFileName(defaults.dbPrefix, subfolder.data().toString(), extension);
 
     return paths::joinPath(dbSubFolderAbsolutePath(subfolder), subFolderDbFileName);
 }
