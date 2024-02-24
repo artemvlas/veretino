@@ -27,22 +27,22 @@ Files::Files(const FileList &fileList, QObject *parent)
     : QObject(parent), initFileList(fileList)
 {}
 
-FileList Files::allFiles()
+FileList Files::getFileList()
 {
-    return allFiles(initFolderPath);
+    return getFileList(initFolderPath);
 }
 
-FileList Files::allFiles(const QString &rootFolder)
+FileList Files::getFileList(const QString &rootFolder)
 {
-    return allFiles(rootFolder, FilterRule());
+    return getFileList(rootFolder, FilterRule());
 }
 
-FileList Files::allFiles(const FilterRule &filter)
+FileList Files::getFileList(const FilterRule &filter)
 {
-    return allFiles(initFolderPath, filter);
+    return getFileList(initFolderPath, filter);
 }
 
-FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
+FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 {
     if (!QFileInfo(rootFolder).isDir()) {
         qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
@@ -83,7 +83,7 @@ FileList Files::allFiles(const QString &rootFolder, const FilterRule &filter)
     return resultList;
 }
 
-FileList Files::allFiles(const FileList &fileList, const FilterRule &filter)
+FileList Files::getFileList(const FileList &fileList, const FilterRule &filter)
 {
     FileList filteredFiles; // result list
     FileList::const_iterator iter;
@@ -178,7 +178,7 @@ QString Files::itemInfo(const QAbstractItemModel* model, const QSet<FileStatus>&
 
         if (itData.isValid()
             && (fileStatuses.isEmpty()
-                || fileStatuses.contains(static_cast<FileStatus>(itData.toInt())))) {
+                || fileStatuses.contains(itData.value<FileStatus>()))) {
 
             dataSize += it.data(Column::ColumnSize).toLongLong();
             ++filesNumber;
@@ -195,7 +195,7 @@ void Files::folderContentsByType()
         return;
     }
 
-    FileList fileList = allFiles(FilterRule(false));
+    FileList fileList = getFileList(FilterRule(false));
 
     if (canceled)
         return;
@@ -233,7 +233,7 @@ void Files::folderContentsByType()
 qint64 Files::dataSize()
 {
     if (!initFolderPath.isEmpty())
-        return dataSize(allFiles());
+        return dataSize(getFileList());
     else if (!initFileList.isEmpty())
         return dataSize(initFileList);
     else {
@@ -244,7 +244,7 @@ qint64 Files::dataSize()
 
 qint64 Files::dataSize(const QString &folder)
 {
-    return dataSize(allFiles(folder));
+    return dataSize(getFileList(folder));
 }
 
 qint64 Files::dataSize(const FileList &filelist)

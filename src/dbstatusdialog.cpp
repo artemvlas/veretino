@@ -16,7 +16,6 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
 {
     ui->setupUi(this);
 
-    //setFixedSize(400,300);
     setWindowIcon(QIcon(":/veretino.png"));
 
     connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath));});

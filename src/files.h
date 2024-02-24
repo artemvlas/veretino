@@ -47,16 +47,16 @@ public:
     }; // struct ExtNumSize
 
     // functions
-    FileList allFiles(); // 'initFolderPath' --> allFiles(const QString &rootFolder)
-    FileList allFiles(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
-    FileList allFiles(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
-    FileList allFiles(const QString &rootFolder, const FilterRule &filter);
-    FileList allFiles(const FileList &fileList, const FilterRule &filter);
+    FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
+    FileList getFileList(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
+    FileList getFileList(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
+    FileList getFileList(const QString &rootFolder, const FilterRule &filter);
+    FileList getFileList(const FileList &fileList, const FilterRule &filter);
 
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false)); // checks whether there are any (or filtered) files the folder/subfolders
 
     qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
-    qint64 dataSize(const QString &folder); // total size of allFiles('folder')
+    qint64 dataSize(const QString &folder); // total size of getFileList('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
     QString contentStatus(const QString &path);
