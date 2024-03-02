@@ -1,8 +1,8 @@
 # Veretino: folder data audit and verification
-### The app allows to verify folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
+### The app allows verifying folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
-* Folder/filelist audit: analysis and verification of folder contents, looking for folder-wide data changes.
+* Folder/file-list audit: analysis and verification of folder contents, looking for folder-wide data changes.
 * Multiple checksums calculator.
 * Finding damaged files in a folder.
 * Checksums calculation, store and verification for individual files.
@@ -14,7 +14,7 @@
 * To begin with, the program calculates a list of checksums for all files (or for certain types of files) in the specified folder (and its subfolders) and stores it in the local database.
 * Once the list is ready, you can check the integrity of the data in this folder by comparing their checksums with those calculated and saved earlier. This can also be done only with selected file types by applying filters.
 * Also, the saved list (a database of folder contents) makes it possible to find new or missing files in a folder by comparing the current contents with a previously saved list.
-* The program allows to analyze the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
+* The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
 * And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
 
 <p align="center">
