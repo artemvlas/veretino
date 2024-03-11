@@ -67,6 +67,7 @@ signals:
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderContentsFilterCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
+    void folderChecked(const Numbers &result, const QString &subFolder = QString());
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text); // Sending directly to QGuiApplication::clipboard()->setText works great on Linux,
                                            // but does NOT work on older QT builds on Windows. So this signal is used for compatibility.

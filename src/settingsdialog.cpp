@@ -26,7 +26,7 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
 
     ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
                                                "(if all files exist and match the saved checksums),\n"
-                                               "the current datetime will be saved in the database file");
+                                               "the current date/time will be saved in the database file");
 
     loadSettings(*settings);
 

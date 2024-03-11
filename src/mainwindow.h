@@ -45,6 +45,7 @@ public slots:
     void dialogOpenFolder();
     void dialogOpenJson();
     void promptOpenBranch(const QString &dbFilePath);
+    void showFolderCheckResult(const Numbers &result, const QString &subFolder);
 
 private:
     void connectManager(); // connections with Manager separated for convenience

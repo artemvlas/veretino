@@ -65,7 +65,7 @@ bool DataContainer::contains(const FileStatus status) const
     return (numbers.numberOf(status) != 0);
 }
 
-bool DataContainer::contains(const QSet<FileStatus> statuses) const
+bool DataContainer::contains(const QSet<FileStatus> &statuses) const
 {
     QSet<FileStatus>::const_iterator it;
     for (it = statuses.constBegin(); it != statuses.constEnd(); ++it) {

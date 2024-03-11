@@ -212,33 +212,20 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        if (dataMaintainer->data_->contains(FileStatus::Mismatched))
-            emit showMessage(QString("%1 out of %2 files is changed or corrupted")
-                                 .arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Mismatched))
-                                 .arg(dataMaintainer->data_->numbers.available()), "FAILED");
-        else if (dataMaintainer->data_->contains(FileStatus::Matched)) {
-            emit showMessage(QString("ALL %1 files passed the verification.\nStored %2 checksums matched.")
-                                 .arg(dataMaintainer->data_->numbers.numberOf(FileStatus::Matched))
-                                 .arg(format::algoToStr(dataMaintainer->data_->metaData.algorithm)), "Success");
+        emit folderChecked(dataMaintainer->data_->numbers);
 
-            if (settings_->saveVerificationDateTime)
-                dataMaintainer->updateSuccessfulCheckDateTime();
+        // Save verification time if necessary
+        if (!dataMaintainer->data_->contains(FileStatus::Mismatched)
+            && dataMaintainer->data_->contains(FileStatus::Matched)
+            && settings_->saveVerificationDateTime) {
+            dataMaintainer->updateSuccessfulCheckDateTime();
         }
     }
-    else {// if subfolder
+    else { // if subfolder
         QString subfolderName = TreeModel::siblingAtRow(folderItemIndex, Column::ColumnPath).data().toString();
         Numbers num = dataMaintainer->getNumbers(dataMaintainer->data_->model_, folderItemIndex);
-        int subMatched = num.numberOf(FileStatus::Matched);
 
-        if (num.numberOf(FileStatus::Mismatched) > 0)
-            emit showMessage(QString("Subfolder: %1\n\n%2 out of %3 files in the Subfolder is changed or corrupted")
-                                 .arg(subfolderName)
-                                 .arg(num.numberOf(FileStatus::Mismatched))
-                                 .arg(subMatched + num.numberOf(FileStatus::Mismatched)), "FAILED");
-        else
-            emit showMessage(QString("Subfolder: %1\n\nAll %2 checked files passed the verification")
-                                 .arg(subfolderName)
-                                 .arg(subMatched), "Success");
+        emit folderChecked(num, subfolderName);
     }
 }
 

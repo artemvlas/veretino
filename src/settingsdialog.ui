@@ -140,7 +140,7 @@ Unchecked: to Home folder</string>
        <item row="4" column="0">
         <widget class="QCheckBox" name="cbSaveVerificationDateTime">
          <property name="text">
-          <string>Save the verification date</string>
+          <string>Save verification date/time</string>
          </property>
          <property name="checked">
           <bool>false</bool>

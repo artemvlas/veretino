@@ -102,6 +102,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<ModelView>("ModelView");
     qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");
     qRegisterMetaType<MetaData>("MetaData");
+    qRegisterMetaType<Numbers>("Numbers");
 
     manager->moveToThread(thread);
 
@@ -127,6 +128,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
     connect(manager, &Manager::setStatusbarText, this, &MainWindow::updateStatusIcon);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
+    connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
@@ -274,6 +276,34 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
                 modeSelect->processFolderChecksums(filter);
         }
     }
+}
+
+void MainWindow::showFolderCheckResult(const Numbers &result, const QString &subFolder)
+{
+
+    QMessageBox msgBox(this);
+
+    QString titleText = (result.numberOf(FileStatus::Mismatched) > 0) ? "FAILED" : "Success";
+    QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
+
+    QIcon icon = (result.numberOf(FileStatus::Mismatched) > 0) ? QIcon(":/icons/filestatus/mismatched.svg")
+                                                               : QIcon(":/icons/filestatus/matched.svg");
+
+    if (result.numberOf(FileStatus::Mismatched) > 0) {
+        messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
+                            .arg(result.numberOf(FileStatus::Mismatched))
+                            .arg(result.available())
+                            .arg(result.numberOf(FileStatus::Mismatched) == 1 ? "is" : "are"));
+    }
+    else {
+        messageText.append(QString("ALL %1 files passed verification.")
+                                    .arg(result.numberOf(FileStatus::Matched)));
+    }
+
+    msgBox.setWindowTitle(titleText);
+    msgBox.setText(messageText);
+    msgBox.setIconPixmap(icon.pixmap(64, 64));
+    msgBox.exec();
 }
 
 void MainWindow::dialogSettings()
