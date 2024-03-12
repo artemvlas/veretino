@@ -42,7 +42,7 @@ public slots:
 private:
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
-    void showFileCheckResultMessage(bool isMatched, const QString &fileName = QString());
+    void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
     void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
@@ -68,6 +68,7 @@ signals:
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderContentsFilterCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderChecked(const Numbers &result, const QString &subFolder = QString());
+    void fileChecked(const FileValues &result);
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text); // Sending directly to QGuiApplication::clipboard()->setText works great on Linux,
                                            // but does NOT work on older QT builds on Windows. So this signal is used for compatibility.

@@ -103,6 +103,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");
     qRegisterMetaType<MetaData>("MetaData");
     qRegisterMetaType<Numbers>("Numbers");
+    qRegisterMetaType<FileValues>("FileValues");
 
     manager->moveToThread(thread);
 
@@ -129,6 +130,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setStatusbarText, this, &MainWindow::updateStatusIcon);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
+    connect(manager, &Manager::fileChecked, this, &MainWindow::showFileCheckResult);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
@@ -315,6 +317,28 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     if (result.contains(FileStatus::Mismatched) && ret == QMessageBox::Ok) {
         emit modeSelect->updateMismatch();
     }
+}
+
+void MainWindow::showFileCheckResult(const FileValues &values)
+{
+    QMessageBox msgBox(this);
+
+    QString titleText = (values.status == FileStatus::Matched) ? "Checksums Match" : "Checksums do not match";
+    QIcon icon = (values.status == FileStatus::Matched) ? QIcon(":/icons/filestatus/matched.svg")
+                                                        : QIcon(":/icons/filestatus/mismatched.svg");
+
+    QString messageText = QString("File: %1\nSize: %2\n\n").arg(values.fileName, format::dataSizeReadable(values.size));
+
+    if (values.status == FileStatus::Matched)
+        messageText.append(format::shortenString(values.checksum));
+    else
+        messageText.append(QString("Estimated:\n%1\n\nCalculated:\n%2")
+                            .arg(format::shortenString(values.checksum), format::shortenString(values.reChecksum)));
+
+    msgBox.setWindowTitle(titleText);
+    msgBox.setText(messageText);
+    msgBox.setIconPixmap(icon.pixmap(64, 64));
+    msgBox.exec();
 }
 
 void MainWindow::dialogSettings()

@@ -182,15 +182,15 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
     if (!savedSum.isEmpty()) {
         dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
-
-        QString sum = calculateChecksum(paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex)),
-                                        dataMaintainer->data_->metaData.algorithm, true, true);
+        QString filePath = paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex));
+        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true, true);
 
         if (sum.isEmpty()) {
             dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
         }
         else {
-            showFileCheckResultMessage(dataMaintainer->updateChecksum(fileItemIndex, sum));
+            showFileCheckResultMessage(filePath, dataMaintainer->getStoredChecksum(fileItemIndex), sum);
+            dataMaintainer->updateChecksum(fileItemIndex, sum);
             dataMaintainer->updateNumbers();
         }
     }
@@ -278,8 +278,9 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
 {
     QString sum = calculateChecksum(filePath, algo, true, true);
 
-    if (!sum.isEmpty())
-        showFileCheckResultMessage(sum == checkSum.toLower(), paths::basicName(filePath));
+    if (!sum.isEmpty()) {
+        showFileCheckResultMessage(filePath, checkSum, sum);
+    }
 }
 
 QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess, bool isVerification)
@@ -404,16 +405,18 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
     return doneNum;
 }
 
-void Manager::showFileCheckResultMessage(bool isMatched, const QString &fileName)
+void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)
 {
-    QString file_name;
-    if (!fileName.isEmpty())
-        file_name = "\n\n" + fileName;
+    FileValues fileVal(paths::basicName(filePath));
+    fileVal.checksum = checksumEstimated.toLower();
+    fileVal.size = QFileInfo(filePath).size();
+    fileVal.status = (checksumEstimated.toLower() == checksumCalculated.toLower()) ? FileStatus::Matched : FileStatus::Mismatched;
 
-    if (isMatched)
-        emit showMessage(QString("Checksum Match%1").arg(file_name), "Success");
-    else
-        emit showMessage(QString("Checksum does NOT match%1").arg(file_name), "Failed");
+    if (fileVal.status == FileStatus::Mismatched) {
+        fileVal.reChecksum = checksumCalculated;
+    }
+
+    emit fileChecked(fileVal);
 }
 
 // info about folder (number of files and total size) or file (size)
