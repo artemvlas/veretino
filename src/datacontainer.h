@@ -31,18 +31,23 @@ struct Numbers {
 
     QHash<FileStatus, int> holder; // {enum FileStatus : int number of corresponding files}
 
-    int numberOf(FileStatus status) const
+    int numberOf(const FileStatus status) const
     {
         return holder.contains(status) ? holder.value(status) : 0;
     }
 
-    int numberOf(QList<FileStatus> statuses) const
+    int numberOf(const QList<FileStatus> &statuses) const
     {
         int result = 0;
-        foreach (FileStatus status, statuses) {
+        foreach (const FileStatus status, statuses) {
             result += numberOf(status);
         }
         return result;
+    }
+
+    bool contains(const FileStatus status) const
+    {
+        return numberOf(status) > 0;
     }
 
     int available() const

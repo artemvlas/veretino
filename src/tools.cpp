@@ -400,7 +400,7 @@ QIcon fileItemStatusIcon(FileStatus status)
         case Files::Removed:
             return QIcon(":/icons/filestatus/removed.svg");
         case FileStatus::ChecksumUpdated:
-            return QIcon(":/icons/filestatus/updated.svg");
+            return QIcon(":/icons/filestatus/update.svg");
         default:
             return QIcon(":/icons/filestatus/unknown.svg");
     }

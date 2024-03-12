@@ -283,13 +283,20 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
     QMessageBox msgBox(this);
 
-    QString titleText = (result.numberOf(FileStatus::Mismatched) > 0) ? "FAILED" : "Success";
+    QString titleText = (result.contains(FileStatus::Mismatched)) ? "FAILED" : "Success";
     QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
 
-    QIcon icon = (result.numberOf(FileStatus::Mismatched) > 0) ? QIcon(":/icons/filestatus/mismatched.svg")
-                                                               : QIcon(":/icons/filestatus/matched.svg");
+    QIcon icon = (result.contains(FileStatus::Mismatched)) ? QIcon(":/icons/filestatus/mismatched.svg")
+                                                           : QIcon(":/icons/filestatus/matched.svg");
 
-    if (result.numberOf(FileStatus::Mismatched) > 0) {
+    if (result.contains(FileStatus::Mismatched)) {
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.button(QMessageBox::Ok)->setText("Update");
+        msgBox.button(QMessageBox::Cancel)->setText("Continue");
+        msgBox.button(QMessageBox::Ok)->setIcon(QIcon(":/icons/filestatus/update.svg"));
+        msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
+
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
                             .arg(result.numberOf(FileStatus::Mismatched))
                             .arg(result.available())
@@ -297,13 +304,17 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     }
     else {
         messageText.append(QString("ALL %1 files passed verification.")
-                                    .arg(result.numberOf(FileStatus::Matched)));
+                            .arg(result.numberOf(FileStatus::Matched)));
     }
 
     msgBox.setWindowTitle(titleText);
     msgBox.setText(messageText);
     msgBox.setIconPixmap(icon.pixmap(64, 64));
-    msgBox.exec();
+
+    int ret = msgBox.exec();
+    if (result.contains(FileStatus::Mismatched) && ret == QMessageBox::Ok) {
+        emit modeSelect->updateMismatch();
+    }
 }
 
 void MainWindow::dialogSettings()
