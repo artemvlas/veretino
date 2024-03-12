@@ -89,9 +89,7 @@ using ExtNumSize = Files::ExtNumSize;
 
 struct FileValues {
     FileValues(FileStatus initStatus = FileStatus::New) : status(initStatus) {}
-    FileValues(const QString &file_name) : fileName(file_name) {}
 
-    QString fileName;
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
     qint64 size = 0; // file size in bytes

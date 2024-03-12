@@ -407,16 +407,16 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
 
 void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)
 {
-    FileValues fileVal(paths::basicName(filePath));
+    FileStatus status = (checksumEstimated.toLower() == checksumCalculated.toLower()) ? FileStatus::Matched : FileStatus::Mismatched;
+    FileValues fileVal(status);
     fileVal.checksum = checksumEstimated.toLower();
     fileVal.size = QFileInfo(filePath).size();
-    fileVal.status = (checksumEstimated.toLower() == checksumCalculated.toLower()) ? FileStatus::Matched : FileStatus::Mismatched;
 
     if (fileVal.status == FileStatus::Mismatched) {
         fileVal.reChecksum = checksumCalculated;
     }
 
-    emit fileChecked(fileVal);
+    emit fileChecked(paths::basicName(filePath), fileVal);
 }
 
 // info about folder (number of files and total size) or file (size)

@@ -319,15 +319,17 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     }
 }
 
-void MainWindow::showFileCheckResult(const FileValues &values)
+void MainWindow::showFileCheckResult(const QString &fileName, const FileValues &values)
 {
     QMessageBox msgBox(this);
 
-    QString titleText = (values.status == FileStatus::Matched) ? "Checksums Match" : "Checksums do not match";
+    QString titleText = (values.status == FileStatus::Matched) ? "Checksums Match"
+                                                               : "Checksums do not match";
+
     QIcon icon = (values.status == FileStatus::Matched) ? QIcon(":/icons/filestatus/matched.svg")
                                                         : QIcon(":/icons/filestatus/mismatched.svg");
 
-    QString messageText = QString("File: %1\nSize: %2\n\n").arg(values.fileName, format::dataSizeReadable(values.size));
+    QString messageText = QString("File: %1\nSize: %2\n\n").arg(fileName, format::dataSizeReadable(values.size));
 
     if (values.status == FileStatus::Matched)
         messageText.append(format::shortenString(values.checksum));
