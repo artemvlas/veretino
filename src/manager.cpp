@@ -70,21 +70,38 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
                         .arg(format::algoToStr(algo), format::shortenString(sum, 40)), paths::basicName(filePath));
     }
 
-    if (summaryFile) {
-        QString ext = format::algoToStr(algo, false);
-        QString sumFile = QString("%1.%2").arg(filePath, ext);
+    else if (summaryFile) {
+        makeSumFile(filePath, sum);
+    }
 
-        QFile file(sumFile);
-        if (file.open(QFile::WriteOnly)) {
-            file.write(QString("%1 *%2").arg(sum, paths::basicName(filePath)).toUtf8());
-            emit showMessage(QString("The checksum is saved in the summary file:\n\n%1").arg(paths::basicName(sumFile)), // Message body
-                             QString("%1 computed").arg(format::algoToStr(algo))); // Message header
-        }
-        else {
-            emit toClipboard(sum); // if unable to write summary, send the checksum to clipboard
-            emit showMessage(QString("Unable to create summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
-                                  .arg(sumFile, format::algoToStr(algo), format::shortenString(sum, 40)), "Warning");
-        }
+    else {
+        FileValues fileVal(FileStatus::Added);
+        fileVal.checksum = sum.toLower();
+        fileVal.size = QFileInfo(filePath).size();
+
+        emit fileProcessed(filePath, fileVal);
+    }
+}
+
+void Manager::makeSumFile(const QString &originFilePath, const QString &checksum)
+{
+    if (originFilePath.isEmpty() || !tools::canBeChecksum(checksum))
+        return;
+
+    QCryptographicHash::Algorithm algo = tools::algorithmByStrLen(checksum.length());
+    QString ext = format::algoToStr(algo, false);
+    QString sumFile = QString("%1.%2").arg(originFilePath, ext);
+
+    QFile file(sumFile);
+    if (file.open(QFile::WriteOnly)) {
+        file.write(QString("%1 *%2").arg(checksum, paths::basicName(originFilePath)).toUtf8());
+        emit showMessage(QString("The checksum is saved in the summary file:\n\n%1").arg(paths::basicName(sumFile)), // Message body
+                         "Saved"); // Message header
+    }
+    else {
+        emit toClipboard(checksum); // if unable to write summary, send the checksum to clipboard
+        emit showMessage(QString("Unable to create summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
+                             .arg(sumFile, format::algoToStr(algo), format::shortenString(checksum, 40)), "Warning");
     }
 }
 
@@ -416,7 +433,7 @@ void Manager::showFileCheckResultMessage(const QString &filePath, const QString 
         fileVal.reChecksum = checksumCalculated;
     }
 
-    emit fileChecked(paths::basicName(filePath), fileVal);
+    emit fileProcessed(filePath, fileVal);
 }
 
 // info about folder (number of files and total size) or file (size)

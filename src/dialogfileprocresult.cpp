@@ -1,6 +1,7 @@
 #include "dialogfileprocresult.h"
 #include "ui_dialogfileprocresult.h"
 #include "tools.h"
+#include <QPushButton>
 
 DialogFileProcResult::DialogFileProcResult(const QString &fileName, const FileValues &values, QWidget *parent)
     : QDialog(parent)
@@ -32,6 +33,7 @@ void DialogFileProcResult::setInfo(const QString &fileName, const FileValues &va
         case FileStatus::Added:
             icon = QIcon(":/icons/filestatus/processing.svg");
             titleText = "Checksum calculated";
+            setModeCalculated();
             break;
         default:
             break;
@@ -54,9 +56,20 @@ void DialogFileProcResult::setInfo(const QString &fileName, const FileValues &va
         reChecksum->setText(values.reChecksum);
         ui->verticalLayout->addWidget(reChecksum);
     }
-    else if (values.status == FileStatus::Added) {
-
-    }
 
     ui->textChecksum->setText(values.checksum);
+}
+
+void DialogFileProcResult::setModeCalculated()
+{
+    ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
+    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
+    QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::AcceptRole);
+
+    QString themeFolder = tools::themeFolder(palette());
+    buttonCopy->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(themeFolder)));
+    buttonSave->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder)));
+
+    connect(buttonCopy, &QPushButton::clicked, this, [=]{clickedButton = Copy;});
+    connect(buttonSave, &QPushButton::clicked, this, [=]{clickedButton = Save;});
 }

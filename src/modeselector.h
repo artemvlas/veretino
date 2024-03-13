@@ -52,7 +52,7 @@ public:
                                                                 // or do not abort the process, cancel execution (false)
 
     //---->>>
-    void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
+    void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard);
     void verifyItem();
     void verifyDb();
     void showFolderContentTypes();
@@ -144,7 +144,7 @@ signals:
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void processFolderSha(const MetaData &metaData);
-    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
+    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, bool summaryFile = false, bool clipboard = false);
     void parseJsonFile(const QString &path);
     void verify(const QModelIndex& index = QModelIndex());
     void updateNewLost();
@@ -158,6 +158,7 @@ signals:
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);
     void branchSubfolder(const QModelIndex &subfolder);
+    void makeSumFile(const QString &originFilePath, const QString &checksum);
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

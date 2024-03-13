@@ -125,13 +125,14 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
     connect(modeSelect, &ModeSelector::branchSubfolder, manager->dataMaintainer, &DataMaintainer::forkJsonDb);
+    connect(modeSelect, &ModeSelector::makeSumFile, manager, &Manager::makeSumFile);
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
     connect(manager, &Manager::setStatusbarText, this, &MainWindow::updateStatusIcon);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
-    connect(manager, &Manager::fileChecked, this, &MainWindow::showFileCheckResult);
+    connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
     connect(manager, &Manager::toClipboard, this, [=](const QString &text){QGuiApplication::clipboard()->setText(text);});
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
@@ -320,10 +321,18 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     }
 }
 
-void MainWindow::showFileCheckResult(const QString &fileName, const FileValues &values)
+void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &values)
 {
-    DialogFileProcResult dialog(fileName, values, this);
-    dialog.exec();
+    DialogFileProcResult dialog(paths::basicName(filePath), values, this);
+
+    if (dialog.exec() == QDialog::Accepted && values.status == FileStatus::Added) {
+        if (dialog.clickedButton == DialogFileProcResult::Copy) {
+            QGuiApplication::clipboard()->setText(values.checksum);
+        }
+        else if (dialog.clickedButton == DialogFileProcResult::Save) {
+            emit modeSelect->makeSumFile(filePath, values.checksum);
+        }
+    }
 }
 
 void MainWindow::dialogSettings()

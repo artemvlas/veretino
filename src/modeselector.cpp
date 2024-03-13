@@ -56,10 +56,10 @@ void ModeSelector::connectActions()
     connect(actionProcessContainedChecksums, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionProcessFilteredChecksums, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
-    connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1);});
-    connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256);});
-    connect(actionProcessSha512File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha512);});
-    connect(actionProcessSha_toClipboard, &QAction::triggered, this, &ModeSelector::quickAction);
+    connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1, true, false);});
+    connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256, true, false);});
+    connect(actionProcessSha512File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha512, true, false);});
+    connect(actionProcessSha_toClipboard, &QAction::triggered, this, [=]{computeFileChecksum(settings_->algorithm, false, true);});
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -473,7 +473,7 @@ void ModeSelector::quickAction()
 
     switch (curMode) {
         case File:
-            emit processFileSha(view_->curPathFileSystem, settings_->algorithm, false, true);
+            doWork();
             break;
         case DbFile:
             emit parseJsonFile(view_->curPathFileSystem);

@@ -15,10 +15,13 @@ class DialogFileProcResult : public QDialog
 public:
     explicit DialogFileProcResult(const QString &fileName, const FileValues &values, QWidget *parent = nullptr);
     ~DialogFileProcResult();
+    enum ClickedButton {Undefined, Copy, Save};
+    ClickedButton clickedButton = Undefined;
 
 private:
     Ui::DialogFileProcResult *ui;
     void setInfo(const QString &fileName, const FileValues &values);
+    void setModeCalculated();
 };
 
 #endif // DIALOGFILEPROCRESULT_H
