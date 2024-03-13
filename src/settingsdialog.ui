@@ -180,7 +180,7 @@ Unchecked: to Home folder</string>
           <string>Exclude the summary files from the filelist</string>
          </property>
          <property name="text">
-          <string>Ignore sha files (*.sha1/256/512)</string>
+          <string>Ignore *.sha1/256/512 files</string>
          </property>
         </widget>
        </item>
