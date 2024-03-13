@@ -13,6 +13,7 @@ SOURCES += \
     src/datacontainer.cpp \
     src/datamaintainer.cpp \
     src/dbstatusdialog.cpp \
+    src/dialogfileprocresult.cpp \
     src/files.cpp \
     src/filterrule.cpp \
     src/foldercontentsdialog.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     src/datacontainer.h \
     src/datamaintainer.h \
     src/dbstatusdialog.h \
+    src/dialogfileprocresult.h \
     src/files.h \
     src/filterrule.h \
     src/foldercontentsdialog.h \
@@ -57,6 +59,7 @@ HEADERS += \
 FORMS += \
     src/aboutdialog.ui \
     src/dbstatusdialog.ui \
+    src/dialogfileprocresult.ui \
     src/foldercontentsdialog.ui \
     src/mainwindow.ui \
     src/settingsdialog.ui

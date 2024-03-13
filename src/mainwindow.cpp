@@ -7,6 +7,7 @@
 #include "ui_mainwindow.h"
 #include "dbstatusdialog.h"
 #include "foldercontentsdialog.h"
+#include "dialogfileprocresult.h"
 #include <QClipboard>
 #include <QSettings>
 #include <QDebug>
@@ -321,26 +322,8 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
 void MainWindow::showFileCheckResult(const QString &fileName, const FileValues &values)
 {
-    QMessageBox msgBox(this);
-
-    QString titleText = (values.status == FileStatus::Matched) ? "Checksums Match"
-                                                               : "Checksums do not match";
-
-    QIcon icon = (values.status == FileStatus::Matched) ? QIcon(":/icons/filestatus/matched.svg")
-                                                        : QIcon(":/icons/filestatus/mismatched.svg");
-
-    QString messageText = QString("File: %1\nSize: %2\n\n").arg(fileName, format::dataSizeReadable(values.size));
-
-    if (values.status == FileStatus::Matched)
-        messageText.append(format::shortenString(values.checksum));
-    else
-        messageText.append(QString("Estimated:\n%1\n\nCalculated:\n%2")
-                            .arg(format::shortenString(values.checksum), format::shortenString(values.reChecksum)));
-
-    msgBox.setWindowTitle(titleText);
-    msgBox.setText(messageText);
-    msgBox.setIconPixmap(icon.pixmap(64, 64));
-    msgBox.exec();
+    DialogFileProcResult dialog(fileName, values, this);
+    dialog.exec();
 }
 
 void MainWindow::dialogSettings()
