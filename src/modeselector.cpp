@@ -195,9 +195,9 @@ void ModeSelector::setButtonInfo()
         button_->setToolTip(QString("Calculate checksums of contained files\nand save the result to the local database"));
         break;
     case File:
-        button_->setText(format::algoToStr(settings_->algorithm, false).prepend("*."));
-        button_->setIcon(iconProvider.icon(Icons::Save));
-        button_->setToolTip(QString("Calculate %1 checksum\nand store it in the summary file").arg(format::algoToStr(settings_->algorithm)));
+        button_->setText(format::algoToStr(settings_->algorithm));
+        button_->setIcon(iconProvider.icon(Icons::HashFile));
+        button_->setToolTip(QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm)));
         break;
     case DbFile:
         button_->setText("Open");
