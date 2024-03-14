@@ -23,7 +23,7 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
 
     connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
 
-    iconProvider.setTheme(view_);
+    iconProvider.setTheme(view_->palette());
 
     menuOpenRecent->setToolTipsVisible(true);
 

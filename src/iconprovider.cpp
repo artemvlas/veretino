@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #include "iconprovider.h"
 
 IconProvider::IconProvider() {}
@@ -12,110 +17,156 @@ void IconProvider::setTheme(Theme theme)
     theme_ = theme;
 }
 
-void IconProvider::setTheme(const QWidget *widget)
-{
-    setTheme(widget->palette());
-}
-
 void IconProvider::setTheme(const QPalette &palette)
 {
     theme_ = isDarkTheme(palette) ? Dark : Light;
 }
 
-bool IconProvider::isDarkTheme(const QPalette &palette)
+bool IconProvider::isDarkTheme(const QPalette &palette) const
 {
     int curLightness = palette.color(QPalette::Active, QPalette::Base).lightness();
     return (curLightness < 120);
 }
 
+QString IconProvider::themeFolder() const
+{
+    return (theme_ == Dark) ? "dark" : "light";
+}
+
 QIcon IconProvider::icon(FileStatus status) const
 {
+    QString iconFileName;
+
     switch (status) {
     case FileStatus::Queued:
-        return QIcon(":/icons/color/queued.svg");
+        iconFileName = "queued.svg";
+        break;
     case FileStatus::Calculating:
-        return QIcon(":/icons/color/processing.svg");
+        iconFileName = "processing.svg";
+        break;
     case FileStatus::Verifying:
-        return QIcon(":/icons/color/processing.svg");
+        iconFileName = "processing.svg";
+        break;
     case FileStatus::NotChecked:
-        return QIcon(":/icons/color/notchecked.svg");
+        iconFileName = "notchecked.svg";
+        break;
     case FileStatus::Matched:
-        return QIcon(":/icons/color/matched.svg");
+        iconFileName = "matched.svg";
+        break;
     case FileStatus::Mismatched:
-        return QIcon(":/icons/color/mismatched.svg");
+        iconFileName = "mismatched.svg";
+        break;
     case FileStatus::New:
-        return QIcon(":/icons/color/new.svg");
+        iconFileName = "new.svg";
+        break;
     case FileStatus::Missing:
-        return QIcon(":/icons/color/missing.svg");
+        iconFileName = "missing.svg";
+        break;
     case FileStatus::Unreadable:
-        return QIcon(":/icons/color/unknown.svg");
+        iconFileName = "unknown.svg";
+        break;
     case FileStatus::Added:
-        return QIcon(":/icons/color/added.svg");
+        iconFileName = "added.svg";
+        break;
     case Files::Removed:
-        return QIcon(":/icons/color/removed.svg");
+        iconFileName = "removed.svg";
+        break;
     case FileStatus::ChecksumUpdated:
-        return QIcon(":/icons/color/update.svg");
+        iconFileName = "update.svg";
+        break;
     default:
-        return QIcon(":/icons/color/unknown.svg");
+        iconFileName = "unknown.svg";
+        break;
     }
+
+    return QIcon(":/icons/color/" + iconFileName);
 }
 
 QIcon IconProvider::icon(Icons icon) const
 {
-    QString theme = (theme_ == Dark) ? "dark" : "light";
-
+    QString iconFileName;
     switch (icon) {
     case AddFork:
-        return QIcon(QString(":/icons/%1/add-fork.svg").arg(theme));
+        iconFileName = "add-fork.svg";
+        break;
     case Backup:
-        return QIcon(QString(":/icons/%1/backup.svg").arg(theme));
+        iconFileName = "backup.svg";
+        break;
     case Cancel:
-        return QIcon(QString(":/icons/%1/cancel.svg").arg(theme));
+        iconFileName = "cancel.svg";
+        break;
     case ChartPie:
-        return QIcon(QString(":/icons/%1/chart-pie.svg").arg(theme));
+        iconFileName = "chart-pie.svg";
+        break;
     case ClearHistory:
-        return QIcon(QString(":/icons/%1/clear-history.svg").arg(theme));
+        iconFileName = "clear-history.svg";
+        break;
     case Clock:
-        return QIcon(QString(":/icons/%1/clock.svg").arg(theme));
+        iconFileName = "clock.svg";
+        break;
     case Configure:
-        return QIcon(QString(":/icons/%1/configure.svg").arg(theme));
+        iconFileName = "configure.svg";
+        break;
     case Copy:
-        return QIcon(QString(":/icons/%1/copy.svg").arg(theme));
+        iconFileName = "copy.svg";
+        break;
     case Database:
-        return QIcon(QString(":/icons/%1/database.svg").arg(theme));
+        iconFileName = "database.svg";
+        break;
     case DocClose:
-        return QIcon(QString(":/icons/%1/document-close.svg").arg(theme));
+        iconFileName = "document-close.svg";
+        break;
     case DoubleGear:
-        return QIcon(QString(":/icons/%1/double-gear.svg").arg(theme));
+        iconFileName = "double-gear.svg";
+        break;
     case FileSystem:
-        return QIcon(QString(":/icons/%1/filesystem.svg").arg(theme));
+        iconFileName = "filesystem.svg";
+        break;
     case Filter:
-        return QIcon(QString(":/icons/%1/filter.svg").arg(theme));
+        iconFileName = "filter.svg";
+        break;
     case Folder:
-        return QIcon(QString(":/icons/%1/folder.svg").arg(theme));
+        iconFileName = "folder.svg";
+        break;
     case FolderSync:
-        return QIcon(QString(":/icons/%1/folder-sync.svg").arg(theme));
+        iconFileName = "folder-sync.svg";
+        break;
     case Gear:
-        return QIcon(QString(":/icons/%1/gear.svg").arg(theme));
+        iconFileName = "gear.svg";
+        break;
     case GoHome:
-        return QIcon(QString(":/icons/%1/go-home.svg").arg(theme));
+        iconFileName = "go-home.svg";
+        break;
+    case HashFile:
+        iconFileName = "hash-file.svg";
+        break;
     case NewFile:
-        return QIcon(QString(":/icons/%1/newfile.svg").arg(theme));
+        iconFileName = "newfile.svg";
+        break;
     case Paste:
-        return QIcon(QString(":/icons/%1/paste.svg").arg(theme));
+        iconFileName = "paste.svg";
+        break;
     case ProcessStop:
-        return QIcon(QString(":/icons/%1/process-stop.svg").arg(theme));
+        iconFileName = "process-stop.svg";
+        break;
     case Save:
-        return QIcon(QString(":/icons/%1/save.svg").arg(theme));
+        iconFileName = "save.svg";
+        break;
     case Scan:
-        return QIcon(QString(":/icons/%1/scan.svg").arg(theme));
+        iconFileName = "scan.svg";
+        break;
     case Start:
-        return QIcon(QString(":/icons/%1/start.svg").arg(theme));
+        iconFileName = "start.svg";
+        break;
     case Undo:
-        return QIcon(QString(":/icons/%1/undo.svg").arg(theme));
+        iconFileName = "undo.svg";
+        break;
     case Update:
-        return QIcon(QString(":/icons/%1/update.svg").arg(theme));
+        iconFileName = "update.svg";
+        break;
     default:
         return QIcon();
     }
+
+    return QIcon(QString(":/icons/%1/%2").arg(themeFolder(), iconFileName));
 }

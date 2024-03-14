@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #include "dialogfileprocresult.h"
 #include "ui_dialogfileprocresult.h"
 #include "tools.h"
@@ -33,7 +38,7 @@ void DialogFileProcResult::setInfo(const QString &fileName, const FileValues &va
             titleText = "Checksums do not match";
             break;
         case FileStatus::Added:
-            icon = icons_.icon(FileStatus::Calculating);
+            icon = icons_.icon(Icons::HashFile);
             titleText = "Checksum calculated";
             setModeCalculated();
             break;

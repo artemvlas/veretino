@@ -1,6 +1,10 @@
+/*
+ * This file is part of Veretino project.
+ * GNU General Public License (GNU GPLv3).
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef ICONPROVIDER_H
 #define ICONPROVIDER_H
-#include <QWidget>
 #include <QPalette>
 #include <QIcon>
 #include "files.h"
@@ -30,6 +34,7 @@ public:
         FolderSync,
         Gear,
         GoHome,
+        HashFile,
         NewFile,
         Paste,
         ProcessStop,
@@ -41,14 +46,14 @@ public:
     };
 
     void setTheme(Theme theme);
-    void setTheme(const QWidget *widget);
     void setTheme(const QPalette &palette);
 
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons icon) const;
 
 private:
-    bool isDarkTheme(const QPalette &palette);
+    bool isDarkTheme(const QPalette &palette) const;
+    QString themeFolder() const;
     Theme theme_ = Light;
 };
 

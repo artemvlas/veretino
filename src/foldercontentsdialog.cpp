@@ -68,7 +68,7 @@ void FolderContentsDialog::connections()
 
 void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)
 {
-    QFileIconProvider iconProvider;
+    QFileIconProvider fileIcons;
 
     for (int i = 0; i < extList.size(); ++i) {
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
@@ -76,7 +76,7 @@ void FolderContentsDialog::makeItemsList(const QList<ExtNumSize> &extList)
         item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
-        item->setIcon(TreeWidgetItem::ColumnExtension, iconProvider.icon(QFileInfo("file." + item->extension())));
+        item->setIcon(TreeWidgetItem::ColumnExtension, fileIcons.icon(QFileInfo("file." + item->extension())));
         items.append(item);
     }
 }
