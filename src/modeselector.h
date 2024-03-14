@@ -121,7 +121,7 @@ public:
 
     // Menu
     QMenu *menuAlgo = new QMenu;
-    QMenu *menuStoreSummary = new QMenu("Store checksum to summary");
+    QMenu *menuStoreSummary = new QMenu("Calculate checksum → Summary");
 
 public slots:
     void processing(bool isProcessing);

@@ -521,9 +521,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionProcessFilteredChecksums);
             }
             else if (isCurrentMode(File)) {
-                viewContextMenu->addMenu(menuStoreSummary);
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addAction(actionProcessSha_toClipboard);
+                viewContextMenu->addMenu(menuStoreSummary);
 
                 QString clipboardText = QGuiApplication::clipboard()->text();
                 if (tools::canBeChecksum(clipboardText)) {
