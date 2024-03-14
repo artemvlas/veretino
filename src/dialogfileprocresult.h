@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "files.h"
+#include "iconprovider.h"
 
 namespace Ui {
 class DialogFileProcResult;
@@ -19,9 +20,11 @@ public:
     ClickedButton clickedButton = Undefined;
 
 private:
-    Ui::DialogFileProcResult *ui;
     void setInfo(const QString &fileName, const FileValues &values);
     void setModeCalculated();
+
+    Ui::DialogFileProcResult *ui;
+    IconProvider icons_;
 };
 
 #endif // DIALOGFILEPROCRESULT_H

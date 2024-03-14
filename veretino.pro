@@ -17,6 +17,7 @@ SOURCES += \
     src/files.cpp \
     src/filterrule.cpp \
     src/foldercontentsdialog.cpp \
+    src/iconprovider.cpp \
     src/jsondb.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     src/files.h \
     src/filterrule.h \
     src/foldercontentsdialog.h \
+    src/iconprovider.h \
     src/jsondb.h \
     src/mainwindow.h \
     src/manager.h \

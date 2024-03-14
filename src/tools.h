@@ -9,7 +9,6 @@
 #include <QString>
 #include <QCryptographicHash>
 #include <QAbstractItemModel>
-#include <QIcon>
 #include <QPalette>
 #include "files.h"
 
@@ -59,10 +58,7 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen); // ^vice versa
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
 
 QString findCompleteString(const QStringList &strList, const QString &sample, int sampleLength = 4); // strList{"Ignored", "Included"} | sample "ignore" --> "Ignored", sample "Include Only" --> "Included"
-QString themeFolder(bool isDarkTheme);
-QString themeFolder(const QPalette &palette);
 
-bool isDarkTheme(const QPalette &palette);
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &text);
@@ -92,7 +88,6 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
 QString fileItemStatus(FileStatus status);
-QIcon fileItemStatusIcon(FileStatus status);
 } // namespace format
 
 #endif // TOOLS_H

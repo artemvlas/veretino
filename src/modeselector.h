@@ -11,6 +11,7 @@
 #include <QAction>
 #include <QPushButton>
 #include "view.h"
+#include "iconprovider.h"
 
 class ModeSelector : public QObject
 {
@@ -61,6 +62,8 @@ public:
     void showFileSystem();
     void updateMenuOpenRecent();
     QMenu* menuAlgorithm(); // QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
+
+    IconProvider iconProvider;
 
     // Actions --->>
     // MainWindow menu

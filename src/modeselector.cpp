@@ -23,6 +23,8 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
 
     connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
 
+    iconProvider.setTheme(view_);
+
     menuOpenRecent->setToolTipsVisible(true);
 
     actionShowNewLostOnly->setCheckable(true);
@@ -91,46 +93,44 @@ void ModeSelector::connectActions()
 
 void ModeSelector::setActionsIcons()
 {
-    QString theme = tools::themeFolder(view_->palette());
-
     // MainWindow menu
-    actionOpenFolder->setIcon(QIcon(QString(":/icons/%1/folder.svg").arg(theme)));
-    actionOpenDatabaseFile->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
-    actionShowFilesystem->setIcon(QIcon(QString(":/icons/%1/filesystem.svg").arg(theme)));
-    actionOpenSettingsDialog->setIcon(QIcon(QString(":/icons/%1/configure.svg").arg(theme)));
+    actionOpenFolder->setIcon(iconProvider.icon(Icons::Folder));
+    actionOpenDatabaseFile->setIcon(iconProvider.icon(Icons::Database));
+    actionShowFilesystem->setIcon(iconProvider.icon(Icons::FileSystem));
+    actionOpenSettingsDialog->setIcon(iconProvider.icon(Icons::Configure));
 
-    menuOpenRecent->menuAction()->setIcon(QIcon(QString(":/icons/%1/clock.svg").arg(theme)));
-    actionClearRecent->setIcon(QIcon(QString(":/icons/%1/clear-history.svg").arg(theme)));
+    menuOpenRecent->menuAction()->setIcon(iconProvider.icon(Icons::Clock));
+    actionClearRecent->setIcon(iconProvider.icon(Icons::ClearHistory));
 
     // File system View
-    actionToHome->setIcon(QIcon(QString(":/icons/%1/go-home.svg").arg(theme)));
-    actionCancel->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(theme)));
-    actionShowFolderContentsTypes->setIcon(QIcon(QString(":/icons/%1/chart-pie.svg").arg(theme)));
-    actionProcessContainedChecksums->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(theme)));
-    actionProcessFilteredChecksums->setIcon(QIcon(QString(":/icons/%1/filter.svg").arg(theme)));
-    actionCheckFileByClipboardChecksum->setIcon(QIcon(QString(":/icons/%1/paste.svg").arg(theme)));
-    actionProcessSha_toClipboard->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
-    actionOpenDatabase->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
-    actionCheckSumFile->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
+    actionToHome->setIcon(iconProvider.icon(Icons::GoHome));
+    actionCancel->setIcon(iconProvider.icon(Icons::Cancel));
+    actionShowFolderContentsTypes->setIcon(iconProvider.icon(Icons::ChartPie));
+    actionProcessContainedChecksums->setIcon(iconProvider.icon(Icons::FolderSync));
+    actionProcessFilteredChecksums->setIcon(iconProvider.icon(Icons::Filter));
+    actionCheckFileByClipboardChecksum->setIcon(iconProvider.icon(Icons::Paste));
+    actionProcessSha_toClipboard->setIcon(iconProvider.icon(Icons::Copy));
+    actionOpenDatabase->setIcon(iconProvider.icon(Icons::Database));
+    actionCheckSumFile->setIcon(iconProvider.icon(Icons::Scan));
 
-    menuAlgo->menuAction()->setIcon(QIcon(QString(":/icons/%1/double-gear.svg").arg(theme)));
-    menuStoreSummary->menuAction()->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(theme)));
+    menuAlgo->menuAction()->setIcon(iconProvider.icon(Icons::DoubleGear));
+    menuStoreSummary->menuAction()->setIcon(iconProvider.icon(Icons::Save));
 
     // DB Model View
-    actionCancelBackToFS->setIcon(QIcon(QString(":/icons/%1/process-stop.svg").arg(theme)));
-    actionShowDbStatus->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(theme)));
-    actionResetDb->setIcon(QIcon(QString(":/icons/%1/undo.svg").arg(theme)));
-    actionForgetChanges->setIcon(QIcon(QString(":/icons/%1/backup.svg").arg(theme)));
-    actionUpdateDbWithReChecksums->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(theme)));
-    actionUpdateDbWithNewLost->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(theme)));
-    actionShowNewLostOnly->setIcon(QIcon(QString(":/icons/%1/newfile.svg").arg(theme)));
-    actionShowMismatchesOnly->setIcon(QIcon(QString(":/icons/%1/document-close.svg").arg(theme)));
-    actionCheckCurFileFromModel->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(theme)));
-    actionCheckCurSubfolderFromModel->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(theme)));
-    actionCheckAll->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(theme)));
-    actionCopyStoredChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
-    actionCopyReChecksum->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(theme)));
-    actionBranchSubfolder->setIcon(QIcon(QString(":/icons/%1/add-fork.svg").arg(theme)));
+    actionCancelBackToFS->setIcon(iconProvider.icon(Icons::ProcessStop));
+    actionShowDbStatus->setIcon(iconProvider.icon(Icons::Database));
+    actionResetDb->setIcon(iconProvider.icon(Icons::Undo));
+    actionForgetChanges->setIcon(iconProvider.icon(Icons::Backup));
+    actionUpdateDbWithReChecksums->setIcon(iconProvider.icon(Icons::Update));
+    actionUpdateDbWithNewLost->setIcon(iconProvider.icon(Icons::Update));
+    actionShowNewLostOnly->setIcon(iconProvider.icon(Icons::NewFile));
+    actionShowMismatchesOnly->setIcon(iconProvider.icon(Icons::DocClose));
+    actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
+    actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
+    actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
+    actionCopyStoredChecksum->setIcon(iconProvider.icon(Icons::Copy));
+    actionCopyReChecksum->setIcon(iconProvider.icon(Icons::Copy));
+    actionBranchSubfolder->setIcon(iconProvider.icon(Icons::AddFork));
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -167,7 +167,7 @@ void ModeSelector::setMode()
 {
     if (isProcessing_) {
         button_->setText("Cancel");
-        button_->setIcon(QIcon(QString(":/icons/%1/cancel.svg").arg(tools::themeFolder(view_->palette()))));
+        button_->setIcon(iconProvider.icon(Icons::Cancel));
         button_->setToolTip("");
         return;
     }
@@ -187,40 +187,39 @@ void ModeSelector::setMode()
 void ModeSelector::setButtonInfo()
 {
     button_->setToolTip(QString());
-    QString themeFolder = tools::themeFolder(view_->palette());
 
     switch (curMode) {
     case Folder:
         button_->setText(format::algoToStr(settings_->algorithm));
-        button_->setIcon(QIcon(QString(":/icons/%1/folder-sync.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::FolderSync));
         button_->setToolTip(QString("Calculate checksums of contained files\nand save the result to the local database"));
         break;
     case File:
         button_->setText(format::algoToStr(settings_->algorithm, false).prepend("*."));
-        button_->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::Save));
         button_->setToolTip(QString("Calculate %1 checksum\nand store it in the summary file").arg(format::algoToStr(settings_->algorithm)));
         break;
     case DbFile:
         button_->setText("Open");
-        button_->setIcon(QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::Database));
         break;
     case SumFile:
         button_->setText("Check");
-        button_->setIcon(QIcon(QString(":/icons/%1/scan.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::Scan));
         break;
     case Model:
         button_->setText("Verify");
-        button_->setIcon(QIcon(QString(":/icons/%1/start.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::Start));
         button_->setToolTip(QString("Check ALL files against stored checksums"));
         break;
     case ModelNewLost:
         button_->setText("New/Lost");
-        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::Update));
         button_->setToolTip(QString("Update the Database:\nadd new files, delete missing ones"));
         break;
     case UpdateMismatch:
         button_->setText("Update");
-        button_->setIcon(QIcon(QString(":/icons/%1/update.svg").arg(themeFolder)));
+        button_->setIcon(iconProvider.icon(Icons::Update));
         button_->setToolTip(QString("Update mismatched checksums with newly calculated ones"));
         break;
     case NoMode:
@@ -612,7 +611,7 @@ void ModeSelector::updateMenuOpenRecent()
     if (!menuOpenRecent->isEnabled())
         return;
 
-    QIcon dbIcon = QIcon(QString(":/icons/%1/database.svg").arg(tools::themeFolder(view_->palette())));
+    QIcon dbIcon = iconProvider.icon(Icons::Database);
 
     foreach (const QString &recentFilePath, settings_->recentFiles) {
         if (QFileInfo::exists(recentFilePath)) {

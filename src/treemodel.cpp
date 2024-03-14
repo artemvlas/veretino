@@ -145,7 +145,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
                                        : iconProvider.icon(QFileIconProvider::Folder);
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
-            return format::fileItemStatusIcon(curIndex.data(RawDataRole).value<FileStatus>());
+            return icons_.icon(curIndex.data(RawDataRole).value<FileStatus>());
         }
     }
 

@@ -8,6 +8,8 @@ DialogFileProcResult::DialogFileProcResult(const QString &fileName, const FileVa
     , ui(new Ui::DialogFileProcResult)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/veretino.png"));
+    icons_.setTheme(palette());
     setInfo(fileName, values);
 }
 
@@ -23,15 +25,15 @@ void DialogFileProcResult::setInfo(const QString &fileName, const FileValues &va
 
     switch (values.status) {
         case FileStatus::Matched:
-            icon = QIcon(":/icons/filestatus/matched.svg");
+        icon = icons_.icon(FileStatus::Matched);
             titleText = "Checksums Match";
             break;
         case FileStatus::Mismatched:
-            icon = QIcon(":/icons/filestatus/mismatched.svg");
+            icon = icons_.icon(FileStatus::Mismatched);
             titleText = "Checksums do not match";
             break;
         case FileStatus::Added:
-            icon = QIcon(":/icons/filestatus/processing.svg");
+            icon = icons_.icon(FileStatus::Calculating);
             titleText = "Checksum calculated";
             setModeCalculated();
             break;
@@ -66,9 +68,8 @@ void DialogFileProcResult::setModeCalculated()
     QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
     QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::AcceptRole);
 
-    QString themeFolder = tools::themeFolder(palette());
-    buttonCopy->setIcon(QIcon(QString(":/icons/%1/copy.svg").arg(themeFolder)));
-    buttonSave->setIcon(QIcon(QString(":/icons/%1/save.svg").arg(themeFolder)));
+    buttonCopy->setIcon(icons_.icon(Icons::Copy));
+    buttonSave->setIcon(icons_.icon(Icons::Save));
 
     connect(buttonCopy, &QPushButton::clicked, this, [=]{clickedButton = Copy;});
     connect(buttonSave, &QPushButton::clicked, this, [=]{clickedButton = Save;});

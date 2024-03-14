@@ -8,6 +8,7 @@
 #include "clickablelabel.h"
 #include <QFile>
 #include <QDebug>
+#include "iconprovider.h"
 
 DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     : QDialog(parent)
@@ -37,16 +38,16 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     data->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()
                                                      : ui->labelDateTime_Check->setText("Verified: " + data->metaData.successfulCheckDateTime);
 
-    QString themeFolder = tools::themeFolder(palette()); // to set tabs icons
+    IconProvider icons(palette()); // to set tabs icons
 
     // tab Content
     ui->labelContentNumbers->setText(infoContent(data).join("\n"));
-    ui->tabWidget->setTabIcon(TabListed, QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
+    ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
     // tab Filter
     ui->tabWidget->setTabEnabled(TabFilter, data->isFilterApplied());
     if (data->isFilterApplied()) {
-        ui->tabWidget->setTabIcon(TabFilter, QIcon(QString(":/icons/%1/filter.svg").arg(themeFolder)));
+        ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
         QString extensions = data->metaData.filter.extensionsList.join(", ");
         data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included Only:\n%1").arg(extensions))
@@ -56,7 +57,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     // tab Verification
     ui->tabWidget->setTabEnabled(TabVerification, data->containsChecked());
     if (data->containsChecked()) {
-        ui->tabWidget->setTabIcon(TabVerification, QIcon(QString(":/icons/%1/double-gear.svg").arg(themeFolder)));
+        ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
 
@@ -64,7 +65,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated()
                                              && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
-        ui->tabWidget->setTabIcon(TabChanges, QIcon(QString(":/icons/%1/update.svg").arg(themeFolder)));
+        ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join("\n"));
     }
 

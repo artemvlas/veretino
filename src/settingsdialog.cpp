@@ -6,6 +6,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include <QPushButton>
+#include "iconprovider.h"
 
 SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     QDialog(parent),
@@ -31,9 +32,9 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     loadSettings(*settings);
 
     // set tabs icons
-    QString themeFolder = tools::themeFolder(palette());
-    ui->tabWidget->setTabIcon(TabDatabase, QIcon(QString(":/icons/%1/database.svg").arg(themeFolder)));
-    ui->tabWidget->setTabIcon(TabFilter, QIcon(QString(":/icons/%1/filter.svg").arg(themeFolder)));
+    IconProvider icons(palette());
+    ui->tabWidget->setTabIcon(TabDatabase, icons.icon(Icons::Database));
+    ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 }
 
 void SettingsDialog::loadSettings(const Settings &settings)

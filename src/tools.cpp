@@ -69,22 +69,6 @@ QString findCompleteString(const QStringList &strList, const QString &sample, in
     return result;
 }
 
-QString themeFolder(bool isDarkTheme)
-{
-    return isDarkTheme ? "dark" : "light";
-}
-
-QString themeFolder(const QPalette &palette)
-{
-    return themeFolder(isDarkTheme(palette));
-}
-
-bool isDarkTheme(const QPalette &palette)
-{
-    int curLightness = palette.color(QPalette::Active, QPalette::Base).lightness();
-    return (curLightness < 120);
-}
-
 bool isDatabaseFile(const QString &filePath) {
     return filePath.endsWith(".ver", Qt::CaseInsensitive)
            || filePath.endsWith(".ver.json", Qt::CaseInsensitive);
@@ -372,38 +356,6 @@ QString fileItemStatus(FileStatus status)
     }
 
     return result;
-}
-
-QIcon fileItemStatusIcon(FileStatus status)
-{
-    switch (status) {
-        case FileStatus::Queued:
-            return QIcon(":/icons/filestatus/queued.svg");
-        case FileStatus::Calculating:
-            return QIcon(":/icons/filestatus/processing.svg");
-        case FileStatus::Verifying:
-            return QIcon(":/icons/filestatus/processing.svg");
-        case FileStatus::NotChecked:
-            return QIcon(":/icons/filestatus/notchecked.svg");
-        case FileStatus::Matched:
-            return QIcon(":/icons/filestatus/matched.svg");
-        case FileStatus::Mismatched:
-            return QIcon(":/icons/filestatus/mismatched.svg");
-        case FileStatus::New:
-            return QIcon(":/icons/filestatus/new.svg");
-        case FileStatus::Missing:
-            return QIcon(":/icons/filestatus/missing.svg");
-        case FileStatus::Unreadable:
-            return QIcon(":/icons/filestatus/unknown.svg");
-        case FileStatus::Added:
-            return QIcon(":/icons/filestatus/added.svg");
-        case Files::Removed:
-            return QIcon(":/icons/filestatus/removed.svg");
-        case FileStatus::ChecksumUpdated:
-            return QIcon(":/icons/filestatus/update.svg");
-        default:
-            return QIcon(":/icons/filestatus/unknown.svg");
-    }
 }
 
 } // namespace format

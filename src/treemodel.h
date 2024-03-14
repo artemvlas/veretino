@@ -11,6 +11,7 @@
 #include "treeitem.h"
 #include "files.h"
 #include "tools.h"
+#include "iconprovider.h"
 
 class TreeItem;
 
@@ -58,6 +59,7 @@ private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *rootItem;
     QFileIconProvider iconProvider;
+    IconProvider icons_;
 }; // class TreeModel
 
 using Column = TreeModel::Column;

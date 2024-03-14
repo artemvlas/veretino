@@ -11,6 +11,7 @@
 #include <QClipboard>
 #include <QSettings>
 #include <QDebug>
+#include "iconprovider.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -290,15 +291,15 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     QString titleText = (result.contains(FileStatus::Mismatched)) ? "FAILED" : "Success";
     QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
 
-    QIcon icon = (result.contains(FileStatus::Mismatched)) ? QIcon(":/icons/filestatus/mismatched.svg")
-                                                           : QIcon(":/icons/filestatus/matched.svg");
+    QIcon icon = (result.contains(FileStatus::Mismatched)) ? modeSelect->iconProvider.icon(FileStatus::Mismatched)
+                                                           : modeSelect->iconProvider.icon(FileStatus::Matched);
 
     if (result.contains(FileStatus::Mismatched)) {
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
         msgBox.button(QMessageBox::Ok)->setText("Update");
         msgBox.button(QMessageBox::Cancel)->setText("Continue");
-        msgBox.button(QMessageBox::Ok)->setIcon(QIcon(":/icons/filestatus/update.svg"));
+        msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->iconProvider.icon(FileStatus::ChecksumUpdated));
         msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
 
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
@@ -406,14 +407,14 @@ void MainWindow::updateStatusIcon()
 {
     QIcon statusIcon;
     if (modeSelect->isProcessing()) {
-        statusIcon = QIcon(":/icons/filestatus/processing.svg");
+        statusIcon = modeSelect->iconProvider.icon(FileStatus::Calculating);
     }
     else if (ui->treeView->isViewFileSystem()) {
         statusIcon = QFileIconProvider().icon(QFileInfo(ui->treeView->curPathFileSystem));
     }
     else if (ui->treeView->isViewDatabase()) {
         if (TreeModel::isFileRow(ui->treeView->curIndexSource))
-            statusIcon = format::fileItemStatusIcon(TreeModel::itemFileStatus(ui->treeView->curIndexSource));
+            statusIcon = modeSelect->iconProvider.icon(TreeModel::itemFileStatus(ui->treeView->curIndexSource));
         else
             statusIcon = QFileIconProvider().icon(QFileIconProvider::Folder);
     }
@@ -435,8 +436,7 @@ void MainWindow::updatePermanentStatus()
     }
     else if (ui->treeView->isViewFileSystem()) {
         settings_->filter.extensionsList.isEmpty() ? permanentStatus->clear()
-                                                   : permanentStatus->setPixmap(QIcon(QString(":/icons/%1/filter.svg")
-                                                                  .arg(tools::themeFolder(palette()))).pixmap(16, 16));
+                                                   : permanentStatus->setPixmap(modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16));
     }
     else
         permanentStatus->clear();

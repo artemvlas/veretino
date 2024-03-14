@@ -43,17 +43,17 @@
         <file>icons/light/start.svg</file>
         <file>icons/light/undo.svg</file>
         <file>icons/light/update.svg</file>
-        <file>icons/filestatus/added.svg</file>
-        <file>icons/filestatus/matched.svg</file>
-        <file>icons/filestatus/mismatched.svg</file>
-        <file>icons/filestatus/missing.svg</file>
-        <file>icons/filestatus/new.svg</file>
-        <file>icons/filestatus/notchecked.svg</file>
-        <file>icons/filestatus/processing.svg</file>
-        <file>icons/filestatus/queued.svg</file>
-        <file>icons/filestatus/removed.svg</file>
-        <file>icons/filestatus/unknown.svg</file>
-        <file>icons/filestatus/update.svg</file>
+        <file>icons/color/added.svg</file>
+        <file>icons/color/matched.svg</file>
+        <file>icons/color/mismatched.svg</file>
+        <file>icons/color/missing.svg</file>
+        <file>icons/color/new.svg</file>
+        <file>icons/color/notchecked.svg</file>
+        <file>icons/color/processing.svg</file>
+        <file>icons/color/queued.svg</file>
+        <file>icons/color/removed.svg</file>
+        <file>icons/color/unknown.svg</file>
+        <file>icons/color/update.svg</file>
         <file>icons/dark/clear-history.svg</file>
         <file>icons/light/clear-history.svg</file>
         <file>icons/dark/clock.svg</file>
