@@ -85,14 +85,8 @@ void DialogFileProcResult::setInfo(const QString &filePath, const FileValues &va
 void DialogFileProcResult::setModeCalculated()
 {
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
-    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
-    QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::AcceptRole);
-
-    buttonCopy->setIcon(icons_.icon(Icons::Copy));
-    buttonSave->setIcon(icons_.icon(Icons::Save));
-
-    connect(buttonCopy, &QPushButton::clicked, this, [=]{clickedButton = Copy;});
-    connect(buttonSave, &QPushButton::clicked, this, [=]{clickedButton = Save;});
+    addButtonCopy();
+    addButtonSave();
 }
 
 void DialogFileProcResult::setModeUnstored()
@@ -101,9 +95,21 @@ void DialogFileProcResult::setModeUnstored()
     ui->labelAlgo->setVisible(false);
 
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
-    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
+    addButtonCopy();
+}
 
+void DialogFileProcResult::addButtonCopy()
+{
+    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
     buttonCopy->setIcon(icons_.icon(Icons::Copy));
 
     connect(buttonCopy, &QPushButton::clicked, this, [=]{clickedButton = Copy;});
+}
+
+void DialogFileProcResult::addButtonSave()
+{
+    QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::AcceptRole);
+    buttonSave->setIcon(icons_.icon(Icons::Save));
+
+    connect(buttonSave, &QPushButton::clicked, this, [=]{clickedButton = Save;});
 }

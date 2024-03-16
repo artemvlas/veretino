@@ -28,6 +28,8 @@ private:
     void setInfo(const QString &filePath, const FileValues &values);
     void setModeCalculated();
     void setModeUnstored();
+    void addButtonCopy();
+    void addButtonSave();
 
     Ui::DialogFileProcResult *ui;
     IconProvider icons_;
