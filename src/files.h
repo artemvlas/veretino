@@ -36,7 +36,11 @@ public:
         Unreadable, // present on the disk, but unreadable (no read permission or read error)
         Added, // item (file path and its checksum) has been added to the database
         Removed, // item^ removed from the database
-        ChecksumUpdated
+        ChecksumUpdated,
+        Computed, // the checksum has been calculated and is ready for further processing (copy or save)
+        Copied, // the checksum is calculated and copied to clipboard
+        Stored, // the checksum is calculated and stored in the summary file
+        UnStored // the checksum was calculated, but writing the summary file failed
     };
     Q_ENUM(FileStatus)
 

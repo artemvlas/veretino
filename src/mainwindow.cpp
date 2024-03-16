@@ -325,15 +325,23 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
 void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &values)
 {
-    DialogFileProcResult dialog(paths::basicName(filePath), values, this);
+    if (values.status == FileStatus::Copied)
+        QGuiApplication::clipboard()->setText(values.checksum);
 
-    if (dialog.exec() == QDialog::Accepted && values.status == FileStatus::Added) {
-        if (dialog.clickedButton == DialogFileProcResult::Copy) {
+    DialogFileProcResult dialog(filePath, values, this);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        if (values.status == FileStatus::Computed) {
+            if (dialog.clickedButton == DialogFileProcResult::Copy) {
+                QGuiApplication::clipboard()->setText(values.checksum);
+            }
+            else if (dialog.clickedButton == DialogFileProcResult::Save) {
+                emit modeSelect->makeSumFile(filePath, values.checksum);
+            }
+        }
+        else if (values.status == FileStatus::UnStored
+                 && dialog.clickedButton == DialogFileProcResult::Copy)
             QGuiApplication::clipboard()->setText(values.checksum);
-        }
-        else if (dialog.clickedButton == DialogFileProcResult::Save) {
-            emit modeSelect->makeSumFile(filePath, values.checksum);
-        }
     }
 }
 

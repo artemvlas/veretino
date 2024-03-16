@@ -19,14 +19,15 @@ class DialogFileProcResult : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogFileProcResult(const QString &fileName, const FileValues &values, QWidget *parent = nullptr);
+    explicit DialogFileProcResult(const QString &filePath, const FileValues &values, QWidget *parent = nullptr);
     ~DialogFileProcResult();
     enum ClickedButton {Undefined, Copy, Save};
     ClickedButton clickedButton = Undefined;
 
 private:
-    void setInfo(const QString &fileName, const FileValues &values);
+    void setInfo(const QString &filePath, const FileValues &values);
     void setModeCalculated();
+    void setModeUnstored();
 
     Ui::DialogFileProcResult *ui;
     IconProvider icons_;

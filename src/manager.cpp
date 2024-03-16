@@ -64,18 +64,12 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     if (sum.isEmpty())
         return;
 
-    if (result == Clipboard) {
-        emit toClipboard(sum);
-        emit showMessage(QString("Computed checksum is copied to clipboard\n\n%1: %2")
-                        .arg(format::algoToStr(algo), format::shortenString(sum, 40)), paths::basicName(filePath));
-    }
-
-    else if (result == SumFile) {
+    if (result == SumFile) {
         makeSumFile(filePath, sum);
     }
 
     else {
-        FileValues fileVal(FileStatus::Added);
+        FileValues fileVal(result == Clipboard ? FileStatus::Copied : FileStatus::Computed);
         fileVal.checksum = sum.toLower();
         fileVal.size = QFileInfo(filePath).size();
 
@@ -93,16 +87,13 @@ void Manager::makeSumFile(const QString &originFilePath, const QString &checksum
     QString sumFile = QString("%1.%2").arg(originFilePath, ext);
 
     QFile file(sumFile);
-    if (file.open(QFile::WriteOnly)) {
-        file.write(QString("%1 *%2").arg(checksum, paths::basicName(originFilePath)).toUtf8());
-        emit showMessage(QString("The checksum is saved:\n\n%1").arg(paths::basicName(sumFile)), // Message body
-                         "Saved"); // Message header
-    }
-    else {
-        emit toClipboard(checksum); // if unable to write summary, send the checksum to clipboard
-        emit showMessage(QString("Unable to create a summary file:\n%1\n\nThe Checksum is copied to clipboard:\n%2: %3")
-                             .arg(sumFile, format::algoToStr(algo), format::shortenString(checksum, 40)), "Warning");
-    }
+    bool isStored = (file.open(QFile::WriteOnly)
+                     && (file.write(QString("%1 *%2").arg(checksum, paths::basicName(originFilePath)).toUtf8()) > 0));
+
+    FileValues fileVal(isStored ? FileStatus::Stored : FileStatus::UnStored);
+    fileVal.checksum = checksum.toLower();
+
+    emit fileProcessed(sumFile, fileVal);
 }
 
 void Manager::resetDatabase()
