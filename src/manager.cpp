@@ -100,7 +100,7 @@ void Manager::makeSumFile(const QString &originFilePath, const QString &checksum
     }
     else {
         emit toClipboard(checksum); // if unable to write summary, send the checksum to clipboard
-        emit showMessage(QString("Unable to create a summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
+        emit showMessage(QString("Unable to create a summary file:\n%1\n\nThe Checksum is copied to clipboard:\n%2: %3")
                              .arg(sumFile, format::algoToStr(algo), format::shortenString(checksum, 40)), "Warning");
     }
 }
