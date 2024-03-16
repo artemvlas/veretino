@@ -58,19 +58,19 @@ void Manager::processFolderSha(const MetaData &metaData)
     }
 }
 
-void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
+void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, ProcFileResult result)
 {
     QString sum = calculateChecksum(filePath, algo);
     if (sum.isEmpty())
         return;
 
-    if (clipboard) {
+    if (result == Clipboard) {
         emit toClipboard(sum);
         emit showMessage(QString("Computed checksum is copied to clipboard\n\n%1: %2")
                         .arg(format::algoToStr(algo), format::shortenString(sum, 40)), paths::basicName(filePath));
     }
 
-    else if (summaryFile) {
+    else if (result == SumFile) {
         makeSumFile(filePath, sum);
     }
 

@@ -17,12 +17,12 @@ class Manager : public QObject
     Q_OBJECT
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
-
+    enum ProcFileResult {Generic, Clipboard, SumFile};
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
 
 public slots:
     void processFolderSha(const MetaData &metaData);
-    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, bool summaryFile = true, bool clipboard = false);
+    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, ProcFileResult result);
     void makeSumFile(const QString &originFilePath, const QString &checksum);
     void verify(const QModelIndex &curIndex);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
@@ -73,6 +73,8 @@ signals:
     void showMessage(const QString &text, const QString &title = "Info");
     void toClipboard(const QString &text); // Sending directly to QGuiApplication::clipboard()->setText works great on Linux,
                                            // but does NOT work on older QT builds on Windows. So this signal is used for compatibility.
-};
+}; // class Manager
+
+using ProcFileResult = Manager::ProcFileResult;
 
 #endif // MANAGER_H

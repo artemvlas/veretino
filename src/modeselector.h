@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include "view.h"
 #include "iconprovider.h"
+#include "manager.h"
 
 class ModeSelector : public QObject
 {
@@ -53,7 +54,7 @@ public:
                                                                 // or do not abort the process, cancel execution (false)
 
     //---->>>
-    void computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard);
+    void procSumFile(QCryptographicHash::Algorithm algo);
     void verifyItem();
     void verifyDb();
     void showFolderContentTypes();
@@ -147,7 +148,7 @@ signals:
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void processFolderSha(const MetaData &metaData);
-    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, bool summaryFile = false, bool clipboard = false);
+    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, ProcFileResult result = ProcFileResult::Generic);
     void parseJsonFile(const QString &path);
     void verify(const QModelIndex& index = QModelIndex());
     void updateNewLost();

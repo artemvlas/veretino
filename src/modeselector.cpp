@@ -58,10 +58,11 @@ void ModeSelector::connectActions()
     connect(actionProcessContainedChecksums, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionProcessFilteredChecksums, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
-    connect(actionProcessSha1File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha1, true, false);});
-    connect(actionProcessSha256File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha256, true, false);});
-    connect(actionProcessSha512File, &QAction::triggered, this, [=]{computeFileChecksum(QCryptographicHash::Sha512, true, false);});
-    connect(actionProcessSha_toClipboard, &QAction::triggered, this, [=]{computeFileChecksum(settings_->algorithm, false, true);});
+    connect(actionProcessSha1File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha1);});
+    connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
+    connect(actionProcessSha512File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha512);});
+    connect(actionProcessSha_toClipboard, &QAction::triggered, this,
+            [=]{emit processFileSha(view_->curPathFileSystem, settings_->algorithm, ProcFileResult::Clipboard);});
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -72,8 +73,10 @@ void ModeSelector::connectActions()
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
     connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, &ModeSelector::updateMismatch);
     connect(actionUpdateDbWithNewLost, &QAction::triggered, this, &ModeSelector::updateNewLost);
-    connect(actionShowNewLostOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
-    connect(actionShowMismatchesOnly, &QAction::toggled, this, [=](bool isChecked){if (isChecked) view_->setFilter(FileStatus::Mismatched); else view_->disableFilter();});
+    connect(actionShowNewLostOnly, &QAction::toggled, this,
+            [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
+    connect(actionShowMismatchesOnly, &QAction::toggled, this,
+            [=](bool isChecked){if (isChecked) view_->setFilter(FileStatus::Mismatched); else view_->disableFilter();});
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
@@ -285,9 +288,9 @@ void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
 }
 
 // tasks execution --->>>
-void ModeSelector::computeFileChecksum(QCryptographicHash::Algorithm algo, bool summaryFile, bool clipboard)
+void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
 {
-    emit processFileSha(view_->curPathFileSystem, algo, summaryFile, clipboard);
+    emit processFileSha(view_->curPathFileSystem, algo, ProcFileResult::SumFile);
 }
 
 void ModeSelector::verifyItem()
