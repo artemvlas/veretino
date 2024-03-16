@@ -50,6 +50,7 @@ void DialogFileProcResult::setInfo(const QString &fileName, const FileValues &va
     ui->labelIcon->setPixmap(icon.pixmap(64, 64));
     ui->labelFileName->setText("File: " + fileName);
     ui->labelFileSize->setText("Size: " + format::dataSizeReadable(values.size));
+    ui->labelAlgo->setText("Algorithm: " + format::algoToStr(values.checksum.length()));
 
     if (values.status == FileStatus::Matched) {
         ui->textChecksum->setTextColor(QColor("green"));
@@ -58,7 +59,7 @@ void DialogFileProcResult::setInfo(const QString &fileName, const FileValues &va
         ui->textChecksum->setTextColor(QColor("red"));
         QTextEdit *reChecksum = new QTextEdit(this);
         reChecksum->setReadOnly(true);
-        reChecksum->setMinimumHeight(50);
+        reChecksum->setMinimumHeight(40);
         reChecksum->setTextColor(QColor("green"));
         reChecksum->setText(values.reChecksum);
         ui->verticalLayout->addWidget(reChecksum);

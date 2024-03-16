@@ -84,6 +84,7 @@ QString simplifiedChars(QString str);
 QString joinStrings(const QString &str1, const QString &str2, const QString joint = "_");
 QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension);
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true);
+QString algoToStr(int sumStrLength, bool capitalLetters = true);
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"

@@ -290,6 +290,11 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
     }
 }
 
+QString algoToStr(int sumStrLength, bool capitalLetters)
+{
+    return algoToStr(tools::algorithmByStrLen(sumStrLength), capitalLetters);
+}
+
 QString filesNumberAndSize(int filesNumber, qint64 filesSize)
 {
     if (filesNumber == 0)
