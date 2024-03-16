@@ -1,5 +1,6 @@
 Veretino 0.3.6
-* Improved message about folder verification results.
+* Added an extended dialog box for file processing results.
+* Improved message box about folder verification results.
 
 Veretino 0.3.5
 * Added the ability to create separate databases for subfolders based on an existing list of checksums.
