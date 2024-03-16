@@ -95,12 +95,12 @@ void Manager::makeSumFile(const QString &originFilePath, const QString &checksum
     QFile file(sumFile);
     if (file.open(QFile::WriteOnly)) {
         file.write(QString("%1 *%2").arg(checksum, paths::basicName(originFilePath)).toUtf8());
-        emit showMessage(QString("The checksum is saved in the summary file:\n\n%1").arg(paths::basicName(sumFile)), // Message body
+        emit showMessage(QString("The checksum is saved:\n\n%1").arg(paths::basicName(sumFile)), // Message body
                          "Saved"); // Message header
     }
     else {
         emit toClipboard(checksum); // if unable to write summary, send the checksum to clipboard
-        emit showMessage(QString("Unable to create summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
+        emit showMessage(QString("Unable to create a summary file: %1\nChecksum is copied to clipboard\n\n%2: %3")
                              .arg(sumFile, format::algoToStr(algo), format::shortenString(checksum, 40)), "Warning");
     }
 }
