@@ -330,17 +330,12 @@ void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &
     DialogFileProcResult dialog(filePath, values, this);
 
     if (dialog.exec() == QDialog::Accepted) {
-        if (values.status == FileStatus::Computed) {
-            if (dialog.clickedButton == DialogFileProcResult::Copy) {
-                QGuiApplication::clipboard()->setText(values.checksum);
-            }
-            else if (dialog.clickedButton == DialogFileProcResult::Save) {
-                emit modeSelect->makeSumFile(filePath, values.checksum);
-            }
-        }
-        else if (values.status == FileStatus::UnStored
-                 && dialog.clickedButton == DialogFileProcResult::Copy)
+        if (dialog.clickedButton == DialogFileProcResult::Copy) {
             QGuiApplication::clipboard()->setText(values.checksum);
+        }
+        else if (dialog.clickedButton == DialogFileProcResult::Save) {
+            emit modeSelect->makeSumFile(filePath, values.checksum);
+        }
     }
 }
 
