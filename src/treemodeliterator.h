@@ -28,7 +28,7 @@ private:
     const QAbstractItemModel *model_;
     QModelIndex index_;
     QModelIndex rootIndex_;
-    QModelIndex nextIndex_;
+    QModelIndex nextIndex_; // the next index is found in advance and used as a cache to avoid calling the function twice when hasNext()
 
     bool endReached = false;
 };

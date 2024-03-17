@@ -5,13 +5,18 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "iconprovider.h"
 #include "dbstatusdialog.h"
 #include "foldercontentsdialog.h"
 #include "dialogfileprocresult.h"
+#include "settingsdialog.h"
+#include "aboutdialog.h"
+#include <QMimeData>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QClipboard>
 #include <QSettings>
 #include <QDebug>
-#include "iconprovider.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

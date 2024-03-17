@@ -8,16 +8,8 @@
 
 #include <QMainWindow>
 #include <QThread>
-#include <QMessageBox>
-#include <QFileDialog>
 #include <QDragEnterEvent>
-#include <QMimeData>
-#include <QLabel>
-#include <QCryptographicHash>
-#include "treemodel.h"
 #include "manager.h"
-#include "settingsdialog.h"
-#include "aboutdialog.h"
 #include "modeselector.h"
 #include "clickablelabel.h"
 
@@ -49,7 +41,7 @@ public slots:
     void showFileCheckResult(const QString &filePath, const FileValues &values);
 
 private:
-    void connectManager(); // connections with Manager separated for convenience
+    void connectManager(); // connections are separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
     void saveSettings();
