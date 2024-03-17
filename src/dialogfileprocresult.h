@@ -21,18 +21,26 @@ class DialogFileProcResult : public QDialog
 public:
     explicit DialogFileProcResult(const QString &filePath, const FileValues &values, QWidget *parent = nullptr);
     ~DialogFileProcResult();
-    enum ClickedButton {Undefined, Copy, Save};
-    ClickedButton clickedButton = Undefined;
 
 private:
-    void setInfo(const QString &filePath, const FileValues &values);
-    void setModeCalculated();
+    void setModeMatched();
+    void setModeMismatched();
+    void setModeComputed();
+    void setModeCopied();
+    void setModeStored();
     void setModeUnstored();
     void addButtonCopy();
     void addButtonSave();
+    void setIcon(const QIcon &icon);
+    void makeSumFile();
+    void setFileName(const QString &filePath);
+    void showLineSizeAlgo();
+    void hideLineSizeAlgo();
 
     Ui::DialogFileProcResult *ui;
     IconProvider icons_;
+    QString filePath_;
+    FileValues values_;
 };
 
 #endif // DIALOGFILEPROCRESULT_H

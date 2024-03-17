@@ -23,7 +23,6 @@ public:
 public slots:
     void processFolderSha(const MetaData &metaData);
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, ProcFileResult result);
-    void makeSumFile(const QString &originFilePath, const QString &checksum);
     void verify(const QModelIndex &curIndex);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);

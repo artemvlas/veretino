@@ -127,7 +127,6 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
     connect(modeSelect, &ModeSelector::branchSubfolder, manager->dataMaintainer, &DataMaintainer::forkJsonDb);
-    connect(modeSelect, &ModeSelector::makeSumFile, manager, &Manager::makeSumFile);
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
@@ -324,11 +323,10 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
 void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &values)
 {
-    if (values.status == FileStatus::Copied)
-        QGuiApplication::clipboard()->setText(values.checksum);
-
     DialogFileProcResult dialog(filePath, values, this);
+    dialog.exec();
 
+    /*
     if (dialog.exec() == QDialog::Accepted) {
         if (dialog.clickedButton == DialogFileProcResult::Copy) {
             QGuiApplication::clipboard()->setText(values.checksum);
@@ -336,7 +334,7 @@ void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &
         else if (dialog.clickedButton == DialogFileProcResult::Save) {
             emit modeSelect->makeSumFile(filePath, values.checksum);
         }
-    }
+    }*/
 }
 
 void MainWindow::dialogSettings()

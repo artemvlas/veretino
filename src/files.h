@@ -38,9 +38,9 @@ public:
         Removed, // item^ removed from the database
         ChecksumUpdated,
         Computed, // the checksum has been calculated and is ready for further processing (copy or save)
-        Copied, // the checksum is calculated and copied to clipboard
-        Stored, // the checksum is calculated and stored in the summary file
-        UnStored // the checksum was calculated, but writing the summary file failed
+        ToClipboard, // the calculated checksum is intended to be copied to the clipboard
+        ToSumFile, // the calculated checksum is intended to be stored in the summary file
+        //UnStored // the checksum was calculated, but writing the summary file failed
     };
     Q_ENUM(FileStatus)
 

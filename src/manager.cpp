@@ -61,39 +61,29 @@ void Manager::processFolderSha(const MetaData &metaData)
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, ProcFileResult result)
 {
     QString sum = calculateChecksum(filePath, algo);
+
     if (sum.isEmpty())
         return;
 
-    if (result == SumFile) {
-        makeSumFile(filePath, sum);
+    FileStatus purpose;
+
+    switch (result) {
+        case SumFile:
+            purpose = FileStatus::ToSumFile;
+            break;
+        case Clipboard:
+            purpose = FileStatus::ToClipboard;
+            break;
+        default:
+            purpose = FileStatus::Computed;
+            break;
     }
 
-    else {
-        FileValues fileVal(result == Clipboard ? FileStatus::Copied : FileStatus::Computed);
-        fileVal.checksum = sum.toLower();
-        fileVal.size = QFileInfo(filePath).size();
+    FileValues fileVal(purpose);
+    fileVal.checksum = sum.toLower();
+    fileVal.size = QFileInfo(filePath).size();
 
-        emit fileProcessed(filePath, fileVal);
-    }
-}
-
-void Manager::makeSumFile(const QString &originFilePath, const QString &checksum)
-{
-    if (originFilePath.isEmpty() || !tools::canBeChecksum(checksum))
-        return;
-
-    QCryptographicHash::Algorithm algo = tools::algorithmByStrLen(checksum.length());
-    QString ext = format::algoToStr(algo, false);
-    QString sumFile = QString("%1.%2").arg(originFilePath, ext);
-
-    QFile file(sumFile);
-    bool isStored = (file.open(QFile::WriteOnly)
-                     && (file.write(QString("%1 *%2").arg(checksum, paths::basicName(originFilePath)).toUtf8()) > 0));
-
-    FileValues fileVal(isStored ? FileStatus::Stored : FileStatus::UnStored);
-    fileVal.checksum = checksum.toLower();
-
-    emit fileProcessed(sumFile, fileVal);
+    emit fileProcessed(filePath, fileVal);
 }
 
 void Manager::resetDatabase()
