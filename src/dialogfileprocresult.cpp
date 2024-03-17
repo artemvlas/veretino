@@ -73,7 +73,7 @@ void DialogFileProcResult::setInfo(const QString &filePath, const FileValues &va
         ui->textChecksum->setTextColor(QColor("red"));
         QTextEdit *reChecksum = new QTextEdit(this);
         reChecksum->setReadOnly(true);
-        reChecksum->setMinimumHeight(40);
+        reChecksum->setMinimumHeight(45);
         reChecksum->setTextColor(QColor("green"));
         reChecksum->setText(values.reChecksum);
         ui->verticalLayout->addWidget(reChecksum);
