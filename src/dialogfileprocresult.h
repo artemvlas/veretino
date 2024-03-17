@@ -23,19 +23,20 @@ public:
     ~DialogFileProcResult();
 
 private:
+    void setFileName(const QString &filePath);
+    void setIcon(const QIcon &icon);
+    void showLineSizeAlgo();
+    void hideLineSizeAlgo();
+    void addButtonCopy();
+    void addButtonSave();
+    void makeSumFile();
+
     void setModeMatched();
     void setModeMismatched();
     void setModeComputed();
     void setModeCopied();
     void setModeStored();
     void setModeUnstored();
-    void addButtonCopy();
-    void addButtonSave();
-    void setIcon(const QIcon &icon);
-    void makeSumFile();
-    void setFileName(const QString &filePath);
-    void showLineSizeAlgo();
-    void hideLineSizeAlgo();
 
     Ui::DialogFileProcResult *ui;
     IconProvider icons_;

@@ -325,16 +325,6 @@ void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &
 {
     DialogFileProcResult dialog(filePath, values, this);
     dialog.exec();
-
-    /*
-    if (dialog.exec() == QDialog::Accepted) {
-        if (dialog.clickedButton == DialogFileProcResult::Copy) {
-            QGuiApplication::clipboard()->setText(values.checksum);
-        }
-        else if (dialog.clickedButton == DialogFileProcResult::Save) {
-            emit modeSelect->makeSumFile(filePath, values.checksum);
-        }
-    }*/
 }
 
 void MainWindow::dialogSettings()

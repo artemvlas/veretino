@@ -40,7 +40,6 @@ public:
         Computed, // the checksum has been calculated and is ready for further processing (copy or save)
         ToClipboard, // the calculated checksum is intended to be copied to the clipboard
         ToSumFile, // the calculated checksum is intended to be stored in the summary file
-        //UnStored // the checksum was calculated, but writing the summary file failed
     };
     Q_ENUM(FileStatus)
 

@@ -74,16 +74,6 @@ void DialogFileProcResult::setModeMismatched()
     ui->verticalLayout->addWidget(reChecksum);
 }
 
-void DialogFileProcResult::setModeCopied()
-{
-    setWindowTitle("Copied to clipboard");
-    setIcon(icons_.icon(Icons::Paste));
-
-    ui->textChecksum->setText(values_.checksum);
-
-    QGuiApplication::clipboard()->setText(values_.checksum);
-}
-
 void DialogFileProcResult::setModeComputed()
 {
     setWindowTitle("Checksum calculated");
@@ -96,6 +86,16 @@ void DialogFileProcResult::setModeComputed()
 
     addButtonCopy();
     addButtonSave();
+}
+
+void DialogFileProcResult::setModeCopied()
+{
+    setWindowTitle("Copied to clipboard");
+    setIcon(icons_.icon(Icons::Paste));
+
+    ui->textChecksum->setText(values_.checksum);
+
+    QGuiApplication::clipboard()->setText(values_.checksum);
 }
 
 void DialogFileProcResult::setModeStored()
@@ -123,22 +123,6 @@ void DialogFileProcResult::setModeUnstored()
     addButtonCopy();
 }
 
-void DialogFileProcResult::addButtonCopy()
-{
-    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
-    buttonCopy->setIcon(icons_.icon(Icons::Copy));
-
-    connect(buttonCopy, &QPushButton::clicked, this, [=]{QGuiApplication::clipboard()->setText(values_.checksum);});
-}
-
-void DialogFileProcResult::addButtonSave()
-{
-    QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::ActionRole);
-    buttonSave->setIcon(icons_.icon(Icons::Save));
-
-    connect(buttonSave, &QPushButton::clicked, this, &DialogFileProcResult::makeSumFile);
-}
-
 void DialogFileProcResult::setIcon(const QIcon &icon)
 {
     ui->labelIcon->setPixmap(icon.pixmap(64, 64));
@@ -162,6 +146,22 @@ void DialogFileProcResult::hideLineSizeAlgo()
 {
     ui->labelFileSize->setVisible(false);
     ui->labelAlgo->setVisible(false);
+}
+
+void DialogFileProcResult::addButtonCopy()
+{
+    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
+    buttonCopy->setIcon(icons_.icon(Icons::Copy));
+
+    connect(buttonCopy, &QPushButton::clicked, this, [=]{QGuiApplication::clipboard()->setText(values_.checksum);});
+}
+
+void DialogFileProcResult::addButtonSave()
+{
+    QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::ActionRole);
+    buttonSave->setIcon(icons_.icon(Icons::Save));
+
+    connect(buttonSave, &QPushButton::clicked, this, &DialogFileProcResult::makeSumFile);
 }
 
 void DialogFileProcResult::makeSumFile()
