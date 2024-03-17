@@ -21,7 +21,7 @@ DialogFileProcResult::DialogFileProcResult(const QString &filePath, const FileVa
 
     icons_.setTheme(palette());
     setFileName(filePath_);
-    showLineSizeAlgo();
+    setExtLineVisible(values_.status != FileStatus::ToSumFile);
 
     switch (values_.status) {
     case FileStatus::Matched:
@@ -102,7 +102,7 @@ void DialogFileProcResult::setModeStored()
 {
     setWindowTitle("The checksum is saved");
     setIcon(icons_.icon(Icons::Save));
-    hideLineSizeAlgo();
+    setExtLineVisible(false);
 
     ui->textChecksum->setText(values_.checksum);
 
@@ -114,7 +114,7 @@ void DialogFileProcResult::setModeUnstored()
 {
     setWindowTitle("Unable to create a summary file");
     setIcon(icons_.icon(Icons::DocClose));
-    hideLineSizeAlgo();
+    setExtLineVisible(false);
 
     ui->textChecksum->setText(values_.checksum);
 
@@ -133,19 +133,15 @@ void DialogFileProcResult::setFileName(const QString &filePath)
     ui->labelFileName->setText("File: " + paths::basicName(filePath));
 }
 
-void DialogFileProcResult::showLineSizeAlgo()
+void DialogFileProcResult::setExtLineVisible(bool visible)
 {
-    ui->labelFileSize->setVisible(true);
-    ui->labelAlgo->setVisible(true);
+    ui->labelFileSize->setVisible(visible);
+    ui->labelAlgo->setVisible(visible);
 
-    ui->labelFileSize->setText("Size: " + format::dataSizeReadable(values_.size));
-    ui->labelAlgo->setText("Algorithm: " + format::algoToStr(values_.checksum.length()));
-}
-
-void DialogFileProcResult::hideLineSizeAlgo()
-{
-    ui->labelFileSize->setVisible(false);
-    ui->labelAlgo->setVisible(false);
+    if (visible) {
+        ui->labelFileSize->setText("Size: " + format::dataSizeReadable(values_.size));
+        ui->labelAlgo->setText("Algorithm: " + format::algoToStr(values_.checksum.length()));
+    }
 }
 
 void DialogFileProcResult::addButtonCopy()
