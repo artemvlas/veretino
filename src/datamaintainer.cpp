@@ -188,6 +188,11 @@ qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatus
         return 0;
     }
 
+    if (rootIndex.isValid() && rootIndex.model() != data_->model_) {
+        qDebug() << "DataMaintainer::totalSizeOfListedFiles | Wrong model index";
+        return 0;
+    }
+
     qint64 result = 0;
     TreeModelIterator it(data_->model_, rootIndex);
 
@@ -196,7 +201,7 @@ qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatus
 
         if (itData.isValid()
             && (fileStatuses.isEmpty()
-                || fileStatuses.contains(static_cast<FileStatus>(itData.toInt())))) {
+                || fileStatuses.contains(itData.value<FileStatus>()))) {
 
             result += it.data(Column::ColumnSize).toLongLong();
         }
@@ -436,6 +441,9 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 {
+    if (!data_ || !curIndex.isValid() || (curIndex.model() != data_->model_))
+        return QString();
+
     QString text;
 
     if (TreeModel::isFileRow(curIndex)) {
@@ -447,7 +455,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
         return QString("%1%2").arg(itemFileNameStr, itemFileSizeStr);
     }
     // if curIndex is at folder row
-    else if (curIndex.isValid()) {
+    else if (TreeModel::isFolderRow(curIndex)) {
         Numbers num = getNumbers(curIndex.model(), curIndex);
         qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
 
