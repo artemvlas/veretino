@@ -95,7 +95,7 @@ public:
     QList<QAction*> actionsMakeSummaries {actionProcessSha1File, actionProcessSha256File, actionProcessSha512File};
 
     // DB Model View
-    QAction *actionCancelBackToFS = new QAction("Close Database", this);
+    QAction *actionCancelBackToFS = new QAction("Close the Database", this);
     QAction *actionShowDbStatus = new QAction("Status", this);
     QAction *actionResetDb = new QAction("Reset", this);
     QAction *actionForgetChanges = new QAction("Forget all changes", this);
