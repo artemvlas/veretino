@@ -33,7 +33,7 @@ QString IconProvider::themeFolder() const
     return (theme_ == Dark) ? "dark" : "light";
 }
 
-QIcon IconProvider::icon(FileStatus status) const
+QString IconProvider::svgFilePath(FileStatus status) const
 {
     QString iconFileName;
 
@@ -79,12 +79,13 @@ QIcon IconProvider::icon(FileStatus status) const
         break;
     }
 
-    return QIcon(":/icons/color/" + iconFileName);
+    return ":/icons/color/" + iconFileName;
 }
 
-QIcon IconProvider::icon(Icons icon) const
+QString IconProvider::svgFilePath(Icons icon) const
 {
     QString iconFileName;
+
     switch (icon) {
     case AddFork:
         iconFileName = "add-fork.svg";
@@ -165,8 +166,18 @@ QIcon IconProvider::icon(Icons icon) const
         iconFileName = "update.svg";
         break;
     default:
-        return QIcon();
+        return QString();
     }
 
-    return QIcon(QString(":/icons/%1/%2").arg(themeFolder(), iconFileName));
+    return QString(":/icons/%1/%2").arg(themeFolder(), iconFileName);
+}
+
+QIcon IconProvider::icon(FileStatus status) const
+{
+    return QIcon(svgFilePath(status));
+}
+
+QIcon IconProvider::icon(Icons icon) const
+{
+    return QIcon(svgFilePath(icon));
 }
