@@ -57,6 +57,8 @@ private:
     bool isViewFileSysytem;
     Settings *settings_;
 
+    const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
+
 signals:
     void processing(bool isProcessing, bool visibleProgress = false);
     void cancelProcess();

@@ -73,6 +73,7 @@ public:
     bool contains(const FileStatus status) const;
     bool contains(const QSet<FileStatus> &statuses) const;
     bool containsChecked() const;
+    bool containsAvailable() const;
     bool isAllChecked() const;
 
     bool isBackupExists();

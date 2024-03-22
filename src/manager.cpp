@@ -119,12 +119,9 @@ void Manager::updateNewLost()
         return;
     }
 
-    int numNew = dataMaintainer->data_->numbers.numberOf(FileStatus::New);
-    int numMissing = dataMaintainer->data_->numbers.numberOf(FileStatus::Missing);
-
-    if (numMissing >= (dataMaintainer->data_->numbers.numChecksums + numNew)) {
+    if (!dataMaintainer->data_->containsAvailable()) {
         emit processing(false);
-        emit showMessage("Failure to delete all database items.\n\nThe database file may have been moved or refers to an inaccessible location.", "Warning");
+        emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
         return;
     }
 
@@ -198,6 +195,12 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 {
     if (!dataMaintainer->data_) {
         emit processing(false);
+        return;
+    }
+
+    if (!dataMaintainer->data_->containsAvailable()) {
+        emit processing(false);
+        emit showMessage("There are no files available for verification.\n\n" + movedDbWarning, "Warning");
         return;
     }
 

@@ -86,6 +86,11 @@ bool DataContainer::isAllChecked() const
     return (containsChecked() && !contains(FileStatus::NotChecked));
 }
 
+bool DataContainer::containsAvailable() const
+{
+    return numbers.available() > 0;
+}
+
 bool DataContainer::isBackupExists()
 {
     return (QFile::exists(backupFilePath()));

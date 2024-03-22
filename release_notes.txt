@@ -1,5 +1,6 @@
 Veretino 0.3.7
 * Fixed freezing when switching the processed database.
+* Minor UI improvements.
 
 Veretino 0.3.6
 * Added an extended dialog box for file processing results.
