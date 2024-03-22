@@ -124,7 +124,7 @@ void Manager::updateNewLost()
 
     if (numMissing >= (dataMaintainer->data_->numbers.numChecksums + numNew)) {
         emit processing(false);
-        emit showMessage("Failure to delete all database items", "Warning");
+        emit showMessage("Failure to delete all database items.\n\nThe database file may have been moved or refers to an inaccessible location.", "Warning");
         return;
     }
 
