@@ -60,7 +60,7 @@ public:
 
     QString getStoredChecksum(const QModelIndex &fileRowIndex);
 
-    int clearDataFromLostFiles(bool finalProcess = false); // returns the number of cleared
+    int clearLostFiles(bool finalProcess = false); // returns the number of cleared
     int updateMismatchedChecksums(bool finalProcess = false); // returns the number of updated checksums
 
     bool importJson(const QString &jsonFilePath);

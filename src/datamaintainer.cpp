@@ -335,10 +335,10 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
     return savedSum;
 }
 
-int DataMaintainer::clearDataFromLostFiles(bool finalProcess)
+int DataMaintainer::clearLostFiles(bool finalProcess)
 {
     if (!data_) {
-        qDebug() << "DataMaintainer::clearDataFromLostFiles | NO data_";
+        qDebug() << "DataMaintainer::clearLostFiles | NO data_";
         return 0;
     }
 

@@ -135,7 +135,7 @@ void Manager::updateNewLost()
     }
 
     if (dataMaintainer->data_->contains(FileStatus::Missing)) {
-        dataMaintainer->clearDataFromLostFiles();
+        dataMaintainer->clearLostFiles();
     }
 
     dataMaintainer->exportToJson();
