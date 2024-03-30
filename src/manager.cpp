@@ -112,7 +112,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
         emit setViewData(dataMaintainer->data_);
 }
 
-void Manager::updateNewLost()
+void Manager::updateDatabase(const TaskDbUpdate task)
 {
     if (!dataMaintainer->data_) {
         emit processing(false);
@@ -125,31 +125,29 @@ void Manager::updateNewLost()
         return;
     }
 
-    if (dataMaintainer->data_->contains(FileStatus::New)) {
-        calculateChecksums(FileStatus::New, false);
+    if (task == TaskUpdateMismatches) {
+        dataMaintainer->updateMismatchedChecksums();
+    }
 
-        if (canceled) {
-            emit processing(false);
-            return;
+    else {
+        if ((task == TaskUpdateNewLost || task == TaskAddNew)
+            && dataMaintainer->data_->contains(FileStatus::New)) {
+
+            calculateChecksums(FileStatus::New, false);
+
+            if (canceled) {
+                emit processing(false);
+                return;
+            }
+        }
+
+        if ((task == TaskUpdateNewLost || task == TaskClearLost)
+            && dataMaintainer->data_->contains(FileStatus::Missing)) {
+
+            dataMaintainer->clearLostFiles();
         }
     }
 
-    if (dataMaintainer->data_->contains(FileStatus::Missing)) {
-        dataMaintainer->clearLostFiles();
-    }
-
-    dataMaintainer->exportToJson();
-}
-
-// update the Database with newly calculated checksums for failed verification files
-void Manager::updateMismatch()
-{
-    if (!dataMaintainer->data_) {
-        emit processing(false);
-        return;
-    }
-
-    dataMaintainer->updateMismatchedChecksums();
     dataMaintainer->exportToJson();
 }
 

@@ -17,8 +17,7 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::cancelProcess);
 
-    connect(this, &ModeSelector::updateNewLost, this, &ModeSelector::prepareView);
-    connect(this, &ModeSelector::updateMismatch, this, &ModeSelector::prepareView);
+    connect(this, &ModeSelector::updateDatabase, this, &ModeSelector::prepareView);
     connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!TreeModel::isFileRow(ind)) prepareView();});
 
     connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
@@ -71,8 +70,8 @@ void ModeSelector::connectActions()
     connect(actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
-    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, &ModeSelector::updateMismatch);
-    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, &ModeSelector::updateNewLost);
+    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateMismatches);});
+    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);});
     connect(actionShowNewLostOnly, &QAction::toggled, this,
             [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
     connect(actionShowMismatchesOnly, &QAction::toggled, this,
@@ -454,10 +453,10 @@ void ModeSelector::doWork()
             emit verify();
             break;
         case ModelNewLost:
-            emit updateNewLost();
+            emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);
             break;
         case UpdateMismatch:
-            emit updateMismatch();
+            emit updateDatabase(TaskDbUpdate::TaskUpdateMismatches);
             break;
         case NoMode:
             showFileSystem();

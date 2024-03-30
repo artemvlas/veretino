@@ -112,6 +112,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
     qRegisterMetaType<ProcFileResult>("ProcFileResult");
+    qRegisterMetaType<TaskDbUpdate>("TaskDbUpdate");
 
     manager->moveToThread(thread);
 
@@ -127,8 +128,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::processFolderSha, manager, &Manager::processFolderSha);
     connect(modeSelect, &ModeSelector::processFileSha, manager, &Manager::processFileSha);
     connect(modeSelect, &ModeSelector::verify, manager, &Manager::verify);
-    connect(modeSelect, &ModeSelector::updateNewLost, manager, &Manager::updateNewLost);
-    connect(modeSelect, &ModeSelector::updateMismatch, manager, &Manager::updateMismatch);
+    connect(modeSelect, &ModeSelector::updateDatabase, manager, &Manager::updateDatabase);
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
     connect(modeSelect, &ModeSelector::branchSubfolder, manager->dataMaintainer, &DataMaintainer::forkJsonDb);
@@ -322,7 +322,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
     int ret = msgBox.exec();
     if (result.contains(FileStatus::Mismatched) && ret == QMessageBox::Ok) {
-        emit modeSelect->updateMismatch();
+        emit modeSelect->updateDatabase(TaskDbUpdate::TaskUpdateMismatches);
     }
 }
 

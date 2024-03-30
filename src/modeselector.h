@@ -151,8 +151,7 @@ signals:
     void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, ProcFileResult result = ProcFileResult::Generic);
     void parseJsonFile(const QString &path);
     void verify(const QModelIndex& index = QModelIndex());
-    void updateNewLost();
-    void updateMismatch(); // update json Database with new checksums for files with failed verification
+    void updateDatabase(const TaskDbUpdate task);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
     void cancelProcess();

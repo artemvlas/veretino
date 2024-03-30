@@ -18,6 +18,7 @@ class Manager : public QObject
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
     enum ProcFileResult {Generic, Clipboard, SumFile};
+    enum TaskDbUpdate {TaskUpdateMismatches, TaskUpdateNewLost, TaskAddNew, TaskClearLost};
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
 
 public slots:
@@ -31,8 +32,7 @@ public slots:
     void getPathInfo(const QString &path); // info about file (size) or folder contents
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
     void createDataModel(const QString &databaseFilePath); // making the tree data model
-    void updateNewLost(); // remove lost files, add new files
-    void updateMismatch(); // update the Database with newly calculated checksums for failed verification files
+    void updateDatabase(const TaskDbUpdate task);
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
@@ -75,5 +75,6 @@ signals:
 }; // class Manager
 
 using ProcFileResult = Manager::ProcFileResult;
+using TaskDbUpdate = Manager::TaskDbUpdate;
 
 #endif // MANAGER_H
