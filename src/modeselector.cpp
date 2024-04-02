@@ -559,8 +559,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
 
             viewContextMenu->addSeparator();
             viewContextMenu->addAction(actionShowFilesystem);
-            if (view_->isCurrentViewModel(ModelView::ModelProxy)
-                && view_->data_->proxyModel_->isFilterEnabled) {
+            if (view_->isViewFiltered()) {
                 viewContextMenu->addAction(actionShowAll);
             }
             viewContextMenu->addSeparator();

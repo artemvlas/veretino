@@ -214,6 +214,11 @@ bool View::isViewDatabase()
     return isCurrentViewModel(ModelProxy) || isCurrentViewModel(ModelSource);
 }
 
+bool View::isViewFiltered()
+{
+    return isCurrentViewModel(ModelView::ModelProxy) && data_->proxyModel_->isFilterEnabled;
+}
+
 void View::deleteOldSelModel()
 {
     if (oldSelectionModel_ && (oldSelectionModel_ != selectionModel())) {

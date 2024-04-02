@@ -28,6 +28,7 @@ public:
     bool isCurrentViewModel(const ModelView modelView);
     bool isViewFileSystem(); // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
     bool isViewDatabase();
+    bool isViewFiltered();
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;

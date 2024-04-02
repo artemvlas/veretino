@@ -528,8 +528,12 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape) {
-        if (modeSelect->processAbortPrompt() && !ui->treeView->isViewFileSystem())
-            ui->treeView->setFileSystemModel();
+        if (modeSelect->processAbortPrompt() && !ui->treeView->isViewFileSystem()) {
+            if (ui->treeView->isViewFiltered())
+                ui->treeView->disableFilter();
+            else
+                ui->treeView->setFileSystemModel();
+        }
     }
 
     //QMainWindow::keyPressEvent(event);
