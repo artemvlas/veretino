@@ -1,8 +1,9 @@
 Veretino 0.3.8
 * Database updating has become more flexible.
+* Minor UI improvements.
 
 Veretino 0.3.7
-* Fixed freezing when switching the processed database.
+* Fixed a freezing when switching the currently processed database.
 * Minor UI improvements.
 
 Veretino 0.3.6

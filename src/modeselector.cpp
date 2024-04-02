@@ -150,7 +150,7 @@ void ModeSelector::processing(bool isProcessing)
             view_->setTreeModel(ModelView::ModelProxy);
 
             // if there are Mismatches in the Model, filter them
-            if (view_->data_->numbers.numberOf(FileStatus::Mismatched) > 0)
+            if (view_->data_->contains(FileStatus::Mismatched))
                 view_->setFilter(FileStatus::Mismatched);
         }
     }
