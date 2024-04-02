@@ -72,6 +72,8 @@ void ModeSelector::connectActions()
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
     connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateMismatches);});
     connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);});
+    connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskAddNew);});
+    connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskClearLost);});
     connect(actionShowNewLostOnly, &QAction::toggled, this,
             [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
     connect(actionShowMismatchesOnly, &QAction::toggled, this,
@@ -123,8 +125,10 @@ void ModeSelector::setActionsIcons()
     actionShowDbStatus->setIcon(iconProvider.icon(Icons::Database));
     actionResetDb->setIcon(iconProvider.icon(Icons::Undo));
     actionForgetChanges->setIcon(iconProvider.icon(Icons::Backup));
-    actionUpdateDbWithReChecksums->setIcon(iconProvider.icon(Icons::Update));
+    actionUpdateDbWithReChecksums->setIcon(iconProvider.icon(FileStatus::ChecksumUpdated));
     actionUpdateDbWithNewLost->setIcon(iconProvider.icon(Icons::Update));
+    actionDbAddNew->setIcon(iconProvider.icon(FileStatus::Added));
+    actionDbClearLost->setIcon(iconProvider.icon(FileStatus::Removed));
     actionShowNewLostOnly->setIcon(iconProvider.icon(Icons::NewFile));
     actionShowMismatchesOnly->setIcon(iconProvider.icon(Icons::DocClose));
     actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
@@ -566,7 +570,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     actionShowMismatchesOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::Mismatched));
                     viewContextMenu->addAction(actionShowMismatchesOnly);
                 }
-                viewContextMenu->addAction(actionUpdateDbWithReChecksums);
+                //viewContextMenu->addAction(actionUpdateDbWithReChecksums);
+                //viewContextMenu->addMenu(menuUpdateDb());
                 if (TreeModel::isFileRow(index) && TreeModel::siblingAtRow(index, Column::ColumnReChecksum).data().isValid()) {
                     viewContextMenu->addAction(actionCopyReChecksum);
                 }
@@ -577,7 +582,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionShowNewLostOnly);
                 }
 
-                viewContextMenu->addAction(actionUpdateDbWithNewLost);
+                //viewContextMenu->addAction(actionUpdateDbWithNewLost);
+                //viewContextMenu->addMenu(menuUpdateDb());
                 viewContextMenu->addSeparator();
             }
 
@@ -595,6 +601,10 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     }
                 }
                 viewContextMenu->addAction(actionCheckAll);
+            }
+
+            if (view_->data_->containsUpdateable()) {
+                viewContextMenu->addMenu(menuUpdateDb());
             }
         }
         viewContextMenu->addSeparator();
@@ -647,6 +657,30 @@ QMenu* ModeSelector::menuAlgorithm()
     menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(settings_->algorithm));
 
     return menuAlgo;
+}
+
+QMenu* ModeSelector::menuUpdateDb()
+{
+    if (!view_->data_)
+        return menuUpdateDatabase;
+
+    if (!menuUpdateDatabase) {
+        menuUpdateDatabase = new QMenu("Update the Database", view_);
+        menuUpdateDatabase->menuAction()->setIcon(iconProvider.icon(Icons::Update));
+
+        menuUpdateDatabase->addAction(actionDbAddNew);
+        menuUpdateDatabase->addAction(actionDbClearLost);
+        menuUpdateDatabase->addAction(actionUpdateDbWithNewLost);
+        menuUpdateDatabase->addSeparator();
+        menuUpdateDatabase->addAction(actionUpdateDbWithReChecksums);
+    }
+
+    actionDbAddNew->setEnabled(view_->data_->contains(FileStatus::New));
+    actionDbClearLost->setEnabled(view_->data_->contains(FileStatus::Missing));
+    actionUpdateDbWithNewLost->setEnabled(actionDbAddNew->isEnabled() || actionDbClearLost->isEnabled());
+    actionUpdateDbWithReChecksums->setEnabled(view_->data_->contains(FileStatus::Mismatched));
+
+    return menuUpdateDatabase;
 }
 
 void ModeSelector::createContextMenu_Button(const QPoint &point)

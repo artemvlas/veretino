@@ -63,6 +63,7 @@ public:
     void showFileSystem();
     void updateMenuOpenRecent();
     QMenu* menuAlgorithm(); // QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
+    QMenu* menuUpdateDb(); // returns *menuUpdateDatabase
 
     IconProvider iconProvider;
 
@@ -99,8 +100,10 @@ public:
     QAction *actionShowDbStatus = new QAction("Status", this);
     QAction *actionResetDb = new QAction("Reset", this);
     QAction *actionForgetChanges = new QAction("Forget all changes", this);
-    QAction *actionUpdateDbWithReChecksums = new QAction("Update the Database with new checksums", this);
-    QAction *actionUpdateDbWithNewLost = new QAction("Update the Database with New/Lost files", this);
+    QAction *actionUpdateDbWithReChecksums = new QAction("Update Mismatched checksums", this);
+    QAction *actionUpdateDbWithNewLost = new QAction("Add New + Clear Lost", this);
+    QAction *actionDbAddNew = new QAction("Add New files", this);
+    QAction *actionDbClearLost = new QAction("Clear Lost files", this);
     QAction *actionShowNewLostOnly = new QAction("Show only New/Lost", this);
     QAction *actionShowMismatchesOnly = new QAction("Show only Mismatches", this);
     QAction *actionShowAll = new QAction("Show All", this);
@@ -123,6 +126,7 @@ public:
     // Menu
     QMenu *menuAlgo = new QMenu;
     QMenu *menuStoreSummary = new QMenu("Calculate checksum → Summary");
+    QMenu *menuUpdateDatabase = nullptr;
 
 public slots:
     void processing(bool isProcessing);

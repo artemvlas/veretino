@@ -62,12 +62,12 @@ bool DataContainer::isFilterApplied() const
 
 bool DataContainer::contains(const FileStatus status) const
 {
-    return (numbers.numberOf(status) != 0);
+    return (numbers.numberOf(status) > 0);
 }
 
-bool DataContainer::contains(const QSet<FileStatus> &statuses) const
+bool DataContainer::contains(const QList<FileStatus> &statuses) const
 {
-    QSet<FileStatus>::const_iterator it;
+    QList<FileStatus>::const_iterator it;
     for (it = statuses.constBegin(); it != statuses.constEnd(); ++it) {
         if (contains(*it))
             return true;
@@ -89,6 +89,11 @@ bool DataContainer::isAllChecked() const
 bool DataContainer::containsAvailable() const
 {
     return numbers.available() > 0;
+}
+
+bool DataContainer::containsUpdateable() const
+{
+    return (contains({FileStatus::New, FileStatus::Missing, FileStatus::Mismatched}));
 }
 
 bool DataContainer::isBackupExists()

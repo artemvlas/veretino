@@ -71,9 +71,10 @@ public:
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
     bool contains(const FileStatus status) const;
-    bool contains(const QSet<FileStatus> &statuses) const;
+    bool contains(const QList<FileStatus> &statuses) const;
     bool containsChecked() const;
     bool containsAvailable() const;
+    bool containsUpdateable() const;
     bool isAllChecked() const;
 
     bool isBackupExists();
