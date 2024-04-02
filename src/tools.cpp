@@ -347,13 +347,13 @@ QString fileItemStatus(FileStatus status)
         result = "ureadable";
         break;
     case FileStatus::Added:
-        result = "added to DB";
+        result = "added";
         break;
     case Files::Removed:
-        result = "removed from DB";
+        result = "removed";
         break;
     case FileStatus::ChecksumUpdated:
-        result = "checksum updated";
+        result = "updated";
         break;
     default:
         result = "unknown";

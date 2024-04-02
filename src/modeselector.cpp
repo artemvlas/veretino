@@ -570,8 +570,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     actionShowMismatchesOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::Mismatched));
                     viewContextMenu->addAction(actionShowMismatchesOnly);
                 }
-                //viewContextMenu->addAction(actionUpdateDbWithReChecksums);
-                //viewContextMenu->addMenu(menuUpdateDb());
+
                 if (TreeModel::isFileRow(index) && TreeModel::siblingAtRow(index, Column::ColumnReChecksum).data().isValid()) {
                     viewContextMenu->addAction(actionCopyReChecksum);
                 }
@@ -582,8 +581,6 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionShowNewLostOnly);
                 }
 
-                //viewContextMenu->addAction(actionUpdateDbWithNewLost);
-                //viewContextMenu->addMenu(menuUpdateDb());
                 viewContextMenu->addSeparator();
             }
 

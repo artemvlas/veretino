@@ -1,5 +1,5 @@
 Veretino 0.3.8
-* Database updating has become more flexible.
+* Updating the database has become more flexible.
 * Minor UI improvements.
 
 Veretino 0.3.7
