@@ -225,7 +225,7 @@ void ModeSelector::setButtonInfo()
         break;
     case UpdateMismatch:
         button_->setText("Update");
-        button_->setIcon(iconProvider.icon(Icons::Update));
+        button_->setIcon(iconProvider.icon(FileStatus::ChecksumUpdated));
         button_->setToolTip(QString("Update mismatched checksums with newly calculated ones"));
         break;
     case NoMode:
