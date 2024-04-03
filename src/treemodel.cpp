@@ -269,9 +269,14 @@ bool TreeModel::isFolderRow(const QModelIndex &curIndex)
     return (index.isValid() && index.model()->hasChildren(index));
 }
 
-bool TreeModel::isChecksumStored(const QModelIndex &curIndex)
+bool TreeModel::hasChecksum(const QModelIndex &curIndex)
 {
     return siblingAtRow(curIndex, ColumnChecksum).data().isValid();
+}
+
+bool TreeModel::hasReChecksum(const QModelIndex &curIndex)
+{
+    return siblingAtRow(curIndex, ColumnReChecksum).data().isValid();
 }
 
 bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
@@ -281,7 +286,7 @@ bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
     if (isFolderRow(folderIndex)) {
         TreeModelIterator it(folderIndex.model(), folderIndex);
         while (it.hasNext()) {
-            if (isChecksumStored(it.nextFile().index())) {
+            if (hasChecksum(it.nextFile().index())) {
                 isAny = true;
                 break;
             }

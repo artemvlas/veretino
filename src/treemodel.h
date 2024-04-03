@@ -48,7 +48,8 @@ public:
     static QModelIndex siblingAtRow(const QModelIndex &curIndex, Column column); // get the index of an item of the same row (curIndex row) and a specified column
     static bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or (folder(false) || invalid(false))
     static bool isFolderRow(const QModelIndex &curIndex); // same^, but folder(true); (file(false) || invalid(false))
-    static bool isChecksumStored(const QModelIndex &curIndex);
+    static bool hasChecksum(const QModelIndex &curIndex);
+    static bool hasReChecksum(const QModelIndex &curIndex);
     static bool containsChecksums(const QModelIndex &folderIndex); // checks whether the specified subfolder contains files with saved checksums
     static FileStatus itemFileStatus(const QModelIndex &curIndex);
 

@@ -570,7 +570,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionShowMismatchesOnly);
                 }
 
-                if (TreeModel::isFileRow(index) && TreeModel::siblingAtRow(index, Column::ColumnReChecksum).data().isValid()) {
+                if (TreeModel::hasReChecksum(index)) {
                     viewContextMenu->addAction(actionCopyReChecksum);
                 }
             }
@@ -587,7 +587,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 if (index.isValid()) {
                     if (TreeModel::isFileRow(index)) {
                         viewContextMenu->addAction(actionCheckCurFileFromModel);
-                        viewContextMenu->addAction(actionCopyStoredChecksum);
+                        if (TreeModel::hasChecksum(index))
+                            viewContextMenu->addAction(actionCopyStoredChecksum);
                     }
                     else if (TreeModel::containsChecksums(index)) {
                         if (!QFileInfo::exists(view_->data_->dbSubFolderDbFilePath(index))) // preventing accidental overwriting

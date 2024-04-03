@@ -449,7 +449,7 @@ QString MainWindow::getDatabaseStatusSummary()
     QString matched;
     QString sep;
 
-    if (numbers.contains({FileStatus::New, FileStatus::Missing}))
+    if (numbers.contains(FileStatusFlag::FlagNewLost))
         newmissing = "* ";
 
     if (numbers.contains(FileStatus::Mismatched))

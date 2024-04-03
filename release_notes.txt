@@ -5,6 +5,7 @@ Veretino 0.3.8
  - some menu items and icons have been improved
  - as well as the layout of some UI elements
  - added a notification about the absence of available files when verifying a subfolder
+ - the Copy Checksum menu item appears only if there is one
 
 Veretino 0.3.7
 * Fixed a freezing when switching the currently processed database.

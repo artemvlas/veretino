@@ -155,7 +155,7 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     while (iter.hasNext()) {
         iter.nextFile();
 
-        if (TreeModel::isChecksumStored(iter.index())) {
+        if (TreeModel::hasChecksum(iter.index())) {
             ++num.numChecksums;
             num.totalSize += iter.data(Column::ColumnSize).toLongLong();
         }

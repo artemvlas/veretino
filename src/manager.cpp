@@ -360,7 +360,7 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
-            FileStatus procStatus = TreeModel::isChecksumStored(iter.index()) ? FileStatus::Verifying : FileStatus::Calculating;
+            FileStatus procStatus = TreeModel::hasChecksum(iter.index()) ? FileStatus::Verifying : FileStatus::Calculating;
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
             QString doneData;
