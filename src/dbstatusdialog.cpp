@@ -55,8 +55,8 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 
     // tab Verification
-    ui->tabWidget->setTabEnabled(TabVerification, data->containsChecked());
-    if (data->containsChecked()) {
+    ui->tabWidget->setTabEnabled(TabVerification, data->contains(FileStatusFlags::FlagsChecked));
+    if (data->contains(FileStatusFlags::FlagsChecked)) {
         ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
@@ -148,7 +148,7 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(data->numbers.available()));
     }
-    else if (data->containsChecked()) {
+    else if (data->contains(FileStatusFlags::FlagsChecked)) {
         result.append(QString("%1 out of %2 files were checked")
                           .arg(data->numbers.numberOf(FileStatus::Matched) + data->numbers.numberOf(FileStatus::Mismatched))
                           .arg(data->numbers.available()));

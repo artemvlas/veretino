@@ -599,7 +599,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionCheckAll);
             }
 
-            if (view_->data_->containsUpdateable()) {
+            if (view_->data_->contains(FileStatusFlags::FlagsUpdatable)) {
                 viewContextMenu->addMenu(menuUpdateDb());
             }
         }

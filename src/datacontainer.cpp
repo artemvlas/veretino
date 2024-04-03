@@ -66,6 +66,12 @@ bool DataContainer::contains(const FileStatus status) const
     return (numbers.numberOf(status) > 0);
 }
 
+bool DataContainer::contains(const FileStatusFlags flags) const
+{
+    return (flags == FlagsAvailable) ? (numbers.available() > 0)
+                                     : contains(flagsList(flags));
+}
+
 bool DataContainer::contains(const QList<FileStatus> &statuses) const
 {
     QList<FileStatus>::const_iterator it;
@@ -77,24 +83,9 @@ bool DataContainer::contains(const QList<FileStatus> &statuses) const
     return false;
 }
 
-bool DataContainer::containsChecked() const
-{
-    return (contains(FileStatus::Matched) || contains(FileStatus::Mismatched));
-}
-
 bool DataContainer::isAllChecked() const
 {
-    return (containsChecked() && !contains(FileStatus::NotChecked));
-}
-
-bool DataContainer::containsAvailable() const
-{
-    return numbers.available() > 0;
-}
-
-bool DataContainer::containsUpdateable() const
-{
-    return (contains({FileStatus::New, FileStatus::Missing, FileStatus::Mismatched}));
+    return (contains(FileStatusFlags::FlagsChecked) && !contains(FileStatus::NotChecked));
 }
 
 bool DataContainer::isBackupExists()
@@ -182,6 +173,20 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     }
 
     return num;
+}
+
+const QList<FileStatus>& DataContainer::flagsList(FileStatusFlags flags) const
+{
+    switch (flags) {
+    case FlagsAvailable:
+        return flagsAvailable;
+    case FlagsUpdatable:
+        return flagsUpdatable;
+    case FlagsChecked:
+        return flagsChecked;
+    default:
+        return flagsEmpty;
+    }
 }
 
 DataContainer::~DataContainer()
