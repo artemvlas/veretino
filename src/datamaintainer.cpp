@@ -141,39 +141,11 @@ void DataMaintainer::updateNumbers()
         return;
     }
 
-    data_->numbers = getNumbers(data_->model_);
+    data_->updateNumbers();
     emit numbersUpdated();
 
     if (data_->contains({FileStatus::Mismatched, FileStatus::Missing}))
         data_->metaData.successfulCheckDateTime.clear();
-}
-
-Numbers DataMaintainer::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
-{
-    Numbers num;
-
-    TreeModelIterator iter(model, rootIndex);
-
-    while (iter.hasNext()) {
-        iter.nextFile();
-
-        if (iter.data(Column::ColumnChecksum).isValid()
-            && !iter.data(Column::ColumnChecksum).toString().isEmpty()) {
-
-            ++num.numChecksums;
-            num.totalSize += iter.data(Column::ColumnSize).toLongLong();
-        }
-
-        if (!num.holder.contains(iter.status())) {
-            num.holder.insert(iter.status(), 1);
-        }
-        else {
-            int storedNumber = num.holder.value(iter.status());
-            num.holder.insert(iter.status(), ++storedNumber);
-        }
-    }
-
-    return num;
 }
 
 qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex &rootIndex)
@@ -456,7 +428,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        Numbers num = getNumbers(curIndex.model(), curIndex);
+        Numbers num = DataContainer::getNumbers(curIndex.model(), curIndex);
         qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
 
         if (num.available() > 0) {

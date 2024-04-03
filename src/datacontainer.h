@@ -83,6 +83,11 @@ public:
     void removeBackupFile();
     void setSaveResult(const QString &dbFilePath);
 
+    const Numbers& updateNumbers();
+    Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex());
+    static Numbers getNumbers(const QAbstractItemModel *model,
+                              const QModelIndex &rootIndex = QModelIndex());
+
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
     MetaData metaData;

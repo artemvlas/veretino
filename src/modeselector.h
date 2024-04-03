@@ -101,7 +101,7 @@ public:
     QAction *actionResetDb = new QAction("Reset", this);
     QAction *actionForgetChanges = new QAction("Forget all changes", this);
     QAction *actionUpdateDbWithReChecksums = new QAction("Update Mismatched checksums", this);
-    QAction *actionUpdateDbWithNewLost = new QAction("Add New + Clear Lost", this);
+    QAction *actionUpdateDbWithNewLost = new QAction("Add New && Clear Lost", this);
     QAction *actionDbAddNew = new QAction("Add New files", this);
     QAction *actionDbClearLost = new QAction("Clear Lost files", this);
     QAction *actionShowNewLostOnly = new QAction("Show only New/Lost", this);

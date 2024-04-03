@@ -31,8 +31,6 @@ public:
                        bool finalProcess = false); // <finalProcess> -->> whether it sends a process end signal or not
 
     void updateNumbers();
-    static Numbers getNumbers(const QAbstractItemModel* model,
-                              const QModelIndex& rootIndex = QModelIndex());
 
     qint64 totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex& rootIndex = QModelIndex());
     qint64 totalSizeOfListedFiles(const QSet<FileStatus>& fileStatuses = QSet<FileStatus>(),

@@ -222,7 +222,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     }
     else { // if subfolder
         QString subfolderName = TreeModel::siblingAtRow(folderItemIndex, Column::ColumnPath).data().toString();
-        Numbers num = dataMaintainer->getNumbers(dataMaintainer->data_->model_, folderItemIndex);
+        Numbers num = dataMaintainer->data_->getNumbers(folderItemIndex);
 
         emit folderChecked(num, subfolderName);
     }

@@ -75,7 +75,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
 {
     QJsonObject header;
     bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
-    Numbers numbers = DataMaintainer::getNumbers(data->model_, rootFolder);
+    Numbers numbers = DataContainer::getNumbers(data->model_, rootFolder);
 
     header["Created with"] = QString("Veretino %1 https://github.com/artemvlas/veretino").arg(APP_VERSION);
     header["Files number"] = numbers.numChecksums;

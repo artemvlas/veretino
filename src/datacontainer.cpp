@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QStandardPaths>
+#include "treemodeliterator.h"
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}
@@ -142,6 +143,45 @@ void DataContainer::setSaveResult(const QString &dbFilePath)
 
     if (metaData.saveResult == MetaData::Saved || metaData.saveResult == MetaData::SavedToDesktop)
         metaData.databaseFilePath = dbFilePath;
+}
+
+const Numbers& DataContainer::updateNumbers()
+{
+    numbers = getNumbers();
+    return numbers;
+}
+
+Numbers DataContainer::getNumbers(const QModelIndex &rootIndex)
+{
+    return getNumbers(model_, rootIndex);
+}
+
+Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
+{
+    Numbers num;
+
+    TreeModelIterator iter(model, rootIndex);
+
+    while (iter.hasNext()) {
+        iter.nextFile();
+
+        if (iter.data(Column::ColumnChecksum).isValid()
+            && !iter.data(Column::ColumnChecksum).toString().isEmpty()) {
+
+            ++num.numChecksums;
+            num.totalSize += iter.data(Column::ColumnSize).toLongLong();
+        }
+
+        if (!num.holder.contains(iter.status())) {
+            num.holder.insert(iter.status(), 1);
+        }
+        else {
+            int storedNumber = num.holder.value(iter.status());
+            num.holder.insert(iter.status(), ++storedNumber);
+        }
+    }
+
+    return num;
 }
 
 DataContainer::~DataContainer()
