@@ -55,6 +55,16 @@ struct Numbers {
         return numberOf(status) > 0;
     }
 
+    bool contains(const FileStatusFlags flags) const
+    {
+        return numberOf(flags) > 0;
+    }
+
+    bool contains(const QList<FileStatus> &statuses) const
+    {
+        return numberOf(statuses) > 0;
+    }
+
     int available() const
     {
         return numChecksums - numberOf(FileStatus::Missing);
@@ -75,9 +85,9 @@ public:
     QString dbSubFolderDbFilePath(const QModelIndex &subfolder) const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
-    bool contains(const FileStatus status) const;
-    bool contains(const FileStatusFlags flags) const;
-    bool contains(const QList<FileStatus> &statuses) const;
+    bool contains(const FileStatus status, const QModelIndex &subfolder = QModelIndex()) const;
+    bool contains(const FileStatusFlags flags, const QModelIndex &subfolder = QModelIndex()) const;
+    bool contains(const QList<FileStatus> &statuses, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
 
     bool isBackupExists();
@@ -87,7 +97,7 @@ public:
     void setSaveResult(const QString &dbFilePath);
 
     const Numbers& updateNumbers();
-    Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex());
+    Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
     static Numbers getNumbers(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
 

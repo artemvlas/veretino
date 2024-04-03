@@ -267,9 +267,9 @@ QList<FileStatus> Files::flagsList(const FileStatusFlags flags)
     case FlagsAvailable:
         return {NotChecked, Matched, Mismatched, Added, ChecksumUpdated};
     case FlagsUpdatable:
-        return {Matched, Mismatched};
-    case FlagsChecked:
         return {New, Missing, Mismatched};
+    case FlagsChecked:
+        return {Matched, Mismatched};
     default:
         return QList<FileStatus>();
     }

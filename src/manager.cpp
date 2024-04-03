@@ -196,9 +196,14 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         return;
     }
 
-    if (!dataMaintainer->data_->contains(FileStatusFlags::FlagsAvailable)) {
+    if (!dataMaintainer->data_->contains(FileStatusFlags::FlagsAvailable, folderItemIndex)) {
         emit processing(false);
-        emit showMessage("There are no files available for verification.\n\n" + movedDbWarning, "Warning");
+
+        QString warningText = "There are no files available for verification.";
+        if (!folderItemIndex.isValid())
+            warningText.append("\n\n" + movedDbWarning);
+
+        emit showMessage(warningText, "Warning");
         return;
     }
 

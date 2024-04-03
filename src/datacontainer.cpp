@@ -61,26 +61,25 @@ bool DataContainer::isFilterApplied() const
     return !metaData.filter.extensionsList.isEmpty();
 }
 
-bool DataContainer::contains(const FileStatus status) const
+bool DataContainer::contains(const FileStatus status, const QModelIndex &subfolder) const
 {
-    return (numbers.numberOf(status) > 0);
+    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
+
+    return num.contains(status);
 }
 
-bool DataContainer::contains(const FileStatusFlags flags) const
+bool DataContainer::contains(const FileStatusFlags flags, const QModelIndex &subfolder) const
 {
-    return (flags == FileStatusFlags::FlagsAvailable) ? (numbers.available() > 0)
-                                                      : contains(Files::flagsList(flags));
+    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
+
+    return num.contains(flags);
 }
 
-bool DataContainer::contains(const QList<FileStatus> &statuses) const
+bool DataContainer::contains(const QList<FileStatus> &statuses, const QModelIndex &subfolder) const
 {
-    QList<FileStatus>::const_iterator it;
-    for (it = statuses.constBegin(); it != statuses.constEnd(); ++it) {
-        if (contains(*it))
-            return true;
-    }
+    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
 
-    return false;
+    return num.contains(statuses);
 }
 
 bool DataContainer::isAllChecked() const
@@ -142,7 +141,7 @@ const Numbers& DataContainer::updateNumbers()
     return numbers;
 }
 
-Numbers DataContainer::getNumbers(const QModelIndex &rootIndex)
+Numbers DataContainer::getNumbers(const QModelIndex &rootIndex) const
 {
     return getNumbers(model_, rootIndex);
 }
