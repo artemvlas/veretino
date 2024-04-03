@@ -36,9 +36,12 @@ struct Numbers {
         return holder.contains(status) ? holder.value(status) : 0;
     }
 
-    int numberOf(const FileStatusFlags flags) const
+    int numberOf(const FileStatusFlag flag) const
     {
-        return numberOf(Files::flagsList(flags));
+        if (flag == FileStatusFlag::FlagAvailable) // for proper display in a permanent status during the process
+            return numChecksums - numberOf(FileStatus::Missing);
+
+        return numberOf(Files::flagsList(flag));
     }
 
     int numberOf(const QList<FileStatus> &statuses) const
@@ -55,19 +58,14 @@ struct Numbers {
         return numberOf(status) > 0;
     }
 
-    bool contains(const FileStatusFlags flags) const
+    bool contains(const FileStatusFlag flag) const
     {
-        return numberOf(flags) > 0;
+        return numberOf(flag) > 0;
     }
 
     bool contains(const QList<FileStatus> &statuses) const
     {
         return numberOf(statuses) > 0;
-    }
-
-    int available() const
-    {
-        return numChecksums - numberOf(FileStatus::Missing);
     }
 }; // struct Numbers
 
@@ -86,7 +84,7 @@ public:
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
     bool contains(const FileStatus status, const QModelIndex &subfolder = QModelIndex()) const;
-    bool contains(const FileStatusFlags flags, const QModelIndex &subfolder = QModelIndex()) const;
+    bool contains(const FileStatusFlag flag, const QModelIndex &subfolder = QModelIndex()) const;
     bool contains(const QList<FileStatus> &statuses, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
 

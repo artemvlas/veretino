@@ -25,9 +25,11 @@ public:
 
     enum FileStatus {
         Undefined,
+
         Queued, // added to the processing queue
         Calculating, // checksum is being calculated
         Verifying, // // checksum is being verified
+
         NotChecked, // available for verification
         Matched, // checked, checksum matched
         Mismatched, // checked, checksum did not match
@@ -36,7 +38,8 @@ public:
         Unreadable, // present on the disk, but unreadable (no read permission or read error)
         Added, // item (file path and its checksum) has been added to the database
         Removed, // item^ removed from the database
-        ChecksumUpdated,
+        Updated, // the checksum has been updated
+
         Computed, // the checksum has been calculated and is ready for further processing (copy or save)
         ToClipboard, // the calculated checksum is intended to be copied to the clipboard
         ToSumFile, // the calculated checksum is intended to be stored in the summary file
@@ -44,8 +47,8 @@ public:
     Q_ENUM(FileStatus)
 
     // Flags
-    enum FileStatusFlags {FlagsAvailable, FlagsUpdatable, FlagsChecked};
-    static QList<FileStatus> flagsList(const FileStatusFlags flags);
+    enum FileStatusFlag {FlagAvailable, FlagUpdatable, FlagChecked, FlagMatched, FlagNewLost};
+    static QList<FileStatus> flagsList(const FileStatusFlag flags);
 
     // functions
     FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
@@ -93,7 +96,7 @@ signals:
 }; // class Files
 
 using FileStatus = Files::FileStatus;
-using FileStatusFlags = Files::FileStatusFlags;
+using FileStatusFlag = Files::FileStatusFlag;
 using ExtNumSize = Files::ExtNumSize;
 
 struct FileValues {

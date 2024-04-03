@@ -68,7 +68,7 @@ bool DataContainer::contains(const FileStatus status, const QModelIndex &subfold
     return num.contains(status);
 }
 
-bool DataContainer::contains(const FileStatusFlags flags, const QModelIndex &subfolder) const
+bool DataContainer::contains(const FileStatusFlag flags, const QModelIndex &subfolder) const
 {
     const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
 
@@ -84,7 +84,7 @@ bool DataContainer::contains(const QList<FileStatus> &statuses, const QModelInde
 
 bool DataContainer::isAllChecked() const
 {
-    return (contains(FileStatusFlags::FlagsChecked) && !contains(FileStatus::NotChecked));
+    return (contains(FileStatusFlag::FlagChecked) && !contains(FileStatus::NotChecked));
 }
 
 bool DataContainer::isBackupExists()
@@ -155,9 +155,7 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     while (iter.hasNext()) {
         iter.nextFile();
 
-        if (iter.data(Column::ColumnChecksum).isValid()
-            && !iter.data(Column::ColumnChecksum).toString().isEmpty()) {
-
+        if (TreeModel::isChecksumStored(iter.index())) {
             ++num.numChecksums;
             num.totalSize += iter.data(Column::ColumnSize).toLongLong();
         }

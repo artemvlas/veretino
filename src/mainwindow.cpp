@@ -303,12 +303,12 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         msgBox.setDefaultButton(QMessageBox::Cancel);
         msgBox.button(QMessageBox::Ok)->setText("Update");
         msgBox.button(QMessageBox::Cancel)->setText("Continue");
-        msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->iconProvider.icon(FileStatus::ChecksumUpdated));
+        msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->iconProvider.icon(FileStatus::Updated));
         msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
 
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
                             .arg(result.numberOf(FileStatus::Mismatched))
-                            .arg(result.available())
+                            .arg(result.numberOf(FileStatusFlag::FlagAvailable))
                             .arg(result.numberOf(FileStatus::Mismatched) == 1 ? "is" : "are"));
     }
     else {
@@ -449,24 +449,22 @@ QString MainWindow::getDatabaseStatusSummary()
     QString matched;
     QString sep;
 
-    if (numbers.numberOf(FileStatus::New) > 0 || numbers.numberOf(FileStatus::Missing) > 0)
+    if (numbers.contains({FileStatus::New, FileStatus::Missing}))
         newmissing = "* ";
 
-    if (numbers.numberOf(FileStatus::Mismatched) > 0)
+    if (numbers.contains(FileStatus::Mismatched))
         mismatched = QString("☒%1").arg(numbers.numberOf(FileStatus::Mismatched));
-    if (numbers.numberOf(FileStatus::Matched) > 0)
-        matched = QString(" ✓%1").arg(numbers.numberOf(FileStatus::Matched)
-                                      + numbers.numberOf(FileStatus::Added)
-                                      + numbers.numberOf(FileStatus::ChecksumUpdated));
+    if (numbers.contains(FileStatus::Matched))
+        matched = QString(" ✓%1").arg(numbers.numberOf(FileStatusFlag::FlagMatched));
 
-    if (numbers.numberOf(FileStatus::Mismatched) > 0 || numbers.numberOf(FileStatus::Matched) > 0)
+    if (numbers.contains(FileStatusFlag::FlagChecked))
         sep = " : ";
 
     QString checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
 
     return QString("%1%2 avail. | %3 | %4")
                     .arg(checkStatus)
-                    .arg(numbers.available())
+                    .arg(numbers.numberOf(FileStatusFlag::FlagAvailable))
                     .arg(format::dataSizeReadable(numbers.totalSize), format::algoToStr(ui->treeView->data_->metaData.algorithm));
 }
 

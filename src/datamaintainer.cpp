@@ -355,7 +355,7 @@ int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
             if (!reChecksum.isEmpty()) {
                 data_->model_->setRowData(iter.index(), Column::ColumnChecksum, reChecksum);
                 data_->model_->setRowData(iter.index(), Column::ColumnReChecksum);
-                data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::ChecksumUpdated);
+                data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Updated);
                 ++number;
             }
         }
@@ -428,24 +428,25 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        Numbers num = DataContainer::getNumbers(curIndex.model(), curIndex);
+        const Numbers num = data_->getNumbers(curIndex);
+        const bool containsAvailable = num.contains(FileStatusFlag::FlagAvailable);
         qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
 
-        if (num.available() > 0) {
+        if (containsAvailable) {
             text = QString("Avail.: %1")
-                       .arg(format::filesNumberAndSize(num.available(), num.totalSize - newFilesDataSize));
+                       .arg(format::filesNumberAndSize(num.numberOf(FileStatusFlag::FlagAvailable), num.totalSize - newFilesDataSize));
         }
 
-        if (num.numberOf(FileStatus::Missing) > 0) {
+        if (num.contains(FileStatus::Missing)) {
             QString pre;
-            if (num.available() > 0)
+            if (containsAvailable)
                 pre = "; ";
             text.append(QString("%1Missing: %2").arg(pre).arg(num.numberOf(FileStatus::Missing)));
         }
 
-        if (num.numberOf(FileStatus::New) > 0) {
+        if (num.contains(FileStatus::New)) {
             QString pre;
-            if (num.available() > 0 || num.numberOf(FileStatus::Missing) > 0)
+            if (containsAvailable || num.contains(FileStatus::Missing))
                 pre = "; ";
             text.append(QString("%1New: %2")
                         .arg(pre, format::filesNumberAndSize(num.numberOf(FileStatus::New), newFilesDataSize)));

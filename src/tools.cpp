@@ -352,7 +352,7 @@ QString fileItemStatus(FileStatus status)
     case Files::Removed:
         result = "removed";
         break;
-    case FileStatus::ChecksumUpdated:
+    case FileStatus::Updated:
         result = "updated";
         break;
     default:

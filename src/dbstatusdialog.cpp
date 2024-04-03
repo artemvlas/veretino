@@ -55,15 +55,15 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 
     // tab Verification
-    ui->tabWidget->setTabEnabled(TabVerification, data->contains(FileStatusFlags::FlagsChecked));
-    if (data->contains(FileStatusFlags::FlagsChecked)) {
+    ui->tabWidget->setTabEnabled(TabVerification, data->contains(FileStatusFlag::FlagChecked));
+    if (data->contains(FileStatusFlag::FlagChecked)) {
         ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
 
     // tab Result
     ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated()
-                                             && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::ChecksumUpdated}));
+                                             && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::Updated}));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join("\n"));
@@ -88,11 +88,12 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
 {
     QStringList contentNumbers;
     QString createdDataSize;
+    int available = data->numbers.numberOf(FileStatusFlag::FlagAvailable);
 
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(data->numbers.totalSize));
 
-    if (isJustCreated() || (data->numbers.numChecksums != data->numbers.available()))
+    if (isJustCreated() || (data->numbers.numChecksums != available))
         contentNumbers.append(QString("Stored checksums: %1%2").arg(data->numbers.numChecksums).arg(createdDataSize));
 
     if (data->contains(FileStatus::Unreadable))
@@ -107,8 +108,8 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
     if (isJustCreated())
         return contentNumbers;
 
-    if (data->numbers.available() > 0)
-        contentNumbers.append(QString("Available: %1").arg(format::filesNumberAndSize(data->numbers.available(), data->numbers.totalSize)));
+    if (available > 0)
+        contentNumbers.append(QString("Available: %1").arg(format::filesNumberAndSize(available, data->numbers.totalSize)));
     else
         contentNumbers.append("NO FILES available to check");
 
@@ -125,7 +126,7 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
     else
         contentNumbers.append("No Missing files found");
 
-    if (data->contains({FileStatus::New, FileStatus::Missing})) {
+    if (data->contains(FileStatusFlag::FlagNewLost)) {
         contentNumbers.append(QString());
         contentNumbers.append("Use a context menu for more options");
     }
@@ -136,6 +137,7 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
 QStringList DbStatusDialog::infoVerification(const DataContainer *data)
 {
     QStringList result;
+    const int available = data->numbers.numberOf(FileStatusFlag::FlagAvailable);
 
     if (data->isAllChecked()) {
         if (data->contains(FileStatus::Mismatched))
@@ -143,15 +145,15 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
                               .arg(data->numbers.numberOf(FileStatus::Mismatched))
                               .arg(data->numbers.numChecksums));
 
-        else if (data->numbers.numChecksums == data->numbers.available())
+        else if (data->numbers.numChecksums == available)
             result.append(QString("✓ ALL %1 stored checksums matched").arg(data->numbers.numChecksums));
         else
-            result.append(QString("✓ All %1 available files matched the stored checksums").arg(data->numbers.available()));
+            result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
     }
-    else if (data->contains(FileStatusFlags::FlagsChecked)) {
+    else if (data->contains(FileStatusFlag::FlagChecked)) {
         result.append(QString("%1 out of %2 files were checked")
-                          .arg(data->numbers.numberOf(FileStatus::Matched) + data->numbers.numberOf(FileStatus::Mismatched))
-                          .arg(data->numbers.available()));
+                          .arg(data->numbers.numberOf(FileStatusFlag::FlagChecked))
+                          .arg(available));
 
         result.append(QString());
         if (data->contains(FileStatus::Mismatched))
@@ -176,8 +178,8 @@ QStringList DbStatusDialog::infoChanges()
     if (data_->contains(FileStatus::Removed))
         result.append(QString("Removed: %1").arg(data_->numbers.numberOf(FileStatus::Removed)));
 
-    if (data_->contains(FileStatus::ChecksumUpdated))
-        result.append(QString("Updated: %1").arg(data_->numbers.numberOf(FileStatus::ChecksumUpdated)));
+    if (data_->contains(FileStatus::Updated))
+        result.append(QString("Updated: %1").arg(data_->numbers.numberOf(FileStatus::Updated)));
 
     return result;
 }

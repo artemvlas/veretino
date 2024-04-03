@@ -71,7 +71,7 @@ QString IconProvider::svgFilePath(FileStatus status) const
     case Files::Removed:
         iconFileName = "removed.svg";
         break;
-    case FileStatus::ChecksumUpdated:
+    case FileStatus::Updated:
         iconFileName = "update.svg";
         break;
     default:

@@ -125,7 +125,7 @@ void ModeSelector::setActionsIcons()
     actionShowDbStatus->setIcon(iconProvider.icon(Icons::Database));
     actionResetDb->setIcon(iconProvider.icon(Icons::Undo));
     actionForgetChanges->setIcon(iconProvider.icon(Icons::Backup));
-    actionUpdateDbWithReChecksums->setIcon(iconProvider.icon(FileStatus::ChecksumUpdated));
+    actionUpdateDbWithReChecksums->setIcon(iconProvider.icon(FileStatus::Updated));
     actionUpdateDbWithNewLost->setIcon(iconProvider.icon(Icons::Update));
     actionDbAddNew->setIcon(iconProvider.icon(FileStatus::Added));
     actionDbClearLost->setIcon(iconProvider.icon(FileStatus::Removed));
@@ -225,7 +225,7 @@ void ModeSelector::setButtonInfo()
         break;
     case UpdateMismatch:
         button_->setText("Update");
-        button_->setIcon(iconProvider.icon(FileStatus::ChecksumUpdated));
+        button_->setIcon(iconProvider.icon(FileStatus::Updated));
         button_->setToolTip(QString("Update mismatched checksums with newly calculated ones"));
         break;
     case NoMode:
@@ -599,7 +599,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionCheckAll);
             }
 
-            if (view_->data_->contains(FileStatusFlags::FlagsUpdatable)) {
+            if (view_->data_->contains(FileStatusFlag::FlagUpdatable)) {
                 viewContextMenu->addMenu(menuUpdateDb());
             }
         }
