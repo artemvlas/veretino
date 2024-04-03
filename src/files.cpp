@@ -261,6 +261,20 @@ qint64 Files::dataSize(const FileList &filelist)
     return totalSize;
 }
 
+QList<FileStatus> Files::flagsList(FileStatusFlags flags)
+{
+    switch (flags) {
+    case FlagsAvailable:
+        return {NotChecked, Matched, Mismatched, Added, ChecksumUpdated};
+    case FlagsUpdatable:
+        return {Matched, Mismatched};
+    case FlagsChecked:
+        return {New, Missing, Mismatched};
+    default:
+        return QList<FileStatus>();
+    }
+}
+
 void Files::cancelProcess()
 {
     canceled = true;

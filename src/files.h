@@ -43,11 +43,10 @@ public:
     };
     Q_ENUM(FileStatus)
 
-    struct ExtNumSize {
-        QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
-        int filesNumber = 0; // number of files with this extension
-        qint64 filesSize = 0; // total size of these files
-    }; // struct ExtNumSize
+    enum FileStatusFlags {FlagsAvailable, FlagsUpdatable, FlagsChecked};
+
+    // Flag Lists
+    static QList<FileStatus> flagsList(FileStatusFlags flags);
 
     // functions
     FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
@@ -66,6 +65,13 @@ public:
     static QString contentStatus(const FileList &filelist);
     static QString itemInfo(const QAbstractItemModel *model, const QSet<FileStatus> &fileStatuses = QSet<FileStatus>(),
                             const QModelIndex& rootIndex = QModelIndex());
+
+    //
+    struct ExtNumSize {
+        QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
+        int filesNumber = 0; // number of files with this extension
+        qint64 filesSize = 0; // total size of these files
+    }; // struct ExtNumSize
 
     // variables
     bool canceled = false;
@@ -88,6 +94,7 @@ signals:
 }; // class Files
 
 using FileStatus = Files::FileStatus;
+using FileStatusFlags = Files::FileStatusFlags;
 using ExtNumSize = Files::ExtNumSize;
 
 struct FileValues {

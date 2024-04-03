@@ -63,8 +63,6 @@ public:
     explicit DataContainer(QObject *parent = nullptr);
     ~DataContainer();
 
-    enum FileStatusFlags {FlagsAvailable, FlagsUpdatable, FlagsChecked};
-
     ProxyModel* setProxyModel();
     QString databaseFileName() const;
     QString backupFilePath() const;
@@ -74,7 +72,7 @@ public:
     bool isFilterApplied() const;
     bool contains(const FileStatus status) const;
     bool contains(const FileStatusFlags flags) const;
-    bool contains(const QList<FileStatus> &statuses) const;    
+    bool contains(const QList<FileStatus> &statuses) const;
     bool isAllChecked() const;
 
     bool isBackupExists();
@@ -88,14 +86,6 @@ public:
     static Numbers getNumbers(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
 
-    // Flag Lists
-    const QList<FileStatus>& flagsList(FileStatusFlags flags) const;
-    const QList<FileStatus> flagsAvailable = {FileStatus::NotChecked, FileStatus::Matched, FileStatus::Mismatched,
-                                              FileStatus::Added, FileStatus::ChecksumUpdated};
-    const QList<FileStatus> flagsChecked = {FileStatus::Matched, FileStatus::Mismatched};
-    const QList<FileStatus> flagsUpdatable = {FileStatus::New, FileStatus::Missing, FileStatus::Mismatched};
-    const QList<FileStatus> flagsEmpty;
-
     // DATA
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
@@ -103,5 +93,4 @@ public:
     Numbers numbers;
 }; // class DataContainer
 
-using FileStatusFlags = DataContainer::FileStatusFlags;
 #endif // DATACONTAINER_H
