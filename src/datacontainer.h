@@ -36,6 +36,11 @@ struct Numbers {
         return holder.contains(status) ? holder.value(status) : 0;
     }
 
+    int numberOf(const FileStatusFlags flags) const
+    {
+        return numberOf(Files::flagsList(flags));
+    }
+
     int numberOf(const QList<FileStatus> &statuses) const
     {
         int result = 0;

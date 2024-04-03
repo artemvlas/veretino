@@ -43,10 +43,9 @@ public:
     };
     Q_ENUM(FileStatus)
 
+    // Flags
     enum FileStatusFlags {FlagsAvailable, FlagsUpdatable, FlagsChecked};
-
-    // Flag Lists
-    static QList<FileStatus> flagsList(FileStatusFlags flags);
+    static QList<FileStatus> flagsList(const FileStatusFlags flags);
 
     // functions
     FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
