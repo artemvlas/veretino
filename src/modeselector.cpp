@@ -84,7 +84,8 @@ void ModeSelector::connectActions()
     connect(actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
     connect(actionCopyStoredChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnChecksum);});
     connect(actionCopyReChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnReChecksum);});
-    connect(actionBranchSubfolder, &QAction::triggered, this, [=]{emit branchSubfolder(view_->curIndexSource);});
+    connect(actionBranchMake, &QAction::triggered, this, [=]{emit branchSubfolder(view_->curIndexSource);});
+    connect(actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
 
     connect(actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -136,7 +137,8 @@ void ModeSelector::setActionsIcons()
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
     actionCopyStoredChecksum->setIcon(iconProvider.icon(Icons::Copy));
     actionCopyReChecksum->setIcon(iconProvider.icon(Icons::Copy));
-    actionBranchSubfolder->setIcon(iconProvider.icon(Icons::AddFork));
+    actionBranchMake->setIcon(iconProvider.icon(Icons::AddFork));
+    actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
 }
 
 void ModeSelector::processing(bool isProcessing)
@@ -330,7 +332,7 @@ void ModeSelector::showFileSystem()
 
 void ModeSelector::copyDataToClipboard(Column column)
 {
-    if ((view_->isCurrentViewModel(ModelView::ModelSource) || view_->isCurrentViewModel(ModelView::ModelProxy))
+    if (view_->isViewDatabase()
         && view_->curIndexSource.isValid()) {
 
         QString strData = TreeModel::siblingAtRow(view_->curIndexSource, column).data().toString();
@@ -360,6 +362,17 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (processAbortPrompt())
         emit parseJsonFile(filePath);
+}
+
+void ModeSelector::openBranchDb()
+{
+    if (!view_->data_)
+        return;
+
+    QString assumedPath = view_->data_->branchDbFilePath(view_->curIndexSource);
+
+    if (QFileInfo::exists(assumedPath))
+        openJsonDatabase(assumedPath);
 }
 
 void ModeSelector::processFolderChecksums()
@@ -412,7 +425,6 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
             emit processFolderSha(metaData);
             break;
         default:
-            return;
             break;
     }
 }
@@ -591,8 +603,10 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                             viewContextMenu->addAction(actionCopyStoredChecksum);
                     }
                     else if (TreeModel::containsChecksums(index)) {
-                        if (!QFileInfo::exists(view_->data_->dbSubFolderDbFilePath(index))) // preventing accidental overwriting
-                            viewContextMenu->addAction(actionBranchSubfolder);
+                        if (QFileInfo::exists(view_->data_->branchDbFilePath(index))) // preventing accidental overwriting
+                            viewContextMenu->addAction(actionBranchOpen);
+                        else
+                            viewContextMenu->addAction(actionBranchMake);
 
                         viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
                     }

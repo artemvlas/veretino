@@ -1,11 +1,10 @@
 Veretino 0.3.8
 * Updating the database has become more flexible.
-* UI improvements:
- - pressing the Escape key disables the filtered view, if any
- - some menu items and icons have been improved
- - as well as the layout of some UI elements
- - added a notification about the absence of available files when verifying a subfolder
- - the Copy Checksum menu item appears only if there is one
+* Added the ability to open previously created Branches.
+* Pressing the Escape key disables the filtered view, if any.
+* Added a notification about the absence of available files when verifying a subfolder.
+* The context menu has been improved.
+* Multiple minor improvements...
 
 Veretino 0.3.7
 * Fixed a freezing when switching the currently processed database.

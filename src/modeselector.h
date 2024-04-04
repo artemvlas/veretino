@@ -50,6 +50,7 @@ public:
     void processFolderFilteredChecksums();
     void openFsPath(const QString &path);
     void openJsonDatabase(const QString &filePath);
+    void openBranchDb();
     bool processAbortPrompt(const bool sendCancelation = true); // abort process if any and allow further execution (true)
                                                                 // or do not abort the process, cancel execution (false)
 
@@ -109,7 +110,8 @@ public:
     QAction *actionShowAll = new QAction("Show All", this);
     QAction *actionCheckCurFileFromModel = new QAction("Check the File", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check the Subfolder", this);
-    QAction *actionBranchSubfolder = new QAction("Branch the Subfolder", this);
+    QAction *actionBranchMake = new QAction("Branch the Subfolder", this);
+    QAction *actionBranchOpen = new QAction("Open the Branch", this);
     QAction *actionCheckAll = new QAction("Check ALL available files", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);

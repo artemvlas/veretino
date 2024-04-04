@@ -39,9 +39,9 @@ QString DataContainer::dbSubFolderAbsolutePath(const QModelIndex &subfolder) con
     return paths::joinPath(metaData.workDir, TreeModel::getPath(subfolder));
 }
 
-QString DataContainer::dbSubFolderDbFilePath(const QModelIndex &subfolder) const
+QString DataContainer::branchDbFilePath(const QModelIndex &subfolder) const
 {
-    if (!subfolder.isValid())
+    if (!TreeModel::isFolderRow(subfolder))
         return QString();
 
     const Settings defaults;
