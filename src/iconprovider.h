@@ -19,6 +19,7 @@ public:
     enum Icons {
         AddFork,
         Backup,
+        Branch,
         Cancel,
         ChartPie,
         ClearHistory,

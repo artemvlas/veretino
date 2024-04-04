@@ -64,5 +64,7 @@
         <file>icons/light/add-fork.svg</file>
         <file>icons/light/hash-file.svg</file>
         <file>icons/dark/hash-file.svg</file>
+        <file>icons/dark/branch.svg</file>
+        <file>icons/light/branch.svg</file>
     </qresource>
 </RCC>

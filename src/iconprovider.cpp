@@ -93,6 +93,9 @@ QString IconProvider::svgFilePath(Icons icon) const
     case Backup:
         iconFileName = "backup.svg";
         break;
+    case Branch:
+        iconFileName = "branch.svg";
+        break;
     case Cancel:
         iconFileName = "cancel.svg";
         break;
