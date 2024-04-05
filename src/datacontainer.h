@@ -41,15 +41,18 @@ struct Numbers {
         if (flag == FileStatusFlag::FlagAvailable) // for proper display in a permanent status during the process
             return numChecksums - numberOf(FileStatus::Missing);
 
-        return numberOf(Files::flagsList(flag));
+        return numberOf(Files::flagStatuses(flag));
     }
 
-    int numberOf(const QList<FileStatus> &statuses) const
+    int numberOf(const QSet<FileStatus> &statuses) const
     {
         int result = 0;
-        foreach (const FileStatus status, statuses) {
-            result += numberOf(status);
+
+        QSet<FileStatus>::const_iterator it;
+        for (it = statuses.constBegin(); it != statuses.constEnd(); ++it) {
+            result += numberOf(*it);
         }
+
         return result;
     }
 
@@ -63,7 +66,7 @@ struct Numbers {
         return numberOf(flag) > 0;
     }
 
-    bool contains(const QList<FileStatus> &statuses) const
+    bool contains(const QSet<FileStatus> &statuses) const
     {
         return numberOf(statuses) > 0;
     }
@@ -85,7 +88,7 @@ public:
     bool isFilterApplied() const;
     bool contains(const FileStatus status, const QModelIndex &subfolder = QModelIndex()) const;
     bool contains(const FileStatusFlag flag, const QModelIndex &subfolder = QModelIndex()) const;
-    bool contains(const QList<FileStatus> &statuses, const QModelIndex &subfolder = QModelIndex()) const;
+    bool contains(const QSet<FileStatus> &statuses, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
 
     bool isBackupExists();

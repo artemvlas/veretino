@@ -261,7 +261,7 @@ qint64 Files::dataSize(const FileList &filelist)
     return totalSize;
 }
 
-QList<FileStatus> Files::flagsList(const FileStatusFlag flag)
+QSet<FileStatus> Files::flagStatuses(const FileStatusFlag flag)
 {
     switch (flag) {
     case FlagAvailable:
@@ -275,7 +275,7 @@ QList<FileStatus> Files::flagsList(const FileStatusFlag flag)
     case FlagNewLost:
         return {New, Missing};
     default:
-        return QList<FileStatus>();
+        return QSet<FileStatus>();
     }
 }
 

@@ -75,7 +75,7 @@ bool DataContainer::contains(const FileStatusFlag flags, const QModelIndex &subf
     return num.contains(flags);
 }
 
-bool DataContainer::contains(const QList<FileStatus> &statuses, const QModelIndex &subfolder) const
+bool DataContainer::contains(const QSet<FileStatus> &statuses, const QModelIndex &subfolder) const
 {
     const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
 
