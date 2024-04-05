@@ -29,6 +29,7 @@ public:
     bool isViewFileSystem(); // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
     bool isViewDatabase();
     bool isViewFiltered();
+    bool isViewFiltered(const FileStatus status);
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
@@ -49,7 +50,7 @@ public slots:
     void setTreeModel(ModelView modelSel = ModelProxy);
     void setIndexByPath(const QString &path);
     void setFilter(const FileStatus status);
-    void setFilter(const QSet<FileStatus> statuses = QSet<FileStatus>());
+    void setFilter(const QSet<FileStatus> &statuses = QSet<FileStatus>());
     void disableFilter();
     void saveHeaderState();
     void toHome();

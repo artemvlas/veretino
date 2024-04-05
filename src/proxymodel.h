@@ -18,10 +18,10 @@ public:
     explicit ProxyModel(QObject *parent = nullptr);
     ProxyModel(QAbstractItemModel *sourceModel, QObject *parent = nullptr);
     ~ProxyModel();
-    void setFilter(QSet<FileStatus> statuses);
+    void setFilter(const QSet<FileStatus> &statuses);
     void disableFilter();
     QSet<FileStatus> currentlyFiltered();
-    bool isFilterEnabled = false;
+    bool isFilterEnabled() const;
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;

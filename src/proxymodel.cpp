@@ -36,7 +36,7 @@ void ProxyModel::setInitSettings()
 
 bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    if (!isFilterEnabled || fileStatuses_.isEmpty())
+    if (!isFilterEnabled())
         return true;
 
     QModelIndex curIndex = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
@@ -55,7 +55,7 @@ bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) con
     return sourceModel()->hasChildren(left);
 }
 
-void ProxyModel::setFilter(QSet<FileStatus> statuses)
+void ProxyModel::setFilter(const QSet<FileStatus> &statuses)
 {
     if (statuses.isEmpty()) {
         disableFilter();
@@ -63,13 +63,11 @@ void ProxyModel::setFilter(QSet<FileStatus> statuses)
     }
 
     fileStatuses_ = statuses;
-    isFilterEnabled = true;
     invalidateFilter();
 }
 
 void ProxyModel::disableFilter()
 {
-    isFilterEnabled = false;
     fileStatuses_.clear();
     invalidateFilter();
 }
@@ -77,4 +75,9 @@ void ProxyModel::disableFilter()
 QSet<FileStatus> ProxyModel::currentlyFiltered()
 {
     return fileStatuses_;
+}
+
+bool ProxyModel::isFilterEnabled() const
+{
+    return !fileStatuses_.isEmpty();
 }

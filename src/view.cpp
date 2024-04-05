@@ -165,7 +165,7 @@ void View::setFilter(const FileStatus status)
     setFilter(QSet<FileStatus>({status}));
 }
 
-void View::setFilter(const QSet<FileStatus> statuses)
+void View::setFilter(const QSet<FileStatus> &statuses)
 {
     if (isCurrentViewModel(ModelProxy)) {
         QString prePathModel = curPathModel;
@@ -216,7 +216,14 @@ bool View::isViewDatabase()
 
 bool View::isViewFiltered()
 {
-    return isCurrentViewModel(ModelView::ModelProxy) && data_->proxyModel_->isFilterEnabled;
+    return isCurrentViewModel(ModelView::ModelProxy)
+           && data_->proxyModel_->isFilterEnabled();
+}
+
+bool View::isViewFiltered(const FileStatus status)
+{
+    return isCurrentViewModel(ModelView::ModelProxy)
+           && data_->proxyModel_->currentlyFiltered().contains(status);
 }
 
 void View::deleteOldSelModel()

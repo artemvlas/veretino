@@ -566,58 +566,54 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         else {
             viewContextMenu->addAction(actionShowDbStatus);
             viewContextMenu->addAction(actionResetDb);
-            if (view_->data_ && QFile::exists(view_->data_->backupFilePath()))
+            if (QFile::exists(view_->data_->backupFilePath()))
                 viewContextMenu->addAction(actionForgetChanges);
 
             viewContextMenu->addSeparator();
             viewContextMenu->addAction(actionShowFilesystem);
-            if (view_->isViewFiltered()) {
+            if (view_->isViewFiltered())
                 viewContextMenu->addAction(actionShowAll);
-            }
             viewContextMenu->addSeparator();
 
-            if (isCurrentMode(UpdateMismatch)) {
-                if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
-                    actionShowMismatchesOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::Mismatched));
+            if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
+                if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
+                    actionShowMismatchesOnly->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
                     viewContextMenu->addAction(actionShowMismatchesOnly);
                 }
 
-                if (TreeModel::hasReChecksum(index)) {
-                    viewContextMenu->addAction(actionCopyReChecksum);
-                }
-            }
-            else if (isCurrentMode(ModelNewLost)) {
-                if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
-                    actionShowNewLostOnly->setChecked(view_->data_->proxyModel_->currentlyFiltered().contains(FileStatus::New));
+                if (view_->data_->numbers.contains(FileStatusFlag::FlagNewLost)) {
+                    actionShowNewLostOnly->setChecked(view_->isViewFiltered(FileStatus::New));
                     viewContextMenu->addAction(actionShowNewLostOnly);
                 }
 
-                viewContextMenu->addSeparator();
+                if (view_->data_->numbers.contains(FileStatusFlag::FlagUpdatable))
+                    viewContextMenu->addSeparator();
             }
 
-            if (isCurrentMode(Model) || isCurrentMode(ModelNewLost)) {
-                if (index.isValid()) {
-                    if (TreeModel::isFileRow(index)) {
-                        viewContextMenu->addAction(actionCheckCurFileFromModel);
-                        if (TreeModel::hasChecksum(index))
-                            viewContextMenu->addAction(actionCopyStoredChecksum);
-                    }
-                    else if (TreeModel::containsChecksums(index)) {
-                        if (QFileInfo::exists(view_->data_->branchDbFilePath(index))) // preventing accidental overwriting
-                            viewContextMenu->addAction(actionBranchOpen);
-                        else
-                            viewContextMenu->addAction(actionBranchMake);
-
-                        viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
-                    }
+            if (index.isValid()) {
+                if (TreeModel::isFileRow(index)) {
+                    viewContextMenu->addAction(actionCheckCurFileFromModel);
+                    if (TreeModel::hasReChecksum(index))
+                        viewContextMenu->addAction(actionCopyReChecksum);
+                    else if (TreeModel::hasChecksum(index))
+                        viewContextMenu->addAction(actionCopyStoredChecksum);
                 }
-                viewContextMenu->addAction(actionCheckAll);
+                else if (TreeModel::containsChecksums(index)) {
+                    if (QFileInfo::exists(view_->data_->branchDbFilePath(index)))
+                        viewContextMenu->addAction(actionBranchOpen);
+                    else
+                        viewContextMenu->addAction(actionBranchMake);
+
+                    viewContextMenu->addAction(actionCheckCurSubfolderFromModel);
+                }
             }
 
-            if (view_->data_->contains(FileStatusFlag::FlagUpdatable)) {
+            viewContextMenu->addAction(actionCheckAll);
+
+            if (view_->data_->contains(FileStatusFlag::FlagUpdatable))
                 viewContextMenu->addMenu(menuUpdateDb());
-            }
         }
+
         viewContextMenu->addSeparator();
         viewContextMenu->addAction(actionCollapseAll);
         viewContextMenu->addAction(actionExpandAll);
