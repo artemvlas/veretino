@@ -444,23 +444,27 @@ QString MainWindow::getDatabaseStatusSummary()
         return QString();
 
     const Numbers &numbers = ui->treeView->data_->numbers;
-    QString newmissing;
-    QString mismatched;
-    QString matched;
-    QString sep;
+    QString checkStatus;
 
-    if (numbers.contains(FileStatusFlag::FlagNewLost))
-        newmissing = "* ";
+    if (!modeSelect->isProcessing()) {
+        QString newmissing;
+        QString mismatched;
+        QString matched;
+        QString sep;
 
-    if (numbers.contains(FileStatus::Mismatched))
-        mismatched = QString("☒%1").arg(numbers.numberOf(FileStatus::Mismatched));
-    if (numbers.contains(FileStatus::Matched))
-        matched = QString(" ✓%1").arg(numbers.numberOf(FileStatusFlag::FlagMatched));
+        if (numbers.contains(FileStatusFlag::FlagNewLost))
+            newmissing = "* ";
 
-    if (numbers.contains(FileStatusFlag::FlagChecked))
-        sep = " : ";
+        if (numbers.contains(FileStatus::Mismatched))
+            mismatched = QString("☒%1").arg(numbers.numberOf(FileStatus::Mismatched));
+        if (numbers.contains(FileStatus::Matched))
+            matched = QString(" ✓%1").arg(numbers.numberOf(FileStatusFlag::FlagMatched));
 
-    QString checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
+        if (numbers.contains(FileStatusFlag::FlagChecked))
+            sep = " : ";
+
+        checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
+    }
 
     return QString("%1%2 avail. | %3 | %4")
                     .arg(checkStatus)

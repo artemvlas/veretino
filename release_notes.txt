@@ -5,6 +5,7 @@ Veretino 0.3.8
 * Pressing the Escape key disables the filtered view, if any.
 * Added a notification about the absence of available files when verifying a subfolder.
 * The context menu has been improved.
+* The permanent status has become cleaner during verification.
 * Multiple minor improvements...
 
 Veretino 0.3.7
