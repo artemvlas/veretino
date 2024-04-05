@@ -1,6 +1,7 @@
 Veretino 0.3.8
 * Updating the database has become more flexible.
 * Added the ability to open previously created Branches.
+* The filtered view can also now include independent file statuses.
 * Pressing the Escape key disables the filtered view, if any.
 * Added a notification about the absence of available files when verifying a subfolder.
 * The context menu has been improved.

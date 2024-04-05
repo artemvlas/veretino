@@ -52,6 +52,8 @@ public slots:
     void setFilter(const FileStatus status);
     void setFilter(const FileStatusFlag flag);
     void setFilter(const QSet<FileStatus> &statuses = QSet<FileStatus>());
+    void editFilter(const FileStatus status, bool add);
+    void editFilter(const FileStatusFlag flag, bool add);
     void disableFilter();
     void saveHeaderState();
     void toHome();

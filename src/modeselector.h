@@ -105,8 +105,8 @@ public:
     QAction *actionUpdateDbWithNewLost = new QAction("Add New && Clear Lost", this);
     QAction *actionDbAddNew = new QAction("Add New files", this);
     QAction *actionDbClearLost = new QAction("Clear Lost files", this);
-    QAction *actionShowNewLostOnly = new QAction("Show only New/Lost", this);
-    QAction *actionShowMismatchesOnly = new QAction("Show only Mismatches", this);
+    QAction *actionFilterNewLost = new QAction("Filter New/Lost", this);
+    QAction *actionFilterMismatches = new QAction("Filter Mismatches", this);
     QAction *actionShowAll = new QAction("Show All", this);
     QAction *actionCheckCurFileFromModel = new QAction("Check the File", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check the Subfolder", this);

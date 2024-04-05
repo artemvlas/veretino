@@ -179,6 +179,30 @@ void View::setFilter(const QSet<FileStatus> &statuses)
     }
 }
 
+void View::editFilter(const FileStatus status, bool add)
+{
+    if (isCurrentViewModel(ModelProxy)) {
+        QSet<FileStatus> filter = data_->proxyModel_->currentlyFiltered();
+
+        if (add)
+            filter.insert(status);
+        else
+            filter.remove(status);
+
+        setFilter(filter);
+    }
+}
+
+void View::editFilter(const FileStatusFlag flag, bool add)
+{
+    if (isCurrentViewModel(ModelProxy)) {
+        QSet<FileStatus> filter = data_->proxyModel_->currentlyFiltered();
+        QSet<FileStatus> other = Files::flagStatuses(flag);
+
+        setFilter(add ? filter.unite(other) : filter.subtract(other));
+    }
+}
+
 void View::disableFilter()
 {
     setFilter();

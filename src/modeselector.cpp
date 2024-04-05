@@ -26,8 +26,8 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
 
     menuOpenRecent->setToolTipsVisible(true);
 
-    actionShowNewLostOnly->setCheckable(true);
-    actionShowMismatchesOnly->setCheckable(true);
+    actionFilterNewLost->setCheckable(true);
+    actionFilterMismatches->setCheckable(true);
 
     actionSetAlgoSha1->setCheckable(true);
     actionSetAlgoSha256->setCheckable(true);
@@ -74,10 +74,10 @@ void ModeSelector::connectActions()
     connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);});
     connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskAddNew);});
     connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskClearLost);});
-    connect(actionShowNewLostOnly, &QAction::triggered, this,
-            [=](bool isChecked){if (isChecked) view_->setFilter(FileStatusFlag::FlagNewLost); else view_->disableFilter();});
-    connect(actionShowMismatchesOnly, &QAction::triggered, this,
-            [=](bool isChecked){if (isChecked) view_->setFilter(FileStatus::Mismatched); else view_->disableFilter();});
+    connect(actionFilterNewLost, &QAction::triggered, this,
+            [=](bool isChecked){view_->editFilter(FileStatusFlag::FlagNewLost, isChecked);});
+    connect(actionFilterMismatches, &QAction::triggered, this,
+            [=](bool isChecked){view_->editFilter(FileStatus::Mismatched, isChecked);});
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
@@ -130,8 +130,8 @@ void ModeSelector::setActionsIcons()
     actionUpdateDbWithNewLost->setIcon(iconProvider.icon(Icons::Update));
     actionDbAddNew->setIcon(iconProvider.icon(FileStatus::Added));
     actionDbClearLost->setIcon(iconProvider.icon(FileStatus::Removed));
-    actionShowNewLostOnly->setIcon(iconProvider.icon(Icons::NewFile));
-    actionShowMismatchesOnly->setIcon(iconProvider.icon(Icons::DocClose));
+    actionFilterNewLost->setIcon(iconProvider.icon(Icons::NewFile));
+    actionFilterMismatches->setIcon(iconProvider.icon(Icons::DocClose));
     actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
     actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
@@ -577,13 +577,13 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
 
             if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
                 if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
-                    actionShowMismatchesOnly->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
-                    viewContextMenu->addAction(actionShowMismatchesOnly);
+                    actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
+                    viewContextMenu->addAction(actionFilterMismatches);
                 }
 
                 if (view_->data_->numbers.contains(FileStatusFlag::FlagNewLost)) {
-                    actionShowNewLostOnly->setChecked(view_->isViewFiltered(FileStatus::New));
-                    viewContextMenu->addAction(actionShowNewLostOnly);
+                    actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
+                    viewContextMenu->addAction(actionFilterNewLost);
                 }
 
                 if (view_->data_->numbers.contains(FileStatusFlag::FlagUpdatable))
