@@ -72,7 +72,7 @@ void ProxyModel::disableFilter()
     invalidateFilter();
 }
 
-QSet<FileStatus> ProxyModel::currentlyFiltered()
+QSet<FileStatus> ProxyModel::currentlyFiltered() const
 {
     return fileStatuses_;
 }

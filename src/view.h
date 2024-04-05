@@ -50,6 +50,7 @@ public slots:
     void setTreeModel(ModelView modelSel = ModelProxy);
     void setIndexByPath(const QString &path);
     void setFilter(const FileStatus status);
+    void setFilter(const FileStatusFlag flag);
     void setFilter(const QSet<FileStatus> &statuses = QSet<FileStatus>());
     void disableFilter();
     void saveHeaderState();

@@ -74,9 +74,9 @@ void ModeSelector::connectActions()
     connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);});
     connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskAddNew);});
     connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskClearLost);});
-    connect(actionShowNewLostOnly, &QAction::toggled, this,
-            [=](bool isChecked){if (isChecked) view_->setFilter({FileStatus::New, FileStatus::Missing}); else view_->disableFilter();});
-    connect(actionShowMismatchesOnly, &QAction::toggled, this,
+    connect(actionShowNewLostOnly, &QAction::triggered, this,
+            [=](bool isChecked){if (isChecked) view_->setFilter(FileStatusFlag::FlagNewLost); else view_->disableFilter();});
+    connect(actionShowMismatchesOnly, &QAction::triggered, this,
             [=](bool isChecked){if (isChecked) view_->setFilter(FileStatus::Mismatched); else view_->disableFilter();});
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);

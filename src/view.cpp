@@ -165,6 +165,11 @@ void View::setFilter(const FileStatus status)
     setFilter(QSet<FileStatus>({status}));
 }
 
+void View::setFilter(const FileStatusFlag flag)
+{
+    setFilter(Files::flagStatuses(flag));
+}
+
 void View::setFilter(const QSet<FileStatus> &statuses)
 {
     if (isCurrentViewModel(ModelProxy)) {

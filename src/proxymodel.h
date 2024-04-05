@@ -20,7 +20,7 @@ public:
     ~ProxyModel();
     void setFilter(const QSet<FileStatus> &statuses);
     void disableFilter();
-    QSet<FileStatus> currentlyFiltered();
+    QSet<FileStatus> currentlyFiltered() const;
     bool isFilterEnabled() const;
 
 protected:
