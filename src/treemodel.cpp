@@ -296,7 +296,27 @@ bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
     return isAny;
 }
 
+QString TreeModel::itemName(const QModelIndex &curIndex)
+{
+    return siblingAtRow(curIndex, ColumnName).data().toString();
+}
+
+qint64 TreeModel::itemFileSize(const QModelIndex &fileIndex)
+{
+    return siblingAtRow(fileIndex, ColumnSize).data(RawDataRole).toLongLong();
+}
+
 FileStatus TreeModel::itemFileStatus(const QModelIndex &fileIndex)
 {
     return siblingAtRow(fileIndex, ColumnStatus).data(RawDataRole).value<FileStatus>();
+}
+
+QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
+{
+    return siblingAtRow(fileIndex, ColumnChecksum).data().toString();
+}
+
+QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
+{
+    return siblingAtRow(fileIndex, ColumnReChecksum).data().toString();
 }

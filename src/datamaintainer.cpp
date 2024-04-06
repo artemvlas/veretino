@@ -192,7 +192,7 @@ bool DataMaintainer::updateChecksum(QModelIndex fileRowIndex, const QString &com
     if (fileRowIndex.model() == data_->proxyModel_)
         fileRowIndex = data_->proxyModel_->mapToSource(fileRowIndex);
 
-    QString storedChecksum = TreeModel::siblingAtRow(fileRowIndex, Column::ColumnChecksum).data().toString();
+    QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
         data_->model_->setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
@@ -289,8 +289,7 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
         return QString();
     }
 
-    FileStatus fileStatus = TreeModel::siblingAtRow(fileRowIndex, TreeModel::ColumnStatus)
-                                        .data(TreeModel::RawDataRole).value<FileStatus>();
+    FileStatus fileStatus = TreeModel::itemFileStatus(fileRowIndex);
 
     QString savedSum;
 
@@ -299,7 +298,7 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
     else if (fileStatus == FileStatus::Unreadable)
         emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
     else {
-        savedSum = TreeModel::siblingAtRow(fileRowIndex, Column::ColumnChecksum).data().toString();
+        savedSum = TreeModel::itemFileChecksum(fileRowIndex);
         if (savedSum.isEmpty())
             emit showMessage("No checksum in the database.", "No checksum");
     }
@@ -419,7 +418,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     QString text;
 
     if (TreeModel::isFileRow(curIndex)) {
-        QString itemFileNameStr = TreeModel::siblingAtRow(curIndex, Column::ColumnName).data().toString();
+        QString itemFileNameStr = TreeModel::itemName(curIndex);
         QVariant itemFileSize = TreeModel::siblingAtRow(curIndex, Column::ColumnSize).data(TreeModel::RawDataRole);
         QString itemFileSizeStr = itemFileSize.isValid() ? QString(" (%1)").arg(format::dataSizeReadable(itemFileSize.toLongLong()))
                                                          : QString();

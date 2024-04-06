@@ -51,7 +51,12 @@ public:
     static bool hasChecksum(const QModelIndex &fileIndex);
     static bool hasReChecksum(const QModelIndex &fileIndex);
     static bool containsChecksums(const QModelIndex &folderIndex); // checks whether the specified subfolder contains files with saved checksums
+
+    static QString itemName(const QModelIndex &curIndex);
+    static qint64 itemFileSize(const QModelIndex &fileIndex);
     static FileStatus itemFileStatus(const QModelIndex &fileIndex);
+    static QString itemFileChecksum(const QModelIndex &fileIndex);
+    static QString itemFileReChecksum(const QModelIndex &fileIndex);
 
 public slots:
     bool addFile(const QString &filePath, const FileValues &values);

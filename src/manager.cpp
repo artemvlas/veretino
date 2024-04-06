@@ -164,7 +164,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    FileStatus storedStatus = TreeModel::siblingAtRow(fileItemIndex, Column::ColumnStatus).data(TreeModel::RawDataRole).value<FileStatus>();
+    FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
 
     if (storedStatus == FileStatus::Missing) {
         emit showMessage("File does not exist", "Missing file");
@@ -226,7 +226,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         }
     }
     else { // if subfolder
-        QString subfolderName = TreeModel::siblingAtRow(folderItemIndex, Column::ColumnName).data().toString();
+        QString subfolderName = TreeModel::itemName(folderItemIndex);
         Numbers num = dataMaintainer->data_->getNumbers(folderItemIndex);
 
         emit folderChecked(num, subfolderName);
