@@ -11,7 +11,7 @@
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({"Path", "Size", "Status", "Checksum", "ReChecksum"}); // "Size / Availability"
+    rootItem = new TreeItem({"Name", "Size", "Status", "Checksum", "ReChecksum"});
 }
 
 TreeModel::~TreeModel()
@@ -140,7 +140,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
         return QVariant();
 
     if (role == Qt::DecorationRole) {
-        if (curIndex.column() == ColumnPath) {
+        if (curIndex.column() == ColumnName) {
             return isFileRow(curIndex) ? iconProvider.icon(QFileInfo(curIndex.data().toString()))
                                        : iconProvider.icon(QFileIconProvider::Folder);
         }
@@ -208,7 +208,7 @@ TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
 QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
 {
     QString path;
-    QModelIndex newIndex = siblingAtRow(curIndex, ColumnPath);
+    QModelIndex newIndex = siblingAtRow(curIndex, ColumnName);
 
     if (newIndex.isValid()) {
         path = newIndex.data().toString();
@@ -257,14 +257,14 @@ QModelIndex TreeModel::siblingAtRow(const QModelIndex &curIndex, Column column)
 // the TreeModel implies that if an item has children, then it is a folder (or invalid-root); if not, then it is a file
 bool TreeModel::isFileRow(const QModelIndex &curIndex)
 {
-    QModelIndex index = siblingAtRow(curIndex, ColumnPath);
+    QModelIndex index = siblingAtRow(curIndex, ColumnName);
 
     return (index.isValid() && !index.model()->hasChildren(index));
 }
 
 bool TreeModel::isFolderRow(const QModelIndex &curIndex)
 {
-    QModelIndex index = siblingAtRow(curIndex, ColumnPath);
+    QModelIndex index = siblingAtRow(curIndex, ColumnName);
 
     return (index.isValid() && index.model()->hasChildren(index));
 }

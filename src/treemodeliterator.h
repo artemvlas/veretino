@@ -17,7 +17,7 @@ public:
     TreeModelIterator& nextFile();
     bool hasNext();
     const QModelIndex& index();
-    QVariant data(Column column = Column::ColumnPath, int role = TreeModel::RawDataRole);
+    QVariant data(Column column = Column::ColumnName, int role = TreeModel::RawDataRole);
     QString path(const QModelIndex &root = QModelIndex());
     FileStatus status();
 

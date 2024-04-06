@@ -8,7 +8,7 @@
 TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex)
     : model_(model)
 {
-    rootIndex = (rootIndex.isValid() && rootIndex.model() == model) ? TreeModel::siblingAtRow(rootIndex, Column::ColumnPath)
+    rootIndex = (rootIndex.isValid() && rootIndex.model() == model) ? TreeModel::siblingAtRow(rootIndex, Column::ColumnName)
                                                                     : QModelIndex();
 
     if (TreeModel::isFileRow(rootIndex))

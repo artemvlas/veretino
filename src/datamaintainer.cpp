@@ -419,7 +419,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     QString text;
 
     if (TreeModel::isFileRow(curIndex)) {
-        QString itemFileNameStr = TreeModel::siblingAtRow(curIndex, Column::ColumnPath).data().toString();
+        QString itemFileNameStr = TreeModel::siblingAtRow(curIndex, Column::ColumnName).data().toString();
         QVariant itemFileSize = TreeModel::siblingAtRow(curIndex, Column::ColumnSize).data(TreeModel::RawDataRole);
         QString itemFileSizeStr = itemFileSize.isValid() ? QString(" (%1)").arg(format::dataSizeReadable(itemFileSize.toLongLong()))
                                                          : QString();
