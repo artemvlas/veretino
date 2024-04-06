@@ -363,4 +363,10 @@ QString fileItemStatus(FileStatus status)
     return result;
 }
 
+QString coloredText(const bool ignore)
+{
+    QString color = ignore ? "red" : "green";
+    return QString("color : %1").arg(color);
+}
+
 } // namespace format

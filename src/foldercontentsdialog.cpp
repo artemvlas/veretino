@@ -58,6 +58,7 @@ void FolderContentsDialog::connections()
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, [=](bool isChecked){isChecked ? enableFilterCreating() : disableFilterCreating();});
 
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &FolderContentsDialog::updateTotalFiltered);
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &FolderContentsDialog::updateFilterExtensionsList);
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &FolderContentsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &FolderContentsDialog::reject);
@@ -185,7 +186,9 @@ void FolderContentsDialog::updateFilterExtensionsList()
         }
     }
 
+    ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
     ui->labelFilterExtensions->setText(filterExtensions.join(" "));
+
     updateTotalFiltered();
 }
 
@@ -215,9 +218,9 @@ void FolderContentsDialog::updateTotalFiltered()
 
 FilterRule FolderContentsDialog::resultFilter()
 {
-    if (isFilterCreatingEnabled() && !ui->labelFilterExtensions->text().isEmpty()) {
+    if (isFilterCreatingEnabled() && !filterExtensions.isEmpty()) {
         FilterRule::ExtensionsFilter filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-        return FilterRule(filterType, ui->labelFilterExtensions->text().split(" "));
+        return FilterRule(filterType, filterExtensions);
     }
 
     return FilterRule(true);

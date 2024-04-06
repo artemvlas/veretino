@@ -49,8 +49,10 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     if (data->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
+        ui->labelFiltersInfo->setStyleSheet(format::coloredText(data->metaData.filter.isFilter(FilterRule::Ignore)));
+
         QString extensions = data->metaData.filter.extensionsList.join(", ");
-        data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included Only:\n%1").arg(extensions))
+        data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included:\n%1").arg(extensions))
                                                             : ui->labelFiltersInfo->setText(QString("Ignored:\n%1").arg(extensions));
     }
 
@@ -62,8 +64,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 
     // tab Result
-    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated()
-                                             && data->contains({FileStatus::Added, FileStatus::Removed, FileStatus::Updated}));
+    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data->contains(FileStatusFlag::FlagDbChanged));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join("\n"));

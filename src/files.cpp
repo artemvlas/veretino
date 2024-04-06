@@ -268,6 +268,8 @@ QSet<FileStatus> Files::flagStatuses(const FileStatusFlag flag)
         return {NotChecked, Matched, Mismatched, Added, Updated};
     case FlagUpdatable:
         return {New, Missing, Mismatched};
+    case FlagDbChanged:
+        return {Added, Removed, Updated};
     case FlagChecked:
         return {Matched, Mismatched};
     case FlagMatched:

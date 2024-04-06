@@ -23,7 +23,7 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &SettingsDialog::updateLabelDatabaseFilename);
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
-         {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);});
+         {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable); setExtensionsColor();});
 
     ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
                                                "(if all files exist and match the saved checksums),\n"
@@ -69,6 +69,7 @@ void SettingsDialog::loadSettings(const Settings &settings)
     updateLabelDatabaseFilename();
 
     // Tab Filter
+    setExtensionsColor();
     ui->inputExtensions->setText(settings.filter.extensionsList.join(" "));
     settings.filter.isFilter(FilterRule::Include) ? ui->radioButtonIncludeOnly->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
 
@@ -145,6 +146,11 @@ void SettingsDialog::updateLabelDatabaseFilename()
 void SettingsDialog::restoreDefaults()
 {
     loadSettings(defaults);
+}
+
+void SettingsDialog::setExtensionsColor()
+{
+    ui->inputExtensions->setStyleSheet(format::coloredText(ui->radioButtonIgnore->isChecked()));
 }
 
 SettingsDialog::~SettingsDialog()

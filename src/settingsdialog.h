@@ -28,6 +28,7 @@ private:
     void loadSettings(const Settings &settings);
     void restoreDefaults();
     void updateLabelDatabaseFilename();
+    void setExtensionsColor();
 
     Ui::SettingsDialog *ui;
     QStringList extensionsList(); // return a list of extensions from input

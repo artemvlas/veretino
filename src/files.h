@@ -47,7 +47,7 @@ public:
     Q_ENUM(FileStatus)
 
     // Flags
-    enum FileStatusFlag {FlagAvailable, FlagUpdatable, FlagChecked, FlagMatched, FlagNewLost};
+    enum FileStatusFlag {FlagAvailable, FlagUpdatable, FlagDbChanged, FlagChecked, FlagMatched, FlagNewLost};
     static QSet<FileStatus> flagStatuses(const FileStatusFlag flag);
 
     // functions
