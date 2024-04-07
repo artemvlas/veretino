@@ -1,9 +1,12 @@
-# Veretino: folder data audit and verification
-### The app allows verifying folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
+# Veretino: a new way to organize and store checksums
+_With this application, the integrity of both individual files and entire lists can be verified.
+Analyze the contents of folders, calculate checksums, and easily find modified or corrupted data..._
+
+### The app allows you to check the folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
-* Folder/file-list audit: analysis and verification of folder contents, looking for folder-wide data changes.
 * Multiple checksums calculator.
+* Folder/file-list data audit: analysis and verification of folder contents, looking for folder-wide data changes.
 * Finding damaged files in a folder.
 * Checksums calculation, store and verification for individual files.
 * Comparing files by checksum.
