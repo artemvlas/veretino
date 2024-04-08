@@ -91,6 +91,7 @@ QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "numbe
 QString fileItemStatus(FileStatus status);
 
 QString coloredText(const bool ignore); // 'ignore' (true = red, false = green)
+QString coloredText(const QString &className, const bool ignore); // 'className': "QLineEdit", "QTreeView", "QLabel", etc...
 } // namespace format
 
 #endif // TOOLS_H

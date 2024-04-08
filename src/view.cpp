@@ -323,7 +323,9 @@ void View::headerContextMenuRequested(const QPoint &point)
 
 void View::setBackgroundColor()
 {
-    isViewFiltered() ? setStyleSheet("QTreeView { background-color : grey; color : black }") : setStyleSheet("");
+    QString style = isViewFiltered() ? "QTreeView { background-color : grey; color : black }" : QString();
+
+    setStyleSheet(style);
 }
 
 void View::keyPressEvent(QKeyEvent* event)

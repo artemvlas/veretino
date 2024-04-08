@@ -369,4 +369,9 @@ QString coloredText(const bool ignore)
     return QString("color : %1").arg(color);
 }
 
+QString coloredText(const QString &className, const bool ignore)
+{
+    return QString("%1 { %2 }").arg(className, coloredText(ignore));
+}
+
 } // namespace format

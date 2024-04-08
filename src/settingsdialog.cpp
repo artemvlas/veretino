@@ -150,7 +150,7 @@ void SettingsDialog::restoreDefaults()
 
 void SettingsDialog::setExtensionsColor()
 {
-    ui->inputExtensions->setStyleSheet(QString("QLineEdit { %1 }").arg(format::coloredText(ui->radioButtonIgnore->isChecked())));
+    ui->inputExtensions->setStyleSheet(format::coloredText("QLineEdit", ui->radioButtonIgnore->isChecked()));
 }
 
 SettingsDialog::~SettingsDialog()
