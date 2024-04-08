@@ -32,11 +32,12 @@ private:
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
     QJsonObject dbHeader(const DataContainer *data, const QModelIndex &rootFolder);
+    bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList);
 
     const QString strHeaderIgnored = "Ignored";
     const QString strHeaderIncluded = "Included";
     const QString strHeaderAlgo = "Used algorithm";
-    const QString strHeaderWorkDir = "Working folder";
+    const QString strHeaderWorkDir = "WorkDir";
 
     QString jsonFilePath;
     QElapsedTimer elapsedTimer;

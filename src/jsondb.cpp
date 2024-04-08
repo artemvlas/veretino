@@ -202,7 +202,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     QJsonObject header(mainArray.at(0).toObject());
     DataContainer* parsedData = new DataContainer;
 
-    // filling metadata
+    // Filling in metadata
     parsedData->metaData.databaseFilePath = filePath;
     parsedData->metaData.isImported = true;
 
@@ -210,10 +210,20 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     QString strIncluded = tools::findCompleteString(header.keys(), strHeaderIncluded);
     QString strWorkDir = tools::findCompleteString(header.keys(), strHeaderWorkDir);
 
-    parsedData->metaData.workDir = (!strWorkDir.isEmpty() && header.value(strWorkDir).toString().contains('/'))
-                                       ? header.value(strWorkDir).toString()
-                                       : paths::parentFolder(filePath);
+    // [checking for files in the intended WorkDir]
+    if (!strWorkDir.isEmpty()
+        && header.value(strWorkDir).toString().contains('/')) {
 
+        if (!isPresentInWorkDir(header.value(strWorkDir).toString(), filelistData)
+            && isPresentInWorkDir(paths::parentFolder(filePath), filelistData))
+            parsedData->metaData.workDir = paths::parentFolder(filePath);
+        else
+            parsedData->metaData.workDir = header.value(strWorkDir).toString();
+    }
+    else
+        parsedData->metaData.workDir = paths::parentFolder(filePath);
+
+    // [filter rule]
     if (!strIgnored.isEmpty()) {
         parsedData->metaData.filter.setFilter(FilterRule::Ignore, header.value(strIgnored).toString().split(" "));
     }
@@ -221,6 +231,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         parsedData->metaData.filter.setFilter(FilterRule::Include, header.value(strIncluded).toString().split(" "));
     }
 
+    // [algorithm]
     if (header.contains(strHeaderAlgo)) {
         parsedData->metaData.algorithm = tools::strToAlgo(header.value(strHeaderAlgo).toString());
         qDebug() << "JsonDb::parseJson | Used algorithm from header data:" << parsedData->metaData.algorithm;
@@ -230,12 +241,14 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         qDebug() << "JsonDb::parseJson | The algorithm is determined by the length of the checksum string:" << parsedData->metaData.algorithm;
     }
 
+    // [date]
     if (header.contains("Updated"))
         parsedData->metaData.saveDateTime = header.value("Updated").toString();
 
     if (header.contains("Verified"))
         parsedData->metaData.successfulCheckDateTime = header.value("Verified").toString();
 
+    // Filling in the Main Data
     // with very big Data, it is faster to add new files first, and then the main ones
     emit setStatusbarText("Looking for new files...");
 
@@ -296,6 +309,23 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     qDebug() << "JsonDb::parseJson | parsing took" << format::millisecToReadable(elapsedTimer.elapsed(), false);
 
     return parsedData;
+}
+
+// checks if there is at least one file from the list (keys) in the folder (workDir)
+bool JsonDb::isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList)
+{
+    bool isPresent = false;
+    QJsonObject::const_iterator i;
+
+    for (i = fileList.constBegin(); !canceled && i != fileList.constEnd(); ++i) {
+        QString fullPath = paths::joinPath(workDir, i.key());
+        if (QFileInfo::exists(fullPath)) {
+            isPresent = true;
+            break;
+        }
+    }
+
+    return isPresent;
 }
 
 void JsonDb::cancelProcess()
