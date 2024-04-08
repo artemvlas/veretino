@@ -24,6 +24,7 @@ View::View(QWidget *parent)
 
     connect(this, &View::modelChanged, this, &View::connectModel);
     connect(this, &View::modelChanged, this, &View::deleteOldSelModel);
+    connect(this, &View::modelChanged, this, &View::setBackgroundColor);
 }
 
 // called every time the model is changed
@@ -176,6 +177,7 @@ void View::setFilter(const QSet<FileStatus> &statuses)
         QString prePathModel = curPathModel;
         data_->proxyModel_->setFilter(statuses);
         setIndexByPath(prePathModel);
+        setBackgroundColor();
     }
 }
 
@@ -317,6 +319,11 @@ void View::headerContextMenuRequested(const QPoint &point)
     headerContextMenu->addSeparator();
     headerContextMenu->addAction("Show all", this, &View::showAllColumns);
     headerContextMenu->exec(header()->mapToGlobal(point));
+}
+
+void View::setBackgroundColor()
+{
+    isViewFiltered() ? setStyleSheet("QTreeView { background-color : grey; color : black }") : setStyleSheet("");
 }
 
 void View::keyPressEvent(QKeyEvent* event)

@@ -64,6 +64,7 @@ private:
     void changeCurIndexAndPath(const QModelIndex &curIndex);
     void deleteOldSelModel();
     void connectModel();
+    void setBackgroundColor(); // if isViewFiltered()
     void toggleColumnVisibility(int column);
     void showAllColumns();
     void setDefaultColumnsWidth();
