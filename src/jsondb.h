@@ -32,7 +32,9 @@ private:
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
     QJsonArray loadJsonDB(const QString &filePath);
     QJsonObject dbHeader(const DataContainer *data, const QModelIndex &rootFolder);
+    MetaData getMetaData(const QString &filePath, const QJsonObject &header, const QJsonObject &fileList);
     bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList);
+    QString findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength = 4);
 
     const QString strHeaderIgnored = "Ignored";
     const QString strHeaderIncluded = "Included";
@@ -40,7 +42,7 @@ private:
     const QString strHeaderWorkDir = "WorkDir";
 
     QString jsonFilePath;
-    QElapsedTimer elapsedTimer;
+    //QElapsedTimer elapsedTimer;
     bool canceled = false;
 
 signals:

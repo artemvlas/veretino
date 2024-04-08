@@ -57,8 +57,6 @@ int algoStrLen(QCryptographicHash::Algorithm algo); // returns the length of che
 QCryptographicHash::Algorithm algorithmByStrLen(int strLen); // ^vice versa
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
 
-QString findCompleteString(const QStringList &strList, const QString &sample, int sampleLength = 4); // strList{"Ignored", "Included"} | sample "ignore" --> "Ignored", sample "Include Only" --> "Included"
-
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &text);
