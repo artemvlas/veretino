@@ -274,7 +274,6 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     QString strWorkDir = findValueStr(header, strHeaderWorkDir);
 
     if (strWorkDir.contains('/')) {
-
         if (!isPresentInWorkDir(strWorkDir, fileList)
             && isPresentInWorkDir(paths::parentFolder(filePath), fileList))
             metaData.workDir = paths::parentFolder(filePath);
@@ -319,6 +318,9 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
 // checks if there is at least one file from the list (keys) in the folder (workDir)
 bool JsonDb::isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList)
 {
+    if (!QFileInfo::exists(workDir))
+        return false;
+
     bool isPresent = false;
     QJsonObject::const_iterator i;
 
