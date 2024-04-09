@@ -474,6 +474,9 @@ QString MainWindow::getDatabaseStatusSummary()
 
 void MainWindow::handlePermanentStatusClick()
 {
+    if (modeSelect->isProcessing())
+        return;
+
     if (ui->treeView->isViewFileSystem() && !settings_->filter.extensionsList.isEmpty())
         dialogSettings();
     else if (ui->treeView->isViewDatabase())
