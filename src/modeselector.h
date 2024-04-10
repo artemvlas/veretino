@@ -60,6 +60,7 @@ public:
     void verifyDb();
     void showFolderContentTypes();
     void checkFileChecksum(const QString &checkSum);
+    void copyItem();
 
     void showFileSystem();
     void updateMenuOpenRecent();
@@ -115,6 +116,7 @@ public:
     QAction *actionCheckAll = new QAction("Check ALL available files", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
+    QAction *actionCopyItem = new QAction("Copy", this);
 
     QAction *actionCollapseAll = new QAction("Collapse all", this);
     QAction *actionExpandAll = new QAction("Expand all", this);

@@ -83,7 +83,7 @@ public:
     ProxyModel* setProxyModel();
     QString databaseFileName() const;
     QString backupFilePath() const;
-    QString dbSubFolderAbsolutePath(const QModelIndex &subfolder) const; // returns the absolute path to the database subfolder
+    QString itemAbsolutePath(const QModelIndex &curIndex) const; // returns the absolute path to the database item (file or subfolder)
     QString branchDbFilePath(const QModelIndex &subfolder) const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;

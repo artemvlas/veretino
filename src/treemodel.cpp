@@ -279,6 +279,11 @@ bool TreeModel::hasReChecksum(const QModelIndex &fileIndex)
     return siblingAtRow(fileIndex, ColumnReChecksum).data().isValid();
 }
 
+bool TreeModel::hasStatus(const FileStatusFlag flag, const QModelIndex &fileIndex)
+{
+    return isFileRow(fileIndex) && Files::flagStatuses(flag).contains(itemFileStatus(fileIndex));
+}
+/*
 bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
 {
     bool isAny = false;
@@ -287,6 +292,24 @@ bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
         TreeModelIterator it(folderIndex.model(), folderIndex);
         while (it.hasNext()) {
             if (hasChecksum(it.nextFile().index())) {
+                isAny = true;
+                break;
+            }
+        }
+    }
+
+    return isAny;
+}*/
+
+bool TreeModel::contains(const FileStatusFlag flag, const QModelIndex &folderIndex)
+{
+    bool isAny = false;
+
+    if (isFolderRow(folderIndex)) {
+        QSet<FileStatus> requiredStatuses = Files::flagStatuses(flag);
+        TreeModelIterator it(folderIndex.model(), folderIndex);
+        while (it.hasNext()) {
+            if (requiredStatuses.contains(itemFileStatus(it.nextFile().index()))) {
                 isAny = true;
                 break;
             }

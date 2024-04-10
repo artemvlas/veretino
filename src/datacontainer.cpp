@@ -35,11 +35,11 @@ QString DataContainer::backupFilePath() const
                            ".tmp-backup_" + paths::basicName(metaData.databaseFilePath));
 }
 
-// returns the absolute path to the database subfolder
+// returns the absolute path to the database item (file or subfolder)
 // (working folder path in filesystem + relative path in the database)
-QString DataContainer::dbSubFolderAbsolutePath(const QModelIndex &subfolder) const
+QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
 {
-    return paths::joinPath(metaData.workDir, TreeModel::getPath(subfolder));
+    return paths::joinPath(metaData.workDir, TreeModel::getPath(curIndex));
 }
 
 QString DataContainer::branchDbFilePath(const QModelIndex &subfolder) const
@@ -51,7 +51,7 @@ QString DataContainer::branchDbFilePath(const QModelIndex &subfolder) const
     QString extension = defaults.dbFileExtension(!metaData.databaseFilePath.endsWith(".ver"));
     QString subFolderDbFileName = format::composeDbFileName(defaults.dbPrefix, subfolder.data().toString(), extension);
 
-    return paths::joinPath(dbSubFolderAbsolutePath(subfolder), subFolderDbFileName);
+    return paths::joinPath(itemAbsolutePath(subfolder), subFolderDbFileName);
 }
 
 bool DataContainer::isWorkDirRelative() const

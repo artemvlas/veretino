@@ -8,6 +8,7 @@
 #include <QGuiApplication>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QMimeData>
 #include <QDebug>
 
 ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent)
@@ -84,6 +85,7 @@ void ModeSelector::connectActions()
     connect(actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
     connect(actionCopyStoredChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnChecksum);});
     connect(actionCopyReChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnReChecksum);});
+    connect(actionCopyItem, &QAction::triggered, this, &ModeSelector::copyItem);
     connect(actionBranchMake, &QAction::triggered, this, [=]{emit branchSubfolder(view_->curIndexSource);});
     connect(actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
 
@@ -137,6 +139,7 @@ void ModeSelector::setActionsIcons()
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
     actionCopyStoredChecksum->setIcon(iconProvider.icon(Icons::Copy));
     actionCopyReChecksum->setIcon(iconProvider.icon(Icons::Copy));
+    actionCopyItem->setIcon(iconProvider.icon(Icons::Copy));
     actionBranchMake->setIcon(iconProvider.icon(Icons::AddFork));
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
 }
@@ -316,6 +319,17 @@ void ModeSelector::showFolderContentTypes()
 void ModeSelector::checkFileChecksum(const QString &checkSum)
 {
     emit checkFile(view_->curPathFileSystem, checkSum);
+}
+
+void ModeSelector::copyItem()
+{
+    if (!view_->isViewDatabase() || !view_->curIndexSource.isValid())
+        return;
+
+    QString itemPath = view_->data_->itemAbsolutePath(view_->curIndexSource);
+    QMimeData* mimeData = new QMimeData();
+    mimeData->setUrls({QUrl::fromLocalFile(itemPath)});
+    QGuiApplication::clipboard()->setMimeData(mimeData);
 }
 
 void ModeSelector::showFileSystem()
@@ -591,14 +605,23 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
             }
 
             if (index.isValid()) {
-                if (TreeModel::isFileRow(index)) {
-                    viewContextMenu->addAction(actionCheckCurFileFromModel);
+                 if (TreeModel::isFileRow(index)) {
                     if (TreeModel::hasReChecksum(index))
                         viewContextMenu->addAction(actionCopyReChecksum);
                     else if (TreeModel::hasChecksum(index))
                         viewContextMenu->addAction(actionCopyStoredChecksum);
+
+                    if (TreeModel::hasStatus(FileStatusFlag::FlagAvailable, index)) {
+                        actionCopyItem->setText("Copy File");
+                        viewContextMenu->addAction(actionCopyItem);
+
+                        viewContextMenu->addAction(actionCheckCurFileFromModel);
+                    }
                 }
-                else if (TreeModel::containsChecksums(index)) {
+                else if (TreeModel::contains(FileStatusFlag::FlagAvailable, index)) {
+                    actionCopyItem->setText("Copy Folder");
+                    viewContextMenu->addAction(actionCopyItem);
+
                     if (QFileInfo::exists(view_->data_->branchDbFilePath(index)))
                         viewContextMenu->addAction(actionBranchOpen);
                     else
