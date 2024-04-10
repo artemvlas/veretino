@@ -2,7 +2,6 @@ Veretino 0.3.9
 * A database file with a predefined WorkDir can now be placed in the current one.
 * The filtered View is highlighted by changing the background.
 * Added the ability to copy files and folders from the database.
-* Minor UI improvements.
 
 Veretino 0.3.8
 * Updating the database has become more flexible.

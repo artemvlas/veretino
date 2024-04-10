@@ -263,9 +263,9 @@ Mode ModeSelector::selectMode(const QString &path)
 
 Mode ModeSelector::selectMode(const Numbers &numbers)
 {
-    if (numbers.numberOf(FileStatus::Mismatched) > 0)
+    if (numbers.contains(FileStatus::Mismatched))
         curMode = UpdateMismatch;
-    else if (numbers.numberOf(FileStatus::New) > 0 || numbers.numberOf(FileStatus::Missing) > 0)
+    else if (numbers.contains(FileStatusFlag::FlagNewLost))
         curMode = ModelNewLost;
     else
         curMode = Model;
