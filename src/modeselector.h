@@ -109,9 +109,9 @@ public:
     QAction *actionFilterNewLost = new QAction("Filter New/Lost", this);
     QAction *actionFilterMismatches = new QAction("Filter Mismatches", this);
     QAction *actionShowAll = new QAction("Show All", this);
-    QAction *actionCheckCurFileFromModel = new QAction("Check the File", this);
-    QAction *actionCheckCurSubfolderFromModel = new QAction("Check the Subfolder", this);
-    QAction *actionBranchMake = new QAction("Branch the Subfolder", this);
+    QAction *actionCheckCurFileFromModel = new QAction("Check File", this);
+    QAction *actionCheckCurSubfolderFromModel = new QAction("Check Folder", this);
+    QAction *actionBranchMake = new QAction("Branch Folder", this);
     QAction *actionBranchOpen = new QAction("Open the Branch", this);
     QAction *actionCheckAll = new QAction("Check ALL available files", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);

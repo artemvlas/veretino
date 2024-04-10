@@ -283,23 +283,6 @@ bool TreeModel::hasStatus(const FileStatusFlag flag, const QModelIndex &fileInde
 {
     return isFileRow(fileIndex) && Files::flagStatuses(flag).contains(itemFileStatus(fileIndex));
 }
-/*
-bool TreeModel::containsChecksums(const QModelIndex &folderIndex)
-{
-    bool isAny = false;
-
-    if (isFolderRow(folderIndex)) {
-        TreeModelIterator it(folderIndex.model(), folderIndex);
-        while (it.hasNext()) {
-            if (hasChecksum(it.nextFile().index())) {
-                isAny = true;
-                break;
-            }
-        }
-    }
-
-    return isAny;
-}*/
 
 bool TreeModel::contains(const FileStatusFlag flag, const QModelIndex &folderIndex)
 {
