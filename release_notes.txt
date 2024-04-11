@@ -1,6 +1,7 @@
 Veretino 0.3.9
-* A database file with a predefined WorkDir can now be placed in the current one.
+* The checked checksums have become colored.
 * The filtered View is highlighted by changing the background.
+* A database file with a predefined WorkDir can now be placed in the current one.
 * Added the ability to copy files and folders from the database.
 
 Veretino 0.3.8

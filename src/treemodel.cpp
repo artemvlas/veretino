@@ -149,6 +149,18 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
         }
     }
 
+    if (role == Qt::ForegroundRole) {
+        if (curIndex.column() == ColumnStatus || curIndex.column() == ColumnChecksum) {
+            FileStatus status = itemFileStatus(curIndex);
+            if (status == FileStatus::Matched)
+                return QColor(Qt::darkGreen);
+            else if (status == FileStatus::Mismatched)
+                return QColor(Qt::red);
+        }
+        else if (curIndex.column() == ColumnReChecksum)
+            return QColor(Qt::darkGreen);
+    }
+
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
         return QVariant();
 
@@ -277,6 +289,11 @@ bool TreeModel::hasChecksum(const QModelIndex &fileIndex)
 bool TreeModel::hasReChecksum(const QModelIndex &fileIndex)
 {
     return siblingAtRow(fileIndex, ColumnReChecksum).data().isValid();
+}
+
+bool TreeModel::hasStatus(const FileStatus status, const QModelIndex &fileIndex)
+{
+    return status == itemFileStatus(fileIndex);
 }
 
 bool TreeModel::hasStatus(const FileStatusFlag flag, const QModelIndex &fileIndex)
