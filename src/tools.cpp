@@ -318,10 +318,10 @@ QString fileItemStatus(FileStatus status)
         result = "ready...";
         break;
     case FileStatus::Matched:
-        result = "OK";
+        result = "match";
         break;
     case FileStatus::Mismatched:
-        result = "NOT match";
+        result = "not match";
         break;
     case FileStatus::New:
         result = "new file";
