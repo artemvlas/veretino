@@ -184,8 +184,11 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     TreeItem *item = getItem(curIndex);
     bool result = item->setData(curIndex.column(), value);
 
-    if (result)
-        emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
+    if (result) // to change the color of the checksum during the verification process
+        emit dataChanged(curIndex, (curIndex.column() == ColumnStatus) ? siblingAtRow(curIndex, ColumnChecksum)
+                                                                       : curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
+        // It was before
+        //emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
 
     return result;
 }
