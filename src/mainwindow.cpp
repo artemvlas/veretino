@@ -185,6 +185,7 @@ void MainWindow::saveSettings()
     storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
     storedSettings.setValue("isLongExtension", settings_->isLongExtension);
     storedSettings.setValue("saveVerificationDateTime", settings_->saveVerificationDateTime);
+    storedSettings.setValue("coloredDbItems", settings_->coloredDbItems);
 
     // FilterRule
     storedSettings.setValue("filter/ignoreDbFiles", settings_->filter.ignoreDbFiles);
@@ -218,6 +219,7 @@ void MainWindow::loadSettings()
     settings_->addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", defaults.addWorkDirToFilename).toBool();
     settings_->isLongExtension = storedSettings.value("isLongExtension", defaults.isLongExtension).toBool();
     settings_->saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", defaults.saveVerificationDateTime).toBool();
+    settings_->coloredDbItems = storedSettings.value("coloredDbItems", defaults.coloredDbItems).toBool();
 
     // FilterRule
     settings_->filter.setFilter(static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()),

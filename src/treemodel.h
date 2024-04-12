@@ -42,6 +42,7 @@ public:
     void populate(const FileList &filesData);
     bool setRowData(const QModelIndex &curIndex, Column column,
                     const QVariant &itemData = QVariant());
+    void setColoredItems(const bool colored);
 
     static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex()); // build path by current index data
     static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
@@ -68,6 +69,7 @@ private:
     TreeItem *rootItem;
     QFileIconProvider iconProvider;
     IconProvider icons_;
+    bool isColored = false;
 }; // class TreeModel
 
 using Column = TreeModel::Column;

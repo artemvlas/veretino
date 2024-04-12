@@ -149,7 +149,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
         }
     }
 
-    if (role == Qt::ForegroundRole) {
+    if (isColored && role == Qt::ForegroundRole) {
         if (curIndex.column() == ColumnStatus || curIndex.column() == ColumnChecksum) {
             FileStatus status = itemFileStatus(curIndex);
             if (status == FileStatus::Matched)
@@ -184,11 +184,14 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     TreeItem *item = getItem(curIndex);
     bool result = item->setData(curIndex.column(), value);
 
-    if (result) // to change the color of the checksum during the verification process
-        emit dataChanged(curIndex, (curIndex.column() == ColumnStatus) ? siblingAtRow(curIndex, ColumnChecksum)
-                                                                       : curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
+    if (result) { // to change the color of the checksum during the verification process
+        const QModelIndex &endIndex = (isColored && (curIndex.column() == ColumnStatus)) ? siblingAtRow(curIndex, ColumnChecksum)
+                                                                                         : curIndex;
+
+        emit dataChanged(curIndex, endIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
         // It was before
         //emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
+    }
 
     return result;
 }
@@ -345,4 +348,9 @@ QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
 QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 {
     return siblingAtRow(fileIndex, ColumnReChecksum).data().toString();
+}
+
+void TreeModel::setColoredItems(const bool colored)
+{
+    isColored = colored;
 }

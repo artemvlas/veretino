@@ -37,6 +37,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
     dataMaintainer->data_->metaData.isImported = false;
+    dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, false);
@@ -108,8 +109,10 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
-    if (dataMaintainer->importJson(databaseFilePath))
+    if (dataMaintainer->importJson(databaseFilePath)) {
+        dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
+    }
 }
 
 void Manager::updateDatabase(const TaskDbUpdate task)

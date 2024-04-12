@@ -147,6 +147,17 @@ Unchecked: to Home folder</string>
          </property>
         </widget>
        </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="cbColoredItems">
+         <property name="toolTip">
+          <string>With a large number of small files, this may require
+more computing resources during an active Process</string>
+         </property>
+         <property name="text">
+          <string>Colored Items</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabFilter">

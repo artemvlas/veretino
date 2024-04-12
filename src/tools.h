@@ -21,6 +21,7 @@ struct Settings {
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
+    bool coloredDbItems = true;
 
     QString dbFileExtension() const
     {

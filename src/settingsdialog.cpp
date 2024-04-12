@@ -64,6 +64,7 @@ void SettingsDialog::loadSettings(const Settings &settings)
 
     ui->cbAddFolderName->setChecked(settings.addWorkDirToFilename);
     ui->cbSaveVerificationDateTime->setChecked(settings.saveVerificationDateTime);
+    ui->cbColoredItems->setChecked(settings.coloredDbItems);
     settings.isLongExtension ? ui->rbExtVerJson->setChecked(true) : ui->rbExtVer->setChecked(true);
 
     updateLabelDatabaseFilename();
@@ -93,12 +94,14 @@ void SettingsDialog::updateSettings()
 
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
 
-    // database filename
+    // database
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix
                                                                         : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
+    settings_->saveVerificationDateTime = ui->cbSaveVerificationDateTime->isChecked();
+    settings_->coloredDbItems = ui->cbColoredItems->isChecked();
 
     // filters
     ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
@@ -111,7 +114,6 @@ void SettingsDialog::updateSettings()
 
     settings_->filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
     settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
-    settings_->saveVerificationDateTime = ui->cbSaveVerificationDateTime->isChecked();
 }
 
 QStringList SettingsDialog::extensionsList()

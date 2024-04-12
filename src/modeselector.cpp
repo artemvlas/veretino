@@ -184,8 +184,8 @@ void ModeSelector::setMode()
     }
 
     if (view_->isViewFileSystem()) {
-        if (dbModes.contains(currentMode())) // determining whether the previous view is a database
-            emit switchedToFs(); // if so, then the View was switched from the database to the file system ()
+        if (dbModes.contains(currentMode())) // determining whether the previous View is a database
+            emit switchedToFs(); // if so, then the View was switched from the database to the file system
                                  // it is used to delete DB data from memory
 
         selectMode(view_->curPathFileSystem);
