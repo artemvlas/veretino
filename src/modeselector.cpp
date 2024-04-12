@@ -357,18 +357,11 @@ void ModeSelector::copyDataToClipboard(Column column)
 
 void ModeSelector::openFsPath(const QString &path)
 {
-    // This non-obvious sequence of functions is needed to use
-    // the busy state of another [Manager] thread as a timer
-    // (to defer data cleanup and prevent segmentation faults)
-
-    if (processAbortPrompt(false)) {
+    if (processAbortPrompt()) {
         if (QFileInfo::exists(path))
             view_->curPathFileSystem = path;
 
         view_->setFileSystemModel();
-
-        if (isProcessing())
-            emit cancelProcess();
     }
 }
 
@@ -719,16 +712,21 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
         menuAlgorithm()->exec(button_->mapToGlobal(point));
 }
 
-bool ModeSelector::processAbortPrompt(const bool sendCancelation)
+bool ModeSelector::processAbortPrompt()
 {
     if (!isProcessing())
         return true;
 
-    int ret = QMessageBox::question(view_, "Processing...", "Abort current process?", QMessageBox::Yes | QMessageBox::No);
+    QMessageBox msgBox(view_);
+    msgBox.setWindowTitle("Processing...");
+    msgBox.setText("Abort current process?");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+    int ret = msgBox.exec();
 
     if (ret == QMessageBox::Yes) {
-        if (sendCancelation)
-            emit cancelProcess();
+        emit cancelProcess();
         return true;
     }
     else

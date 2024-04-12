@@ -51,8 +51,7 @@ public:
     void openFsPath(const QString &path);
     void openJsonDatabase(const QString &filePath);
     void openBranchDb();
-    bool processAbortPrompt(const bool sendCancelation = true); // abort process if any and allow further execution (true)
-                                                                // or do not abort the process, cancel execution (false)
+    bool processAbortPrompt();
 
     //---->>>
     void procSumFile(QCryptographicHash::Algorithm algo);
