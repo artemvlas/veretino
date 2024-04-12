@@ -514,7 +514,8 @@ void Manager::modelChanged(ModelView modelView)
 {
     isViewFileSysytem = (modelView == ModelView::FileSystem);
 
-    if (isViewFileSysytem) {
+    // It is premature to start cleansing here.
+    /*if (isViewFileSysytem) {
         dataMaintainer->clearData(); // if the View is switched to the filesystem, then main data is no longer needed
-    }
+    }*/
 }

@@ -21,8 +21,6 @@ public:
     // functions() --->>
     void setSourceData();
     bool setSourceData(DataContainer *sourceData);
-    void clearData();
-    void clearOldData();
     void updateSuccessfulCheckDateTime();
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
@@ -72,6 +70,10 @@ public:
     DataContainer *data_ = nullptr; // main data
     JsonDb *json = new JsonDb;
     bool canceled = false;
+
+public slots:
+    void clearData();
+    void clearOldData();
 
 private:
     void connections();

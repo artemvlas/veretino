@@ -40,7 +40,7 @@ public:
     void setButtonInfo(); // sets the Button icon and text according the current Mode
     void setAlgorithm(QCryptographicHash::Algorithm algo);
     //QSet<Mode> fsModes {Folder, File, DbFile, SumFile};
-    //QSet<Mode> dbModes {Model, ModelNewLost, UpdateMismatch};
+    const QSet<Mode> dbModes {Model, ModelNewLost, UpdateMismatch};
 
     // tasks execution
     void quickAction();
@@ -169,6 +169,7 @@ signals:
     void makeFolderContentsFilter(const QString &folderPath);
     void branchSubfolder(const QModelIndex &subfolder);
     void makeSumFile(const QString &originFilePath, const QString &checksum);
+    void switchedToFs();
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;
