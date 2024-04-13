@@ -7,7 +7,7 @@
 #include "ui_mainwindow.h"
 #include "iconprovider.h"
 #include "dbstatusdialog.h"
-#include "foldercontentsdialog.h"
+#include "dialogfoldercontents.h"
 #include "dialogfileprocresult.h"
 #include "settingsdialog.h"
 #include "aboutdialog.h"
@@ -143,7 +143,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
     connect(modeSelect, &ModeSelector::makeFolderContentsList, manager, &Manager::makeFolderContentsList);
     connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
-    connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showFolderContentsDialog);
+    connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogFolderContents);
     connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
 
     // results processing
@@ -246,10 +246,10 @@ void MainWindow::showDbStatus()
     }
 }
 
-void MainWindow::showFolderContentsDialog(const QString &folderName, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogFolderContents(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        FolderContentsDialog dialog(folderName, extList, this);
+        DialogFolderContents dialog(folderName, extList, this);
         if (dialog.exec() == QDialog::Accepted) {
             FilterRule filter = dialog.resultFilter();
             if (!filter.isFilter(FilterRule::NotSet)) {
@@ -263,7 +263,7 @@ void MainWindow::showFolderContentsDialog(const QString &folderName, const QList
 void MainWindow::showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        FolderContentsDialog dialog(folderName, extList, this);
+        DialogFolderContents dialog(folderName, extList, this);
         dialog.setFilterCreatingEnabled();
         FilterRule filter;
 

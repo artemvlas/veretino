@@ -14,9 +14,9 @@ SOURCES += \
     src/datamaintainer.cpp \
     src/dbstatusdialog.cpp \
     src/dialogfileprocresult.cpp \
+    src/dialogfoldercontents.cpp \
     src/files.cpp \
     src/filterrule.cpp \
-    src/foldercontentsdialog.cpp \
     src/iconprovider.cpp \
     src/jsondb.cpp \
     src/main.cpp \
@@ -40,9 +40,9 @@ HEADERS += \
     src/datamaintainer.h \
     src/dbstatusdialog.h \
     src/dialogfileprocresult.h \
+    src/dialogfoldercontents.h \
     src/files.h \
     src/filterrule.h \
-    src/foldercontentsdialog.h \
     src/iconprovider.h \
     src/jsondb.h \
     src/mainwindow.h \
@@ -62,7 +62,7 @@ FORMS += \
     src/aboutdialog.ui \
     src/dbstatusdialog.ui \
     src/dialogfileprocresult.ui \
-    src/foldercontentsdialog.ui \
+    src/dialogfoldercontents.ui \
     src/mainwindow.ui \
     src/settingsdialog.ui
 

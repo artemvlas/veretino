@@ -3,8 +3,8 @@
  * GNU General Public License (GNU GPLv3).
  * https://github.com/artemvlas/veretino
 */
-#ifndef FOLDERCONTENTSDIALOG_H
-#define FOLDERCONTENTSDIALOG_H
+#ifndef DIALOGFOLDERCONTENTS_H
+#define DIALOGFOLDERCONTENTS_H
 
 #include <QDialog>
 #include <QTreeWidgetItem>
@@ -59,21 +59,21 @@ private:
 }; // class TreeWidgetItem
 
 namespace Ui {
-class FolderContentsDialog;
+class DialogFolderContents;
 }
 
-class FolderContentsDialog : public QDialog
+class DialogFolderContents : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit FolderContentsDialog(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
-    ~FolderContentsDialog();
+    explicit DialogFolderContents(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
+    ~DialogFolderContents();
     FilterRule resultFilter();
     void setFilterCreatingEnabled(bool enabled = true);
 
 private:
-    Ui::FolderContentsDialog *ui;
+    Ui::DialogFolderContents *ui;
     void connections();
     void setTotalInfo();
     void makeItemsList(const QList<ExtNumSize> &extList);
@@ -89,6 +89,6 @@ private:
     QList<TreeWidgetItem *> items;
     QStringList filterExtensions;
 
-}; // class FolderContentsDialog
+}; // class DialogFolderContents
 
-#endif // FOLDERCONTENTSDIALOG_H
+#endif // DIALOGFOLDERCONTENTS_H
