@@ -184,3 +184,8 @@ QIcon IconProvider::icon(Icons icon) const
 {
     return QIcon(svgFilePath(icon));
 }
+
+QIcon IconProvider::iconVeretino()
+{
+    return QIcon(":/icons/color/veretino.svg");
+}

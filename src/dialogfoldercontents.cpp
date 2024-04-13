@@ -6,6 +6,7 @@
 #include "dialogfoldercontents.h"
 #include "ui_dialogfoldercontents.h"
 #include "tools.h"
+#include "iconprovider.h"
 #include <QPushButton>
 #include <QFileIconProvider>
 #include <QDebug>
@@ -16,7 +17,7 @@ DialogFolderContents::DialogFolderContents(const QString &folderPath, const QLis
     , extList_(extList)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/veretino.png"));
+    setWindowIcon(IconProvider::iconVeretino());
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnExtension, 130);
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);

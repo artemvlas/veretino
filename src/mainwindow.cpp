@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/veretino.png"));
+    setWindowIcon(IconProvider::iconVeretino());
     QThread::currentThread()->setObjectName("MAIN Thread");
 
     loadSettings();

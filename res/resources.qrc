@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>veretino.png</file>
         <file>icons/dark/backup.svg</file>
         <file>icons/dark/cancel.svg</file>
         <file>icons/dark/chart-pie.svg</file>
@@ -66,5 +65,6 @@
         <file>icons/dark/hash-file.svg</file>
         <file>icons/dark/branch.svg</file>
         <file>icons/light/branch.svg</file>
+        <file>icons/color/veretino.svg</file>
     </qresource>
 </RCC>

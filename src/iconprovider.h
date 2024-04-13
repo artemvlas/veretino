@@ -51,6 +51,7 @@ public:
 
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons icon) const;
+    static QIcon iconVeretino();
 
 private:
     bool isDarkTheme(const QPalette &palette) const;
