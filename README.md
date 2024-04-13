@@ -41,9 +41,9 @@ The App allows you to avoid unexpected data loss*, for example, in case of a dis
 
 #### *Please note that the Veretino app does not repair the data and is not able to prevent its loss, but only serves to verify its integrity.
 ---
-Veretino App is Qt based and cross platform. Prebuilt packages for Linux and Windows are available [here](https://github.com/artemvlas/veretino/releases).
+Veretino App is Qt based and cross platform. Prebuilt packages for Linux and Windows are available [here](https://github.com/artemvlas/veretino/releases)
 
-For users of Arch-based distros, the Vereteno app is also available in the [AUR](https://aur.archlinux.org/packages/veretino).
+For users of Arch-based distros: [AUR](https://aur.archlinux.org/packages/veretino)
 
 #### Building the app is very easy:
 * Download and extract the source code or type in the terminal:
