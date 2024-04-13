@@ -37,15 +37,15 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
   <br>This information can be easily updated if needed.</em>
 </p>
 
-The App allows to avoid unexpected data loss*, for example, in the event of a disk error or incomplete download. Checking across the entire folder and multiple subfolders allows to find data loss in any of the contained files.
+The App allows you to avoid unexpected data loss*, for example, in case of a disk error or incomplete download. Checking across the entire folder and multiple subfolders allows you to detect data loss in any of the contained files.
 
-#### *Please note that the Veretino app does not repair the data and is not able to prevent the data loss, but only serves to data integrity verification
+#### *Please note that the Veretino app does not repair the data and is not able to prevent its loss, but only serves to verify its integrity.
 ---
-Veretino App is Qt based and cross platform. Prebuilt packages for Linux and Windows are available [here](https://github.com/artemvlas/veretino/releases)
-For users of Arch-based distros, Veretino also is available on the [AUR](https://aur.archlinux.org/packages/veretino)  
+Veretino App is Qt based and cross platform. Prebuilt packages for Linux and Windows are available [here](https://github.com/artemvlas/veretino/releases).
+For users of Arch-based distros, Veretino also is available on the [AUR](https://aur.archlinux.org/packages/veretino)
 
 #### Building the app is very easy:
-* Download and extract the source code, or type in terminal:
+* Download and extract the source code or type in the terminal:
 
       git clone https://github.com/artemvlas/veretino
 * execute 'makeScripts/makeInstall.sh'
