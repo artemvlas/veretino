@@ -3,13 +3,13 @@
  * GNU General Public License (GNU GPLv3).
  * https://github.com/artemvlas/veretino
 */
-#include "aboutdialog.h"
-#include "ui_aboutdialog.h"
+#include "dialogabout.h"
+#include "ui_dialogabout.h"
 #include <QIcon>
 
-AboutDialog::AboutDialog(QWidget *parent) :
+DialogAbout::DialogAbout(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::AboutDialog)
+    ui(new Ui::DialogAbout)
 {
     ui->setupUi(this);
     setFixedSize(400, 200);
@@ -26,7 +26,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
 
 }
 
-AboutDialog::~AboutDialog()
+DialogAbout::~DialogAbout()
 {
     delete ui;
 }

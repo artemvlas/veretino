@@ -10,7 +10,7 @@
 #include "dialogfoldercontents.h"
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"
-#include "aboutdialog.h"
+#include "dialogabout.h"
 #include <QMimeData>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -96,7 +96,7 @@ void MainWindow::connections()
     connect(modeSelect->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
     connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about(this); about.exec();});
+    connect(ui->actionAbout, &QAction::triggered, this, [=]{DialogAbout about(this); about.exec();});
 
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
 }

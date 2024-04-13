@@ -8,10 +8,10 @@ VERSION = 0.3.9
 DEFINES += APP_VERSION=\\\"$${VERSION}\\\"
 
 SOURCES += \
-    src/aboutdialog.cpp \
     src/clickablelabel.cpp \
     src/datacontainer.cpp \
     src/datamaintainer.cpp \
+    src/dialogabout.cpp \
     src/dialogdbstatus.cpp \
     src/dialogfileprocresult.cpp \
     src/dialogfoldercontents.cpp \
@@ -34,10 +34,10 @@ SOURCES += \
     src/view.cpp
 
 HEADERS += \
-    src/aboutdialog.h \
     src/clickablelabel.h \
     src/datacontainer.h \
     src/datamaintainer.h \
+    src/dialogabout.h \
     src/dialogdbstatus.h \
     src/dialogfileprocresult.h \
     src/dialogfoldercontents.h \
@@ -59,7 +59,7 @@ HEADERS += \
     src/view.h
 
 FORMS += \
-    src/aboutdialog.ui \
+    src/dialogabout.ui \
     src/dialogdbstatus.ui \
     src/dialogfileprocresult.ui \
     src/dialogfoldercontents.ui \
