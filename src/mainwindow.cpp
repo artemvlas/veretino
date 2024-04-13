@@ -6,7 +6,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "iconprovider.h"
-#include "dbstatusdialog.h"
+#include "dialogdbstatus.h"
 #include "dialogfoldercontents.h"
 #include "dialogfileprocresult.h"
 #include "settingsdialog.h"
@@ -241,8 +241,8 @@ void MainWindow::loadSettings()
 void MainWindow::showDbStatus()
 {
     if (ui->treeView->data_ && !modeSelect->isProcessing()) {
-        DbStatusDialog dbStatusDialog(ui->treeView->data_, this);
-        dbStatusDialog.exec();
+        DialogDbStatus statusDialog(ui->treeView->data_, this);
+        statusDialog.exec();
     }
 }
 

@@ -3,25 +3,25 @@
  * GNU General Public License (GNU GPLv3).
  * https://github.com/artemvlas/veretino
 */
-#ifndef DBSTATUSDIALOG_H
-#define DBSTATUSDIALOG_H
+#ifndef DIALOGDBSTATUS_H
+#define DIALOGDBSTATUS_H
 
 #include <QDialog>
 #include "datacontainer.h"
 
 namespace Ui {
-class DbStatusDialog;
+class DialogDbStatus;
 }
 
-class DbStatusDialog : public QDialog
+class DialogDbStatus : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit DbStatusDialog(const DataContainer *data, QWidget *parent = nullptr);
-    ~DbStatusDialog();
+    explicit DialogDbStatus(const DataContainer *data, QWidget *parent = nullptr);
+    ~DialogDbStatus();
 private:
-    Ui::DbStatusDialog *ui;
+    Ui::DialogDbStatus *ui;
     const DataContainer *data_;
 
     enum Tabs{TabListed, TabFilter, TabVerification, TabChanges};
@@ -31,4 +31,4 @@ private:
     bool isJustCreated();
 };
 
-#endif // DBSTATUSDIALOG_H
+#endif // DIALOGDBSTATUS_H

@@ -3,16 +3,16 @@
  * GNU General Public License (GNU GPLv3).
  * https://github.com/artemvlas/veretino
 */
-#include "dbstatusdialog.h"
-#include "ui_dbstatusdialog.h"
+#include "dialogdbstatus.h"
+#include "ui_dialogdbstatus.h"
 #include "clickablelabel.h"
 #include <QFile>
 #include <QDebug>
 #include "iconprovider.h"
 
-DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
+DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::DbStatusDialog)
+    , ui(new Ui::DialogDbStatus)
     , data_(data)
 {
     ui->setupUi(this);
@@ -85,7 +85,7 @@ DbStatusDialog::DbStatusDialog(const DataContainer *data, QWidget *parent)
     }
 }
 
-QStringList DbStatusDialog::infoContent(const DataContainer *data)
+QStringList DialogDbStatus::infoContent(const DataContainer *data)
 {
     QStringList contentNumbers;
     QString createdDataSize;
@@ -135,7 +135,7 @@ QStringList DbStatusDialog::infoContent(const DataContainer *data)
     return contentNumbers;
 }
 
-QStringList DbStatusDialog::infoVerification(const DataContainer *data)
+QStringList DialogDbStatus::infoVerification(const DataContainer *data)
 {
     QStringList result;
     const int available = data->numbers.numberOf(FileStatusFlag::FlagAvailable);
@@ -169,7 +169,7 @@ QStringList DbStatusDialog::infoVerification(const DataContainer *data)
     return result;
 }
 
-QStringList DbStatusDialog::infoChanges()
+QStringList DialogDbStatus::infoChanges()
 {
     QStringList result;
 
@@ -185,13 +185,13 @@ QStringList DbStatusDialog::infoChanges()
     return result;
 }
 
-bool DbStatusDialog::isJustCreated()
+bool DialogDbStatus::isJustCreated()
 {
     return (!data_->metaData.isImported
             && data_->numbers.numberOf({FileStatus::Added, FileStatus::Matched, FileStatus::Mismatched}) == data_->numbers.numChecksums);
 }
 
-DbStatusDialog::~DbStatusDialog()
+DialogDbStatus::~DialogDbStatus()
 {
     delete ui;
 }

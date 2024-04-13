@@ -12,7 +12,7 @@ SOURCES += \
     src/clickablelabel.cpp \
     src/datacontainer.cpp \
     src/datamaintainer.cpp \
-    src/dbstatusdialog.cpp \
+    src/dialogdbstatus.cpp \
     src/dialogfileprocresult.cpp \
     src/dialogfoldercontents.cpp \
     src/files.cpp \
@@ -38,7 +38,7 @@ HEADERS += \
     src/clickablelabel.h \
     src/datacontainer.h \
     src/datamaintainer.h \
-    src/dbstatusdialog.h \
+    src/dialogdbstatus.h \
     src/dialogfileprocresult.h \
     src/dialogfoldercontents.h \
     src/files.h \
@@ -60,7 +60,7 @@ HEADERS += \
 
 FORMS += \
     src/aboutdialog.ui \
-    src/dbstatusdialog.ui \
+    src/dialogdbstatus.ui \
     src/dialogfileprocresult.ui \
     src/dialogfoldercontents.ui \
     src/mainwindow.ui \
