@@ -3,14 +3,14 @@
  * GNU General Public License (GNU GPLv3).
  * https://github.com/artemvlas/veretino
 */
-#include "settingsdialog.h"
-#include "ui_settingsdialog.h"
+#include "dialogsettings.h"
+#include "ui_dialogsettings.h"
 #include <QPushButton>
 #include "iconprovider.h"
 
-SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
+DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::SettingsDialog),
+    ui(new Ui::DialogSettings),
     settings_(settings)
 {
     ui->setupUi(this);
@@ -18,10 +18,10 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
 
     ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText("Defaults");
 
-    connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &SettingsDialog::restoreDefaults);
-    connect(ui->rbExtVer, &QRadioButton::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
-    connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &SettingsDialog::updateLabelDatabaseFilename);
-    connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &SettingsDialog::updateLabelDatabaseFilename);
+    connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &DialogSettings::restoreDefaults);
+    connect(ui->rbExtVer, &QRadioButton::toggled, this, &DialogSettings::updateLabelDatabaseFilename);
+    connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &DialogSettings::updateLabelDatabaseFilename);
+    connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &DialogSettings::updateLabelDatabaseFilename);
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
          {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable); setExtensionsColor();});
 
@@ -37,7 +37,7 @@ SettingsDialog::SettingsDialog(Settings *settings, QWidget *parent) :
     ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 }
 
-void SettingsDialog::loadSettings(const Settings &settings)
+void DialogSettings::loadSettings(const Settings &settings)
 {
     switch (settings.algorithm)
     {
@@ -82,7 +82,7 @@ void SettingsDialog::loadSettings(const Settings &settings)
     ui->tabWidget->setCurrentIndex(curTab);
 }
 
-void SettingsDialog::updateSettings()
+void DialogSettings::updateSettings()
 {
     // algorithm
     if (ui->rbSha1->isChecked())
@@ -116,7 +116,7 @@ void SettingsDialog::updateSettings()
     settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
 }
 
-QStringList SettingsDialog::extensionsList()
+QStringList DialogSettings::extensionsList()
 {
     if (!ui->inputExtensions->text().isEmpty()) {
         QString ignoreExtensions = ui->inputExtensions->text().toLower();
@@ -136,7 +136,7 @@ QStringList SettingsDialog::extensionsList()
         return QStringList();
 }
 
-void SettingsDialog::updateLabelDatabaseFilename()
+void DialogSettings::updateLabelDatabaseFilename()
 {
     QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
     QString folderName = ui->cbAddFolderName->isChecked() ? "@FolderName" : QString();
@@ -145,17 +145,17 @@ void SettingsDialog::updateLabelDatabaseFilename()
     ui->labelDatabaseFilename->setText(format::composeDbFileName(prefix, folderName, extension));
 }
 
-void SettingsDialog::restoreDefaults()
+void DialogSettings::restoreDefaults()
 {
     loadSettings(defaults);
 }
 
-void SettingsDialog::setExtensionsColor()
+void DialogSettings::setExtensionsColor()
 {
     ui->inputExtensions->setStyleSheet(format::coloredText("QLineEdit", ui->radioButtonIgnore->isChecked()));
 }
 
-SettingsDialog::~SettingsDialog()
+DialogSettings::~DialogSettings()
 {
     delete ui;
 }

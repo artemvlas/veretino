@@ -72,10 +72,10 @@ public:
     // MainWindow menu
     QAction *actionOpenFolder = new QAction("Open Folder", this);
     QAction *actionOpenDatabaseFile = new QAction("Open Database", this);
-    QAction *actionOpenSettingsDialog = new QAction("Settings", this);
+    QAction *actionOpenDialogSettings = new QAction("Settings", this);
     QAction *actionShowFilesystem = new QAction("Show file system", this);
 
-    QList<QAction*> menuFileActions {actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenSettingsDialog};
+    QList<QAction*> menuFileActions {actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenDialogSettings};
 
     QMenu *menuOpenRecent = new QMenu("Open Recent");
     QAction *actionClearRecent = new QAction("Clear History");

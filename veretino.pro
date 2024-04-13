@@ -15,6 +15,7 @@ SOURCES += \
     src/dialogdbstatus.cpp \
     src/dialogfileprocresult.cpp \
     src/dialogfoldercontents.cpp \
+    src/dialogsettings.cpp \
     src/files.cpp \
     src/filterrule.cpp \
     src/iconprovider.cpp \
@@ -25,7 +26,6 @@ SOURCES += \
     src/modeselector.cpp \
     src/procstate.cpp \
     src/proxymodel.cpp \
-    src/settingsdialog.cpp \
     src/shacalculator.cpp \
     src/tools.cpp \
     src/treeitem.cpp \
@@ -41,6 +41,7 @@ HEADERS += \
     src/dialogdbstatus.h \
     src/dialogfileprocresult.h \
     src/dialogfoldercontents.h \
+    src/dialogsettings.h \
     src/files.h \
     src/filterrule.h \
     src/iconprovider.h \
@@ -50,7 +51,6 @@ HEADERS += \
     src/modeselector.h \
     src/procstate.h \
     src/proxymodel.h \
-    src/settingsdialog.h \
     src/shacalculator.h \
     src/tools.h \
     src/treeitem.h \
@@ -63,8 +63,8 @@ FORMS += \
     src/dialogdbstatus.ui \
     src/dialogfileprocresult.ui \
     src/dialogfoldercontents.ui \
-    src/mainwindow.ui \
-    src/settingsdialog.ui
+    src/dialogsettings.ui \
+    src/mainwindow.ui
 
 RESOURCES += \
     res/resources.qrc

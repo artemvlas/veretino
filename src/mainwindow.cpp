@@ -9,7 +9,7 @@
 #include "dialogdbstatus.h"
 #include "dialogfoldercontents.h"
 #include "dialogfileprocresult.h"
-#include "settingsdialog.h"
+#include "dialogsettings.h"
 #include "aboutdialog.h"
 #include <QMimeData>
 #include <QFileDialog>
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
 
     ui->menuFile->addActions(modeSelect->menuFileActions);
-    ui->menuFile->insertSeparator(modeSelect->actionOpenSettingsDialog);
+    ui->menuFile->insertSeparator(modeSelect->actionOpenDialogSettings);
     ui->menuFile->insertMenu(modeSelect->actionShowFilesystem, modeSelect->menuOpenRecent);
 
     updatePermanentStatus();
@@ -93,7 +93,7 @@ void MainWindow::connections()
     connect(permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
-    connect(modeSelect->actionOpenSettingsDialog, &QAction::triggered, this, &MainWindow::dialogSettings);
+    connect(modeSelect->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
     connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{AboutDialog about(this); about.exec();});
@@ -337,7 +337,7 @@ void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &
 
 void MainWindow::dialogSettings()
 {
-    SettingsDialog dialog(settings_, this);
+    DialogSettings dialog(settings_, this);
 
     if (dialog.exec() == QDialog::Accepted) {
         dialog.updateSettings();

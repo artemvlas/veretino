@@ -104,7 +104,7 @@ void ModeSelector::setActionsIcons()
     actionOpenFolder->setIcon(iconProvider.icon(Icons::Folder));
     actionOpenDatabaseFile->setIcon(iconProvider.icon(Icons::Database));
     actionShowFilesystem->setIcon(iconProvider.icon(Icons::FileSystem));
-    actionOpenSettingsDialog->setIcon(iconProvider.icon(Icons::Configure));
+    actionOpenDialogSettings->setIcon(iconProvider.icon(Icons::Configure));
 
     menuOpenRecent->menuAction()->setIcon(iconProvider.icon(Icons::Clock));
     actionClearRecent->setIcon(iconProvider.icon(Icons::ClearHistory));
