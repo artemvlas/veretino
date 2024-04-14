@@ -36,6 +36,7 @@ private:
     void setFilterPreset(int presetIndex);
     void setFilterRule(const FilterRule &filter);
     void handleFilterMode();
+    void cleanUpExtList();
 
     FilterRule selectPresetFilter(const FilterPreset preset);
     FilterRule getCurrentFilter();

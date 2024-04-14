@@ -104,6 +104,7 @@ void DialogSettings::updateSettings()
 
     // filters
     settings_->filter = getCurrentFilter();
+    cleanUpExtList();
 }
 
 QStringList DialogSettings::extensionsList()
@@ -226,6 +227,25 @@ void DialogSettings::handleFilterMode()
 
     setExtensionsColor();
     setComboBoxFpIndex();
+}
+
+void DialogSettings::cleanUpExtList()
+{
+    if (!settings_->filter.extensionsList.isEmpty()) {
+        QStringList list;
+        if (!settings_->filter.isFilter(FilterRule::Include)) {
+            if (settings_->filter.ignoreShaFiles)
+                list.append({"sha1", "sha256", "sha512"});
+            if (settings_->filter.ignoreDbFiles)
+                list.append({"ver", "ver.json"});
+        }
+
+        if (!list.isEmpty()) {
+            foreach (const QString &str, list) {
+                settings_->filter.extensionsList.removeOne(str);
+            }
+        }
+    }
 }
 
 DialogSettings::~DialogSettings()

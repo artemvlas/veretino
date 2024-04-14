@@ -23,8 +23,7 @@ public:
     QStringList extensionsList;
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
-private:
-    void cleanUpExtList();
+
 }; // class FilterRule
 
 #endif // FILTERRULE_H

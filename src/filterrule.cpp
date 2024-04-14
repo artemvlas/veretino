@@ -20,7 +20,6 @@ void FilterRule::setFilter(const FilterMode filterMode, const QStringList &exten
 {
     extensionsList = extensions;
     extensionsList.isEmpty() ? mode_ = NotSet : mode_ = filterMode;
-    cleanUpExtList();
 }
 
 void FilterRule::clearFilter()
@@ -61,25 +60,4 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
     }
 
     return allowed;
-}
-
-void FilterRule::cleanUpExtList()
-{
-    if (!extensionsList.isEmpty()) {
-        extensionsList.removeDuplicates();
-
-        QStringList list;
-        if (!isFilter(Include)) {
-            if (ignoreShaFiles)
-                list.append({"sha1", "sha256", "sha512"});
-            if (ignoreDbFiles)
-                list.append({"ver", "ver.json"});
-        }
-
-        if (!list.isEmpty()) {
-            foreach (const QString &str, list) {
-                extensionsList.removeOne(str);
-            }
-        }
-    }
 }
