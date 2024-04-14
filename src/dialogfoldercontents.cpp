@@ -77,7 +77,7 @@ void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
         QIcon icon;
 
         if (extList.at(i).extension == "Veretino DB")
-            icon = icons.iconVeretino();
+            icon = icons.icon(Icons::Database);
         else if (extList.at(i).extension == "Sha-files")
             icon = icons.icon(Icons::HashFile);
         else
