@@ -17,13 +17,17 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     setWindowIcon(IconProvider::iconVeretino());
 
     ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText("Defaults");
+    ui->comboBoxPresets->addItems(filterPresetsList);
 
     connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &DialogSettings::restoreDefaults);
     connect(ui->rbExtVer, &QRadioButton::toggled, this, &DialogSettings::updateLabelDatabaseFilename);
     connect(ui->cbAddFolderName, &QCheckBox::toggled, this, &DialogSettings::updateLabelDatabaseFilename);
     connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &DialogSettings::updateLabelDatabaseFilename);
+    connect(ui->comboBoxPresets, qOverload<int>(&QComboBox::activated), this, &DialogSettings::setFilterPreset);
+    connect(ui->inputExtensions, &QLineEdit::textEdited, this, qOverload<>(&DialogSettings::setComboBoxFpIndex));
     connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
-         {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable); setExtensionsColor();});
+            {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);
+          setExtensionsColor(); setComboBoxFpIndex();});
 
     ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
                                                "(if all files exist and match the saved checksums),\n"
@@ -33,6 +37,7 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
 
     // set tabs icons
     const IconProvider icons(palette());
+    ui->tabWidget->setTabIcon(TabMain, icons.icon(Icons::Configure));
     ui->tabWidget->setTabIcon(TabDatabase, icons.icon(Icons::Database));
     ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 }
@@ -70,15 +75,10 @@ void DialogSettings::loadSettings(const Settings &settings)
     updateLabelDatabaseFilename();
 
     // Tab Filter
-    setExtensionsColor();
-    ui->inputExtensions->setText(settings.filter.extensionsList.join(" "));
-    settings.filter.isFilter(FilterRule::Include) ? ui->radioButtonIncludeOnly->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
-
-    ui->ignoreDbFiles->setChecked(settings.filter.ignoreDbFiles);
-    ui->ignoreShaFiles->setChecked(settings.filter.ignoreShaFiles);
+    setFilterRule(settings.filter);
 
     // Select open Tab
-    Tabs curTab = ui->inputExtensions->text().isEmpty() ? TabDatabase : TabFilter;
+    Tabs curTab = ui->inputExtensions->text().isEmpty() ? TabMain : TabFilter;
     ui->tabWidget->setCurrentIndex(curTab);
 }
 
@@ -104,16 +104,7 @@ void DialogSettings::updateSettings()
     settings_->coloredDbItems = ui->cbColoredItems->isChecked();
 
     // filters
-    ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
-
-    if (ui->inputExtensions->text().isEmpty())
-        settings_->filter.clearFilter();
-    else
-        ui->radioButtonIgnore->isChecked() ? settings_->filter.setFilter(FilterRule::Ignore, extensionsList())
-                                           : settings_->filter.setFilter(FilterRule::Include, extensionsList());
-
-    settings_->filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
-    settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
+    settings_->filter = getCurrentFilter();
 }
 
 QStringList DialogSettings::extensionsList()
@@ -153,6 +144,79 @@ void DialogSettings::restoreDefaults()
 void DialogSettings::setExtensionsColor()
 {
     ui->inputExtensions->setStyleSheet(format::coloredText("QLineEdit", ui->radioButtonIgnore->isChecked()));
+}
+
+void DialogSettings::setComboBoxFpIndex()
+{
+    setComboBoxFpIndex(getCurrentFilter());
+}
+
+void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
+{
+    FilterPreset preset = PresetCustom;
+    if (filter.isFilter(FilterRule::Include)) {
+        if (filter.extensionsList == listPresetDocuments)
+            preset = PresetDocuments;
+        else if (filter.extensionsList == listPresetPictures)
+            preset = PresetPictures;
+        else if (filter.extensionsList == listPresetMusic)
+            preset = PresetMusic;
+        else if (filter.extensionsList == listPresetVideos)
+            preset = PresetVideos;
+    }
+
+    ui->comboBoxPresets->setCurrentIndex(preset);
+}
+
+void DialogSettings::setFilterRule(const FilterRule &filter)
+{
+    ui->inputExtensions->setText(filter.extensionsList.join(" "));
+    filter.isFilter(FilterRule::Include) ? ui->radioButtonIncludeOnly->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
+
+    ui->ignoreDbFiles->setChecked(filter.ignoreDbFiles);
+    ui->ignoreShaFiles->setChecked(filter.ignoreShaFiles);
+
+    setExtensionsColor();
+    setComboBoxFpIndex(filter);
+}
+
+void DialogSettings::setFilterPreset(int presetIndex)
+{
+    if (presetIndex > PresetCustom)
+        setFilterRule(selectPresetFilter(static_cast<FilterPreset>(presetIndex)));
+}
+
+FilterRule DialogSettings::selectPresetFilter(const FilterPreset preset)
+{
+    switch (preset) {
+    case PresetDocuments:
+        return FilterRule(FilterRule::Include, listPresetDocuments);
+    case PresetPictures:
+        return FilterRule(FilterRule::Include, listPresetPictures);
+    case PresetMusic:
+        return FilterRule(FilterRule::Include, listPresetMusic);
+    case PresetVideos:
+        return FilterRule(FilterRule::Include, listPresetVideos);
+    default:
+        return FilterRule();
+    }
+}
+
+FilterRule DialogSettings::getCurrentFilter()
+{
+    ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
+
+    FilterRule curFilter;
+
+    if (!ui->inputExtensions->text().isEmpty()) {
+        ui->radioButtonIgnore->isChecked() ? curFilter.setFilter(FilterRule::Ignore, extensionsList())
+                                           : curFilter.setFilter(FilterRule::Include, extensionsList());
+    }
+
+    curFilter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
+    curFilter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
+
+    return curFilter;
 }
 
 DialogSettings::~DialogSettings()

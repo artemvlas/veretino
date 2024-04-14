@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>313</height>
+    <height>240</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,54 +15,85 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QRadioButton" name="rbSha1">
-        <property name="text">
-         <string>SHA-1</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rbSha256">
-        <property name="text">
-         <string>SHA-256</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rbSha512">
-        <property name="text">
-         <string>SHA-512</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="cbLastPath">
-     <property name="toolTip">
-      <string>Checked: on startup go to last path
-Unchecked: to Home folder</string>
-     </property>
-     <property name="text">
-      <string>Open last path on startup</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <widget class="QWidget" name="tabMain">
+      <attribute name="title">
+       <string>Main</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QFrame" name="frame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QRadioButton" name="rbSha1">
+            <property name="text">
+             <string>SHA-1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbSha256">
+            <property name="text">
+             <string>SHA-256</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbSha512">
+            <property name="text">
+             <string>SHA-512</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QCheckBox" name="cbLastPath">
+           <property name="toolTip">
+            <string>Checked: on startup go to last path
+Unchecked: to Home folder</string>
+           </property>
+           <property name="text">
+            <string>Open last path on startup</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tabDatabase">
       <attribute name="title">
        <string>Database</string>
@@ -161,63 +192,10 @@ Unchecked: to Home folder</string>
      </widget>
      <widget class="QWidget" name="tabFilter">
       <attribute name="title">
-       <string>Filter</string>
+       <string>Permanent Filter</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="4" column="1">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Filter files by extensions:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2" colspan="2">
-        <widget class="QCheckBox" name="ignoreShaFiles">
-         <property name="toolTip">
-          <string>Exclude the summary files from the filelist</string>
-         </property>
-         <property name="text">
-          <string>Ignore *.sha1/256/512 files</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QCheckBox" name="ignoreDbFiles">
-         <property name="toolTip">
-          <string>Exclude *.ver.json files from the filelist</string>
-         </property>
-         <property name="text">
-          <string>Ignore Veretino DB files</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" colspan="3">
-        <widget class="QLineEdit" name="inputExtensions">
-         <property name="toolTip">
-          <string>Extensions list separated by spaces</string>
-         </property>
-         <property name="placeholderText">
-          <string>log jpg docx mkv</string>
-         </property>
-         <property name="clearButtonEnabled">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" colspan="2">
+       <item row="1" column="2" colspan="2">
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -258,6 +236,62 @@ Unchecked: to Home folder</string>
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="2" column="1" colspan="3">
+        <widget class="QLineEdit" name="inputExtensions">
+         <property name="toolTip">
+          <string>Extensions list separated by spaces</string>
+         </property>
+         <property name="placeholderText">
+          <string>log jpg docx mkv</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" colspan="2">
+        <widget class="QCheckBox" name="ignoreShaFiles">
+         <property name="toolTip">
+          <string>Exclude the summary files from the filelist</string>
+         </property>
+         <property name="text">
+          <string>Ignore *.sha1/256/512 files</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Filter files by extensions:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="ignoreDbFiles">
+         <property name="toolTip">
+          <string>Exclude *.ver.json files from the filelist</string>
+         </property>
+         <property name="text">
+          <string>Ignore Veretino DB files</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="1" colspan="3">
+        <widget class="QComboBox" name="comboBoxPresets"/>
        </item>
       </layout>
      </widget>
