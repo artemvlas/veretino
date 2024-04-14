@@ -71,14 +71,24 @@ void DialogFolderContents::connections()
 void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
 {
     QFileIconProvider fileIcons;
+    IconProvider icons(palette());
 
     for (int i = 0; i < extList.size(); ++i) {
+        QIcon icon;
+
+        if (extList.at(i).extension == "Veretino DB")
+            icon = icons.iconVeretino();
+        else if (extList.at(i).extension == "Sha-files")
+            icon = icons.icon(Icons::HashFile);
+        else
+            icon = fileIcons.icon(QFileInfo("file." + extList.at(i).extension));
+
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
         item->setData(TreeWidgetItem::ColumnExtension, Qt::DisplayRole, extList.at(i).extension);
         item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
-        item->setIcon(TreeWidgetItem::ColumnExtension, fileIcons.icon(QFileInfo("file." + item->extension())));
+        item->setIcon(TreeWidgetItem::ColumnExtension, icon);
         items.append(item);
     }
 }
@@ -140,9 +150,10 @@ void DialogFolderContents::enableFilterCreating()
     ui->labelFilterExtensions->clear();
     ui->labelTotalFiltered->clear();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+    const QStringList excluded({"No type", "Veretino DB", "Sha-files"});
 
     for (int i = 0; i < items.size(); ++i) {
-        if (items.at(i)->extension() != "No type")
+        if (!excluded.contains(items.at(i)->extension()))
             items.at(i)->setCheckBoxVisible(true);
     }
 
@@ -202,11 +213,12 @@ void DialogFolderContents::updateTotalFiltered()
     qint64 filteredFilesSize = 0;
 
     for (int i = 0; i < items.size(); ++i) {
-        if ((ui->rbInclude->isChecked() && !items.at(i)->isHidden() && items.at(i)->isChecked()) // Include only visible and checked
-            || (ui->rbIgnore->isChecked() && (items.at(i)->isHidden() || !items.at(i)->isChecked()))) { // Include all except visible and checked
+        TreeWidgetItem *item = items.at(i);
+        if ((ui->rbInclude->isChecked() && !item->isHidden() && item->isChecked()) // Include only visible and checked
+            || (ui->rbIgnore->isChecked() && isItemFilterable(item) && (item->isHidden() || !item->isChecked()))) { // Include all except visible and checked
 
-            filteredFilesNumber += items.at(i)->filesNumber();
-            filteredFilesSize += items.at(i)->filesSize();
+            filteredFilesNumber += item->filesNumber();
+            filteredFilesSize += item->filesSize();
         }
     }
 
@@ -235,4 +247,9 @@ void DialogFolderContents::setFilterCreatingEnabled(bool enabled)
 bool DialogFolderContents::isFilterCreatingEnabled()
 {
     return ui->checkBox_CreateFilter->isChecked();
+}
+
+bool DialogFolderContents::isItemFilterable(const TreeWidgetItem *item)
+{
+    return ((item->extension() != "Veretino DB") && (item->extension() != "Sha-files"));
 }

@@ -1,5 +1,6 @@
 Veretino 0.3.10
 * The Permanent Filter now has preset templates.
+* "Folder Contents" dialog: the database/sha files have become unfilterable.
 
 Veretino 0.3.9
 * The checked checksums have become colored.

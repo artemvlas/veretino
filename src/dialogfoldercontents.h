@@ -84,6 +84,7 @@ private:
     void updateFilterExtensionsList();
     void updateTotalFiltered();
     bool isFilterCreatingEnabled();
+    bool isItemFilterable(const TreeWidgetItem *item);
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items;

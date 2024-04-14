@@ -210,9 +210,18 @@ void Files::folderContentsByType()
 
     FileList::const_iterator filesIter;
     for (filesIter = fileList.constBegin(); filesIter != fileList.constEnd(); ++filesIter) {
-        QString ext = QFileInfo(filesIter.key()).suffix().toLower();
+        QString ext;
+
+        if (tools::isDatabaseFile(filesIter.key()))
+            ext = "Veretino DB";
+        else if (tools::isSummaryFile(filesIter.key()))
+            ext = "Sha-files";
+        else
+            ext = QFileInfo(filesIter.key()).suffix().toLower();
+
         if (ext.isEmpty())
             ext = "No type";
+
         listsByType[ext].insert(filesIter.key(), filesIter.value());
     }
 
