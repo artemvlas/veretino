@@ -10,19 +10,21 @@
 class FilterRule
 {
 public:
-    enum ExtensionsFilter {NotSet, Include, Ignore};
+    enum FilterMode {NotSet, Include, Ignore};
     FilterRule(bool ignoreSummaries = true);
-    FilterRule(const ExtensionsFilter filterType, const QStringList &extensions);
+    FilterRule(const FilterMode filterMode, const QStringList &extensions);
 
-    void setFilter(const ExtensionsFilter filterType, const QStringList &extensions);
+    void setFilter(const FilterMode filterMode, const QStringList &extensions);
     void clearFilter(); // set defaults
-    bool isFilter(const ExtensionsFilter filterType) const;
+    bool isFilter(const FilterMode filterMode) const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
 
-    ExtensionsFilter extensionsFilter_ = NotSet;
+    FilterMode mode_ = NotSet;
     QStringList extensionsList;
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
+private:
+    void cleanUpExtList();
 }; // class FilterRule
 
 #endif // FILTERRULE_H

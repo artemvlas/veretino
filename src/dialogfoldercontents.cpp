@@ -220,7 +220,7 @@ void DialogFolderContents::updateTotalFiltered()
 FilterRule DialogFolderContents::resultFilter()
 {
     if (isFilterCreatingEnabled() && !filterExtensions.isEmpty()) {
-        FilterRule::ExtensionsFilter filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
+        FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
         return FilterRule(filterType, filterExtensions);
     }
 

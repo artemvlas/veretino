@@ -190,7 +190,7 @@ void MainWindow::saveSettings()
     // FilterRule
     storedSettings.setValue("filter/ignoreDbFiles", settings_->filter.ignoreDbFiles);
     storedSettings.setValue("filter/ignoreShaFiles", settings_->filter.ignoreShaFiles);
-    storedSettings.setValue("filter/filterType", settings_->filter.extensionsFilter_);
+    storedSettings.setValue("filter/filterMode", settings_->filter.mode_);
     storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
 
     // recent files
@@ -222,7 +222,7 @@ void MainWindow::loadSettings()
     settings_->coloredDbItems = storedSettings.value("coloredDbItems", defaults.coloredDbItems).toBool();
 
     // FilterRule
-    settings_->filter.setFilter(static_cast<FilterRule::ExtensionsFilter>(storedSettings.value("filter/filterType", FilterRule::NotSet).toInt()),
+    settings_->filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value("filter/filterMode", FilterRule::NotSet).toInt()),
                                 storedSettings.value("filter/filterExtensionsList").toStringList());
     settings_->filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", defaults.filter.ignoreDbFiles).toBool();
     settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", defaults.filter.ignoreShaFiles).toBool();

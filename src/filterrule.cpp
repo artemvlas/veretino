@@ -11,28 +11,29 @@ FilterRule::FilterRule(bool ignoreSummaries)
     , ignoreDbFiles(ignoreSummaries)
 {}
 
-FilterRule::FilterRule(const ExtensionsFilter filterType, const QStringList &extensions)
-    : extensionsFilter_(filterType)
-    , extensionsList(extensions)
-{}
+FilterRule::FilterRule(const FilterMode filterMode, const QStringList &extensions)
+{
+    setFilter(filterMode, extensions);
+}
 
-void FilterRule::setFilter(const ExtensionsFilter filterType, const QStringList &extensions)
+void FilterRule::setFilter(const FilterMode filterMode, const QStringList &extensions)
 {
     extensionsList = extensions;
-    extensionsList.isEmpty() ? extensionsFilter_ = NotSet : extensionsFilter_ = filterType;
+    extensionsList.isEmpty() ? mode_ = NotSet : mode_ = filterMode;
+    cleanUpExtList();
 }
 
 void FilterRule::clearFilter()
 {
-    extensionsFilter_ = NotSet;
+    mode_ = NotSet;
     extensionsList.clear();
     ignoreShaFiles = true;
     ignoreDbFiles = true;
 }
 
-bool FilterRule::isFilter(const ExtensionsFilter filterType) const
+bool FilterRule::isFilter(const FilterMode filterMode) const
 {
-    return (filterType == extensionsFilter_);
+    return (filterMode == mode_);
 }
 
 bool FilterRule::isFileAllowed(const QString &filePath) const
@@ -60,4 +61,23 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
     }
 
     return allowed;
+}
+
+void FilterRule::cleanUpExtList()
+{
+    if (!extensionsList.isEmpty()) {
+        extensionsList.removeDuplicates();
+
+        QStringList list;
+        if (ignoreShaFiles)
+            list.append({"sha1", "sha256", "sha512"});
+        if (ignoreDbFiles)
+            list.append({"ver", "ver.json"});
+
+        if (!list.isEmpty()) {
+            foreach (const QString &str, list) {
+                extensionsList.removeOne(str);
+            }
+        }
+    }
 }
