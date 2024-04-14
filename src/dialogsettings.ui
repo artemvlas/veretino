@@ -215,7 +215,7 @@ Unchecked: to Home folder</string>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButtonIncludeOnly">
+           <widget class="QRadioButton" name="rbInclude">
             <property name="text">
              <string>Include</string>
             </property>

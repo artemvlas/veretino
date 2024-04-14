@@ -69,10 +69,12 @@ void FilterRule::cleanUpExtList()
         extensionsList.removeDuplicates();
 
         QStringList list;
-        if (ignoreShaFiles)
-            list.append({"sha1", "sha256", "sha512"});
-        if (ignoreDbFiles)
-            list.append({"ver", "ver.json"});
+        if (!isFilter(Include)) {
+            if (ignoreShaFiles)
+                list.append({"sha1", "sha256", "sha512"});
+            if (ignoreDbFiles)
+                list.append({"ver", "ver.json"});
+        }
 
         if (!list.isEmpty()) {
             foreach (const QString &str, list) {

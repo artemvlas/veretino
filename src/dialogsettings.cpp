@@ -7,6 +7,7 @@
 #include "ui_dialogsettings.h"
 #include <QPushButton>
 #include "iconprovider.h"
+#include <QDebug>
 
 DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     QDialog(parent),
@@ -25,9 +26,7 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     connect(ui->inputJsonFileNamePrefix, &QLineEdit::textEdited, this, &DialogSettings::updateLabelDatabaseFilename);
     connect(ui->comboBoxPresets, qOverload<int>(&QComboBox::activated), this, &DialogSettings::setFilterPreset);
     connect(ui->inputExtensions, &QLineEdit::textEdited, this, qOverload<>(&DialogSettings::setComboBoxFpIndex));
-    connect(ui->radioButtonIncludeOnly, &QRadioButton::toggled, this, [=](const bool &disable)
-            {ui->ignoreDbFiles->setDisabled(disable); ui->ignoreShaFiles->setDisabled(disable);
-          setExtensionsColor(); setComboBoxFpIndex();});
+    connect(ui->rbInclude, &QRadioButton::toggled, this, &DialogSettings::handleFilterMode);
 
     ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
                                                "(if all files exist and match the saved checksums),\n"
@@ -171,7 +170,7 @@ void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
 void DialogSettings::setFilterRule(const FilterRule &filter)
 {
     ui->inputExtensions->setText(filter.extensionsList.join(" "));
-    filter.isFilter(FilterRule::Include) ? ui->radioButtonIncludeOnly->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
+    filter.isFilter(FilterRule::Include) ? ui->rbInclude->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
 
     ui->ignoreDbFiles->setChecked(filter.ignoreDbFiles);
     ui->ignoreShaFiles->setChecked(filter.ignoreShaFiles);
@@ -207,16 +206,26 @@ FilterRule DialogSettings::getCurrentFilter()
     ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
 
     FilterRule curFilter;
+    curFilter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
+    curFilter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
 
     if (!ui->inputExtensions->text().isEmpty()) {
         ui->radioButtonIgnore->isChecked() ? curFilter.setFilter(FilterRule::Ignore, extensionsList())
                                            : curFilter.setFilter(FilterRule::Include, extensionsList());
     }
 
-    curFilter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
-    curFilter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
-
     return curFilter;
+}
+
+void DialogSettings::handleFilterMode()
+{
+    const bool isInculde = ui->rbInclude->isChecked();
+
+    ui->ignoreDbFiles->setDisabled(isInculde);
+    ui->ignoreShaFiles->setDisabled(isInculde);
+
+    setExtensionsColor();
+    setComboBoxFpIndex();
 }
 
 DialogSettings::~DialogSettings()

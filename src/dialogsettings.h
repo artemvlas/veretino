@@ -35,6 +35,7 @@ private:
     void setComboBoxFpIndex(const FilterRule &filter);
     void setFilterPreset(int presetIndex);
     void setFilterRule(const FilterRule &filter);
+    void handleFilterMode();
 
     FilterRule selectPresetFilter(const FilterPreset preset);
     FilterRule getCurrentFilter();
