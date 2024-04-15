@@ -70,6 +70,10 @@ public:
 
     //
     struct ExtNumSize {
+        static QString strNoType() { return "No type"; }
+        static QString strVeretinoDb() { return "Veretino DB"; }
+        static QString strShaFiles() { return "Sha-files"; }
+
         QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
         int filesNumber = 0; // number of files with this extension
         qint64 filesSize = 0; // total size of these files

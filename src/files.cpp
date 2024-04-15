@@ -213,14 +213,14 @@ void Files::folderContentsByType()
         QString ext;
 
         if (tools::isDatabaseFile(filesIter.key()))
-            ext = "Veretino DB";
+            ext = ExtNumSize::strVeretinoDb();
         else if (tools::isSummaryFile(filesIter.key()))
-            ext = "Sha-files";
+            ext = ExtNumSize::strShaFiles();
         else
             ext = QFileInfo(filesIter.key()).suffix().toLower();
 
         if (ext.isEmpty())
-            ext = "No type";
+            ext = ExtNumSize::strNoType();
 
         listsByType[ext].insert(filesIter.key(), filesIter.value());
     }
