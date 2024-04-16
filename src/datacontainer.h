@@ -31,44 +31,25 @@ struct Numbers {
 
     QHash<FileStatus, int> holder; // {enum FileStatus : int number of corresponding files}
 
-    int numberOf(const FileStatus status) const
+    int numberOf(const FileStatuses flag) const
     {
-        return holder.contains(status) ? holder.value(status) : 0;
-    }
-
-    int numberOf(const FileStatusFlag flag) const
-    {
-        if (flag == FileStatusFlag::FlagAvailable) // for proper display in a permanent status during the process
+        if (flag == FileStatus::FlagAvailable) // for proper display in a permanent status during the process
             return numChecksums - numberOf(FileStatus::Missing);
 
-        return numberOf(Files::flagStatuses(flag));
-    }
-
-    int numberOf(const QSet<FileStatus> &statuses) const
-    {
         int result = 0;
+        QHash<FileStatus, int>::const_iterator it;
 
-        QSet<FileStatus>::const_iterator it;
-        for (it = statuses.constBegin(); it != statuses.constEnd(); ++it) {
-            result += numberOf(*it);
+        for (it = holder.constBegin(); it != holder.constEnd(); ++it) {
+            if (it.key() & flag)
+                result += it.value();
         }
 
         return result;
     }
 
-    bool contains(const FileStatus status) const
+    bool contains(const FileStatuses flags) const
     {
-        return numberOf(status) > 0;
-    }
-
-    bool contains(const FileStatusFlag flag) const
-    {
-        return numberOf(flag) > 0;
-    }
-
-    bool contains(const QSet<FileStatus> &statuses) const
-    {
-        return numberOf(statuses) > 0;
+        return numberOf(flags) > 0;
     }
 }; // struct Numbers
 
@@ -87,9 +68,7 @@ public:
     QString branchDbFilePath(const QModelIndex &subfolder) const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
-    bool contains(const FileStatus status, const QModelIndex &subfolder = QModelIndex()) const;
-    bool contains(const FileStatusFlag flag, const QModelIndex &subfolder = QModelIndex()) const;
-    bool contains(const QSet<FileStatus> &statuses, const QModelIndex &subfolder = QModelIndex()) const;
+    bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
 
     bool isBackupExists();

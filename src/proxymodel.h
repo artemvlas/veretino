@@ -7,7 +7,6 @@
 #define PROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include <QSet>
 #include "files.h"
 #include "tools.h"
 
@@ -18,9 +17,9 @@ public:
     explicit ProxyModel(QObject *parent = nullptr);
     ProxyModel(QAbstractItemModel *sourceModel, QObject *parent = nullptr);
     ~ProxyModel();
-    void setFilter(const QSet<FileStatus> &statuses);
+    void setFilter(const FileStatuses flags);
     void disableFilter();
-    QSet<FileStatus> currentlyFiltered() const;
+    FileStatuses currentlyFiltered() const;
     bool isFilterEnabled() const;
 
 protected:
@@ -29,7 +28,7 @@ protected:
 
 private:
     void setInitSettings();
-    QSet<FileStatus> fileStatuses_;
+    FileStatuses filteredFlags = FileStatus::NotSet;
 };
 
 #endif // PROXYMODEL_H

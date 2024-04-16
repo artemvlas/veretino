@@ -311,7 +311,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
                             .arg(result.numberOf(FileStatus::Mismatched))
-                            .arg(result.numberOf(FileStatusFlag::FlagAvailable))
+                            .arg(result.numberOf(FileStatus::FlagAvailable))
                             .arg(result.numberOf(FileStatus::Mismatched) == 1 ? "is" : "are"));
     }
     else {
@@ -455,15 +455,15 @@ QString MainWindow::getDatabaseStatusSummary()
         QString matched;
         QString sep;
 
-        if (numbers.contains(FileStatusFlag::FlagNewLost))
+        if (numbers.contains(FileStatus::FlagNewLost))
             newmissing = "* ";
 
         if (numbers.contains(FileStatus::Mismatched))
             mismatched = QString("☒%1").arg(numbers.numberOf(FileStatus::Mismatched));
         if (numbers.contains(FileStatus::Matched))
-            matched = QString(" ✓%1").arg(numbers.numberOf(FileStatusFlag::FlagMatched));
+            matched = QString(" ✓%1").arg(numbers.numberOf(FileStatus::FlagMatched));
 
-        if (numbers.contains(FileStatusFlag::FlagChecked))
+        if (numbers.contains(FileStatus::FlagChecked))
             sep = " : ";
 
         checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
@@ -471,7 +471,7 @@ QString MainWindow::getDatabaseStatusSummary()
 
     return QString("%1%2 avail. | %3 | %4")
                     .arg(checkStatus)
-                    .arg(numbers.numberOf(FileStatusFlag::FlagAvailable))
+                    .arg(numbers.numberOf(FileStatus::FlagAvailable))
                     .arg(format::dataSizeReadable(numbers.totalSize), format::algoToStr(ui->treeView->data_->metaData.algorithm));
 }
 

@@ -161,47 +161,23 @@ void View::setIndexByPath(const QString &path)
     }
 }
 
-void View::setFilter(const FileStatus status)
-{
-    setFilter(QSet<FileStatus>({status}));
-}
-
-void View::setFilter(const FileStatusFlag flag)
-{
-    setFilter(Files::flagStatuses(flag));
-}
-
-void View::setFilter(const QSet<FileStatus> &statuses)
+void View::setFilter(const FileStatuses flags)
 {
     if (isCurrentViewModel(ModelProxy)) {
         QString prePathModel = curPathModel;
-        data_->proxyModel_->setFilter(statuses);
+        data_->proxyModel_->setFilter(flags);
         setIndexByPath(prePathModel);
         setBackgroundColor();
+        //qDebug() << "View::setFilter" << flags;
     }
 }
 
-void View::editFilter(const FileStatus status, bool add)
+void View::editFilter(const FileStatuses flags, bool add)
 {
     if (isCurrentViewModel(ModelProxy)) {
-        QSet<FileStatus> filter = data_->proxyModel_->currentlyFiltered();
+        FileStatuses curFilter = data_->proxyModel_->currentlyFiltered();
 
-        if (add)
-            filter.insert(status);
-        else
-            filter.remove(status);
-
-        setFilter(filter);
-    }
-}
-
-void View::editFilter(const FileStatusFlag flag, bool add)
-{
-    if (isCurrentViewModel(ModelProxy)) {
-        QSet<FileStatus> filter = data_->proxyModel_->currentlyFiltered();
-        QSet<FileStatus> other = Files::flagStatuses(flag);
-
-        setFilter(add ? filter.unite(other) : filter.subtract(other));
+        setFilter(add ? (curFilter | flags) : (curFilter & ~flags));
     }
 }
 
@@ -254,7 +230,7 @@ bool View::isViewFiltered()
 bool View::isViewFiltered(const FileStatus status)
 {
     return isCurrentViewModel(ModelView::ModelProxy)
-           && data_->proxyModel_->currentlyFiltered().contains(status);
+           && data_->proxyModel_->currentlyFiltered() & status;
 }
 
 void View::deleteOldSelModel()

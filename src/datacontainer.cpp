@@ -64,30 +64,16 @@ bool DataContainer::isFilterApplied() const
     return !metaData.filter.extensionsList.isEmpty();
 }
 
-bool DataContainer::contains(const FileStatus status, const QModelIndex &subfolder) const
-{
-    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
-
-    return num.contains(status);
-}
-
-bool DataContainer::contains(const FileStatusFlag flags, const QModelIndex &subfolder) const
+bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfolder) const
 {
     const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
 
     return num.contains(flags);
 }
 
-bool DataContainer::contains(const QSet<FileStatus> &statuses, const QModelIndex &subfolder) const
-{
-    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers;
-
-    return num.contains(statuses);
-}
-
 bool DataContainer::isAllChecked() const
 {
-    return (contains(FileStatusFlag::FlagChecked) && !contains(FileStatus::NotChecked));
+    return (contains(FileStatus::FlagChecked) && !contains(FileStatus::NotChecked));
 }
 
 bool DataContainer::isBackupExists()

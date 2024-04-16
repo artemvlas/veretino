@@ -8,7 +8,6 @@
 
 #include <QObject>
 #include <QMap>
-#include <QSet>
 #include <QAbstractItemModel>
 #include "filterrule.h"
 
@@ -25,31 +24,36 @@ public:
     Files(const FileList &fileList, QObject *parent = nullptr);
 
     enum FileStatus {
-        Undefined,
+        NotSet = 0,
 
-        Queued, // added to the processing queue
-        Calculating, // checksum is being calculated
-        Verifying, // // checksum is being verified
+        Queued = 1 << 0, // added to the processing queue
+        Calculating = 1 << 1, // checksum is being calculated
+        Verifying = 1 << 2, // // checksum is being verified
+        FlagProcessing = Queued | Calculating | Verifying,
 
-        NotChecked, // available for verification
-        Matched, // checked, checksum matched
-        Mismatched, // checked, checksum did not match
-        New, // a file that is present on disk but not in the database
-        Missing, // not on disk, but present in the database
-        Unreadable, // present on the disk, but unreadable (no read permission or read error)
-        Added, // item (file path and its checksum) has been added to the database
-        Removed, // item^ removed from the database
-        Updated, // the checksum has been updated
+        NotChecked = 1 << 3, // available for verification
+        Matched = 1 << 4, // checked, checksum matched
+        Mismatched = 1 << 5, // checked, checksum did not match
+        New = 1 << 6, // a file that is present on disk but not in the database
+        Missing = 1 << 7, // not on disk, but present in the database
+        Unreadable = 1 << 8, // present on the disk, but unreadable (no read permission or read error)
+        Added = 1 << 9, // item (file path and its checksum) has been added to the database
+        Removed = 1 << 10, // item^ removed from the database
+        Updated = 1 << 11, // the checksum has been updated
 
-        Computed, // the checksum has been calculated and is ready for further processing (copy or save)
-        ToClipboard, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile, // the calculated checksum is intended to be stored in the summary file
+        FlagAvailable = NotChecked | Matched | Mismatched | Added | Updated,
+        FlagUpdatable = New | Missing | Mismatched,
+        FlagDbChanged = Added | Removed | Updated,
+        FlagChecked = Matched | Mismatched,
+        FlagMatched = Matched | Added | Updated,
+        FlagNewLost = New | Missing,
+
+        Computed = 1 << 12, // the checksum has been calculated and is ready for further processing (copy or save)
+        ToClipboard = 1 << 13, // the calculated checksum is intended to be copied to the clipboard
+        ToSumFile = 1 << 14, // the calculated checksum is intended to be stored in the summary file
     };
     Q_ENUM(FileStatus)
-
-    // Flags
-    enum FileStatusFlag {FlagAvailable, FlagUpdatable, FlagDbChanged, FlagChecked, FlagMatched, FlagNewLost};
-    static QSet<FileStatus> flagStatuses(const FileStatusFlag flag);
+    Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 
     // functions
     FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
@@ -66,8 +70,8 @@ public:
 
     QString contentStatus(const QString &path);
     static QString contentStatus(const FileList &filelist);
-    static QString itemInfo(const QAbstractItemModel *model, const QSet<FileStatus> &fileStatuses = QSet<FileStatus>(),
-                            const QModelIndex& rootIndex = QModelIndex());
+    static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags = FileStatus::NotSet,
+                            const QModelIndex &rootIndex = QModelIndex());
 
     // variables
     bool canceled = false;
@@ -90,7 +94,8 @@ signals:
 }; // class Files
 
 using FileStatus = Files::FileStatus;
-using FileStatusFlag = Files::FileStatusFlag;
+using FileStatuses = Files::FileStatuses;
+Q_DECLARE_OPERATORS_FOR_FLAGS(Files::FileStatuses)
 
 struct FileValues {
     FileValues(FileStatus initStatus = FileStatus::New) : status(initStatus) {}

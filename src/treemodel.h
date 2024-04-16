@@ -51,9 +51,8 @@ public:
     static bool isFolderRow(const QModelIndex &curIndex); // same^, but folder(true); (file(false) || invalid(false))
     static bool hasChecksum(const QModelIndex &fileIndex);
     static bool hasReChecksum(const QModelIndex &fileIndex);
-    static bool hasStatus(const FileStatus status, const QModelIndex &fileIndex);
-    static bool hasStatus(const FileStatusFlag flag, const QModelIndex &fileIndex);
-    static bool contains(const FileStatusFlag flag, const QModelIndex &folderIndex);
+    static bool hasStatus(const FileStatuses flag, const QModelIndex &fileIndex);
+    static bool contains(const FileStatuses flag, const QModelIndex &folderIndex);
 
     static QString itemName(const QModelIndex &curIndex);
     static qint64 itemFileSize(const QModelIndex &fileIndex);

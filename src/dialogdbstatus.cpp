@@ -57,14 +57,14 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     }
 
     // tab Verification
-    ui->tabWidget->setTabEnabled(TabVerification, data->contains(FileStatusFlag::FlagChecked));
-    if (data->contains(FileStatusFlag::FlagChecked)) {
+    ui->tabWidget->setTabEnabled(TabVerification, data->contains(FileStatus::FlagChecked));
+    if (data->contains(FileStatus::FlagChecked)) {
         ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         ui->labelVerification->setText(infoVerification(data).join("\n"));
     }
 
     // tab Result
-    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data->contains(FileStatusFlag::FlagDbChanged));
+    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data->contains(FileStatus::FlagDbChanged));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join("\n"));
@@ -89,7 +89,7 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
 {
     QStringList contentNumbers;
     QString createdDataSize;
-    int available = data->numbers.numberOf(FileStatusFlag::FlagAvailable);
+    int available = data->numbers.numberOf(FileStatus::FlagAvailable);
 
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(data->numbers.totalSize));
@@ -118,7 +118,7 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
     contentNumbers.append("***");
 
     if (data->contains(FileStatus::New))
-        contentNumbers.append("New: " + Files::itemInfo(data->model_, {FileStatus::New}));
+        contentNumbers.append("New: " + Files::itemInfo(data->model_, FileStatus::New));
     else
         contentNumbers.append("No New files found");
 
@@ -127,7 +127,7 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
     else
         contentNumbers.append("No Missing files found");
 
-    if (data->contains(FileStatusFlag::FlagNewLost)) {
+    if (data->contains(FileStatus::FlagNewLost)) {
         contentNumbers.append(QString());
         contentNumbers.append("Use a context menu for more options");
     }
@@ -138,7 +138,7 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
 QStringList DialogDbStatus::infoVerification(const DataContainer *data)
 {
     QStringList result;
-    const int available = data->numbers.numberOf(FileStatusFlag::FlagAvailable);
+    const int available = data->numbers.numberOf(FileStatus::FlagAvailable);
 
     if (data->isAllChecked()) {
         if (data->contains(FileStatus::Mismatched))
@@ -151,9 +151,9 @@ QStringList DialogDbStatus::infoVerification(const DataContainer *data)
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
     }
-    else if (data->contains(FileStatusFlag::FlagChecked)) {
+    else if (data->contains(FileStatus::FlagChecked)) {
         result.append(QString("%1 out of %2 files were checked")
-                          .arg(data->numbers.numberOf(FileStatusFlag::FlagChecked))
+                          .arg(data->numbers.numberOf(FileStatus::FlagChecked))
                           .arg(available));
 
         result.append(QString());
@@ -174,7 +174,7 @@ QStringList DialogDbStatus::infoChanges()
     QStringList result;
 
     if (data_->contains(FileStatus::Added))
-        result.append(QString("Added: %1").arg(Files::itemInfo(data_->model_, {FileStatus::Added})));
+        result.append(QString("Added: %1").arg(Files::itemInfo(data_->model_, FileStatus::Added)));
 
     if (data_->contains(FileStatus::Removed))
         result.append(QString("Removed: %1").arg(data_->numbers.numberOf(FileStatus::Removed)));
@@ -188,7 +188,7 @@ QStringList DialogDbStatus::infoChanges()
 bool DialogDbStatus::isJustCreated()
 {
     return (!data_->metaData.isImported
-            && data_->numbers.numberOf({FileStatus::Added, FileStatus::Matched, FileStatus::Mismatched}) == data_->numbers.numChecksums);
+            && data_->numbers.numberOf(FileStatus::Added | FileStatus::Matched | FileStatus::Mismatched) == data_->numbers.numChecksums);
 }
 
 DialogDbStatus::~DialogDbStatus()

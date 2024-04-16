@@ -12,7 +12,6 @@
 #include <QSortFilterProxyModel>
 #include "treemodel.h"
 #include "proxymodel.h"
-#include <QSet>
 #include "datacontainer.h"
 
 class View : public QTreeView
@@ -49,11 +48,8 @@ public slots:
     void setData(DataContainer *data);
     void setTreeModel(ModelView modelSel = ModelProxy);
     void setIndexByPath(const QString &path);
-    void setFilter(const FileStatus status);
-    void setFilter(const FileStatusFlag flag);
-    void setFilter(const QSet<FileStatus> &statuses = QSet<FileStatus>());
-    void editFilter(const FileStatus status, bool add);
-    void editFilter(const FileStatusFlag flag, bool add);
+    void setFilter(const FileStatuses flags = FileStatus::NotSet);
+    void editFilter(const FileStatuses flags, bool add);
     void disableFilter();
     void saveHeaderState();
     void toHome();

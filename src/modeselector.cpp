@@ -76,7 +76,7 @@ void ModeSelector::connectActions()
     connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskAddNew);});
     connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskClearLost);});
     connect(actionFilterNewLost, &QAction::triggered, this,
-            [=](bool isChecked){view_->editFilter(FileStatusFlag::FlagNewLost, isChecked);});
+            [=](bool isChecked){view_->editFilter(FileStatus::FlagNewLost, isChecked);});
     connect(actionFilterMismatches, &QAction::triggered, this,
             [=](bool isChecked){view_->editFilter(FileStatus::Mismatched, isChecked);});
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
@@ -270,7 +270,7 @@ Mode ModeSelector::selectMode(const Numbers &numbers)
 {
     if (numbers.contains(FileStatus::Mismatched))
         curMode = UpdateMismatch;
-    else if (numbers.contains(FileStatusFlag::FlagNewLost))
+    else if (numbers.contains(FileStatus::FlagNewLost))
         curMode = ModelNewLost;
     else
         curMode = Model;
@@ -593,12 +593,12 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionFilterMismatches);
                 }
 
-                if (view_->data_->numbers.contains(FileStatusFlag::FlagNewLost)) {
+                if (view_->data_->numbers.contains(FileStatus::FlagNewLost)) {
                     actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
                     viewContextMenu->addAction(actionFilterNewLost);
                 }
 
-                if (view_->data_->numbers.contains(FileStatusFlag::FlagUpdatable))
+                if (view_->data_->numbers.contains(FileStatus::FlagUpdatable))
                     viewContextMenu->addSeparator();
             }
 
@@ -609,14 +609,14 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     else if (TreeModel::hasChecksum(index))
                         viewContextMenu->addAction(actionCopyStoredChecksum);
 
-                    if (TreeModel::hasStatus(FileStatusFlag::FlagAvailable, index)) {
+                    if (TreeModel::hasStatus(FileStatus::FlagAvailable, index)) {
                         actionCopyItem->setText("Copy File");
                         viewContextMenu->addAction(actionCopyItem);
 
                         viewContextMenu->addAction(actionCheckCurFileFromModel);
                     }
                 }
-                else if (TreeModel::contains(FileStatusFlag::FlagAvailable, index)) {
+                else if (TreeModel::contains(FileStatus::FlagAvailable, index)) {
                     actionCopyItem->setText("Copy Folder");
                     viewContextMenu->addAction(actionCopyItem);
 
@@ -631,7 +631,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
 
             viewContextMenu->addAction(actionCheckAll);
 
-            if (view_->data_->contains(FileStatusFlag::FlagUpdatable))
+            if (view_->data_->contains(FileStatus::FlagUpdatable))
                 viewContextMenu->addMenu(menuUpdateDb());
         }
 

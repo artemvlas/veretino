@@ -297,25 +297,19 @@ bool TreeModel::hasReChecksum(const QModelIndex &fileIndex)
     return siblingAtRow(fileIndex, ColumnReChecksum).data().isValid();
 }
 
-bool TreeModel::hasStatus(const FileStatus status, const QModelIndex &fileIndex)
+bool TreeModel::hasStatus(const FileStatuses flag, const QModelIndex &fileIndex)
 {
-    return status == itemFileStatus(fileIndex);
+    return flag & itemFileStatus(fileIndex);
 }
 
-bool TreeModel::hasStatus(const FileStatusFlag flag, const QModelIndex &fileIndex)
-{
-    return isFileRow(fileIndex) && Files::flagStatuses(flag).contains(itemFileStatus(fileIndex));
-}
-
-bool TreeModel::contains(const FileStatusFlag flag, const QModelIndex &folderIndex)
+bool TreeModel::contains(const FileStatuses flag, const QModelIndex &folderIndex)
 {
     bool isAny = false;
 
     if (isFolderRow(folderIndex)) {
-        QSet<FileStatus> requiredStatuses = Files::flagStatuses(flag);
         TreeModelIterator it(folderIndex.model(), folderIndex);
         while (it.hasNext()) {
-            if (requiredStatuses.contains(itemFileStatus(it.nextFile().index()))) {
+            if (flag & itemFileStatus(it.nextFile().index())) {
                 isAny = true;
                 break;
             }

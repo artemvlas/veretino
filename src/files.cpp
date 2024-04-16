@@ -171,7 +171,7 @@ QString Files::contentStatus(const FileList &fileList)
     return format::filesNumberAndSize(fileList.size(), dataSize(fileList));
 }
 
-QString Files::itemInfo(const QAbstractItemModel* model, const QSet<FileStatus>& fileStatuses, const QModelIndex& rootIndex)
+QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flags, const QModelIndex &rootIndex)
 {
     int filesNumber = 0;
     qint64 dataSize = 0;
@@ -181,8 +181,8 @@ QString Files::itemInfo(const QAbstractItemModel* model, const QSet<FileStatus>&
         QVariant itData = it.nextFile().data(Column::ColumnStatus);
 
         if (itData.isValid()
-            && (fileStatuses.isEmpty()
-                || fileStatuses.contains(itData.value<FileStatus>()))) {
+            && (flags == FileStatus::NotSet
+                || flags & itData.value<FileStatus>())) {
 
             dataSize += it.data(Column::ColumnSize).toLongLong();
             ++filesNumber;
@@ -272,26 +272,6 @@ qint64 Files::dataSize(const FileList &filelist)
     }
 
     return totalSize;
-}
-
-QSet<FileStatus> Files::flagStatuses(const FileStatusFlag flag)
-{
-    switch (flag) {
-    case FlagAvailable:
-        return {NotChecked, Matched, Mismatched, Added, Updated};
-    case FlagUpdatable:
-        return {New, Missing, Mismatched};
-    case FlagDbChanged:
-        return {Added, Removed, Updated};
-    case FlagChecked:
-        return {Matched, Mismatched};
-    case FlagMatched:
-        return {Matched, Added, Updated};
-    case FlagNewLost:
-        return {New, Missing};
-    default:
-        return QSet<FileStatus>();
-    }
 }
 
 void Files::cancelProcess()

@@ -122,7 +122,7 @@ void Manager::updateDatabase(const TaskDbUpdate task)
         return;
     }
 
-    if (!dataMaintainer->data_->contains(FileStatusFlag::FlagAvailable)) {
+    if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable)) {
         emit processing(false);
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
         return;
@@ -199,7 +199,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         return;
     }
 
-    if (!dataMaintainer->data_->contains(FileStatusFlag::FlagAvailable, folderItemIndex)) {
+    if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable, folderItemIndex)) {
         emit processing(false);
 
         QString warningText = "There are no files available for verification.";
