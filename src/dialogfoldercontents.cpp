@@ -76,9 +76,9 @@ void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
     for (int i = 0; i < extList.size(); ++i) {
         QIcon icon;
 
-        if (extList.at(i).extension == ExtNumSize::strVeretinoDb())
+        if (extList.at(i).extension == ExtNumSize::strVeretinoDb)
             icon = icons.icon(Icons::Database);
-        else if (extList.at(i).extension == ExtNumSize::strShaFiles())
+        else if (extList.at(i).extension == ExtNumSize::strShaFiles)
             icon = icons.icon(Icons::HashFile);
         else
             icon = fileIcons.icon(QFileInfo("file." + extList.at(i).extension));
@@ -150,7 +150,7 @@ void DialogFolderContents::enableFilterCreating()
     ui->labelFilterExtensions->clear();
     ui->labelTotalFiltered->clear();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
-    const QStringList excluded({ExtNumSize::strNoType(), ExtNumSize::strVeretinoDb(), ExtNumSize::strShaFiles()});
+    const QStringList excluded({ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles});
 
     for (int i = 0; i < items.size(); ++i) {
         if (!excluded.contains(items.at(i)->extension()))
@@ -251,5 +251,5 @@ bool DialogFolderContents::isFilterCreatingEnabled()
 
 bool DialogFolderContents::isItemFilterable(const TreeWidgetItem *item)
 {
-    return ((item->extension() != ExtNumSize::strVeretinoDb()) && (item->extension() != ExtNumSize::strShaFiles()));
+    return ((item->extension() != ExtNumSize::strVeretinoDb) && (item->extension() != ExtNumSize::strShaFiles));
 }

@@ -13,6 +13,7 @@
 #include "filterrule.h"
 
 struct FileValues;
+struct ExtNumSize;
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
 
 class Files : public QObject
@@ -68,17 +69,6 @@ public:
     static QString itemInfo(const QAbstractItemModel *model, const QSet<FileStatus> &fileStatuses = QSet<FileStatus>(),
                             const QModelIndex& rootIndex = QModelIndex());
 
-    //
-    struct ExtNumSize {
-        static QString strNoType() { return "No type"; }
-        static QString strVeretinoDb() { return "Veretino DB"; }
-        static QString strShaFiles() { return "Sha-files"; }
-
-        QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
-        int filesNumber = 0; // number of files with this extension
-        qint64 filesSize = 0; // total size of these files
-    }; // struct ExtNumSize
-
     // variables
     bool canceled = false;
 
@@ -101,7 +91,6 @@ signals:
 
 using FileStatus = Files::FileStatus;
 using FileStatusFlag = Files::FileStatusFlag;
-using ExtNumSize = Files::ExtNumSize;
 
 struct FileValues {
     FileValues(FileStatus initStatus = FileStatus::New) : status(initStatus) {}
@@ -111,5 +100,15 @@ struct FileValues {
     qint64 size = 0; // file size in bytes
     FileStatus status;
 }; // struct FileValues
+
+struct ExtNumSize {
+    static const QString strNoType;
+    static const QString strVeretinoDb;
+    static const QString strShaFiles;
+
+    QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
+    int filesNumber = 0; // number of files with this extension
+    qint64 filesSize = 0; // total size of these files
+}; // struct ExtNumSize
 
 #endif // FILES_H

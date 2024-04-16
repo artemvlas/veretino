@@ -10,6 +10,10 @@
 #include "treemodeliterator.h"
 #include "treemodel.h"
 
+const QString ExtNumSize::strNoType = "No type";
+const QString ExtNumSize::strVeretinoDb = "Veretino DB";
+const QString ExtNumSize::strShaFiles = "Sha-files";
+
 Files::Files(QObject *parent)
     : QObject(parent)
 {}
@@ -45,7 +49,7 @@ FileList Files::getFileList(const FilterRule &filter)
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 {
     if (!QFileInfo(rootFolder).isDir()) {
-        qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
+        // qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
         return FileList();
     }
 
@@ -213,14 +217,14 @@ void Files::folderContentsByType()
         QString ext;
 
         if (tools::isDatabaseFile(filesIter.key()))
-            ext = ExtNumSize::strVeretinoDb();
+            ext = ExtNumSize::strVeretinoDb;
         else if (tools::isSummaryFile(filesIter.key()))
-            ext = ExtNumSize::strShaFiles();
+            ext = ExtNumSize::strShaFiles;
         else
             ext = QFileInfo(filesIter.key()).suffix().toLower();
 
         if (ext.isEmpty())
-            ext = ExtNumSize::strNoType();
+            ext = ExtNumSize::strNoType;
 
         listsByType[ext].insert(filesIter.key(), filesIter.value());
     }
