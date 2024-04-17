@@ -104,7 +104,7 @@ void MainWindow::connections()
 void MainWindow::connectManager()
 {
     qRegisterMetaType<QVector<int>>("QVector<int>"); // for building on Windows (qt 5.15.2)
-    qRegisterMetaType<QSet<FileStatus>>("QSet<FileStatus>");
+    //qRegisterMetaType<QSet<FileStatus>>("QSet<FileStatus>");
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<ModelView>("ModelView");
     qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");

@@ -148,12 +148,7 @@ void DataMaintainer::updateNumbers()
         data_->metaData.successfulCheckDateTime.clear();
 }
 
-qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatus fileStatus, const QModelIndex &rootIndex)
-{
-    return totalSizeOfListedFiles(QSet<FileStatus>({fileStatus}), rootIndex);
-}
-
-qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatuses, const QModelIndex &rootIndex)
+qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatuses flags, const QModelIndex &rootIndex)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::totalSizeOfListedFiles | NO data_";
@@ -169,51 +164,43 @@ qint64 DataMaintainer::totalSizeOfListedFiles(const QSet<FileStatus> &fileStatus
     TreeModelIterator it(data_->model_, rootIndex);
 
     while (it.hasNext()) {
-        QVariant itData = it.nextFile().data(Column::ColumnStatus);
-
-        if (itData.isValid()
-            && (fileStatuses.isEmpty()
-                || fileStatuses.contains(itData.value<FileStatus>()))) {
-
-            result += it.data(Column::ColumnSize).toLongLong();
+        if (flags & it.nextFile().status()) {
+            result += it.size();
         }
     }
 
     return result;
 }
 
-bool DataMaintainer::updateChecksum(QModelIndex fileRowIndex, const QString &computedChecksum)
+bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
 {
-    if (!data_ || !fileRowIndex.isValid()) {
+    if (!data_ || !fileRowIndex.isValid() || fileRowIndex.model() != data_->model_) {
         qDebug() << "DataMaintainer::updateChecksum | NO data_ or invalid index";
         return false;
     }
 
-    if (fileRowIndex.model() == data_->proxyModel_)
-        fileRowIndex = data_->proxyModel_->mapToSource(fileRowIndex);
-
+    bool result = false;
     QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
         data_->model_->setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
         data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+        result = true;
     }
-    else if (storedChecksum == computedChecksum)
+    else if (storedChecksum == computedChecksum) {
         data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
+        result = true;
+    }
     else {
         data_->model_->setRowData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
         data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
     }
 
-    return (storedChecksum.isEmpty() || storedChecksum == computedChecksum);
+    return (result);
 }
 
-int DataMaintainer::changeFilesStatus(const FileStatus currentStatus, const FileStatus newStatus, const QModelIndex &rootIndex)
-{
-    return changeFilesStatus(QSet<FileStatus>({currentStatus}), newStatus, rootIndex);
-}
 
-int DataMaintainer::changeFilesStatus(const QSet<FileStatus> curStatuses, const FileStatus newStatus, const QModelIndex &rootIndex)
+int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::changeFilesStatus | NO data_";
@@ -227,7 +214,7 @@ int DataMaintainer::changeFilesStatus(const QSet<FileStatus> curStatuses, const 
     TreeModelIterator iter(data_->model_, rootIndex);
 
     while (iter.hasNext()) {
-        if (curStatuses.contains(iter.nextFile().status())) {
+        if (flags & iter.nextFile().status()) {
             data_->model_->setRowData(iter.index(), Column::ColumnStatus, newStatus);
             ++number;
         }
@@ -242,22 +229,12 @@ int DataMaintainer::changeFilesStatus(const QSet<FileStatus> curStatuses, const 
     return number;
 }
 
-int DataMaintainer::addToQueue(const FileStatus currentStatus, const QModelIndex &rootIndex)
+int DataMaintainer::addToQueue(const FileStatuses flags, const QModelIndex &rootIndex)
 {
-    return changeFilesStatus(currentStatus, FileStatus::Queued, rootIndex);
+    return changeFilesStatus(flags, FileStatus::Queued, rootIndex);
 }
 
-int DataMaintainer::addToQueue(const QSet<FileStatus> curStatuses, const QModelIndex &rootIndex)
-{
-    return changeFilesStatus(curStatuses, FileStatus::Queued, rootIndex);
-}
-
-int DataMaintainer::clearChecksums(const FileStatus curStatus, const QModelIndex &rootIndex)
-{
-    return clearChecksums(QSet<FileStatus>({curStatus}), rootIndex);
-}
-
-int DataMaintainer::clearChecksums(const QSet<FileStatus> curStatuses, const QModelIndex &rootIndex)
+int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &rootIndex)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::clearChecksums | NO data_";
@@ -268,7 +245,7 @@ int DataMaintainer::clearChecksums(const QSet<FileStatus> curStatuses, const QMo
     TreeModelIterator iter(data_->model_, rootIndex);
 
     while (iter.hasNext()) {
-        if (curStatuses.contains(iter.nextFile().status())) {
+        if (flags & iter.nextFile().status()) {
             data_->model_->setRowData(iter.index(), Column::ColumnChecksum);
             ++number;
         }

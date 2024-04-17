@@ -184,7 +184,7 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
             && (flags == FileStatus::NotSet
                 || flags & itData.value<FileStatus>())) {
 
-            dataSize += it.data(Column::ColumnSize).toLongLong();
+            dataSize += it.size();
             ++filesNumber;
         }
     }

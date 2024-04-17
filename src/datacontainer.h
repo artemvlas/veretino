@@ -33,8 +33,8 @@ struct Numbers {
 
     int numberOf(const FileStatuses flag) const
     {
-        if (flag == FileStatus::FlagAvailable) // for proper display in a permanent status during the process
-            return numChecksums - numberOf(FileStatus::Missing);
+        //if (flag == FileStatus::FlagAvailable) // for proper display in a permanent status during the process
+        //    return numChecksums - numberOf(FileStatus::Missing);
 
         int result = 0;
         QHash<FileStatus, int>::const_iterator it;

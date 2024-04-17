@@ -93,3 +93,8 @@ FileStatus TreeModelIterator::status()
 {
     return data(Column::ColumnStatus).value<FileStatus>();
 }
+
+qint64 TreeModelIterator::size()
+{
+    return data(Column::ColumnSize).toLongLong();
+}

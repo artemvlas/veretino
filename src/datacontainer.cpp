@@ -146,7 +146,7 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
 
         if (TreeModel::hasChecksum(iter.index())) {
             ++num.numChecksums;
-            num.totalSize += iter.data(Column::ColumnSize).toLongLong();
+            num.totalSize += iter.size();
         }
 
         if (!num.holder.contains(iter.status())) {
