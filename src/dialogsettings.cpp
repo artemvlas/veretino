@@ -154,6 +154,7 @@ void DialogSettings::setComboBoxFpIndex()
 void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
 {
     FilterPreset preset = PresetCustom;
+
     if (filter.isFilter(FilterRule::Include)) {
         if (filter.extensionsList == listPresetDocuments)
             preset = PresetDocuments;
@@ -163,6 +164,10 @@ void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
             preset = PresetMusic;
         else if (filter.extensionsList == listPresetVideos)
             preset = PresetVideos;
+    }
+    else if (filter.isFilter(FilterRule::Ignore)) {
+        if (filter.extensionsList == listPresetIgnoreTriflings)
+            preset = PresetIgnoreTriflings;
     }
 
     ui->comboBoxPresets->setCurrentIndex(preset);
@@ -197,6 +202,8 @@ FilterRule DialogSettings::selectPresetFilter(const FilterPreset preset)
         return FilterRule(FilterRule::Include, listPresetMusic);
     case PresetVideos:
         return FilterRule(FilterRule::Include, listPresetVideos);
+    case PresetIgnoreTriflings:
+        return FilterRule(FilterRule::Ignore, listPresetIgnoreTriflings);
     default:
         return FilterRule();
     }
