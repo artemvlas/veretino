@@ -81,7 +81,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header["Files number"] = numbers.numberOf(FileStatus::FlagHasChecksum);
     header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(data->metaData.workDir);
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
-    header["Total size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagHasChecksum));
+    header["Total size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagAvailable));
     header["Updated"] = data->metaData.saveDateTime;
 
     if (!isWorkDirRelative && !rootFolder.isValid())

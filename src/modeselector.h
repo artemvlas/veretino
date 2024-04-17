@@ -21,14 +21,15 @@ public:
     explicit ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent = nullptr);
 
     enum Mode {
-        NoMode,
-        Folder,
-        File,
-        DbFile,
-        SumFile,
-        Model,
-        ModelNewLost,
-        UpdateMismatch,
+        NoMode = 0,
+        Folder = 1 << 0,
+        File = 1 << 1,
+        DbFile = 1 << 2,
+        SumFile = 1 << 3,
+        Model = 1 << 4,
+        ModelNewLost = 1 << 5,
+        UpdateMismatch = 1 << 6,
+        FlagDbModes = Model | ModelNewLost | UpdateMismatch
     };
     Q_ENUM(Mode)
 
@@ -39,8 +40,6 @@ public:
     bool isProcessing();
     void setButtonInfo(); // sets the Button icon and text according the current Mode
     void setAlgorithm(QCryptographicHash::Algorithm algo);
-    //QSet<Mode> fsModes {Folder, File, DbFile, SumFile};
-    const QSet<Mode> dbModes {Model, ModelNewLost, UpdateMismatch};
 
     // tasks execution
     void quickAction();

@@ -10,7 +10,6 @@
 #include <QCryptographicHash>
 #include "treemodel.h"
 #include "proxymodel.h"
-#include <QDebug>
 
 class TreeModel;
 
