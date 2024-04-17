@@ -142,10 +142,8 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     TreeModelIterator iter(model, rootIndex);
 
     while (iter.hasNext()) {
-        FileStatus status = iter.nextFile().status();
-
-        num.holderNumber[status]++;
-        num.holderSize[status] += iter.size();
+        iter.nextFile();
+        num.addFile(iter.status(), iter.size());
     }
 
     return num;
