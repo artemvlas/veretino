@@ -89,13 +89,15 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
 {
     QStringList contentNumbers;
     QString createdDataSize;
+    int numChecksums = data->numbers.numberOf(FileStatus::FlagHasChecksum);
     int available = data->numbers.numberOf(FileStatus::FlagAvailable);
+    qint64 totalSize = data->numbers.totalSize(FileStatus::FlagAvailable);
 
     if (isJustCreated())
-        createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(data->numbers.totalSize));
+        createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
 
-    if (isJustCreated() || (data->numbers.numChecksums != available))
-        contentNumbers.append(QString("Stored checksums: %1%2").arg(data->numbers.numChecksums).arg(createdDataSize));
+    if (isJustCreated() || (numChecksums != available))
+        contentNumbers.append(QString("Stored checksums: %1%2").arg(numChecksums).arg(createdDataSize));
 
     if (data->contains(FileStatus::Unreadable))
         contentNumbers.append(QString("Unreadable files: %1").arg(data->numbers.numberOf(FileStatus::Unreadable)));
@@ -110,7 +112,7 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
         return contentNumbers;
 
     if (available > 0)
-        contentNumbers.append(QString("Available: %1").arg(format::filesNumberAndSize(available, data->numbers.totalSize)));
+        contentNumbers.append(QString("Available: %1").arg(format::filesNumberAndSize(available, totalSize)));
     else
         contentNumbers.append("NO FILES available to check");
 
@@ -139,6 +141,7 @@ QStringList DialogDbStatus::infoVerification(const DataContainer *data)
 {
     QStringList result;
     const int available = data->numbers.numberOf(FileStatus::FlagAvailable);
+    const int numChecksums = data->numbers.numberOf(FileStatus::FlagHasChecksum);
 
     if (data->isAllChecked()) {
         if (data->contains(FileStatus::Mismatched))
@@ -146,8 +149,8 @@ QStringList DialogDbStatus::infoVerification(const DataContainer *data)
                               .arg(data->numbers.numberOf(FileStatus::Mismatched))
                               .arg(available));
 
-        else if (data->numbers.numChecksums == available)
-            result.append(QString("✓ ALL %1 stored checksums matched").arg(data->numbers.numChecksums));
+        else if (numChecksums == available)
+            result.append(QString("✓ ALL %1 stored checksums matched").arg(numChecksums));
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
     }
@@ -188,7 +191,8 @@ QStringList DialogDbStatus::infoChanges()
 bool DialogDbStatus::isJustCreated()
 {
     return (!data_->metaData.isImported
-            && data_->numbers.numberOf(FileStatus::Added | FileStatus::Matched | FileStatus::Mismatched) == data_->numbers.numChecksums);
+            && data_->numbers.numberOf(FileStatus::Added | FileStatus::Matched | FileStatus::Mismatched)
+                                                == data_->numbers.numberOf(FileStatus::FlagHasChecksum));
 }
 
 DialogDbStatus::~DialogDbStatus()

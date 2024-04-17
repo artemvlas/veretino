@@ -41,8 +41,8 @@ public:
         Removed = 1 << 10, // item^ removed from the database
         Updated = 1 << 11, // the checksum has been updated
 
-        //FlagHasChecksum = NotChecked | Matched | Mismatched | Added | Updated | Missing,
-        FlagAvailable = NotChecked | Matched | Mismatched | Added | Updated | FlagProcessing,
+        FlagAvailable = NotChecked | Matched | Mismatched | Added | Updated,
+        FlagHasChecksum = FlagAvailable | Missing,
         FlagUpdatable = New | Missing | Mismatched,
         FlagDbChanged = Added | Removed | Updated,
         FlagChecked = Matched | Mismatched,

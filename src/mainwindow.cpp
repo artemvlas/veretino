@@ -469,10 +469,13 @@ QString MainWindow::getDatabaseStatusSummary()
         checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
     }
 
+    FileStatuses flagAvailDuringProc = (FileStatus::FlagAvailable | FileStatus::FlagProcessing);
+
     return QString("%1%2 avail. | %3 | %4")
-                    .arg(checkStatus)
-                    .arg(numbers.numberOf(FileStatus::FlagAvailable))
-                    .arg(format::dataSizeReadable(numbers.totalSize), format::algoToStr(ui->treeView->data_->metaData.algorithm));
+                    .arg(checkStatus) // %1
+                    .arg(numbers.numberOf(flagAvailDuringProc)) // %2
+                    .arg(format::dataSizeReadable(numbers.totalSize(flagAvailDuringProc)), // %3
+                         format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
 }
 
 void MainWindow::handlePermanentStatusClick()

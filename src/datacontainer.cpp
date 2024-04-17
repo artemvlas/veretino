@@ -142,20 +142,10 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     TreeModelIterator iter(model, rootIndex);
 
     while (iter.hasNext()) {
-        iter.nextFile();
+        FileStatus status = iter.nextFile().status();
 
-        if (TreeModel::hasChecksum(iter.index())) {
-            ++num.numChecksums;
-            num.totalSize += iter.size();
-        }
-
-        if (!num.holder.contains(iter.status())) {
-            num.holder.insert(iter.status(), 1);
-        }
-        else {
-            int storedNumber = num.holder.value(iter.status());
-            num.holder.insert(iter.status(), ++storedNumber);
-        }
+        num.holderNumber[status]++;
+        num.holderSize[status] += iter.size();
     }
 
     return num;

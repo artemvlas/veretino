@@ -406,11 +406,11 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     else if (TreeModel::isFolderRow(curIndex)) {
         const Numbers num = data_->getNumbers(curIndex);
         const bool containsAvailable = num.contains(FileStatus::FlagAvailable);
-        qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
+        //qint64 newFilesDataSize = totalSizeOfListedFiles(FileStatus::New, curIndex);
 
         if (containsAvailable) {
             text = QString("Avail.: %1")
-                       .arg(format::filesNumberAndSize(num.numberOf(FileStatus::FlagAvailable), num.totalSize - newFilesDataSize));
+                       .arg(format::filesNumberAndSize(num.numberOf(FileStatus::FlagAvailable), num.totalSize(FileStatus::FlagAvailable)));
         }
 
         if (num.contains(FileStatus::Missing)) {
@@ -425,7 +425,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
             if (containsAvailable || num.contains(FileStatus::Missing))
                 pre = "; ";
             text.append(QString("%1New: %2")
-                        .arg(pre, format::filesNumberAndSize(num.numberOf(FileStatus::New), newFilesDataSize)));
+                        .arg(pre, format::filesNumberAndSize(num.numberOf(FileStatus::New), num.totalSize(FileStatus::New))));
         }
     }
 

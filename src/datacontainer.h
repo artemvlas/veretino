@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include "treemodel.h"
 #include "proxymodel.h"
+#include <QDebug>
 
 class TreeModel;
 
@@ -26,20 +27,29 @@ struct MetaData {
 }; // struct MetaData
 
 struct Numbers {
-    int numChecksums = 0; // number of files with checksums
-    qint64 totalSize = 0; // total size in bytes of all actual files for which there are checksums listed
+    QHash<FileStatus, int> holderNumber; // {enum FileStatus : number of corresponding files}
+    QHash<FileStatus, qint64> holderSize; // {enum FileStatus : total size}
 
-    QHash<FileStatus, int> holder; // {enum FileStatus : int number of corresponding files}
+    qint64 totalSize(const FileStatuses flag) const
+    {
+        qint64 result = 0;
+        QHash<FileStatus, qint64>::const_iterator it;
+
+        for (it = holderSize.constBegin(); it != holderSize.constEnd(); ++it) {
+            if (it.key() & flag) {
+                result += it.value();
+            }
+        }
+
+        return result;
+    }
 
     int numberOf(const FileStatuses flag) const
     {
-        //if (flag == FileStatus::FlagAvailable) // for proper display in a permanent status during the process
-        //    return numChecksums - numberOf(FileStatus::Missing);
-
         int result = 0;
         QHash<FileStatus, int>::const_iterator it;
 
-        for (it = holder.constBegin(); it != holder.constEnd(); ++it) {
+        for (it = holderNumber.constBegin(); it != holderNumber.constEnd(); ++it) {
             if (it.key() & flag)
                 result += it.value();
         }
