@@ -14,11 +14,11 @@ class TreeWidgetItem : public QTreeWidgetItem
 {
 public:
     TreeWidgetItem(QTreeWidget* parent) : QTreeWidgetItem(parent){}
-    enum Column {ColumnExtension, ColumnFilesNumber, ColumnTotalSize};
+    enum Column {ColumnType, ColumnFilesNumber, ColumnTotalSize};
 
     QString extension() const
     {
-        return data(ColumnExtension, Qt::DisplayRole).toString();
+        return data(ColumnType, Qt::DisplayRole).toString();
     }
 
     int filesNumber() const
@@ -33,17 +33,17 @@ public:
 
     void setChecked(bool checked)
     {
-        checked ? setCheckState(ColumnExtension, Qt::Checked) : setCheckState(ColumnExtension, Qt::Unchecked);
+        checked ? setCheckState(ColumnType, Qt::Checked) : setCheckState(ColumnType, Qt::Unchecked);
     }
 
     void setCheckBoxVisible(bool visible)
     {
-        visible ? setChecked(false) : setData(ColumnExtension, Qt::CheckStateRole, QVariant());
+        visible ? setChecked(false) : setData(ColumnType, Qt::CheckStateRole, QVariant());
     }
 
     bool isChecked()
     {
-        QVariant checkState = data(0, Qt::CheckStateRole);
+        QVariant checkState = data(ColumnType, Qt::CheckStateRole);
         return (checkState.isValid() && checkState == Qt::Checked);
     }
 

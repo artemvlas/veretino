@@ -18,7 +18,7 @@ DialogFolderContents::DialogFolderContents(const QString &folderPath, const QLis
 {
     ui->setupUi(this);
     setWindowIcon(IconProvider::iconVeretino());
-    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnExtension, 130);
+    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnType, 130);
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
 
@@ -84,11 +84,11 @@ void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
             icon = fileIcons.icon(QFileInfo("file." + extList.at(i).extension));
 
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
-        item->setData(TreeWidgetItem::ColumnExtension, Qt::DisplayRole, extList.at(i).extension);
+        item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, extList.at(i).extension);
         item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
-        item->setIcon(TreeWidgetItem::ColumnExtension, icon);
+        item->setIcon(TreeWidgetItem::ColumnType, icon);
         items.append(item);
     }
 }
@@ -178,11 +178,11 @@ void DialogFolderContents::handleDoubleClickedItem(QTreeWidgetItem *item)
         return;
     }
 
-    if (!item->data(TreeWidgetItem::ColumnExtension, Qt::CheckStateRole).isValid())
+    if (!item->data(TreeWidgetItem::ColumnType, Qt::CheckStateRole).isValid())
         return;
 
-    Qt::CheckState checkState = (item->checkState(TreeWidgetItem::ColumnExtension) == Qt::Unchecked) ? Qt::Checked : Qt::Unchecked;
-    item->setCheckState(TreeWidgetItem::ColumnExtension, checkState);
+    Qt::CheckState checkState = (item->checkState(TreeWidgetItem::ColumnType) == Qt::Unchecked) ? Qt::Checked : Qt::Unchecked;
+    item->setCheckState(TreeWidgetItem::ColumnType, checkState);
 }
 
 void DialogFolderContents::updateFilterExtensionsList()

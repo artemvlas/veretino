@@ -24,7 +24,7 @@
      </property>
      <column>
       <property name="text">
-       <string>Extension</string>
+       <string>Type</string>
       </property>
      </column>
      <column>

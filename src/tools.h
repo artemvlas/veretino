@@ -35,20 +35,13 @@ struct Settings {
 
     void addRecentFile(const QString &filePath)
     {
-        if (!recentFiles.contains(filePath))
-            recentFiles.prepend(filePath);
-        else if (recentFiles.size() > 1 && recentFiles.first() != filePath) { // move the recent file to the top
-            //recentFiles.move(recentFiles.indexOf(filePath), 0);
+        int ind = recentFiles.indexOf(filePath);
+        if (ind == -1)
+            recentFiles.prepend(filePath); // add to the top of the list
+        else if (ind > 0)
+            recentFiles.move(ind, 0); // move the recent file to the top
 
-            for (int i = 1; i < recentFiles.size(); ++i) {
-                if (recentFiles.at(i) == filePath) {
-                    recentFiles.move(i, 0);
-                    break;
-                }
-            }
-        }
-
-        if (recentFiles.size() > 10)
+        if (recentFiles.size() > 15)
             recentFiles.removeLast();
     }
 };
