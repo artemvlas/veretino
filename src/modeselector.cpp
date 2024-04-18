@@ -55,6 +55,7 @@ void ModeSelector::connectActions()
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
+    connect(actionProcessChecksumsNoFilter, &QAction::triggered, this, qOverload<>(&ModeSelector::processFolderChecksums));
     connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, qOverload<>(&ModeSelector::processFolderChecksums));
     connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
@@ -113,7 +114,8 @@ void ModeSelector::setActionsIcons()
     actionToHome->setIcon(iconProvider.icon(Icons::GoHome));
     actionCancel->setIcon(iconProvider.icon(Icons::Cancel));
     actionShowFolderContentsTypes->setIcon(iconProvider.icon(Icons::ChartPie));
-    //actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(Icons::Filter));
+    actionProcessChecksumsNoFilter->setIcon(iconProvider.icon(Icons::Folder));
+    actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(Icons::Filter));
     actionProcessChecksumsCustomFilter->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckFileByClipboardChecksum->setIcon(iconProvider.icon(Icons::Paste));
     actionProcessSha_toClipboard->setIcon(iconProvider.icon(Icons::Copy));
@@ -413,15 +415,21 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.filter = filter;
     metaData.databaseFilePath = paths::joinPath(metaData.workDir, databaseFileName);
 
-    if (!QFileInfo(metaData.databaseFilePath).isFile()) {
+    if (overwriteDbPrompt(metaData.databaseFilePath))
         emit processFolderSha(metaData);
-        return;
-    }
+    else
+        emit parseJsonFile(metaData.databaseFilePath);
+}
 
-    // if the folder already contains a database file with the same name, display a prompt
+bool ModeSelector::overwriteDbPrompt(const QString &dbFilePath)
+{
+    // if the folder already contains a database file with the same name, display the prompt
+    if (!QFileInfo(dbFilePath).isFile())
+        return true;
+
     QMessageBox msgBox(view_);
     msgBox.setWindowTitle("Existing database detected");
-    msgBox.setText(QString("The folder already contains the database file:\n%1").arg(databaseFileName));
+    msgBox.setText(QString("The folder already contains the database file:\n%1").arg(paths::basicName(dbFilePath)));
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Open);
@@ -429,16 +437,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     msgBox.button(QMessageBox::Save)->setText("Overwrite");
     int ret = msgBox.exec();
 
-    switch (ret) {
-        case QMessageBox::Open:
-            emit parseJsonFile(metaData.databaseFilePath);
-            break;
-        case QMessageBox::Save:
-            emit processFolderSha(metaData);
-            break;
-        default:
-            break;
-    }
+    return (ret == QMessageBox::Save);
 }
 
 void ModeSelector::processFolderFilteredChecksums()
@@ -548,12 +547,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addSeparator();
 
-                Icons iconPermFilter = settings_->filter.isFilterEnabled() ? Icons::Filter : Icons::Folder;
-                QString textPermFilter = settings_->filter.isFilterEnabled() ? "Calculate checksums [Permanent Filter]"
-                                                                             : "Calculate checksums [All Files]";
-                actionProcessChecksumsPermFilter->setText(textPermFilter);
-                actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(iconPermFilter));
-                viewContextMenu->addAction(actionProcessChecksumsPermFilter);
+                settings_->filter.isFilterEnabled() ? viewContextMenu->addAction(actionProcessChecksumsPermFilter)
+                                                    : viewContextMenu->addAction(actionProcessChecksumsNoFilter);
+
                 viewContextMenu->addAction(actionProcessChecksumsCustomFilter);
             }
             else if (isCurrentMode(File)) {
