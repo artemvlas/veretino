@@ -49,7 +49,7 @@ private:
                               bool finalProcess = true, bool isVerification = false); // <finalProcess> -->> whether it sends a process end signal or not
     int calculateChecksums(FileStatus status = FileStatus::Queued,
                            bool finalProcess = true);
-    int calculateChecksums(QModelIndex rootIndex,
+    int calculateChecksums(const QModelIndex &rootIndex,
                            FileStatus status = FileStatus::Queued,
                            bool finalProcess = true);
 

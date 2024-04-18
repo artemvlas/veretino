@@ -210,7 +210,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         return;
     }
 
-    dataMaintainer->changeFilesStatus({FileStatus::Added, FileStatus::Updated}, FileStatus::Matched, folderItemIndex);
+    dataMaintainer->changeFilesStatus((FileStatus::Added | FileStatus::Updated), FileStatus::Matched, folderItemIndex);
     calculateChecksums(folderItemIndex, FileStatus::NotChecked);
 
     if (canceled) {
@@ -323,17 +323,16 @@ int Manager::calculateChecksums(FileStatus status, bool finalProcess)
     return calculateChecksums(QModelIndex(), status, finalProcess);
 }
 
-int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool finalProcess)
+int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status, bool finalProcess)
 {
-    if (!dataMaintainer->data_) {
-        qDebug() << "Manager::calculateChecksums | No data";
+    if (!dataMaintainer->data_
+        || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_)) {
+
+        qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         if (finalProcess)
             emit processing(false);
         return 0;
     }
-
-    if (rootIndex.isValid() && rootIndex.model() == dataMaintainer->data_->proxyModel_)
-        rootIndex = dataMaintainer->data_->proxyModel_->mapToSource(rootIndex);
 
     int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);
@@ -357,13 +356,17 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
     connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
     connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
 
+    // checking whether this is a Calculation or Verification process
+    const FileStatus procStatus = (status & FileStatus::FlagAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
+    const QString procStatusText = (procStatus == FileStatus::Verifying) ? "Verifying" : "Calculating";
+
+    // process
     emit processing(true, true); // set processing view, show progress bar
 
     TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
-            FileStatus procStatus = TreeModel::hasChecksum(iter.index()) ? FileStatus::Verifying : FileStatus::Calculating;
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
             QString doneData;
@@ -373,7 +376,7 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                 doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize_), totalSizeReadable);
 
             emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
-                                      .arg(procStatus == FileStatus::Verifying ? "Verifying" : "Calculating")
+                                      .arg(procStatusText)
                                       .arg(doneNum + 1)
                                       .arg(numQueued)
                                       .arg(doneData));
@@ -388,7 +391,7 @@ int Manager::calculateChecksums(QModelIndex rootIndex, FileStatus status, bool f
                     if (status == FileStatus::New)
                         dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
 
-                    dataMaintainer->changeFilesStatus({FileStatus::Queued, FileStatus::Added}, status, rootIndex);
+                    dataMaintainer->changeFilesStatus((FileStatus::Queued | FileStatus::Added), status, rootIndex);
                 }
 
                 qDebug() << "Manager::calculateChecksums | CANCELED | Done" << doneNum;

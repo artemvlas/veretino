@@ -23,7 +23,7 @@ int algoStrLen(QCryptographicHash::Algorithm algo)
         case QCryptographicHash::Sha512:
             return 128;
         default:
-            qDebug() << "tools::algoStrLen | Wrong input algo:" << algo;
+            //qDebug() << "tools::algoStrLen | Wrong input algo:" << algo;
             return 0;
     }
 }
@@ -38,7 +38,7 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
         case 128:
             return QCryptographicHash::Sha512;
         default:
-            qDebug() << "tools::algorithmByStrLen | Wrong input strLen:" << strLen;
+            //qDebug() << "tools::algorithmByStrLen | Wrong input strLen:" << strLen;
             return QCryptographicHash::Sha256;
     }
 }
@@ -349,13 +349,13 @@ QString fileItemStatus(FileStatus status)
     return result;
 }
 
-QString coloredText(const bool ignore)
+QString coloredText(bool ignore)
 {
     QString color = ignore ? "red" : "green";
     return QString("color : %1").arg(color);
 }
 
-QString coloredText(const QString &className, const bool ignore)
+QString coloredText(const QString &className, bool ignore)
 {
     return QString("%1 { %2 }").arg(className, coloredText(ignore));
 }
