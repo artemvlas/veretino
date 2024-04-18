@@ -79,7 +79,7 @@ QString IconProvider::svgFilePath(FileStatus status) const
         break;
     }
 
-    return ":/icons/color/" + iconFileName;
+    return ":/icons/generic/" + iconFileName;
 }
 
 QString IconProvider::svgFilePath(Icons icon) const
@@ -187,5 +187,5 @@ QIcon IconProvider::icon(Icons icon) const
 
 QIcon IconProvider::iconVeretino()
 {
-    return QIcon(":/icons/color/veretino.svg");
+    return QIcon(":/icons/generic/veretino.svg");
 }
