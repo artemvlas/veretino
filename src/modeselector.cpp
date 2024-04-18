@@ -389,41 +389,50 @@ void ModeSelector::openBranchDb()
         openJsonDatabase(assumedPath);
 }
 
+QString ModeSelector::composeDbFilePath()
+{
+    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem) : QString();
+    QString databaseFileName = format::composeDbFileName(settings_->dbPrefix, folderName, settings_->dbFileExtension());
+
+    return paths::joinPath(view_->curPathFileSystem, databaseFileName);
+}
+
+void ModeSelector::processFolderFilteredChecksums()
+{
+    if (isSelectedCreateDb())
+        emit makeFolderContentsFilter(view_->curPathFileSystem);
+}
+
 void ModeSelector::processFolderChecksums()
 {
-    processFolderChecksums(settings_->filter);
+    if (isSelectedCreateDb())
+        processFolderChecksums(settings_->filter);
 }
 
 void ModeSelector::processFolderChecksums(const FilterRule &filter)
+{
+    MetaData metaData;
+    metaData.workDir = view_->curPathFileSystem;
+    metaData.algorithm = settings_->algorithm;
+    metaData.filter = filter;
+    metaData.databaseFilePath = composeDbFilePath();
+
+    emit processFolderSha(metaData);
+}
+
+bool ModeSelector::isSelectedCreateDb()
 {
     // if a very large folder is selected, the file system iteration (info about folder contents process) may continue for some time,
     // so cancelation is needed before starting a new process
     emit cancelProcess();
 
-    if (Files::isEmptyFolder(view_->curPathFileSystem)) {
-        QMessageBox messageBox;
-        messageBox.information(view_, "Empty folder", "Nothing to do.");
-        return;
-    }
-
-    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem) : QString();
-    QString databaseFileName = format::composeDbFileName(settings_->dbPrefix, folderName, settings_->dbFileExtension());
-
-    MetaData metaData;
-    metaData.workDir = view_->curPathFileSystem;
-    metaData.algorithm = settings_->algorithm;
-    metaData.filter = filter;
-    metaData.databaseFilePath = paths::joinPath(metaData.workDir, databaseFileName);
-
-    if (overwriteDbPrompt(metaData.databaseFilePath))
-        emit processFolderSha(metaData);
-    else
-        emit parseJsonFile(metaData.databaseFilePath);
+    return (emptyFolderPrompt() && overwriteDbPrompt());
 }
 
-bool ModeSelector::overwriteDbPrompt(const QString &dbFilePath)
+bool ModeSelector::overwriteDbPrompt()
 {
-    // if the folder already contains a database file with the same name, display the prompt
+    const QString dbFilePath = composeDbFilePath();
+
     if (!QFileInfo(dbFilePath).isFile())
         return true;
 
@@ -437,20 +446,21 @@ bool ModeSelector::overwriteDbPrompt(const QString &dbFilePath)
     msgBox.button(QMessageBox::Save)->setText("Overwrite");
     int ret = msgBox.exec();
 
+    if (ret == QMessageBox::Open)
+        emit parseJsonFile(dbFilePath);
+
     return (ret == QMessageBox::Save);
 }
 
-void ModeSelector::processFolderFilteredChecksums()
+bool ModeSelector::emptyFolderPrompt()
 {
-    emit cancelProcess();
-
     if (Files::isEmptyFolder(view_->curPathFileSystem)) {
-            QMessageBox messageBox;
-            messageBox.information(view_, "Empty folder", "Nothing to do.");
-            return;
+        QMessageBox messageBox;
+        messageBox.information(view_, "Empty folder", "Nothing to do.");
+        return false;
     }
 
-    emit makeFolderContentsFilter(view_->curPathFileSystem);
+    return true;
 }
 
 void ModeSelector::doWork()

@@ -51,7 +51,8 @@ public:
     void openJsonDatabase(const QString &filePath);
     void openBranchDb();
     bool processAbortPrompt();
-    bool overwriteDbPrompt(const QString &dbFilePath);
+    bool overwriteDbPrompt();
+    bool emptyFolderPrompt();
 
     //---->>>
     void procSumFile(QCryptographicHash::Algorithm algo);
@@ -145,6 +146,9 @@ private:
 
     void copyDataToClipboard(Column column);
     void setActionsIcons();
+
+    QString composeDbFilePath();
+    bool isSelectedCreateDb();
 
     Mode curMode = NoMode;
     bool isProcessing_ = false;
