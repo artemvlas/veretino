@@ -549,8 +549,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addSeparator();
 
                 Icons iconPermFilter = settings_->filter.isFilterEnabled() ? Icons::Filter : Icons::Folder;
-                if (settings_->filter.isFilterEnabled())
-                    actionProcessChecksumsPermFilter->setText("Calculate checksums [Permanent Filter]");
+                QString textPermFilter = settings_->filter.isFilterEnabled() ? "Calculate checksums [Permanent Filter]"
+                                                                             : "Calculate checksums [All Files]";
+                actionProcessChecksumsPermFilter->setText(textPermFilter);
                 actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(iconPermFilter));
                 viewContextMenu->addAction(actionProcessChecksumsPermFilter);
                 viewContextMenu->addAction(actionProcessChecksumsCustomFilter);
