@@ -1,5 +1,6 @@
 Veretino 0.3.10
 * The Permanent Filter now has preset templates.
+* The filter selection process has been improved.
 * "Folder Contents" dialog: the database/sha files have become unfilterable.
 
 Veretino 0.3.9

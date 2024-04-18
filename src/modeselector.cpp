@@ -55,8 +55,8 @@ void ModeSelector::connectActions()
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
-    connect(actionProcessContainedChecksums, &QAction::triggered, this, &ModeSelector::doWork);
-    connect(actionProcessFilteredChecksums, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
+    connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, qOverload<>(&ModeSelector::processFolderChecksums));
+    connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha1);});
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
@@ -113,8 +113,8 @@ void ModeSelector::setActionsIcons()
     actionToHome->setIcon(iconProvider.icon(Icons::GoHome));
     actionCancel->setIcon(iconProvider.icon(Icons::Cancel));
     actionShowFolderContentsTypes->setIcon(iconProvider.icon(Icons::ChartPie));
-    actionProcessContainedChecksums->setIcon(iconProvider.icon(Icons::FolderSync));
-    actionProcessFilteredChecksums->setIcon(iconProvider.icon(Icons::Filter));
+    //actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(Icons::Filter));
+    actionProcessChecksumsCustomFilter->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckFileByClipboardChecksum->setIcon(iconProvider.icon(Icons::Paste));
     actionProcessSha_toClipboard->setIcon(iconProvider.icon(Icons::Copy));
     actionOpenDatabase->setIcon(iconProvider.icon(Icons::Database));
@@ -466,7 +466,7 @@ void ModeSelector::doWork()
 
     switch (curMode) {
         case Folder:
-            processFolderChecksums();
+            processFolderFilteredChecksums();
             break;
         case File:
             emit processFileSha(view_->curPathFileSystem, settings_->algorithm);
@@ -547,8 +547,13 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addSeparator();
-                viewContextMenu->addAction(actionProcessContainedChecksums);
-                viewContextMenu->addAction(actionProcessFilteredChecksums);
+
+                Icons iconPermFilter = settings_->filter.isFilterEnabled() ? Icons::Filter : Icons::Folder;
+                if (settings_->filter.isFilterEnabled())
+                    actionProcessChecksumsPermFilter->setText("Calculate checksums [Permanent Filter]");
+                actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(iconPermFilter));
+                viewContextMenu->addAction(actionProcessChecksumsPermFilter);
+                viewContextMenu->addAction(actionProcessChecksumsCustomFilter);
             }
             else if (isCurrentMode(File)) {
                 viewContextMenu->addMenu(menuAlgorithm());

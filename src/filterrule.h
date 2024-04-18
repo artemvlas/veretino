@@ -17,6 +17,7 @@ public:
     void setFilter(const FilterMode filterMode, const QStringList &extensions);
     void clearFilter(); // set defaults
     bool isFilter(const FilterMode filterMode) const;
+    bool isFilterEnabled() const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
 
     FilterMode mode_ = NotSet;

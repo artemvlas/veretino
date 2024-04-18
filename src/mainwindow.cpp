@@ -279,7 +279,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
             msgBox.setText("File filtering is not set.");
             msgBox.setInformativeText("Continue for all files?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
-            msgBox.setDefaultButton(QMessageBox::Abort);
+            msgBox.setDefaultButton(QMessageBox::Yes);
             msgBox.setIcon(QMessageBox::Question);
             msgBox.button(QMessageBox::Yes)->setText("Continue");
 

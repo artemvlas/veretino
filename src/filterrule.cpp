@@ -35,6 +35,11 @@ bool FilterRule::isFilter(const FilterMode filterMode) const
     return (filterMode == mode_);
 }
 
+bool FilterRule::isFilterEnabled() const
+{
+    return !isFilter(NotSet);
+}
+
 bool FilterRule::isFileAllowed(const QString &filePath) const
 {
     if (!isFilter(Include)) {

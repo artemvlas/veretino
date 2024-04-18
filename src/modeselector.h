@@ -83,8 +83,8 @@ public:
     QAction *actionToHome = new QAction("to Home", this);
     QAction *actionCancel = new QAction("Cancel", this);
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);
-    QAction *actionProcessContainedChecksums = new QAction("Calculate checksums", this);
-    QAction *actionProcessFilteredChecksums = new QAction("Calculate checksums of Filtered files", this);
+    QAction *actionProcessChecksumsPermFilter = new QAction("Calculate checksums [All Files]", this);
+    QAction *actionProcessChecksumsCustomFilter = new QAction("Calculate checksums", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
     QAction *actionProcessSha_toClipboard = new QAction("Calculate checksum → Clipboard", this);
     QAction *actionProcessSha1File = new QAction("SHA-1 → *.sha1", this);
