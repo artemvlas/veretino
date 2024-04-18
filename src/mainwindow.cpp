@@ -447,6 +447,8 @@ QString MainWindow::getDatabaseStatusSummary()
 
     const Numbers &numbers = ui->treeView->data_->numbers;
     QString checkStatus;
+    static QString availNumber;
+    static QString availSize;
 
     if (!modeSelect->isProcessing()) {
         QString newmissing;
@@ -466,14 +468,16 @@ QString MainWindow::getDatabaseStatusSummary()
             sep = " : ";
 
         checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
+
+        // update only if the process is not running (there are no files with the "queued" status)
+        availNumber = QString("%1 avail.").arg(numbers.numberOf(FileStatus::FlagAvailable));
+        availSize = format::dataSizeReadable(numbers.totalSize(FileStatus::FlagAvailable));
     }
 
-    FileStatuses flagAvailDuringProc = (FileStatus::FlagAvailable | FileStatus::FlagProcessing);
-
-    return QString("%1%2 avail. | %3 | %4")
-                    .arg(checkStatus) // %1
-                    .arg(numbers.numberOf(flagAvailDuringProc)) // %2
-                    .arg(format::dataSizeReadable(numbers.totalSize(flagAvailDuringProc)), // %3
+    return QString("%1%2 | %3 | %4")
+                    .arg(checkStatus, // %1
+                         availNumber, // %2
+                         availSize, // %3
                          format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
 }
 
