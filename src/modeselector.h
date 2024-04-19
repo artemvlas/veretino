@@ -44,10 +44,10 @@ public:
     // tasks execution
     void quickAction();
     void doWork();
-    void processFolderChecksumsNoFilter();
-    void processFolderChecksumsPermFilter();
+    void processChecksumsNoFilter();
+    void processChecksumsPermFilter();
+    void processChecksumsFiltered();
     void processFolderChecksums(const FilterRule &filter);
-    void processFolderFilteredChecksums();
     void openFsPath(const QString &path);
     void openJsonDatabase(const QString &filePath);
     void openBranchDb();

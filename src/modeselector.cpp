@@ -55,9 +55,9 @@ void ModeSelector::connectActions()
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
-    connect(actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processFolderChecksumsNoFilter);
-    connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processFolderChecksumsPermFilter);
-    connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
+    connect(actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
+    connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processChecksumsPermFilter);
+    connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processChecksumsFiltered);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, &ModeSelector::checkFileByClipboardChecksum);
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha1);});
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
@@ -397,19 +397,19 @@ QString ModeSelector::composeDbFilePath()
     return paths::joinPath(view_->curPathFileSystem, databaseFileName);
 }
 
-void ModeSelector::processFolderFilteredChecksums()
+void ModeSelector::processChecksumsFiltered()
 {
     if (isSelectedCreateDb())
         emit makeFolderContentsFilter(view_->curPathFileSystem);
 }
 
-void ModeSelector::processFolderChecksumsNoFilter()
+void ModeSelector::processChecksumsNoFilter()
 {
     if (isSelectedCreateDb())
         processFolderChecksums(FilterRule());
 }
 
-void ModeSelector::processFolderChecksumsPermFilter()
+void ModeSelector::processChecksumsPermFilter()
 {
     if (isSelectedCreateDb())
         processFolderChecksums(settings_->filter);
@@ -481,7 +481,7 @@ void ModeSelector::doWork()
 
     switch (curMode) {
         case Folder:
-            processFolderFilteredChecksums();
+            processChecksumsFiltered();
             break;
         case File:
             emit processFileSha(view_->curPathFileSystem, settings_->algorithm);
