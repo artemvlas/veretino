@@ -60,7 +60,7 @@ public:
     void verifyItem();
     void verifyDb();
     void showFolderContentTypes();
-    void checkFileChecksum(const QString &checkSum);
+    void checkFileByClipboardChecksum();
     void copyItem();
 
     void showFileSystem();

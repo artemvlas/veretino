@@ -58,7 +58,7 @@ void ModeSelector::connectActions()
     connect(actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processFolderChecksumsNoFilter);
     connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processFolderChecksumsPermFilter);
     connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
-    connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
+    connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, &ModeSelector::checkFileByClipboardChecksum);
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha1);});
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
     connect(actionProcessSha512File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha512);});
@@ -323,9 +323,9 @@ void ModeSelector::showFolderContentTypes()
     emit makeFolderContentsList(view_->curPathFileSystem);
 }
 
-void ModeSelector::checkFileChecksum(const QString &checkSum)
+void ModeSelector::checkFileByClipboardChecksum()
 {
-    emit checkFile(view_->curPathFileSystem, checkSum);
+    emit checkFile(view_->curPathFileSystem, QGuiApplication::clipboard()->text());
 }
 
 void ModeSelector::copyItem()
