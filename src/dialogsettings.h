@@ -51,7 +51,7 @@ private:
     const QStringList listPresetPictures = {"jpg", "jpeg", "png", "svg", "webp"};
     const QStringList listPresetMusic = {"flac", "wv", "ape", "oga", "ogg", "opus", "m4a", "mp3"};
     const QStringList listPresetVideos = {"mkv", "webm", "mp4", "m4v", "avi"};
-    const QStringList listPresetIgnoreTriflings = {"log", "cue", "m3u", "json"};
+    const QStringList listPresetIgnoreTriflings = {"log", "cue", "txt"};
 };
 
 #endif // DIALOGSETTINGS_H

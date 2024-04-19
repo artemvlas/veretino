@@ -44,7 +44,8 @@ public:
     // tasks execution
     void quickAction();
     void doWork();
-    void processFolderChecksums();
+    void processFolderChecksumsNoFilter();
+    void processFolderChecksumsPermFilter();
     void processFolderChecksums(const FilterRule &filter);
     void processFolderFilteredChecksums();
     void openFsPath(const QString &path);

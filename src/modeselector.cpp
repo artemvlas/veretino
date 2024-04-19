@@ -55,8 +55,8 @@ void ModeSelector::connectActions()
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
     connect(actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
     connect(actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
-    connect(actionProcessChecksumsNoFilter, &QAction::triggered, this, qOverload<>(&ModeSelector::processFolderChecksums));
-    connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, qOverload<>(&ModeSelector::processFolderChecksums));
+    connect(actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processFolderChecksumsNoFilter);
+    connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processFolderChecksumsPermFilter);
     connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processFolderFilteredChecksums);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, [=]{checkFileChecksum(QGuiApplication::clipboard()->text());});
     connect(actionProcessSha1File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha1);});
@@ -403,7 +403,13 @@ void ModeSelector::processFolderFilteredChecksums()
         emit makeFolderContentsFilter(view_->curPathFileSystem);
 }
 
-void ModeSelector::processFolderChecksums()
+void ModeSelector::processFolderChecksumsNoFilter()
+{
+    if (isSelectedCreateDb())
+        processFolderChecksums(FilterRule());
+}
+
+void ModeSelector::processFolderChecksumsPermFilter()
 {
     if (isSelectedCreateDb())
         processFolderChecksums(settings_->filter);
@@ -557,9 +563,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addSeparator();
 
-                settings_->filter.isFilterEnabled() ? viewContextMenu->addAction(actionProcessChecksumsPermFilter)
-                                                    : viewContextMenu->addAction(actionProcessChecksumsNoFilter);
-
+                viewContextMenu->addAction(actionProcessChecksumsNoFilter);
+                if (settings_->filter.isFilterEnabled())
+                    viewContextMenu->addAction(actionProcessChecksumsPermFilter);
                 viewContextMenu->addAction(actionProcessChecksumsCustomFilter);
             }
             else if (isCurrentMode(File)) {
