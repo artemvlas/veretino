@@ -162,7 +162,7 @@ void MainWindow::connectManager()
     // change view
     connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
-    connect(modeSelect, &ModeSelector::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
+    connect(modeSelect, &ModeSelector::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData, Qt::BlockingQueuedConnection);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
     connect(ui->treeView, &View::dataSetted, this, [=]{if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.databaseFilePath);});
