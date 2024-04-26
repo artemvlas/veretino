@@ -165,7 +165,7 @@ void ModeSelector::processing(bool isProcessing)
 
 void ModeSelector::prepareView()
 {
-    if (view_->currentViewModel() == ModelView::ModelProxy) {
+    if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
         view_->disableFilter(); // if proxy model filtering is enabled, starting a Big Data queuing/verification may be very slow,
                                 // even if switching to Source Model, so disable filtering first
 

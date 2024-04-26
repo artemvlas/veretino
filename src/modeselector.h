@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QMenu>
 #include <QAction>
+#include <QActionGroup>
 #include <QPushButton>
 #include "view.h"
 #include "iconprovider.h"

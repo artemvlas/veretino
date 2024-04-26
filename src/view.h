@@ -19,9 +19,16 @@ class View : public QTreeView
     Q_OBJECT
 public:
     explicit View(QWidget *parent = nullptr);
-    enum ModelView {NotSetted, FileSystem, ModelSource, ModelProxy};
-    enum ColumnFileSystem {ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified};
+    enum ModelView {
+        NotSetted,
+        FileSystem,
+        ModelSource,
+        ModelProxy = 4,
+        ModelDb = ModelSource | ModelProxy
+    };
     Q_ENUM(ModelView)
+
+    enum ColumnFileSystem {ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified};   
 
     ModelView currentViewModel();
     bool isCurrentViewModel(const ModelView modelView);

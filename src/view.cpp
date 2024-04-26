@@ -63,12 +63,12 @@ void View::setFileSystemModel()
 
 void View::setTreeModel(ModelView modelSel)
 {
-    if (!data_ || (modelSel != ModelSource && modelSel != ModelProxy)) {
+    if (!data_ || !(modelSel & ModelDb)) {
         setFileSystemModel();
         return;
     }
 
-    if (modelSel == currentViewModel())
+    if (isCurrentViewModel(modelSel))
         return; // if the current model remains the same
 
     oldSelectionModel_ = selectionModel();
@@ -220,7 +220,7 @@ bool View::isViewFileSystem()
 
 bool View::isViewDatabase()
 {
-    return isCurrentViewModel(ModelProxy) || isCurrentViewModel(ModelSource);
+    return ModelDb & currentViewModel();
 }
 
 bool View::isViewFiltered()
