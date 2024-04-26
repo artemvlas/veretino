@@ -93,7 +93,8 @@ QString basicName(const QString &path)
         return QString("Drive_%1").arg(path.at(0).toUpper());
 
     // #1 impl.
-    QStringList components = path.split(QRegExp("[/\\\\]"), Qt::SkipEmptyParts);
+    QChar pathSep = path.contains('\\') ? '\\' : '/';
+    QStringList components = path.split(pathSep, Qt::SkipEmptyParts);
     return components.isEmpty() ? QString() : components.last();
 
     // #2 impl. (for single '/' only)
