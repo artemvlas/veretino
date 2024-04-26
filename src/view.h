@@ -75,6 +75,7 @@ signals:
     void pathChanged(const QString &path);
     void modelChanged(ModelView modelView);
     void dataSetted();
+    void switchedToFs();
     void showDbStatus();
     void showMessage(const QString &text, const QString &title = "Info");
     void keyEnterPressed();

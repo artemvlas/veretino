@@ -175,7 +175,6 @@ signals:
     void makeFolderContentsFilter(const QString &folderPath);
     void branchSubfolder(const QModelIndex &subfolder);
     void makeSumFile(const QString &originFilePath, const QString &checksum);
-    void switchedToFs();
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

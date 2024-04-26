@@ -57,6 +57,8 @@ void View::setFileSystemModel()
         header()->restoreState(headerStateFs);
 
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
+
+    QTimer::singleShot(100, this, &View::switchedToFs);
 }
 
 void View::setTreeModel(ModelView modelSel)
@@ -104,7 +106,7 @@ void View::setData(DataContainer *data)
     else
         setTreeModel(ModelView::ModelSource);
 
-    emit dataSetted();
+    QTimer::singleShot(100, this, &View::dataSetted);
 }
 
 void View::changeCurIndexAndPath(const QModelIndex &curIndex)

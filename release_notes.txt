@@ -1,3 +1,6 @@
+Veretino 0.3.11
+* Improved stability when switching databases.
+
 Veretino 0.3.10
 * Improved filter creation/selection.
 * The Permanent Filter now has preset templates.
