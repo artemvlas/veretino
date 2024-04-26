@@ -185,16 +185,49 @@ void ModeSelector::setMode()
         return;
     }
 
-    if (view_->isViewFileSystem())
-        selectMode(view_->curPathFileSystem);
-    else if (view_->isViewDatabase())
-        selectMode(view_->data_->numbers);
-    else {
+    if (view_->isCurrentViewModel(ModelView::NotSetted)) {
         qDebug() << "ModeSelector | Insufficient data to set mode";
         return;
     }
 
+    if (view_->isViewFileSystem()) {
+        curMode = selectMode(view_->curPathFileSystem);
+        emit getPathInfo(view_->curPathFileSystem);
+    }
+    else if (view_->isViewDatabase()) {
+        curMode = selectMode(view_->data_->numbers);
+        emit getIndexInfo(view_->curIndexSource);
+    }
+
     setButtonInfo();
+}
+
+Mode ModeSelector::selectMode(const QString &path)
+{
+    QFileInfo pathInfo(path);
+
+    if (pathInfo.isDir())
+        return Folder;
+    else if (pathInfo.isFile()) {
+        if (tools::isDatabaseFile(path))
+            return DbFile;
+        else if (tools::isSummaryFile(path))
+            return SumFile;
+        else
+            return File;
+    }
+    else
+        return curMode;
+}
+
+Mode ModeSelector::selectMode(const Numbers &numbers)
+{
+    if (numbers.contains(FileStatus::Mismatched))
+        return UpdateMismatch;
+    else if (numbers.contains(FileStatus::FlagNewLost))
+        return ModelNewLost;
+    else
+        return Model;
 }
 
 void ModeSelector::setButtonInfo()
@@ -242,38 +275,6 @@ void ModeSelector::setButtonInfo()
         qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode;
         break;
     }
-}
-
-Mode ModeSelector::selectMode(const QString &path)
-{
-    QFileInfo pathInfo(path);
-
-    if (pathInfo.isDir())
-        curMode = Folder;
-    else if (pathInfo.isFile()) {
-        if (tools::isDatabaseFile(path))
-            curMode = DbFile;
-        else if (tools::isSummaryFile(path))
-            curMode = SumFile;
-        else
-            curMode = File;
-    }
-
-    emit getPathInfo(path);
-    return curMode;
-}
-
-Mode ModeSelector::selectMode(const Numbers &numbers)
-{
-    if (numbers.contains(FileStatus::Mismatched))
-        curMode = UpdateMismatch;
-    else if (numbers.contains(FileStatus::FlagNewLost))
-        curMode = ModelNewLost;
-    else
-        curMode = Model;
-
-    emit getIndexInfo(view_->curIndexSource);
-    return curMode;
 }
 
 Mode ModeSelector::currentMode()
