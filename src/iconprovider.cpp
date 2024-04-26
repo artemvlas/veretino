@@ -33,6 +33,15 @@ QString IconProvider::themeFolder() const
     return (theme_ == Dark) ? "dark" : "light";
 }
 
+void IconProvider::makeCache()
+{
+    for (int i = 1; i < 4096; i *= 2) {
+        FileStatus status = static_cast<FileStatus>(i);
+        cacheFileStatus.insert(status, QIcon(svgFilePath(status)));
+    }
+    //qDebug() << "IconProvider::makeCache |" << cacheFileStatus.keys();
+}
+
 QString IconProvider::svgFilePath(FileStatus status) const
 {
     QString iconFileName;
@@ -177,7 +186,7 @@ QString IconProvider::svgFilePath(Icons icon) const
 
 QIcon IconProvider::icon(FileStatus status) const
 {
-    return QIcon(svgFilePath(status));
+    return cacheFileStatus.contains(status) ? cacheFileStatus.value(status) : QIcon(svgFilePath(status));
 }
 
 QIcon IconProvider::icon(Icons icon) const
