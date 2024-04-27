@@ -48,7 +48,6 @@ public:
 
     void setTheme(Theme theme);
     void setTheme(const QPalette &palette);
-    void makeCache();
 
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons icon) const;
@@ -60,7 +59,7 @@ private:
     QString svgFilePath(FileStatus status) const;
     QString svgFilePath(Icons icon) const;
 
-    QHash<FileStatus, QIcon> cacheFileStatus;
+    static QHash<FileStatus, QIcon> cacheFileStatus;
     Theme theme_ = Light;
 };
 

@@ -5,6 +5,8 @@
 */
 #include "iconprovider.h"
 
+QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
+
 IconProvider::IconProvider() {}
 
 IconProvider::IconProvider(const QPalette &palette)
@@ -33,62 +35,53 @@ QString IconProvider::themeFolder() const
     return (theme_ == Dark) ? "dark" : "light";
 }
 
-void IconProvider::makeCache()
-{
-    for (int i = 1; i < 4096; i *= 2) {
-        FileStatus status = static_cast<FileStatus>(i);
-        cacheFileStatus.insert(status, QIcon(svgFilePath(status)));
-    }
-    //qDebug() << "IconProvider::makeCache |" << cacheFileStatus.keys();
-}
-
 QString IconProvider::svgFilePath(FileStatus status) const
 {
     QString iconFileName;
 
     switch (status) {
     case FileStatus::Queued:
-        iconFileName = "queued.svg";
+        iconFileName = "queued";
         break;
     case FileStatus::Calculating:
-        iconFileName = "processing.svg";
+        iconFileName = "processing";
         break;
     case FileStatus::Verifying:
-        iconFileName = "processing.svg";
+        iconFileName = "processing";
         break;
     case FileStatus::NotChecked:
-        iconFileName = "notchecked.svg";
+        iconFileName = "notchecked";
         break;
     case FileStatus::Matched:
-        iconFileName = "matched.svg";
+        iconFileName = "matched";
         break;
     case FileStatus::Mismatched:
-        iconFileName = "mismatched.svg";
+        iconFileName = "mismatched";
         break;
     case FileStatus::New:
-        iconFileName = "new.svg";
+        iconFileName = "new";
         break;
     case FileStatus::Missing:
-        iconFileName = "missing.svg";
+        iconFileName = "missing";
         break;
     case FileStatus::Unreadable:
-        iconFileName = "unknown.svg";
+        iconFileName = "unknown";
         break;
     case FileStatus::Added:
-        iconFileName = "added.svg";
+        iconFileName = "added";
         break;
     case Files::Removed:
-        iconFileName = "removed.svg";
+        iconFileName = "removed";
         break;
     case FileStatus::Updated:
-        iconFileName = "update.svg";
+        iconFileName = "update";
         break;
     default:
-        iconFileName = "unknown.svg";
+        iconFileName = "unknown";
         break;
     }
 
-    return ":/icons/generic/" + iconFileName;
+    return QString(":/icons/generic/%1.svg").arg(iconFileName);
 }
 
 QString IconProvider::svgFilePath(Icons icon) const
@@ -97,96 +90,103 @@ QString IconProvider::svgFilePath(Icons icon) const
 
     switch (icon) {
     case AddFork:
-        iconFileName = "add-fork.svg";
+        iconFileName = "add-fork";
         break;
     case Backup:
-        iconFileName = "backup.svg";
+        iconFileName = "backup";
         break;
     case Branch:
-        iconFileName = "branch.svg";
+        iconFileName = "branch";
         break;
     case Cancel:
-        iconFileName = "cancel.svg";
+        iconFileName = "cancel";
         break;
     case ChartPie:
-        iconFileName = "chart-pie.svg";
+        iconFileName = "chart-pie";
         break;
     case ClearHistory:
-        iconFileName = "clear-history.svg";
+        iconFileName = "clear-history";
         break;
     case Clock:
-        iconFileName = "clock.svg";
+        iconFileName = "clock";
         break;
     case Configure:
-        iconFileName = "configure.svg";
+        iconFileName = "configure";
         break;
     case Copy:
-        iconFileName = "copy.svg";
+        iconFileName = "copy";
         break;
     case Database:
-        iconFileName = "database.svg";
+        iconFileName = "database";
         break;
     case DocClose:
-        iconFileName = "document-close.svg";
+        iconFileName = "document-close";
         break;
     case DoubleGear:
-        iconFileName = "double-gear.svg";
+        iconFileName = "double-gear";
         break;
     case FileSystem:
-        iconFileName = "filesystem.svg";
+        iconFileName = "filesystem";
         break;
     case Filter:
-        iconFileName = "filter.svg";
+        iconFileName = "filter";
         break;
     case Folder:
-        iconFileName = "folder.svg";
+        iconFileName = "folder";
         break;
     case FolderSync:
-        iconFileName = "folder-sync.svg";
+        iconFileName = "folder-sync";
         break;
     case Gear:
-        iconFileName = "gear.svg";
+        iconFileName = "gear";
         break;
     case GoHome:
-        iconFileName = "go-home.svg";
+        iconFileName = "go-home";
         break;
     case HashFile:
-        iconFileName = "hash-file.svg";
+        iconFileName = "hash-file";
         break;
     case NewFile:
-        iconFileName = "newfile.svg";
+        iconFileName = "newfile";
         break;
     case Paste:
-        iconFileName = "paste.svg";
+        iconFileName = "paste";
         break;
     case ProcessStop:
-        iconFileName = "process-stop.svg";
+        iconFileName = "process-stop";
         break;
     case Save:
-        iconFileName = "save.svg";
+        iconFileName = "save";
         break;
     case Scan:
-        iconFileName = "scan.svg";
+        iconFileName = "scan";
         break;
     case Start:
-        iconFileName = "start.svg";
+        iconFileName = "start";
         break;
     case Undo:
-        iconFileName = "undo.svg";
+        iconFileName = "undo";
         break;
     case Update:
-        iconFileName = "update.svg";
+        iconFileName = "update";
         break;
     default:
         return QString();
     }
 
-    return QString(":/icons/%1/%2").arg(themeFolder(), iconFileName);
+    return QString(":/icons/%1/%2.svg").arg(themeFolder(), iconFileName);
 }
 
 QIcon IconProvider::icon(FileStatus status) const
 {
-    return cacheFileStatus.contains(status) ? cacheFileStatus.value(status) : QIcon(svgFilePath(status));
+    if (cacheFileStatus.contains(status)) {
+        return cacheFileStatus.value(status);
+    }
+    else {
+        QIcon ico = QIcon(svgFilePath(status));
+        cacheFileStatus.insert(status, ico);
+        return ico;
+    }
 }
 
 QIcon IconProvider::icon(Icons icon) const

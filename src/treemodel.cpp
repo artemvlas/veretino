@@ -12,7 +12,6 @@ TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
     rootItem = new TreeItem({"Name", "Size", "Status", "Checksum", "ReChecksum"});
-    icons_.makeCache();
 }
 
 TreeModel::~TreeModel()
