@@ -1,4 +1,4 @@
-Veretino 0.3.11 (dev)
+Veretino 0.3.11
 * Improved stability when switching databases.
 * Improved performance and UI responsiveness.
 
