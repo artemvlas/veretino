@@ -369,11 +369,8 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
         if (iter.nextFile().status() == FileStatus::Queued) {
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
-            QString doneData;
-            if (state.doneSize_ == 0)
-                doneData = QString("(%1)").arg(totalSizeReadable);
-            else
-                doneData = QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize_), totalSizeReadable);
+            QString doneData = (state.doneSize() == 0) ? QString("(%1)").arg(totalSizeReadable)
+                                                       : QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize()), totalSizeReadable);
 
             emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
                                       .arg(procStatusText)

@@ -14,9 +14,7 @@ class ProcState : public QObject
     Q_OBJECT
 public:
     explicit ProcState(qint64 totalSize, QObject *parent = nullptr);
-
-    qint64 totalSize_ = 0; // total data size
-    qint64 doneSize_ = 0;
+    qint64 doneSize();
 
 public slots:
     void doneChunk(int chunk);
@@ -34,6 +32,9 @@ private:
     qint64 prevDoneSize;
     qint64 pieceTime;
     qint64 pieceSize;
+
+    qint64 totalSize_ = 0; // total data size
+    qint64 doneSize_ = 0;
 
 signals:
     void donePercents(int perc);

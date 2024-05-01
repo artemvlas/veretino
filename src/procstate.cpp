@@ -17,6 +17,11 @@ void ProcState::doneChunk(int chunk)
     toPercents(chunk);
 }
 
+qint64 ProcState::doneSize()
+{
+    return doneSize_;
+}
+
 void ProcState::start()
 {
     prevTimePassed = 0;
@@ -36,6 +41,9 @@ void ProcState::curStatus(int percDone)
 
 void ProcState::toPercents(int bytes)
 {
+    if (totalSize_ == 0)
+        return;
+
     if (doneSize_ == 0)
         emit donePercents(0); // initial 0 to reset progressbar value
 
