@@ -296,9 +296,9 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     ShaCalculator shaCalc(algo);
 
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
-    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
-    connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
-    connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
+    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::addChunk);
+    connect(&state, &ProcState::percentageChanged, this, &Manager::donePercents);
+    connect(&state, &ProcState::progressInfoChanged, this, &Manager::procStatus);
 
     emit processing(true, true);
     emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
@@ -352,9 +352,9 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
     int doneNum = 0;
 
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
-    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::doneChunk);
-    connect(&state, &ProcState::donePercents, this, &Manager::donePercents);
-    connect(&state, &ProcState::procStatus, this, &Manager::procStatus);
+    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::addChunk);
+    connect(&state, &ProcState::percentageChanged, this, &Manager::donePercents);
+    connect(&state, &ProcState::progressInfoChanged, this, &Manager::procStatus);
 
     // checking whether this is a Calculation or Verification process
     const FileStatus procStatus = (status & FileStatus::FlagAvailable) ? FileStatus::Verifying : FileStatus::Calculating;

@@ -17,14 +17,14 @@ public:
     qint64 doneSize();
 
 public slots:
-    void doneChunk(int chunk);
+    void addChunk(int chunk);
 
 private:
-    void start();
-    void curStatus(int percDone);
-    void toPercents(int bytes); // add this processed piece, calculate total done size and emit donePercents()
-    QString calcLeftTime(const int percentsDone);
-    QString calcSpeed(int percDone);
+    void startProgress();
+    void sendProgressInfo(int percDone); // get progress info and emit ::progressInfoChanged
+    void toPercents(int bytes); // add this processed piece, calculate total done size and emit ::percentageChanged
+    QString progTimeLeft();
+    QString progSpeed();
     void donePiece();
 
     QElapsedTimer elapsedTimer;
@@ -37,8 +37,8 @@ private:
     qint64 doneSize_ = 0;
 
 signals:
-    void donePercents(int perc);
-    void procStatus(const QString &str);
+    void percentageChanged(int perc);
+    void progressInfoChanged(const QString &str);
 };
 
 #endif // PROCSTATE_H

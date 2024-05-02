@@ -9,10 +9,10 @@
 ProcState::ProcState(qint64 totalSize, QObject *parent)
     : QObject{parent}, totalSize_(totalSize)
 {
-    connect(this, &ProcState::donePercents, this, &ProcState::curStatus);
+    connect(this, &ProcState::percentageChanged, this, &ProcState::sendProgressInfo);
 }
 
-void ProcState::doneChunk(int chunk)
+void ProcState::addChunk(int chunk)
 {
     toPercents(chunk);
 }
@@ -22,20 +22,22 @@ qint64 ProcState::doneSize()
     return doneSize_;
 }
 
-void ProcState::start()
+void ProcState::startProgress()
 {
     prevTimePassed = 0;
     prevDoneSize = 0;
     elapsedTimer.start();
 }
 
-void ProcState::curStatus(int percDone)
+void ProcState::sendProgressInfo(int percDone)
 {
     if (percDone == 0)
-        start();
+        startProgress();
     else {
         donePiece();
-        emit procStatus(QString("%1% | %2 | %3").arg(percDone).arg(calcSpeed(percDone), calcLeftTime(percDone)));
+        emit progressInfoChanged(QString("%1% | %2 | %3")
+                                     .arg(percDone)
+                                     .arg(progSpeed(), progTimeLeft()));
     }
 }
 
@@ -45,7 +47,7 @@ void ProcState::toPercents(int bytes)
         return;
 
     if (doneSize_ == 0)
-        emit donePercents(0); // initial 0 to reset progressbar value
+        emit percentageChanged(0); // initial 0 to reset progressbar value
 
     int lastPerc = (doneSize_ * 100) / totalSize_; // before current chunk added
 
@@ -53,35 +55,28 @@ void ProcState::toPercents(int bytes)
     int curPerc = (doneSize_ * 100) / totalSize_; // after
 
     if (curPerc > lastPerc)
-        emit donePercents(curPerc);
+        emit percentageChanged(curPerc);
 }
 
-QString ProcState::calcLeftTime(const int percentsDone)
-{
-    if (percentsDone == 0) {
-        start();
-        return QString();
-    }
-
-    //qint64 timePassed = elapsedTimer.elapsed();
-    //int leftPercents = 100 - percentsDone;
-    //qint64 timeleft = (timePassed / percentsDone) * leftPercents;
-
-    qint64 timeleft = ((totalSize_ - doneSize_) / pieceSize) * pieceTime;
-
-    return format::millisecToReadable(timeleft, true);
-}
-
-QString ProcState::calcSpeed(int percDone)
+QString ProcState::progTimeLeft()
 {
     QString result;
 
-    if (percDone == 0) {
-        start();
+    if (pieceSize > 0) {
+        qint64 timeleft = ((totalSize_ - doneSize_) / pieceSize) * pieceTime;
+        result = format::millisecToReadable(timeleft, true);
     }
-    else {
-        if (pieceTime > 0)
-            result = QString("%1/sec").arg(format::dataSizeReadable((pieceSize / pieceTime) * 1000)); // bytes per second
+
+    return result;
+}
+
+QString ProcState::progSpeed()
+{
+    QString result;
+
+    if (pieceTime > 0) {
+        result = QString("%1/sec")
+                 .arg(format::dataSizeReadable((pieceSize / pieceTime) * 1000));
     }
 
     return result;
