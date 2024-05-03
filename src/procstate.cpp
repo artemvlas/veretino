@@ -31,7 +31,6 @@ qint64 ProcState::doneSize() const
 
 void ProcState::startProgress()
 {
-    prevTimePassed = 0;
     prevDoneSize = 0;
     elapsedTimer.start();
     emit percentageChanged(0); // initial 0 to reset progressbar value
@@ -55,9 +54,8 @@ void ProcState::toPercents(int bytes)
 
 void ProcState::updateDonePiece()
 {
-    pieceTime = elapsedTimer.elapsed() - prevTimePassed; // milliseconds
+    pieceTime = elapsedTimer.restart();
     pieceSize = doneSize_ - prevDoneSize;
-    prevTimePassed += pieceTime;
     prevDoneSize += pieceSize;
 }
 

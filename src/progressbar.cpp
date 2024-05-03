@@ -18,8 +18,9 @@ void ProgressBar::setProcState(const ProcState *proc)
 
 void ProgressBar::updateProgressInfo()
 {
-    if (procState_)
+    if (procState_) {
         setFormat(QString("%1% | %2 | %3")
                       .arg(value())
                       .arg(procState_->progSpeed(), procState_->progTimeLeft()));
+    }
 }

@@ -29,9 +29,8 @@ private:
     void toPercents(int bytes); // add this processed piece, calculate total done size and emit ::percentageChanged
 
     QElapsedTimer elapsedTimer;
-    qint64 prevTimePassed;
     qint64 prevDoneSize;
-    qint64 pieceTime;
+    qint64 pieceTime; // milliseconds
     qint64 pieceSize;
 
     qint64 totalSize_ = 0; // total data size
