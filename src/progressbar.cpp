@@ -4,6 +4,7 @@
  * https://github.com/artemvlas/veretino
 */
 #include "progressbar.h"
+#include "tools.h"
 
 ProgressBar::ProgressBar(QWidget *parent)
     : QProgressBar(parent)
@@ -11,25 +12,60 @@ ProgressBar::ProgressBar(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &ProgressBar::updateProgressInfo);
 }
 
-void ProgressBar::setProcState(ProcState *proc)
+void ProgressBar::setProcState(const ProcState *proc)
 {
     procState_ = proc;
+}
+
+void ProgressBar::setProgEnabled(bool enabled)
+{
+    if (enabled) {
+        timer->start(1000);
+        elapsedTimer.start();
+    }
+    else
+        timer->stop();
+
+    resetFormat();
+    setValue(0);
+    setVisible(enabled);
 }
 
 void ProgressBar::updateProgressInfo()
 {
     if (procState_) {
-        procState_->updateDonePiece();
+        updateDonePiece();
         setFormat(QString("%p% | %1 | %2")
-                      .arg(procState_->progSpeed(), procState_->progTimeLeft()));
+                      .arg(progSpeed(), progTimeLeft()));
     }
 }
 
-void ProgressBar::setProgEnabled(bool enabled)
+void ProgressBar::updateDonePiece()
 {
-    enabled ? timer->start(1000) : timer->stop();
+    pieceTime_ = elapsedTimer.restart();
+    pieceSize_ = procState_->donePieceSize();
+}
 
-    setVisible(enabled);
-    setValue(0);
-    resetFormat();
+QString ProgressBar::progTimeLeft()
+{
+    QString result;
+
+    if (pieceSize_ > 0) {
+        qint64 timeleft = (procState_->remainingSize() / pieceSize_) * pieceTime_;
+        result = format::millisecToReadable(timeleft, true);
+    }
+
+    return result;
+}
+
+QString ProgressBar::progSpeed()
+{
+    QString result;
+
+    if (pieceTime_ > 0) {
+        result = QString("%1/sec")
+                     .arg(format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000));
+    }
+
+    return result;
 }

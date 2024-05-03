@@ -7,7 +7,6 @@
 #define PROCSTATE_H
 
 #include <QObject>
-#include <QElapsedTimer>
 
 class ProcState : public QObject
 {
@@ -15,11 +14,10 @@ class ProcState : public QObject
 public:
     explicit ProcState(QObject *parent = nullptr);
     void setTotalSize(qint64 totalSize);
-    void updateDonePiece();
 
-    qint64 doneSize() const;
-    QString progTimeLeft() const;
-    QString progSpeed() const;
+    qint64 doneSize() const; // returns the total size of the processed data
+    qint64 donePieceSize() const; // returns the size of the data processed since the previous function call
+    qint64 remainingSize() const; // totalSize_ - doneSize_
 
 public slots:
     void addChunk(int chunk);
@@ -28,12 +26,8 @@ private:
     void startProgress();
     void toPercents(int bytes); // add this processed piece, calculate total done size and emit ::percentageChanged
 
-    QElapsedTimer elapsedTimer;
-    qint64 prevDoneSize;
-    qint64 pieceTime; // milliseconds
-    qint64 pieceSize;
-
-    qint64 totalSize_ = 0; // total data size
+    static qint64 prevDoneSize_;
+    qint64 totalSize_ = 0;
     qint64 doneSize_ = 0;
 
 signals:

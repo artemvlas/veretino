@@ -4,7 +4,8 @@
  * https://github.com/artemvlas/veretino
 */
 #include "procstate.h"
-#include "tools.h"
+
+qint64 ProcState::prevDoneSize_ = 0;
 
 ProcState::ProcState(QObject *parent)
     : QObject{parent}
@@ -16,24 +17,18 @@ void ProcState::setTotalSize(qint64 totalSize)
     doneSize_ = 0;
 }
 
+void ProcState::startProgress()
+{
+    prevDoneSize_ = 0;
+    emit percentageChanged(0); // initial 0 to reset progressbar value
+}
+
 void ProcState::addChunk(int chunk)
 {
     if (doneSize_ == 0)
         startProgress();
 
     toPercents(chunk);
-}
-
-qint64 ProcState::doneSize() const
-{
-    return doneSize_;
-}
-
-void ProcState::startProgress()
-{
-    prevDoneSize = 0;
-    elapsedTimer.start();
-    emit percentageChanged(0); // initial 0 to reset progressbar value
 }
 
 void ProcState::toPercents(int bytes)
@@ -51,33 +46,20 @@ void ProcState::toPercents(int bytes)
     }
 }
 
-void ProcState::updateDonePiece()
+qint64 ProcState::doneSize() const
 {
-    pieceTime = elapsedTimer.restart();
-    pieceSize = doneSize_ - prevDoneSize;
-    prevDoneSize += pieceSize;
+    return doneSize_;
 }
 
-QString ProcState::progTimeLeft() const
+qint64 ProcState::donePieceSize() const
 {
-    QString result;
+    qint64 pieceSize = doneSize_ - prevDoneSize_;
+    prevDoneSize_ += pieceSize;
 
-    if (pieceSize > 0) {
-        qint64 timeleft = ((totalSize_ - doneSize_) / pieceSize) * pieceTime;
-        result = format::millisecToReadable(timeleft, true);
-    }
-
-    return result;
+    return pieceSize;
 }
 
-QString ProcState::progSpeed() const
+qint64 ProcState::remainingSize() const
 {
-    QString result;
-
-    if (pieceTime > 0) {
-        result = QString("%1/sec")
-                 .arg(format::dataSizeReadable((pieceSize / pieceTime) * 1000));
-    }
-
-    return result;
+    return totalSize_ - doneSize_;
 }
