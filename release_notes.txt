@@ -1,3 +1,6 @@
+Veretino 0.3.12 (dev)
+* More accurate and smooth process speed and remaining time.
+
 Veretino 0.3.11
 * Improved stability when switching databases.
 * Improved performance and UI responsiveness.

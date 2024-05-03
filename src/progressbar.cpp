@@ -8,10 +8,10 @@
 ProgressBar::ProgressBar(QWidget *parent)
     : QProgressBar(parent)
 {
-    connect(this, &ProgressBar::valueChanged, this, &ProgressBar::updateProgressInfo);
+    connect(timer, &QTimer::timeout, this, &ProgressBar::updateProgressInfo);
 }
 
-void ProgressBar::setProcState(const ProcState *proc)
+void ProgressBar::setProcState(ProcState *proc)
 {
     procState_ = proc;
 }
@@ -19,8 +19,18 @@ void ProgressBar::setProcState(const ProcState *proc)
 void ProgressBar::updateProgressInfo()
 {
     if (procState_) {
+        procState_->updateDonePiece();
         setFormat(QString("%1% | %2 | %3")
                       .arg(value())
                       .arg(procState_->progSpeed(), procState_->progTimeLeft()));
     }
+}
+
+void ProgressBar::setProgEnabled(bool enabled)
+{
+    enabled ? timer->start(1000) : timer->stop();
+
+    setVisible(enabled);
+    setValue(0);
+    resetFormat();
 }

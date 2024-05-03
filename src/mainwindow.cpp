@@ -397,9 +397,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
 
 void MainWindow::setProgressBar(bool processing, bool visible)
 {
-    ui->progressBar->setVisible(processing && visible);
-    ui->progressBar->setValue(0);
-    ui->progressBar->resetFormat();
+    ui->progressBar->setProgEnabled(processing && visible);
 }
 
 void MainWindow::updateStatusIcon()

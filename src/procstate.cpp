@@ -47,7 +47,6 @@ void ProcState::toPercents(int bytes)
     int curPerc = (doneSize_ * 100) / totalSize_; // after
 
     if (curPerc > lastPerc) {
-        updateDonePiece();
         emit percentageChanged(curPerc);
     }
 }

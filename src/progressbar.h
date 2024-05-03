@@ -7,6 +7,7 @@
 #define PROGRESSBAR_H
 
 #include <QProgressBar>
+#include <QTimer>
 #include "procstate.h"
 
 class ProgressBar : public QProgressBar
@@ -14,11 +15,13 @@ class ProgressBar : public QProgressBar
     Q_OBJECT
 public:
     explicit ProgressBar(QWidget *parent = nullptr);
-    void setProcState(const ProcState *proc);
+    void setProcState(ProcState *proc);
+    void setProgEnabled(bool enabled);
 
 private:
     void updateProgressInfo();
-    const ProcState *procState_ = nullptr;
+    ProcState *procState_ = nullptr;
+    QTimer *timer = new QTimer(this);
 };
 
 #endif // PROGRESSBAR_H
