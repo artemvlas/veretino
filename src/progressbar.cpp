@@ -20,8 +20,7 @@ void ProgressBar::updateProgressInfo()
 {
     if (procState_) {
         procState_->updateDonePiece();
-        setFormat(QString("%1% | %2 | %3")
-                      .arg(value())
+        setFormat(QString("%p% | %1 | %2")
                       .arg(procState_->progSpeed(), procState_->progTimeLeft()));
     }
 }
