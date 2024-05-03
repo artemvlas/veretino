@@ -48,7 +48,7 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="2">
-       <widget class="QProgressBar" name="progressBar">
+       <widget class="ProgressBar" name="progressBar">
         <property name="value">
          <number>0</number>
         </property>
@@ -98,6 +98,11 @@
    <class>View</class>
    <extends>QTreeView</extends>
    <header>src/view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header>src/progressbar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

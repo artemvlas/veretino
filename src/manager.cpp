@@ -11,7 +11,6 @@
 #include <QDebug>
 #include "files.h"
 #include "shacalculator.h"
-#include "procstate.h"
 #include "treemodeliterator.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
@@ -292,13 +291,12 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
 
 QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess, bool isVerification)
 {
-    ProcState state(QFileInfo(filePath).size());
+    procState->setTotalSize(QFileInfo(filePath).size());
+
     ShaCalculator shaCalc(algo);
 
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
-    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::addChunk);
-    connect(&state, &ProcState::percentageChanged, this, &Manager::donePercents);
-    connect(&state, &ProcState::progressInfoChanged, this, &Manager::procStatus);
+    connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
     emit processing(true, true);
     emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
@@ -346,15 +344,14 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
 
     qint64 totalSize = dataMaintainer->totalSizeOfListedFiles(FileStatus::Queued, rootIndex);
     QString totalSizeReadable = format::dataSizeReadable(totalSize);
-    ProcState state(totalSize);
+    procState->setTotalSize(totalSize);
+
     ShaCalculator shaCalc(dataMaintainer->data_->metaData.algorithm);
     canceled = false;
     int doneNum = 0;
 
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
-    connect(&shaCalc, &ShaCalculator::doneChunk, &state, &ProcState::addChunk);
-    connect(&state, &ProcState::percentageChanged, this, &Manager::donePercents);
-    connect(&state, &ProcState::progressInfoChanged, this, &Manager::procStatus);
+    connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
     // checking whether this is a Calculation or Verification process
     const FileStatus procStatus = (status & FileStatus::FlagAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
@@ -369,8 +366,8 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
         if (iter.nextFile().status() == FileStatus::Queued) {
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
-            QString doneData = (state.doneSize() == 0) ? QString("(%1)").arg(totalSizeReadable)
-                                                       : QString("(%1 / %2)").arg(format::dataSizeReadable(state.doneSize()), totalSizeReadable);
+            QString doneData = (procState->doneSize() == 0) ? QString("(%1)").arg(totalSizeReadable)
+                                                       : QString("(%1 / %2)").arg(format::dataSizeReadable(procState->doneSize()), totalSizeReadable);
 
             emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
                                       .arg(procStatusText)

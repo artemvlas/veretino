@@ -11,6 +11,7 @@
 #include "treemodel.h"
 #include "datamaintainer.h"
 #include "view.h"
+#include "procstate.h"
 
 class Manager : public QObject
 {
@@ -20,6 +21,8 @@ public:
     enum ProcFileResult {Generic, Clipboard, SumFile};
     enum TaskDbUpdate {TaskUpdateMismatches, TaskUpdateNewLost, TaskAddNew, TaskClearLost};
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
+    ProcState *procState = new ProcState(this);
+
 
 public slots:
     void processFolderSha(const MetaData &metaData);
@@ -63,8 +66,6 @@ signals:
     void processing(bool isProcessing, bool visibleProgress = false);
     void cancelProcess();
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
-    void donePercents(int done);
-    void procStatus(const QString &str);
     void setViewData(DataContainer *data = nullptr);
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);

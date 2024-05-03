@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(IconProvider::iconVeretino());
     QThread::currentThread()->setObjectName("MAIN Thread");
 
+    ui->progressBar->setProcState(manager->procState);
+    ui->progressBar->setVisible(false);
+
     loadSettings();
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
 
@@ -41,7 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
     if (!argumentInput())
         ui->treeView->setFileSystemModel();
 
-    ui->progressBar->setVisible(false);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -156,8 +158,7 @@ void MainWindow::connectManager()
     // process status
     connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);
     connect(manager, &Manager::processing, modeSelect, &ModeSelector::processing);
-    connect(manager, &Manager::donePercents, ui->progressBar, &QProgressBar::setValue);
-    connect(manager, &Manager::procStatus, ui->progressBar, &QProgressBar::setFormat);
+    connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
 
     // change view
     connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
