@@ -52,8 +52,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     // calculating checksums
     calculateChecksums();
 
-    if (!canceled) {
-        // saving to json
+    if (!canceled) { // saving to json
         dataMaintainer->exportToJson();
     }
 }
@@ -367,7 +366,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
             QString doneData = (procState->doneSize() == 0) ? QString("(%1)").arg(totalSizeReadable)
-                                                       : QString("(%1 / %2)").arg(format::dataSizeReadable(procState->doneSize()), totalSizeReadable);
+                                                            : QString("(%1 / %2)").arg(format::dataSizeReadable(procState->doneSize()), totalSizeReadable);
 
             emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
                                       .arg(procStatusText)
@@ -493,13 +492,11 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
         connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
         connect(files, &Files::folderContentsListCreated, thread, &QThread::quit);
 
-        if (filterCreation)
-            connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsFilterCreated);
-        else
-            connect(files, &Files::folderContentsListCreated, this, &Manager::folderContentsListCreated);
+        connect(files, &Files::folderContentsListCreated, this, filterCreation ? &Manager::folderContentsFilterCreated
+                                                                               : &Manager::folderContentsListCreated);
 
         // ***debug***
-        connect(thread, &QThread::destroyed, this, [=]{qDebug() << "Manager::folderContentsByType | &QThread::destroyed" << folderPath;});
+        // connect(thread, &QThread::destroyed, this, [=]{qDebug() << "Manager::folderContentsList | &QThread::destroyed" << folderPath;});
 
         thread->start();
     }
@@ -511,9 +508,4 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 void Manager::modelChanged(ModelView modelView)
 {
     isViewFileSysytem = (modelView == ModelView::FileSystem);
-
-    // It is premature to start cleansing here.
-    /*if (isViewFileSysytem) {
-        dataMaintainer->clearData(); // if the View is switched to the filesystem, then main data is no longer needed
-    }*/
 }
