@@ -49,7 +49,8 @@ private:
     void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
-                              bool finalProcess = true, bool isVerification = false); // <finalProcess> -->> whether it sends a process end signal or not
+                              bool isVerification = false);
+
     int calculateChecksums(FileStatus status = FileStatus::Queued,
                            bool finalProcess = true);
     int calculateChecksums(const QModelIndex &rootIndex,

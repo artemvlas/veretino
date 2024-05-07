@@ -177,7 +177,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     if (!savedSum.isEmpty()) {
         dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
         QString filePath = paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex));
-        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true, true);
+        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
 
         if (sum.isEmpty()) {
             dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
@@ -281,14 +281,14 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    QString sum = calculateChecksum(filePath, algo, true, true);
+    QString sum = calculateChecksum(filePath, algo, true);
 
     if (!sum.isEmpty()) {
         showFileCheckResultMessage(filePath, checkSum, sum);
     }
 }
 
-QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool finalProcess, bool isVerification)
+QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool isVerification)
 {
     procState->setTotalSize(QFileInfo(filePath).size());
 
@@ -309,8 +309,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     else if (!canceled)
         emit setStatusbarText("read error");
 
-    if (finalProcess)
-        emit processing(false);
+    emit processing(false);
 
     return checkSum;
 }
