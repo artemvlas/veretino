@@ -137,7 +137,7 @@ public:
     QMenu *menuUpdateDatabase = nullptr;
 
 public slots:
-    void processing(bool isProcessing);
+    void setProcView(bool isProcessing);
     void prepareView();
     void createContextMenu_View(const QPoint &point);
     void createContextMenu_Button(const QPoint &point);

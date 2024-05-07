@@ -146,7 +146,7 @@ void ModeSelector::setActionsIcons()
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
 }
 
-void ModeSelector::processing(bool isProcessing)
+void ModeSelector::setProcView(bool isProcessing)
 {
     if (isProcessing_ != isProcessing) {
         isProcessing_ = isProcessing;
@@ -173,7 +173,7 @@ void ModeSelector::prepareView()
                                                     // because the Proxy Model is not friendly with Big Data
     }
 
-    processing(true);
+    setProcView(true);
 }
 
 void ModeSelector::setMode()

@@ -157,7 +157,7 @@ void MainWindow::connectManager()
 
     // process status
     connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);
-    connect(manager, &Manager::processing, modeSelect, &ModeSelector::processing);
+    connect(manager, &Manager::processing, modeSelect, &ModeSelector::setProcView);
     connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
 
     // change view
