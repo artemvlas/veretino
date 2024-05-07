@@ -362,7 +362,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
 
     TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
 
-    while (iter.hasNext()) {
+    while (iter.hasNext() && !canceled) {
         if (iter.nextFile().status() == FileStatus::Queued) {
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
@@ -375,30 +375,28 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
                                       .arg(numQueued)
                                       .arg(doneData));
 
-            QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()),
-                                                 dataMaintainer->data_->metaData.algorithm);
+            QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()));
 
-            if (canceled) {
-                dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, status);
-
-                if (status != FileStatus::Queued) {
-                    if (status == FileStatus::New)
-                        dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
-
-                    dataMaintainer->changeFilesStatus((FileStatus::Queued | FileStatus::Added), status, rootIndex);
+            if (!canceled) {
+                if (checksum.isEmpty())
+                    dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
+                else {
+                    dataMaintainer->updateChecksum(iter.index(), checksum);
+                    ++doneNum;
                 }
-
-                qDebug() << "Manager::calculateChecksums | CANCELED | Done" << doneNum;
-                break;
-            }
-
-            if (checksum.isEmpty())
-                dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
-            else {
-                dataMaintainer->updateChecksum(iter.index(), checksum);
-                ++doneNum;
             }
         }
+    }
+
+    if (canceled) {
+        if (status != FileStatus::Queued) {
+            if (status == FileStatus::New)
+                dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
+
+            dataMaintainer->changeFilesStatus((FileStatus::FlagProcessing | FileStatus::Added), status, rootIndex);
+        }
+
+        qDebug() << "Manager::calculateChecksums | CANCELED | Done" << doneNum;
     }
 
     dataMaintainer->updateNumbers();
