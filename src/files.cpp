@@ -27,11 +27,6 @@ FileList Files::getFileList()
     return getFileList(initPath_);
 }
 
-FileList Files::getFileList(const QString &rootFolder)
-{
-    return getFileList(rootFolder, FilterRule());
-}
-
 FileList Files::getFileList(const FilterRule &filter)
 {
     return getFileList(initPath_, filter);
@@ -76,19 +71,6 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 
     emit setStatusbarText(QString("%1 files found").arg(resultList.size()));
     return resultList;
-}
-
-FileList Files::getFileList(const FileList &fileList, const FilterRule &filter)
-{
-    FileList filteredFiles; // result list
-    FileList::const_iterator iter;
-
-    for (iter = fileList.constBegin(); iter != fileList.constEnd(); ++iter) {
-        if (filter.isFileAllowed(iter.key()))
-            filteredFiles.insert(iter.key(), iter.value());
-    }
-
-    return filteredFiles;
 }
 
 bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
@@ -148,11 +130,6 @@ QString Files::contentStatus(const QString &path)
 
     emit setStatusbarText(result);
     return result;
-}
-
-QString Files::contentStatus(const FileList &fileList)
-{
-    return format::filesNumberAndSize(fileList.size(), dataSize(fileList));
 }
 
 QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flags, const QModelIndex &rootIndex)

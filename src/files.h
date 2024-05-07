@@ -57,10 +57,8 @@ public:
 
     // functions
     FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
-    FileList getFileList(const QString &rootFolder); // iterate the 'rootFolder', returns all files list
     FileList getFileList(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
-    FileList getFileList(const QString &rootFolder, const FilterRule &filter);
-    FileList getFileList(const FileList &fileList, const FilterRule &filter);
+    FileList getFileList(const QString &rootFolder, const FilterRule &filter = FilterRule());
 
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false)); // checks whether there are any (or filtered) files the folder/subfolders
 
@@ -69,7 +67,6 @@ public:
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
     QString contentStatus(const QString &path);
-    static QString contentStatus(const FileList &filelist);
     static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
 
@@ -83,7 +80,7 @@ public slots:
 
 private:
     // variables
-    QString initPath_; // path to the File specified when creating the object
+    QString initPath_; // path to the File or Folder specified when creating the object
 
 signals:
     void setStatusbarText(const QString &text = QString());
