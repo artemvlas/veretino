@@ -191,11 +191,11 @@ void ModeSelector::setMode()
     }
 
     if (view_->isViewFileSystem()) {
-        curMode = selectMode(view_->curPathFileSystem);
+        curMode_ = selectMode(view_->curPathFileSystem);
         emit getPathInfo(view_->curPathFileSystem);
     }
     else if (view_->isViewDatabase()) {
-        curMode = selectMode(view_->data_->numbers);
+        curMode_ = selectMode(view_->data_->numbers);
         emit getIndexInfo(view_->curIndexSource);
     }
 
@@ -217,7 +217,7 @@ Mode ModeSelector::selectMode(const QString &path)
             return File;
     }
     else
-        return curMode;
+        return curMode_;
 }
 
 Mode ModeSelector::selectMode(const Numbers &numbers)
@@ -234,7 +234,7 @@ void ModeSelector::setButtonInfo()
 {
     button_->setToolTip(QString());
 
-    switch (curMode) {
+    switch (curMode_) {
     case Folder:
         button_->setText(format::algoToStr(settings_->algorithm));
         button_->setIcon(iconProvider.icon(Icons::FolderSync));
@@ -272,19 +272,19 @@ void ModeSelector::setButtonInfo()
         button_->setText("Browse");
         break;
     default:
-        qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode;
+        qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode_;
         break;
     }
 }
 
 Mode ModeSelector::currentMode()
 {
-    return curMode;
+    return curMode_;
 }
 
-bool ModeSelector::isCurrentMode(const Mode mode)
+bool ModeSelector::isCurrentMode(const Modes mode)
 {
-    return mode == curMode;
+    return (mode & curMode_);
 }
 
 bool ModeSelector::isProcessing()
@@ -475,7 +475,7 @@ void ModeSelector::doWork()
         return;
     }
 
-    switch (curMode) {
+    switch (curMode_) {
         case Folder:
             processChecksumsFiltered();
             break;
@@ -501,7 +501,7 @@ void ModeSelector::doWork()
             showFileSystem();
             break;
         default:
-            qDebug() << "MainWindow::doWork() | Wrong MODE:" << curMode;
+            qDebug() << "MainWindow::doWork() | Wrong MODE:" << curMode_;
             break;
     }
 }
@@ -511,7 +511,7 @@ void ModeSelector::quickAction()
     if (isProcessing())
             return;
 
-    switch (curMode) {
+    switch (curMode_) {
         case File:
             doWork();
             break;
@@ -727,7 +727,7 @@ QMenu* ModeSelector::menuUpdateDb()
 
 void ModeSelector::createContextMenu_Button(const QPoint &point)
 {
-    if (!isProcessing() && (isCurrentMode(File) || isCurrentMode(Folder)))
+    if (!isProcessing() && isCurrentMode(File | Folder))
         menuAlgorithm()->exec(button_->mapToGlobal(point));
 }
 

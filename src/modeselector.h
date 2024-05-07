@@ -22,22 +22,23 @@ public:
     explicit ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent = nullptr);
 
     enum Mode {
-        NoMode = 0,
-        Folder = 1 << 0,
-        File = 1 << 1,
-        DbFile = 1 << 2,
-        SumFile = 1 << 3,
-        Model = 1 << 4,
-        ModelNewLost = 1 << 5,
-        UpdateMismatch = 1 << 6,
+        NoMode = 1 << 0,
+        Folder = 1 << 1,
+        File = 1 << 2,
+        DbFile = 1 << 3,
+        SumFile = 1 << 4,
+        Model = 1 << 5,
+        ModelNewLost = 1 << 6,
+        UpdateMismatch = 1 << 7,
         FlagDbModes = Model | ModelNewLost | UpdateMismatch
     };
     Q_ENUM(Mode)
+    Q_DECLARE_FLAGS(Modes, Mode)
 
     // modes
     void setMode();
     Mode currentMode();
-    bool isCurrentMode(const Mode mode);
+    bool isCurrentMode(const Modes mode);
     bool isProcessing();
     void setButtonInfo(); // sets the Button icon and text according the current Mode
     void setAlgorithm(QCryptographicHash::Algorithm algo);
@@ -152,7 +153,7 @@ private:
     QString composeDbFilePath();
     bool isSelectedCreateDb();
 
-    Mode curMode = NoMode;
+    Mode curMode_ = NoMode;
     bool isProcessing_ = false;
     View *view_;
     QPushButton *button_;
@@ -179,4 +180,6 @@ signals:
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;
+Q_DECLARE_OPERATORS_FOR_FLAGS(ModeSelector::Modes)
+
 #endif // MODESELECTOR_H
