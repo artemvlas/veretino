@@ -13,7 +13,9 @@ class ShaCalculator : public QObject
 {
     Q_OBJECT
 public:
-    explicit ShaCalculator(QCryptographicHash::Algorithm algo = QCryptographicHash::Sha256, QObject *parent = nullptr);
+    explicit ShaCalculator(QObject *parent = nullptr);
+    explicit ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent = nullptr);
+    void setAlgorithm(QCryptographicHash::Algorithm algo);
 
 public slots:
     QString calculate(const QString &filePath);
@@ -23,7 +25,7 @@ public slots:
 private:
     int chunk = 1048576; // file read buffer size
     bool canceled = false; // if true, task should be aborted
-    QCryptographicHash::Algorithm initAlgo;
+    QCryptographicHash::Algorithm algo_ = QCryptographicHash::Sha256;
 
 signals:   
     void doneChunk(int done);

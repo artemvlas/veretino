@@ -7,13 +7,22 @@
 #include <QFile>
 #include <QDebug>
 
-ShaCalculator::ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent)
-    : QObject(parent), initAlgo(algo)
+ShaCalculator::ShaCalculator(QObject *parent)
+    : QObject(parent)
 {}
+
+ShaCalculator::ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent)
+    : QObject(parent), algo_(algo)
+{}
+
+void ShaCalculator::setAlgorithm(QCryptographicHash::Algorithm algo)
+{
+    algo_ = algo;
+}
 
 QString ShaCalculator::calculate(const QString &filePath)
 {
-    return calculate(filePath, initAlgo);
+    return calculate(filePath, algo_);
 }
 
 QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
