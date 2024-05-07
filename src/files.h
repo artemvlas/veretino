@@ -21,7 +21,6 @@ class Files : public QObject
 public:
     explicit Files(QObject *parent = nullptr);
     explicit Files(const QString &initPath, QObject *parent = nullptr);
-    Files(const FileList &fileList, QObject *parent = nullptr);
 
     enum FileStatus {
         NotSet = 0,
@@ -71,7 +70,7 @@ public:
 
     QString contentStatus(const QString &path);
     static QString contentStatus(const FileList &filelist);
-    static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags = FileStatus::NotSet,
+    static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
 
     // variables
@@ -84,12 +83,9 @@ public slots:
 
 private:
     // variables
-    QString initFilePath; // path to the File specified when creating the object
-    QString initFolderPath; // path to the Folder specified when creating the object
-    FileList initFileList;
+    QString initPath_; // path to the File specified when creating the object
 
 signals:
-    void processing(bool isProcessing, bool visibleProgress = false);
     void setStatusbarText(const QString &text = QString());
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
 }; // class Files

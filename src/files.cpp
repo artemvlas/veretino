@@ -19,21 +19,12 @@ Files::Files(QObject *parent)
 {}
 
 Files::Files(const QString &initPath, QObject *parent)
-    : QObject(parent)
-{
-    if (QFileInfo(initPath).isFile())
-        initFilePath = initPath;
-    else if (QFileInfo(initPath).isDir())
-        initFolderPath = initPath;
-}
-
-Files::Files(const FileList &fileList, QObject *parent)
-    : QObject(parent), initFileList(fileList)
+    : QObject(parent), initPath_(initPath)
 {}
 
 FileList Files::getFileList()
 {
-    return getFileList(initFolderPath);
+    return getFileList(initPath_);
 }
 
 FileList Files::getFileList(const QString &rootFolder)
@@ -43,13 +34,13 @@ FileList Files::getFileList(const QString &rootFolder)
 
 FileList Files::getFileList(const FilterRule &filter)
 {
-    return getFileList(initFolderPath, filter);
+    return getFileList(initPath_, filter);
 }
 
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 {
     if (!QFileInfo(rootFolder).isDir()) {
-        // qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
+        qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
         return FileList();
     }
 
@@ -121,14 +112,7 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 
 QString Files::contentStatus()
 {
-    if (!initFilePath.isEmpty())
-        return contentStatus(initFilePath);
-    else if (!initFolderPath.isEmpty())
-        return contentStatus(initFolderPath);
-    else if (!initFileList.isEmpty())
-        return contentStatus(initFileList);
-    else
-        return "Files::contentStatus() | No content to display status";
+    return !initPath_.isEmpty() ? contentStatus(initPath_) : QString();
 }
 
 QString Files::contentStatus(const QString &path)
@@ -181,8 +165,7 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
         QVariant itData = it.nextFile().data(Column::ColumnStatus);
 
         if (itData.isValid()
-            && (flags == FileStatus::NotSet
-                || flags & itData.value<FileStatus>())) {
+            && (flags & itData.value<FileStatus>())) {
 
             dataSize += it.size();
             ++filesNumber;
@@ -194,7 +177,7 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
 
 void Files::folderContentsByType()
 {
-    if (initFolderPath.isEmpty()) {
+    if (initPath_.isEmpty()) {
         qDebug() << "Files::folderContentsByType | No initial data";
         return;
     }
@@ -206,7 +189,6 @@ void Files::folderContentsByType()
 
     if (fileList.isEmpty()) {
         qDebug() << "Empty folder. No file types to display.";
-        //emit folderContentsListCreated(initFolderPath, QList<ExtNumSize>());
         return;
     }
 
@@ -240,19 +222,12 @@ void Files::folderContentsByType()
         combList.append(t);
     }
 
-    emit folderContentsListCreated(initFolderPath, combList);
+    emit folderContentsListCreated(initPath_, combList);
 }
 
 qint64 Files::dataSize()
 {
-    if (!initFolderPath.isEmpty())
-        return dataSize(getFileList());
-    else if (!initFileList.isEmpty())
-        return dataSize(initFileList);
-    else {
-        qDebug() << "Files::dataSize() | No data to size return";
-        return 0;
-    }
+    return !initPath_.isEmpty() ? dataSize(getFileList()) : 0;
 }
 
 qint64 Files::dataSize(const QString &folder)
