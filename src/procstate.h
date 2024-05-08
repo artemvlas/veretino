@@ -32,6 +32,8 @@ private:
 
 signals:
     void percentageChanged(int perc);
+    void progressStarted();
+    void progressFinished();
 };
 
 #endif // PROCSTATE_H

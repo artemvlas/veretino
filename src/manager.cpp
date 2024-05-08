@@ -19,7 +19,6 @@ Manager::Manager(Settings *settings, QObject *parent)
     connect(this, &Manager::cancelProcess, this, [=]{canceled = true; emit setStatusbarText("Canceled");}, Qt::DirectConnection);
 
     connect(this, &Manager::cancelProcess, dataMaintainer, &DataMaintainer::cancelProcess, Qt::DirectConnection);
-    //connect(dataMaintainer, &DataMaintainer::processing, this, &Manager::processing);
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
 }
@@ -303,7 +302,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
-    emit processing(true, true);
+    emit processing(true);
     emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
                                                     format::algoToStr(algo),
                                                     format::fileNameAndSize(filePath)));
@@ -316,6 +315,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
         emit setStatusbarText("read error");
 
     emit processing(false);
+    emit procState->progressFinished();
 
     return checkSum;
 }
@@ -360,7 +360,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     const QString procStatusText = (procStatus == FileStatus::Verifying) ? "Verifying" : "Calculating";
 
     // process
-    emit processing(true, true); // set processing view, show progress bar
+    emit processing(true);
 
     TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
 
@@ -404,6 +404,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     dataMaintainer->updateNumbers();
 
     emit processing(false); // set Mode view, hide progress bar
+    emit procState->progressFinished();
 
     return doneNum;
 }

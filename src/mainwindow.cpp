@@ -156,8 +156,9 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
 
     // process status
-    connect(manager, &Manager::processing, this, &MainWindow::setProgressBar);
     connect(manager, &Manager::processing, modeSelect, &ModeSelector::setProcView);
+    connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
+    connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
     connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
 
     // change view
@@ -393,11 +394,6 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     if (msgBox.exec() == QMessageBox::Open) {
         modeSelect->openJsonDatabase(dbFilePath);
     }
-}
-
-void MainWindow::setProgressBar(bool processing, bool visible)
-{
-    ui->progressBar->setProgEnabled(processing && visible);
 }
 
 void MainWindow::updateStatusIcon()

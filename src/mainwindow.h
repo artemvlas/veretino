@@ -27,7 +27,6 @@ public:
 
 public slots:
     void showMessage(const QString &message, const QString &title = "Info");
-    void setProgressBar(bool processing, bool visible);
     void updatePermanentStatus();
     void handlePathEdit();
     void showDbStatus();
@@ -58,10 +57,12 @@ private:
     ClickableLabel *statusTextLabel = new ClickableLabel;
     ClickableLabel *permanentStatus = new ClickableLabel;
     ModeSelector *modeSelect = nullptr;
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent* event) override;
-};
+}; // class MainWindow
+
 #endif // MAINWINDOW_H

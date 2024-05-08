@@ -17,9 +17,13 @@ class ProgressBar : public QProgressBar
 public:
     explicit ProgressBar(QWidget *parent = nullptr);
     void setProcState(const ProcState *proc);
-    void setProgEnabled(bool enabled);
+
+public slots:
+    void start();
+    void finish();
 
 private:
+    void setProgEnabled(bool enabled);
     void updateProgressInfo();
     void updateDonePiece();
     QString progTimeLeft();

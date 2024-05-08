@@ -60,7 +60,7 @@ private:
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
 
 signals:
-    void processing(bool isProcessing, bool visibleProgress = false);
+    void processing(bool isProcessing);
     void cancelProcess();
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setViewData(DataContainer *data = nullptr);

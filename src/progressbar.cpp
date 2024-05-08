@@ -17,6 +17,16 @@ void ProgressBar::setProcState(const ProcState *proc)
     procState_ = proc;
 }
 
+void ProgressBar::start()
+{
+    setProgEnabled(true);
+}
+
+void ProgressBar::finish()
+{
+    setProgEnabled(false);
+}
+
 void ProgressBar::setProgEnabled(bool enabled)
 {
     if (enabled) {

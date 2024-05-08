@@ -20,7 +20,8 @@ void ProcState::setTotalSize(qint64 totalSize)
 void ProcState::startProgress()
 {
     prevDoneSize_ = 0;
-    emit percentageChanged(0); // initial 0 to reset progressbar value
+    //emit percentageChanged(0); // initial 0 to reset progressbar value
+    emit progressStarted();
 }
 
 void ProcState::addChunk(int chunk)
