@@ -16,22 +16,35 @@
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)
 {
-    connect(this, &Manager::cancelProcess, this, [=]{canceled = true; emit setStatusbarText("Canceled");}, Qt::DirectConnection);
+    connect(this, &Manager::cancelProcess, this, [=]{ canceled = true; emit setStatusbarText("Canceled"); }, Qt::DirectConnection);
 
     connect(this, &Manager::cancelProcess, dataMaintainer, &DataMaintainer::cancelProcess, Qt::DirectConnection);
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
 }
 
-void Manager::processFolderSha(const MetaData &metaData)
+void Manager::runTask(std::function<void()> task)
 {
-    if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
-        emit showMessage("All files have been excluded.\nFiltering rules can be changed in the settings.", "No proper files");
-        return;
-    }
-
     canceled = false;
     emit processing(true);
+
+    task();
+
+    emit processing(false);
+}
+
+void Manager::processFolderSha(const MetaData &metaData)
+{
+    runTask([&] { _processFolderSha(metaData); });
+}
+
+void Manager::_processFolderSha(const MetaData &metaData)
+{
+    if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
+        emit showMessage("All files have been excluded.\n"
+                         "Filtering rules can be changed in the settings.", "No proper files");
+        return;
+    }
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
@@ -44,18 +57,16 @@ void Manager::processFolderSha(const MetaData &metaData)
     // exception and cancelation handling
     if (canceled || !dataMaintainer->data_) {
         emit setViewData();
-        emit processing(false);
         return;
     }
 
     emit setViewData(dataMaintainer->data_);
 
     // calculating checksums
-    calculateChecksums();
+    calculateChecksums(FileStatus::Queued);
 
     if (!canceled) { // saving to json
         dataMaintainer->exportToJson();
-        emit processing(false);
     }
 }
 
@@ -117,18 +128,19 @@ void Manager::createDataModel(const QString &databaseFilePath)
 
 void Manager::updateDatabase(const TaskDbUpdate task)
 {
+    runTask([&] { _updateDatabase(task); });
+}
+
+void Manager::_updateDatabase(const TaskDbUpdate task)
+{
     if (!dataMaintainer->data_) {
-        emit processing(false);
         return;
     }
 
     if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable)) {
-        emit processing(false);
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
         return;
     }
-
-    emit processing(true);
 
     if (task == TaskUpdateMismatches) {
         dataMaintainer->updateMismatchedChecksums();
@@ -141,7 +153,6 @@ void Manager::updateDatabase(const TaskDbUpdate task)
             calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
 
             if (canceled) {
-                emit processing(false);
                 return;
             }
         }
@@ -154,7 +165,6 @@ void Manager::updateDatabase(const TaskDbUpdate task)
     }
 
     dataMaintainer->exportToJson();
-    emit processing(false);
 }
 
 void Manager::verify(const QModelIndex &curIndex)
@@ -197,14 +207,16 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
 void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 {
+    runTask([&] { _verifyFolderItem(folderItemIndex); });
+}
+
+void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
+{
     if (!dataMaintainer->data_) {
-        emit processing(false);
         return;
     }
 
     if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable, folderItemIndex)) {
-        emit processing(false);
-
         QString warningText = "There are no files available for verification.";
         if (!folderItemIndex.isValid())
             warningText.append("\n\n" + movedDbWarning);
@@ -228,6 +240,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         if (!dataMaintainer->data_->contains(FileStatus::Mismatched)
             && dataMaintainer->data_->contains(FileStatus::Matched)
             && settings_->saveVerificationDateTime) {
+
             dataMaintainer->updateSuccessfulCheckDateTime();
         }
     }
@@ -331,7 +344,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
         || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_)) {
 
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
-        emit processing(false);
         return 0;
     }
 
@@ -340,7 +352,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
     if (numQueued == 0) {
         qDebug() << "Manager::calculateChecksums | No files in queue";
-        emit processing(false);
         return 0;
     }
 
@@ -349,7 +360,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     procState->setTotalSize(totalSize);
 
     ShaCalculator shaCalc(dataMaintainer->data_->metaData.algorithm);
-    canceled = false;
     int doneNum = 0;
 
     connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
@@ -360,8 +370,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     const QString procStatusText = (procStatus == FileStatus::Verifying) ? "Verifying" : "Calculating";
 
     // process
-    emit processing(true);
-
     TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
 
     while (iter.hasNext() && !canceled) {
@@ -402,8 +410,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     }
 
     dataMaintainer->updateNumbers();
-
-    emit processing(false); // set Mode view, hide progress bar
     emit procState->progressFinished();
 
     return doneNum;

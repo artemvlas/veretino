@@ -361,11 +361,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
     }
 
-    //emit processing(true);
-
     emit subDbForked(json->makeJson(data_, rootFolder));
-
-    //emit processing(false);
 }
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)

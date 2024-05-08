@@ -42,7 +42,13 @@ public slots:
     void makeFolderContentsFilter(const QString &folderPath);
 
 private:
+    void runTask(std::function<void()> task);
+
+    void _processFolderSha(const MetaData &metaData);
+    void _updateDatabase(const TaskDbUpdate task);
+
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
+    void _verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex());
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
     void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
     void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
@@ -50,7 +56,7 @@ private:
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
 
-    int calculateChecksums(FileStatus status = FileStatus::Queued);
+    int calculateChecksums(FileStatus status);
     int calculateChecksums(const QModelIndex &rootIndex, FileStatus status);
 
     bool canceled = false;

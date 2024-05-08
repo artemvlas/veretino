@@ -241,7 +241,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::showDbStatus()
 {
-    if (ui->treeView->data_ && !modeSelect->isProcessing()) {
+    if (ui->treeView->data_) {
         DialogDbStatus statusDialog(ui->treeView->data_, this);
         statusDialog.exec();
     }
