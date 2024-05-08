@@ -112,7 +112,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<MetaData>("MetaData");
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
-    qRegisterMetaType<ProcFileResult>("ProcFileResult");
+    qRegisterMetaType<PurposeFileProc>("PurposeFileProc");
     qRegisterMetaType<TaskDbUpdate>("TaskDbUpdate");
 
     manager->moveToThread(thread);

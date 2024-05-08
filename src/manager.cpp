@@ -57,7 +57,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     }
 }
 
-void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, ProcFileResult result)
+void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, PurposeFileProc result)
 {
     QString sum = calculateChecksum(filePath, algo);
 

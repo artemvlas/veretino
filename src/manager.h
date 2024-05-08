@@ -18,15 +18,14 @@ class Manager : public QObject
     Q_OBJECT
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
-    enum ProcFileResult {Generic, Clipboard, SumFile};
-    enum TaskDbUpdate {TaskUpdateMismatches, TaskUpdateNewLost, TaskAddNew, TaskClearLost};
+    enum PurposeFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
+    enum TaskDbUpdate { TaskUpdateMismatches, TaskUpdateNewLost, TaskAddNew, TaskClearLost };
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
     ProcState *procState = new ProcState(this);
 
-
 public slots:
     void processFolderSha(const MetaData &metaData);
-    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, ProcFileResult result);
+    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, PurposeFileProc result);
     void verify(const QModelIndex &curIndex);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);
@@ -73,7 +72,7 @@ signals:
     void showMessage(const QString &text, const QString &title = "Info");
 }; // class Manager
 
-using ProcFileResult = Manager::ProcFileResult;
+using PurposeFileProc = Manager::PurposeFileProc;
 using TaskDbUpdate = Manager::TaskDbUpdate;
 
 #endif // MANAGER_H

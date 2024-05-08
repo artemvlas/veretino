@@ -163,7 +163,7 @@ signals:
     void getPathInfo(const QString &path); // info about folder contents or file (size)
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
     void processFolderSha(const MetaData &metaData);
-    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, ProcFileResult result = ProcFileResult::Generic);
+    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, PurposeFileProc result = PurposeFileProc::Generic);
     void parseJsonFile(const QString &path);
     void verify(const QModelIndex& index = QModelIndex());
     void updateDatabase(const TaskDbUpdate task);

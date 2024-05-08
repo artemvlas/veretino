@@ -63,7 +63,7 @@ void ModeSelector::connectActions()
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
     connect(actionProcessSha512File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha512);});
     connect(actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{emit processFileSha(view_->curPathFileSystem, settings_->algorithm, ProcFileResult::Clipboard);});
+            [=]{emit processFileSha(view_->curPathFileSystem, settings_->algorithm, PurposeFileProc::Clipboard);});
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -301,7 +301,7 @@ void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
 // tasks execution --->>>
 void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
 {
-    emit processFileSha(view_->curPathFileSystem, algo, ProcFileResult::SumFile);
+    emit processFileSha(view_->curPathFileSystem, algo, PurposeFileProc::SumFile);
 }
 
 void ModeSelector::verifyItem()
