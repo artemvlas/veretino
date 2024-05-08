@@ -141,8 +141,8 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 
     if (role == Qt::DecorationRole) {
         if (curIndex.column() == ColumnName) {
-            return isFileRow(curIndex) ? iconProvider.icon(QFileInfo(curIndex.data().toString()))
-                                       : iconProvider.icon(QFileIconProvider::Folder);
+            return isFileRow(curIndex) ? fileIcons_.icon(QFileInfo(curIndex.data().toString()))
+                                       : fileIcons_.icon(QFileIconProvider::Folder);
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
             return icons_.icon(curIndex.data(RawDataRole).value<FileStatus>());
@@ -189,8 +189,8 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
                                                                                          : curIndex;
 
         emit dataChanged(curIndex, endIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
-        // It was before
-        //emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
+        // It was before:
+        // emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
     }
 
     return result;

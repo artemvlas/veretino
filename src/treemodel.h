@@ -66,7 +66,7 @@ public slots:
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *rootItem;
-    QFileIconProvider iconProvider;
+    QFileIconProvider fileIcons_;
     IconProvider icons_;
     bool isColored = false;
 }; // class TreeModel

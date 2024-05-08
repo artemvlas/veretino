@@ -24,9 +24,8 @@ public:
     void updateSuccessfulCheckDateTime();
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
-    int addActualFiles(FileStatus addedFileStatus = FileStatus::New,
-                       bool ignoreUnreadable = true,
-                       bool finalProcess = false); // <finalProcess> -->> whether it sends a process end signal or not
+    int addActualFiles(FileStatus fileStatus = FileStatus::New,
+                       bool ignoreUnreadable = true);
 
     void updateNumbers();
 
@@ -48,11 +47,11 @@ public:
 
     QString getStoredChecksum(const QModelIndex &fileRowIndex);
 
-    int clearLostFiles(bool finalProcess = false); // returns the number of cleared
-    int updateMismatchedChecksums(bool finalProcess = false); // returns the number of updated checksums
+    int clearLostFiles(); // returns the number of cleared
+    int updateMismatchedChecksums(); // returns the number of updated checksums
 
     bool importJson(const QString &jsonFilePath);
-    void exportToJson(bool finalProcess = true);
+    void exportToJson();
     void forkJsonDb(const QModelIndex &rootFolder);
 
     QString itemContentsInfo(const QModelIndex &curIndex); // if file - "filename (size)", if folder - folder contents (availability, size etc.)

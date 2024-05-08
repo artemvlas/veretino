@@ -78,7 +78,7 @@ void DataMaintainer::updateSuccessfulCheckDateTime()
 }
 
 // add new files to data_->model_
-int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnreadable, bool finalProcess)
+int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
 {
     if (!data_)
         return 0;
@@ -105,7 +105,7 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
             FileValues curFileValues;
             QFileInfo fileInfo(fullPath);
             if (fileInfo.isReadable()) {
-                curFileValues.status = addedFileStatus;
+                curFileValues.status = fileStatus;
                 curFileValues.size = fileInfo.size(); // If the file is unreadable, then its size is not needed
             }
             else if (!ignoreUnreadable)
@@ -118,13 +118,11 @@ int DataMaintainer::addActualFiles(FileStatus addedFileStatus, bool ignoreUnread
         }
     }
 
-    if (finalProcess || canceled)
-        emit processing(false);
-
     if (canceled) {
         qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
         clearData();
         emit setStatusbarText();
+        emit processing(false);
         return 0;
     }
 
@@ -283,7 +281,7 @@ QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
     return savedSum;
 }
 
-int DataMaintainer::clearLostFiles(bool finalProcess)
+int DataMaintainer::clearLostFiles()
 {
     if (!data_) {
         qDebug() << "DataMaintainer::clearLostFiles | NO data_";
@@ -306,13 +304,10 @@ int DataMaintainer::clearLostFiles(bool finalProcess)
     if (number > 0)
         updateNumbers();
 
-    if (finalProcess)
-        emit processing(false);
-
     return number;
 }
 
-int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
+int DataMaintainer::updateMismatchedChecksums()
 {
     if (!data_) {
         qDebug() << "DataMaintainer::updateMismatchedChecksums | NO data_";
@@ -340,9 +335,6 @@ int DataMaintainer::updateMismatchedChecksums(bool finalProcess)
     if (number > 0)
         updateNumbers();
 
-    if (finalProcess)
-        emit processing(false);
-
     return number;
 }
 
@@ -351,7 +343,7 @@ bool DataMaintainer::importJson(const QString &jsonFilePath)
     return setSourceData(json->parseJson(jsonFilePath));
 }
 
-void DataMaintainer::exportToJson(bool finalProcess)
+void DataMaintainer::exportToJson()
 {
     if (!data_)
         return;
@@ -364,8 +356,7 @@ void DataMaintainer::exportToJson(bool finalProcess)
 
     data_->setSaveResult(json->makeJson(data_));
 
-    if (finalProcess)
-        emit processing(false);
+    emit processing(false);
 
     emit databaseUpdated();
 }
