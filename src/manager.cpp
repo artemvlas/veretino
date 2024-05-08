@@ -19,7 +19,7 @@ Manager::Manager(Settings *settings, QObject *parent)
     connect(this, &Manager::cancelProcess, this, [=]{canceled = true; emit setStatusbarText("Canceled");}, Qt::DirectConnection);
 
     connect(this, &Manager::cancelProcess, dataMaintainer, &DataMaintainer::cancelProcess, Qt::DirectConnection);
-    connect(dataMaintainer, &DataMaintainer::processing, this, &Manager::processing);
+    //connect(dataMaintainer, &DataMaintainer::processing, this, &Manager::processing);
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
 }
@@ -32,6 +32,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     }
 
     canceled = false;
+    emit processing(true);
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
@@ -44,6 +45,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     // exception and cancelation handling
     if (canceled || !dataMaintainer->data_) {
         emit setViewData();
+        emit processing(false);
         return;
     }
 
@@ -54,6 +56,7 @@ void Manager::processFolderSha(const MetaData &metaData)
 
     if (!canceled) { // saving to json
         dataMaintainer->exportToJson();
+        emit processing(false);
     }
 }
 
@@ -126,6 +129,8 @@ void Manager::updateDatabase(const TaskDbUpdate task)
         return;
     }
 
+    emit processing(true);
+
     if (task == TaskUpdateMismatches) {
         dataMaintainer->updateMismatchedChecksums();
     }
@@ -150,6 +155,7 @@ void Manager::updateDatabase(const TaskDbUpdate task)
     }
 
     dataMaintainer->exportToJson();
+    emit processing(false);
 }
 
 void Manager::verify(const QModelIndex &curIndex)

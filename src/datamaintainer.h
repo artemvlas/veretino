@@ -71,7 +71,6 @@ private:
     DataContainer *oldData_ = nullptr; // backup for the duration of data_ setup, deleted by a signal after setting the data_ to View
 
 signals:
-    void processing(bool isProcessing, bool visibleProgress = false);
     void databaseUpdated();
     void setStatusbarText(const QString &text = QString()); // text to statusbar
     void numbersUpdated();

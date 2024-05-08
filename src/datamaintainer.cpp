@@ -88,7 +88,6 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         return 0;
     }
 
-    emit processing(true);
     emit setStatusbarText("Creating a list of files...");
 
     canceled = false;
@@ -122,7 +121,6 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
         clearData();
         emit setStatusbarText();
-        emit processing(false);
         return 0;
     }
 
@@ -291,8 +289,6 @@ int DataMaintainer::clearLostFiles()
     int number = 0;
     TreeModelIterator iter(data_->model_);
 
-    emit processing(true);
-
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Missing) {
             data_->model_->setRowData(iter.index(), Column::ColumnChecksum);
@@ -316,8 +312,6 @@ int DataMaintainer::updateMismatchedChecksums()
 
     int number = 0;
     TreeModelIterator iter(data_->model_);
-
-    emit processing(true);
 
     while (iter.hasNext()) {
         if (iter.nextFile().status() == FileStatus::Mismatched) {
@@ -352,11 +346,7 @@ void DataMaintainer::exportToJson()
     data_->metaData.successfulCheckDateTime.clear();
     data_->metaData.saveDateTime = format::currentDateTime();
 
-    emit processing(true);
-
     data_->setSaveResult(json->makeJson(data_));
-
-    emit processing(false);
 
     emit databaseUpdated();
 }
@@ -371,11 +361,11 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
     }
 
-    emit processing(true);
+    //emit processing(true);
 
     emit subDbForked(json->makeJson(data_, rootFolder));
 
-    emit processing(false);
+    //emit processing(false);
 }
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
