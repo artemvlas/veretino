@@ -51,11 +51,8 @@ private:
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
 
-    int calculateChecksums(FileStatus status = FileStatus::Queued,
-                           bool finalProcess = true);
-    int calculateChecksums(const QModelIndex &rootIndex,
-                           FileStatus status = FileStatus::Queued,
-                           bool finalProcess = true);
+    int calculateChecksums(FileStatus status = FileStatus::Queued);
+    int calculateChecksums(const QModelIndex &rootIndex, FileStatus status);
 
     bool canceled = false;
     bool isViewFileSysytem;

@@ -134,7 +134,7 @@ void Manager::updateDatabase(const TaskDbUpdate task)
         if ((task == TaskUpdateNewLost || task == TaskAddNew)
             && dataMaintainer->data_->contains(FileStatus::New)) {
 
-            calculateChecksums(FileStatus::New, false);
+            calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
 
             if (canceled) {
                 emit processing(false);
@@ -314,19 +314,18 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return checkSum;
 }
 
-int Manager::calculateChecksums(FileStatus status, bool finalProcess)
+int Manager::calculateChecksums(FileStatus status)
 {
-    return calculateChecksums(QModelIndex(), status, finalProcess);
+    return calculateChecksums(QModelIndex(), status);
 }
 
-int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status, bool finalProcess)
+int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 {
     if (!dataMaintainer->data_
         || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_)) {
 
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
-        if (finalProcess)
-            emit processing(false);
+        emit processing(false);
         return 0;
     }
 
@@ -335,8 +334,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
 
     if (numQueued == 0) {
         qDebug() << "Manager::calculateChecksums | No files in queue";
-        if (finalProcess)
-            emit processing(false);
+        emit processing(false);
         return 0;
     }
 
@@ -399,8 +397,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status,
 
     dataMaintainer->updateNumbers();
 
-    if (finalProcess)
-        emit processing(false); // set Mode view, hide progress bar
+    emit processing(false); // set Mode view, hide progress bar
 
     return doneNum;
 }
