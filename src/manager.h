@@ -25,18 +25,21 @@ public:
 
 public slots:
     void processFolderSha(const MetaData &metaData);
-    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, PurposeFileProc result);
+    void branchSubfolder(const QModelIndex &subfolder);
+    void updateDatabase(const TaskDbUpdate dest);
     void verify(const QModelIndex &curIndex);
+
+    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, PurposeFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
-    void getPathInfo(const QString &path); // info about file (size) or folder contents
-    void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
     void createDataModel(const QString &databaseFilePath); // making the tree data model
-    void updateDatabase(const TaskDbUpdate task);
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
+
+    void getPathInfo(const QString &path); // info about file (size) or folder contents
+    void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);
@@ -45,7 +48,7 @@ private:
     void runTask(std::function<void()> task);
 
     void _processFolderSha(const MetaData &metaData);
-    void _updateDatabase(const TaskDbUpdate task);
+    void _updateDatabase(const TaskDbUpdate dest);
 
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void _verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex());

@@ -126,12 +126,12 @@ void Manager::createDataModel(const QString &databaseFilePath)
     }
 }
 
-void Manager::updateDatabase(const TaskDbUpdate task)
+void Manager::updateDatabase(const TaskDbUpdate dest)
 {
-    runTask([&] { _updateDatabase(task); });
+    runTask([&] { _updateDatabase(dest); });
 }
 
-void Manager::_updateDatabase(const TaskDbUpdate task)
+void Manager::_updateDatabase(const TaskDbUpdate dest)
 {
     if (!dataMaintainer->data_) {
         return;
@@ -142,12 +142,12 @@ void Manager::_updateDatabase(const TaskDbUpdate task)
         return;
     }
 
-    if (task == TaskUpdateMismatches) {
+    if (dest == TaskUpdateMismatches) {
         dataMaintainer->updateMismatchedChecksums();
     }
 
     else {
-        if ((task == TaskUpdateNewLost || task == TaskAddNew)
+        if ((dest == TaskUpdateNewLost || dest == TaskAddNew)
             && dataMaintainer->data_->contains(FileStatus::New)) {
 
             calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
@@ -157,7 +157,7 @@ void Manager::_updateDatabase(const TaskDbUpdate task)
             }
         }
 
-        if ((task == TaskUpdateNewLost || task == TaskClearLost)
+        if ((dest == TaskUpdateNewLost || dest == TaskClearLost)
             && dataMaintainer->data_->contains(FileStatus::Missing)) {
 
             dataMaintainer->clearLostFiles();
@@ -165,6 +165,11 @@ void Manager::_updateDatabase(const TaskDbUpdate task)
     }
 
     dataMaintainer->exportToJson();
+}
+
+void Manager::branchSubfolder(const QModelIndex &subfolder)
+{
+    runTask([&] { dataMaintainer->forkJsonDb(subfolder); });
 }
 
 void Manager::verify(const QModelIndex &curIndex)
