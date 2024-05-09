@@ -112,8 +112,8 @@ void MainWindow::connectManager()
     qRegisterMetaType<MetaData>("MetaData");
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
-    qRegisterMetaType<PurposeFileProc>("PurposeFileProc");
-    qRegisterMetaType<TaskDbUpdate>("TaskDbUpdate");
+    qRegisterMetaType<DestFileProc>("DestFileProc");
+    qRegisterMetaType<DestDbUpdate>("DestDbUpdate");
 
     manager->moveToThread(thread);
 
@@ -326,7 +326,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
     int ret = msgBox.exec();
     if (result.contains(FileStatus::Mismatched) && ret == QMessageBox::Ok) {
-        emit modeSelect->updateDatabase(TaskDbUpdate::TaskUpdateMismatches);
+        emit modeSelect->updateDatabase(DestDbUpdate::DestUpdateMismatches);
     }
 }
 

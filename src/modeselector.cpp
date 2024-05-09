@@ -63,7 +63,7 @@ void ModeSelector::connectActions()
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
     connect(actionProcessSha512File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha512);});
     connect(actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{emit processFileSha(view_->curPathFileSystem, settings_->algorithm, PurposeFileProc::Clipboard);});
+            [=]{emit processFileSha(view_->curPathFileSystem, settings_->algorithm, DestFileProc::Clipboard);});
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -72,10 +72,10 @@ void ModeSelector::connectActions()
     connect(actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
-    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateMismatches);});
-    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);});
-    connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskAddNew);});
-    connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(TaskDbUpdate::TaskClearLost);});
+    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestUpdateMismatches);});
+    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestUpdateNewLost);});
+    connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestAddNew);});
+    connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestClearLost);});
     connect(actionFilterNewLost, &QAction::triggered, this,
             [=](bool isChecked){view_->editFilter(FileStatus::FlagNewLost, isChecked);});
     connect(actionFilterMismatches, &QAction::triggered, this,
@@ -301,7 +301,7 @@ void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
 // tasks execution --->>>
 void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
 {
-    emit processFileSha(view_->curPathFileSystem, algo, PurposeFileProc::SumFile);
+    emit processFileSha(view_->curPathFileSystem, algo, DestFileProc::SumFile);
 }
 
 void ModeSelector::verifyItem()
@@ -492,10 +492,10 @@ void ModeSelector::doWork()
             emit verify();
             break;
         case ModelNewLost:
-            emit updateDatabase(TaskDbUpdate::TaskUpdateNewLost);
+            emit updateDatabase(DestDbUpdate::DestUpdateNewLost);
             break;
         case UpdateMismatch:
-            emit updateDatabase(TaskDbUpdate::TaskUpdateMismatches);
+            emit updateDatabase(DestDbUpdate::DestUpdateMismatches);
             break;
         case NoMode:
             showFileSystem();

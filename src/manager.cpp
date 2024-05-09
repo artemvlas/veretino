@@ -70,7 +70,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
     }
 }
 
-void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, PurposeFileProc result)
+void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
     QString sum = calculateChecksum(filePath, algo);
 
@@ -126,38 +126,35 @@ void Manager::createDataModel(const QString &databaseFilePath)
     }
 }
 
-void Manager::updateDatabase(const TaskDbUpdate dest)
+void Manager::updateDatabase(const DestDbUpdate dest)
 {
     runTask([&] { _updateDatabase(dest); });
 }
 
-void Manager::_updateDatabase(const TaskDbUpdate dest)
+void Manager::_updateDatabase(const DestDbUpdate dest)
 {
-    if (!dataMaintainer->data_) {
+    if (!dataMaintainer->data_)
         return;
-    }
 
     if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable)) {
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
         return;
     }
 
-    if (dest == TaskUpdateMismatches) {
+    if (dest == DestUpdateMismatches)
         dataMaintainer->updateMismatchedChecksums();
-    }
 
     else {
-        if ((dest == TaskUpdateNewLost || dest == TaskAddNew)
+        if ((dest & DestAddNew)
             && dataMaintainer->data_->contains(FileStatus::New)) {
 
             calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
 
-            if (canceled) {
+            if (canceled)
                 return;
-            }
         }
 
-        if ((dest == TaskUpdateNewLost || dest == TaskClearLost)
+        if ((dest & DestClearLost)
             && dataMaintainer->data_->contains(FileStatus::Missing)) {
 
             dataMaintainer->clearLostFiles();

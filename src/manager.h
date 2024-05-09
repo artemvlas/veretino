@@ -18,18 +18,26 @@ class Manager : public QObject
     Q_OBJECT
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
-    enum PurposeFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
-    enum TaskDbUpdate { TaskUpdateMismatches, TaskUpdateNewLost, TaskAddNew, TaskClearLost };
+
+    enum DestFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
+
+    enum DestDbUpdate {
+        DestUpdateMismatches = 1 << 0,
+        DestAddNew = 1 << 1,
+        DestClearLost = 1 << 2,
+        DestUpdateNewLost = DestAddNew | DestClearLost
+    };
+
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
     ProcState *procState = new ProcState(this);
 
 public slots:
     void processFolderSha(const MetaData &metaData);
     void branchSubfolder(const QModelIndex &subfolder);
-    void updateDatabase(const TaskDbUpdate dest);
+    void updateDatabase(const DestDbUpdate dest);
     void verify(const QModelIndex &curIndex);
 
-    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, PurposeFileProc result);
+    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
@@ -48,7 +56,7 @@ private:
     void runTask(std::function<void()> task);
 
     void _processFolderSha(const MetaData &metaData);
-    void _updateDatabase(const TaskDbUpdate dest);
+    void _updateDatabase(const DestDbUpdate dest);
 
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void _verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex());
@@ -81,7 +89,7 @@ signals:
     void showMessage(const QString &text, const QString &title = "Info");
 }; // class Manager
 
-using PurposeFileProc = Manager::PurposeFileProc;
-using TaskDbUpdate = Manager::TaskDbUpdate;
+using DestFileProc = Manager::DestFileProc;
+using DestDbUpdate = Manager::DestDbUpdate;
 
 #endif // MANAGER_H
