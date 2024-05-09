@@ -456,11 +456,11 @@ void Manager::getPathInfo(const QString &path)
             connect(thread, &QThread::finished, thread, &QThread::deleteLater);
             connect(thread, &QThread::finished, files, &Files::deleteLater);
             connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-            connect(files, &Files::setStatusbarText, this, [=](const QString &text){if (text != "counting...") thread->quit();});
-            connect(files, &Files::setStatusbarText, this, [=](const QString &text){if (!text.isEmpty()) emit setStatusbarText(text);});
+            connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
+            connect(files, &Files::finished, thread, &QThread::quit);
 
             // ***debug***
-            // connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getItemInfo | &Files::destroyed" << path;});
+            // connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getPathInfo | &Files::destroyed" << path;});
 
             thread->start();
         }
@@ -496,12 +496,11 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
         files->moveToThread(thread);
 
         connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
-        connect(this, &Manager::cancelProcess, thread, &QThread::quit);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         connect(thread, &QThread::finished, files, &Files::deleteLater);
         connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
         connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
-        connect(files, &Files::folderContentsListCreated, thread, &QThread::quit);
+        connect(files, &Files::finished, thread, &QThread::quit);
 
         connect(files, &Files::folderContentsListCreated, this, filterCreation ? &Manager::folderContentsFilterCreated
                                                                                : &Manager::folderContentsListCreated);

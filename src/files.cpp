@@ -92,13 +92,13 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
     return result;
 }
 
-QString Files::contentStatus()
+void Files::contentStatus()
 {
-    return !initPath_.isEmpty() ? contentStatus(initPath_) : QString();
+    contentStatus(initPath_);
 }
 
-QString Files::contentStatus(const QString &path)
-{
+void Files::contentStatus(const QString &path)
+{   
     QFileInfo fileInfo(path);
     QString result;
 
@@ -115,21 +115,20 @@ QString Files::contentStatus(const QString &path)
             ++filesNumber;
         }
 
-        if (!canceled) {
+        if (!canceled)
             result = QString("%1: %2").arg(paths::basicName(path), format::filesNumberAndSize(filesNumber, totalSize));
-        }
-        else {
+        else
             qDebug() << "Files::contentStatus | Canceled" << path;
-        }
     }
-    else if (fileInfo.isFile()) {
+    else if (fileInfo.isFile())
         result = format::fileNameAndSize(path);
-    }
     else
         qDebug() << "Files::contentStatus | The 'path' doesn't exist";
 
-    emit setStatusbarText(result);
-    return result;
+    if (!result.isEmpty())
+        emit setStatusbarText(result);
+
+    emit finished();
 }
 
 QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flags, const QModelIndex &rootIndex)
@@ -153,6 +152,12 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
 }
 
 void Files::folderContentsByType()
+{
+    _folderContentsByType();
+    emit finished();
+}
+
+void Files::_folderContentsByType()
 {
     if (initPath_.isEmpty()) {
         qDebug() << "Files::folderContentsByType | No initial data";
