@@ -153,26 +153,19 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
 
 void Files::folderContentsByType()
 {
-    _folderContentsByType();
+    folderContentsByType(initPath_);
     emit finished();
 }
 
-void Files::_folderContentsByType()
+void Files::folderContentsByType(const QString &folderPath)
 {
-    if (initPath_.isEmpty()) {
-        qDebug() << "Files::folderContentsByType | No initial data";
-        return;
-    }
-
-    FileList fileList = getFileList(FilterRule(false));
-
-    if (canceled)
+    if (folderPath.isEmpty())
         return;
 
-    if (fileList.isEmpty()) {
-        qDebug() << "Empty folder. No file types to display.";
+    FileList fileList = getFileList(folderPath, FilterRule(false));
+
+    if (canceled || fileList.isEmpty())
         return;
-    }
 
     QHash<QString, FileList> listsByType; // key = extension, value = list of files with that extension
 
@@ -204,7 +197,7 @@ void Files::_folderContentsByType()
         combList.append(t);
     }
 
-    emit folderContentsListCreated(initPath_, combList);
+    emit folderContentsListCreated(folderPath, combList);
 }
 
 qint64 Files::dataSize()

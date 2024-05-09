@@ -59,7 +59,7 @@ private:
     void _updateDatabase(const DestDbUpdate dest);
 
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
-    void _verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex());
+    void _verifyFolderItem(const QModelIndex &folderItemIndex);
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
     void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
     void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size

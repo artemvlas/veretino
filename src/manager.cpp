@@ -214,9 +214,8 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 
 void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
 {
-    if (!dataMaintainer->data_) {
+    if (!dataMaintainer->data_)
         return;
-    }
 
     if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable, folderItemIndex)) {
         QString warningText = "There are no files available for verification.";
@@ -230,9 +229,8 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
     dataMaintainer->changeFilesStatus((FileStatus::Added | FileStatus::Updated), FileStatus::Matched, folderItemIndex);
     calculateChecksums(folderItemIndex, FileStatus::NotChecked);
 
-    if (canceled) {
+    if (canceled)
         return;
-    }
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder

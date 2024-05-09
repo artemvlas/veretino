@@ -62,7 +62,7 @@ public:
 
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false)); // checks whether there are any (or filtered) files the folder/subfolders
 
-    qint64 dataSize(); // total size of all files in the 'initFolderPath' or 'initFileList'
+    qint64 dataSize(); // total size of all files in the 'initPath_' folder
     qint64 dataSize(const QString &folder); // total size of getFileList('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
@@ -75,11 +75,11 @@ public:
 
 public slots:
     void cancelProcess();
-    void contentStatus(); // returns "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
-    void folderContentsByType(); // returns sorted by data size list of extensions, files number and their size
+    void contentStatus(); // "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
+    void folderContentsByType(); // emits the list of extensions with files number and their size
 
 private:
-    void _folderContentsByType();
+    void folderContentsByType(const QString &folderPath);
 
     // variables
     QString initPath_; // path to the File or Folder specified when creating the object
