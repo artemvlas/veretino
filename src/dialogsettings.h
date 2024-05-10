@@ -39,10 +39,10 @@ private:
     void cleanUpExtList();
 
     FilterRule selectPresetFilter(const FilterPreset preset);
-    FilterRule getCurrentFilter();
+    FilterRule getCurrentFilter() const;
 
     Ui::DialogSettings *ui;
-    QStringList extensionsList(); // return a list of extensions from input
+    QStringList extensionsList() const; // return a list of extensions from input
     Settings *settings_;
     const Settings defaults;
 

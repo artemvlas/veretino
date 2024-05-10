@@ -1,5 +1,6 @@
 Veretino 0.3.12 (dev)
 * More accurate and smooth process speed and remaining time.
+* Settings tab "Permanent Filter": Fixed the Ignore/Include switch when the list of extensions is empty.
 
 Veretino 0.3.11
 * Improved stability when switching databases.

@@ -107,7 +107,7 @@ void DialogSettings::updateSettings()
     cleanUpExtList();
 }
 
-QStringList DialogSettings::extensionsList()
+QStringList DialogSettings::extensionsList() const
 {
     if (!ui->inputExtensions->text().isEmpty()) {
         QString ignoreExtensions = ui->inputExtensions->text().toLower();
@@ -209,10 +209,8 @@ FilterRule DialogSettings::selectPresetFilter(const FilterPreset preset)
     }
 }
 
-FilterRule DialogSettings::getCurrentFilter()
+FilterRule DialogSettings::getCurrentFilter() const
 {
-    ui->radioButtonIgnore->setChecked(ui->inputExtensions->text().isEmpty());
-
     FilterRule curFilter;
     curFilter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
     curFilter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
@@ -242,9 +240,9 @@ void DialogSettings::cleanUpExtList()
         QStringList list;
         if (!settings_->filter.isFilter(FilterRule::Include)) {
             if (settings_->filter.ignoreShaFiles)
-                list.append({"sha1", "sha256", "sha512"});
+                list.append({ "sha1", "sha256", "sha512" });
             if (settings_->filter.ignoreDbFiles)
-                list.append({"ver", "ver.json"});
+                list.append({ "ver", "ver.json" });
         }
 
         if (!list.isEmpty()) {
