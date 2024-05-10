@@ -60,6 +60,7 @@ public slots:
     void disableFilter();
     void saveHeaderState();
     void toHome();
+    void setMismatchFiltering(const Numbers &num);
 
     void headerContextMenuRequested(const QPoint &point);
 

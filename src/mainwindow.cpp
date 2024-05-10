@@ -138,6 +138,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
     connect(manager, &Manager::setStatusbarText, this, &MainWindow::updateStatusIcon);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
+    connect(manager, &Manager::folderChecked, ui->treeView, &View::setMismatchFiltering);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
     connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
     connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
@@ -293,7 +294,6 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
 
 void MainWindow::showFolderCheckResult(const Numbers &result, const QString &subFolder)
 {
-
     QMessageBox msgBox(this);
 
     QString titleText = (result.contains(FileStatus::Mismatched)) ? "FAILED" : "Success";

@@ -83,9 +83,6 @@ void View::setTreeModel(ModelView modelSel)
     else
         setDefaultColumnsWidth();
 
-    data_->numbers.contains(FileStatus::Mismatched) ? showAllColumns()
-                                                    : hideColumn(Column::ColumnReChecksum);
-
     setIndexByPath(curPathModel);
 }
 
@@ -107,6 +104,20 @@ void View::setData(DataContainer *data)
         setTreeModel(ModelView::ModelSource);
 
     QTimer::singleShot(100, this, &View::dataSetted);
+}
+
+void View::setMismatchFiltering(const Numbers &num)
+{
+    if (!data_)
+        return;
+
+    if (num.contains(FileStatus::Mismatched)) {
+        showAllColumns();
+        data_->proxyModel_->setFilter(FileStatus::Mismatched); // used instead of 'View::setFilter' because at the time of calling this function
+                                                               // the current model is ModelSource, the ModelProxy is set later
+    }
+    else
+        hideColumn(Column::ColumnReChecksum);
 }
 
 void View::changeCurIndexAndPath(const QModelIndex &curIndex)
@@ -170,7 +181,6 @@ void View::setFilter(const FileStatuses flags)
         data_->proxyModel_->setFilter(flags);
         setIndexByPath(prePathModel);
         setBackgroundColor();
-        //qDebug() << "View::setFilter" << flags;
     }
 }
 

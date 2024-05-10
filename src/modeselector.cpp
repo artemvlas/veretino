@@ -155,10 +155,6 @@ void ModeSelector::setProcView(bool isProcessing)
         // when the process is completed, return to the Proxy Model view
         if (!isProcessing && view_->isCurrentViewModel(ModelView::ModelSource)) {
             view_->setTreeModel(ModelView::ModelProxy);
-
-            // if there are Mismatches in the Model, filter them
-            if (view_->data_->contains(FileStatus::Mismatched))
-                view_->setFilter(FileStatus::Mismatched);
         }
     }
 }
