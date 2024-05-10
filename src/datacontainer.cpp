@@ -42,16 +42,31 @@ QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
     return paths::joinPath(metaData.workDir, TreeModel::getPath(curIndex));
 }
 
-QString DataContainer::branchDbFilePath(const QModelIndex &subfolder) const
+QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool existing) const
 {
     if (!TreeModel::isFolderRow(subfolder))
         return QString();
 
     const Settings defaults;
-    QString extension = defaults.dbFileExtension(!metaData.databaseFilePath.endsWith(".ver"));
-    QString subFolderDbFileName = format::composeDbFileName(defaults.dbPrefix, subfolder.data().toString(), extension);
+    QString folderName = subfolder.data().toString();
+    QString folderPath = itemAbsolutePath(subfolder);
+    const bool isLongExtension = !metaData.databaseFilePath.endsWith(".ver");
 
-    return paths::joinPath(itemAbsolutePath(subfolder), subFolderDbFileName);
+    QString extension = defaults.dbFileExtension(isLongExtension);
+    QString fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);
+    QString filePath = paths::joinPath(folderPath, fileName);
+
+    if (QFile::exists(filePath) || !existing)
+        return filePath;
+
+    extension = defaults.dbFileExtension(!isLongExtension);
+    fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);
+    filePath = paths::joinPath(folderPath, fileName);
+
+    if (QFile::exists(filePath))
+        return filePath;
+
+    return QString();
 }
 
 bool DataContainer::isWorkDirRelative() const

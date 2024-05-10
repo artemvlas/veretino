@@ -375,7 +375,7 @@ void ModeSelector::openBranchDb()
     if (!view_->data_)
         return;
 
-    QString assumedPath = view_->data_->branchDbFilePath(view_->curIndexSource);
+    QString assumedPath = view_->data_->getBranchFilePath(view_->curIndexSource, true);
 
     if (QFileInfo::exists(assumedPath))
         openJsonDatabase(assumedPath);
@@ -630,7 +630,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     actionCopyItem->setText("Copy Folder");
                     viewContextMenu->addAction(actionCopyItem);
 
-                    if (QFileInfo::exists(view_->data_->branchDbFilePath(index)))
+                    if (!view_->data_->getBranchFilePath(index, true).isEmpty())
                         viewContextMenu->addAction(actionBranchOpen);
                     else
                         viewContextMenu->addAction(actionBranchMake);
