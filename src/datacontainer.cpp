@@ -42,6 +42,8 @@ QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
     return paths::joinPath(metaData.workDir, TreeModel::getPath(curIndex));
 }
 
+// existing = false: returns the predefined path to the branch database file, regardless of the file's existence
+// true: returns the path to the existing branch's database file; empty str if missing
 QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool existing) const
 {
     if (!TreeModel::isFolderRow(subfolder))

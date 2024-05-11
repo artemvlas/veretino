@@ -82,8 +82,6 @@ public:
     QString backupFilePath() const;
     QString itemAbsolutePath(const QModelIndex &curIndex) const; // returns the absolute path to the database item (file or subfolder)
     QString getBranchFilePath(const QModelIndex &subfolder, bool existing = false) const;
-    // ^ existing = false: returns the predefined path to the branch database file, regardless of the file's existence
-    // true: returns the path to the existing branch's database file; empty str if missing
 
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
