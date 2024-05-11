@@ -1,8 +1,8 @@
-Veretino 0.3.12 (dev)
+Veretino 0.3.12
 * More accurate and smooth process speed and remaining time.
-* After checking a subfolder, filtering of Mismatches is enabled only if they were found in this particular subfolder.
-* Settings tab "Permanent Filter": Fixed the Ignore/Include switch when the list of extensions is empty.
+* After checking a subfolder, filtering of Mismatches is applied only if they were found in this particular subfolder.
 * Both extensions are now used when discovering existing Branches.
+* Settings tab "Permanent Filter": Fixed the Ignore/Include switch when the list of extensions is empty.
 
 Veretino 0.3.11
 * Improved stability when switching databases.
