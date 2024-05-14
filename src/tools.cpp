@@ -141,8 +141,9 @@ void browsePath(const QString &path)
 
 bool isRoot(const QString &path)
 {
-    return (path == "/")
-           || ((path.length() == 2 || path.length() == 3) && path.at(0).isLetter() && path.at(1) == ':');
+    return (path == "/") // Linux FS root
+           || ((path.length() == 2 || path.length() == 3) // Windows drive root
+               && path.at(0).isLetter() && path.at(1) == ':');
 }
 } // namespace paths
 
@@ -292,7 +293,9 @@ QString filesNumberAndSize(int filesNumber, qint64 filesSize)
     if (filesNumber == 1)
         s = "file"; // if only 1 file the text is "file", if more the text is "files"
 
-    return QString("%1 %2 (%3)").arg(filesNumber).arg(s, dataSizeReadable(filesSize));
+    return QString("%1 %2 (%3)")
+                    .arg(filesNumber)
+                    .arg(s, dataSizeReadable(filesSize));
 }
 
 QString fileNameAndSize(const QString &filePath)

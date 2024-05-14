@@ -73,7 +73,7 @@ QString ProgressBar::progSpeed()
     QString result;
 
     if (pieceTime_ > 0) {
-        result = QString("%1/sec")
+        result = QString("%1/s")
                      .arg(format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000));
     }
 
