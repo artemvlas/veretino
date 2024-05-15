@@ -21,7 +21,7 @@ trap cleanup EXIT
 pushd "$BUILD_DIR"
 
 # make project
-qmake "$REPO_ROOT"
+qmake6 "$REPO_ROOT"
 
 # build the application on all CPU cores
 make -j$(nproc)
