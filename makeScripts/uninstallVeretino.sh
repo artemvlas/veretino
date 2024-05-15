@@ -1,5 +1,5 @@
 #! /bin/bash
-#remove Veretino from system:
+# remove the Veretino app from the OS:
 
 sudo rm /usr/share/applications/veretino.desktop
 sudo rm /usr/share/pixmaps/veretino.png

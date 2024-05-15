@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Install 'make' to system:
+# It is assumed that 'make' is installed
 # sudo pacman -S make
 
 set -x
@@ -20,13 +20,13 @@ trap cleanup EXIT
 
 pushd "$BUILD_DIR"
 
-# make project
+# make the project
 qmake6 "$REPO_ROOT"
 
 # build the application on all CPU cores
 make -j$(nproc)
 
-# install to system
+# install [/usr/bin/veretino]
 sudo make install
 
 echo "All done..."
