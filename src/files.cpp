@@ -22,6 +22,11 @@ Files::Files(const QString &path, QObject *parent)
     : QObject(parent), fsPath_(path)
 {}
 
+void Files::setPath(const QString &path)
+{
+    fsPath_ = path;
+}
+
 FileList Files::getFileList()
 {
     return getFileList(fsPath_);

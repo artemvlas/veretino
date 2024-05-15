@@ -56,13 +56,12 @@ public:
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 
     // functions
-    FileList getFileList(); // 'initFolderPath' --> getFileList(const QString &rootFolder)
+    void setPath(const QString &path); // path to file or folder >> 'fsPath_'
+    FileList getFileList(); // 'fsPath_' --> getFileList(const QString &rootFolder)
     FileList getFileList(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
     FileList getFileList(const QString &rootFolder, const FilterRule &filter = FilterRule());
 
-    static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false)); // checks whether there are any (or filtered) files the folder/subfolders
-
-    qint64 dataSize(); // total size of all files in the 'initPath_' folder
+    qint64 dataSize(); // total size of all files in the 'fsPath_' folder
     qint64 dataSize(const QString &folder); // total size of getFileList('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
@@ -73,6 +72,9 @@ public:
 
     static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
+
+    // checks whether there are any (or filtered) files the folder/subfolders
+    static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false));
 
     // variables
     bool canceled = false;
