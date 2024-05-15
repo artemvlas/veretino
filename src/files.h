@@ -20,7 +20,7 @@ class Files : public QObject
     Q_OBJECT
 public:
     explicit Files(QObject *parent = nullptr);
-    explicit Files(const QString &initPath, QObject *parent = nullptr);
+    explicit Files(const QString &path, QObject *parent = nullptr);
 
     enum FileStatus {
         NotSet = 0,
@@ -66,7 +66,7 @@ public:
     qint64 dataSize(const QString &folder); // total size of getFileList('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
-    void contentStatus(const QString &path);
+    QString getFolderSize(const QString &path);
     static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
 
@@ -75,14 +75,14 @@ public:
 
 public slots:
     void cancelProcess();
-    void contentStatus(); // "filename (readable size)" for file, or "folder name: number of files (redable size) for folders"
+    QString getFolderSize(); // returns "folder name: number of files (redable size)"
     void folderContentsByType(); // emits the list of extensions with files number and their size
 
 private:
     void folderContentsByType(const QString &folderPath);
 
     // variables
-    QString initPath_; // path to the File or Folder specified when creating the object
+    QString fsPath_; // path to the File or Folder specified when creating the object
 
 signals:
     void setStatusbarText(const QString &text = QString());

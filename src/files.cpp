@@ -18,18 +18,18 @@ Files::Files(QObject *parent)
     : QObject(parent)
 {}
 
-Files::Files(const QString &initPath, QObject *parent)
-    : QObject(parent), initPath_(initPath)
+Files::Files(const QString &path, QObject *parent)
+    : QObject(parent), fsPath_(path)
 {}
 
 FileList Files::getFileList()
 {
-    return getFileList(initPath_);
+    return getFileList(fsPath_);
 }
 
 FileList Files::getFileList(const FilterRule &filter)
 {
-    return getFileList(initPath_, filter);
+    return getFileList(fsPath_, filter);
 }
 
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
@@ -92,12 +92,12 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
     return result;
 }
 
-void Files::contentStatus()
+QString Files::getFolderSize()
 {
-    contentStatus(initPath_);
+    return getFolderSize(fsPath_);
 }
 
-void Files::contentStatus(const QString &path)
+QString Files::getFolderSize(const QString &path)
 {   
     QFileInfo fileInfo(path);
     QString result;
@@ -106,29 +106,27 @@ void Files::contentStatus(const QString &path)
         canceled = false;
         int filesNumber = 0;
         qint64 totalSize = 0;
+
+        // iterating
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
-
-        emit setStatusbarText("counting...");
-
         while (it.hasNext() && !canceled) {
             totalSize += QFileInfo(it.next()).size();
             ++filesNumber;
         }
 
-        if (!canceled)
-            result = QString("%1: %2").arg(paths::basicName(path), format::filesNumberAndSize(filesNumber, totalSize));
+        // result processing
+        if (!canceled) {
+            QString folderName = paths::basicName(path);
+            QString folderSize = (filesNumber > 0) ? format::filesNumberAndSize(filesNumber, totalSize) : "no files";
+
+            result = QString("%1: %2")
+                         .arg(folderName, folderSize);
+        }
         else
-            qDebug() << "Files::contentStatus | Canceled" << path;
+            qDebug() << "Files::getFolderSize | Canceled" << path;
     }
-    else if (fileInfo.isFile())
-        result = format::fileNameAndSize(path);
-    else
-        qDebug() << "Files::contentStatus | The 'path' doesn't exist";
 
-    if (!result.isEmpty())
-        emit setStatusbarText(result);
-
-    emit finished();
+    return result;
 }
 
 QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flags, const QModelIndex &rootIndex)
@@ -153,7 +151,7 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
 
 void Files::folderContentsByType()
 {
-    folderContentsByType(initPath_);
+    folderContentsByType(fsPath_);
     emit finished();
 }
 
@@ -202,7 +200,7 @@ void Files::folderContentsByType(const QString &folderPath)
 
 qint64 Files::dataSize()
 {
-    return !initPath_.isEmpty() ? dataSize(getFileList()) : 0;
+    return !fsPath_.isEmpty() ? dataSize(getFileList()) : 0;
 }
 
 qint64 Files::dataSize(const QString &folder)

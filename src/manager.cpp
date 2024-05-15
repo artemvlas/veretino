@@ -435,32 +435,15 @@ void Manager::getPathInfo(const QString &path)
     if (isViewFileSysytem) {
         QFileInfo fileInfo(path);
 
-        // If a file path is specified, then there is no need to complicate this task and create an Object and a Thread
-        // If a folder path is specified, then that folder should be iterated on a separate thread to be able to interrupt this process
         if (fileInfo.isFile()) {
             emit setStatusbarText(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
-            if (Files::isEmptyFolder(path)) {
-                emit setStatusbarText(QString("%1: no files").arg(paths::basicName(path)));
-                return;
-            }
+            Files files(path);
+            connect(this, &Manager::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
 
-            QThread *thread = new QThread;
-            Files *files = new Files(path);
-            files->moveToThread(thread);
-
-            connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
-            connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-            connect(thread, &QThread::finished, files, &Files::deleteLater);
-            connect(thread, &QThread::started, files, qOverload<>(&Files::contentStatus));
-            connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
-            connect(files, &Files::finished, thread, &QThread::quit);
-
-            // ***debug***
-            // connect(thread, &Files::destroyed, this, [=]{qDebug()<< "Manager::getPathInfo | &Files::destroyed" << path;});
-
-            thread->start();
+            emit setStatusbarText("counting...");
+            emit setStatusbarText(files.getFolderSize());
         }
     }
 }
