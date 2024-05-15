@@ -35,7 +35,7 @@ FileList Files::getFileList(const FilterRule &filter)
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 {
     if (!QFileInfo(rootFolder).isDir()) {
-        qDebug() << "Files::allFiles | Not a folder path: " << rootFolder;
+        qDebug() << "Files::getFileList | Not a folder path: " << rootFolder;
         return FileList();
     }
 
@@ -64,7 +64,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
     }
 
     if (canceled) {
-        qDebug() << "Files::allFiles | Canceled:" << rootFolder;
+        qDebug() << "Files::getFileList | Canceled:" << rootFolder;
         emit setStatusbarText();
         return FileList();
     }
@@ -149,21 +149,17 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
     return format::filesNumberAndSize(filesNumber, dataSize);
 }
 
-void Files::folderContentsByType()
+QList<ExtNumSize> Files::getFileTypes()
 {
-    folderContentsByType(fsPath_);
-    emit finished();
+    return getFileTypes(fsPath_);
 }
 
-void Files::folderContentsByType(const QString &folderPath)
+QList<ExtNumSize> Files::getFileTypes(const QString &folderPath)
 {
-    if (folderPath.isEmpty())
-        return;
-
     FileList fileList = getFileList(folderPath, FilterRule(false));
 
-    if (canceled || fileList.isEmpty())
-        return;
+    if (fileList.isEmpty())
+        return QList<ExtNumSize>();
 
     QHash<QString, FileList> listsByType; // key = extension, value = list of files with that extension
 
@@ -195,7 +191,7 @@ void Files::folderContentsByType(const QString &folderPath)
         combList.append(t);
     }
 
-    emit folderContentsListCreated(folderPath, combList);
+    return combList;
 }
 
 qint64 Files::dataSize()

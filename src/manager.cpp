@@ -439,11 +439,11 @@ void Manager::getPathInfo(const QString &path)
             emit setStatusbarText(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
-            Files files(path);
+            Files files;
             connect(this, &Manager::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
 
             emit setStatusbarText("counting...");
-            emit setStatusbarText(files.getFolderSize());
+            emit setStatusbarText(files.getFolderSize(path));
         }
     }
 }
@@ -472,27 +472,18 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        QThread *thread = new QThread;
-        Files *files = new Files(folderPath);
-        files->moveToThread(thread);
+        Files files;
+        connect(this, &Manager::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
+        connect(&files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
 
-        connect(this, &Manager::cancelProcess, files, &Files::cancelProcess, Qt::DirectConnection);
-        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-        connect(thread, &QThread::finished, files, &Files::deleteLater);
-        connect(thread, &QThread::started, files, qOverload<>(&Files::folderContentsByType));
-        connect(files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
-        connect(files, &Files::finished, thread, &QThread::quit);
+        QList<ExtNumSize> typesList = files.getFileTypes(folderPath);
 
-        connect(files, &Files::folderContentsListCreated, this, filterCreation ? &Manager::folderContentsFilterCreated
-                                                                               : &Manager::folderContentsListCreated);
-
-        // ***debug***
-        // connect(thread, &QThread::destroyed, this, [=]{qDebug() << "Manager::folderContentsList | &QThread::destroyed" << folderPath;});
-
-        thread->start();
-    }
-    else {
-        qDebug() << "Manager::folderContentsByType | Not a filesystem view";
+        if (!typesList.isEmpty()) {
+            if (filterCreation)
+                emit folderContentsFilterCreated(folderPath, typesList);
+            else
+                emit folderContentsListCreated(folderPath, typesList);
+        }
     }
 }
 

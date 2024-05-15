@@ -66,7 +66,11 @@ public:
     qint64 dataSize(const QString &folder); // total size of getFileList('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
+    QString getFolderSize(); // returns "folder name: number of files (redable size)"
     QString getFolderSize(const QString &path);
+    QList<ExtNumSize> getFileTypes(); // returns a list of file types (extensions) with files number and their size
+    QList<ExtNumSize> getFileTypes(const QString &folderPath);
+
     static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
 
@@ -75,19 +79,14 @@ public:
 
 public slots:
     void cancelProcess();
-    QString getFolderSize(); // returns "folder name: number of files (redable size)"
-    void folderContentsByType(); // emits the list of extensions with files number and their size
 
 private:
-    void folderContentsByType(const QString &folderPath);
-
     // variables
     QString fsPath_; // path to the File or Folder specified when creating the object
 
 signals:
     void setStatusbarText(const QString &text = QString());
-    void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
-    void finished();
+
 }; // class Files
 
 using FileStatus = Files::FileStatus;
