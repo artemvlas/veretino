@@ -70,9 +70,11 @@ private:
     int calculateChecksums(FileStatus status);
     int calculateChecksums(const QModelIndex &rootIndex, FileStatus status);
 
+    // variables
     bool canceled = false;
     bool isViewFileSysytem;
     Settings *settings_;
+    Files *files_ = new Files(this);
 
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
 

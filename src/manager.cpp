@@ -17,10 +17,13 @@ Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)
 {
     connect(this, &Manager::cancelProcess, this, [=]{ canceled = true; emit setStatusbarText("Canceled"); }, Qt::DirectConnection);
-
+    connect(this, &Manager::cancelProcess, files_, &Files::cancelProcess, Qt::DirectConnection);
     connect(this, &Manager::cancelProcess, dataMaintainer, &DataMaintainer::cancelProcess, Qt::DirectConnection);
+
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
+
+    connect(files_, &Files::setStatusbarText, this, &Manager::setStatusbarText);
 }
 
 void Manager::runTask(std::function<void()> task)
@@ -439,11 +442,8 @@ void Manager::getPathInfo(const QString &path)
             emit setStatusbarText(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
-            Files files;
-            connect(this, &Manager::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
-
             emit setStatusbarText("counting...");
-            emit setStatusbarText(files.getFolderSize(path));
+            emit setStatusbarText(files_->getFolderSize(path));
         }
     }
 }
@@ -472,11 +472,7 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        Files files;
-        connect(this, &Manager::cancelProcess, &files, &Files::cancelProcess, Qt::DirectConnection);
-        connect(&files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
-
-        QList<ExtNumSize> typesList = files.getFileTypes(folderPath);
+        QList<ExtNumSize> typesList = files_->getFileTypes(folderPath);
 
         if (!typesList.isEmpty()) {
             if (filterCreation)
