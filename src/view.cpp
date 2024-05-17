@@ -103,6 +103,8 @@ void View::setData(DataContainer *data)
     else
         setTreeModel(ModelView::ModelSource);
 
+    hideColumn(Column::ColumnReChecksum); // the newly setted data has not yet been verified and does not contain ReChecksums
+
     QTimer::singleShot(100, this, &View::dataSetted);
 }
 
@@ -113,8 +115,9 @@ void View::setMismatchFiltering(const Numbers &num)
 
     if (num.contains(FileStatus::Mismatched)) {
         showAllColumns();
-        data_->proxyModel_->setFilter(FileStatus::Mismatched); // used instead of 'View::setFilter' because at the time of calling this function
-                                                               // the current model is ModelSource, the ModelProxy is set later
+        data_->proxyModel_->setFilter(FileStatus::Mismatched);
+        // used instead of 'View::setFilter' because at the time of calling this function
+        // the current model is ModelSource, the ModelProxy is set later
     }
     else
         hideColumn(Column::ColumnReChecksum);
@@ -151,7 +154,7 @@ void View::setIndexByPath(const QString &path)
             QModelIndex index = fileSystem->index(path);
             expand(index);
             setCurrentIndex(index);
-            QTimer::singleShot(500, this, [=]{scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter);});
+            QTimer::singleShot(500, this, [=]{ scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter); });
             // for better scrolling work, a timer^ is used
             // QFileSystemModel needs some time after setup to Scrolling be able
             // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
