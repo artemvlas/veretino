@@ -27,6 +27,9 @@ public:
 
     void setState(State state);
     State state() const; // returns current state_
+    bool isState(State state) const;
+    bool isStarted() const;
+    bool isCanceled() const;
 
     qint64 doneSize() const; // returns the total size of the processed data
     qint64 donePieceSize() const; // returns the size of the data processed since the previous function call

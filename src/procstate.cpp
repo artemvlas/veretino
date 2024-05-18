@@ -24,6 +24,21 @@ State ProcState::state() const
     return state_;
 }
 
+bool ProcState::isState(State state) const
+{
+    return (state_ & state);
+}
+
+bool ProcState::isStarted() const
+{
+    return (state_ & Started);
+}
+
+bool ProcState::isCanceled() const
+{
+    return (state_ & Canceled);
+}
+
 void ProcState::setTotalSize(qint64 totalSize)
 {
     totalSize_ = totalSize;
