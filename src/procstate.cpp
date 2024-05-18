@@ -11,6 +11,19 @@ ProcState::ProcState(QObject *parent)
     : QObject{parent}
 {}
 
+void ProcState::setState(State state)
+{
+    if (state != state_) {
+        state_ = state;
+        emit stateChanged();
+    }
+}
+
+State ProcState::state() const
+{
+    return state_;
+}
+
 void ProcState::setTotalSize(qint64 totalSize)
 {
     totalSize_ = totalSize;
@@ -20,7 +33,6 @@ void ProcState::setTotalSize(qint64 totalSize)
 void ProcState::startProgress()
 {
     prevDoneSize_ = 0;
-    //emit percentageChanged(0); // initial 0 to reset progressbar value
     emit progressStarted();
 }
 
