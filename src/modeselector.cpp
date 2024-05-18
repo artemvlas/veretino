@@ -146,6 +146,11 @@ void ModeSelector::setActionsIcons()
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
 }
 
+void ModeSelector::setProcState(ProcState *procState)
+{
+    proc_ = procState;
+}
+
 void ModeSelector::setProcView(bool isProcessing)
 {
     if (isProcessing_ != isProcessing) {

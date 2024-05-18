@@ -35,6 +35,8 @@ public:
     Q_ENUM(Mode)
     Q_DECLARE_FLAGS(Modes, Mode)
 
+    void setProcState(ProcState *procState);
+
     // modes
     void setMode();
     Mode currentMode();
@@ -158,6 +160,7 @@ private:
     View *view_;
     QPushButton *button_;
     Settings *settings_;
+    ProcState *proc_ = nullptr;
 
 signals:
     void getPathInfo(const QString &path); // info about folder contents or file (size)

@@ -21,6 +21,11 @@ JsonDb::JsonDb(const QString &filePath, QObject *parent)
     : QObject(parent), jsonFilePath(filePath)
 {}
 
+void JsonDb::setProcState(const ProcState *procState)
+{
+    proc_ = procState;
+}
+
 QJsonDocument JsonDb::readJsonFile(const QString &filePath)
 {
     if (!QFile::exists(filePath)) {

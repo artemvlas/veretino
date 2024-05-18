@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QAbstractItemModel>
 #include "filterrule.h"
+#include "procstate.h"
 
 struct FileValues;
 struct ExtNumSize;
@@ -56,6 +57,7 @@ public:
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 
     // functions
+    void setProcState(const ProcState *procState);
     void setPath(const QString &path); // path to file or folder >> 'fsPath_'
     FileList getFileList(); // 'fsPath_' --> getFileList(const QString &rootFolder)
     FileList getFileList(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
@@ -85,6 +87,7 @@ public slots:
 private:
     // variables
     QString fsPath_; // path to the File or Folder specified when creating the object
+    const ProcState *proc_ = nullptr;
 
 signals:
     void setStatusbarText(const QString &text = QString());

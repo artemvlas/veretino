@@ -33,6 +33,12 @@ void DataMaintainer::connections()
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 }
 
+void DataMaintainer::setProcState(const ProcState *procState)
+{
+    proc_ = procState;
+    json->setProcState(procState);
+}
+
 void DataMaintainer::setSourceData()
 {
     setSourceData(new DataContainer(this));

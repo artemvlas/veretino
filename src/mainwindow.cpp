@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadSettings();
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
+    modeSelect->setProcState(manager->procState);
 
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusIconLabel->setContentsMargins(5, 0, 0, 0);

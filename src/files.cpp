@@ -22,6 +22,11 @@ Files::Files(const QString &path, QObject *parent)
     : QObject(parent), fsPath_(path)
 {}
 
+void Files::setProcState(const ProcState *procState)
+{
+    proc_ = procState;
+}
+
 void Files::setPath(const QString &path)
 {
     fsPath_ = path;

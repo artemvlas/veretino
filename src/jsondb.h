@@ -11,7 +11,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "datacontainer.h"
-#include <QElapsedTimer>
+#include "procstate.h"
 
 class JsonDb : public QObject
 {
@@ -19,6 +19,7 @@ class JsonDb : public QObject
 public:
     explicit JsonDb(QObject *parent = nullptr);
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
+    void setProcState(const ProcState *procState);
 
     DataContainer* parseJson(const QString &filePath);
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
@@ -42,7 +43,7 @@ private:
     const QString strHeaderWorkDir = "WorkDir";
 
     QString jsonFilePath;
-    //QElapsedTimer elapsedTimer;
+    const ProcState *proc_ = nullptr;
     bool canceled = false;
 
 signals:

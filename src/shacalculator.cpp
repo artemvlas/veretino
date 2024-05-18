@@ -20,6 +20,11 @@ void ShaCalculator::setAlgorithm(QCryptographicHash::Algorithm algo)
     algo_ = algo;
 }
 
+void ShaCalculator::setProcState(const ProcState *procState)
+{
+    proc_ = procState;
+}
+
 QString ShaCalculator::calculate(const QString &filePath)
 {
     return calculate(filePath, algo_);
