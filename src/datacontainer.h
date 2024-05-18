@@ -18,10 +18,11 @@ struct MetaData {
     QString workDir; // current working folder
     QString databaseFilePath;
     QString saveDateTime; // date and time the database was saved
-    QString successfulCheckDateTime; // date and time of the last completely successful check (all files from the list are exists and match the checksums)
+    QString successfulCheckDateTime; // date and time of the last completely successful check
+                                    // (all files from the list are exists and match the checksums)
     FilterRule filter;
     bool isImported = false; // from db(json) file
-    enum SaveResult {NotSaved, Saved, SavedToDesktop};
+    enum SaveResult { NotSaved, Saved, SavedToDesktop };
     SaveResult saveResult = NotSaved;
 }; // struct MetaData
 

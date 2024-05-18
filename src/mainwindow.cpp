@@ -65,7 +65,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)  // if a computing process is running, show a hint when user wants to close the app
+// if a computing process is running, show a hint when user wants to close the app
+void MainWindow::closeEvent(QCloseEvent *event)
 {
     modeSelect->processAbortPrompt() ? event->accept()
                                      : event->ignore();
@@ -85,8 +86,8 @@ void MainWindow::connections()
     connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
     connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
-    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
-                                                        modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem);});
+    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
+                                                        modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem); });
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
@@ -98,7 +99,7 @@ void MainWindow::connections()
     connect(modeSelect->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
     connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
     connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(ui->actionAbout, &QAction::triggered, this, [=]{DialogAbout about(this); about.exec();});
+    connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
 
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
 }

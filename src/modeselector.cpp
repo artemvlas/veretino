@@ -19,7 +19,7 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::cancelProcess);
 
     connect(this, &ModeSelector::updateDatabase, this, &ModeSelector::prepareView);
-    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){if (!TreeModel::isFileRow(ind)) prepareView();});
+    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){ if (!TreeModel::isFileRow(ind)) prepareView(); });
 
     connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
 
@@ -49,7 +49,7 @@ void ModeSelector::connectActions()
 {
     // MainWindow menu
     connect(actionShowFilesystem, &QAction::triggered, this, &ModeSelector::showFileSystem);
-    connect(actionClearRecent, &QAction::triggered, this, [=]{settings_->recentFiles.clear();});
+    connect(actionClearRecent, &QAction::triggered, this, [=]{ settings_->recentFiles.clear(); });
 
     // File system View
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
@@ -59,11 +59,11 @@ void ModeSelector::connectActions()
     connect(actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processChecksumsPermFilter);
     connect(actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processChecksumsFiltered);
     connect(actionCheckFileByClipboardChecksum, &QAction::triggered, this, &ModeSelector::checkFileByClipboardChecksum);
-    connect(actionProcessSha1File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha1);});
-    connect(actionProcessSha256File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha256);});
-    connect(actionProcessSha512File, &QAction::triggered, this, [=]{procSumFile(QCryptographicHash::Sha512);});
+    connect(actionProcessSha1File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha1); });
+    connect(actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
+    connect(actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
     connect(actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{emit processFileSha(view_->curPathFileSystem, settings_->algorithm, DestFileProc::Clipboard);});
+            [=]{ emit processFileSha(view_->curPathFileSystem, settings_->algorithm, DestFileProc::Clipboard); });
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -72,10 +72,10 @@ void ModeSelector::connectActions()
     connect(actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
-    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestUpdateMismatches);});
-    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestUpdateNewLost);});
-    connect(actionDbAddNew, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestAddNew);});
-    connect(actionDbClearLost, &QAction::triggered, this, [=]{emit updateDatabase(DestDbUpdate::DestClearLost);});
+    connect(actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{ emit updateDatabase(DestDbUpdate::DestUpdateMismatches); });
+    connect(actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{ emit updateDatabase(DestDbUpdate::DestUpdateNewLost); });
+    connect(actionDbAddNew, &QAction::triggered, this, [=]{ emit updateDatabase(DestDbUpdate::DestAddNew); });
+    connect(actionDbClearLost, &QAction::triggered, this, [=]{ emit updateDatabase(DestDbUpdate::DestClearLost); });
     connect(actionFilterNewLost, &QAction::triggered, this,
             [=](bool isChecked){view_->editFilter(FileStatus::FlagNewLost, isChecked);});
     connect(actionFilterMismatches, &QAction::triggered, this,
@@ -84,19 +84,19 @@ void ModeSelector::connectActions()
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
-    connect(actionCopyStoredChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnChecksum);});
-    connect(actionCopyReChecksum, &QAction::triggered, this, [=]{copyDataToClipboard(Column::ColumnReChecksum);});
+    connect(actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
+    connect(actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
     connect(actionCopyItem, &QAction::triggered, this, &ModeSelector::copyItem);
-    connect(actionBranchMake, &QAction::triggered, this, [=]{emit branchSubfolder(view_->curIndexSource);});
+    connect(actionBranchMake, &QAction::triggered, this, [=]{ emit branchSubfolder(view_->curIndexSource); });
     connect(actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
 
     connect(actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
 
     // Algorithm selection
-    connect(actionSetAlgoSha1, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha1);});
-    connect(actionSetAlgoSha256, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha256);});
-    connect(actionSetAlgoSha512, &QAction::triggered, this, [=]{setAlgorithm(QCryptographicHash::Sha512);});
+    connect(actionSetAlgoSha1, &QAction::triggered, this, [=]{ setAlgorithm(QCryptographicHash::Sha1); });
+    connect(actionSetAlgoSha256, &QAction::triggered, this, [=]{ setAlgorithm(QCryptographicHash::Sha256); });
+    connect(actionSetAlgoSha512, &QAction::triggered, this, [=]{ setAlgorithm(QCryptographicHash::Sha512); });
 }
 
 void ModeSelector::setActionsIcons()

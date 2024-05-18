@@ -25,7 +25,7 @@ DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
 
 void DataMaintainer::connections()
 {
-    connect(this, &DataMaintainer::cancelProcess, this, [=]{canceled = true;}, Qt::DirectConnection);
+    connect(this, &DataMaintainer::cancelProcess, this, [=]{ canceled = true; }, Qt::DirectConnection);
 
     // JsonDb
     connect(this, &DataMaintainer::cancelProcess, json, &JsonDb::cancelProcess, Qt::DirectConnection);
