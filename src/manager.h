@@ -71,7 +71,6 @@ private:
     int calculateChecksums(const QModelIndex &rootIndex, FileStatus status);
 
     // variables
-    bool canceled = false;
     bool isViewFileSysytem;
     Settings *settings_;
     Files *files_ = new Files(this);
@@ -79,8 +78,6 @@ private:
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
 
 signals:
-    void processing(bool isProcessing);
-    void cancelProcess();
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setViewData(DataContainer *data = nullptr);
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);

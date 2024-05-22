@@ -25,10 +25,7 @@ DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
 
 void DataMaintainer::connections()
 {
-    connect(this, &DataMaintainer::cancelProcess, this, [=]{ canceled = true; }, Qt::DirectConnection);
-
     // JsonDb
-    connect(this, &DataMaintainer::cancelProcess, json, &JsonDb::cancelProcess, Qt::DirectConnection);
     connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 }
@@ -86,7 +83,7 @@ void DataMaintainer::updateSuccessfulCheckDateTime()
 // add new files to data_->model_
 int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
 {
-    if (!data_)
+    if (!data_ || !proc_)
         return 0;
 
     if (!QFileInfo(data_->metaData.workDir).isDir()) {
@@ -96,13 +93,12 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
 
     emit setStatusbarText("Creating a list of files...");
 
-    canceled = false;
     int numAdded = 0;
 
     QDir dir(data_->metaData.workDir);
     QDirIterator it(data_->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext() && !canceled) {
+    while (it.hasNext() && !proc_->isCanceled()) {
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
@@ -123,7 +119,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         }
     }
 
-    if (canceled) {
+    if (proc_->isCanceled()) {
         qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
         clearData();
         emit setStatusbarText();

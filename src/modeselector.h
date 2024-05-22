@@ -36,13 +36,11 @@ public:
     Q_DECLARE_FLAGS(Modes, Mode)
 
     void setProcState(ProcState *procState);
+    void cancelProcess();
 
-    // modes
-    void setMode();
     Mode currentMode();
     bool isCurrentMode(const Modes mode);
-    bool isProcessing();
-    void setButtonInfo(); // sets the Button icon and text according the current Mode
+
     void setAlgorithm(QCryptographicHash::Algorithm algo);
 
     // tasks execution
@@ -139,15 +137,17 @@ public:
     QMenu *menuUpdateDatabase = nullptr;
 
 public slots:
-    void setProcView(bool isProcessing);
-    void prepareView();
     void createContextMenu_View(const QPoint &point);
     void createContextMenu_Button(const QPoint &point);
+
+    void setMode();
+    void getInfoPathItem();
 
 private:
     void connectActions();
     Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct
     Mode selectMode(const QString &path); // select Mode based on file system path
+    void setButtonInfo(); // sets the Button icon and text according the current Mode
 
     void copyDataToClipboard(Column column);
     void setActionsIcons();
@@ -156,7 +156,6 @@ private:
     bool isSelectedCreateDb();
 
     Mode curMode_ = NoMode;
-    bool isProcessing_ = false;
     View *view_;
     QPushButton *button_;
     Settings *settings_;
@@ -172,7 +171,6 @@ signals:
     void updateDatabase(const DestDbUpdate task);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
-    void cancelProcess();
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void dbItemContents(const QString &itemPath);

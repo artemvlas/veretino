@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     loadSettings();
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
     modeSelect->setProcState(manager->procState);
+    proc_ = manager->procState;
 
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusIconLabel->setContentsMargins(5, 0, 0, 0);
@@ -57,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    emit modeSelect->cancelProcess();
+    modeSelect->cancelProcess();
 
     saveSettings();
     thread->quit();
@@ -87,6 +88,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
     connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
+    connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
     connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
                                                         modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem); });
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
@@ -123,9 +125,6 @@ void MainWindow::connectManager()
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
-    // cancel process
-    connect(modeSelect, &ModeSelector::cancelProcess, manager, &Manager::cancelProcess, Qt::DirectConnection);
-
     // signals for execution tasks
     connect(modeSelect, &ModeSelector::parseJsonFile, manager, &Manager::createDataModel);
     connect(modeSelect, &ModeSelector::processFolderSha, manager, &Manager::processFolderSha);
@@ -159,7 +158,8 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
 
     // process status
-    connect(manager, &Manager::processing, modeSelect, &ModeSelector::setProcView);
+    connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->treeView->setViewProxy(); });
+    connect(manager->procState, &ProcState::stateChanged, modeSelect, &ModeSelector::setMode);
     connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
     connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
     connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
@@ -401,7 +401,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
 void MainWindow::updateStatusIcon()
 {
     QIcon statusIcon;
-    if (modeSelect->isProcessing()) {
+    if (proc_->isStarted()) {
         statusIcon = modeSelect->iconProvider.icon(FileStatus::Calculating);
     }
     else if (ui->treeView->isViewFileSystem()) {
@@ -420,7 +420,7 @@ void MainWindow::updateStatusIcon()
 void MainWindow::updatePermanentStatus()
 {
     if (ui->treeView->isViewDatabase()) {
-        if (modeSelect->isProcessing() && !ui->treeView->data_->metaData.isImported) {
+        if (proc_->isStarted() && !ui->treeView->data_->metaData.isImported) {
             QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
                 permStatus.prepend("filters applied | ");
@@ -447,7 +447,7 @@ QString MainWindow::getDatabaseStatusSummary()
     static QString availNumber;
     static QString availSize;
 
-    if (!modeSelect->isProcessing()) {
+    if (!proc_->isStarted()) {
         QString newmissing;
         QString mismatched;
         QString matched;
@@ -480,7 +480,7 @@ QString MainWindow::getDatabaseStatusSummary()
 
 void MainWindow::handlePermanentStatusClick()
 {
-    if (modeSelect->isProcessing())
+    if (proc_->isStarted())
         return;
 
     if (ui->treeView->isViewFileSystem() && !settings_->filter.extensionsList.isEmpty())

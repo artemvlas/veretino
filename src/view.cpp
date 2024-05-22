@@ -108,6 +108,27 @@ void View::setData(DataContainer *data)
     QTimer::singleShot(100, this, &View::dataSetted);
 }
 
+// when the process is completed, return to the Proxy Model view
+void View::setViewProxy()
+{
+    if (isCurrentViewModel(ModelView::ModelSource)) {
+        setTreeModel(ModelView::ModelProxy);
+    }
+}
+
+void View::setViewSource()
+{
+    if (isCurrentViewModel(ModelView::ModelProxy)) {
+        // if proxy model filtering is enabled, starting a Big Data queuing/verification may be very slow,
+        // even if switching to Source Model, so disable filtering first
+        disableFilter();
+
+        // set the Source Model for the duration of the process,
+        // because the Proxy Model is not friendly with Big Data
+        setTreeModel(ModelView::ModelSource);
+    }
+}
+
 void View::setMismatchFiltering(const Numbers &num)
 {
     if (!data_)

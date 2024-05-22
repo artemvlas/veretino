@@ -78,12 +78,6 @@ public:
     // checks whether there are any (or filtered) files the folder/subfolders
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false));
 
-    // variables
-    bool canceled = false;
-
-public slots:
-    void cancelProcess();
-
 private:
     // variables
     QString fsPath_; // path to the File or Folder specified when creating the object
@@ -91,7 +85,6 @@ private:
 
 signals:
     void setStatusbarText(const QString &text = QString());
-
 }; // class Files
 
 using FileStatus = Files::FileStatus;

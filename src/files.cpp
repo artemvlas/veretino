@@ -44,20 +44,18 @@ FileList Files::getFileList(const FilterRule &filter)
 
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 {
-    if (!QFileInfo(rootFolder).isDir()) {
-        qDebug() << "Files::getFileList | Not a folder path: " << rootFolder;
+    if (!QFileInfo(rootFolder).isDir() || !proc_) {
         return FileList();
     }
 
     emit setStatusbarText("Creating a list of files...");
 
-    canceled = false;
     FileList resultList; // result list
 
     QDir dir(rootFolder);
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext() && !canceled) {
+    while (it.hasNext() && !proc_->isCanceled()) {
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
@@ -73,7 +71,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
         }
     }
 
-    if (canceled) {
+    if (proc_->isCanceled()) {
         qDebug() << "Files::getFileList | Canceled:" << rootFolder;
         emit setStatusbarText();
         return FileList();
@@ -113,19 +111,18 @@ QString Files::getFolderSize(const QString &path)
     QString result;
 
     if (fileInfo.isDir()) {
-        canceled = false;
         int filesNumber = 0;
         qint64 totalSize = 0;
 
         // iterating
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext() && !canceled) {
+        while (it.hasNext() && !proc_->isCanceled()) {
             totalSize += QFileInfo(it.next()).size();
             ++filesNumber;
         }
 
         // result processing
-        if (!canceled) {
+        if (!proc_->isCanceled()) {
             QString folderName = paths::basicName(path);
             QString folderSize = (filesNumber > 0) ? format::filesNumberAndSize(filesNumber, totalSize) : "no files";
 
@@ -226,9 +223,4 @@ qint64 Files::dataSize(const FileList &filelist)
     }
 
     return totalSize;
-}
-
-void Files::cancelProcess()
-{
-    canceled = true;
 }

@@ -48,6 +48,7 @@ void ProcState::setTotalSize(qint64 totalSize)
 void ProcState::startProgress()
 {
     prevDoneSize_ = 0;
+    setState(StartVerbose);
     emit progressStarted();
 }
 

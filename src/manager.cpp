@@ -16,24 +16,21 @@
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)
 {
-    connect(this, &Manager::cancelProcess, this, [=]{ canceled = true; emit setStatusbarText("Canceled"); }, Qt::DirectConnection);
-    connect(this, &Manager::cancelProcess, files_, &Files::cancelProcess, Qt::DirectConnection);
-    connect(this, &Manager::cancelProcess, dataMaintainer, &DataMaintainer::cancelProcess, Qt::DirectConnection);
+    files_->setProcState(procState);
+    dataMaintainer->setProcState(procState);
 
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
-
     connect(files_, &Files::setStatusbarText, this, &Manager::setStatusbarText);
 }
 
 void Manager::runTask(std::function<void()> task)
 {
-    canceled = false;
-    emit processing(true);
+    procState->setState(State::StartSilently);
 
     task();
 
-    emit processing(false);
+    procState->setState(State::Idle);
 }
 
 void Manager::processFolderSha(const MetaData &metaData)
@@ -58,7 +55,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
     dataMaintainer->addActualFiles(FileStatus::Queued, false);
 
     // exception and cancelation handling
-    if (canceled || !dataMaintainer->data_) {
+    if (procState->isCanceled() || !dataMaintainer->data_) {
         emit setViewData();
         return;
     }
@@ -68,7 +65,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
     // calculating checksums
     calculateChecksums(FileStatus::Queued);
 
-    if (!canceled) { // saving to json
+    if (!procState->isCanceled()) { // saving to json
         dataMaintainer->exportToJson();
     }
 }
@@ -153,7 +150,7 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
 
             calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
 
-            if (canceled)
+            if (procState->isCanceled())
                 return;
         }
 
@@ -232,7 +229,7 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
     dataMaintainer->changeFilesStatus((FileStatus::Added | FileStatus::Updated), FileStatus::Matched, folderItemIndex);
     calculateChecksums(folderItemIndex, FileStatus::NotChecked);
 
-    if (canceled)
+    if (procState->isCanceled())
         return;
 
     // result
@@ -314,11 +311,11 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     procState->setTotalSize(QFileInfo(filePath).size());
 
     ShaCalculator shaCalc(algo);
+    shaCalc.setProcState(procState);
 
-    connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
-    emit processing(true);
+    // procState->setState(State::StartVerbose);
     emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
                                                     format::algoToStr(algo),
                                                     format::fileNameAndSize(filePath)));
@@ -327,10 +324,10 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     if (!checkSum.isEmpty())
         emit setStatusbarText(QString("%1 calculated").arg(format::algoToStr(algo)));
-    else if (!canceled)
+    else if (!procState->isCanceled())
         emit setStatusbarText("read error");
 
-    emit processing(false);
+    procState->setState(State::Idle);
     emit procState->progressFinished();
 
     return checkSum;
@@ -363,9 +360,9 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     procState->setTotalSize(totalSize);
 
     ShaCalculator shaCalc(dataMaintainer->data_->metaData.algorithm);
+    shaCalc.setProcState(procState);
     int doneNum = 0;
 
-    connect(this, &Manager::cancelProcess, &shaCalc, &ShaCalculator::cancelProcess, Qt::DirectConnection);
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
     // checking whether this is a Calculation or Verification process
@@ -375,7 +372,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     // process
     TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
 
-    while (iter.hasNext() && !canceled) {
+    while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
             dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, procStatus);
 
@@ -390,7 +387,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
             QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()));
 
-            if (!canceled) {
+            if (!procState->isCanceled()) {
                 if (checksum.isEmpty())
                     dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
                 else {
@@ -401,7 +398,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
         }
     }
 
-    if (canceled) {
+    if (procState->isCanceled()) {
         if (status != FileStatus::Queued) {
             if (status == FileStatus::New)
                 dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
@@ -443,7 +440,7 @@ void Manager::getPathInfo(const QString &path)
         }
         else if (fileInfo.isDir()) {
             emit setStatusbarText("counting...");
-            emit setStatusbarText(files_->getFolderSize(path));
+            runTask([&] { emit setStatusbarText(files_->getFolderSize(path)); });
         }
     }
 }
@@ -456,12 +453,12 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
 
 void Manager::makeFolderContentsList(const QString &folderPath)
 {
-    folderContentsList(folderPath, false);
+    runTask([&]{ folderContentsList(folderPath, false); });
 }
 
 void Manager::makeFolderContentsFilter(const QString &folderPath)
 {
-    folderContentsList(folderPath, true);
+    runTask([&]{ folderContentsList(folderPath, true); });
 }
 
 void Manager::folderContentsList(const QString &folderPath, bool filterCreation)

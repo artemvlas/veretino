@@ -115,7 +115,6 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     QJsonObject header = dbHeader(data, rootFolder);
 
-    canceled = false;
     emit setStatusbarText("Exporting data to json...");
 
     QJsonObject storedData;   
@@ -123,7 +122,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     TreeModelIterator iter(data->model_, rootFolder);
 
-    while (iter.hasNext() && !canceled) {
+    while (iter.hasNext() && !proc_->isCanceled()) {
         iter.nextFile();
         if (iter.status() == FileStatus::Unreadable) {
             unreadableFiles.append(iter.path(rootFolder));
@@ -147,7 +146,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     QJsonDocument doc(mainArray);
 
-    if (canceled) {
+    if (proc_->isCanceled()) {
         qDebug() << "JsonDb::makeJson | Canceled";
         return QString();
     }
@@ -203,7 +202,6 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
-    canceled = false;
     DataContainer* parsedData = new DataContainer(getMetaData(filePath, mainArray.at(0).toObject(), filelistData));
 
     // Filling in the Main Data
@@ -213,7 +211,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     QDir dir(parsedData->metaData.workDir);
     QDirIterator it(parsedData->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext() && !canceled) {
+    while (it.hasNext() && !proc_->isCanceled()) {
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
@@ -230,7 +228,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     // populating the main data
     emit setStatusbarText("Parsing Json database...");
     QJsonObject::const_iterator i;
-    for (i = filelistData.constBegin(); !canceled && i != filelistData.constEnd(); ++i) {
+    for (i = filelistData.constBegin(); !proc_->isCanceled() && i != filelistData.constEnd(); ++i) {
         FileValues curFileValues;
 
         QString fullPath = paths::joinPath(parsedData->metaData.workDir, i.key());
@@ -250,7 +248,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
-            for (int var = 0; !canceled && var < unreadableFiles.size(); ++var) {                
+            for (int var = 0; !proc_->isCanceled() && var < unreadableFiles.size(); ++var) {
                 parsedData->model_->addFile(unreadableFiles.at(var).toString(), FileValues(FileStatus::Unreadable));
             }
         }
@@ -258,7 +256,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     emit setStatusbarText();
 
-    if (canceled) {
+    if (proc_->isCanceled()) {
         qDebug() << "JsonDb::parseJson | Canceled:" << paths::basicName(filePath);
         delete parsedData;
         return nullptr;
@@ -329,7 +327,7 @@ bool JsonDb::isPresentInWorkDir(const QString &workDir, const QJsonObject &fileL
     bool isPresent = false;
     QJsonObject::const_iterator i;
 
-    for (i = fileList.constBegin(); !canceled && i != fileList.constEnd(); ++i) {
+    for (i = fileList.constBegin(); !proc_->isCanceled() && i != fileList.constEnd(); ++i) {
         QString fullPath = paths::joinPath(workDir, i.key());
         if (QFileInfo::exists(fullPath)) {
             isPresent = true;
@@ -353,9 +351,4 @@ QString JsonDb::findValueStr(const QJsonObject &object, const QString &approxKey
     }
 
     return result;
-}
-
-void JsonDb::cancelProcess()
-{
-    canceled = true;
 }

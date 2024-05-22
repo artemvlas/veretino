@@ -24,6 +24,7 @@ public:
         Abort = 1 << 4, // after canceling the process, exit it immediately without the rolling back operations
         Canceled = Cancel | Abort
     };
+    Q_ENUM(State)
 
     void setState(State state);
     State state() const; // returns current state_

@@ -20,15 +20,15 @@ class View : public QTreeView
 public:
     explicit View(QWidget *parent = nullptr);
     enum ModelView {
-        NotSetted,
-        FileSystem,
-        ModelSource,
-        ModelProxy = 4,
+        NotSetted = 1,
+        FileSystem = 1 << 1,
+        ModelSource = 1 << 2,
+        ModelProxy = 1 << 3,
         ModelDb = ModelSource | ModelProxy
     };
     Q_ENUM(ModelView)
 
-    enum ColumnFileSystem {ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified};   
+    enum ColumnFileSystem { ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified };
 
     ModelView currentViewModel();
     bool isCurrentViewModel(const ModelView modelView);
@@ -61,6 +61,9 @@ public slots:
     void saveHeaderState();
     void toHome();
     void setMismatchFiltering(const Numbers &num);
+
+    void setViewSource();
+    void setViewProxy();
 
     void headerContextMenuRequested(const QPoint &point);
 

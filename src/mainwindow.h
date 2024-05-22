@@ -57,6 +57,7 @@ private:
     ClickableLabel *statusTextLabel = new ClickableLabel;
     ClickableLabel *permanentStatus = new ClickableLabel;
     ModeSelector *modeSelect = nullptr;
+    const ProcState *proc_ = nullptr;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

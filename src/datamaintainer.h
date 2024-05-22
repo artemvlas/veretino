@@ -62,7 +62,6 @@ public:
     // variables
     DataContainer *data_ = nullptr; // main data
     JsonDb *json = new JsonDb;
-    bool canceled = false;
 
 public slots:
     void clearData();
@@ -79,7 +78,6 @@ signals:
     void numbersUpdated();
     void showMessage(const QString &text, const QString &title = "Info");
     void subDbForked(const QString &forkedDbFilePath);
-    void cancelProcess();
-};
+}; // class DataMaintainer
 
 #endif // DATAMAINTAINER_H

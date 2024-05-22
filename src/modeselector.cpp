@@ -18,8 +18,8 @@ ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, 
     connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::cancelProcess);
 
-    connect(this, &ModeSelector::updateDatabase, this, &ModeSelector::prepareView);
-    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){ if (!TreeModel::isFileRow(ind)) prepareView(); });
+    connect(this, &ModeSelector::updateDatabase, view_, &View::setViewSource);
+    connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){ if (!TreeModel::isFileRow(ind)) view_->setViewSource(); });
 
     connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
 
@@ -151,35 +151,18 @@ void ModeSelector::setProcState(ProcState *procState)
     proc_ = procState;
 }
 
-void ModeSelector::setProcView(bool isProcessing)
+void ModeSelector::cancelProcess()
 {
-    if (isProcessing_ != isProcessing) {
-        isProcessing_ = isProcessing;
-        setMode();
-
-        // when the process is completed, return to the Proxy Model view
-        if (!isProcessing && view_->isCurrentViewModel(ModelView::ModelSource)) {
-            view_->setTreeModel(ModelView::ModelProxy);
-        }
-    }
-}
-
-void ModeSelector::prepareView()
-{
-    if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
-        view_->disableFilter(); // if proxy model filtering is enabled, starting a Big Data queuing/verification may be very slow,
-                                // even if switching to Source Model, so disable filtering first
-
-        view_->setTreeModel(ModelView::ModelSource); // set the Source Model for the duration of the process,
-                                                    // because the Proxy Model is not friendly with Big Data
-    }
-
-    setProcView(true);
+    if (proc_->isStarted())
+        proc_->setState(State::Cancel);
 }
 
 void ModeSelector::setMode()
 {
-    if (isProcessing_) {
+    if (proc_->isState(State::StartSilently))
+        return;
+
+    if (proc_->isState(State::StartVerbose)) {
         button_->setText("Cancel");
         button_->setIcon(iconProvider.icon(Icons::Cancel));
         button_->setToolTip("");
@@ -193,11 +176,9 @@ void ModeSelector::setMode()
 
     if (view_->isViewFileSystem()) {
         curMode_ = selectMode(view_->curPathFileSystem);
-        emit getPathInfo(view_->curPathFileSystem);
     }
     else if (view_->isViewDatabase()) {
         curMode_ = selectMode(view_->data_->numbers);
-        emit getIndexInfo(view_->curIndexSource);
     }
 
     setButtonInfo();
@@ -229,6 +210,19 @@ Mode ModeSelector::selectMode(const Numbers &numbers)
         return ModelNewLost;
     else
         return Model;
+}
+
+void ModeSelector::getInfoPathItem()
+{
+    if (proc_->isState(State::StartVerbose))
+        return;
+
+    if (view_->isViewFileSystem()) {
+        emit getPathInfo(view_->curPathFileSystem);
+    }
+    else if (view_->isViewDatabase()) {
+        emit getIndexInfo(view_->curIndexSource);
+    }
 }
 
 void ModeSelector::setButtonInfo()
@@ -286,11 +280,6 @@ Mode ModeSelector::currentMode()
 bool ModeSelector::isCurrentMode(const Modes mode)
 {
     return (mode & curMode_);
-}
-
-bool ModeSelector::isProcessing()
-{
-    return isProcessing_;
 }
 
 void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
@@ -427,7 +416,7 @@ bool ModeSelector::isSelectedCreateDb()
 {
     // if a very large folder is selected, the file system iteration (info about folder contents process) may continue for some time,
     // so cancelation is needed before starting a new process
-    emit cancelProcess();
+    cancelProcess();
 
     return (emptyFolderPrompt() && overwriteDbPrompt());
 }
@@ -468,11 +457,11 @@ bool ModeSelector::emptyFolderPrompt()
 
 void ModeSelector::doWork()
 {
-    if (isProcessing()) {
+    if (proc_->isState(State::StartVerbose)) {
         if (view_->data_ && !view_->data_->metaData.isImported)
             showFileSystem();
         else
-            emit cancelProcess();
+            cancelProcess();
         return;
     }
 
@@ -509,7 +498,7 @@ void ModeSelector::doWork()
 
 void ModeSelector::quickAction()
 {
-    if (isProcessing())
+    if (proc_->isStarted())
             return;
 
     switch (curMode_) {
@@ -552,7 +541,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         viewContextMenu->addAction(actionToHome);
         viewContextMenu->addSeparator();
 
-        if (isProcessing())
+        if (proc_->isState(State::StartVerbose))
             viewContextMenu->addAction(actionCancel);
         else if (index.isValid()) {
             if (isCurrentMode(Folder)) {
@@ -585,7 +574,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     }
     // TreeModel or ProxyModel View
     else if (view_->isViewDatabase()) {
-        if (isProcessing()) {
+        if (proc_->isStarted()) {
             if (view_->data_->metaData.isImported)
                 viewContextMenu->addAction(actionCancel);
             viewContextMenu->addAction(actionCancelBackToFS);
@@ -728,13 +717,13 @@ QMenu* ModeSelector::menuUpdateDb()
 
 void ModeSelector::createContextMenu_Button(const QPoint &point)
 {
-    if (!isProcessing() && isCurrentMode(File | Folder))
+    if (!proc_->isStarted() && isCurrentMode(File | Folder))
         menuAlgorithm()->exec(button_->mapToGlobal(point));
 }
 
 bool ModeSelector::processAbortPrompt()
 {
-    if (!isProcessing())
+    if (!proc_->isStarted())
         return true;
 
     QMessageBox msgBox(view_);
@@ -746,7 +735,7 @@ bool ModeSelector::processAbortPrompt()
     int ret = msgBox.exec();
 
     if (ret == QMessageBox::Yes) {
-        emit cancelProcess();
+        cancelProcess();
         return true;
     }
     else

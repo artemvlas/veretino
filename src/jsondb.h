@@ -25,9 +25,6 @@ public:
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
     bool updateSuccessfulCheckDateTime(const QString &filePath);
 
-public slots:
-    void cancelProcess();
-
 private:   
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
@@ -44,7 +41,6 @@ private:
 
     QString jsonFilePath;
     const ProcState *proc_ = nullptr;
-    bool canceled = false;
 
 signals:
     void showMessage(const QString &text, const QString &title = "Info");

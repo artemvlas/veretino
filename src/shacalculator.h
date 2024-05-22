@@ -22,16 +22,14 @@ public:
 public slots:
     QString calculate(const QString &filePath);
     QString calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
-    void cancelProcess();
 
 private:
     int chunk = 1048576; // file read buffer size
-    bool canceled = false; // if true, task should be aborted
     QCryptographicHash::Algorithm algo_ = QCryptographicHash::Sha256;
     const ProcState *proc_ = nullptr;
 
 signals:   
     void doneChunk(int done);
-};
+}; // class ShaCalculator
 
 #endif // SHACALCULATOR_H
