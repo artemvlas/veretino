@@ -1,6 +1,6 @@
 /*
- * This file is part of Veretino project.
- * GNU General Public License (GNU GPLv3).
+ * This file is part of Veretino,
+ * licensed under the GNU GPLv3.
  * https://github.com/artemvlas/veretino
 */
 #include "treemodel.h"
