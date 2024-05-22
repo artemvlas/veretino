@@ -398,6 +398,12 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
         }
     }
 
+    if (procState->isState(State::Abort)) {
+        qDebug() << "Manager::calculateChecksums >> Aborted";
+        return 0;
+    }
+
+    // rolling back file statuses
     if (procState->isCanceled()) {
         if (status != FileStatus::Queued) {
             if (status == FileStatus::New)
@@ -406,9 +412,10 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
             dataMaintainer->changeFilesStatus((FileStatus::FlagProcessing | FileStatus::Added), status, rootIndex);
         }
 
-        qDebug() << "Manager::calculateChecksums | CANCELED | Done" << doneNum;
+        qDebug() << "Manager::calculateChecksums | Canceled | Done" << doneNum;
     }
 
+    // end
     dataMaintainer->updateNumbers();
     emit procState->progressFinished();
 

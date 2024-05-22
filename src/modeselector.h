@@ -37,6 +37,7 @@ public:
 
     void setProcState(ProcState *procState);
     void cancelProcess();
+    void abortProcess();
 
     Mode currentMode();
     bool isCurrentMode(const Modes mode);

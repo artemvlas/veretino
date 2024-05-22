@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    modeSelect->cancelProcess();
+    modeSelect->abortProcess();
 
     saveSettings();
     thread->quit();

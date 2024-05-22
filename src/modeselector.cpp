@@ -157,6 +157,12 @@ void ModeSelector::cancelProcess()
         proc_->setState(State::Cancel);
 }
 
+void ModeSelector::abortProcess()
+{
+    if (proc_->isStarted())
+        proc_->setState(State::Abort);
+}
+
 void ModeSelector::setMode()
 {
     if (proc_->isState(State::StartSilently))
@@ -735,7 +741,7 @@ bool ModeSelector::processAbortPrompt()
     int ret = msgBox.exec();
 
     if (ret == QMessageBox::Yes) {
-        cancelProcess();
+        abortProcess();
         return true;
     }
     else
