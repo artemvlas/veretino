@@ -77,7 +77,7 @@ private:
     void setDefaultColumnsWidth();
     QString headerText(int column);
 
-    QFileSystemModel *fileSystem = new QFileSystemModel;
+    QFileSystemModel *fileSystem = new QFileSystemModel(this);
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

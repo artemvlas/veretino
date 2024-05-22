@@ -61,7 +61,7 @@ public:
 
     // variables
     DataContainer *data_ = nullptr; // main data
-    JsonDb *json = new JsonDb;
+    JsonDb *json_ = new JsonDb(this);
 
 public slots:
     void clearData();

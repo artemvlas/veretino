@@ -26,14 +26,14 @@ DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
 void DataMaintainer::connections()
 {
     // JsonDb
-    connect(json, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
-    connect(json, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
+    connect(json_, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
+    connect(json_, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
 {
     proc_ = procState;
-    json->setProcState(procState);
+    json_->setProcState(procState);
 }
 
 void DataMaintainer::setSourceData()
@@ -74,7 +74,7 @@ void DataMaintainer::updateSuccessfulCheckDateTime()
 {
     if (data_
         && !data_->contains(FileStatus::Missing)
-        && json->updateSuccessfulCheckDateTime(data_->metaData.databaseFilePath)) {
+        && json_->updateSuccessfulCheckDateTime(data_->metaData.databaseFilePath)) {
 
         data_->metaData.successfulCheckDateTime = format::currentDateTime();
     }
@@ -336,7 +336,7 @@ int DataMaintainer::updateMismatchedChecksums()
 
 bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
-    return setSourceData(json->parseJson(jsonFilePath));
+    return setSourceData(json_->parseJson(jsonFilePath));
 }
 
 void DataMaintainer::exportToJson()
@@ -348,7 +348,7 @@ void DataMaintainer::exportToJson()
     data_->metaData.successfulCheckDateTime.clear();
     data_->metaData.saveDateTime = format::currentDateTime();
 
-    data_->setSaveResult(json->makeJson(data_));
+    data_->setSaveResult(json_->makeJson(data_));
 
     emit databaseUpdated();
 }
@@ -363,7 +363,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
     }
 
-    emit subDbForked(json->makeJson(data_, rootFolder));
+    emit subDbForked(json_->makeJson(data_, rootFolder));
 }
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
@@ -423,6 +423,5 @@ QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)
 
 DataMaintainer::~DataMaintainer()
 {
-    clearData();
     qDebug() << "DataMaintainer deleted";
 }
