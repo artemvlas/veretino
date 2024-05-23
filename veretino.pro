@@ -27,6 +27,7 @@ SOURCES += \
     src/procstate.cpp \
     src/progressbar.cpp \
     src/proxymodel.cpp \
+    src/settings.cpp \
     src/shacalculator.cpp \
     src/tools.cpp \
     src/treeitem.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
     src/procstate.h \
     src/progressbar.h \
     src/proxymodel.h \
+    src/settings.h \
     src/shacalculator.h \
     src/tools.h \
     src/treeitem.h \

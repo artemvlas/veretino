@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QStandardPaths>
 #include "treemodeliterator.h"
+#include "settings.h"
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}

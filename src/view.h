@@ -13,6 +13,7 @@
 #include "treemodel.h"
 #include "proxymodel.h"
 #include "datacontainer.h"
+#include "settings.h"
 
 class View : public QTreeView
 {
@@ -47,8 +48,7 @@ public:
     QModelIndex curIndexSource;
     QModelIndex curIndexProxy;
 
-    QByteArray headerStateFs;
-    QByteArray headerStateDb;
+    void setSettings(Settings *settings);
 
 public slots:
     void setFileSystemModel();
@@ -78,6 +78,7 @@ private:
     QString headerText(int column);
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
+    Settings *settings_ = nullptr;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

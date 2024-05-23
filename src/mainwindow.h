@@ -43,14 +43,12 @@ private:
     void connectManager(); // connections are separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
-    void saveSettings();
-    void loadSettings();
     QString getDatabaseStatusSummary();
     void handlePermanentStatusClick();
     void updateStatusIcon();
 
     Ui::MainWindow *ui;
-    Settings *settings_ = new Settings; // current app settings
+    Settings *settings_ = new Settings(this); // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
     ClickableLabel *statusIconLabel = new ClickableLabel;

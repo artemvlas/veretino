@@ -12,6 +12,7 @@
 #include "datamaintainer.h"
 #include "view.h"
 #include "procstate.h"
+#include "settings.h"
 
 class Manager : public QObject
 {

@@ -12,40 +12,6 @@
 #include <QPalette>
 #include "files.h"
 
-struct Settings {
-    QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
-    FilterRule filter;
-    QStringList recentFiles;
-    QString dbPrefix = "checksums";
-    bool restoreLastPathOnStartup = true;
-    bool addWorkDirToFilename = true;
-    bool isLongExtension = true;
-    bool saveVerificationDateTime = false;
-    bool coloredDbItems = true;
-
-    QString dbFileExtension() const
-    {
-        return dbFileExtension(isLongExtension);
-    }
-
-    static QString dbFileExtension(bool isLong)
-    {
-        return isLong ? ".ver.json" : ".ver";
-    }
-
-    void addRecentFile(const QString &filePath)
-    {
-        int ind = recentFiles.indexOf(filePath);
-        if (ind == -1)
-            recentFiles.prepend(filePath); // add to the top of the list
-        else if (ind > 0)
-            recentFiles.move(ind, 0); // move the recent file to the top
-
-        if (recentFiles.size() > 15)
-            recentFiles.removeLast();
-    }
-};
-
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo); // returns the length of checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
 QCryptographicHash::Algorithm algorithmByStrLen(int strLen); // ^vice versa

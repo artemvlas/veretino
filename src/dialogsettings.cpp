@@ -7,6 +7,7 @@
 #include "ui_dialogsettings.h"
 #include <QPushButton>
 #include "iconprovider.h"
+#include "tools.h"
 #include <QDebug>
 
 DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :

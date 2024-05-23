@@ -49,7 +49,7 @@ void ModeSelector::connectActions()
 {
     // MainWindow menu
     connect(actionShowFilesystem, &QAction::triggered, this, &ModeSelector::showFileSystem);
-    connect(actionClearRecent, &QAction::triggered, this, [=]{ settings_->recentFiles.clear(); });
+    connect(actionClearRecent, &QAction::triggered, settings_, &Settings::clearRecentFiles);
 
     // File system View
     connect(actionToHome, &QAction::triggered, view_, &View::toHome);
@@ -77,9 +77,9 @@ void ModeSelector::connectActions()
     connect(actionDbAddNew, &QAction::triggered, this, [=]{ emit updateDatabase(DestDbUpdate::DestAddNew); });
     connect(actionDbClearLost, &QAction::triggered, this, [=]{ emit updateDatabase(DestDbUpdate::DestClearLost); });
     connect(actionFilterNewLost, &QAction::triggered, this,
-            [=](bool isChecked){view_->editFilter(FileStatus::FlagNewLost, isChecked);});
+            [=](bool isChecked){ view_->editFilter(FileStatus::FlagNewLost, isChecked); });
     connect(actionFilterMismatches, &QAction::triggered, this,
-            [=](bool isChecked){view_->editFilter(FileStatus::Mismatched, isChecked);});
+            [=](bool isChecked){ view_->editFilter(FileStatus::Mismatched, isChecked); });
     connect(actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);

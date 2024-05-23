@@ -33,6 +33,12 @@ void View::connectModel()
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
 }
 
+void View::setSettings(Settings *settings)
+{
+    settings_ = settings;
+    curPathFileSystem = settings_->lastFsPath;
+}
+
 void View::setFileSystemModel()
 {
     if (isViewFileSystem()) {
@@ -49,12 +55,12 @@ void View::setFileSystemModel()
 
     emit modelChanged(FileSystem);
 
-    if (headerStateFs.isEmpty()) {
+    if (settings_->headerStateFs.isEmpty()) {
         showAllColumns();
         setDefaultColumnsWidth();
     }
     else
-        header()->restoreState(headerStateFs);
+        header()->restoreState(settings_->headerStateFs);
 
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 
@@ -78,10 +84,12 @@ void View::setTreeModel(ModelView modelSel)
 
     emit modelChanged(modelSel);
 
-    if (!headerStateDb.isEmpty())
-        header()->restoreState(headerStateDb);
-    else
+    if (settings_->headerStateDb.isEmpty()) {
+        showAllColumns();
         setDefaultColumnsWidth();
+    }
+    else
+        header()->restoreState(settings_->headerStateDb);
 
     setIndexByPath(curPathModel);
 }
@@ -306,10 +314,13 @@ void View::setDefaultColumnsWidth()
 
 void View::saveHeaderState()
 {
+    if (!settings_)
+        return;
+
     if (isViewFileSystem())
-        headerStateFs = header()->saveState();
+        settings_->headerStateFs = header()->saveState();
     else if (isViewDatabase())
-        headerStateDb = header()->saveState();
+        settings_->headerStateDb = header()->saveState();
 }
 
 void View::headerContextMenuRequested(const QPoint &point)

@@ -15,7 +15,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QClipboard>
-#include <QSettings>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -29,7 +28,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar->setProcState(manager->procState);
     ui->progressBar->setVisible(false);
 
-    loadSettings();
+    settings_->loadSettings();
+    ui->treeView->setSettings(settings_);
+    restoreGeometry(settings_->geometryMainWindow);
+
     modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
     modeSelect->setProcState(manager->procState);
     proc_ = manager->procState;
@@ -60,7 +62,11 @@ MainWindow::~MainWindow()
 {
     modeSelect->abortProcess();
 
-    saveSettings();
+    ui->treeView->saveHeaderState();
+    settings_->lastFsPath = ui->treeView->curPathFileSystem;
+    settings_->geometryMainWindow = saveGeometry();
+    settings_->saveSettings();
+
     thread->quit();
     thread->wait();
 
@@ -173,73 +179,6 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::dataSetted, this, [=]{if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.databaseFilePath);});
 
     thread->start();
-}
-
-void MainWindow::saveSettings()
-{
-    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
-    qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
-
-    QString lastPath = settings_->restoreLastPathOnStartup ? ui->treeView->curPathFileSystem : QString();
-    storedSettings.setValue("history/lastFsPath", lastPath);
-
-    storedSettings.setValue("algorithm", settings_->algorithm);
-    storedSettings.setValue("dbPrefix", settings_->dbPrefix);
-    storedSettings.setValue("restoreLastPathOnStartup", settings_->restoreLastPathOnStartup);
-    storedSettings.setValue("addWorkDirToFilename", settings_->addWorkDirToFilename);
-    storedSettings.setValue("isLongExtension", settings_->isLongExtension);
-    storedSettings.setValue("saveVerificationDateTime", settings_->saveVerificationDateTime);
-    storedSettings.setValue("coloredDbItems", settings_->coloredDbItems);
-
-    // FilterRule
-    storedSettings.setValue("filter/ignoreDbFiles", settings_->filter.ignoreDbFiles);
-    storedSettings.setValue("filter/ignoreShaFiles", settings_->filter.ignoreShaFiles);
-    storedSettings.setValue("filter/filterMode", settings_->filter.mode_);
-    storedSettings.setValue("filter/filterExtensionsList", settings_->filter.extensionsList);
-
-    // recent files
-    storedSettings.setValue("history/recentDbFiles", settings_->recentFiles);
-
-    // geometry
-    storedSettings.setValue("view/geometry", saveGeometry());
-
-    // TreeView header(columns) state
-    ui->treeView->saveHeaderState();
-    storedSettings.setValue("view/columnStateFs", ui->treeView->headerStateFs);
-    storedSettings.setValue("view/columnStateDb", ui->treeView->headerStateDb);
-}
-
-void MainWindow::loadSettings()
-{
-    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
-    qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
-
-    ui->treeView->curPathFileSystem = storedSettings.value("history/lastFsPath").toString();
-
-    Settings defaults;
-    settings_->algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm).toInt());
-    settings_->dbPrefix = storedSettings.value("dbPrefix", defaults.dbPrefix).toString();
-    settings_->restoreLastPathOnStartup = storedSettings.value("restoreLastPathOnStartup", defaults.restoreLastPathOnStartup).toBool();
-    settings_->addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", defaults.addWorkDirToFilename).toBool();
-    settings_->isLongExtension = storedSettings.value("isLongExtension", defaults.isLongExtension).toBool();
-    settings_->saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", defaults.saveVerificationDateTime).toBool();
-    settings_->coloredDbItems = storedSettings.value("coloredDbItems", defaults.coloredDbItems).toBool();
-
-    // FilterRule
-    settings_->filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value("filter/filterMode", FilterRule::NotSet).toInt()),
-                                storedSettings.value("filter/filterExtensionsList").toStringList());
-    settings_->filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", defaults.filter.ignoreDbFiles).toBool();
-    settings_->filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", defaults.filter.ignoreShaFiles).toBool();
-
-    // recent files
-    settings_->recentFiles = storedSettings.value("history/recentDbFiles").toStringList();
-
-    // geometry
-    restoreGeometry(storedSettings.value("view/geometry").toByteArray());
-
-    // TreeView header(columns) state
-    ui->treeView->headerStateFs = storedSettings.value("view/columnStateFs").toByteArray();
-    ui->treeView->headerStateDb = storedSettings.value("view/columnStateDb").toByteArray();
 }
 
 void MainWindow::showDbStatus()
