@@ -94,8 +94,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
     connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateButtonInfo);
-    connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
-                                                        modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem); });
+    connect(ui->treeView, &View::modelChanged, this, &MainWindow::handleChangedModel);
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
@@ -446,6 +445,15 @@ void MainWindow::handlePathEdit()
 {
     (ui->pathEdit->text() == ui->treeView->curPathFileSystem) ? modeSelect->quickAction()
                                                               : ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
+}
+
+void MainWindow::handleChangedModel()
+{
+    bool isViewFS = ui->treeView->isViewFileSystem();
+
+    ui->pathEdit->setEnabled(isViewFS);
+    ui->pathEdit->setClearButtonEnabled(isViewFS);
+    modeSelect->actionShowFilesystem->setEnabled(!isViewFS);
 }
 
 bool MainWindow::argumentInput()
