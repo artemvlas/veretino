@@ -315,7 +315,6 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
-    // procState->setState(State::StartVerbose);
     emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
                                                     format::algoToStr(algo),
                                                     format::fileNameAndSize(filePath)));
@@ -328,7 +327,6 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
         emit setStatusbarText("read error");
 
     procState->setState(State::Idle);
-    emit procState->progressFinished();
 
     return checkSum;
 }
@@ -400,7 +398,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
     if (procState->isState(State::Abort)) {
         qDebug() << "Manager::calculateChecksums >> Aborted";
-        emit procState->progressFinished();
         return 0;
     }
 
@@ -418,8 +415,6 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
     // end
     dataMaintainer->updateNumbers();
-    emit procState->progressFinished();
-
     return doneNum;
 }
 

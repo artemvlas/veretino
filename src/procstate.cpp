@@ -16,6 +16,7 @@ void ProcState::setState(State state)
     if (state != state_) {
         state_ = state;
         emit stateChanged();
+        isFinished();
     }
 }
 
@@ -52,9 +53,17 @@ void ProcState::startProgress()
     emit progressStarted();
 }
 
+void ProcState::isFinished()
+{
+    if (doneSize_ > 0 && totalSize_ > 0 && isState(Idle)) {
+        setTotalSize(0); // reset to 0
+        emit progressFinished();
+    }
+}
+
 void ProcState::addChunk(int chunk)
 {
-    if (doneSize_ == 0)
+    if (doneSize_ == 0 && totalSize_ > 0)
         startProgress();
 
     toPercents(chunk);
