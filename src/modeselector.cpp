@@ -279,6 +279,9 @@ QIcon ModeSelector::getButtonIcon()
 
 QString ModeSelector::getButtonToolTip()
 {
+    if (proc_->isState(State::StartVerbose))
+        return QString();
+
     switch (curMode_) {
         case Folder:
             return "Calculate checksums of contained files\nand save the result to the local database";
