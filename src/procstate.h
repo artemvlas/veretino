@@ -44,6 +44,7 @@ private:
     void isFinished();
 
     static qint64 prevDoneSize_;
+    int lastPerc_ = 0; // percentage before current chunk added
     qint64 totalSize_ = 0;
     qint64 doneSize_ = 0;
 

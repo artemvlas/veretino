@@ -49,6 +49,7 @@ void ProcState::setTotalSize(qint64 totalSize)
 void ProcState::startProgress()
 {
     prevDoneSize_ = 0;
+    lastPerc_ = 0;
     setState(StartVerbose);
     emit progressStarted();
 }
@@ -70,12 +71,13 @@ void ProcState::addChunk(int chunk)
     if (doneSize_ == 0)
         startProgress();
 
-    int lastPerc = (doneSize_ * 100) / totalSize_; // before current chunk added
     doneSize_ += chunk;
-    int curPerc = (doneSize_ * 100) / totalSize_; // after
+    int curPerc = (doneSize_ * 100) / totalSize_; // current percentage
 
-    if (curPerc > lastPerc)
+    if (curPerc > lastPerc_) {
+        lastPerc_ = curPerc;
         emit percentageChanged(curPerc);
+    }
 }
 
 qint64 ProcState::doneSize() const
