@@ -14,10 +14,15 @@ Settings::Settings(QObject *parent)
 
 void Settings::setAlgorithm(QCryptographicHash::Algorithm algo)
 {
-    if (algorithm != algo) {
-        algorithm = algo;
+    if (algorithm_ != algo) {
+        algorithm_ = algo;
         emit algorithmChanged();
     }
+}
+
+QCryptographicHash::Algorithm Settings::algorithm() const
+{
+    return algorithm_;
 }
 
 QString Settings::dbFileExtension() const
@@ -54,7 +59,7 @@ void Settings::saveSettings()
 
     storedSettings.setValue("history/lastFsPath", restoreLastPathOnStartup ? lastFsPath : QString());
 
-    storedSettings.setValue("algorithm", algorithm);
+    storedSettings.setValue("algorithm", algorithm_);
     storedSettings.setValue("dbPrefix", dbPrefix);
     storedSettings.setValue("restoreLastPathOnStartup", restoreLastPathOnStartup);
     storedSettings.setValue("addWorkDirToFilename", addWorkDirToFilename);
@@ -87,7 +92,7 @@ void Settings::loadSettings()
     lastFsPath = storedSettings.value("history/lastFsPath").toString();
 
     Settings defaults;
-    algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm).toInt());
+    algorithm_ = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm()).toInt());
     dbPrefix = storedSettings.value("dbPrefix", defaults.dbPrefix).toString();
     restoreLastPathOnStartup = storedSettings.value("restoreLastPathOnStartup", defaults.restoreLastPathOnStartup).toBool();
     addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", defaults.addWorkDirToFilename).toBool();

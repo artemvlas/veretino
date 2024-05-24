@@ -44,7 +44,7 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
 
 void DialogSettings::loadSettings(const Settings &settings)
 {
-    switch (settings.algorithm)
+    switch (settings.algorithm())
     {
         case QCryptographicHash::Sha1:
             ui->rbSha1->setChecked(true);

@@ -18,6 +18,7 @@ public:
     explicit Settings(QObject *parent = nullptr);
 
     void setAlgorithm(QCryptographicHash::Algorithm algo);
+    QCryptographicHash::Algorithm algorithm() const;
     QString dbFileExtension() const;
     void addRecentFile(const QString &filePath);
     void clearRecentFiles();
@@ -27,7 +28,6 @@ public:
     void loadSettings();
 
     // variables
-    QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
     FilterRule filter;
     QStringList recentFiles;
     QString dbPrefix = "checksums";
@@ -43,6 +43,8 @@ public:
 
     QString lastFsPath;
 
+private:
+    QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;
 signals:
     void algorithmChanged();
 

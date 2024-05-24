@@ -63,7 +63,7 @@ void ModeSelector::connectActions()
     connect(actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
     connect(actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
     connect(actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{ emit processFileSha(view_->curPathFileSystem, settings_->algorithm, DestFileProc::Clipboard); });
+            [=]{ emit processFileSha(view_->curPathFileSystem, settings_->algorithm(), DestFileProc::Clipboard); });
     connect(actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -230,7 +230,7 @@ QString ModeSelector::getButtonText()
     switch (curMode_) {
         case Folder:
         case File:
-            return format::algoToStr(settings_->algorithm);
+            return format::algoToStr(settings_->algorithm());
         case DbFile:
             return "Open";
         case SumFile:
@@ -286,7 +286,7 @@ QString ModeSelector::getButtonToolTip()
         case Folder:
             return "Calculate checksums of contained files\nand save the result to the local database";
         case File:
-            return QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm));
+            return QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm()));
         case Model:
             return "Check ALL files against stored checksums";
         case ModelNewLost:
@@ -427,7 +427,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
 {
     MetaData metaData;
     metaData.workDir = view_->curPathFileSystem;
-    metaData.algorithm = settings_->algorithm;
+    metaData.algorithm = settings_->algorithm();
     metaData.filter = filter;
     metaData.databaseFilePath = composeDbFilePath();
 
@@ -492,7 +492,7 @@ void ModeSelector::doWork()
             processChecksumsFiltered();
             break;
         case File:
-            emit processFileSha(view_->curPathFileSystem, settings_->algorithm);
+            emit processFileSha(view_->curPathFileSystem, settings_->algorithm());
             break;
         case DbFile:
             emit parseJsonFile(view_->curPathFileSystem);
@@ -693,7 +693,7 @@ void ModeSelector::updateMenuOpenRecent()
 
 QMenu* ModeSelector::menuAlgorithm()
 {
-    switch (settings_->algorithm) {
+    switch (settings_->algorithm()) {
     case QCryptographicHash::Sha1:
         actionSetAlgoSha1->setChecked(true);
         break;
@@ -708,7 +708,7 @@ QMenu* ModeSelector::menuAlgorithm()
         break;
     }
 
-    menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(settings_->algorithm));
+    menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(settings_->algorithm()));
 
     return menuAlgo;
 }
