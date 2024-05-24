@@ -61,27 +61,21 @@ void ProcState::isFinished()
     }
 }
 
+// add this processed piece(chunk), calculate total done size and emit ::percentageChanged
 void ProcState::addChunk(int chunk)
-{
-    if (doneSize_ == 0 && totalSize_ > 0)
-        startProgress();
-
-    toPercents(chunk);
-}
-
-void ProcState::toPercents(int bytes)
 {
     if (totalSize_ == 0)
         return;
 
-    int lastPerc = (doneSize_ * 100) / totalSize_; // before current chunk added
+    if (doneSize_ == 0)
+        startProgress();
 
-    doneSize_ += bytes;
+    int lastPerc = (doneSize_ * 100) / totalSize_; // before current chunk added
+    doneSize_ += chunk;
     int curPerc = (doneSize_ * 100) / totalSize_; // after
 
-    if (curPerc > lastPerc) {
+    if (curPerc > lastPerc)
         emit percentageChanged(curPerc);
-    }
 }
 
 qint64 ProcState::doneSize() const

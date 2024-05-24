@@ -41,7 +41,6 @@ public slots:
 
 private:
     void startProgress();
-    void toPercents(int bytes); // add this processed piece, calculate total done size and emit ::percentageChanged
     void isFinished();
 
     static qint64 prevDoneSize_;
