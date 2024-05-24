@@ -61,11 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     modeSelect->abortProcess();
-
-    ui->treeView->saveHeaderState();
-    settings_->lastFsPath = ui->treeView->curPathFileSystem;
-    settings_->geometryMainWindow = saveGeometry();
-    settings_->saveSettings();
+    saveSettings();
 
     thread->quit();
     thread->wait();
@@ -179,6 +175,14 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::dataSetted, this, [=]{if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.databaseFilePath);});
 
     thread->start();
+}
+
+void MainWindow::saveSettings()
+{
+    ui->treeView->saveHeaderState();
+    settings_->lastFsPath = ui->treeView->curPathFileSystem;
+    settings_->geometryMainWindow = saveGeometry();
+    settings_->saveSettings();
 }
 
 void MainWindow::showDbStatus()

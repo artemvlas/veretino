@@ -46,6 +46,7 @@ private:
     QString getDatabaseStatusSummary();
     void handlePermanentStatusClick();
     void updateStatusIcon();
+    void saveSettings();
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings(this); // current app settings

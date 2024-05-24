@@ -729,7 +729,7 @@ void ModeSelector::createContextMenu_Button(const QPoint &point)
 
 bool ModeSelector::processAbortPrompt()
 {
-    if (!proc_->isStarted())
+    if (!proc_->isState(State::StartVerbose))
         return true;
 
     QMessageBox msgBox(view_);
