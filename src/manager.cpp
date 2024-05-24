@@ -400,6 +400,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
     if (procState->isState(State::Abort)) {
         qDebug() << "Manager::calculateChecksums >> Aborted";
+        emit procState->progressFinished();
         return 0;
     }
 
