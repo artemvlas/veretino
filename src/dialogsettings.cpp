@@ -86,11 +86,11 @@ void DialogSettings::updateSettings()
 {
     // algorithm
     if (ui->rbSha1->isChecked())
-        settings_->algorithm = QCryptographicHash::Sha1;
+        settings_->setAlgorithm(QCryptographicHash::Sha1);
     else if (ui->rbSha256->isChecked())
-        settings_->algorithm = QCryptographicHash::Sha256;
+        settings_->setAlgorithm(QCryptographicHash::Sha256);
     else if (ui->rbSha512->isChecked())
-        settings_->algorithm = QCryptographicHash::Sha512;
+        settings_->setAlgorithm(QCryptographicHash::Sha512);
 
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
 

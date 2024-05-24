@@ -46,6 +46,7 @@ private:
     QString getDatabaseStatusSummary();
     void handlePermanentStatusClick();
     void updateStatusIcon();
+    void updateButtonInfo(); // sets the Button icon and text according the current Mode
     void saveSettings();
 
     Ui::MainWindow *ui;

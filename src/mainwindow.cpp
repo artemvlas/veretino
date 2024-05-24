@@ -84,6 +84,8 @@ void MainWindow::connections()
     connect(ui->button, &QPushButton::clicked, modeSelect, &ModeSelector::doWork);
     connect(ui->button, &QPushButton::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_Button);
 
+    connect(settings_, &Settings::algorithmChanged, this, &MainWindow::updateButtonInfo);
+
     // TreeView
     connect(ui->treeView, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
@@ -91,6 +93,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
+    connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateButtonInfo);
     connect(ui->treeView, &View::modelChanged, this, [=](ModelView modelView){ ui->pathEdit->setEnabled(modelView == ModelView::FileSystem);
                                                         modeSelect->actionShowFilesystem->setEnabled(modelView != ModelView::FileSystem); });
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
@@ -162,6 +165,7 @@ void MainWindow::connectManager()
     // process status
     connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->treeView->setViewProxy(); });
     connect(manager->procState, &ProcState::stateChanged, modeSelect, &ModeSelector::setMode);
+    connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateButtonInfo);
     connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
     connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
     connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
@@ -287,7 +291,6 @@ void MainWindow::dialogSettings()
 
     if (dialog.exec() == QDialog::Accepted) {
         dialog.updateSettings();
-        modeSelect->setMode(); // "setMode" changes the text on button
         updatePermanentStatus();
     }
 }
@@ -339,6 +342,13 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     if (msgBox.exec() == QMessageBox::Open) {
         modeSelect->openJsonDatabase(dbFilePath);
     }
+}
+
+void MainWindow::updateButtonInfo()
+{
+    ui->button->setIcon(modeSelect->getButtonIcon());
+    ui->button->setText(modeSelect->getButtonText());
+    ui->button->setToolTip(modeSelect->getButtonToolTip());
 }
 
 void MainWindow::updateStatusIcon()

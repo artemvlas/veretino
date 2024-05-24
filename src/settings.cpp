@@ -12,6 +12,14 @@ Settings::Settings(QObject *parent)
     : QObject{parent}
 {}
 
+void Settings::setAlgorithm(QCryptographicHash::Algorithm algo)
+{
+    if (algorithm != algo) {
+        algorithm = algo;
+        emit algorithmChanged();
+    }
+}
+
 QString Settings::dbFileExtension() const
 {
     return dbFileExtension(isLongExtension);

@@ -42,7 +42,9 @@ public:
     Mode currentMode();
     bool isCurrentMode(const Modes mode);
 
-    void setAlgorithm(QCryptographicHash::Algorithm algo);
+    QString getButtonText();
+    QString getButtonToolTip();
+    QIcon getButtonIcon();
 
     // tasks execution
     void quickAction();
@@ -148,7 +150,6 @@ private:
     void connectActions();
     Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct
     Mode selectMode(const QString &path); // select Mode based on file system path
-    void setButtonInfo(); // sets the Button icon and text according the current Mode
 
     void copyDataToClipboard(Column column);
     void setActionsIcons();

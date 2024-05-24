@@ -17,6 +17,7 @@ class Settings : public QObject
 public:
     explicit Settings(QObject *parent = nullptr);
 
+    void setAlgorithm(QCryptographicHash::Algorithm algo);
     QString dbFileExtension() const;
     void addRecentFile(const QString &filePath);
     void clearRecentFiles();
@@ -41,6 +42,9 @@ public:
     QByteArray headerStateDb;
 
     QString lastFsPath;
+
+signals:
+    void algorithmChanged();
 
 }; // class Settings
 

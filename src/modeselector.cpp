@@ -94,9 +94,9 @@ void ModeSelector::connectActions()
     connect(actionExpandAll, &QAction::triggered, view_, &View::expandAll);
 
     // Algorithm selection
-    connect(actionSetAlgoSha1, &QAction::triggered, this, [=]{ setAlgorithm(QCryptographicHash::Sha1); });
-    connect(actionSetAlgoSha256, &QAction::triggered, this, [=]{ setAlgorithm(QCryptographicHash::Sha256); });
-    connect(actionSetAlgoSha512, &QAction::triggered, this, [=]{ setAlgorithm(QCryptographicHash::Sha512); });
+    connect(actionSetAlgoSha1, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha1); });
+    connect(actionSetAlgoSha256, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha256); });
+    connect(actionSetAlgoSha512, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha512); });
 }
 
 void ModeSelector::setActionsIcons()
@@ -165,15 +165,8 @@ void ModeSelector::abortProcess()
 
 void ModeSelector::setMode()
 {
-    if (proc_->isState(State::StartSilently))
+    if (proc_->isStarted())
         return;
-
-    if (proc_->isState(State::StartVerbose)) {
-        button_->setText("Cancel");
-        button_->setIcon(iconProvider.icon(Icons::Cancel));
-        button_->setToolTip("");
-        return;
-    }
 
     if (view_->isCurrentViewModel(ModelView::NotSetted)) {
         qDebug() << "ModeSelector | Insufficient data to set mode";
@@ -186,8 +179,6 @@ void ModeSelector::setMode()
     else if (view_->isViewDatabase()) {
         curMode_ = selectMode(view_->data_->numbers);
     }
-
-    setButtonInfo();
 }
 
 Mode ModeSelector::selectMode(const QString &path)
@@ -231,51 +222,79 @@ void ModeSelector::getInfoPathItem()
     }
 }
 
-void ModeSelector::setButtonInfo()
+QString ModeSelector::getButtonText()
 {
-    button_->setToolTip(QString());
+    if (proc_->isState(State::StartVerbose))
+        return "Cancel";
 
     switch (curMode_) {
-    case Folder:
-        button_->setText(format::algoToStr(settings_->algorithm));
-        button_->setIcon(iconProvider.icon(Icons::FolderSync));
-        button_->setToolTip(QString("Calculate checksums of contained files\nand save the result to the local database"));
-        break;
-    case File:
-        button_->setText(format::algoToStr(settings_->algorithm));
-        button_->setIcon(iconProvider.icon(Icons::HashFile));
-        button_->setToolTip(QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm)));
-        break;
-    case DbFile:
-        button_->setText("Open");
-        button_->setIcon(iconProvider.icon(Icons::Database));
-        break;
-    case SumFile:
-        button_->setText("Check");
-        button_->setIcon(iconProvider.icon(Icons::Scan));
-        break;
-    case Model:
-        button_->setText("Verify");
-        button_->setIcon(iconProvider.icon(Icons::Start));
-        button_->setToolTip(QString("Check ALL files against stored checksums"));
-        break;
-    case ModelNewLost:
-        button_->setText("New/Lost");
-        button_->setIcon(iconProvider.icon(Icons::Update));
-        button_->setToolTip(QString("Update the Database:\nadd new files, delete missing ones"));
-        break;
-    case UpdateMismatch:
-        button_->setText("Update");
-        button_->setIcon(iconProvider.icon(FileStatus::Updated));
-        button_->setToolTip(QString("Update mismatched checksums with newly calculated ones"));
-        break;
-    case NoMode:
-        button_->setText("Browse");
-        break;
-    default:
-        qDebug() << "ModeSelector::selectMode | WRONG MODE" << curMode_;
-        break;
+        case Folder:
+        case File:
+            return format::algoToStr(settings_->algorithm);
+        case DbFile:
+            return "Open";
+        case SumFile:
+            return "Check";
+        case Model:
+            return "Verify";
+        case ModelNewLost:
+            return "New/Lost";
+        case UpdateMismatch:
+            return "Update";
+        case NoMode:
+            return "Browse";
+        default:
+            break;
     }
+
+    return "?";
+}
+
+QIcon ModeSelector::getButtonIcon()
+{
+    if (proc_->isState(State::StartVerbose))
+        return iconProvider.icon(Icons::Cancel);
+
+    switch (curMode_) {
+        case Folder:
+            return iconProvider.icon(Icons::FolderSync);
+        case File:
+            return iconProvider.icon(Icons::HashFile);
+        case DbFile:
+            return iconProvider.icon(Icons::Database);
+        case SumFile:
+            return iconProvider.icon(Icons::Scan);
+        case Model:
+            return iconProvider.icon(Icons::Start);
+        case ModelNewLost:
+            return iconProvider.icon(Icons::Update);
+        case UpdateMismatch:
+            return iconProvider.icon(FileStatus::Updated);
+        default:
+            break;
+    }
+
+    return QIcon();
+}
+
+QString ModeSelector::getButtonToolTip()
+{
+    switch (curMode_) {
+        case Folder:
+            return "Calculate checksums of contained files\nand save the result to the local database";
+        case File:
+            return QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm));
+        case Model:
+            return "Check ALL files against stored checksums";
+        case ModelNewLost:
+            return "Update the Database:\nadd new files, delete missing ones";
+        case UpdateMismatch:
+            return "Update mismatched checksums with newly calculated ones";
+        default:
+            break;
+    }
+
+    return QString();
 }
 
 Mode ModeSelector::currentMode()
@@ -286,12 +305,6 @@ Mode ModeSelector::currentMode()
 bool ModeSelector::isCurrentMode(const Modes mode)
 {
     return (mode & curMode_);
-}
-
-void ModeSelector::setAlgorithm(QCryptographicHash::Algorithm algo)
-{
-    settings_->algorithm = algo;
-    setButtonInfo();
 }
 
 // tasks execution --->>>
