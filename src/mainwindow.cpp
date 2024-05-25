@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setSettings(settings_);
     restoreGeometry(settings_->geometryMainWindow);
 
-    modeSelect = new ModeSelector(ui->treeView, ui->button, settings_, this);
+    modeSelect = new ModeSelector(ui->treeView, settings_, this);
     modeSelect->setProcState(manager->procState);
     proc_ = manager->procState;
 
@@ -82,7 +82,7 @@ void MainWindow::connections()
 
     // Push Button
     connect(ui->button, &QPushButton::clicked, modeSelect, &ModeSelector::doWork);
-    connect(ui->button, &QPushButton::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_Button);
+    connect(ui->button, &QPushButton::customContextMenuRequested, this, &MainWindow::createContextMenu_Button);
 
     connect(settings_, &Settings::algorithmChanged, this, &MainWindow::updateButtonInfo);
 
@@ -454,6 +454,12 @@ void MainWindow::handleChangedModel()
     ui->pathEdit->setEnabled(isViewFS);
     ui->pathEdit->setClearButtonEnabled(isViewFS);
     modeSelect->actionShowFilesystem->setEnabled(!isViewFS);
+}
+
+void MainWindow::createContextMenu_Button(const QPoint &point)
+{
+    if (!proc_->isStarted() && modeSelect->isCurrentMode(Mode::File | Mode::Folder))
+        modeSelect->menuAlgorithm()->exec(ui->button->mapToGlobal(point));
 }
 
 bool MainWindow::argumentInput()

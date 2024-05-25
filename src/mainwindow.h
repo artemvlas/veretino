@@ -39,6 +39,8 @@ public slots:
     void showFolderCheckResult(const Numbers &result, const QString &subFolder);
     void showFileCheckResult(const QString &filePath, const FileValues &values);
 
+    void createContextMenu_Button(const QPoint &point);
+
 private:
     void connectManager(); // connections are separated for convenience
     void connections();

@@ -19,7 +19,7 @@ class ModeSelector : public QObject
 {
     Q_OBJECT
 public:
-    explicit ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent = nullptr);
+    explicit ModeSelector(View *view, Settings *settings, QObject *parent = nullptr);
 
     enum Mode {
         NoMode = 1 << 0,
@@ -141,7 +141,6 @@ public:
 
 public slots:
     void createContextMenu_View(const QPoint &point);
-    void createContextMenu_Button(const QPoint &point);
 
     void setMode();
     void getInfoPathItem();
@@ -159,7 +158,6 @@ private:
 
     Mode curMode_ = NoMode;
     View *view_;
-    QPushButton *button_;
     Settings *settings_;
     ProcState *proc_ = nullptr;
 

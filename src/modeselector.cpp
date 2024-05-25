@@ -11,8 +11,8 @@
 #include <QMimeData>
 #include <QDebug>
 
-ModeSelector::ModeSelector(View *view, QPushButton *button, Settings *settings, QObject *parent)
-    : QObject{parent}, view_(view), button_(button), settings_(settings)
+ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
+    : QObject{parent}, view_(view), settings_(settings)
 {
     connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
     connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::cancelProcess);
@@ -735,12 +735,6 @@ QMenu* ModeSelector::menuUpdateDb()
     actionUpdateDbWithReChecksums->setEnabled(view_->data_->contains(FileStatus::Mismatched));
 
     return menuUpdateDatabase;
-}
-
-void ModeSelector::createContextMenu_Button(const QPoint &point)
-{
-    if (!proc_->isStarted() && isCurrentMode(File | Folder))
-        menuAlgorithm()->exec(button_->mapToGlobal(point));
 }
 
 bool ModeSelector::processAbortPrompt()
