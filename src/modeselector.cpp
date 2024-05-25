@@ -163,24 +163,6 @@ void ModeSelector::abortProcess()
         proc_->setState(State::Abort);
 }
 
-void ModeSelector::setMode()
-{
-    if (proc_->isStarted())
-        return;
-
-    if (view_->isCurrentViewModel(ModelView::NotSetted)) {
-        qDebug() << "ModeSelector | Insufficient data to set mode";
-        return;
-    }
-
-    if (view_->isViewFileSystem()) {
-        curMode_ = selectMode(view_->curPathFileSystem);
-    }
-    else if (view_->isViewDatabase()) {
-        curMode_ = selectMode(view_->data_->numbers);
-    }
-}
-
 Mode ModeSelector::selectMode(const QString &path)
 {
     QFileInfo pathInfo(path);
@@ -196,7 +178,7 @@ Mode ModeSelector::selectMode(const QString &path)
             return File;
     }
     else
-        return curMode_;
+        return NoMode;
 }
 
 Mode ModeSelector::selectMode(const Numbers &numbers)
@@ -224,10 +206,9 @@ void ModeSelector::getInfoPathItem()
 
 QString ModeSelector::getButtonText()
 {
-    if (proc_->isState(State::StartVerbose))
-        return "Cancel";
-
-    switch (curMode_) {
+    switch (currentMode()) {
+        case Processing:
+            return "Cancel";
         case Folder:
         case File:
             return format::algoToStr(settings_->algorithm());
@@ -252,10 +233,9 @@ QString ModeSelector::getButtonText()
 
 QIcon ModeSelector::getButtonIcon()
 {
-    if (proc_->isState(State::StartVerbose))
-        return iconProvider.icon(Icons::Cancel);
-
-    switch (curMode_) {
+    switch (currentMode()) {
+        case Processing:
+            return iconProvider.icon(Icons::Cancel);
         case Folder:
             return iconProvider.icon(Icons::FolderSync);
         case File:
@@ -279,10 +259,7 @@ QIcon ModeSelector::getButtonIcon()
 
 QString ModeSelector::getButtonToolTip()
 {
-    if (proc_->isState(State::StartVerbose))
-        return QString();
-
-    switch (curMode_) {
+    switch (currentMode()) {
         case Folder:
             return "Calculate checksums of contained files\nand save the result to the local database";
         case File:
@@ -302,12 +279,21 @@ QString ModeSelector::getButtonToolTip()
 
 Mode ModeSelector::currentMode()
 {
-    return curMode_;
+    if (proc_->isState(State::StartVerbose) || view_->isCurrentViewModel(ModelView::ModelSource))
+        return Processing;
+
+    if (view_->isViewFileSystem())
+        return selectMode(view_->curPathFileSystem);
+
+    if (view_->isViewDatabase())
+        return selectMode(view_->data_->numbers);
+
+    return NoMode;
 }
 
 bool ModeSelector::isCurrentMode(const Modes mode)
 {
-    return (mode & curMode_);
+    return (mode & currentMode());
 }
 
 // tasks execution --->>>
@@ -479,15 +465,13 @@ bool ModeSelector::emptyFolderPrompt()
 
 void ModeSelector::doWork()
 {
-    if (proc_->isState(State::StartVerbose)) {
-        if (view_->data_ && !view_->data_->metaData.isImported)
-            showFileSystem();
-        else
-            cancelProcess();
-        return;
-    }
-
-    switch (curMode_) {
+    switch (currentMode()) {
+        case Processing:
+            if (view_->data_ && !view_->data_->metaData.isImported)
+                showFileSystem();
+            else
+                cancelProcess();
+            break;
         case Folder:
             processChecksumsFiltered();
             break;
@@ -513,7 +497,7 @@ void ModeSelector::doWork()
             showFileSystem();
             break;
         default:
-            qDebug() << "MainWindow::doWork() | Wrong MODE:" << curMode_;
+            qDebug() << "MainWindow::doWork() | Wrong MODE:" << currentMode();
             break;
     }
 }
@@ -523,7 +507,7 @@ void ModeSelector::quickAction()
     if (proc_->isStarted())
             return;
 
-    switch (curMode_) {
+    switch (currentMode()) {
         case File:
             doWork();
             break;

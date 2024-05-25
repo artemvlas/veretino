@@ -23,14 +23,15 @@ public:
 
     enum Mode {
         NoMode = 1 << 0,
-        Folder = 1 << 1,
-        File = 1 << 2,
-        DbFile = 1 << 3,
-        SumFile = 1 << 4,
-        Model = 1 << 5,
-        ModelNewLost = 1 << 6,
-        UpdateMismatch = 1 << 7,
-        FlagDbModes = Model | ModelNewLost | UpdateMismatch
+        Processing = 1 << 1,
+        Folder = 1 << 2,
+        File = 1 << 3,
+        DbFile = 1 << 4,
+        SumFile = 1 << 5,
+        Model = 1 << 6,
+        ModelNewLost = 1 << 7,
+        UpdateMismatch = 1 << 8,
+        // FlagDbModes = Model | ModelNewLost | UpdateMismatch
     };
     Q_ENUM(Mode)
     Q_DECLARE_FLAGS(Modes, Mode)
@@ -141,8 +142,6 @@ public:
 
 public slots:
     void createContextMenu_View(const QPoint &point);
-
-    void setMode();
     void getInfoPathItem();
 
 private:
@@ -156,7 +155,6 @@ private:
     QString composeDbFilePath();
     bool isSelectedCreateDb();
 
-    Mode curMode_ = NoMode;
     View *view_;
     Settings *settings_;
     ProcState *proc_ = nullptr;

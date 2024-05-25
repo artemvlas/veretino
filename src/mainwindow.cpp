@@ -91,7 +91,6 @@ void MainWindow::connections()
     connect(ui->treeView, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
     connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
     connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
-    connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::setMode);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
     connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateButtonInfo);
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::handleChangedModel);
@@ -156,14 +155,12 @@ void MainWindow::connectManager()
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
-    connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, modeSelect, &ModeSelector::setMode);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
 
     // process status
     connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->treeView->setViewProxy(); });
-    connect(manager->procState, &ProcState::stateChanged, modeSelect, &ModeSelector::setMode);
     connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateButtonInfo);
     connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
     connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
@@ -458,7 +455,7 @@ void MainWindow::handleChangedModel()
 
 void MainWindow::createContextMenu_Button(const QPoint &point)
 {
-    if (!proc_->isStarted() && modeSelect->isCurrentMode(Mode::File | Mode::Folder))
+    if (modeSelect->isCurrentMode(Mode::File | Mode::Folder))
         modeSelect->menuAlgorithm()->exec(ui->button->mapToGlobal(point));
 }
 
