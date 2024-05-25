@@ -1,6 +1,12 @@
 Veretino 0.4.0
-* Migration to Qt6 (this version supports both Qt5 and Qt6 builds).
+* This version supports both Qt5 and Qt6 builds.
 * The internal process management system has been completely rewritten.
+* Improvement and optimization of internal architecture.
+
+Fixes and Minor Enhancements:
+* The speed display is brought to the standard form: MiB/sec >> MiB/s
+* In the path input field, the clear button is hidden when it doesn't make sense.
+* Prevented some database columns from being accidentally hidden on first run.
 
 Veretino 0.3.12
 * More accurate and smooth process speed and remaining time.
