@@ -1,7 +1,9 @@
 Veretino 0.4.0
 * This version supports both Qt5 and Qt6 builds.
-* The internal process management system has been completely rewritten.
-* Improvement and optimization of internal architecture.
+
+Internal changes:
+* The process management system has been completely rewritten.
+* The architecture has been optimized and improved.
 
 Fixes and Minor Enhancements:
 * The speed display is brought to the standard form: MiB/sec >> MiB/s
