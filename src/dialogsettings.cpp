@@ -16,7 +16,7 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     settings_(settings)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::iconVeretino());
+    setWindowIcon(IconProvider::iconVeretino);
 
     ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText("Defaults");
     ui->comboBoxPresets->addItems(filterPresetsList);

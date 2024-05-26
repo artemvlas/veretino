@@ -15,7 +15,7 @@ public:
     IconProvider();
     IconProvider(const QPalette &palette);
 
-    enum Theme {Light, Dark};
+    enum Theme { Light, Dark };
     enum Icons {
         AddFork,
         Backup,
@@ -48,10 +48,11 @@ public:
 
     void setTheme(Theme theme);
     void setTheme(const QPalette &palette);
+    Theme theme() const;
 
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons icon) const;
-    static QIcon iconVeretino();
+    static const QIcon iconVeretino;
 
 private:
     bool isDarkTheme(const QPalette &palette) const;
@@ -61,7 +62,8 @@ private:
 
     static QHash<FileStatus, QIcon> cacheFileStatus;
     Theme theme_ = Light;
-};
+
+}; // class IconProvider
 
 using Icons = IconProvider::Icons;
 

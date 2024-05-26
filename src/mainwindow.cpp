@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::iconVeretino());
+    setWindowIcon(IconProvider::iconVeretino);
     QThread::currentThread()->setObjectName("MAIN Thread");
 
     ui->progressBar->setProcState(manager->procState);

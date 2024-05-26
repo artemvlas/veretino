@@ -17,10 +17,10 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
 {
     ui->setupUi(this);
 
-    setWindowIcon(IconProvider::iconVeretino());
+    setWindowIcon(IconProvider::iconVeretino);
 
-    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath));});
-    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(data_->metaData.workDir);});
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
+    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData.workDir); });
 
     QString dbFileName = data->databaseFileName();
     if (data->metaData.saveResult == MetaData::SavedToDesktop)

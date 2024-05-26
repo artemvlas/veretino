@@ -6,6 +6,7 @@
 #include "iconprovider.h"
 
 QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
+const QIcon IconProvider::iconVeretino = QIcon(":/icons/generic/veretino.svg");
 
 IconProvider::IconProvider() {}
 
@@ -28,6 +29,11 @@ bool IconProvider::isDarkTheme(const QPalette &palette) const
 {
     int curLightness = palette.color(QPalette::Active, QPalette::Base).lightness();
     return (curLightness < 120);
+}
+
+IconProvider::Theme IconProvider::theme() const
+{
+    return theme_;
 }
 
 QString IconProvider::themeFolder() const
@@ -192,9 +198,4 @@ QIcon IconProvider::icon(FileStatus status) const
 QIcon IconProvider::icon(Icons icon) const
 {
     return QIcon(svgFilePath(icon));
-}
-
-QIcon IconProvider::iconVeretino()
-{
-    return QIcon(":/icons/generic/veretino.svg");
 }

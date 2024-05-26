@@ -17,7 +17,7 @@ DialogFolderContents::DialogFolderContents(const QString &folderPath, const QLis
     , extList_(extList)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::iconVeretino());
+    setWindowIcon(IconProvider::iconVeretino);
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnType, 130);
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
