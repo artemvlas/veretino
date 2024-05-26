@@ -6,6 +6,7 @@
 #include "iconprovider.h"
 
 QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
+QHash<Icons, QIcon> IconProvider::cacheThemeIcons = QHash<Icons, QIcon>();
 const QIcon IconProvider::iconVeretino = QIcon(":/icons/generic/veretino.svg");
 
 IconProvider::IconProvider() {}
@@ -195,7 +196,14 @@ QIcon IconProvider::icon(FileStatus status) const
     }
 }
 
-QIcon IconProvider::icon(Icons icon) const
+QIcon IconProvider::icon(Icons themeIcon) const
 {
-    return QIcon(svgFilePath(icon));
+    if (cacheThemeIcons.contains(themeIcon)) {
+        return cacheThemeIcons.value(themeIcon);
+    }
+    else {
+        QIcon ico = QIcon(svgFilePath(themeIcon));
+        cacheThemeIcons.insert(themeIcon, ico);
+        return ico;
+    }
 }

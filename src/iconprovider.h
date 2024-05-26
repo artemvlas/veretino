@@ -51,7 +51,7 @@ public:
     Theme theme() const;
 
     QIcon icon(FileStatus status) const;
-    QIcon icon(Icons icon) const;
+    QIcon icon(Icons themeIcon) const;
     static const QIcon iconVeretino;
 
 private:
@@ -61,6 +61,7 @@ private:
     QString svgFilePath(Icons icon) const;
 
     static QHash<FileStatus, QIcon> cacheFileStatus;
+    static QHash<Icons, QIcon> cacheThemeIcons;
     Theme theme_ = Light;
 
 }; // class IconProvider
