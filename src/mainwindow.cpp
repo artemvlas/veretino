@@ -51,9 +51,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    ui->menuFile->addActions(modeSelect->menuFileActions);
-    ui->menuFile->insertSeparator(modeSelect->actionOpenDialogSettings);
-    ui->menuFile->insertMenu(modeSelect->actionShowFilesystem, modeSelect->menuOpenRecent);
+    ui->menuFile->addActions(modeSelect->menuAct_->menuFileActions);
+    ui->menuFile->insertSeparator(modeSelect->menuAct_->actionOpenDialogSettings);
+    ui->menuFile->insertMenu(modeSelect->menuAct_->actionShowFilesystem, modeSelect->menuAct_->menuOpenRecent);
 
     updatePermanentStatus();
 }
@@ -102,9 +102,9 @@ void MainWindow::connections()
     connect(permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
-    connect(modeSelect->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
-    connect(modeSelect->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
-    connect(modeSelect->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
+    connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
+    connect(modeSelect->menuAct_->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
+    connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
 
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
@@ -450,7 +450,7 @@ void MainWindow::handleChangedModel()
 
     ui->pathEdit->setEnabled(isViewFS);
     ui->pathEdit->setClearButtonEnabled(isViewFS);
-    modeSelect->actionShowFilesystem->setEnabled(!isViewFS);
+    modeSelect->menuAct_->actionShowFilesystem->setEnabled(!isViewFS);
 }
 
 void MainWindow::createContextMenu_Button(const QPoint &point)

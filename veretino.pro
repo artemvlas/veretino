@@ -23,6 +23,7 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/manager.cpp \
+    src/menuactions.cpp \
     src/modeselector.cpp \
     src/procstate.cpp \
     src/progressbar.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     src/jsondb.h \
     src/mainwindow.h \
     src/manager.h \
+    src/menuactions.h \
     src/modeselector.h \
     src/procstate.h \
     src/progressbar.h \
