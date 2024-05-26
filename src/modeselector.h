@@ -40,8 +40,8 @@ public:
     void cancelProcess();
     void abortProcess();
 
-    Mode currentMode();
-    bool isCurrentMode(const Modes mode);
+    Mode mode();
+    bool isMode(const Modes expected);
 
     QString getButtonText();
     QString getButtonToolTip();
@@ -146,9 +146,6 @@ public slots:
 
 private:
     void connectActions();
-    Mode selectMode(const Numbers &numbers); // select Mode based on the contents of the Numbers struct
-    Mode selectMode(const QString &path); // select Mode based on file system path
-
     void copyDataToClipboard(Column column);
     void setActionsIcons();
 

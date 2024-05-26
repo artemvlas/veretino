@@ -163,34 +163,6 @@ void ModeSelector::abortProcess()
         proc_->setState(State::Abort);
 }
 
-Mode ModeSelector::selectMode(const QString &path)
-{
-    QFileInfo pathInfo(path);
-
-    if (pathInfo.isDir())
-        return Folder;
-    else if (pathInfo.isFile()) {
-        if (tools::isDatabaseFile(path))
-            return DbFile;
-        else if (tools::isSummaryFile(path))
-            return SumFile;
-        else
-            return File;
-    }
-    else
-        return NoMode;
-}
-
-Mode ModeSelector::selectMode(const Numbers &numbers)
-{
-    if (numbers.contains(FileStatus::Mismatched))
-        return UpdateMismatch;
-    else if (numbers.contains(FileStatus::FlagNewLost))
-        return ModelNewLost;
-    else
-        return Model;
-}
-
 void ModeSelector::getInfoPathItem()
 {
     if (proc_->isState(State::StartVerbose))
@@ -206,7 +178,7 @@ void ModeSelector::getInfoPathItem()
 
 QString ModeSelector::getButtonText()
 {
-    switch (currentMode()) {
+    switch (mode()) {
         case Processing:
             return "Cancel";
         case Folder:
@@ -233,7 +205,7 @@ QString ModeSelector::getButtonText()
 
 QIcon ModeSelector::getButtonIcon()
 {
-    switch (currentMode()) {
+    switch (mode()) {
         case Processing:
             return iconProvider.icon(Icons::Cancel);
         case Folder:
@@ -259,7 +231,7 @@ QIcon ModeSelector::getButtonIcon()
 
 QString ModeSelector::getButtonToolTip()
 {
-    switch (currentMode()) {
+    switch (mode()) {
         case Folder:
             return "Calculate checksums of contained files\nand save the result to the local database";
         case File:
@@ -277,23 +249,40 @@ QString ModeSelector::getButtonToolTip()
     return QString();
 }
 
-Mode ModeSelector::currentMode()
+Mode ModeSelector::mode()
 {
     if (proc_->isState(State::StartVerbose) || view_->isCurrentViewModel(ModelView::ModelSource))
         return Processing;
 
-    if (view_->isViewFileSystem())
-        return selectMode(view_->curPathFileSystem);
+    if (view_->isViewDatabase()) {
+        if (view_->data_->numbers.contains(FileStatus::Mismatched))
+            return UpdateMismatch;
+        else if (view_->data_->numbers.contains(FileStatus::FlagNewLost))
+            return ModelNewLost;
+        else
+            return Model;
+    }
 
-    if (view_->isViewDatabase())
-        return selectMode(view_->data_->numbers);
+    if (view_->isViewFileSystem()) {
+        QFileInfo pathInfo(view_->curPathFileSystem);
+        if (pathInfo.isDir())
+            return Folder;
+        else if (pathInfo.isFile()) {
+            if (tools::isDatabaseFile(view_->curPathFileSystem))
+                return DbFile;
+            else if (tools::isSummaryFile(view_->curPathFileSystem))
+                return SumFile;
+            else
+                return File;
+        }
+    }
 
     return NoMode;
 }
 
-bool ModeSelector::isCurrentMode(const Modes mode)
+bool ModeSelector::isMode(const Modes expected)
 {
-    return (mode & currentMode());
+    return (expected & mode());
 }
 
 // tasks execution --->>>
@@ -465,7 +454,7 @@ bool ModeSelector::emptyFolderPrompt()
 
 void ModeSelector::doWork()
 {
-    switch (currentMode()) {
+    switch (mode()) {
         case Processing:
             if (view_->data_ && !view_->data_->metaData.isImported)
                 showFileSystem();
@@ -497,7 +486,7 @@ void ModeSelector::doWork()
             showFileSystem();
             break;
         default:
-            qDebug() << "MainWindow::doWork() | Wrong MODE:" << currentMode();
+            qDebug() << "MainWindow::doWork() | Wrong MODE:" << mode();
             break;
     }
 }
@@ -507,7 +496,7 @@ void ModeSelector::quickAction()
     if (proc_->isStarted())
             return;
 
-    switch (currentMode()) {
+    switch (mode()) {
         case File:
             doWork();
             break;
@@ -550,7 +539,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         if (proc_->isState(State::StartVerbose))
             viewContextMenu->addAction(actionCancel);
         else if (index.isValid()) {
-            if (isCurrentMode(Folder)) {
+            if (isMode(Folder)) {
                 viewContextMenu->addAction(actionShowFolderContentsTypes);
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addSeparator();
@@ -560,7 +549,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionProcessChecksumsPermFilter);
                 viewContextMenu->addAction(actionProcessChecksumsCustomFilter);
             }
-            else if (isCurrentMode(File)) {
+            else if (isMode(File)) {
                 viewContextMenu->addMenu(menuAlgorithm());
                 viewContextMenu->addAction(actionProcessSha_toClipboard);
                 viewContextMenu->addMenu(menuStoreSummary);
@@ -572,9 +561,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                     viewContextMenu->addAction(actionCheckFileByClipboardChecksum);
                 }
             }
-            else if (isCurrentMode(DbFile))
+            else if (isMode(DbFile))
                 viewContextMenu->addAction(actionOpenDatabase);
-            else if (isCurrentMode(SumFile))
+            else if (isMode(SumFile))
                 viewContextMenu->addAction(actionCheckSumFile);
         }
     }

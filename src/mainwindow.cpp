@@ -455,7 +455,7 @@ void MainWindow::handleChangedModel()
 
 void MainWindow::createContextMenu_Button(const QPoint &point)
 {
-    if (modeSelect->isCurrentMode(Mode::File | Mode::Folder))
+    if (modeSelect->isMode(Mode::File | Mode::Folder))
         modeSelect->menuAlgorithm()->exec(ui->button->mapToGlobal(point));
 }
 
