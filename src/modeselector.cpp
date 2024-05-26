@@ -82,6 +82,9 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionSetAlgoSha1, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha1); });
     connect(menuAct_->actionSetAlgoSha256, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha256); });
     connect(menuAct_->actionSetAlgoSha512, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha512); });
+
+    // recent files menu
+    connect(menuAct_->menuOpenRecent, &QMenu::triggered, this, &ModeSelector::openRecentDatabase);
 }
 
 void ModeSelector::setProcState(ProcState *procState)
@@ -297,6 +300,15 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (processAbortPrompt())
         emit parseJsonFile(filePath);
+}
+
+void ModeSelector::openRecentDatabase(const QAction *action)
+{
+    // the recent files menu stores the path to the DB file in the action tooltip
+    QString filePath = action->toolTip();
+
+    if (QFileInfo::exists(filePath))
+        openJsonDatabase(filePath);
 }
 
 void ModeSelector::openBranchDb()
@@ -578,28 +590,6 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     }
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
-}
-
-void ModeSelector::updateMenuOpenRecent()
-{
-    menuAct_->menuOpenRecent->clear();
-    menuAct_->menuOpenRecent->setDisabled(settings_->recentFiles.isEmpty());
-
-    if (!menuAct_->menuOpenRecent->isEnabled())
-        return;
-
-    QIcon dbIcon = iconProvider.icon(Icons::Database);
-
-    foreach (const QString &recentFilePath, settings_->recentFiles) {
-        if (QFileInfo::exists(recentFilePath)) {
-            QAction *act = menuAct_->menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
-            act->setToolTip(recentFilePath);
-            connect(act, &QAction::triggered, this, [=]{ openJsonDatabase(recentFilePath); });
-        }
-    }
-
-    menuAct_->menuOpenRecent->addSeparator();
-    menuAct_->menuOpenRecent->addAction(menuAct_->actionClearRecent);
 }
 
 QMenu* ModeSelector::menuAlgorithm()

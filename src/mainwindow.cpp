@@ -107,7 +107,7 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
 
-    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect, &ModeSelector::updateMenuOpenRecent);
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, [=] { modeSelect->menuAct_->updateMenuOpenRecent(settings_->recentFiles); });
 }
 
 void MainWindow::connectManager()

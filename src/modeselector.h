@@ -43,8 +43,6 @@ public:
     QString getButtonToolTip();
     QIcon getButtonIcon();
 
-    void updateMenuOpenRecent();
-
     // returns QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
     QMenu* menuAlgorithm();
     QMenu* menuUpdateDb(); // returns *menuUpdateDatabase
@@ -58,6 +56,7 @@ public:
     void processFolderChecksums(const FilterRule &filter);
     void openFsPath(const QString &path);
     void openJsonDatabase(const QString &filePath);
+    void openRecentDatabase(const QAction *action);
     void openBranchDb();
     bool processAbortPrompt();
     bool overwriteDbPrompt();

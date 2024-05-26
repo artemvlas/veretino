@@ -20,6 +20,7 @@ public:
     explicit MenuActions(QObject *parent = nullptr);
 
     void setIconTheme(const QPalette &palette);
+    void updateMenuOpenRecent(const QStringList &recentFiles);
 
     // MainWindow menu
     QAction *actionOpenFolder = new QAction("Open Folder", this);

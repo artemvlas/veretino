@@ -5,6 +5,8 @@
 */
 
 #include "menuactions.h"
+#include "tools.h"
+#include <QFileInfo>
 
 MenuActions::MenuActions(QObject *parent)
     : QObject{parent}
@@ -77,4 +79,26 @@ void MenuActions::setActionsIcons()
     actionCopyItem->setIcon(iconProvider.icon(Icons::Copy));
     actionBranchMake->setIcon(iconProvider.icon(Icons::AddFork));
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
+}
+
+void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
+{
+    menuOpenRecent->clear();
+    menuOpenRecent->setDisabled(recentFiles.isEmpty());
+
+    if (!menuOpenRecent->isEnabled())
+        return;
+
+    QIcon dbIcon = iconProvider.icon(Icons::Database);
+
+    foreach (const QString &recentFilePath, recentFiles) {
+        if (QFileInfo::exists(recentFilePath)) {
+            QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
+            act->setToolTip(recentFilePath);
+            // connect(act, &QAction::triggered, this, [=]{ openJsonDatabase(recentFilePath); });
+        }
+    }
+
+    menuOpenRecent->addSeparator();
+    menuOpenRecent->addAction(actionClearRecent);
 }
