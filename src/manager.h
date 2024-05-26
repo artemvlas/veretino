@@ -43,7 +43,7 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
-    void createDataModel(const QString &databaseFilePath); // making the tree data model
+    void createDataModel(const QString &databaseFilePath);
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
 
@@ -58,7 +58,7 @@ private:
 
     void _processFolderSha(const MetaData &metaData);
     void _updateDatabase(const DestDbUpdate dest);
-
+    void _createDataModel(const QString &databaseFilePath); // making the tree data model
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
     void _verifyFolderItem(const QModelIndex &folderItemIndex);
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification

@@ -120,6 +120,11 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
+    runTask([&] { _createDataModel(databaseFilePath); });
+}
+
+void Manager::_createDataModel(const QString &databaseFilePath)
+{
     if (dataMaintainer->importJson(databaseFilePath)) {
         dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
