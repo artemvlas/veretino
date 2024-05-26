@@ -491,7 +491,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         else if (index.isValid()) {
             if (isMode(Folder)) {
                 viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
-                viewContextMenu->addMenu(menuAlgorithm());
+                viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
                 viewContextMenu->addSeparator();
 
                 viewContextMenu->addAction(menuAct_->actionProcessChecksumsNoFilter);
@@ -500,7 +500,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
                 viewContextMenu->addAction(menuAct_->actionProcessChecksumsCustomFilter);
             }
             else if (isMode(File)) {
-                viewContextMenu->addMenu(menuAlgorithm());
+                viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
                 viewContextMenu->addAction(menuAct_->actionProcessSha_toClipboard);
                 viewContextMenu->addMenu(menuAct_->menuStoreSummary);
 
@@ -590,28 +590,6 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     }
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
-}
-
-QMenu* ModeSelector::menuAlgorithm()
-{
-    switch (settings_->algorithm()) {
-    case QCryptographicHash::Sha1:
-        menuAct_->actionSetAlgoSha1->setChecked(true);
-        break;
-    case QCryptographicHash::Sha256:
-        menuAct_->actionSetAlgoSha256->setChecked(true);
-        break;
-    case QCryptographicHash::Sha512:
-        menuAct_->actionSetAlgoSha512->setChecked(true);
-        break;
-    default:
-        menuAct_->actionSetAlgoSha256->setChecked(true);
-        break;
-    }
-
-    menuAct_->menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(settings_->algorithm()));
-
-    return menuAct_->menuAlgo;
 }
 
 bool ModeSelector::processAbortPrompt()

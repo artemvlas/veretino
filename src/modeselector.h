@@ -43,9 +43,6 @@ public:
     QString getButtonToolTip();
     QIcon getButtonIcon();
 
-    // returns QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
-    QMenu* menuAlgorithm();
-
     // tasks execution
     void quickAction();
     void doWork();

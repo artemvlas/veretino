@@ -19,16 +19,19 @@ class MenuActions : public QObject
     Q_OBJECT
 public:
     explicit MenuActions(QObject *parent = nullptr);
+    ~MenuActions();
 
     void setIconTheme(const QPalette &palette);
     void updateMenuOpenRecent(const QStringList &recentFiles);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
+    QMenu* menuAlgorithm(QCryptographicHash::Algorithm curAlgo);
 
     // MainWindow menu
     QAction *actionOpenFolder = new QAction("Open Folder", this);
     QAction *actionOpenDatabaseFile = new QAction("Open Database", this);
     QAction *actionOpenDialogSettings = new QAction("Settings", this);
     QAction *actionShowFilesystem = new QAction("Show file system", this);
+    QAction *actionClearRecent = new QAction("Clear History", this);
 
     QList<QAction*> menuFileActions { actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenDialogSettings };
 
@@ -82,10 +85,9 @@ public:
     // Menu
     QMenu *menuAlgo = new QMenu;
     QMenu *menuStoreSummary = new QMenu("Calculate checksum → Summary");
-
     QMenu *menuOpenRecent = new QMenu("Open Recent");
-    QAction *actionClearRecent = new QAction("Clear History");
     QMenu *menuUpdateDatabase = nullptr;
+    QList<QMenu*> listOfMenus = { menuAlgo, menuStoreSummary, menuOpenRecent, menuUpdateDatabase };
 
 private:
     void setActionsIcons();

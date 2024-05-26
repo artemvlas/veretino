@@ -28,6 +28,11 @@ MenuActions::MenuActions(QObject *parent)
     menuOpenRecent->setToolTipsVisible(true);
 }
 
+MenuActions::~MenuActions()
+{
+    qDeleteAll(listOfMenus);
+}
+
 void MenuActions::setIconTheme(const QPalette &palette)
 {
     iconProvider.setTheme(palette);
@@ -122,4 +127,28 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
     actionUpdateDbWithReChecksums->setEnabled(dataNum.contains(FileStatus::Mismatched));
 
     return menuUpdateDatabase;
+}
+
+// returns QMenu *menuAlgo: sets checked one of the nested actions,
+// changes the text of the menu action, and returns a pointer to that menu
+QMenu* MenuActions::menuAlgorithm(QCryptographicHash::Algorithm curAlgo)
+{
+    switch (curAlgo) {
+    case QCryptographicHash::Sha1:
+        actionSetAlgoSha1->setChecked(true);
+        break;
+    case QCryptographicHash::Sha256:
+        actionSetAlgoSha256->setChecked(true);
+        break;
+    case QCryptographicHash::Sha512:
+        actionSetAlgoSha512->setChecked(true);
+        break;
+    default:
+        actionSetAlgoSha256->setChecked(true);
+        break;
+    }
+
+    menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(curAlgo));
+
+    return menuAlgo;
 }

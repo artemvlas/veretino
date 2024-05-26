@@ -56,9 +56,9 @@ private:
     Settings *settings_ = new Settings(this); // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
-    ClickableLabel *statusIconLabel = new ClickableLabel;
-    ClickableLabel *statusTextLabel = new ClickableLabel;
-    ClickableLabel *permanentStatus = new ClickableLabel;
+    ClickableLabel *statusIconLabel = new ClickableLabel(this);
+    ClickableLabel *statusTextLabel = new ClickableLabel(this);
+    ClickableLabel *permanentStatus = new ClickableLabel(this);
     ModeSelector *modeSelect = nullptr;
     const ProcState *proc_ = nullptr;
 
