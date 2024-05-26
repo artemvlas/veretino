@@ -102,3 +102,24 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
     menuOpenRecent->addSeparator();
     menuOpenRecent->addAction(actionClearRecent);
 }
+
+QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
+{
+    if (!menuUpdateDatabase) {
+        menuUpdateDatabase = new QMenu("Update the Database");
+        menuUpdateDatabase->menuAction()->setIcon(iconProvider.icon(Icons::Update));
+
+        menuUpdateDatabase->addAction(actionDbAddNew);
+        menuUpdateDatabase->addAction(actionDbClearLost);
+        menuUpdateDatabase->addAction(actionUpdateDbWithNewLost);
+        menuUpdateDatabase->addSeparator();
+        menuUpdateDatabase->addAction(actionUpdateDbWithReChecksums);
+    }
+
+    actionDbAddNew->setEnabled(dataNum.contains(FileStatus::New));
+    actionDbClearLost->setEnabled(dataNum.contains(FileStatus::Missing));
+    actionUpdateDbWithNewLost->setEnabled(actionDbAddNew->isEnabled() || actionDbClearLost->isEnabled());
+    actionUpdateDbWithReChecksums->setEnabled(dataNum.contains(FileStatus::Mismatched));
+
+    return menuUpdateDatabase;
+}

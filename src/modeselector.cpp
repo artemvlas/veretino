@@ -304,7 +304,7 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
 
 void ModeSelector::openRecentDatabase(const QAction *action)
 {
-    // the recent files menu stores the path to the DB file in the action tooltip
+    // the recent files menu stores the path to the DB file in the action's tooltip
     QString filePath = action->toolTip();
 
     if (QFileInfo::exists(filePath))
@@ -581,7 +581,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
             viewContextMenu->addAction(menuAct_->actionCheckAll);
 
             if (view_->data_->contains(FileStatus::FlagUpdatable))
-                viewContextMenu->addMenu(menuUpdateDb());
+                viewContextMenu->addMenu(menuAct_->menuUpdateDb(view_->data_->numbers));
         }
 
         viewContextMenu->addSeparator();
@@ -612,30 +612,6 @@ QMenu* ModeSelector::menuAlgorithm()
     menuAct_->menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(settings_->algorithm()));
 
     return menuAct_->menuAlgo;
-}
-
-QMenu* ModeSelector::menuUpdateDb()
-{
-    if (!view_->data_)
-        return menuUpdateDatabase;
-
-    if (!menuUpdateDatabase) {
-        menuUpdateDatabase = new QMenu("Update the Database", view_);
-        menuUpdateDatabase->menuAction()->setIcon(iconProvider.icon(Icons::Update));
-
-        menuUpdateDatabase->addAction(menuAct_->actionDbAddNew);
-        menuUpdateDatabase->addAction(menuAct_->actionDbClearLost);
-        menuUpdateDatabase->addAction(menuAct_->actionUpdateDbWithNewLost);
-        menuUpdateDatabase->addSeparator();
-        menuUpdateDatabase->addAction(menuAct_->actionUpdateDbWithReChecksums);
-    }
-
-    menuAct_->actionDbAddNew->setEnabled(view_->data_->contains(FileStatus::New));
-    menuAct_->actionDbClearLost->setEnabled(view_->data_->contains(FileStatus::Missing));
-    menuAct_->actionUpdateDbWithNewLost->setEnabled(menuAct_->actionDbAddNew->isEnabled() || menuAct_->actionDbClearLost->isEnabled());
-    menuAct_->actionUpdateDbWithReChecksums->setEnabled(view_->data_->contains(FileStatus::Mismatched));
-
-    return menuUpdateDatabase;
 }
 
 bool ModeSelector::processAbortPrompt()

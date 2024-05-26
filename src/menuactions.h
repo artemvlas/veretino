@@ -12,6 +12,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include "iconprovider.h"
+#include "datacontainer.h"
 
 class MenuActions : public QObject
 {
@@ -21,6 +22,7 @@ public:
 
     void setIconTheme(const QPalette &palette);
     void updateMenuOpenRecent(const QStringList &recentFiles);
+    QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
 
     // MainWindow menu
     QAction *actionOpenFolder = new QAction("Open Folder", this);
@@ -83,6 +85,7 @@ public:
 
     QMenu *menuOpenRecent = new QMenu("Open Recent");
     QAction *actionClearRecent = new QAction("Clear History");
+    QMenu *menuUpdateDatabase = nullptr;
 
 private:
     void setActionsIcons();

@@ -45,7 +45,6 @@ public:
 
     // returns QMenu *menuAlgo: sets checked one of the nested actions, changes the text of the menu action, and returns a pointer to that menu
     QMenu* menuAlgorithm();
-    QMenu* menuUpdateDb(); // returns *menuUpdateDatabase
 
     // tasks execution
     void quickAction();
@@ -73,8 +72,6 @@ public:
 
     IconProvider iconProvider;
     MenuActions *menuAct_ = new MenuActions(this);
-
-    QMenu *menuUpdateDatabase = nullptr;
 
 public slots:
     void createContextMenu_View(const QPoint &point);
