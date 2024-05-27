@@ -14,7 +14,7 @@
 class TreeModel;
 
 struct MetaData {
-    QCryptographicHash::Algorithm algorithm;
+    QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
     QString workDir; // current working folder
     QString databaseFilePath;
     QString saveDateTime; // date and time the database was saved
@@ -22,7 +22,7 @@ struct MetaData {
                                     // (all files from the list are exists and match the checksums)
     FilterRule filter;
     bool isImported = false; // from db(json) file
-    enum SaveResult { NotSaved, Saved, SavedToDesktop };
+    enum SaveResult { NotSaved, Saved };
     SaveResult saveResult = NotSaved;
 }; // struct MetaData
 

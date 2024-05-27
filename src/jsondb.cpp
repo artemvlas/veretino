@@ -6,7 +6,6 @@
 #include "jsondb.h"
 #include "files.h"
 #include "tools.h"
-#include <QStandardPaths>
 #include <QFile>
 #include <QFileInfo>
 #include "treemodeliterator.h"
@@ -165,8 +164,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
         mainArray[0] = header;
         doc.setArray(mainArray);
 
-        QString resPathToSave = paths::joinPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
-                                                paths::basicName(pathToSave));
+        QString resPathToSave = paths::joinPath(Files::desktopFolderPath, paths::basicName(pathToSave));
 
         if (saveJsonFile(doc, resPathToSave)) {
             emit setStatusbarText("Saved to Desktop");

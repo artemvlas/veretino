@@ -24,11 +24,13 @@ private:
     Ui::DialogDbStatus *ui;
     const DataContainer *data_;
 
-    enum Tabs{TabListed, TabFilter, TabVerification, TabChanges};
+    enum Tabs{ TabListed, TabFilter, TabVerification, TabChanges };
     QStringList infoContent(const DataContainer *data);
     QStringList infoVerification(const DataContainer *data);
     QStringList infoChanges();
+
     bool isJustCreated();
+    bool isSavedToDesktop();
 };
 
 #endif // DIALOGDBSTATUS_H

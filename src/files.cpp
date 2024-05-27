@@ -5,6 +5,7 @@
 */
 #include "files.h"
 #include <QDirIterator>
+#include <QStandardPaths>
 #include <QDebug>
 #include "tools.h"
 #include "treemodeliterator.h"
@@ -13,6 +14,8 @@
 const QString ExtNumSize::strNoType = "No type";
 const QString ExtNumSize::strVeretinoDb = "Veretino DB";
 const QString ExtNumSize::strShaFiles = "Sha-files";
+
+const QString Files::desktopFolderPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 
 Files::Files(QObject *parent)
     : QObject(parent)

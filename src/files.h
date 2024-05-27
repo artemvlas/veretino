@@ -78,6 +78,8 @@ public:
     // checks whether there are any (or filtered) files the folder/subfolders
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false));
 
+    static const QString desktopFolderPath; // path to the user's Desktop folder
+
 private:
     // variables
     QString fsPath_; // path to the File or Folder specified when creating the object

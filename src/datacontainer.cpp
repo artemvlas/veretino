@@ -6,7 +6,6 @@
 #include "datacontainer.h"
 #include <QDebug>
 #include <QFile>
-#include <QStandardPaths>
 #include "treemodeliterator.h"
 #include "settings.h"
 
@@ -133,13 +132,10 @@ void DataContainer::setSaveResult(const QString &dbFilePath)
 {
     if (!tools::isDatabaseFile(dbFilePath))
         metaData.saveResult = MetaData::NotSaved;
-    else if (paths::parentFolder(dbFilePath) == QStandardPaths::writableLocation(QStandardPaths::DesktopLocation))
-        metaData.saveResult = MetaData::SavedToDesktop;
-    else
+    else {
         metaData.saveResult = MetaData::Saved;
-
-    if (metaData.saveResult == MetaData::Saved || metaData.saveResult == MetaData::SavedToDesktop)
         metaData.databaseFilePath = dbFilePath;
+    }
 }
 
 const Numbers& DataContainer::updateNumbers()
