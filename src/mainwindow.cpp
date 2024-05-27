@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    modeSelect->abortProcess();
+    proc_->setState(State::Abort);
     saveSettings();
 
     thread->quit();

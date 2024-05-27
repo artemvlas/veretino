@@ -265,13 +265,6 @@ void ModeSelector::copyItem()
 
 void ModeSelector::showFileSystem()
 {
-    // without abort prompt
-    /*if (isProcessing())
-        emit cancelProcess();
-
-    view_->setFileSystemModel();*/
-
-    // with abort prompt
     openFsPath(QString());
 }
 
@@ -361,8 +354,11 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
 
 bool ModeSelector::isSelectedCreateDb()
 {
-    // if a very large folder is selected, the file system iteration (info about folder contents process) may continue for some time,
-    // so cancelation is needed before starting a new process
+    /* if a very large folder is selected,
+     * the file system iteration (info about folder contents process) may continue for some time,
+     * so cancelation is needed before starting a new process
+     */
+
     cancelProcess();
 
     return (emptyFolderPrompt() && overwriteDbPrompt());
