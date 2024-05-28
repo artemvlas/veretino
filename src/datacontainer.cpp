@@ -98,7 +98,7 @@ bool DataContainer::isBackupExists() const
     return (QFile::exists(backupFilePath()));
 }
 
-bool DataContainer::makeBackup(bool forceOverwrite)
+bool DataContainer::makeBackup(bool forceOverwrite) const
 {
     if (!QFile::exists(metaData.databaseFilePath))
         return false;
@@ -110,7 +110,7 @@ bool DataContainer::makeBackup(bool forceOverwrite)
                        backupFilePath());
 }
 
-bool DataContainer::restoreBackupFile()
+bool DataContainer::restoreBackupFile() const
 {
     if (isBackupExists()) {
         if (QFile::exists(metaData.databaseFilePath)) {
@@ -122,7 +122,7 @@ bool DataContainer::restoreBackupFile()
     return false;
 }
 
-void DataContainer::removeBackupFile()
+void DataContainer::removeBackupFile() const
 {
     if (isBackupExists())
         QFile::remove(backupFilePath());

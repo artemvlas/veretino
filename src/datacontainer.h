@@ -90,9 +90,9 @@ public:
     bool isAllChecked() const;
 
     bool isBackupExists() const;
-    bool makeBackup(bool forceOverwrite = false);
-    bool restoreBackupFile();
-    void removeBackupFile();
+    bool makeBackup(bool forceOverwrite = false) const;
+    bool restoreBackupFile() const;
+    void removeBackupFile() const;
 
     const Numbers& updateNumbers();
     Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
