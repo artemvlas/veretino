@@ -89,11 +89,10 @@ public:
     bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
 
-    bool isBackupExists();
+    bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false);
     bool restoreBackupFile();
     void removeBackupFile();
-    void setSaveResult(const QString &dbFilePath);
 
     const Numbers& updateNumbers();
     Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;

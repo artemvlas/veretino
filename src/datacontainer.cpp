@@ -93,7 +93,7 @@ bool DataContainer::isAllChecked() const
     return (contains(FileStatus::FlagChecked) && !contains(FileStatus::NotChecked));
 }
 
-bool DataContainer::isBackupExists()
+bool DataContainer::isBackupExists() const
 {
     return (QFile::exists(backupFilePath()));
 }
@@ -126,16 +126,6 @@ void DataContainer::removeBackupFile()
 {
     if (isBackupExists())
         QFile::remove(backupFilePath());
-}
-
-void DataContainer::setSaveResult(const QString &dbFilePath)
-{
-    if (!tools::isDatabaseFile(dbFilePath))
-        metaData.saveResult = MetaData::NotSaved;
-    else {
-        metaData.saveResult = MetaData::Saved;
-        metaData.databaseFilePath = dbFilePath;
-    }
 }
 
 const Numbers& DataContainer::updateNumbers()

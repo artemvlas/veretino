@@ -345,12 +345,20 @@ void DataMaintainer::exportToJson()
         return;
 
     data_->makeBackup();
-    data_->metaData.successfulCheckDateTime.clear();
-    data_->metaData.saveDateTime = format::currentDateTime();
 
-    data_->setSaveResult(json_->makeJson(data_));
+    QString dbFilePath = json_->makeJson(data_);
 
-    emit databaseUpdated();
+    if (!dbFilePath.isEmpty()) {
+        data_->metaData.saveResult = MetaData::Saved;
+        data_->metaData.databaseFilePath = dbFilePath;
+
+        data_->metaData.successfulCheckDateTime.clear();
+        data_->metaData.saveDateTime = format::currentDateTime();
+
+        emit databaseUpdated();
+    }
+    else
+        data_->metaData.saveResult = MetaData::NotSaved;
 }
 
 void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
