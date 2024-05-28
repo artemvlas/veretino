@@ -21,9 +21,8 @@ struct MetaData {
     QString successfulCheckDateTime; // date and time of the last completely successful check
                                     // (all files from the list are exists and match the checksums)
     FilterRule filter;
-    bool isImported = false; // from db(json) file
-    enum SaveResult { NotSaved, Saved };
-    SaveResult saveResult = NotSaved;
+    enum DbFileState { NoFile, Created, NotSaved, Saved };
+    DbFileState dbFileState = NoFile;
 }; // struct MetaData
 
 struct Numbers {
@@ -88,6 +87,7 @@ public:
     bool isFilterApplied() const;
     bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
+    bool isInCreation() const;
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;

@@ -269,7 +269,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
 {
     MetaData metaData;
     metaData.databaseFilePath = filePath;
-    metaData.isImported = true;
+    metaData.dbFileState = MetaData::Saved;
 
     // [checking for files in the intended WorkDir]
     QString strWorkDir = findValueStr(header, strHeaderWorkDir);

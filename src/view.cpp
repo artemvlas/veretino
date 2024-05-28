@@ -102,14 +102,15 @@ void View::setData(DataContainer *data)
     }
 
     data_ = data;
-    curPathFileSystem = data->metaData.isImported ? data->metaData.databaseFilePath : data->metaData.workDir;
+    curPathFileSystem = data->isInCreation() ? data->metaData.workDir : data->metaData.databaseFilePath;
 
-    if (data->metaData.isImported) {
+    if (data->isInCreation()) {
+        setTreeModel(ModelView::ModelSource);
+    }
+    else {
         setTreeModel(ModelView::ModelProxy);
         emit showDbStatus();
     }
-    else
-        setTreeModel(ModelView::ModelSource);
 
     hideColumn(Column::ColumnReChecksum); // the newly setted data has not yet been verified and does not contain ReChecksums
 

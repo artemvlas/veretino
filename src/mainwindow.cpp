@@ -369,7 +369,7 @@ void MainWindow::updateStatusIcon()
 void MainWindow::updatePermanentStatus()
 {
     if (ui->treeView->isViewDatabase()) {
-        if (proc_->isStarted() && !ui->treeView->data_->metaData.isImported) {
+        if (proc_->isStarted() && ui->treeView->data_->isInCreation()) {
             QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
                 permStatus.prepend("filters applied | ");

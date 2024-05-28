@@ -48,7 +48,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
-    dataMaintainer->data_->metaData.isImported = false;
+    dataMaintainer->data_->metaData.dbFileState = MetaData::NoFile;
     dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
 
     // create the filelist

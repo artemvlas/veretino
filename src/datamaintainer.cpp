@@ -346,10 +346,13 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
+    // whether the file existed before or was overwritten
+    bool isDbFileExist = QFile::exists(data_->metaData.databaseFilePath);
+
     QString dbFilePath = json_->makeJson(data_);
 
     if (!dbFilePath.isEmpty()) {
-        data_->metaData.saveResult = MetaData::Saved;
+        data_->metaData.dbFileState = isDbFileExist ? MetaData::Saved : MetaData::Created;
         data_->metaData.databaseFilePath = dbFilePath;
 
         data_->metaData.successfulCheckDateTime.clear();
@@ -358,7 +361,7 @@ void DataMaintainer::exportToJson()
         emit databaseUpdated();
     }
     else
-        data_->metaData.saveResult = MetaData::NotSaved;
+        data_->metaData.dbFileState = MetaData::NotSaved;
 }
 
 void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)

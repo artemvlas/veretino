@@ -93,6 +93,11 @@ bool DataContainer::isAllChecked() const
     return (contains(FileStatus::FlagChecked) && !contains(FileStatus::NotChecked));
 }
 
+bool DataContainer::isInCreation() const
+{
+    return (metaData.dbFileState == MetaData::NoFile);
+}
+
 bool DataContainer::isBackupExists() const
 {
     return (QFile::exists(backupFilePath()));

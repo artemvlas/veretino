@@ -402,7 +402,7 @@ void ModeSelector::doWork()
 {
     switch (mode()) {
         case Processing:
-            if (view_->data_ && !view_->data_->metaData.isImported)
+            if (view_->data_ && view_->data_->isInCreation())
                 showFileSystem();
             else
                 cancelProcess();
@@ -516,7 +516,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
     // TreeModel or ProxyModel View
     else if (view_->isViewDatabase()) {
         if (proc_->isStarted()) {
-            if (view_->data_->metaData.isImported)
+            if (!view_->data_->isInCreation())
                 viewContextMenu->addAction(menuAct_->actionCancel);
             viewContextMenu->addAction(menuAct_->actionCancelBackToFS);
         }

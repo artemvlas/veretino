@@ -36,6 +36,6 @@ private:
 
     bool isJustCreated();
     bool isSavedToDesktop();
-};
+}; // class DialogDbStatus
 
 #endif // DIALOGDBSTATUS_H

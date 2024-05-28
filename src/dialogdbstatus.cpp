@@ -119,11 +119,11 @@ QStringList DialogDbStatus::infoContent()
     if (data_->contains(FileStatus::Unreadable))
         contentNumbers.append(QString("Unreadable files: %1").arg(data_->numbers.numberOf(FileStatus::Unreadable)));
 
-    /*if (isSavedToDesktop()) {
+    if (isSavedToDesktop()) {
         contentNumbers.append(QString());
         contentNumbers.append("Unable to save to working folder!");
         contentNumbers.append("The database is saved in the Desktop folder.");
-    }*/
+    }
 
     if (isJustCreated())
         return contentNumbers;
@@ -207,16 +207,18 @@ QStringList DialogDbStatus::infoChanges()
 
 bool DialogDbStatus::isJustCreated()
 {
-    FileStatuses flagJustCreated = (FileStatus::Added | FileStatus::FlagChecked);
+    /*FileStatuses flagJustCreated = (FileStatus::Added | FileStatus::FlagChecked);
 
     return (!data_->metaData.isImported
-            && (data_->numbers.numberOf(flagJustCreated) == data_->numbers.numberOf(FileStatus::FlagHasChecksum)));
+            && (data_->numbers.numberOf(flagJustCreated) == data_->numbers.numberOf(FileStatus::FlagHasChecksum)));*/
+
+    return (data_->metaData.dbFileState == MetaData::Created);
 }
 
 bool DialogDbStatus::isSavedToDesktop()
 {
-    return (paths::parentFolder(data_->metaData.databaseFilePath)
-            == Files::desktopFolderPath);
+    return (isJustCreated() && !data_->isWorkDirRelative()
+            && (paths::parentFolder(data_->metaData.databaseFilePath) == Files::desktopFolderPath));
 }
 
 DialogDbStatus::~DialogDbStatus()
