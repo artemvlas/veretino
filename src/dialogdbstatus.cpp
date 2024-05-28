@@ -207,11 +207,6 @@ QStringList DialogDbStatus::infoChanges()
 
 bool DialogDbStatus::isJustCreated()
 {
-    /*FileStatuses flagJustCreated = (FileStatus::Added | FileStatus::FlagChecked);
-
-    return (!data_->metaData.isImported
-            && (data_->numbers.numberOf(flagJustCreated) == data_->numbers.numberOf(FileStatus::FlagHasChecksum)));*/
-
     return (data_->metaData.dbFileState == MetaData::Created);
 }
 

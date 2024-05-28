@@ -346,17 +346,14 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
-    // whether the file existed before or was overwritten
-    bool isDbFileExist = QFile::exists(data_->metaData.databaseFilePath);
+    data_->metaData.successfulCheckDateTime.clear();
+    data_->metaData.saveDateTime = format::currentDateTime();
 
     QString dbFilePath = json_->makeJson(data_);
 
     if (!dbFilePath.isEmpty()) {
-        data_->metaData.dbFileState = isDbFileExist ? MetaData::Saved : MetaData::Created;
+        data_->metaData.dbFileState = data_->isInCreation() ? MetaData::Created : MetaData::Saved;
         data_->metaData.databaseFilePath = dbFilePath;
-
-        data_->metaData.successfulCheckDateTime.clear();
-        data_->metaData.saveDateTime = format::currentDateTime();
 
         emit databaseUpdated();
     }
