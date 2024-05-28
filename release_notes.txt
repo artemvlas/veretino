@@ -9,7 +9,9 @@ Fixes and Minor Enhancements:
 * The speed display is brought to the standard form: MiB/sec >> MiB/s
 * In the path input field, the clear button is hidden when it doesn't make sense.
 * Prevented some database columns from being accidentally hidden on first run.
+* When working with a Desktop folder, there is no longer an unnecessary notification of a reserve save path.
 
+---
 Veretino 0.3.12
 * More accurate and smooth process speed and remaining time.
 * After checking a subfolder, filtering of Mismatches is applied only if they were found in this particular subfolder.
