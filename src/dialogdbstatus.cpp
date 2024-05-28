@@ -16,58 +16,80 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     , data_(data)
 {
     ui->setupUi(this);
-
     setWindowIcon(IconProvider::iconVeretino);
 
-    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
-    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData.workDir); });
+    setLabelsInfo();
+    setTabsInfo();
+    setVisibleTabs();
+    connections();
+}
 
-    QString dbFileName = data->databaseFileName();
+void DialogDbStatus::connections()
+{
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [&]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
+    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [&]{ paths::browsePath(data_->metaData.workDir); });
+}
+
+void DialogDbStatus::setLabelsInfo()
+{
+    QString dbFileName = data_->databaseFileName();
+
     if (isSavedToDesktop())
         dbFileName.prepend(".../DESKTOP/");
 
     ui->labelDbFileName->setText(dbFileName);
-    ui->labelDbFileName->setToolTip(data->metaData.databaseFilePath);
-    ui->labelAlgo->setText(QString("Algorithm: %1").arg(format::algoToStr(data->metaData.algorithm)));
-    ui->labelWorkDir->setToolTip(data->metaData.workDir);
+    ui->labelDbFileName->setToolTip(data_->metaData.databaseFilePath);
+    ui->labelAlgo->setText(QString("Algorithm: %1").arg(format::algoToStr(data_->metaData.algorithm)));
+    ui->labelWorkDir->setToolTip(data_->metaData.workDir);
 
-    if (!data->isWorkDirRelative())
+    if (!data_->isWorkDirRelative())
         ui->labelWorkDir->setText("WorkDir: Specified");
 
-    ui->labelDateTime_Update->setText("Updated: " + data->metaData.saveDateTime);
-    data->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()
-                                                     : ui->labelDateTime_Check->setText("Verified: " + data->metaData.successfulCheckDateTime);
+    ui->labelDateTime_Update->setText("Updated: " + data_->metaData.saveDateTime);
+    data_->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()
+                                                      : ui->labelDateTime_Check->setText("Verified: " + data_->metaData.successfulCheckDateTime);
+}
 
+void DialogDbStatus::setTabsInfo()
+{
     IconProvider icons(palette()); // to set tabs icons
 
     // tab Content
-    ui->labelContentNumbers->setText(infoContent(data).join("\n"));
+    ui->labelContentNumbers->setText(infoContent().join("\n"));
     ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
     // tab Filter
-    ui->tabWidget->setTabEnabled(TabFilter, data->isFilterApplied());
-    if (data->isFilterApplied()) {
+    ui->tabWidget->setTabEnabled(TabFilter, data_->isFilterApplied());
+    if (data_->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
-        ui->labelFiltersInfo->setStyleSheet(format::coloredText(data->metaData.filter.isFilter(FilterRule::Ignore)));
+        ui->labelFiltersInfo->setStyleSheet(format::coloredText(data_->metaData.filter.isFilter(FilterRule::Ignore)));
 
-        QString extensions = data->metaData.filter.extensionsList.join(", ");
-        data->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included:\n%1").arg(extensions))
-                                                            : ui->labelFiltersInfo->setText(QString("Ignored:\n%1").arg(extensions));
+        QString extensions = data_->metaData.filter.extensionsList.join(", ");
+        data_->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included:\n%1").arg(extensions))
+                                                             : ui->labelFiltersInfo->setText(QString("Ignored:\n%1").arg(extensions));
     }
 
     // tab Verification
-    ui->tabWidget->setTabEnabled(TabVerification, data->contains(FileStatus::FlagChecked));
-    if (data->contains(FileStatus::FlagChecked)) {
+    ui->tabWidget->setTabEnabled(TabVerification, data_->contains(FileStatus::FlagChecked));
+    if (data_->contains(FileStatus::FlagChecked)) {
         ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
-        ui->labelVerification->setText(infoVerification(data).join("\n"));
+        ui->labelVerification->setText(infoVerification().join("\n"));
     }
 
     // tab Result
-    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data->contains(FileStatus::FlagDbChanged));
+    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data_->contains(FileStatus::FlagDbChanged));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join("\n"));
+    }
+}
+
+void DialogDbStatus::setVisibleTabs()
+{
+    // hide disabled tabs
+    for (int var = 0; var < ui->tabWidget->count(); ++var) {
+        ui->tabWidget->setTabVisible(var, ui->tabWidget->isTabEnabled(var));
     }
 
     // selecting the tab to open
@@ -78,20 +100,15 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
         curTab = TabVerification;
 
     ui->tabWidget->setCurrentIndex(curTab);
-
-    // hide disabled tabs
-    for (int var = 0; var < ui->tabWidget->count(); ++var) {
-        ui->tabWidget->setTabVisible(var, ui->tabWidget->isTabEnabled(var));
-    }
 }
 
-QStringList DialogDbStatus::infoContent(const DataContainer *data)
+QStringList DialogDbStatus::infoContent()
 {
     QStringList contentNumbers;
     QString createdDataSize;
-    int numChecksums = data->numbers.numberOf(FileStatus::FlagHasChecksum);
-    int available = data->numbers.numberOf(FileStatus::FlagAvailable);
-    qint64 totalSize = data->numbers.totalSize(FileStatus::FlagAvailable);
+    int numChecksums = data_->numbers.numberOf(FileStatus::FlagHasChecksum);
+    int available = data_->numbers.numberOf(FileStatus::FlagAvailable);
+    qint64 totalSize = data_->numbers.totalSize(FileStatus::FlagAvailable);
 
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
@@ -99,8 +116,8 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
     if (isJustCreated() || (numChecksums != available))
         contentNumbers.append(QString("Stored checksums: %1%2").arg(numChecksums).arg(createdDataSize));
 
-    if (data->contains(FileStatus::Unreadable))
-        contentNumbers.append(QString("Unreadable files: %1").arg(data->numbers.numberOf(FileStatus::Unreadable)));
+    if (data_->contains(FileStatus::Unreadable))
+        contentNumbers.append(QString("Unreadable files: %1").arg(data_->numbers.numberOf(FileStatus::Unreadable)));
 
     /*if (isSavedToDesktop()) {
         contentNumbers.append(QString());
@@ -119,17 +136,17 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
     contentNumbers.append(QString());
     contentNumbers.append("***");
 
-    if (data->contains(FileStatus::New))
-        contentNumbers.append("New: " + Files::itemInfo(data->model_, FileStatus::New));
+    if (data_->contains(FileStatus::New))
+        contentNumbers.append("New: " + Files::itemInfo(data_->model_, FileStatus::New));
     else
         contentNumbers.append("No New files found");
 
-    if (data->contains(FileStatus::Missing))
-        contentNumbers.append(QString("Missing: %1 files").arg(data->numbers.numberOf(FileStatus::Missing)));
+    if (data_->contains(FileStatus::Missing))
+        contentNumbers.append(QString("Missing: %1 files").arg(data_->numbers.numberOf(FileStatus::Missing)));
     else
         contentNumbers.append("No Missing files found");
 
-    if (data->contains(FileStatus::FlagNewLost)) {
+    if (data_->contains(FileStatus::FlagNewLost)) {
         contentNumbers.append(QString());
         contentNumbers.append("Use a context menu for more options");
     }
@@ -137,16 +154,16 @@ QStringList DialogDbStatus::infoContent(const DataContainer *data)
     return contentNumbers;
 }
 
-QStringList DialogDbStatus::infoVerification(const DataContainer *data)
+QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const int available = data->numbers.numberOf(FileStatus::FlagAvailable);
-    const int numChecksums = data->numbers.numberOf(FileStatus::FlagHasChecksum);
+    const int available = data_->numbers.numberOf(FileStatus::FlagAvailable);
+    const int numChecksums = data_->numbers.numberOf(FileStatus::FlagHasChecksum);
 
-    if (data->isAllChecked()) {
-        if (data->contains(FileStatus::Mismatched))
+    if (data_->isAllChecked()) {
+        if (data_->contains(FileStatus::Mismatched))
             result.append(QString("☒ %1 mismatches out of %2 available files")
-                              .arg(data->numbers.numberOf(FileStatus::Mismatched))
+                              .arg(data_->numbers.numberOf(FileStatus::Mismatched))
                               .arg(available));
 
         else if (numChecksums == available)
@@ -154,19 +171,19 @@ QStringList DialogDbStatus::infoVerification(const DataContainer *data)
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
     }
-    else if (data->contains(FileStatus::FlagChecked)) {
+    else if (data_->contains(FileStatus::FlagChecked)) {
         result.append(QString("%1 out of %2 files were checked")
-                          .arg(data->numbers.numberOf(FileStatus::FlagChecked))
+                          .arg(data_->numbers.numberOf(FileStatus::FlagChecked))
                           .arg(available));
 
         result.append(QString());
-        if (data->contains(FileStatus::Mismatched))
-            result.append(QString("%1 files MISMATCHED").arg(data->numbers.numberOf(FileStatus::Mismatched)));
+        if (data_->contains(FileStatus::Mismatched))
+            result.append(QString("%1 files MISMATCHED").arg(data_->numbers.numberOf(FileStatus::Mismatched)));
         else
             result.append("No Mismatches found");
 
-        if (data->contains(FileStatus::Matched))
-            result.append(QString("%1 files matched").arg(data->numbers.numberOf(FileStatus::Matched)));
+        if (data_->contains(FileStatus::Matched))
+            result.append(QString("%1 files matched").arg(data_->numbers.numberOf(FileStatus::Matched)));
     }
 
     return result;

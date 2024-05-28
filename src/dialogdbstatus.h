@@ -25,9 +25,14 @@ private:
     const DataContainer *data_;
 
     enum Tabs{ TabListed, TabFilter, TabVerification, TabChanges };
-    QStringList infoContent(const DataContainer *data);
-    QStringList infoVerification(const DataContainer *data);
+    QStringList infoContent();
+    QStringList infoVerification();
     QStringList infoChanges();
+
+    void connections();
+    void setTabsInfo();
+    void setVisibleTabs();
+    void setLabelsInfo();
 
     bool isJustCreated();
     bool isSavedToDesktop();
