@@ -342,7 +342,9 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     if (!checkSum.isEmpty())
         emit setStatusbarText(QString("%1 calculated").arg(format::algoToStr(algo)));
-    else if (!procState->isCanceled())
+    else if (procState->isCanceled())
+        emit setStatusbarText("Canceled");
+    else
         emit setStatusbarText("read error");
 
     procState->setState(State::Idle);
