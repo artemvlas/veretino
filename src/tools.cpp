@@ -67,14 +67,14 @@ bool isSummaryFile(const QString &filePath)
             || filePath.endsWith(".sha512", Qt::CaseInsensitive));
 }
 
-bool canBeChecksum(const QString &text)
+bool canBeChecksum(const QString &str)
 {
     bool isOK = false;
 
-    if (text.length() == 40 || text.length() == 64 || text.length() == 128) {
+    if (str.length() == 40 || str.length() == 64 || str.length() == 128) {
         isOK = true;
-        for (int i = 0; isOK && i < text.length(); ++i) {
-            if (!text.at(i).isLetterOrNumber())
+        for (int i = 0; isOK && i < str.length(); ++i) {
+            if (!str.at(i).isLetterOrNumber())
                 isOK = false;
         }
     }

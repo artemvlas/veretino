@@ -188,27 +188,41 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     }
 
     FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
+    QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
 
-    if (storedStatus == FileStatus::Missing) {
-        emit showMessage("File does not exist", "Missing file");
+    if (!tools::canBeChecksum(storedSum) || !(storedStatus & FileStatus::FlagAvailable)) {
+        switch (storedStatus) {
+        case FileStatus::New:
+            emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "New File");
+            break;
+        case FileStatus::Missing:
+            emit showMessage("File does not exist", "Missing File");
+            break;
+        case FileStatus::Removed:
+            emit showMessage("The checksum has been removed from the database.", "No Checksum");
+            break;
+        case FileStatus::Unreadable:
+            emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Unreadable File");
+            break;
+        default:
+            emit showMessage("No checksum in the database.", "No Checksum");
+            break;
+        }
+
         return;
     }
 
-    QString savedSum = dataMaintainer->getStoredChecksum(fileItemIndex);
+    dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
+    QString filePath = dataMaintainer->data_->itemAbsolutePath(fileItemIndex);
+    QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
 
-    if (!savedSum.isEmpty()) {
-        dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
-        QString filePath = paths::joinPath(dataMaintainer->data_->metaData.workDir, TreeModel::getPath(fileItemIndex));
-        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
-
-        if (sum.isEmpty()) {
-            dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
-        }
-        else {
-            showFileCheckResultMessage(filePath, dataMaintainer->getStoredChecksum(fileItemIndex), sum);
-            dataMaintainer->updateChecksum(fileItemIndex, sum);
-            dataMaintainer->updateNumbers();
-        }
+    if (sum.isEmpty()) { // return previous status
+        dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
+    }
+    else {
+        showFileCheckResultMessage(filePath, storedSum, sum);
+        dataMaintainer->updateChecksum(fileItemIndex, sum);
+        dataMaintainer->updateNumbers();
     }
 }
 

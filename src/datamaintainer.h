@@ -47,8 +47,6 @@ public:
     int clearChecksums(const FileStatuses flags,
                        const QModelIndex &rootIndex = QModelIndex());
 
-    QString getStoredChecksum(const QModelIndex &fileRowIndex);
-
     int clearLostFiles(); // returns the number of cleared
     int updateMismatchedChecksums(); // returns the number of updated checksums
 

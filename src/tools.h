@@ -19,7 +19,7 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
 
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
-bool canBeChecksum(const QString &text);
+bool canBeChecksum(const QString &str);
 } // namespace tools
 
 namespace paths {

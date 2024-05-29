@@ -252,35 +252,6 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
     return number;
 }
 
-QString DataMaintainer::getStoredChecksum(const QModelIndex &fileRowIndex)
-{
-    if (!data_) {
-        qDebug() << "DataMaintainer::getStoredChecksum | NO data_";
-        return QString();
-    }
-
-    if (!TreeModel::isFileRow(fileRowIndex)) {
-        qDebug() << "DataMaintainer::getStoredChecksum | Specified index does not belong to the file row";
-        return QString();
-    }
-
-    FileStatus fileStatus = TreeModel::itemFileStatus(fileRowIndex);
-
-    QString savedSum;
-
-    if (fileStatus == FileStatus::New)
-        emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "NEW File");
-    else if (fileStatus == FileStatus::Unreadable)
-        emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Excluded File");
-    else {
-        savedSum = TreeModel::itemFileChecksum(fileRowIndex);
-        if (savedSum.isEmpty())
-            emit showMessage("No checksum in the database.", "No checksum");
-    }
-
-    return savedSum;
-}
-
 int DataMaintainer::clearLostFiles()
 {
     if (!data_) {
