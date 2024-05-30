@@ -36,7 +36,7 @@ void View::connectModel()
 void View::setSettings(Settings *settings)
 {
     settings_ = settings;
-    curPathFileSystem = settings_->lastFsPath;
+    settings_->lastFsPath = &curPathFileSystem;
 }
 
 void View::setFileSystemModel()

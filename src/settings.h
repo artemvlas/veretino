@@ -41,7 +41,7 @@ public:
     QByteArray headerStateFs;
     QByteArray headerStateDb;
 
-    QString lastFsPath;
+    QString *lastFsPath = nullptr; // pointer to ui->treeView->curPathFileSystem
 
 private:
     QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;

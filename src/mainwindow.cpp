@@ -25,11 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(IconProvider::iconVeretino);
     QThread::currentThread()->setObjectName("MAIN Thread");
 
+    ui->treeView->setSettings(settings_);
+    settings_->loadSettings();
+
     ui->progressBar->setProcState(manager->procState);
     ui->progressBar->setVisible(false);
 
-    settings_->loadSettings();
-    ui->treeView->setSettings(settings_);
     restoreGeometry(settings_->geometryMainWindow);
 
     modeSelect = new ModeSelector(ui->treeView, settings_, this);
@@ -180,7 +181,6 @@ void MainWindow::connectManager()
 void MainWindow::saveSettings()
 {
     ui->treeView->saveHeaderState();
-    settings_->lastFsPath = ui->treeView->curPathFileSystem;
     settings_->geometryMainWindow = saveGeometry();
     settings_->saveSettings();
 }

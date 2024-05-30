@@ -57,7 +57,8 @@ void Settings::saveSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
-    storedSettings.setValue("history/lastFsPath", restoreLastPathOnStartup ? lastFsPath : QString());
+    if (lastFsPath)
+        storedSettings.setValue("history/lastFsPath", restoreLastPathOnStartup ? *lastFsPath : QString());
 
     storedSettings.setValue("algorithm", algorithm_);
     storedSettings.setValue("dbPrefix", dbPrefix);
@@ -89,7 +90,8 @@ void Settings::loadSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
-    lastFsPath = storedSettings.value("history/lastFsPath").toString();
+    if (lastFsPath)
+        *lastFsPath = storedSettings.value("history/lastFsPath").toString();
 
     Settings defaults;
     algorithm_ = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm()).toInt());
