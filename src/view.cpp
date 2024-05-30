@@ -55,12 +55,7 @@ void View::setFileSystemModel()
 
     emit modelChanged(FileSystem);
 
-    if (settings_->headerStateFs.isEmpty()) {
-        showAllColumns();
-        setDefaultColumnsWidth();
-    }
-    else
-        header()->restoreState(settings_->headerStateFs);
+    restoreHeaderState();
 
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 
@@ -84,12 +79,7 @@ void View::setTreeModel(ModelView modelSel)
 
     emit modelChanged(modelSel);
 
-    if (settings_->headerStateDb.isEmpty()) {
-        showAllColumns();
-        setDefaultColumnsWidth();
-    }
-    else
-        header()->restoreState(settings_->headerStateDb);
+    restoreHeaderState();
 
     setIndexByPath(curPathModel);
 }
@@ -322,6 +312,25 @@ void View::saveHeaderState()
         settings_->headerStateFs = header()->saveState();
     else if (isViewDatabase())
         settings_->headerStateDb = header()->saveState();
+}
+
+void View::restoreHeaderState()
+{
+    QByteArray headerState;
+
+    if (settings_) {
+        if (isViewFileSystem())
+            headerState = settings_->headerStateFs;
+        else if (isViewDatabase())
+            headerState = settings_->headerStateDb;
+    }
+
+    if (!headerState.isEmpty())
+        header()->restoreState(headerState);
+    else {
+        showAllColumns();
+        setDefaultColumnsWidth();
+    }
 }
 
 void View::headerContextMenuRequested(const QPoint &point)
