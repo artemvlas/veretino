@@ -24,6 +24,7 @@ public slots:
     QString calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
 
 private:
+    inline bool isCanceled() const;
     int chunk = 1048576; // file read buffer size
     QCryptographicHash::Algorithm algo_ = QCryptographicHash::Sha256;
     const ProcState *proc_ = nullptr;

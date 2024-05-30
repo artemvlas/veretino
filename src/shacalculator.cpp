@@ -32,15 +32,12 @@ QString ShaCalculator::calculate(const QString &filePath)
 
 QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
 {
-    if (!proc_)
-        return QString();
-
     QString result;
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly)) {
         QCryptographicHash hash(algo);
-        while (!file.atEnd() && !proc_->isCanceled()) {
+        while (!file.atEnd() && !isCanceled()) {
             const QByteArray &buf = file.read(chunk);
             hash.addData(buf);
             emit doneChunk(buf.size());
@@ -53,4 +50,9 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
     }
 
     return result;
+}
+
+bool ShaCalculator::isCanceled() const
+{
+    return proc_ && proc_->isCanceled();
 }
