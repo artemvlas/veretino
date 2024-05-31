@@ -340,12 +340,10 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     QString checkSum = shaCalc.calculate(filePath, algo);
 
-    if (!checkSum.isEmpty())
-        emit setStatusbarText(QString("%1 calculated").arg(format::algoToStr(algo)));
-    else if (procState->isCanceled())
-        emit setStatusbarText("Canceled");
-    else
-        emit setStatusbarText("read error");
+    if (checkSum.isEmpty() && !procState->isCanceled())
+        emit showMessage("Read error:\n" + filePath, "Warning");
+
+    emit finishedCalcFileChecksum(); // to update the statusbar text
 
     procState->setState(State::Idle);
 

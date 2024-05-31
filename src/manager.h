@@ -87,6 +87,7 @@ signals:
     void folderChecked(const Numbers &result, const QString &subFolder = QString());
     void fileProcessed(const QString &fileName, const FileValues &result);
     void showMessage(const QString &text, const QString &title = "Info");
+    void finishedCalcFileChecksum();
 }; // class Manager
 
 using DestFileProc = Manager::DestFileProc;

@@ -152,6 +152,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogFolderContents);
     connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
+    connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
 
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
