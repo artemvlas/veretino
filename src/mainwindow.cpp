@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::iconVeretino);
+    setWindowIcon(IconProvider::appIcon());
     QThread::currentThread()->setObjectName("MAIN Thread");
 
     ui->treeView->setSettings(settings_);

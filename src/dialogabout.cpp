@@ -13,8 +13,8 @@ DialogAbout::DialogAbout(QWidget *parent) :
 {
     ui->setupUi(this);
     setFixedSize(400, 200);
-    setWindowIcon(IconProvider::iconVeretino);
-    ui->labelPix->setPixmap(IconProvider::iconVeretino.pixmap(100, 100));
+    setWindowIcon(IconProvider::appIcon());
+    ui->labelPix->setPixmap(IconProvider::appIcon().pixmap(100, 100));
 
     ui->labelInfo->setText(QString("Veretino %1\nBuilt: %2\nQt at run-time: %3\n\nFree and open-source software\nGNU General Public License v3")
                                .arg(APP_VERSION, __DATE__, qVersion()));

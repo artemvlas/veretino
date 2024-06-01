@@ -16,7 +16,7 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     , data_(data)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::iconVeretino);
+    setWindowIcon(IconProvider::appIcon());
 
     setLabelsInfo();
     setTabsInfo();

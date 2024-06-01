@@ -7,7 +7,6 @@
 
 QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
 QHash<Icons, QIcon> IconProvider::cacheThemeIcons = QHash<Icons, QIcon>();
-const QIcon IconProvider::iconVeretino = QIcon(":/icons/generic/veretino.svg");
 
 IconProvider::IconProvider() {}
 
@@ -206,4 +205,10 @@ QIcon IconProvider::icon(Icons themeIcon) const
         cacheThemeIcons.insert(themeIcon, ico);
         return ico;
     }
+}
+
+QIcon IconProvider::appIcon()
+{
+    static QIcon iconVeretino = QIcon(":/icons/generic/veretino.svg");
+    return iconVeretino;
 }

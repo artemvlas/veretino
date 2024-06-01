@@ -17,7 +17,7 @@ DialogFileProcResult::DialogFileProcResult(const QString &filePath, const FileVa
     , values_(values)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::iconVeretino);
+    setWindowIcon(IconProvider::appIcon());
 
     icons_.setTheme(palette());
     setFileName(filePath_);
