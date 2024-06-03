@@ -36,6 +36,7 @@ public:
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
     bool coloredDbItems = true;
+    bool instantSaving = true;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;

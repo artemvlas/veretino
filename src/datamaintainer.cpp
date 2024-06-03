@@ -270,8 +270,10 @@ int DataMaintainer::clearLostFiles()
         }
     }
 
-    if (number > 0)
+    if (number > 0) {
+        data_->metaData.dbFileState = MetaData::NotSaved;
         updateNumbers();
+    }
 
     return number;
 }
@@ -299,8 +301,10 @@ int DataMaintainer::updateMismatchedChecksums()
         }
     }
 
-    if (number > 0)
+    if (number > 0) {
+        data_->metaData.dbFileState = MetaData::NotSaved;
         updateNumbers();
+    }
 
     return number;
 }

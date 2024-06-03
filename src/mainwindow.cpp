@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->menuFile->addActions(modeSelect->menuAct_->menuFileActions);
     ui->menuFile->insertSeparator(modeSelect->menuAct_->actionOpenDialogSettings);
-    ui->menuFile->insertMenu(modeSelect->menuAct_->actionShowFilesystem, modeSelect->menuAct_->menuOpenRecent);
+    ui->menuFile->insertMenu(modeSelect->menuAct_->actionSave, modeSelect->menuAct_->menuOpenRecent);
 
     updatePermanentStatus();
 }
@@ -107,7 +107,13 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
 
-    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, [=] { modeSelect->menuAct_->updateMenuOpenRecent(settings_->recentFiles); });
+    // !!! will be reimplement before the next release:
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_,
+            [=] { modeSelect->menuAct_->updateMenuOpenRecent(settings_->recentFiles);
+                    modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->data_
+                    && ui->treeView->data_->metaData.dbFileState == MetaData::NotSaved); });
+
+    connect(modeSelect->menuAct_->actionSave, &QAction::triggered, manager->dataMaintainer, &DataMaintainer::exportToJson);
 }
 
 void MainWindow::connectManager()

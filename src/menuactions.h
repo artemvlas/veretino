@@ -30,10 +30,11 @@ public:
     QAction *actionOpenFolder = new QAction("Open Folder", this);
     QAction *actionOpenDatabaseFile = new QAction("Open Database", this);
     QAction *actionOpenDialogSettings = new QAction("Settings", this);
+    QAction *actionSave = new QAction("Save", this);
     QAction *actionShowFilesystem = new QAction("Show file system", this);
     QAction *actionClearRecent = new QAction("Clear History", this);
 
-    QList<QAction*> menuFileActions { actionOpenFolder, actionOpenDatabaseFile, actionShowFilesystem, actionOpenDialogSettings };
+    QList<QAction*> menuFileActions { actionOpenFolder, actionOpenDatabaseFile, actionSave, actionShowFilesystem, actionOpenDialogSettings };
 
     // File system View
     QAction *actionToHome = new QAction("to Home", this);

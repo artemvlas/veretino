@@ -153,10 +153,12 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
         if ((dest & DestAddNew)
             && dataMaintainer->data_->contains(FileStatus::New)) {
 
-            calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
+            int numAdded = calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
 
             if (procState->isCanceled())
                 return;
+            else if (numAdded > 0)
+                dataMaintainer->data_->metaData.dbFileState = MetaData::NotSaved;
         }
 
         if ((dest & DestClearLost)
@@ -166,7 +168,8 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
         }
     }
 
-    dataMaintainer->exportToJson();
+    if (settings_->instantSaving)
+        dataMaintainer->exportToJson();
 }
 
 void Manager::branchSubfolder(const QModelIndex &subfolder)

@@ -44,6 +44,7 @@ void MenuActions::setActionsIcons()
     // MainWindow menu
     actionOpenFolder->setIcon(iconProvider.icon(Icons::Folder));
     actionOpenDatabaseFile->setIcon(iconProvider.icon(Icons::Database));
+    actionSave->setIcon(iconProvider.icon(Icons::Save));
     actionShowFilesystem->setIcon(iconProvider.icon(Icons::FileSystem));
     actionOpenDialogSettings->setIcon(iconProvider.icon(Icons::Configure));
 

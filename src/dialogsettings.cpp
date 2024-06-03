@@ -60,6 +60,7 @@ void DialogSettings::loadSettings(const Settings &settings)
     }
 
     ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
+    ui->cbInstantSaving->setChecked(settings.instantSaving);
 
     // Tab Database
     if (settings.dbPrefix == defaults.dbPrefix)
@@ -93,6 +94,7 @@ void DialogSettings::updateSettings()
         settings_->setAlgorithm(QCryptographicHash::Sha512);
 
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
+    settings_->instantSaving = ui->cbInstantSaving->isChecked();
 
     // database
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix
