@@ -329,13 +329,17 @@ void DataMaintainer::exportToJson()
     QString dbFilePath = json_->makeJson(data_);
 
     if (!dbFilePath.isEmpty()) {
-        data_->metaData.dbFileState = data_->isInCreation() ? MetaData::Created : MetaData::Saved;
+        data_->setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
         data_->metaData.databaseFilePath = dbFilePath;
 
         emit databaseUpdated();
     }
     else
-        data_->metaData.dbFileState = MetaData::NotSaved;
+        data_->metaData.dbFileState = DbFileState::NotSaved;
+
+    // debug info
+    if (data_->isDbFileState(DbFileState::Saved))
+        qDebug() << "DataMaintainer::exportToJson >> Saved";
 }
 
 void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)

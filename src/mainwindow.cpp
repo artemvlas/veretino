@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     //proc_->setState(State::Abort);
+    emit modeSelect->saveData();
     saveSettings();
 
     thread->quit();
@@ -113,7 +114,8 @@ void MainWindow::connections()
                     modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->data_
                     && ui->treeView->data_->isDbFileState(MetaData::NotSaved)); });
 
-    connect(modeSelect->menuAct_->actionSave, &QAction::triggered, manager->dataMaintainer, &DataMaintainer::exportToJson);
+    connect(modeSelect->menuAct_->actionSave, &QAction::triggered, modeSelect, &ModeSelector::saveData);
+    connect(modeSelect, &ModeSelector::saveData, manager->dataMaintainer, &DataMaintainer::saveData);
 }
 
 void MainWindow::connectManager()
