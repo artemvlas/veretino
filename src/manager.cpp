@@ -158,7 +158,7 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
             if (procState->isCanceled())
                 return;
             else if (numAdded > 0)
-                dataMaintainer->data_->metaData.dbFileState = MetaData::NotSaved;
+                dataMaintainer->data_->setDbFileState(DbFileState::NotSaved);
         }
 
         if ((dest & DestClearLost)

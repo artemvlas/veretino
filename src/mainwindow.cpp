@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    proc_->setState(State::Abort);
+    //proc_->setState(State::Abort);
     saveSettings();
 
     thread->quit();
@@ -111,7 +111,7 @@ void MainWindow::connections()
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_,
             [=] { modeSelect->menuAct_->updateMenuOpenRecent(settings_->recentFiles);
                     modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->data_
-                    && ui->treeView->data_->metaData.dbFileState == MetaData::NotSaved); });
+                    && ui->treeView->data_->isDbFileState(MetaData::NotSaved)); });
 
     connect(modeSelect->menuAct_->actionSave, &QAction::triggered, manager->dataMaintainer, &DataMaintainer::exportToJson);
 }

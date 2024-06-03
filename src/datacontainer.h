@@ -25,6 +25,8 @@ struct MetaData {
     DbFileState dbFileState = NoFile;
 }; // struct MetaData
 
+using DbFileState = MetaData::DbFileState;
+
 struct Numbers {
     void addFile(const FileStatus status, const qint64 size)
     {
@@ -83,6 +85,8 @@ public:
     QString itemAbsolutePath(const QModelIndex &curIndex) const; // returns the absolute path to the database item (file or subfolder)
     QString getBranchFilePath(const QModelIndex &subfolder, bool existing = false) const;
 
+    void setDbFileState(DbFileState state);
+    bool isDbFileState(DbFileState state) const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
     bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;

@@ -44,6 +44,7 @@ void DataMaintainer::setSourceData()
 bool DataMaintainer::setSourceData(DataContainer *sourceData)
 {
     if (sourceData) {
+        saveData();
         clearOldData();
         oldData_ = data_;
         data_ = sourceData;
@@ -57,6 +58,7 @@ bool DataMaintainer::setSourceData(DataContainer *sourceData)
 void DataMaintainer::clearData()
 {
     if (data_) {
+        saveData();
         delete data_;
         data_ = nullptr;
     }
@@ -271,7 +273,7 @@ int DataMaintainer::clearLostFiles()
     }
 
     if (number > 0) {
-        data_->metaData.dbFileState = MetaData::NotSaved;
+        data_->setDbFileState(DbFileState::NotSaved);
         updateNumbers();
     }
 
@@ -302,7 +304,7 @@ int DataMaintainer::updateMismatchedChecksums()
     }
 
     if (number > 0) {
-        data_->metaData.dbFileState = MetaData::NotSaved;
+        data_->setDbFileState(DbFileState::NotSaved);
         updateNumbers();
     }
 
@@ -404,7 +406,14 @@ QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)
     return curIndex;
 }
 
+void DataMaintainer::saveData()
+{
+    if (data_ && data_->isDbFileState(DbFileState::NotSaved))
+        exportToJson();
+}
+
 DataMaintainer::~DataMaintainer()
 {
+    saveData();
     qDebug() << "DataMaintainer deleted";
 }

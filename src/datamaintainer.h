@@ -64,6 +64,7 @@ public:
 public slots:
     void clearData();
     void clearOldData();
+    void saveData();
 
 private:
     void connections();
