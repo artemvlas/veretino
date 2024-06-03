@@ -7,7 +7,6 @@
 #define TREEMODEL_H
 
 #include <QAbstractItemModel>
-#include <QFileIconProvider>
 #include "treeitem.h"
 #include "files.h"
 #include "tools.h"
@@ -66,7 +65,6 @@ public slots:
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *rootItem;
-    QFileIconProvider fileIcons_;
     IconProvider icons_;
     bool isColored = false;
 }; // class TreeModel

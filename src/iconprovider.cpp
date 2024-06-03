@@ -207,6 +207,16 @@ QIcon IconProvider::icon(Icons themeIcon) const
     }
 }
 
+QIcon IconProvider::icon(const QString &file) const
+{
+    return fsIcons.icon(QFileInfo(file));
+}
+
+QIcon IconProvider::iconFolder() const
+{
+    return fsIcons.icon(QFileIconProvider::Folder);
+}
+
 QIcon IconProvider::appIcon()
 {
     static QIcon iconVeretino = QIcon(":/icons/generic/veretino.svg");

@@ -8,7 +8,6 @@
 #include "tools.h"
 #include "iconprovider.h"
 #include <QPushButton>
-#include <QFileIconProvider>
 #include <QDebug>
 
 DialogFolderContents::DialogFolderContents(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
@@ -70,7 +69,6 @@ void DialogFolderContents::connections()
 
 void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
 {
-    QFileIconProvider fileIcons;
     IconProvider icons(palette());
 
     for (int i = 0; i < extList.size(); ++i) {
@@ -81,7 +79,7 @@ void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
         else if (extList.at(i).extension == ExtNumSize::strShaFiles)
             icon = icons.icon(Icons::HashFile);
         else
-            icon = fileIcons.icon(QFileInfo("file." + extList.at(i).extension));
+            icon = icons.icon("file." + extList.at(i).extension);
 
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
         item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, extList.at(i).extension);

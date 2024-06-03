@@ -5,7 +5,6 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "iconprovider.h"
 #include "dialogdbstatus.h"
 #include "dialogfoldercontents.h"
 #include "dialogfileprocresult.h"
@@ -355,13 +354,13 @@ void MainWindow::updateStatusIcon()
         statusIcon = modeSelect->iconProvider.icon(FileStatus::Calculating);
     }
     else if (ui->treeView->isViewFileSystem()) {
-        statusIcon = QFileIconProvider().icon(QFileInfo(ui->treeView->curPathFileSystem));
+        statusIcon = modeSelect->iconProvider.icon(ui->treeView->curPathFileSystem);
     }
     else if (ui->treeView->isViewDatabase()) {
         if (TreeModel::isFileRow(ui->treeView->curIndexSource))
             statusIcon = modeSelect->iconProvider.icon(TreeModel::itemFileStatus(ui->treeView->curIndexSource));
         else
-            statusIcon = QFileIconProvider().icon(QFileIconProvider::Folder);
+            statusIcon = modeSelect->iconProvider.iconFolder();
     }
 
     statusIconLabel->setPixmap(statusIcon.pixmap(16, 16));

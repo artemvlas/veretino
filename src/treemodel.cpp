@@ -141,8 +141,8 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 
     if (role == Qt::DecorationRole) {
         if (curIndex.column() == ColumnName) {
-            return isFileRow(curIndex) ? fileIcons_.icon(QFileInfo(curIndex.data().toString()))
-                                       : fileIcons_.icon(QFileIconProvider::Folder);
+            return isFileRow(curIndex) ? icons_.icon(curIndex.data().toString())
+                                       : icons_.iconFolder();
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
             return icons_.icon(curIndex.data(RawDataRole).value<FileStatus>());

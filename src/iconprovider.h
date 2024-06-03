@@ -5,8 +5,10 @@
 */
 #ifndef ICONPROVIDER_H
 #define ICONPROVIDER_H
+
 #include <QPalette>
 #include <QIcon>
+#include <QFileIconProvider>
 #include "files.h"
 
 class IconProvider
@@ -52,6 +54,8 @@ public:
 
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons themeIcon) const;
+    QIcon icon(const QString &file) const;
+    QIcon iconFolder() const;
     static QIcon appIcon();
 
 private:
@@ -63,6 +67,7 @@ private:
     static QHash<FileStatus, QIcon> cacheFileStatus;
     static QHash<Icons, QIcon> cacheThemeIcons;
     Theme theme_ = Light;
+    QFileIconProvider fsIcons;
 
 }; // class IconProvider
 
