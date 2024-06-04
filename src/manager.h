@@ -46,6 +46,7 @@ public slots:
     void createDataModel(const QString &databaseFilePath);
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
+    void saveData();
 
     void getPathInfo(const QString &path); // info about file (size) or folder contents
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)

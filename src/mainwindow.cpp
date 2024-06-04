@@ -115,7 +115,9 @@ void MainWindow::connections()
                     && ui->treeView->data_->isDbFileState(MetaData::NotSaved)); });
 
     connect(modeSelect->menuAct_->actionSave, &QAction::triggered, modeSelect, &ModeSelector::saveData);
-    connect(modeSelect, &ModeSelector::saveData, manager->dataMaintainer, &DataMaintainer::saveData);
+    connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
+
+    connect(ui->treeView, &View::switchedToFs, modeSelect, &ModeSelector::saveData); // TMP !!!!!
 }
 
 void MainWindow::connectManager()
@@ -181,7 +183,8 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
-    connect(ui->treeView, &View::dataSetted, this, [=]{if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.databaseFilePath);});
+    connect(ui->treeView, &View::dataSetted, this,
+            [=]{ if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.databaseFilePath); });
 
     thread->start();
 }

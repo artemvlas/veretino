@@ -54,6 +54,8 @@ public:
     void exportToJson();
     void forkJsonDb(const QModelIndex &rootFolder);
 
+    bool isDataNotSaved() const;
+
     QString itemContentsInfo(const QModelIndex &curIndex); // if file - "filename (size)", if folder - folder contents (availability, size etc.)
     QModelIndex sourceIndex(const QModelIndex &curIndex); // checks whether the curIndex belongs to the data_->proxyModel, if so, returns the mapToSource
 

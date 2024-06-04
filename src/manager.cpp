@@ -120,6 +120,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
+    saveData();
     runTask([&] { _createDataModel(databaseFilePath); });
 }
 
@@ -129,6 +130,12 @@ void Manager::_createDataModel(const QString &databaseFilePath)
         dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
     }
+}
+
+void Manager::saveData()
+{
+    if (dataMaintainer->isDataNotSaved())
+        runTask([&] { dataMaintainer->saveData(); });
 }
 
 void Manager::updateDatabase(const DestDbUpdate dest)
