@@ -45,8 +45,11 @@ void ProgressBar::updateProgressInfo()
 {
     if (procState_) {
         updateDonePiece();
-        setFormat(QString("%p% | %1 | %2")
-                      .arg(progSpeed(), progTimeLeft()));
+        if (pieceSize_ > 0)
+            setFormat(QString("%p% | %1 | %2")
+                          .arg(progSpeed(), progTimeLeft()));
+        else
+            resetFormat();
     }
 }
 
