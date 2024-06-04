@@ -47,6 +47,7 @@ public slots:
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void saveData();
+    void prepareSwitchToFs();
 
     void getPathInfo(const QString &path); // info about file (size) or folder contents
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
@@ -89,6 +90,7 @@ signals:
     void fileProcessed(const QString &fileName, const FileValues &result);
     void showMessage(const QString &text, const QString &title = "Info");
     void finishedCalcFileChecksum();
+    void switchToFsPrepared();
 }; // class Manager
 
 using DestFileProc = Manager::DestFileProc;

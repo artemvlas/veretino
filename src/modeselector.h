@@ -103,6 +103,7 @@ signals:
     void branchSubfolder(const QModelIndex &subfolder);
     void makeSumFile(const QString &originFilePath, const QString &checksum);
     void saveData();
+    void prepareSwitchToFs();
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

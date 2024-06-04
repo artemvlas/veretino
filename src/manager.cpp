@@ -138,6 +138,14 @@ void Manager::saveData()
         runTask([&] { dataMaintainer->saveData(); });
 }
 
+void Manager::prepareSwitchToFs()
+{
+    saveData();
+    emit switchToFsPrepared();
+
+    qDebug() << "Manager::prepareSwitchToFs >> DONE";
+}
+
 void Manager::updateDatabase(const DestDbUpdate dest)
 {
     runTask([&] { _updateDatabase(dest); });
@@ -175,8 +183,11 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
         }
     }
 
+    if (dataMaintainer->isDataNotSaved())
+        emit dataMaintainer->databaseUpdated();
+
     if (settings_->instantSaving)
-        dataMaintainer->exportToJson();
+        dataMaintainer->saveData();
 }
 
 void Manager::branchSubfolder(const QModelIndex &subfolder)

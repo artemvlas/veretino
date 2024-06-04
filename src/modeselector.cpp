@@ -35,6 +35,7 @@ void ModeSelector::connectActions()
     // MainWindow menu
     connect(menuAct_->actionShowFilesystem, &QAction::triggered, this, &ModeSelector::showFileSystem);
     connect(menuAct_->actionClearRecent, &QAction::triggered, settings_, &Settings::clearRecentFiles);
+    connect(menuAct_->actionSave, &QAction::triggered, this, &ModeSelector::saveData);
 
     // File system View
     connect(menuAct_->actionToHome, &QAction::triggered, view_, &View::toHome);
@@ -265,7 +266,10 @@ void ModeSelector::copyItem()
 
 void ModeSelector::showFileSystem()
 {
-    openFsPath(QString());
+    if (view_->data_ && view_->data_->isDbFileState(DbFileState::NotSaved))
+        emit prepareSwitchToFs();
+    else
+        openFsPath(QString());
 }
 
 void ModeSelector::copyDataToClipboard(Column column)

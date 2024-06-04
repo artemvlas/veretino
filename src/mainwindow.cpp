@@ -114,10 +114,8 @@ void MainWindow::connections()
                     modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->data_
                     && ui->treeView->data_->isDbFileState(MetaData::NotSaved)); });
 
-    connect(modeSelect->menuAct_->actionSave, &QAction::triggered, modeSelect, &ModeSelector::saveData);
-    connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
-
-    connect(ui->treeView, &View::switchedToFs, modeSelect, &ModeSelector::saveData); // TMP !!!!!
+    connect(modeSelect, &ModeSelector::prepareSwitchToFs, manager, &Manager::prepareSwitchToFs);
+    connect(manager, &Manager::switchToFsPrepared, ui->treeView, &View::setFileSystemModel); // TMP !!!!!
 }
 
 void MainWindow::connectManager()
@@ -147,6 +145,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
     connect(modeSelect, &ModeSelector::branchSubfolder, manager, &Manager::branchSubfolder);
+    connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
@@ -518,7 +517,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             if (ui->treeView->isViewFiltered())
                 ui->treeView->disableFilter();
             else
-                ui->treeView->setFileSystemModel();
+                modeSelect->showFileSystem(); // ui->treeView->setFileSystemModel();
         }
     }
 
