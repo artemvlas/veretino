@@ -141,6 +141,10 @@ void Manager::saveData()
 void Manager::prepareSwitchToFs()
 {
     saveData();
+
+    if (dataMaintainer->isDataNotSaved())
+        emit showMessage("The Database is NOT saved", "Error");
+
     emit switchToFsPrepared();
 
     qDebug() << "Manager::prepareSwitchToFs >> DONE";
