@@ -43,13 +43,10 @@ void ProgressBar::setProgEnabled(bool enabled)
 
 void ProgressBar::updateProgressInfo()
 {
-    if (procState_) {
+    if (procState_ && procState_->isStarted()) {
         updateDonePiece();
-        if (pieceSize_ > 0)
-            setFormat(QString("%p% | %1 | %2")
-                          .arg(progSpeed(), progTimeLeft()));
-        else
-            resetFormat();
+        setFormat(QString("%p% | %1 | %2")
+                      .arg(progSpeed(), progTimeLeft()));
     }
 }
 
