@@ -219,6 +219,6 @@ QIcon IconProvider::iconFolder() const
 
 QIcon IconProvider::appIcon()
 {
-    static QIcon iconVeretino = QIcon(":/icons/generic/veretino.svg");
+    static const QIcon iconVeretino = QIcon(":/icons/generic/veretino.svg");
     return iconVeretino;
 }

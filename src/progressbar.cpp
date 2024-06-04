@@ -48,6 +48,8 @@ void ProgressBar::updateProgressInfo()
         setFormat(QString("%p% | %1 | %2")
                       .arg(progSpeed(), progTimeLeft()));
     }
+    else
+        resetFormat();
 }
 
 void ProgressBar::updateDonePiece()
