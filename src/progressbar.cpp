@@ -30,15 +30,15 @@ void ProgressBar::finish()
 void ProgressBar::setProgEnabled(bool enabled)
 {
     if (enabled) {
+        resetFormat();
         timer->start(1000);
         elapsedTimer.start();
     }
     else
         timer->stop();
 
-    resetFormat();
-    setValue(0);
     setVisible(enabled);
+    setValue(0);
 }
 
 void ProgressBar::updateProgressInfo()
