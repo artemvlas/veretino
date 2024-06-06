@@ -106,8 +106,11 @@ void Manager::resetDatabase()
 
 void Manager::restoreDatabase()
 {
-    if (dataMaintainer->data_ && dataMaintainer->data_->restoreBackupFile())
-        createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
+    if (dataMaintainer->data_
+        && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved())) {
+
+        runTask([&] { _createDataModel(dataMaintainer->data_->metaData.databaseFilePath); });
+    }
     else
         emit setStatusbarText("No saved changes");
 }

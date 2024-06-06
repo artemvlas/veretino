@@ -517,7 +517,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             if (ui->treeView->isViewFiltered())
                 ui->treeView->disableFilter();
             else
-                modeSelect->showFileSystem(); // ui->treeView->setFileSystemModel();
+                modeSelect->showFileSystem();
         }
     }
 

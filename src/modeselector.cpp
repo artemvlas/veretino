@@ -527,7 +527,9 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         else {
             viewContextMenu->addAction(menuAct_->actionShowDbStatus);
             viewContextMenu->addAction(menuAct_->actionResetDb);
-            if (QFile::exists(view_->data_->backupFilePath()))
+
+            if (view_->data_->isDbFileState(DbFileState::NotSaved)
+                || QFile::exists(view_->data_->backupFilePath()))
                 viewContextMenu->addAction(menuAct_->actionForgetChanges);
 
             viewContextMenu->addSeparator();
