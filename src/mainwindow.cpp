@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    //proc_->setState(State::Abort);
+    proc_->setState(State::Abort); // just in case
     emit modeSelect->saveData();
     saveSettings();
 

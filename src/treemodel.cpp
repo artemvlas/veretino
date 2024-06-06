@@ -11,13 +11,13 @@
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({"Name", "Size", "Status", "Checksum", "ReChecksum"});
+    rootItem = new TreeItem({ "Name", "Size", "Status", "Checksum", "ReChecksum" });
 }
 
 TreeModel::~TreeModel()
 {
     delete rootItem;
-    qDebug() << this << "deleted";
+    // qDebug() << this << "deleted";
 }
 
 bool TreeModel::isEmpty() const

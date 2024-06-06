@@ -120,8 +120,7 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
-    saveData();
-    runTask([&] { _createDataModel(databaseFilePath); });
+    runTask([&] { dataMaintainer->saveData(); _createDataModel(databaseFilePath); });
 }
 
 void Manager::_createDataModel(const QString &databaseFilePath)

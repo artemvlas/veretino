@@ -5,7 +5,6 @@
 */
 #include "proxymodel.h"
 #include "tools.h"
-#include <QDebug>
 #include "treemodel.h"
 
 ProxyModel::ProxyModel(QObject *parent)
@@ -23,7 +22,7 @@ ProxyModel::ProxyModel(QAbstractItemModel *sourceModel, QObject *parent)
 
 ProxyModel::~ProxyModel()
 {
-    qDebug() << this << "deleted:";
+    // qDebug() << this << "deleted:";
 }
 
 void ProxyModel::setInitSettings()
