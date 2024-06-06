@@ -67,6 +67,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
 
     if (!procState->isCanceled()) { // saving to json
         dataMaintainer->exportToJson();
+        emit dataMaintainer->databaseUpdated();
     }
 }
 
