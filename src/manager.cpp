@@ -186,11 +186,11 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
         }
     }
 
-    if (dataMaintainer->isDataNotSaved())
-        emit dataMaintainer->databaseUpdated();
-
     if (settings_->instantSaving)
         dataMaintainer->saveData();
+
+    if (dataMaintainer->isDataNotSaved())
+        emit dataMaintainer->databaseUpdated();
 }
 
 void Manager::branchSubfolder(const QModelIndex &subfolder)

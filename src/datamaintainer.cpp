@@ -330,7 +330,7 @@ void DataMaintainer::exportToJson()
         data_->setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
         data_->metaData.databaseFilePath = dbFilePath;
 
-        //emit databaseUpdated();
+        // emit databaseUpdated();
     }
     else
         data_->metaData.dbFileState = DbFileState::NotSaved;

@@ -18,6 +18,9 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(IconProvider::appIcon());
 
+    if (data_->isDbFileState(DbFileState::NotSaved))
+        setWindowTitle(windowTitle() + " [unsaved]");
+
     setLabelsInfo();
     setTabsInfo();
     setVisibleTabs();
