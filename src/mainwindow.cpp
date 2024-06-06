@@ -388,9 +388,9 @@ void MainWindow::updatePermanentStatus()
         else
             permanentStatus->setText(getDatabaseStatusSummary());
     }
-    else if (ui->treeView->isViewFileSystem()) {
-        settings_->filter.extensionsList.isEmpty() ? permanentStatus->clear()
-                                                   : permanentStatus->setPixmap(modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16));
+    else if (ui->treeView->isViewFileSystem() && settings_->filter.isFilterEnabled()) {
+        static const QPixmap pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16);
+        permanentStatus->setPixmap(pixFilter);
     }
     else
         permanentStatus->clear();
