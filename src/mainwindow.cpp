@@ -94,6 +94,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
     connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
     connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateButtonInfo);
+    connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateStatusIcon);
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::handleChangedModel);
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
@@ -149,7 +150,6 @@ void MainWindow::connectManager()
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
-    connect(manager, &Manager::setStatusbarText, this, &MainWindow::updateStatusIcon);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::folderChecked, ui->treeView, &View::setMismatchFiltering);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
@@ -175,6 +175,7 @@ void MainWindow::connectManager()
     connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
     connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
     connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
+    connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateStatusIcon);
 
     // change view
     connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
