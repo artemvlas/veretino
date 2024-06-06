@@ -5,7 +5,7 @@
 */
 #include "treeitem.h"
 
-TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent)
+TreeItem::TreeItem(const QVector<QVariant> &data, TreeItem *parent)
     : itemData(data), parentItem(parent)
 {}
 

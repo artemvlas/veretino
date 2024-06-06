@@ -10,7 +10,7 @@
 class TreeItem
 {
 public:
-    explicit TreeItem(const QList<QVariant> &data, TreeItem *parent = nullptr);
+    explicit TreeItem(const QVector<QVariant> &data, TreeItem *parent = nullptr);
     ~TreeItem();
 
     TreeItem *child(int number);
@@ -24,7 +24,7 @@ public:
 
 private:
     QList<TreeItem*> childItems;
-    QList<QVariant> itemData;
+    QVector<QVariant> itemData;
     TreeItem *parentItem;
 };
 

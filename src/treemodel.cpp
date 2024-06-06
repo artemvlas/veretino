@@ -44,18 +44,18 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
 
         if (not_exist) {
             TreeItem *ti;
-            QVariant placebo;
-            QList<QVariant> iData {splitPath.at(var), placebo, placebo, placebo, placebo};
+            QVector<QVariant> iData(rootItem->columnCount());
+            iData[ColumnName] = splitPath.at(var);
 
             // the last item is considered a file
             if (var + 1 == splitPath.size()) {
                 if (values.size > 0)
-                    iData.replace(ColumnSize, values.size);
+                    iData[ColumnSize] = values.size;
 
-                iData.replace(ColumnStatus, QVariant::fromValue(values.status));
+                iData[ColumnStatus] = QVariant::fromValue(values.status);
 
                 if (!values.checksum.isEmpty())
-                    iData.replace(ColumnChecksum, values.checksum);
+                    iData[ColumnChecksum] = values.checksum;
 
                 isAdded = true;
             }
