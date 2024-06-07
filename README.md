@@ -5,6 +5,7 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 ### The app allows you to check the folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
+* Checking the validity of the copied folder.
 * Multiple checksums calculator.
 * Folder/file-list data audit: analysis and verification of folder contents, looking for folder-wide data changes.
 * Finding damaged files in a folder.
