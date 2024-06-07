@@ -51,10 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    ui->menuFile->addActions(modeSelect->menuAct_->menuFileActions);
-    ui->menuFile->insertSeparator(modeSelect->menuAct_->actionOpenDialogSettings);
-    ui->menuFile->insertMenu(modeSelect->menuAct_->actionSave, modeSelect->menuAct_->menuOpenRecent);
-
+    modeSelect->menuAct_->populateMenuFile(ui->menuFile);
     updatePermanentStatus();
 }
 

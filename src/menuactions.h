@@ -23,6 +23,7 @@ public:
 
     void setIconTheme(const QPalette &palette);
     void updateMenuOpenRecent(const QStringList &recentFiles);
+    void populateMenuFile(QMenu *menuFile);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
     QMenu* menuAlgorithm(QCryptographicHash::Algorithm curAlgo);
 

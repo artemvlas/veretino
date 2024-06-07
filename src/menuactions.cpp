@@ -87,6 +87,13 @@ void MenuActions::setActionsIcons()
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
 }
 
+void MenuActions::populateMenuFile(QMenu *menuFile)
+{
+    menuFile->addActions(menuFileActions);
+    menuFile->insertSeparator(actionOpenDialogSettings);
+    menuFile->insertMenu(actionSave, menuOpenRecent);
+}
+
 void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
 {
     menuOpenRecent->clear();
