@@ -45,6 +45,7 @@ private:
     void connectManager(); // connections are separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
+    void setupStatusBar();
     QString getDatabaseStatusSummary();
     void handlePermanentStatusClick();
     void handleChangedModel();

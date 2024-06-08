@@ -19,7 +19,9 @@ View::View(QWidget *parent)
     fileSystem->setObjectName("fileSystem");
     fileSystem->setRootPath(QDir::rootPath());
 
+    setContextMenuPolicy(Qt::CustomContextMenu);
     header()->setContextMenuPolicy(Qt::CustomContextMenu);
+
     connect(header(), &QHeaderView::customContextMenuRequested, this, &View::headerContextMenuRequested);
 
     connect(this, &View::modelChanged, this, &View::connectModel);

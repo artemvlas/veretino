@@ -36,23 +36,15 @@ MainWindow::MainWindow(QWidget *parent)
     modeSelect->setProcState(manager->procState);
     proc_ = manager->procState;
 
-    statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
-    statusIconLabel->setContentsMargins(5, 0, 0, 0);
-    permanentStatus->setContentsMargins(20, 0, 0, 0);
-    ui->statusbar->addWidget(statusIconLabel);
-    ui->statusbar->addWidget(statusTextLabel, 1);
-    ui->statusbar->addPermanentWidget(permanentStatus);
-
     connections();
 
     if (!argumentInput())
         ui->treeView->setFileSystemModel();
 
-    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
 
     modeSelect->menuAct_->populateMenuFile(ui->menuFile);
-    updatePermanentStatus();
+    setupStatusBar();
 }
 
 MainWindow::~MainWindow()
@@ -372,6 +364,18 @@ void MainWindow::updateStatusIcon()
     }
 
     statusIconLabel->setPixmap(statusIcon.pixmap(16, 16));
+}
+
+void MainWindow::setupStatusBar()
+{
+    statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+    statusIconLabel->setContentsMargins(5, 0, 0, 0);
+    permanentStatus->setContentsMargins(20, 0, 0, 0);
+    ui->statusbar->addWidget(statusIconLabel);
+    ui->statusbar->addWidget(statusTextLabel, 1);
+    ui->statusbar->addPermanentWidget(permanentStatus);
+
+    updatePermanentStatus();
 }
 
 void MainWindow::updatePermanentStatus()
