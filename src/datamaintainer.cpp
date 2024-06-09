@@ -397,17 +397,6 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     return text;
 }
 
-QModelIndex DataMaintainer::sourceIndex(const QModelIndex &curIndex)
-{
-    if (!data_ || !curIndex.isValid())
-        return QModelIndex();
-
-    if (curIndex.model() == data_->proxyModel_)
-        return data_->proxyModel_->mapToSource(curIndex);
-
-    return curIndex;
-}
-
 bool DataMaintainer::isDataNotSaved() const
 {
     return (data_ && data_->isDbFileState(DbFileState::NotSaved));

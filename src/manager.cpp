@@ -205,8 +205,10 @@ void Manager::branchSubfolder(const QModelIndex &subfolder)
 
 void Manager::verify(const QModelIndex &curIndex)
 {
-    TreeModel::isFileRow(curIndex) ? verifyFileItem(curIndex)
-                                   : verifyFolderItem(dataMaintainer->sourceIndex(curIndex));
+    if (TreeModel::isFileRow(curIndex))
+        verifyFileItem(curIndex);
+    else
+        verifyFolderItem(curIndex);
 }
 
 // check only selected file instead of full database verification
