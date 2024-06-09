@@ -137,9 +137,7 @@ void View::setMismatchFiltering(const Numbers &num)
 
     if (num.contains(FileStatus::Mismatched)) {
         showAllColumns();
-        data_->proxyModel_->setFilter(FileStatus::Mismatched);
-        // used instead of 'View::setFilter' because at the time of calling this function
-        // the current model is ModelSource, the ModelProxy is set later
+        setFilter(FileStatus::Mismatched);
     }
     else
         hideColumn(Column::ColumnReChecksum);
@@ -207,6 +205,8 @@ void View::setFilter(const FileStatuses flags)
         setIndexByPath(prePathModel);
         setBackgroundColor();
     }
+    else if (isCurrentViewModel(ModelSource))
+        data_->proxyModel_->setFilter(flags);
 }
 
 void View::editFilter(const FileStatuses flags, bool add)
