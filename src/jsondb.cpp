@@ -69,7 +69,7 @@ bool JsonDb::updateSuccessfulCheckDateTime(const QString &filePath)
         return false;
 
     QJsonObject header = dataArray.at(0).toObject();
-    header.insert("Verified", format::currentDateTime());
+    header.insert("DT Verified", format::currentDateTime());
     dataArray[0] = header;
 
     return saveJsonFile(QJsonDocument(dataArray), filePath);
@@ -86,19 +86,26 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(data->metaData.workDir);
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
     header["Total size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagAvailable));
-    header["Updated"] = data->metaData.saveDateTime;
+
+    if (!data->metaData.datetimeCreated.isEmpty())
+        header["DT Created"] = data->metaData.datetimeCreated;
+    if (!data->metaData.datetimeUpdated.isEmpty())
+        header["DT Updated"] = data->metaData.datetimeUpdated;
+    if (!data->metaData.datetimeVerified.isEmpty() && !rootFolder.isValid())
+        header["DT Verified"] = data->metaData.datetimeVerified;
 
     if (!isWorkDirRelative && !rootFolder.isValid())
-        header.insert(strHeaderWorkDir, data->metaData.workDir);
-
-    if (!data->metaData.successfulCheckDateTime.isEmpty() && !rootFolder.isValid())
-        header.insert("Verified", data->metaData.successfulCheckDateTime);
+        header[strHeaderWorkDir] = data->metaData.workDir;
 
     if (data->isFilterApplied()) {
-        if (data->metaData.filter.isFilter(FilterRule::Include))
-            header[strHeaderIncluded] = data->metaData.filter.extensionsList.join(" "); // only files with extensions from this list are included in the database, others are ignored
-        else if (data->metaData.filter.isFilter(FilterRule::Ignore))
-            header[strHeaderIgnored] = data->metaData.filter.extensionsList.join(" "); // files with extensions from this list are ignored (not included in the database)
+        if (data->metaData.filter.isFilter(FilterRule::Include)) {
+            // only files with extensions from this list are included in the database, others are ignored
+            header[strHeaderIncluded] = data->metaData.filter.extensionsList.join(" ");
+        }
+        else if (data->metaData.filter.isFilter(FilterRule::Ignore)) {
+            // files with extensions from this list are ignored (not included in the database)
+            header[strHeaderIgnored] = data->metaData.filter.extensionsList.join(" ");
+        }
     }
 
     return header;
@@ -307,11 +314,19 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // [date]
-    if (header.contains("Updated"))
-        metaData.saveDateTime = header.value("Updated").toString();
+    QString strDtCreated = findValueStr(header, "DT Created");
+    if (!strDtCreated.isEmpty())
+        metaData.datetimeCreated = strDtCreated;
 
-    if (header.contains("Verified"))
-        metaData.successfulCheckDateTime = header.value("Verified").toString();
+    QString strDtUpdated = findValueStr(header, "Updated");
+    if (!strDtUpdated.isEmpty())
+        metaData.datetimeUpdated = strDtUpdated;
+
+    QString strDtVerified = findValueStr(header, "Verified");
+    if (!strDtVerified.isEmpty())
+        metaData.datetimeVerified = strDtVerified;
+
+    // qDebug() << "--->>>" << strDtCreated << strDtUpdated << strDtVerified;
 
     return metaData;
 }

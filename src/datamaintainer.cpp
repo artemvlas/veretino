@@ -73,7 +73,7 @@ void DataMaintainer::clearOldData()
 void DataMaintainer::updateDateTime()
 {
     if (data_)
-        data_->metaData.saveDateTime = format::currentDateTime();
+        data_->metaData.datetimeUpdated = format::currentDateTime();
 }
 
 void DataMaintainer::updateSuccessfulCheckDateTime()
@@ -82,7 +82,7 @@ void DataMaintainer::updateSuccessfulCheckDateTime()
         && !data_->contains(FileStatus::Missing)
         && json_->updateSuccessfulCheckDateTime(data_->metaData.databaseFilePath)) {
 
-        data_->metaData.successfulCheckDateTime = format::currentDateTime();
+        data_->metaData.datetimeVerified = format::currentDateTime();
     }
 }
 
@@ -149,7 +149,7 @@ void DataMaintainer::updateNumbers()
     emit numbersUpdated();
 
     if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
-        data_->metaData.successfulCheckDateTime.clear();
+        data_->metaData.datetimeVerified.clear();
 }
 
 qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatuses flags, const QModelIndex &rootIndex)

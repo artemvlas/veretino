@@ -48,9 +48,19 @@ void DialogDbStatus::setLabelsInfo()
     if (!data_->isWorkDirRelative())
         ui->labelWorkDir->setText("WorkDir: Specified");
 
-    ui->labelDateTime_Update->setText("Updated: " + data_->metaData.saveDateTime);
-    data_->metaData.successfulCheckDateTime.isEmpty() ? ui->labelDateTime_Check->clear()
-                                                      : ui->labelDateTime_Check->setText("Verified: " + data_->metaData.successfulCheckDateTime);
+    // datetime
+    QString strCreated = data_->metaData.datetimeCreated.isEmpty() ? QString() : "Created: " + data_->metaData.datetimeCreated;
+    QString strUpdated = data_->metaData.datetimeUpdated.isEmpty() ? QString() : "Updated: " + data_->metaData.datetimeUpdated;
+    QString strVerified = data_->metaData.datetimeVerified.isEmpty() ? QString() : "Verified: " + data_->metaData.datetimeVerified;
+
+    if (strUpdated.isEmpty())
+        ui->labelDateTime_Update->setText(strCreated);
+    else {
+        ui->labelDateTime_Update->setText(strUpdated);
+        ui->labelDateTime_Update->setToolTip(strCreated);
+    }
+
+    ui->labelDateTime_Check->setText(strVerified);
 }
 
 void DialogDbStatus::setTabsInfo()
