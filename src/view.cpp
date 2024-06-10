@@ -59,6 +59,9 @@ void View::setFileSystemModel()
 
     restoreHeaderState();
 
+    if (!QFileInfo::exists(curPathFileSystem))
+        curPathFileSystem = paths::parentFolder(curPathFileSystem);
+
     QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
 
     QTimer::singleShot(100, this, &View::switchedToFs);
