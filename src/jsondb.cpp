@@ -81,7 +81,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
     Numbers numbers = DataContainer::getNumbers(data->model_, rootFolder);
 
-    header["Created with"] = QString("Veretino %1 https://github.com/artemvlas/veretino").arg(APP_VERSION);
+    header["App/Origin"] = QString("Veretino %1 https://github.com/artemvlas/veretino").arg(APP_VERSION);
     header["Files number"] = numbers.numberOf(FileStatus::FlagHasChecksum);
     header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(data->metaData.workDir);
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
@@ -188,8 +188,6 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
 DataContainer* JsonDb::parseJson(const QString &filePath)
 {
-    //elapsedTimer.start();
-
     QJsonArray mainArray = loadJsonDB(filePath); // json database is QJsonArray of QJsonObjects
 
     if (mainArray.isEmpty()) {
