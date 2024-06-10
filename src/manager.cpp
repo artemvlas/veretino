@@ -66,6 +66,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
     calculateChecksums(FileStatus::Queued);
 
     if (!procState->isCanceled()) { // saving to json
+        dataMaintainer->updateDateTime();
         dataMaintainer->exportToJson();
         emit dataMaintainer->databaseUpdated();
     }
@@ -191,10 +192,11 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
     }
 
     if (dataMaintainer->isDataNotSaved()) {
+        dataMaintainer->data_->metaData.successfulCheckDateTime.clear();
+        dataMaintainer->updateDateTime();
+
         if (settings_->instantSaving)
-            dataMaintainer->saveData();
-        else
-            dataMaintainer->updateDateTime();
+            dataMaintainer->saveData();            
 
         emit dataMaintainer->databaseUpdated();
     }

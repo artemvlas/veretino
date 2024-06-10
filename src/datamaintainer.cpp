@@ -327,16 +327,11 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
-    updateDateTime();
-    data_->metaData.successfulCheckDateTime.clear();
-
     QString dbFilePath = json_->makeJson(data_);
 
     if (!dbFilePath.isEmpty()) {
         data_->setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
         data_->metaData.databaseFilePath = dbFilePath;
-
-        // emit databaseUpdated();
     }
     else
         data_->metaData.dbFileState = DbFileState::NotSaved;
