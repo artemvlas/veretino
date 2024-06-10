@@ -12,6 +12,7 @@ Fixes and Minor Enhancements:
 * In the path input field, the clear button is hidden when it doesn't make sense.
 * Prevented some database columns from being accidentally hidden on first run.
 * When working with a Desktop folder, there is no longer an unnecessary notification of a reserve save path.
+* The names of some items in the database header have been changed.
 
 ---
 Veretino 0.3.12

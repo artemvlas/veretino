@@ -301,7 +301,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // [algorithm]
-    QString strAlgo = findValueStr(header, strHeaderAlgo);
+    QString strAlgo = findValueStr(header, "Algo");
     if (!strAlgo.isEmpty()) {
         metaData.algorithm = tools::strToAlgo(strAlgo);
         qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;

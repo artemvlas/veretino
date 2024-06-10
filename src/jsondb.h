@@ -36,7 +36,7 @@ private:
 
     const QString strHeaderIgnored = "Ignored";
     const QString strHeaderIncluded = "Included";
-    const QString strHeaderAlgo = "Used algorithm";
+    const QString strHeaderAlgo = "Hash Algorithm";
     const QString strHeaderWorkDir = "WorkDir";
 
     QString jsonFilePath;
