@@ -452,8 +452,10 @@ void MainWindow::handlePermanentStatusClick()
 
 void MainWindow::handlePathEdit()
 {
-    (ui->pathEdit->text() == ui->treeView->curPathFileSystem) ? modeSelect->quickAction()
-                                                              : ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
+    if (ui->pathEdit->text() == ui->treeView->curPathFileSystem)
+        modeSelect->quickAction();
+    else
+        ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
 }
 
 void MainWindow::handleChangedModel()

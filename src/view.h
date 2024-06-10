@@ -54,6 +54,7 @@ public slots:
     void setFileSystemModel();
     void setData(DataContainer *data);
     void setTreeModel(ModelView modelSel = ModelProxy);
+    void setIndexByPath();
     void setIndexByPath(const QString &path);
     void setFilter(const FileStatuses flags = FileStatus::NotSet);
     void editFilter(const FileStatuses flags, bool add);

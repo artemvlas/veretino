@@ -44,7 +44,7 @@ void View::setSettings(Settings *settings)
 void View::setFileSystemModel()
 {
     if (isViewFileSystem()) {
-        setIndexByPath(curPathFileSystem);
+        setIndexByPath();
         return;
     }
 
@@ -58,11 +58,7 @@ void View::setFileSystemModel()
     emit modelChanged(FileSystem);
 
     restoreHeaderState();
-
-    if (!QFileInfo::exists(curPathFileSystem))
-        curPathFileSystem = paths::parentFolder(curPathFileSystem);
-
-    QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
+    setIndexByPath();
 
     QTimer::singleShot(100, this, &View::switchedToFs);
 }
@@ -97,7 +93,7 @@ void View::setData(DataContainer *data)
     }
 
     data_ = data;
-    curPathFileSystem = data->isInCreation() ? data->metaData.workDir : data->metaData.databaseFilePath;
+    curPathFileSystem = data->metaData.databaseFilePath;
 
     if (data->isInCreation()) {
         setTreeModel(ModelView::ModelSource);
@@ -168,6 +164,18 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
     }
     else
         qDebug() << "View::changeCurIndexAndPath | FAILURE";
+}
+
+void View::setIndexByPath()
+{
+    if (isViewFileSystem()) {
+        if (!QFileInfo::exists(curPathFileSystem))
+            curPathFileSystem = paths::parentFolder(curPathFileSystem);
+
+        QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
+    }
+    else if (isViewDatabase())
+        setIndexByPath(curPathModel);
 }
 
 void View::setIndexByPath(const QString &path)
