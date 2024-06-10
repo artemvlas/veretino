@@ -23,25 +23,27 @@ public:
     void setProcState(const ProcState *procState);
     void setSourceData();
     bool setSourceData(DataContainer *sourceData);
+    void updateDateTime();
     void updateSuccessfulCheckDateTime();
+    void updateNumbers();
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
     int addActualFiles(FileStatus fileStatus = FileStatus::New,
                        bool ignoreUnreadable = true);
 
-    void updateNumbers();
-
     qint64 totalSizeOfListedFiles(const FileStatuses flags,
                                   const QModelIndex &rootIndex = QModelIndex());
 
+    // returns 'true' if Added or Matched. returns false if Mismatched
     bool updateChecksum(const QModelIndex &fileRowIndex,
-                        const QString &computedChecksum); // returns 'true' if Added or Matched. returns false if Mismatched
+                        const QString &computedChecksum);
 
     int changeFilesStatus(const FileStatuses flags,
                           const FileStatus newStatus,
                           const QModelIndex &rootIndex = QModelIndex());
 
-    int addToQueue(const FileStatuses flags, // changes statuses of files in data_->model_ from <flags> to FileStatus::Queued
+    // changes statuses of files in data_->model_ from <flags> to FileStatus::Queued
+    int addToQueue(const FileStatuses flags,
                    const QModelIndex &rootIndex = QModelIndex());
 
     int clearChecksums(const FileStatuses flags,
@@ -56,7 +58,8 @@ public:
 
     bool isDataNotSaved() const;
 
-    QString itemContentsInfo(const QModelIndex &curIndex); // if file - "filename (size)", if folder - folder contents (availability, size etc.)
+    // if file - "filename (size)", if folder - folder contents (availability, size etc.)
+    QString itemContentsInfo(const QModelIndex &curIndex);
 
     // variables
     DataContainer *data_ = nullptr; // main data

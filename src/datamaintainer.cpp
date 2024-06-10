@@ -70,6 +70,12 @@ void DataMaintainer::clearOldData()
     }
 }
 
+void DataMaintainer::updateDateTime()
+{
+    if (data_)
+        data_->metaData.saveDateTime = format::currentDateTime();
+}
+
 void DataMaintainer::updateSuccessfulCheckDateTime()
 {
     if (data_
@@ -321,8 +327,8 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
+    updateDateTime();
     data_->metaData.successfulCheckDateTime.clear();
-    data_->metaData.saveDateTime = format::currentDateTime();
 
     QString dbFilePath = json_->makeJson(data_);
 

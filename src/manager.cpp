@@ -193,6 +193,8 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
     if (dataMaintainer->isDataNotSaved()) {
         if (settings_->instantSaving)
             dataMaintainer->saveData();
+        else
+            dataMaintainer->updateDateTime();
 
         emit dataMaintainer->databaseUpdated();
     }
