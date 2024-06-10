@@ -1,6 +1,6 @@
 Veretino 0.4.0
 * The database file saving policy has become customizable: if the "Instant Saving" checkbox is checked, the database file will be recreated immediately after any changes are made; if not checked, then at the user's request or when closing.
-* The database now stores the date and time it was created.
+* The database now stores the date and time it was created as a separate value.
 * This version supports both Qt5 and Qt6 builds.
 
 Internal changes:
