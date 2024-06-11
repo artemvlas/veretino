@@ -23,7 +23,6 @@ public:
 
     DataContainer* parseJson(const QString &filePath);
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
-    bool updateSuccessfulCheckDateTime(const QString &filePath);
 
 private:   
     QJsonDocument readJsonFile(const QString &filePath);

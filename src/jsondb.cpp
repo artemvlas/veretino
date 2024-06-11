@@ -62,19 +62,6 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
     return QJsonArray();
 }
 
-bool JsonDb::updateSuccessfulCheckDateTime(const QString &filePath)
-{
-    QJsonArray dataArray = loadJsonDB(filePath);
-    if (dataArray.isEmpty())
-        return false;
-
-    QJsonObject header = dataArray.at(0).toObject();
-    header.insert("DT Verified", format::currentDateTime());
-    dataArray[0] = header;
-
-    return saveJsonFile(QJsonDocument(dataArray), filePath);
-}
-
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
     QJsonObject header;
