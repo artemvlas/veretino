@@ -49,9 +49,9 @@ void DialogDbStatus::setLabelsInfo()
         ui->labelWorkDir->setText("WorkDir: Specified");
 
     // datetime
-    QString strCreated = data_->metaData.datetime[0];
-    QString strUpdated = data_->metaData.datetime[1];
-    QString strVerified = data_->metaData.datetime[2];
+    QString strCreated = data_->metaData.datetime[DateTimeStr::DateCreated];
+    QString strUpdated = data_->metaData.datetime[DateTimeStr::DateUpdated];
+    QString strVerified = data_->metaData.datetime[DateTimeStr::DateVerified];
 
     if (strUpdated.isEmpty())
         ui->labelDateTime_Update->setText(strCreated);

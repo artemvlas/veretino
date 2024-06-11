@@ -72,8 +72,14 @@ void DataMaintainer::clearOldData()
 
 void DataMaintainer::updateDateTime()
 {
-    if (data_)
-        data_->metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + format::currentDateTime();
+    if (data_) {
+        if (data_->isDbFileState(DbFileState::NoFile))
+            data_->metaData.datetime[DateTimeStr::DateCreated] = "Created: " + format::currentDateTime();
+        else if (data_->contains(FileStatus::FlagDbChanged)) {
+            data_->metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + format::currentDateTime();
+            data_->metaData.datetime[DateTimeStr::DateVerified].clear();
+        }
+    }
 }
 
 void DataMaintainer::updateSuccessfulCheckDateTime()
