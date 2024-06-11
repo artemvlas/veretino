@@ -289,12 +289,9 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
     if (!folderItemIndex.isValid()) { // if root folder
         emit folderChecked(dataMaintainer->data_->numbers);
 
-        // Save verification time if necessary
-        if (!dataMaintainer->data_->contains(FileStatus::Mismatched)
-            && dataMaintainer->data_->contains(FileStatus::Matched)
-            && settings_->saveVerificationDateTime) {
-
-            dataMaintainer->updateSuccessfulCheckDateTime();
+        // Save the verification datetime, if needed
+        if (settings_->saveVerificationDateTime) {
+            dataMaintainer->updateVerifDateTime();
         }
     }
     else { // if subfolder

@@ -24,7 +24,7 @@ public:
     void setSourceData();
     bool setSourceData(DataContainer *sourceData);
     void updateDateTime();
-    void updateSuccessfulCheckDateTime();
+    void updateVerifDateTime();
     void updateNumbers();
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
