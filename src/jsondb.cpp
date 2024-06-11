@@ -87,12 +87,15 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header["Total Checksums"] = numbers.numberOf(FileStatus::FlagHasChecksum);
     header["Total Size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagAvailable));
 
-    if (!data->metaData.datetimeCreated.isEmpty())
+    /*if (!data->metaData.datetimeCreated.isEmpty())
         header["DT Created"] = data->metaData.datetimeCreated;
     if (!data->metaData.datetimeUpdated.isEmpty())
         header["DT Updated"] = data->metaData.datetimeUpdated;
     if (!data->metaData.datetimeVerified.isEmpty() && !rootFolder.isValid())
-        header["DT Verified"] = data->metaData.datetimeVerified;
+        header["DT Verified"] = data->metaData.datetimeVerified;*/
+
+    // TMP
+    header["DateTime"] = QString("%1, %2, %3").arg(data->metaData.datetime[0], data->metaData.datetime[1], data->metaData.datetime[2]);
 
     if (!isWorkDirRelative && !rootFolder.isValid())
         header[strHeaderWorkDir] = data->metaData.workDir;
@@ -312,19 +315,21 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // [date]
-    QString strDtCreated = findValueStr(header, "DT Created");
-    if (!strDtCreated.isEmpty())
-        metaData.datetimeCreated = strDtCreated;
+    // compatibility with previous versions
+    if (header.contains("Updated") && !header.contains("DateTime")) {
+        metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + header.value("Updated").toString();
+        if (header.contains("Verified"))
+            metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + header.value("Verified").toString();
+    }
 
-    QString strDtUpdated = findValueStr(header, "Updated");
-    if (!strDtUpdated.isEmpty())
-        metaData.datetimeUpdated = strDtUpdated;
+    // version 0.4.0+
+    if (header.contains("DateTime")) {
+        QStringList strDateTime = header.value("DateTime").toString().split(", ");
 
-    QString strDtVerified = findValueStr(header, "Verified");
-    if (!strDtVerified.isEmpty())
-        metaData.datetimeVerified = strDtVerified;
-
-    // qDebug() << "--->>>" << strDtCreated << strDtUpdated << strDtVerified;
+        for (int i = 0; i < strDateTime.size() && i < 2; ++i) {
+            metaData.datetime[i] = strDateTime.at(i);
+        }
+    }
 
     return metaData;
 }

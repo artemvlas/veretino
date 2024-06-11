@@ -15,20 +15,19 @@ class TreeModel;
 
 struct MetaData {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
+    FilterRule filter;
     QString workDir; // current working folder
     QString databaseFilePath;
 
-    QString datetimeCreated;
-    QString datetimeUpdated;
-    QString datetimeVerified; // date and time of the last completely successful check
-                            // (all files from the list are exists and match the checksums)
+    QString datetime[3];
+    enum DateTimeStr { DateCreated, DateUpdated, DateVerified }; // DateVerified == (all files exist and match the checksums)
 
-    FilterRule filter;
     enum DbFileState { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
 }; // struct MetaData
 
 using DbFileState = MetaData::DbFileState;
+using DateTimeStr = MetaData::DateTimeStr;
 
 struct Numbers {
     void addFile(const FileStatus status, const qint64 size)
