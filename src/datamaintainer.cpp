@@ -85,12 +85,10 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateSuccessfulCheckDateTime()
 {
     if (data_
-        && !data_->contains(FileStatus::Missing)) {
-
-        //if (!data_->isDbFileState(DbFileState::NotSaved))
-        //    json_->updateSuccessfulCheckDateTime(data_->metaData.databaseFilePath);
+        && !data_->contains(FileStatus::Missing | FileStatus::Mismatched)) {
 
         data_->metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + format::currentDateTime();
+        data_->setDbFileState(DbFileState::NotSaved);
     }
 }
 

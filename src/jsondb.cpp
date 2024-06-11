@@ -313,7 +313,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     if (header.contains("DateTime")) {
         QStringList strDateTime = header.value("DateTime").toString().split(", ");
 
-        for (int i = 0; i < strDateTime.size() && i < 2; ++i) {
+        for (int i = 0; i < strDateTime.size() && i < 3; ++i) {
             metaData.datetime[i] = strDateTime.at(i);
         }
     }
