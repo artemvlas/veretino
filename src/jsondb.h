@@ -33,6 +33,7 @@ private:
     bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList);
     QString findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength = 4);
 
+    const QString strHeaderDateTime = "DateTime";
     const QString strHeaderIgnored = "Ignored";
     const QString strHeaderIncluded = "Included";
     const QString strHeaderAlgo = "Hash Algorithm";

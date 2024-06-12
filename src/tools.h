@@ -20,6 +20,8 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &str);
+
+QStringList strToList(const QString &str); // finds a common separator and splits the string
 } // namespace tools
 
 namespace paths {

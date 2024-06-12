@@ -81,6 +81,24 @@ bool canBeChecksum(const QString &str)
 
     return isOK;
 }
+
+QStringList strToList(const QString &str)
+{
+    if (str.isEmpty())
+        return QStringList();
+
+    QString sep = " ";
+    QStringList sepVariants { ", ", ",", "  " };
+
+    for (int i = 0; i < sepVariants.size(); ++i) {
+        if (str.contains(sepVariants.at(i))) {
+            sep = sepVariants.at(i);
+            break;
+        }
+    }
+
+    return str.split(sep);
+}
 } // namespace tools
 
 namespace paths {

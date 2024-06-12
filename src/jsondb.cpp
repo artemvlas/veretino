@@ -74,15 +74,10 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header["Total Checksums"] = numbers.numberOf(FileStatus::FlagHasChecksum);
     header["Total Size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagAvailable));
 
-    /*if (!data->metaData.datetimeCreated.isEmpty())
-        header["DT Created"] = data->metaData.datetimeCreated;
-    if (!data->metaData.datetimeUpdated.isEmpty())
-        header["DT Updated"] = data->metaData.datetimeUpdated;
-    if (!data->metaData.datetimeVerified.isEmpty() && !rootFolder.isValid())
-        header["DT Verified"] = data->metaData.datetimeVerified;*/
-
     // TMP
-    header["DateTime"] = QString("%1, %2, %3").arg(data->metaData.datetime[0], data->metaData.datetime[1], data->metaData.datetime[2]);
+    header[strHeaderDateTime] = QString("%1, %2, %3").arg(data->metaData.datetime[DateTimeStr::DateCreated],
+                                                          data->metaData.datetime[DateTimeStr::DateUpdated],
+                                                          data->metaData.datetime[DateTimeStr::DateVerified]);
 
     if (!isWorkDirRelative && !rootFolder.isValid())
         header[strHeaderWorkDir] = data->metaData.workDir;
@@ -255,8 +250,6 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
-    //qDebug() << "JsonDb::parseJson | parsing took" << format::millisecToReadable(elapsedTimer.elapsed(), false);
-
     return parsedData;
 }
 
@@ -284,10 +277,10 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     QString strIncluded = findValueStr(header, strHeaderIncluded);
 
     if (!strIgnored.isEmpty()) {
-        metaData.filter.setFilter(FilterRule::Ignore, strIgnored.split(" "));
+        metaData.filter.setFilter(FilterRule::Ignore, tools::strToList(strIgnored));
     }
     else if (!strIncluded.isEmpty()) {
-        metaData.filter.setFilter(FilterRule::Include, strIncluded.split(" "));
+        metaData.filter.setFilter(FilterRule::Include, tools::strToList(strIncluded));
     }
 
     // [algorithm]
@@ -303,18 +296,19 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
 
     // [date]
     // compatibility with previous versions
-    if (header.contains("Updated") && !header.contains("DateTime")) {
+    if (header.contains("Updated")) {
         metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + header.value("Updated").toString();
         if (header.contains("Verified"))
             metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + header.value("Verified").toString();
     }
 
     // version 0.4.0+
-    if (header.contains("DateTime")) {
-        QStringList strDateTime = header.value("DateTime").toString().split(", ");
+    QString strDT = findValueStr(header, "time");
+    if (!strDT.isEmpty()) {
+        QStringList dtList = tools::strToList(strDT);
 
-        for (int i = 0; i < strDateTime.size() && i < 3; ++i) {
-            metaData.datetime[i] = strDateTime.at(i);
+        for (int i = 0; i < dtList.size() && i < 3; ++i) {
+            metaData.datetime[i] = dtList.at(i);
         }
     }
 
