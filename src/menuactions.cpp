@@ -39,6 +39,11 @@ void MenuActions::setIconTheme(const QPalette &palette)
     setActionsIcons();
 }
 
+void MenuActions::setSettings(const Settings *settings)
+{
+    settings_ = settings;
+}
+
 void MenuActions::setActionsIcons()
 {
     // MainWindow menu
@@ -159,4 +164,12 @@ QMenu* MenuActions::menuAlgorithm(QCryptographicHash::Algorithm curAlgo)
     menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(curAlgo));
 
     return menuAlgo;
+}
+
+QMenu* MenuActions::disposableMenu()
+{
+    QMenu *dispMenu = new QMenu;
+    connect(dispMenu, &QMenu::aboutToHide, dispMenu, &QMenu::deleteLater);
+
+    return dispMenu;
 }
