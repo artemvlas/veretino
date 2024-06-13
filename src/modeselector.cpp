@@ -474,121 +474,142 @@ void ModeSelector::quickAction()
 
 void ModeSelector::createContextMenu_View(const QPoint &point)
 {
+    if (view_->isViewFileSystem())
+        createContextMenu_ViewFs(point);
+    else if (view_->isViewDatabase())
+        createContextMenu_ViewDb(point);
+    else if (view_->isCurrentViewModel(ModelView::NotSetted)) {
+        QMenu *viewContextMenu = menuAct_->disposableMenu();
+        viewContextMenu->addAction(menuAct_->actionShowFilesystem);
+        viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+    }
+}
+
+void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
+{
+    // Filesystem View
+    if (!view_->isViewFileSystem())
+        return;
+
     QModelIndex index = view_->indexAt(point);
     QMenu *viewContextMenu = menuAct_->disposableMenu();
 
-    if (view_->isCurrentViewModel(ModelView::NotSetted)) {
-        viewContextMenu->addAction(menuAct_->actionShowFilesystem);
+    viewContextMenu->addAction(menuAct_->actionToHome);
+    viewContextMenu->addSeparator();
+
+    if (proc_->isState(State::StartVerbose))
+        viewContextMenu->addAction(menuAct_->actionCancel);
+    else if (index.isValid()) {
+        if (isMode(Folder)) {
+            viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
+            viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
+            viewContextMenu->addSeparator();
+
+            viewContextMenu->addAction(menuAct_->actionProcessChecksumsNoFilter);
+            if (settings_->filter.isFilterEnabled())
+                viewContextMenu->addAction(menuAct_->actionProcessChecksumsPermFilter);
+            viewContextMenu->addAction(menuAct_->actionProcessChecksumsCustomFilter);
+        }
+        else if (isMode(File)) {
+            viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
+            viewContextMenu->addAction(menuAct_->actionProcessSha_toClipboard);
+            viewContextMenu->addMenu(menuAct_->menuStoreSummary);
+
+            QString clipboardText = QGuiApplication::clipboard()->text();
+            if (tools::canBeChecksum(clipboardText)) {
+                menuAct_->actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText, 20));
+                viewContextMenu->addSeparator();
+                viewContextMenu->addAction(menuAct_->actionCheckFileByClipboardChecksum);
+            }
+        }
+        else if (isMode(DbFile))
+            viewContextMenu->addAction(menuAct_->actionOpenDatabase);
+        else if (isMode(SumFile))
+            viewContextMenu->addAction(menuAct_->actionCheckSumFile);
     }
-    // Filesystem View
-    else if (view_->isViewFileSystem()) {
-        viewContextMenu->addAction(menuAct_->actionToHome);
+
+    viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+}
+
+void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
+{
+    // TreeModel or ProxyModel View
+    if (!view_->isViewDatabase())
+        return;
+
+    QModelIndex index = view_->indexAt(point);
+    QMenu *viewContextMenu = menuAct_->disposableMenu();
+
+    if (proc_->isStarted()) {
+        if (!view_->data_->isInCreation())
+            viewContextMenu->addAction(menuAct_->actionCancel);
+        viewContextMenu->addAction(menuAct_->actionCancelBackToFS);
+    }
+    else {
+        viewContextMenu->addAction(menuAct_->actionShowDbStatus);
+        viewContextMenu->addAction(menuAct_->actionResetDb);
+
+        if (view_->data_->isDbFileState(DbFileState::NotSaved)
+            || QFile::exists(view_->data_->backupFilePath()))
+            viewContextMenu->addAction(menuAct_->actionForgetChanges);
+
+        viewContextMenu->addSeparator();
+        viewContextMenu->addAction(menuAct_->actionShowFilesystem);
+        if (view_->isViewFiltered())
+            viewContextMenu->addAction(menuAct_->actionShowAll);
         viewContextMenu->addSeparator();
 
-        if (proc_->isState(State::StartVerbose))
-            viewContextMenu->addAction(menuAct_->actionCancel);
-        else if (index.isValid()) {
-            if (isMode(Folder)) {
-                viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
-                viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
+        if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
+            if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
+                menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
+                viewContextMenu->addAction(menuAct_->actionFilterMismatches);
+            }
+
+            if (view_->data_->numbers.contains(FileStatus::FlagNewLost)) {
+                menuAct_->actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
+                viewContextMenu->addAction(menuAct_->actionFilterNewLost);
+            }
+
+            if (view_->data_->numbers.contains(FileStatus::FlagUpdatable))
                 viewContextMenu->addSeparator();
-
-                viewContextMenu->addAction(menuAct_->actionProcessChecksumsNoFilter);
-                if (settings_->filter.isFilterEnabled())
-                    viewContextMenu->addAction(menuAct_->actionProcessChecksumsPermFilter);
-                viewContextMenu->addAction(menuAct_->actionProcessChecksumsCustomFilter);
-            }
-            else if (isMode(File)) {
-                viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
-                viewContextMenu->addAction(menuAct_->actionProcessSha_toClipboard);
-                viewContextMenu->addMenu(menuAct_->menuStoreSummary);
-
-                QString clipboardText = QGuiApplication::clipboard()->text();
-                if (tools::canBeChecksum(clipboardText)) {
-                    menuAct_->actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText, 20));
-                    viewContextMenu->addSeparator();
-                    viewContextMenu->addAction(menuAct_->actionCheckFileByClipboardChecksum);
-                }
-            }
-            else if (isMode(DbFile))
-                viewContextMenu->addAction(menuAct_->actionOpenDatabase);
-            else if (isMode(SumFile))
-                viewContextMenu->addAction(menuAct_->actionCheckSumFile);
         }
-    }
-    // TreeModel or ProxyModel View
-    else if (view_->isViewDatabase()) {
-        if (proc_->isStarted()) {
-            if (!view_->data_->isInCreation())
-                viewContextMenu->addAction(menuAct_->actionCancel);
-            viewContextMenu->addAction(menuAct_->actionCancelBackToFS);
-        }
-        else {
-            viewContextMenu->addAction(menuAct_->actionShowDbStatus);
-            viewContextMenu->addAction(menuAct_->actionResetDb);
 
-            if (view_->data_->isDbFileState(DbFileState::NotSaved)
-                || QFile::exists(view_->data_->backupFilePath()))
-                viewContextMenu->addAction(menuAct_->actionForgetChanges);
+        if (index.isValid()) {
+            if (TreeModel::isFileRow(index)) {
+                if (TreeModel::hasReChecksum(index))
+                    viewContextMenu->addAction(menuAct_->actionCopyReChecksum);
+                else if (TreeModel::hasChecksum(index))
+                    viewContextMenu->addAction(menuAct_->actionCopyStoredChecksum);
 
-            viewContextMenu->addSeparator();
-            viewContextMenu->addAction(menuAct_->actionShowFilesystem);
-            if (view_->isViewFiltered())
-                viewContextMenu->addAction(menuAct_->actionShowAll);
-            viewContextMenu->addSeparator();
-
-            if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
-                if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
-                    menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
-                    viewContextMenu->addAction(menuAct_->actionFilterMismatches);
-                }
-
-                if (view_->data_->numbers.contains(FileStatus::FlagNewLost)) {
-                    menuAct_->actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
-                    viewContextMenu->addAction(menuAct_->actionFilterNewLost);
-                }
-
-                if (view_->data_->numbers.contains(FileStatus::FlagUpdatable))
-                    viewContextMenu->addSeparator();
-            }
-
-            if (index.isValid()) {
-                 if (TreeModel::isFileRow(index)) {
-                    if (TreeModel::hasReChecksum(index))
-                        viewContextMenu->addAction(menuAct_->actionCopyReChecksum);
-                    else if (TreeModel::hasChecksum(index))
-                        viewContextMenu->addAction(menuAct_->actionCopyStoredChecksum);
-
-                    if (TreeModel::hasStatus(FileStatus::FlagAvailable, index)) {
-                        menuAct_->actionCopyItem->setText("Copy File");
-                        viewContextMenu->addAction(menuAct_->actionCopyItem);
-
-                        viewContextMenu->addAction(menuAct_->actionCheckCurFileFromModel);
-                    }
-                }
-                else if (TreeModel::contains(FileStatus::FlagAvailable, index)) {
-                    menuAct_->actionCopyItem->setText("Copy Folder");
+                if (TreeModel::hasStatus(FileStatus::FlagAvailable, index)) {
+                    menuAct_->actionCopyItem->setText("Copy File");
                     viewContextMenu->addAction(menuAct_->actionCopyItem);
 
-                    if (!view_->data_->getBranchFilePath(index, true).isEmpty())
-                        viewContextMenu->addAction(menuAct_->actionBranchOpen);
-                    else
-                        viewContextMenu->addAction(menuAct_->actionBranchMake);
-
-                    viewContextMenu->addAction(menuAct_->actionCheckCurSubfolderFromModel);
+                    viewContextMenu->addAction(menuAct_->actionCheckCurFileFromModel);
                 }
             }
+            else if (TreeModel::contains(FileStatus::FlagAvailable, index)) {
+                menuAct_->actionCopyItem->setText("Copy Folder");
+                viewContextMenu->addAction(menuAct_->actionCopyItem);
 
-            viewContextMenu->addAction(menuAct_->actionCheckAll);
+                if (!view_->data_->getBranchFilePath(index, true).isEmpty())
+                    viewContextMenu->addAction(menuAct_->actionBranchOpen);
+                else
+                    viewContextMenu->addAction(menuAct_->actionBranchMake);
 
-            if (view_->data_->contains(FileStatus::FlagUpdatable))
-                viewContextMenu->addMenu(menuAct_->menuUpdateDb(view_->data_->numbers));
+                viewContextMenu->addAction(menuAct_->actionCheckCurSubfolderFromModel);
+            }
         }
 
-        viewContextMenu->addSeparator();
-        viewContextMenu->addAction(menuAct_->actionCollapseAll);
-        viewContextMenu->addAction(menuAct_->actionExpandAll);
+        viewContextMenu->addAction(menuAct_->actionCheckAll);
+
+        if (view_->data_->contains(FileStatus::FlagUpdatable))
+            viewContextMenu->addMenu(menuAct_->menuUpdateDb(view_->data_->numbers));
     }
+
+    viewContextMenu->addSeparator();
+    viewContextMenu->addAction(menuAct_->actionCollapseAll);
+    viewContextMenu->addAction(menuAct_->actionExpandAll);
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
 }

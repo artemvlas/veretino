@@ -72,6 +72,8 @@ public:
 
 public slots:
     void createContextMenu_View(const QPoint &point);
+    void createContextMenu_ViewFs(const QPoint &point);
+    void createContextMenu_ViewDb(const QPoint &point);
     void getInfoPathItem();
 
 private:
