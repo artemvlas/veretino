@@ -173,3 +173,11 @@ QMenu* MenuActions::disposableMenu() const
 
     return dispMenu;
 }
+
+QMenu* MenuActions::contextMenuViewNot()
+{
+    QMenu *menuViewNot = disposableMenu();
+    menuViewNot->addAction(actionShowFilesystem);
+
+    return menuViewNot;
+}

@@ -478,11 +478,8 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         createContextMenu_ViewFs(point);
     else if (view_->isViewDatabase())
         createContextMenu_ViewDb(point);
-    else if (view_->isCurrentViewModel(ModelView::NotSetted)) {
-        QMenu *viewContextMenu = menuAct_->disposableMenu();
-        viewContextMenu->addAction(menuAct_->actionShowFilesystem);
-        viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
-    }
+    else if (view_->isCurrentViewModel(ModelView::NotSetted))
+        menuAct_->contextMenuViewNot()->exec(view_->viewport()->mapToGlobal(point));
 }
 
 void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
