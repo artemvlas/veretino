@@ -166,7 +166,7 @@ QMenu* MenuActions::menuAlgorithm(QCryptographicHash::Algorithm curAlgo)
     return menuAlgo;
 }
 
-QMenu* MenuActions::disposableMenu()
+QMenu* MenuActions::disposableMenu() const
 {
     QMenu *dispMenu = new QMenu;
     connect(dispMenu, &QMenu::aboutToHide, dispMenu, &QMenu::deleteLater);

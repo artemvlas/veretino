@@ -475,8 +475,7 @@ void ModeSelector::quickAction()
 void ModeSelector::createContextMenu_View(const QPoint &point)
 {
     QModelIndex index = view_->indexAt(point);
-    QMenu *viewContextMenu = new QMenu(view_);
-    connect(viewContextMenu, &QMenu::aboutToHide, viewContextMenu, &QMenu::deleteLater);
+    QMenu *viewContextMenu = menuAct_->disposableMenu();
 
     if (view_->isCurrentViewModel(ModelView::NotSetted)) {
         viewContextMenu->addAction(menuAct_->actionShowFilesystem);

@@ -28,7 +28,7 @@ public:
     void populateMenuFile(QMenu *menuFile);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
     QMenu* menuAlgorithm(QCryptographicHash::Algorithm curAlgo);
-    QMenu* disposableMenu(); // (context) menu, which will be deleted when closed
+    QMenu* disposableMenu() const; // (context) menu, which will be deleted when closed
 
     // MainWindow menu
     QAction *actionOpenFolder = new QAction("Open Folder", this);
