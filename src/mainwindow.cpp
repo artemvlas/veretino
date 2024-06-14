@@ -132,6 +132,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::processFileSha, manager, &Manager::processFileSha);
     connect(modeSelect, &ModeSelector::verify, manager, &Manager::verify);
     connect(modeSelect, &ModeSelector::updateDatabase, manager, &Manager::updateDatabase);
+    connect(modeSelect, &ModeSelector::updateItemFile, manager, &Manager::updateItemFile);
     connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
     connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
     connect(modeSelect, &ModeSelector::branchSubfolder, manager, &Manager::branchSubfolder);

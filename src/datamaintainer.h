@@ -52,6 +52,9 @@ public:
     int clearLostFiles(); // returns the number of cleared
     int updateMismatchedChecksums(); // returns the number of updated checksums
 
+    bool itemFileRemoveLost(const QModelIndex &fileIndex);
+    bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
+
     bool importJson(const QString &jsonFilePath);
     void exportToJson();
     void forkJsonDb(const QModelIndex &rootFolder);

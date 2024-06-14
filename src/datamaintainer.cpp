@@ -322,6 +322,33 @@ int DataMaintainer::updateMismatchedChecksums()
     return number;
 }
 
+bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
+{
+    if (data_ && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
+        data_->model_->setRowData(fileIndex, Column::ColumnChecksum);
+        data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Removed);
+        return true;
+    }
+
+    return false;
+}
+
+bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
+{
+    if (data_ && TreeModel::hasReChecksum(fileIndex)) {
+        QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
+
+        if (!reChecksum.isEmpty()) {
+            data_->model_->setRowData(fileIndex, Column::ColumnChecksum, reChecksum);
+            data_->model_->setRowData(fileIndex, Column::ColumnReChecksum);
+            data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Updated);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
     return setSourceData(json_->parseJson(jsonFilePath));

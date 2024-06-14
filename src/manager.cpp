@@ -201,6 +201,43 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
     }
 }
 
+void Manager::updateItemFile(const QModelIndex &fileIndex)
+{
+    if (!dataMaintainer->data_ || !fileIndex.isValid()) {
+        return;
+    }
+
+    FileStatus fileStatusBefore = TreeModel::itemFileStatus(fileIndex);
+
+    if (fileStatusBefore == FileStatus::New) {
+        dataMaintainer->data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
+        QString filePath = dataMaintainer->data_->itemAbsolutePath(fileIndex);
+        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm);
+
+        if (sum.isEmpty()) { // return previous status
+            dataMaintainer->data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::New);
+        }
+        else
+            dataMaintainer->updateChecksum(fileIndex, sum);
+    }
+    else if (fileStatusBefore == FileStatus::Missing) {
+        dataMaintainer->itemFileRemoveLost(fileIndex);
+    }
+    else if (fileStatusBefore == FileStatus::Mismatched) {
+        dataMaintainer->itemFileUpdateChecksum(fileIndex);
+    }
+
+    FileStatus fileStatusAfter = TreeModel::itemFileStatus(fileIndex);
+
+    if (fileStatusAfter & FileStatus::FlagDbChanged) {
+        dataMaintainer->data_->setDbFileState(DbFileState::NotSaved);
+        dataMaintainer->updateNumbers();
+
+        if (settings_->instantSaving)
+            dataMaintainer->saveData();
+    }
+}
+
 void Manager::branchSubfolder(const QModelIndex &subfolder)
 {
     runTask([&] { dataMaintainer->forkJsonDb(subfolder); });
