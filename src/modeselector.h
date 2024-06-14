@@ -77,6 +77,7 @@ public slots:
 private:
     void connectActions();
     void copyDataToClipboard(Column column);
+    void updateDbItem();
 
     QString composeDbFilePath();
     bool isSelectedCreateDb();
@@ -96,6 +97,7 @@ signals:
     void parseJsonFile(const QString &path);
     void verify(const QModelIndex& index = QModelIndex());
     void updateDatabase(const DestDbUpdate task);
+    void updateItemFile(const QModelIndex &fileIndex);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
     void resetDatabase(); // reopening and reparsing current database

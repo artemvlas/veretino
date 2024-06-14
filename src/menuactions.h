@@ -23,7 +23,6 @@ public:
     ~MenuActions();
 
     void setIconTheme(const QPalette &palette);
-    void setSettings(const Settings *settings);
     void updateMenuOpenRecent(const QStringList &recentFiles);
     void populateMenuFile(QMenu *menuFile);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
@@ -79,6 +78,10 @@ public:
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
     QAction *actionCopyItem = new QAction("Copy", this);
 
+    QAction *actionUpdFileAdd = new QAction("Add to DB", this);
+    QAction *actionUpdFileRemove = new QAction("Remove from DB", this);
+    QAction *actionUpdFileReChecksum = new QAction("Update Checksum", this);
+
     QAction *actionCollapseAll = new QAction("Collapse all", this);
     QAction *actionExpandAll = new QAction("Expand all", this);
 
@@ -98,7 +101,6 @@ public:
 private:
     void setActionsIcons();
     IconProvider iconProvider;
-    const Settings *settings_ = nullptr;
 
 }; // class MenuActions
 

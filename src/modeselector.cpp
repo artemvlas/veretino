@@ -75,6 +75,9 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCopyItem, &QAction::triggered, this, &ModeSelector::copyItem);
     connect(menuAct_->actionBranchMake, &QAction::triggered, this, [=]{ emit branchSubfolder(view_->curIndexSource); });
     connect(menuAct_->actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
+    connect(menuAct_->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
+    connect(menuAct_->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
+    connect(menuAct_->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
 
     connect(menuAct_->actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -241,6 +244,11 @@ void ModeSelector::verifyItem()
 void ModeSelector::verifyDb()
 {
     emit verify();
+}
+
+void ModeSelector::updateDbItem()
+{
+    emit updateItemFile(view_->curIndexSource);
 }
 
 void ModeSelector::showFolderContentTypes()
@@ -573,11 +581,23 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
         if (index.isValid()) {
             if (TreeModel::isFileRow(index)) {
+                // Updatable file item
+                if (TreeModel::hasStatus(FileStatus::FlagUpdatable, index)) {
+                    FileStatus status = TreeModel::itemFileStatus(index);
+                    if (status == FileStatus::New)
+                        viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
+                    else if (status == FileStatus::Missing)
+                        viewContextMenu->addAction(menuAct_->actionUpdFileRemove);
+                    else if (status == FileStatus::Mismatched)
+                        viewContextMenu->addAction(menuAct_->actionUpdFileReChecksum);
+                }
+
                 if (TreeModel::hasReChecksum(index))
                     viewContextMenu->addAction(menuAct_->actionCopyReChecksum);
                 else if (TreeModel::hasChecksum(index))
                     viewContextMenu->addAction(menuAct_->actionCopyStoredChecksum);
 
+                // Available file item
                 if (TreeModel::hasStatus(FileStatus::FlagAvailable, index)) {
                     menuAct_->actionCopyItem->setText("Copy File");
                     viewContextMenu->addAction(menuAct_->actionCopyItem);
@@ -585,6 +605,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     viewContextMenu->addAction(menuAct_->actionCheckCurFileFromModel);
                 }
             }
+            // Folder item
             else if (TreeModel::contains(FileStatus::FlagAvailable, index)) {
                 menuAct_->actionCopyItem->setText("Copy Folder");
                 viewContextMenu->addAction(menuAct_->actionCopyItem);

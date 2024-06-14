@@ -39,11 +39,6 @@ void MenuActions::setIconTheme(const QPalette &palette)
     setActionsIcons();
 }
 
-void MenuActions::setSettings(const Settings *settings)
-{
-    settings_ = settings;
-}
-
 void MenuActions::setActionsIcons()
 {
     // MainWindow menu
@@ -90,6 +85,9 @@ void MenuActions::setActionsIcons()
     actionCopyItem->setIcon(iconProvider.icon(Icons::Copy));
     actionBranchMake->setIcon(iconProvider.icon(Icons::AddFork));
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
+    actionUpdFileAdd->setIcon(iconProvider.icon(FileStatus::Added));
+    actionUpdFileRemove->setIcon(iconProvider.icon(FileStatus::Removed));
+    actionUpdFileReChecksum->setIcon(iconProvider.icon(FileStatus::Updated));
 }
 
 void MenuActions::populateMenuFile(QMenu *menuFile)
