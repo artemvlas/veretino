@@ -1,7 +1,6 @@
 Veretino 0.4.0
 * The database file saving policy has become customizable: if the "Instant Saving" checkbox is checked, the database file will be recreated immediately after any changes are made; if not checked, then at the user's request or when closing.
-* Added the ability to change individual DB files items.
-* The database now stores the date and time it was created as a separate value.
+* Added the ability to independently update the values ​​of files contained in the database.
 * This version supports both Qt5 and Qt6 builds.
 
 Internal changes:
@@ -9,13 +8,14 @@ Internal changes:
 * The architecture has been optimized and improved.
 
 Fixes and Minor Enhancements:
+* Some items of the database header have been changed.
+* The database now stores the date and time it was created as a separate value.
 * The speed display is brought to the standard form: MiB/sec >> MiB/s
 * In the path input field, the clear button is hidden when it doesn't make sense.
 * Prevented some database columns from being accidentally hidden on first run.
 * When working with a Desktop folder, there is no longer an unnecessary notification of a reserve save path.
 * If the last saved path does not exist, it now goes to the parent folder, if there is one.
 * After creating a new database, the path to it is now remembered when returning to the file system.
-* The names of some items in the database header have been changed.
 
 ---
 Veretino 0.3.12
