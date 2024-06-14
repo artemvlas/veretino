@@ -23,6 +23,7 @@ public:
     ~MenuActions();
 
     void setIconTheme(const QPalette &palette);
+    void setSettings(const Settings *settings);
     void updateMenuOpenRecent(const QStringList &recentFiles);
     void populateMenuFile(QMenu *menuFile);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
@@ -101,6 +102,7 @@ public:
 private:
     void setActionsIcons();
     IconProvider iconProvider;
+    const Settings *settings_ = nullptr;
 
 }; // class MenuActions
 

@@ -68,6 +68,7 @@ void Settings::saveSettings()
     storedSettings.setValue("saveVerificationDateTime", saveVerificationDateTime);
     storedSettings.setValue("coloredDbItems", coloredDbItems);
     storedSettings.setValue("instantSaving", instantSaving);
+    storedSettings.setValue("showUpdNumInMenu", showUpdNumInMenu);
 
     // FilterRule
     storedSettings.setValue("filter/ignoreDbFiles", filter.ignoreDbFiles);
@@ -103,6 +104,7 @@ void Settings::loadSettings()
     saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", defaults.saveVerificationDateTime).toBool();
     coloredDbItems = storedSettings.value("coloredDbItems", defaults.coloredDbItems).toBool();
     instantSaving = storedSettings.value("instantSaving", defaults.instantSaving).toBool();
+    showUpdNumInMenu = storedSettings.value("showUpdNumInMenu", defaults.showUpdNumInMenu).toBool();
 
     // FilterRule
     filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value("filter/filterMode", FilterRule::NotSet).toInt()),

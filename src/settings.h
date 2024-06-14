@@ -37,6 +37,7 @@ public:
     bool saveVerificationDateTime = false;
     bool coloredDbItems = true;
     bool instantSaving = true;
+    bool showUpdNumInMenu = true;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;

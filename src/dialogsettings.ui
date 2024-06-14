@@ -91,6 +91,17 @@ immediately after any change is made.</string>
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="cbShowUpdNumInMenu">
+           <property name="text">
+            <string>Menu: Show the number of updatable</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

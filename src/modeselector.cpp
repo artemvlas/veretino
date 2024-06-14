@@ -26,6 +26,7 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 
     iconProvider.setTheme(view_->palette());
     menuAct_->setIconTheme(view_->palette());
+    menuAct_->setSettings(settings_);
 
     connectActions();
 }
