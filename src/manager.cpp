@@ -235,7 +235,9 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
         dataMaintainer->updateDateTime();
 
         if (settings_->instantSaving)
-            dataMaintainer->saveData();
+            saveData();
+        else
+            emit procState->stateChanged(); // temp solution to update Button info
     }
 }
 
