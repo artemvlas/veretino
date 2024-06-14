@@ -232,6 +232,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
     if (fileStatusAfter & FileStatus::FlagDbChanged) {
         dataMaintainer->data_->setDbFileState(DbFileState::NotSaved);
         dataMaintainer->updateNumbers();
+        dataMaintainer->updateDateTime();
 
         if (settings_->instantSaving)
             dataMaintainer->saveData();
