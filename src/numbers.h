@@ -15,7 +15,7 @@ public:
 
     void addFile(const FileStatus status, const qint64 size);
     void removeFile(const FileStatus status, const qint64 size);
-    bool changeFileStatus(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size);
+    bool moveFile(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size);
     bool contains(const FileStatuses flags) const;
     int numberOf(const FileStatuses flag) const;
     qint64 totalSize(const FileStatuses flag) const;
