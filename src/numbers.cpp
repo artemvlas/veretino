@@ -32,7 +32,7 @@ void Numbers::removeFile(const FileStatus status, const qint64 size)
 
 bool Numbers::moveFile(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size)
 {
-    if (!amounts_.contains(statusBefore))
+    if (!amounts_.contains(statusBefore) || (statusBefore == statusAfter))
         return false;
 
     removeFile(statusBefore, size);
