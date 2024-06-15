@@ -25,6 +25,7 @@ SOURCES += \
     src/manager.cpp \
     src/menuactions.cpp \
     src/modeselector.cpp \
+    src/numbers.cpp \
     src/procstate.cpp \
     src/progressbar.cpp \
     src/proxymodel.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
     src/manager.h \
     src/menuactions.h \
     src/modeselector.h \
+    src/numbers.h \
     src/procstate.h \
     src/progressbar.h \
     src/proxymodel.h \

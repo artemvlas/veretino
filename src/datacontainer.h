@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include "treemodel.h"
 #include "proxymodel.h"
+#include "numbers.h"
 
 class TreeModel;
 
@@ -28,50 +29,6 @@ struct MetaData {
 
 using DbFileState = MetaData::DbFileState;
 using DateTimeStr = MetaData::DateTimeStr;
-
-struct Numbers {
-    void addFile(const FileStatus status, const qint64 size)
-    {
-        amounts_[status]++;
-        sizes_[status] += size;
-    }
-
-    qint64 totalSize(const FileStatuses flag) const
-    {
-        qint64 result = 0;
-        QHash<FileStatus, qint64>::const_iterator it;
-
-        for (it = sizes_.constBegin(); it != sizes_.constEnd(); ++it) {
-            if (it.key() & flag) {
-                result += it.value();
-            }
-        }
-
-        return result;
-    }
-
-    int numberOf(const FileStatuses flag) const
-    {
-        int result = 0;
-        QHash<FileStatus, int>::const_iterator it;
-
-        for (it = amounts_.constBegin(); it != amounts_.constEnd(); ++it) {
-            if (it.key() & flag)
-                result += it.value();
-        }
-
-        return result;
-    }
-
-    bool contains(const FileStatuses flags) const
-    {
-        return numberOf(flags) > 0;
-    }
-
-private:
-    QHash<FileStatus, int> amounts_; // {FileStatus : number of corresponding files}
-    QHash<FileStatus, qint64> sizes_; // {FileStatus : total size}
-}; // struct Numbers
 
 class DataContainer : public QObject
 {
