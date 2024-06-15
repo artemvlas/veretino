@@ -276,42 +276,8 @@ int DataMaintainer::clearLostFiles()
     TreeModelIterator iter(data_->model_);
 
     while (iter.hasNext()) {
-        if (iter.nextFile().status() == FileStatus::Missing) {
-            data_->model_->setRowData(iter.index(), Column::ColumnChecksum);
-            data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Removed);
+        if (itemFileRemoveLost(iter.nextFile().index()))
             ++number;
-        }
-    }
-
-    if (number > 0) {
-        data_->setDbFileState(DbFileState::NotSaved);
-        updateNumbers();
-    }
-
-    return number;
-}
-
-int DataMaintainer::updateMismatchedChecksums()
-{
-    if (!data_) {
-        qDebug() << "DataMaintainer::updateMismatchedChecksums | NO data_";
-        return 0;
-    }
-
-    int number = 0;
-    TreeModelIterator iter(data_->model_);
-
-    while (iter.hasNext()) {
-        if (iter.nextFile().status() == FileStatus::Mismatched) {
-            QString reChecksum = iter.data(Column::ColumnReChecksum).toString();
-
-            if (!reChecksum.isEmpty()) {
-                data_->model_->setRowData(iter.index(), Column::ColumnChecksum, reChecksum);
-                data_->model_->setRowData(iter.index(), Column::ColumnReChecksum);
-                data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Updated);
-                ++number;
-            }
-        }
     }
 
     if (number > 0) {
@@ -331,6 +297,29 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
     }
 
     return false;
+}
+
+int DataMaintainer::updateMismatchedChecksums()
+{
+    if (!data_) {
+        qDebug() << "DataMaintainer::updateMismatchedChecksums | NO data_";
+        return 0;
+    }
+
+    int number = 0;
+    TreeModelIterator iter(data_->model_);
+
+    while (iter.hasNext()) {
+        if (itemFileUpdateChecksum(iter.nextFile().index()))
+            ++number;
+    }
+
+    if (number > 0) {
+        data_->setDbFileState(DbFileState::NotSaved);
+        updateNumbers();
+    }
+
+    return number;
 }
 
 bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
