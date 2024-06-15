@@ -26,7 +26,7 @@ public:
     void updateDateTime();
     void updateVerifDateTime();
     void updateNumbers();
-    void updateNumbers(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 fileSize);
+    void updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore);
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
     int addActualFiles(FileStatus fileStatus = FileStatus::New,

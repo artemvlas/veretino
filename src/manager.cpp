@@ -227,11 +227,9 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
         dataMaintainer->itemFileUpdateChecksum(fileIndex);
     }
 
-    FileStatus fileStatusAfter = TreeModel::itemFileStatus(fileIndex);
-
-    if (fileStatusAfter & FileStatus::FlagDbChanged) {
+    if (TreeModel::hasStatus(FileStatus::FlagDbChanged, fileIndex)) {
         dataMaintainer->data_->setDbFileState(DbFileState::NotSaved);
-        dataMaintainer->updateNumbers(fileStatusBefore, fileStatusAfter, TreeModel::itemFileSize(fileIndex));
+        dataMaintainer->updateNumbers(fileIndex, fileStatusBefore);
         dataMaintainer->updateDateTime();
 
         if (settings_->instantSaving)
@@ -296,7 +294,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     else {
         showFileCheckResultMessage(filePath, storedSum, sum);
         dataMaintainer->updateChecksum(fileItemIndex, sum);
-        dataMaintainer->updateNumbers();
+        dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
     }
 }
 

@@ -159,10 +159,11 @@ void DataMaintainer::updateNumbers()
         data_->metaData.datetime[DateTimeStr::DateVerified].clear();
 }
 
-void DataMaintainer::updateNumbers(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 fileSize)
+// if only one file has changed, there is no need to iterate over the entire list
+void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore)
 {
     if (data_) {
-        data_->numbers.moveFile(statusBefore, statusAfter, fileSize);
+        data_->numbers.moveFile(statusBefore, TreeModel::itemFileStatus(fileIndex), TreeModel::itemFileSize(fileIndex));
         emit numbersUpdated();
     }
 }
