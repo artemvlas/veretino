@@ -183,8 +183,14 @@ QStringList DialogDbStatus::infoVerification()
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
     }
     else if (data_->contains(FileStatus::FlagChecked)) {
-        result.append(QString("%1 out of %2 files were checked")
-                          .arg(data_->numbers.numberOf(FileStatus::FlagChecked))
+        // to account for added and updated files, the total number in parentheses is used
+        int numAddedUpdated = data_->numbers.numberOf(FileStatus::Added | FileStatus::Updated);
+
+        // info str
+        int numChecked = data_->numbers.numberOf(FileStatus::FlagChecked);
+        result.append(QString("%1%2 out of %3 files were checked")
+                          .arg(numChecked)
+                          .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numChecked + numAddedUpdated) : QString())
                           .arg(available));
 
         result.append(QString());
@@ -193,8 +199,12 @@ QStringList DialogDbStatus::infoVerification()
         else
             result.append("No Mismatches found");
 
-        if (data_->contains(FileStatus::Matched))
-            result.append(QString("%1 files matched").arg(data_->numbers.numberOf(FileStatus::Matched)));
+        if (data_->contains(FileStatus::Matched)) {
+            int numMatched = data_->numbers.numberOf(FileStatus::Matched);
+            result.append(QString("%1%2 files matched")
+                              .arg(numMatched)
+                              .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numMatched + numAddedUpdated) : QString()));
+        }
     }
 
     return result;
