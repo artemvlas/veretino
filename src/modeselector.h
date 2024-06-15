@@ -61,6 +61,7 @@ public:
     void procSumFile(QCryptographicHash::Algorithm algo);
     void verifyItem();
     void verifyDb();
+    void promptItemFileUpd();
     void showFolderContentTypes();
     void checkFileByClipboardChecksum();
     void copyItem();

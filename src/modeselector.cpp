@@ -237,9 +237,60 @@ void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
     emit processFileSha(view_->curPathFileSystem, algo, DestFileProc::SumFile);
 }
 
+void ModeSelector::promptItemFileUpd()
+{
+    FileStatus storedStatus = TreeModel::itemFileStatus(view_->curIndexSource);
+
+    if (!(storedStatus & FileStatus::FlagUpdatable))
+        return;
+
+    QMessageBox msgBox(view_);
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Question);
+
+    switch (storedStatus) {
+    case FileStatus::New:
+        msgBox.setWindowTitle("No Checksum yet...");
+        msgBox.setText("This is a new file.");
+        msgBox.setInformativeText("Would you like to add it to the database?");
+        msgBox.button(QMessageBox::Ok)->setText("Add");
+        msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Added));
+        break;
+    case FileStatus::Missing:
+        msgBox.setWindowTitle("Missing File...");
+        msgBox.setText("File does not exist.");
+        msgBox.setInformativeText("Would you like to remove it from the database?");
+        msgBox.button(QMessageBox::Ok)->setText("Remove");
+        msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Removed));
+        break;
+    case FileStatus::Mismatched:
+        msgBox.setWindowTitle("Mismatched Checksum...");
+        msgBox.setText("The calculated and stored checksums do not match.");
+        msgBox.setInformativeText("Do you want to update the saved one?");
+        msgBox.button(QMessageBox::Ok)->setText("Update");
+        msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Updated));
+        break;
+    default:
+        msgBox.setText("No checksum in the database.");
+        break;
+    }
+
+    int ret = msgBox.exec();
+
+    if (ret == QMessageBox::Ok && (storedStatus & FileStatus::FlagUpdatable))
+        updateDbItem();
+}
+
 void ModeSelector::verifyItem()
 {
-    emit verify(view_->curIndexSource);
+    if (TreeModel::isFileRow(view_->curIndexSource)
+        && TreeModel::hasStatus(FileStatus::FlagUpdatable, view_->curIndexSource)) {
+
+        promptItemFileUpd();
+    }
+    else
+        emit verify(view_->curIndexSource);
 }
 
 void ModeSelector::verifyDb()
@@ -466,18 +517,13 @@ void ModeSelector::quickAction()
             emit checkSummaryFile(view_->curPathFileSystem);
             break;
         case Model:
-            if (TreeModel::isFileRow(view_->curIndexSource))
-                emit verify(view_->curIndexSource);
-            break;
         case ModelNewLost:
-            if (TreeModel::isFileRow(view_->curIndexSource))
-                emit verify(view_->curIndexSource);
-            break;
         case UpdateMismatch:
             if (TreeModel::isFileRow(view_->curIndexSource))
-                emit verify(view_->curIndexSource);
+                verifyItem();
             break;
-        default: break;
+        default:
+            break;
     }
 }
 

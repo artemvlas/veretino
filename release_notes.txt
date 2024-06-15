@@ -8,6 +8,7 @@ Internal changes:
 * The architecture has been optimized and improved.
 
 Fixes and Minor Enhancements:
+* Smarter Quick Action on database items: potentially updatable items are now prompted to take action.
 * Added display of the number of files being updated to the "Update the "Database" menu. (Can be disabled in Settings).
 * Verification tab: to account for added and updated files, the total number in parentheses is now used.
 * Some items of the database header have been changed.
