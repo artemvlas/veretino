@@ -49,10 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    proc_->setState(State::Abort); // just in case
-    emit modeSelect->saveData();
-    saveSettings();
-
     thread->quit();
     thread->wait();
 
@@ -62,8 +58,15 @@ MainWindow::~MainWindow()
 // if a computing process is running, show a hint when user wants to close the app
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    modeSelect->processAbortPrompt() ? event->accept()
-                                     : event->ignore();
+    if (modeSelect->processAbortPrompt()) {
+        proc_->setState(State::Abort); // just in case
+        emit modeSelect->saveData();
+        saveSettings();
+
+        event->accept();
+    }
+    else
+        event->ignore();
 }
 
 void MainWindow::connections()
