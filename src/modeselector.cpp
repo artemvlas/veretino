@@ -272,13 +272,10 @@ void ModeSelector::promptItemFileUpd()
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Updated));
         break;
     default:
-        msgBox.setText("No checksum in the database.");
         break;
     }
 
-    int ret = msgBox.exec();
-
-    if (ret == QMessageBox::Ok && (storedStatus & FileStatus::FlagUpdatable))
+    if (msgBox.exec() == QMessageBox::Ok)
         updateDbItem();
 }
 
