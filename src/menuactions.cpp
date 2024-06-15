@@ -26,6 +26,8 @@ MenuActions::MenuActions(QObject *parent)
     menuStoreSummary->addActions(actionsMakeSummaries);
 
     menuOpenRecent->setToolTipsVisible(true);
+
+    setShortcuts();
 }
 
 MenuActions::~MenuActions()
@@ -93,6 +95,14 @@ void MenuActions::setActionsIcons()
     actionUpdFileAdd->setIcon(iconProvider.icon(FileStatus::Added));
     actionUpdFileRemove->setIcon(iconProvider.icon(FileStatus::Removed));
     actionUpdFileReChecksum->setIcon(iconProvider.icon(FileStatus::Updated));
+}
+
+void MenuActions::setShortcuts()
+{
+    // main file menu
+    actionOpenFolder->setShortcut(QKeySequence::Open);
+    actionSave->setShortcut(QKeySequence::Save);
+    actionOpenDialogSettings->setShortcut(QKeySequence(Qt::ALT | Qt::Key_S));
 }
 
 void MenuActions::populateMenuFile(QMenu *menuFile)
