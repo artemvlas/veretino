@@ -159,6 +159,14 @@ void DataMaintainer::updateNumbers()
         data_->metaData.datetime[DateTimeStr::DateVerified].clear();
 }
 
+void DataMaintainer::updateNumbers(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 fileSize)
+{
+    if (data_) {
+        data_->numbers.moveFile(statusBefore, statusAfter, fileSize);
+        emit numbersUpdated();
+    }
+}
+
 qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatuses flags, const QModelIndex &rootIndex)
 {
     if (!data_) {
