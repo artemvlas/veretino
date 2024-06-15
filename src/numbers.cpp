@@ -10,7 +10,24 @@ Numbers::Numbers() {}
 void Numbers::addFile(const FileStatus status, const qint64 size)
 {
     amounts_[status]++;
-    sizes_[status] += size;
+
+    if (size > 0)
+        sizes_[status] += size;
+}
+
+void Numbers::removeFile(const FileStatus status, const qint64 size)
+{
+    if (amounts_.contains(status)) {
+        amounts_[status]--;
+        if (amounts_[status] == 0) {
+            amounts_.remove(status);
+            sizes_.remove(status);
+        }
+    }
+
+    if (size > 0 && sizes_.contains(status)) {
+        sizes_[status] -= size;
+    }
 }
 
 bool Numbers::contains(const FileStatuses flags) const

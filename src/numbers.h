@@ -14,6 +14,7 @@ public:
     Numbers();
 
     void addFile(const FileStatus status, const qint64 size);
+    void removeFile(const FileStatus status, const qint64 size);
     bool contains(const FileStatuses flags) const;
     int numberOf(const FileStatuses flag) const;
     qint64 totalSize(const FileStatuses flag) const;
