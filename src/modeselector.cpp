@@ -281,13 +281,7 @@ void ModeSelector::promptItemFileUpd()
 
 void ModeSelector::verifyItem()
 {
-    if (TreeModel::isFileRow(view_->curIndexSource)
-        && TreeModel::hasStatus(FileStatus::FlagUpdatable, view_->curIndexSource)) {
-
-        promptItemFileUpd();
-    }
-    else
-        emit verify(view_->curIndexSource);
+    emit verify(view_->curIndexSource);
 }
 
 void ModeSelector::verifyDb()
@@ -516,8 +510,12 @@ void ModeSelector::quickAction()
         case Model:
         case ModelNewLost:
         case UpdateMismatch:
-            if (TreeModel::isFileRow(view_->curIndexSource))
-                verifyItem();
+            if (TreeModel::isFileRow(view_->curIndexSource)) {
+                if (TreeModel::hasStatus(FileStatus::FlagUpdatable, view_->curIndexSource))
+                    promptItemFileUpd();
+                else
+                    verifyItem();
+            }
             break;
         default:
             break;
