@@ -28,6 +28,9 @@ void DataMaintainer::connections()
     // JsonDb
     connect(json_, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     connect(json_, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
+
+    connect(this, &DataMaintainer::numbersUpdated, this, [&]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
+                                                                  data_->metaData.datetime[DateTimeStr::DateVerified].clear(); });
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
@@ -154,16 +157,16 @@ void DataMaintainer::updateNumbers()
 
     data_->updateNumbers();
     emit numbersUpdated();
-
-    if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
-        data_->metaData.datetime[DateTimeStr::DateVerified].clear();
 }
 
 // if only one file has changed, there is no need to iterate over the entire list
 void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore)
 {
-    if (data_) {
-        data_->numbers.moveFile(statusBefore, TreeModel::itemFileStatus(fileIndex), TreeModel::itemFileSize(fileIndex));
+    if (data_
+        && data_->numbers.moveFile(statusBefore,
+                                   TreeModel::itemFileStatus(fileIndex),
+                                   TreeModel::itemFileSize(fileIndex))) {
+
         emit numbersUpdated();
     }
 }
