@@ -30,6 +30,17 @@ void Numbers::removeFile(const FileStatus status, const qint64 size)
     }
 }
 
+bool Numbers::changeFileStatus(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size)
+{
+    if (!amounts_.contains(statusBefore))
+        return false;
+
+    removeFile(statusBefore, size);
+    addFile(statusAfter, size);
+
+    return true;
+}
+
 bool Numbers::contains(const FileStatuses flags) const
 {
     return numberOf(flags) > 0;
