@@ -25,6 +25,7 @@ public:
     void setIconTheme(const QPalette &palette);
     void setSettings(const Settings *settings);
     void setShortcuts();
+    void updateMenuOpenRecent();
     void updateMenuOpenRecent(const QStringList &recentFiles);
     void populateMenuFile(QMenu *menuFile);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase

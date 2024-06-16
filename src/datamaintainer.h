@@ -27,6 +27,7 @@ public:
     void updateVerifDateTime();
     void updateNumbers();
     void updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore);
+    void setDbFileState(DbFileState state);
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
     int addActualFiles(FileStatus fileStatus = FileStatus::New,
@@ -85,6 +86,7 @@ signals:
     void numbersUpdated();
     void showMessage(const QString &text, const QString &title = "Info");
     void subDbForked(const QString &forkedDbFilePath);
+    void dbFileStateChanged(bool isNotSaved);
 }; // class DataMaintainer
 
 #endif // DATAMAINTAINER_H

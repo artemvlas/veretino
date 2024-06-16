@@ -228,7 +228,7 @@ QStringList DialogDbStatus::infoChanges()
 
 bool DialogDbStatus::isJustCreated()
 {
-    return (data_->metaData.dbFileState == MetaData::Created);
+    return (data_->isDbFileState(MetaData::Created));
 }
 
 bool DialogDbStatus::isSavedToDesktop()

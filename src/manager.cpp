@@ -48,8 +48,8 @@ void Manager::_processFolderSha(const MetaData &metaData)
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
-    dataMaintainer->data_->metaData.dbFileState = MetaData::NoFile;
     dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
+    dataMaintainer->setDbFileState(MetaData::NoFile);
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, false);
@@ -181,7 +181,7 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
             if (procState->isCanceled())
                 return;
             else if (numAdded > 0)
-                dataMaintainer->data_->setDbFileState(DbFileState::NotSaved);
+                dataMaintainer->setDbFileState(DbFileState::NotSaved);
         }
 
         if ((dest & DestClearLost)
@@ -228,7 +228,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
     }
 
     if (TreeModel::hasStatus(FileStatus::FlagDbChanged, fileIndex)) {
-        dataMaintainer->data_->setDbFileState(DbFileState::NotSaved);
+        dataMaintainer->setDbFileState(DbFileState::NotSaved);
         dataMaintainer->updateNumbers(fileIndex, fileStatusBefore);
         dataMaintainer->updateDateTime();
 

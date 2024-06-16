@@ -44,7 +44,6 @@ public:
     QString itemAbsolutePath(const QModelIndex &curIndex) const; // returns the absolute path to the database item (file or subfolder)
     QString getBranchFilePath(const QModelIndex &subfolder, bool existing = false) const;
 
-    void setDbFileState(DbFileState state);
     bool isDbFileState(DbFileState state) const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;

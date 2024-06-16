@@ -92,7 +92,7 @@ void DataMaintainer::updateVerifDateTime()
         && !data_->contains(FileStatus::Missing | FileStatus::Mismatched | FileStatus::NotChecked)) {
 
         data_->metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + format::currentDateTime();
-        data_->setDbFileState(DbFileState::NotSaved);
+        setDbFileState(DbFileState::NotSaved);
     }
 }
 
@@ -168,6 +168,14 @@ void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatu
                                    TreeModel::itemFileSize(fileIndex))) {
 
         emit numbersUpdated();
+    }
+}
+
+void DataMaintainer::setDbFileState(DbFileState state)
+{
+    if (data_ && !data_->isDbFileState(state)) {
+        data_->metaData.dbFileState = state;
+        emit dbFileStateChanged(state == DbFileState::NotSaved);
     }
 }
 
@@ -293,7 +301,7 @@ int DataMaintainer::clearLostFiles()
     }
 
     if (number > 0) {
-        data_->setDbFileState(DbFileState::NotSaved);
+        setDbFileState(DbFileState::NotSaved);
         updateNumbers();
     }
 
@@ -327,7 +335,7 @@ int DataMaintainer::updateMismatchedChecksums()
     }
 
     if (number > 0) {
-        data_->setDbFileState(DbFileState::NotSaved);
+        setDbFileState(DbFileState::NotSaved);
         updateNumbers();
     }
 
@@ -365,11 +373,11 @@ void DataMaintainer::exportToJson()
     QString dbFilePath = json_->makeJson(data_);
 
     if (!dbFilePath.isEmpty()) {
-        data_->setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
+        setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
         data_->metaData.databaseFilePath = dbFilePath;
     }
     else
-        data_->metaData.dbFileState = DbFileState::NotSaved;
+        setDbFileState(DbFileState::NotSaved);
 
     // debug info
     if (data_->isDbFileState(DbFileState::Saved))

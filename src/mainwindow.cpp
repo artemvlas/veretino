@@ -100,15 +100,8 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
     connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
-
-    // !!! will be reimplement before the next release:
-    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_,
-            [=] { modeSelect->menuAct_->updateMenuOpenRecent(settings_->recentFiles);
-                    modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->data_
-                    && ui->treeView->data_->isDbFileState(MetaData::NotSaved)); });
-
-    connect(modeSelect, &ModeSelector::prepareSwitchToFs, manager, &Manager::prepareSwitchToFs);
-    connect(manager, &Manager::switchToFsPrepared, ui->treeView, &View::setFileSystemModel); // TMP !!!!!
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
+    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, modeSelect->menuAct_->actionSave, &QAction::setEnabled);
 }
 
 void MainWindow::connectManager()
@@ -171,6 +164,8 @@ void MainWindow::connectManager()
     connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateStatusIcon);
 
     // change view
+    connect(modeSelect, &ModeSelector::prepareSwitchToFs, manager, &Manager::prepareSwitchToFs);
+    connect(manager, &Manager::switchToFsPrepared, ui->treeView, &View::setFileSystemModel);
     connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
     connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
     connect(ui->treeView, &View::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
@@ -468,7 +463,10 @@ void MainWindow::handleChangedModel()
 
     ui->pathEdit->setEnabled(isViewFS);
     ui->pathEdit->setClearButtonEnabled(isViewFS);
+
     modeSelect->menuAct_->actionShowFilesystem->setEnabled(!isViewFS);
+    modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->isViewDatabase()
+                                                 && ui->treeView->data_->isDbFileState(DbFileState::NotSaved));
 }
 
 void MainWindow::createContextMenu_Button(const QPoint &point)

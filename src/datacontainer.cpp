@@ -93,11 +93,6 @@ bool DataContainer::isAllChecked() const
     return (contains(FileStatus::FlagChecked) && !contains(FileStatus::NotChecked));
 }
 
-void DataContainer::setDbFileState(DbFileState state)
-{
-    metaData.dbFileState = state;
-}
-
 bool DataContainer::isDbFileState(DbFileState state) const
 {
     return (state == metaData.dbFileState);

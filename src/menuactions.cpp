@@ -112,6 +112,12 @@ void MenuActions::populateMenuFile(QMenu *menuFile)
     menuFile->insertMenu(actionSave, menuOpenRecent);
 }
 
+void MenuActions::updateMenuOpenRecent()
+{
+    if (settings_)
+        updateMenuOpenRecent(settings_->recentFiles);
+}
+
 void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
 {
     menuOpenRecent->clear();
