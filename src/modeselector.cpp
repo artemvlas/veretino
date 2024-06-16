@@ -267,7 +267,7 @@ void ModeSelector::promptItemFileUpd()
     case FileStatus::Mismatched:
         msgBox.setWindowTitle("Mismatched Checksum...");
         msgBox.setText("The calculated and stored checksums do not match.");
-        msgBox.setInformativeText("Do you want to update the saved one?");
+        msgBox.setInformativeText("Do you want to update the stored one?");
         msgBox.button(QMessageBox::Ok)->setText("Update");
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Updated));
         break;
