@@ -52,6 +52,7 @@ private:
     void updateStatusIcon();
     void updateButtonInfo(); // sets the Button icon and text according the current Mode
     void saveSettings();
+    bool isIdleDbView();
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings(this); // current app settings

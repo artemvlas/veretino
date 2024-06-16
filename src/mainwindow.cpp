@@ -493,6 +493,11 @@ bool MainWindow::argumentInput()
     return false;
 }
 
+bool MainWindow::isIdleDbView()
+{
+    return (proc_ && !proc_->isStarted() && ui->treeView->isViewDatabase());
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasUrls()) {
@@ -524,6 +529,10 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
                 modeSelect->showFileSystem();
         }
     }
-
-    //QMainWindow::keyPressEvent(event);
+    // temporary solution until appropriate Actions are added
+    else if (event->key() == Qt::Key_F1 && isIdleDbView())
+        showDbStatus();
+    else if (event->key() == Qt::Key_F5 && isIdleDbView())
+        emit modeSelect->resetDatabase();
+    // TMP ^^^
 }
