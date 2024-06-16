@@ -291,6 +291,13 @@ void ModeSelector::verifyDb()
 
 void ModeSelector::updateDbItem()
 {
+    /*  At the moment, updating a separate file
+     *  with the View filtering enabled is unstable,
+     *  so the filter should be disabled before making changes.
+     */
+    if (view_->isViewFiltered())
+        view_->disableFilter();
+
     emit updateItemFile(view_->curIndexSource);
 }
 
