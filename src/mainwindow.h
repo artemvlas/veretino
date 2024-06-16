@@ -33,7 +33,7 @@ public slots:
     void showDialogFolderContents(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
     void showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList); // the same^ dialog, but with filter creation mode enabled
     void dialogSettings();
-    void dialogOpenFolder();
+    void dialogChooseFolder();
     void dialogOpenJson();
     void promptOpenBranch(const QString &dbFilePath);
     void showFolderCheckResult(const Numbers &result, const QString &subFolder);

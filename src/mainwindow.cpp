@@ -95,7 +95,7 @@ void MainWindow::connections()
 
     // menu actions
     connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
-    connect(modeSelect->menuAct_->actionOpenFolder, &QAction::triggered, this, &MainWindow::dialogOpenFolder);
+    connect(modeSelect->menuAct_->actionChooseFolder, &QAction::triggered, this, &MainWindow::dialogChooseFolder);
     connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
@@ -288,9 +288,9 @@ void MainWindow::dialogSettings()
     }
 }
 
-void MainWindow::dialogOpenFolder()
+void MainWindow::dialogChooseFolder()
 {
-    QString path = QFileDialog::getExistingDirectory(this, "Open folder", QDir::homePath());
+    QString path = QFileDialog::getExistingDirectory(this, "Select a Folder", QDir::homePath());
 
     if (!path.isEmpty()) {
         modeSelect->openFsPath(path);
@@ -299,7 +299,7 @@ void MainWindow::dialogOpenFolder()
 
 void MainWindow::dialogOpenJson()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open Veretino database", QDir::homePath(), "Veretino database (*.ver *.ver.json)");
+    QString path = QFileDialog::getOpenFileName(this, "Select the Vereteno database", QDir::homePath(), "Veretino DB (*.ver *.ver.json)");
 
     if (!path.isEmpty()) {
         modeSelect->openJsonDatabase(path);

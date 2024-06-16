@@ -51,7 +51,7 @@ void MenuActions::setSettings(const Settings *settings)
 void MenuActions::setActionsIcons()
 {
     // MainWindow menu
-    actionOpenFolder->setIcon(iconProvider.icon(Icons::Folder));
+    actionChooseFolder->setIcon(iconProvider.icon(Icons::Folder));
     actionOpenDatabaseFile->setIcon(iconProvider.icon(Icons::Database));
     actionSave->setIcon(iconProvider.icon(Icons::Save));
     actionShowFilesystem->setIcon(iconProvider.icon(Icons::FileSystem));
@@ -102,8 +102,8 @@ void MenuActions::setActionsIcons()
 void MenuActions::setShortcuts()
 {
     // main file menu
-    actionOpenFolder->setShortcut(QKeySequence::Open);
-    actionOpenDatabaseFile->setShortcut(QKeySequence(Qt::ALT | Qt::Key_O));
+    actionChooseFolder->setShortcut(QKeySequence(Qt::ALT | Qt::Key_O));
+    actionOpenDatabaseFile->setShortcut(QKeySequence::Open);
     actionSave->setShortcut(QKeySequence::Save);
     actionOpenDialogSettings->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Comma));
 }
