@@ -532,10 +532,10 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
         // Verifying/Updating (not creating) DB
         else if (ui->treeView->isViewDatabase()
                  && !ui->treeView->data_->isInCreation()
-                 && proc_ && proc_->isState(State::StartVerbose)
-                 && QMessageBox::question(this, "Processing...", "Cancel the operation?") == QMessageBox::Yes) {
+                 && proc_ && proc_->isState(State::StartVerbose)) {
 
-            modeSelect->cancelProcess();
+            if (QMessageBox::question(this, "Processing...", "Cancel the operation?") == QMessageBox::Yes)
+                modeSelect->cancelProcess();
         }
         // other cases
         else if (modeSelect->processAbortPrompt()
