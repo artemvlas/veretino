@@ -324,8 +324,12 @@ void ModeSelector::copyItem()
 
 void ModeSelector::showFileSystem()
 {
-    if (view_->data_ && view_->data_->isDbFileState(DbFileState::NotSaved))
-        emit prepareSwitchToFs();
+    if (view_->data_
+        && view_->data_->isDbFileState(DbFileState::NotSaved)) {
+
+        if (processAbortPrompt())
+            emit prepareSwitchToFs();
+    }
     else
         openFsPath(QString());
 }
