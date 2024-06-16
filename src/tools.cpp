@@ -126,7 +126,7 @@ QString basicName(const QString &path)
 
 QString parentFolder(const QString &path)
 {
-    if (isRoot(path))
+    if (path.isEmpty() || isRoot(path))
         return path;
 
     int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'

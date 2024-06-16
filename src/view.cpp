@@ -169,7 +169,7 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
 void View::setIndexByPath()
 {
     if (isViewFileSystem()) {
-        if (!QFileInfo::exists(curPathFileSystem))
+        if (!curPathFileSystem.isEmpty() && !QFileInfo::exists(curPathFileSystem))
             curPathFileSystem = paths::parentFolder(curPathFileSystem);
 
         QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
