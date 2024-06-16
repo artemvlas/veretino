@@ -106,6 +106,7 @@ void MenuActions::setShortcuts()
     actionOpenDatabaseFile->setShortcut(QKeySequence::Open);
     actionSave->setShortcut(QKeySequence::Save);
     actionOpenDialogSettings->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Comma));
+    actionShowFilesystem->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_Escape));
 
     // db
     actionShowDbStatus->setShortcut(Qt::Key_F1);

@@ -522,11 +522,26 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape) {
-        if (modeSelect->processAbortPrompt() && !ui->treeView->isViewFileSystem()) {
+        // Idle DB
+        if (isIdleDbView()) {
             if (ui->treeView->isViewFiltered())
                 ui->treeView->disableFilter();
-            else
+            else if (QMessageBox::question(this, "Exit...", "Close the Database?") == QMessageBox::Yes)
                 modeSelect->showFileSystem();
+        }
+        // Verifying/Updating (not creating) DB
+        else if (ui->treeView->isViewDatabase()
+                 && !ui->treeView->data_->isInCreation()
+                 && proc_ && proc_->isState(State::StartVerbose)
+                 && QMessageBox::question(this, "Processing...", "Cancel the operation?") == QMessageBox::Yes) {
+
+            modeSelect->cancelProcess();
+        }
+        // other cases
+        else if (modeSelect->processAbortPrompt()
+                 && !ui->treeView->isViewFileSystem()) {
+
+            modeSelect->showFileSystem();
         }
     }
     // temporary solution until appropriate Actions are added

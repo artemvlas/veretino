@@ -692,9 +692,7 @@ bool ModeSelector::processAbortPrompt()
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-    int ret = msgBox.exec();
-
-    if (ret == QMessageBox::Yes) {
+    if (msgBox.exec() == QMessageBox::Yes) {
         abortProcess();
         return true;
     }
