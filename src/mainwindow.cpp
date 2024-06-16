@@ -24,27 +24,25 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(IconProvider::appIcon());
     QThread::currentThread()->setObjectName("MAIN Thread");
 
+    ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->treeView->setSettings(settings_);
-    settings_->loadSettings();
 
-    ui->progressBar->setProcState(manager->procState);
-    ui->progressBar->setVisible(false);
+    settings_->loadSettings();
 
     restoreGeometry(settings_->geometryMainWindow);
 
     modeSelect = new ModeSelector(ui->treeView, settings_, this);
     modeSelect->setProcState(manager->procState);
+    ui->progressBar->setProcState(manager->procState);
     proc_ = manager->procState;
+
+    modeSelect->menuAct_->populateMenuFile(ui->menuFile);
+    setupStatusBar();
 
     connections();
 
     if (!argumentInput())
         ui->treeView->setFileSystemModel();
-
-    ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    modeSelect->menuAct_->populateMenuFile(ui->menuFile);
-    setupStatusBar();
 }
 
 MainWindow::~MainWindow()
@@ -55,9 +53,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// if a computing process is running, show a hint when user wants to close the app
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    // if a computing process is running, show a hint when user wants to close the app
     if (modeSelect->processAbortPrompt()) {
         proc_->setState(State::Abort); // just in case
         emit modeSelect->saveData();

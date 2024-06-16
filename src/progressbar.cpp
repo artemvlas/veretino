@@ -9,6 +9,7 @@
 ProgressBar::ProgressBar(QWidget *parent)
     : QProgressBar(parent)
 {
+    setVisible(false);
     connect(timer, &QTimer::timeout, this, &ProgressBar::updateProgressInfo);
 }
 

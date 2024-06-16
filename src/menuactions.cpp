@@ -28,6 +28,8 @@ MenuActions::MenuActions(QObject *parent)
     menuOpenRecent->setToolTipsVisible(true);
 
     setShortcuts();
+
+    actionSave->setEnabled(false);
 }
 
 MenuActions::~MenuActions()
@@ -101,8 +103,9 @@ void MenuActions::setShortcuts()
 {
     // main file menu
     actionOpenFolder->setShortcut(QKeySequence::Open);
+    actionOpenDatabaseFile->setShortcut(QKeySequence(Qt::ALT | Qt::Key_O));
     actionSave->setShortcut(QKeySequence::Save);
-    actionOpenDialogSettings->setShortcut(QKeySequence(Qt::ALT | Qt::Key_S));
+    actionOpenDialogSettings->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Comma));
 }
 
 void MenuActions::populateMenuFile(QMenu *menuFile)
