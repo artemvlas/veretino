@@ -379,7 +379,7 @@ void MainWindow::setupStatusBar()
 void MainWindow::updatePermanentStatus()
 {
     if (ui->treeView->isViewDatabase()) {
-        if (proc_->isStarted() && ui->treeView->data_->isInCreation()) {
+        if (modeSelect->isMode(Mode::DbCreating)) {
             QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
                 permStatus.prepend("filters applied | ");
@@ -531,10 +531,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
                 modeSelect->showFileSystem();
         }
         // Verifying/Updating (not creating) DB
-        else if (ui->treeView->isViewDatabase()
-                 && !ui->treeView->data_->isInCreation()
-                 && proc_ && proc_->isState(State::StartVerbose)) {
-
+        else if (modeSelect->isMode(Mode::DbProcessing)) {
             modeSelect->promptProcessStop();
         }
         // other cases

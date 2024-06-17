@@ -19,15 +19,17 @@ public:
 
     enum Mode {
         NoMode = 1 << 0,
-        Processing = 1 << 1,
-        Folder = 1 << 2,
-        File = 1 << 3,
-        DbFile = 1 << 4,
-        SumFile = 1 << 5,
-        Model = 1 << 6,
-        ModelNewLost = 1 << 7,
-        UpdateMismatch = 1 << 8,
-        // FlagDbModes = Model | ModelNewLost | UpdateMismatch
+        FileProcessing = 1 << 1,
+        DbCreating = 1 << 2,
+        DbProcessing = 1 << 3,
+        Folder = 1 << 4,
+        File = 1 << 5,
+        DbFile = 1 << 6,
+        SumFile = 1 << 7,
+        Model = 1 << 8,
+        ModelNewLost = 1 << 9,
+        UpdateMismatch = 1 << 10,
+        DbIdle = Model | ModelNewLost | UpdateMismatch
     };
     Q_ENUM(Mode)
     Q_DECLARE_FLAGS(Modes, Mode)
@@ -36,7 +38,7 @@ public:
     void abortProcess();
     void stopProcess();
 
-    Mode mode();
+    Mode mode() const;
     bool isMode(const Modes expected);
 
     QString getButtonText();

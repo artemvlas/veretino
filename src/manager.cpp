@@ -498,7 +498,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
             dataMaintainer->changeFilesStatus((FileStatus::FlagProcessing | FileStatus::Added), status, rootIndex);
         }
 
-        qDebug() << "Manager::calculateChecksums | Canceled | Done" << doneNum;
+        qDebug() << "Manager::calculateChecksums | Stoped | Done" << doneNum;
     }
 
     // end

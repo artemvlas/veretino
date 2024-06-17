@@ -40,7 +40,7 @@ void ModeSelector::connectActions()
 
     // File system View
     connect(menuAct_->actionToHome, &QAction::triggered, view_, &View::toHome);
-    connect(menuAct_->actionCancel, &QAction::triggered, this, &ModeSelector::abortProcess);
+    connect(menuAct_->actionCancel, &QAction::triggered, this, &ModeSelector::stopProcess);
     connect(menuAct_->actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
     connect(menuAct_->actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
     connect(menuAct_->actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processChecksumsPermFilter);
@@ -125,8 +125,12 @@ void ModeSelector::getInfoPathItem()
 QString ModeSelector::getButtonText()
 {
     switch (mode()) {
-        case Processing:
+        case FileProcessing:
             return "Cancel";
+        case DbCreating:
+            return "Abort";
+        case DbProcessing:
+            return "Stop";
         case Folder:
         case File:
             return format::algoToStr(settings_->algorithm());
@@ -152,8 +156,12 @@ QString ModeSelector::getButtonText()
 QIcon ModeSelector::getButtonIcon()
 {
     switch (mode()) {
-        case Processing:
+        case FileProcessing:
             return iconProvider.icon(Icons::Cancel);
+        case DbCreating:
+            return iconProvider.icon(Icons::ProcessAbort);
+        case DbProcessing:
+            return iconProvider.icon(Icons::ProcessStop);
         case Folder:
             return iconProvider.icon(Icons::FolderSync);
         case File:
@@ -195,10 +203,17 @@ QString ModeSelector::getButtonToolTip()
     return QString();
 }
 
-Mode ModeSelector::mode()
+Mode ModeSelector::mode() const
 {
-    if (proc_->isState(State::StartVerbose) || view_->isCurrentViewModel(ModelView::ModelSource))
-        return Processing;
+    if (proc_ && proc_->isState(State::StartVerbose)) {
+        if (view_->isViewDatabase()) {
+            if (view_->data_->isInCreation())
+                return DbCreating;
+            else
+                return DbProcessing;
+        }
+        return FileProcessing;
+    }
 
     if (view_->isViewDatabase()) {
         if (view_->data_->numbers.contains(FileStatus::Mismatched))
@@ -467,11 +482,12 @@ bool ModeSelector::emptyFolderPrompt()
 void ModeSelector::doWork()
 {
     switch (mode()) {
-        case Processing:
-            if (view_->data_ && view_->data_->isInCreation())
-                showFileSystem();
-            else
-                stopProcess();
+        case FileProcessing:
+        case DbProcessing:
+            stopProcess();
+            break;
+        case DbCreating:
+            showFileSystem();
             break;
         case Folder:
             processChecksumsFiltered();
@@ -708,6 +724,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     msgBox.setText(QString("%1 current process?").arg(strAct));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
     msgBox.button(QMessageBox::Yes)->setText(strAct);
     msgBox.button(QMessageBox::No)->setText("Continue...");
     msgBox.button(QMessageBox::Yes)->setIcon(icoAct);
