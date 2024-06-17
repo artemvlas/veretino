@@ -20,7 +20,7 @@ Fixes and Minor Enhancements:
 * When working with a Desktop folder, there is no longer an unnecessary notification of a reserve save path.
 * If the last saved path does not exist, it now goes to the parent folder, if there is one.
 * After creating a new database, the path to it is now remembered when returning to the file system.
-* Smarter behavior of the Esc key when working with the database: accidental closing has been prevented (a prompt has been added), and now canceling an operation does not lead to spontaneous closing of the DB.
+* Smarter behavior of the Esc key when working with the database, prevented accidental closure (prompt added).
 * Added some shortcuts.
 
 ---

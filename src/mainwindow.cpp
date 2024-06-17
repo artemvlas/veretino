@@ -494,11 +494,6 @@ bool MainWindow::argumentInput()
     return false;
 }
 
-bool MainWindow::isIdleDbView()
-{
-    return (proc_ && !proc_->isStarted() && ui->treeView->isViewDatabase());
-}
-
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasUrls()) {
@@ -524,7 +519,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape) {
         // Idle DB
-        if (isIdleDbView()) {
+        if (modeSelect->isMode(Mode::DbIdle)) {
             if (ui->treeView->isViewFiltered())
                 ui->treeView->disableFilter();
             else if (QMessageBox::question(this, "Exit...", "Close the Database?") == QMessageBox::Yes)
@@ -542,9 +537,9 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
         }
     }
     // temporary solution until appropriate Actions are added
-    else if (event->key() == Qt::Key_F1 && isIdleDbView())
+    else if (event->key() == Qt::Key_F1 && modeSelect->isMode(Mode::DbIdle))
         showDbStatus();
-    else if (event->key() == Qt::Key_F5 && isIdleDbView())
+    else if (event->key() == Qt::Key_F5 && modeSelect->isMode(Mode::DbIdle))
         emit modeSelect->resetDatabase();
     // TMP ^^^
 }
