@@ -20,9 +20,9 @@ public:
         StartSilently = 1 << 1,
         StartVerbose = 1 << 2, // set processing view (enable progress bar, change view model, etc...)
         Started = StartSilently | StartVerbose,
-        Cancel = 1 << 3,
-        Abort = 1 << 4, // after canceling the process, exit it immediately without the rolling back operations
-        Canceled = Cancel | Abort
+        Stop = 1 << 3, // stops the current operation, it is assumed that the list of done things will be saved
+        Abort = 1 << 4, // interrupts the process, an immediate exit is expected (switching to the file system)
+        Canceled = Stop | Abort
     };
     Q_ENUM(State)
 

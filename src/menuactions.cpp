@@ -76,7 +76,7 @@ void MenuActions::setActionsIcons()
     menuStoreSummary->menuAction()->setIcon(iconProvider.icon(Icons::Save));
 
     // DB Model View
-    actionCancelBackToFS->setIcon(iconProvider.icon(Icons::ProcessStop));
+    actionCancelBackToFS->setIcon(iconProvider.icon(Icons::ProcessAbort));
     actionShowDbStatus->setIcon(iconProvider.icon(Icons::Database));
     actionResetDb->setIcon(iconProvider.icon(Icons::Undo));
     actionForgetChanges->setIcon(iconProvider.icon(Icons::Backup));

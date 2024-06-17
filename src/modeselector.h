@@ -33,8 +33,8 @@ public:
     Q_DECLARE_FLAGS(Modes, Mode)
 
     void setProcState(ProcState *procState);
-    void cancelProcess();
     void abortProcess();
+    void stopProcess();
 
     Mode mode();
     bool isMode(const Modes expected);
@@ -54,7 +54,8 @@ public:
     void openJsonDatabase(const QString &filePath);
     void openRecentDatabase(const QAction *action);
     void openBranchDb();
-    bool processAbortPrompt();
+    bool promptProcessStop();
+    bool promptProcessAbort();
     bool overwriteDbPrompt();
     bool emptyFolderPrompt();
 
@@ -79,6 +80,7 @@ private:
     void connectActions();
     void copyDataToClipboard(Column column);
     void updateDbItem();
+    bool promptMessageProcCancelation_(bool abort);
 
     QString composeDbFilePath();
     bool isSelectedCreateDb();

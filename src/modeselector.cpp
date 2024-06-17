@@ -15,9 +15,9 @@
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), settings_(settings)
 {
-    connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::cancelProcess);
-    connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::cancelProcess);
-    connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::cancelProcess);
+    connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::abortProcess);
+    connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::abortProcess);
+    connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::abortProcess);
 
     connect(this, &ModeSelector::updateDatabase, view_, &View::setViewSource);
     connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){ if (!TreeModel::isFileRow(ind)) view_->setViewSource(); });
@@ -40,7 +40,7 @@ void ModeSelector::connectActions()
 
     // File system View
     connect(menuAct_->actionToHome, &QAction::triggered, view_, &View::toHome);
-    connect(menuAct_->actionCancel, &QAction::triggered, this, &ModeSelector::cancelProcess);
+    connect(menuAct_->actionCancel, &QAction::triggered, this, &ModeSelector::abortProcess);
     connect(menuAct_->actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
     connect(menuAct_->actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
     connect(menuAct_->actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processChecksumsPermFilter);
@@ -97,16 +97,16 @@ void ModeSelector::setProcState(ProcState *procState)
     proc_ = procState;
 }
 
-void ModeSelector::cancelProcess()
-{
-    if (proc_->isStarted())
-        proc_->setState(State::Cancel);
-}
-
 void ModeSelector::abortProcess()
 {
     if (proc_->isStarted())
         proc_->setState(State::Abort);
+}
+
+void ModeSelector::stopProcess()
+{
+    if (proc_->isStarted())
+        proc_->setState(State::Stop);
 }
 
 void ModeSelector::getInfoPathItem()
@@ -327,7 +327,7 @@ void ModeSelector::showFileSystem()
     if (view_->data_
         && view_->data_->isDbFileState(DbFileState::NotSaved)) {
 
-        if (processAbortPrompt())
+        if (promptProcessAbort())
             emit prepareSwitchToFs();
     }
     else
@@ -347,7 +347,7 @@ void ModeSelector::copyDataToClipboard(Column column)
 
 void ModeSelector::openFsPath(const QString &path)
 {
-    if (processAbortPrompt()) {
+    if (promptProcessAbort()) {
         if (QFileInfo::exists(path))
             view_->curPathFileSystem = path;
 
@@ -357,7 +357,7 @@ void ModeSelector::openFsPath(const QString &path)
 
 void ModeSelector::openJsonDatabase(const QString &filePath)
 {
-    if (processAbortPrompt())
+    if (promptProcessAbort())
         emit parseJsonFile(filePath);
 }
 
@@ -425,7 +425,7 @@ bool ModeSelector::isSelectedCreateDb()
      * so cancelation is needed before starting a new process
      */
 
-    cancelProcess();
+    abortProcess();
 
     return (emptyFolderPrompt() && overwriteDbPrompt());
 }
@@ -471,7 +471,7 @@ void ModeSelector::doWork()
             if (view_->data_ && view_->data_->isInCreation())
                 showFileSystem();
             else
-                cancelProcess();
+                stopProcess();
             break;
         case Folder:
             processChecksumsFiltered();
@@ -685,19 +685,35 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
 }
 
-bool ModeSelector::processAbortPrompt()
+bool ModeSelector::promptProcessStop()
+{
+    return promptMessageProcCancelation_(false);
+}
+
+bool ModeSelector::promptProcessAbort()
+{
+    return promptMessageProcCancelation_(true);
+}
+
+bool ModeSelector::promptMessageProcCancelation_(bool abort)
 {
     if (!proc_->isState(State::StartVerbose))
         return true;
 
+    QString strAct = abort ? "Abort" : "Stop";
+    QIcon icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::Cancel); // tmp, new ico will be added soon
+
     QMessageBox msgBox(view_);
     msgBox.setWindowTitle("Processing...");
-    msgBox.setText("Abort current process?");
+    msgBox.setText(QString("%1 current process?").arg(strAct));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.button(QMessageBox::Yes)->setText(strAct);
+    msgBox.button(QMessageBox::No)->setText("Continue...");
+    msgBox.button(QMessageBox::Yes)->setIcon(icoAct);
 
     if (msgBox.exec() == QMessageBox::Yes) {
-        abortProcess();
+        abort ? abortProcess() : stopProcess();
         return true;
     }
     else

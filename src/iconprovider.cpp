@@ -158,8 +158,8 @@ QString IconProvider::svgFilePath(Icons icon) const
     case Paste:
         iconFileName = "paste";
         break;
-    case ProcessStop:
-        iconFileName = "process-stop";
+    case ProcessAbort:
+        iconFileName = "process-abort";
         break;
     case Save:
         iconFileName = "save";

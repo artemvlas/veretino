@@ -40,7 +40,7 @@ public:
         HashFile,
         NewFile,
         Paste,
-        ProcessStop,
+        ProcessAbort,
         Save,
         Scan,
         Start,

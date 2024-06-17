@@ -56,7 +56,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     // if a computing process is running, show a hint when user wants to close the app
-    if (modeSelect->processAbortPrompt()) {
+    if (modeSelect->promptProcessAbort()) {
         proc_->setState(State::Abort); // just in case
         emit modeSelect->saveData();
         saveSettings();
@@ -534,11 +534,10 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
                  && !ui->treeView->data_->isInCreation()
                  && proc_ && proc_->isState(State::StartVerbose)) {
 
-            if (QMessageBox::question(this, "Processing...", "Cancel the operation?") == QMessageBox::Yes)
-                modeSelect->cancelProcess();
+            modeSelect->promptProcessStop();
         }
         // other cases
-        else if (modeSelect->processAbortPrompt()
+        else if (modeSelect->promptProcessAbort()
                  && !ui->treeView->isViewFileSystem()) {
 
             modeSelect->showFileSystem();
