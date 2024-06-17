@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     proc_ = manager->procState;
 
     modeSelect->menuAct_->populateMenuFile(ui->menuFile);
+    ui->menuHelp->addAction(modeSelect->menuAct_->actionAbout);
     setupStatusBar();
 
     connections();
@@ -97,7 +98,7 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
     connect(modeSelect->menuAct_->actionChooseFolder, &QAction::triggered, this, &MainWindow::dialogChooseFolder);
     connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(ui->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
+    connect(modeSelect->menuAct_->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
     connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, modeSelect->menuAct_->actionSave, &QAction::setEnabled);
 }

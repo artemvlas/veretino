@@ -40,6 +40,7 @@ public:
     QAction *actionSave = new QAction("Save", this);
     QAction *actionShowFilesystem = new QAction("Show file system", this);
     QAction *actionClearRecent = new QAction("Clear History", this);
+    QAction *actionAbout = new QAction("About", this);
 
     QList<QAction*> menuFileActions { actionChooseFolder, actionOpenDatabaseFile, actionSave, actionShowFilesystem, actionOpenDialogSettings };
 

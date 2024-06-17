@@ -59,6 +59,7 @@ void MenuActions::setActionsIcons()
 
     menuOpenRecent->menuAction()->setIcon(iconProvider.icon(Icons::Clock));
     actionClearRecent->setIcon(iconProvider.icon(Icons::ClearHistory));
+    actionAbout->setIcon(iconProvider.icon(Icons::Info));
 
     // File system View
     actionToHome->setIcon(iconProvider.icon(Icons::GoHome));
