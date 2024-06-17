@@ -40,7 +40,7 @@ void ModeSelector::connectActions()
 
     // File system View
     connect(menuAct_->actionToHome, &QAction::triggered, view_, &View::toHome);
-    connect(menuAct_->actionCancel, &QAction::triggered, this, &ModeSelector::stopProcess);
+    connect(menuAct_->actionStop, &QAction::triggered, this, &ModeSelector::stopProcess);
     connect(menuAct_->actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
     connect(menuAct_->actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
     connect(menuAct_->actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processChecksumsPermFilter);
@@ -126,11 +126,10 @@ QString ModeSelector::getButtonText()
 {
     switch (mode()) {
         case FileProcessing:
-            return "Cancel";
-        case DbCreating:
-            return "Abort";
         case DbProcessing:
             return "Stop";
+        case DbCreating:
+            return "Abort";
         case Folder:
         case File:
             return format::algoToStr(settings_->algorithm());
@@ -157,11 +156,10 @@ QIcon ModeSelector::getButtonIcon()
 {
     switch (mode()) {
         case FileProcessing:
-            return iconProvider.icon(Icons::Cancel);
-        case DbCreating:
-            return iconProvider.icon(Icons::ProcessAbort);
         case DbProcessing:
             return iconProvider.icon(Icons::ProcessStop);
+        case DbCreating:
+            return iconProvider.icon(Icons::ProcessAbort);
         case Folder:
             return iconProvider.icon(Icons::FolderSync);
         case File:
@@ -572,7 +570,7 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
     viewContextMenu->addSeparator();
 
     if (proc_->isState(State::StartVerbose))
-        viewContextMenu->addAction(menuAct_->actionCancel);
+        viewContextMenu->addAction(menuAct_->actionStop);
     else if (index.isValid()) {
         if (isMode(Folder)) {
             viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
@@ -616,7 +614,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
     if (proc_->isStarted()) {
         if (!view_->data_->isInCreation())
-            viewContextMenu->addAction(menuAct_->actionCancel);
+            viewContextMenu->addAction(menuAct_->actionStop);
         viewContextMenu->addAction(menuAct_->actionCancelBackToFS);
     }
     else {

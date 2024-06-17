@@ -46,7 +46,7 @@ public:
 
     // File system View
     QAction *actionToHome = new QAction("to Home", this);
-    QAction *actionCancel = new QAction("Cancel", this);
+    QAction *actionStop = new QAction("Stop", this);
     QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);
     QAction *actionProcessChecksumsNoFilter = new QAction("Calculate checksums [All Files]", this);
     QAction *actionProcessChecksumsPermFilter = new QAction("Calculate checksums [Permanent Filter]", this);
