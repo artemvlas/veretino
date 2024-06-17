@@ -414,7 +414,11 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     if (checkSum.isEmpty() && !procState->isCanceled())
         emit showMessage("Read error:\n" + filePath, "Warning");
 
-    emit finishedCalcFileChecksum(); // to update the statusbar text
+    // to update the statusbar text
+    if (isViewFileSysytem && settings_->lastFsPath) // to prevent unnecessary cancellation
+        getPathInfo(*settings_->lastFsPath);
+    else
+        emit finishedCalcFileChecksum();
 
     procState->setState(State::Idle);
 
