@@ -81,7 +81,7 @@ Unchecked: to Home folder</string>
           <widget class="QCheckBox" name="cbInstantSaving">
            <property name="toolTip">
             <string>If checked, the database file will be overwritten
-immediately after any change is made.</string>
+immediately after any changes are made.</string>
            </property>
            <property name="text">
             <string>Instant Saving</string>
