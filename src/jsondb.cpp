@@ -58,7 +58,7 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
             return dataArray;
     }
 
-    emit showMessage("Corrupted or unreadable Json Database", "Error");
+    emit showMessage("Corrupted or unreadable Json Database:\n" + filePath, "Error");
     return QJsonArray();
 }
 

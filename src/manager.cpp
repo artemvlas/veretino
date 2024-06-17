@@ -120,7 +120,7 @@ void Manager::restoreDatabase()
 void Manager::createDataModel(const QString &databaseFilePath)
 {
     if (!tools::isDatabaseFile(databaseFilePath)) {
-        emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver.json'").arg(databaseFilePath), "Wrong DB file!");
+        emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver' or '*.ver.json'").arg(databaseFilePath), "Wrong DB file!");
         emit setViewData();
         return;
     }
@@ -134,6 +134,8 @@ void Manager::_createDataModel(const QString &databaseFilePath)
         dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
     }
+    else
+        emit setViewData();
 }
 
 void Manager::saveData()
