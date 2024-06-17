@@ -203,15 +203,15 @@ QString ModeSelector::getButtonToolTip()
 
 Mode ModeSelector::mode() const
 {
-    if (proc_ && proc_->isState(State::StartVerbose)) {
-        if (view_->isViewDatabase()) {
-            if (view_->data_->isInCreation())
-                return DbCreating;
-            else
-                return DbProcessing;
-        }
-        return FileProcessing;
+    if (proc_ && proc_->isStarted() && view_->isViewDatabase()) {
+        if (view_->data_->isInCreation())
+            return DbCreating;
+        else
+            return DbProcessing;
     }
+
+    if (proc_ && proc_->isState(State::StartVerbose))
+        return FileProcessing;
 
     if (view_->isViewDatabase()) {
         if (view_->data_->numbers.contains(FileStatus::Mismatched))

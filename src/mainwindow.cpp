@@ -382,7 +382,7 @@ void MainWindow::updatePermanentStatus()
         if (modeSelect->isMode(Mode::DbCreating)) {
             QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
-                permStatus.prepend("filters applied | ");
+                permStatus.prepend("filtered >> ");
             permanentStatus->setText(permStatus);
         }
         else

@@ -101,9 +101,9 @@ void View::setData(DataContainer *data)
     else {
         setTreeModel(ModelView::ModelProxy);
 
-        /* If the process of creating data was too fast (very small amount of data),
+        /* If the process of creating data was too fast (few data),
          * then the data comes here as the DbFileState::Created.
-         * So in order to avoid "Database Status" window duplication, an additional condition is needed.
+         * So, to avoid duplicating the "Database Status" window, an additional condition is needed.
          */
 
         if (data->isDbFileState(DbFileState::Saved))
