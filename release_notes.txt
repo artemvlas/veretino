@@ -8,10 +8,11 @@ Internal changes:
 * The architecture has been optimized and improved.
 
 Fixes and Minor Enhancements:
+* Changed some UI elements to make process management more intuitive.
 * Smarter Quick Action on database items: potentially updatable items are now prompted to take action.
 * Added display of the number of files being updated to the "Update the "Database" menu. (Can be disabled in Settings).
 * Verification tab: newly added and updated checksums are now taken into account (the total number is indicated in parentheses).
-* Some items of the database header have been changed.
+* Some items of the database (file) header have been changed.
 * The database now stores the date and time it was created as a separate value.
 * The speed display is brought to the standard form: MiB/sec >> MiB/s
 * In the path input field, the clear button is hidden when it doesn't make sense.
@@ -19,8 +20,7 @@ Fixes and Minor Enhancements:
 * When working with a Desktop folder, there is no longer an unnecessary notification of a reserve save path.
 * If the last saved path does not exist, it now goes to the parent folder, if there is one.
 * After creating a new database, the path to it is now remembered when returning to the file system.
-* Smarter behavior of the Esc key when working with the database: prevented accidental closure (prompt added), also now canceling the operation does not cause spontaneous closure.
-* Changed some UI elements to make process management more intuitive.
+* Smarter behavior of the Esc key when working with the database: accidental closing has been prevented (a prompt has been added), and now canceling an operation does not lead to spontaneous closing of the DB.
 * Added some shortcuts.
 
 ---
