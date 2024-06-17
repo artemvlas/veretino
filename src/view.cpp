@@ -100,10 +100,18 @@ void View::setData(DataContainer *data)
     }
     else {
         setTreeModel(ModelView::ModelProxy);
-        emit showDbStatus();
+
+        /* If the process of creating data was too fast (very small amount of data),
+         * then the data comes here as the DbFileState::Created.
+         * So in order to avoid "Database Status" window duplication, an additional condition is needed.
+         */
+
+        if (data->isDbFileState(DbFileState::Saved))
+            emit showDbStatus();
     }
 
-    hideColumn(Column::ColumnReChecksum); // the newly setted data has not yet been verified and does not contain ReChecksums
+    // the newly setted data has not yet been verified and does not contain ReChecksums
+    hideColumn(Column::ColumnReChecksum);
 
     QTimer::singleShot(100, this, &View::dataSetted);
 }
