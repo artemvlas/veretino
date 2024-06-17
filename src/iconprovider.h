@@ -38,15 +38,17 @@ public:
         Gear,
         GoHome,
         HashFile,
+        Info,
         NewFile,
         Paste,
         ProcessAbort,
+        ProcessStop,
         Save,
         Scan,
         Start,
         Undo,
         Update
-    };
+    }; // enum Icons
 
     void setTheme(Theme theme);
     void setTheme(const QPalette &palette);

@@ -701,7 +701,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
         return true;
 
     QString strAct = abort ? "Abort" : "Stop";
-    QIcon icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::Cancel); // tmp, new ico will be added soon
+    QIcon icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
 
     QMessageBox msgBox(view_);
     msgBox.setWindowTitle("Processing...");

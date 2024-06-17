@@ -152,6 +152,9 @@ QString IconProvider::svgFilePath(Icons icon) const
     case HashFile:
         iconFileName = "hash-file";
         break;
+    case Info:
+        iconFileName = "help-about";
+        break;
     case NewFile:
         iconFileName = "newfile";
         break;
@@ -160,6 +163,9 @@ QString IconProvider::svgFilePath(Icons icon) const
         break;
     case ProcessAbort:
         iconFileName = "process-abort";
+        break;
+    case ProcessStop:
+        iconFileName = "process-stop";
         break;
     case Save:
         iconFileName = "save";

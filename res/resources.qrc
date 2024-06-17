@@ -66,5 +66,9 @@
         <file>icons/dark/branch.svg</file>
         <file>icons/light/branch.svg</file>
         <file>icons/generic/veretino.svg</file>
+        <file>icons/dark/help-about.svg</file>
+        <file>icons/dark/process-stop.svg</file>
+        <file>icons/light/help-about.svg</file>
+        <file>icons/light/process-stop.svg</file>
     </qresource>
 </RCC>
