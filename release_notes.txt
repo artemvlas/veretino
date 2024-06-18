@@ -1,3 +1,7 @@
+Veretino 0.4.1
+* Now the process cancelation prompt disappears automatically if it is no longer relevant.
+
+---
 Veretino 0.4.0
 * The database file saving policy has become customizable: if the "Instant Saving" checkbox is checked, the database file will be recreated immediately after any changes are made; if not checked, then at the user's request or when closing.
 * Added the ability to independently update the values ​​of files contained in the database.

@@ -724,6 +724,8 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     QIcon icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
 
     QMessageBox msgBox(view_);
+    connect(proc_, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
+
     msgBox.setWindowTitle("Processing...");
     msgBox.setText(QString("%1 current process?").arg(strAct));
     msgBox.setIcon(QMessageBox::Question);
