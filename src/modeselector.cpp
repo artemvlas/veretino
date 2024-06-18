@@ -712,6 +712,11 @@ bool ModeSelector::promptProcessAbort()
 
 bool ModeSelector::promptMessageProcCancelation_(bool abort)
 {
+    if (proc_->isState(State::StartSilently)) {
+        abortProcess();
+        return true;
+    }
+
     if (!proc_->isState(State::StartVerbose))
         return true;
 
