@@ -727,6 +727,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     msgBox.button(QMessageBox::Yes)->setText(strAct);
     msgBox.button(QMessageBox::No)->setText("Continue...");
     msgBox.button(QMessageBox::Yes)->setIcon(icoAct);
+    msgBox.button(QMessageBox::No)->setIcon(iconProvider.icon(Icons::DoubleGear));
 
     if (msgBox.exec() == QMessageBox::Yes) {
         abort ? abortProcess() : stopProcess();
