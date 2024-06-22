@@ -31,6 +31,7 @@ SOURCES += \
     src/proxymodel.cpp \
     src/settings.cpp \
     src/shacalculator.cpp \
+    src/statusbar.cpp \
     src/tools.cpp \
     src/treeitem.cpp \
     src/treemodel.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     src/proxymodel.h \
     src/settings.h \
     src/shacalculator.h \
+    src/statusbar.h \
     src/tools.h \
     src/treeitem.h \
     src/treemodel.h \

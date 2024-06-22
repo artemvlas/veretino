@@ -11,7 +11,7 @@
 #include <QDragEnterEvent>
 #include "manager.h"
 #include "modeselector.h"
-#include "clickablelabel.h"
+#include "statusbar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -45,7 +45,6 @@ private:
     void connectManager(); // connections are separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
-    void setupStatusBar();
     QString getDatabaseStatusSummary();
     void handlePermanentStatusClick();
     void handleChangedModel();
@@ -57,11 +56,9 @@ private:
     Settings *settings_ = new Settings(this); // current app settings
     QThread *thread = new QThread;
     Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
-    ClickableLabel *statusIconLabel = new ClickableLabel(this);
-    ClickableLabel *statusTextLabel = new ClickableLabel(this);
-    ClickableLabel *permanentStatus = new ClickableLabel(this);
     ModeSelector *modeSelect = nullptr;
     ProcState *proc_ = nullptr;
+    StatusBar *statusBar = new StatusBar;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

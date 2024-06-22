@@ -38,7 +38,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     modeSelect->menuAct_->populateMenuFile(ui->menuFile);
     ui->menuHelp->addAction(modeSelect->menuAct_->actionAbout);
-    setupStatusBar();
+
+    setStatusBar(statusBar);
+    updatePermanentStatus();
 
     connections();
 
@@ -92,7 +94,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
-    connect(permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
+    connect(statusBar->permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
     connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -134,7 +136,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
 
     // info and notifications
-    connect(manager, &Manager::setStatusbarText, statusTextLabel, &ClickableLabel::setText);
+    connect(manager, &Manager::setStatusbarText, statusBar->statusTextLabel, &ClickableLabel::setText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::folderChecked, ui->treeView, &View::setMismatchFiltering);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
@@ -361,19 +363,7 @@ void MainWindow::updateStatusIcon()
             statusIcon = modeSelect->iconProvider.iconFolder();
     }
 
-    statusIconLabel->setPixmap(statusIcon.pixmap(16, 16));
-}
-
-void MainWindow::setupStatusBar()
-{
-    statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
-    statusIconLabel->setContentsMargins(5, 0, 0, 0);
-    permanentStatus->setContentsMargins(20, 0, 0, 0);
-    ui->statusbar->addWidget(statusIconLabel);
-    ui->statusbar->addWidget(statusTextLabel, 1);
-    ui->statusbar->addPermanentWidget(permanentStatus);
-
-    updatePermanentStatus();
+    statusBar->statusIconLabel->setPixmap(statusIcon.pixmap(16, 16));
 }
 
 void MainWindow::updatePermanentStatus()
@@ -383,17 +373,17 @@ void MainWindow::updatePermanentStatus()
             QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
                 permStatus.prepend("filtered >> ");
-            permanentStatus->setText(permStatus);
+            statusBar->permanentStatus->setText(permStatus);
         }
         else
-            permanentStatus->setText(getDatabaseStatusSummary());
+            statusBar->permanentStatus->setText(getDatabaseStatusSummary());
     }
     else if (ui->treeView->isViewFileSystem() && settings_->filter.isFilterEnabled()) {
         static const QPixmap pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16);
-        permanentStatus->setPixmap(pixFilter);
+        statusBar->permanentStatus->setPixmap(pixFilter);
     }
     else
-        permanentStatus->clear();
+        statusBar->permanentStatus->clear();
 }
 
 QString MainWindow::getDatabaseStatusSummary()
