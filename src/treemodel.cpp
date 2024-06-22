@@ -17,7 +17,7 @@ TreeModel::TreeModel(QObject *parent)
 TreeModel::~TreeModel()
 {
     delete rootItem;
-    // qDebug() << this << "deleted";
+    // qDebug() << Q_FUNC_INFO << this;
 }
 
 bool TreeModel::isEmpty() const

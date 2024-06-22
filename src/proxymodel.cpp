@@ -22,7 +22,7 @@ ProxyModel::ProxyModel(QAbstractItemModel *sourceModel, QObject *parent)
 
 ProxyModel::~ProxyModel()
 {
-    // qDebug() << this << "deleted:";
+    // qDebug() << Q_FUNC_INFO << this;
 }
 
 void ProxyModel::setInitSettings()

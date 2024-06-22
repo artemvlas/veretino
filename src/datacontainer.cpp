@@ -166,5 +166,5 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
 DataContainer::~DataContainer()
 {
     removeBackupFile();
-    qDebug() << "DataContainer deleted" << databaseFileName();
+    qDebug() << Q_FUNC_INFO << databaseFileName();
 }

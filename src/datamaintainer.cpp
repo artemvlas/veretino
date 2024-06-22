@@ -455,5 +455,5 @@ void DataMaintainer::saveData()
 DataMaintainer::~DataMaintainer()
 {
     saveData(); // insurance
-    qDebug() << "DataMaintainer deleted";
+    qDebug() << Q_FUNC_INFO;
 }
