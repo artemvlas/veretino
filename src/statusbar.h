@@ -7,6 +7,7 @@
 #define STATUSBAR_H
 
 #include <QStatusBar>
+#include <QIcon>
 #include "clickablelabel.h"
 
 class StatusBar : public QStatusBar
@@ -16,9 +17,14 @@ public:
     explicit StatusBar(QWidget *parent = nullptr);
     ~StatusBar();
 
-    ClickableLabel *statusIconLabel = new ClickableLabel(this);
-    ClickableLabel *statusTextLabel = new ClickableLabel(this);
+    void setStatusText(const QString &text);
+    void setStatusIcon(const QIcon &icon);
+
     ClickableLabel *permanentStatus = new ClickableLabel(this);
+
+private:
+    QLabel *statusTextLabel = new QLabel(this);
+    QLabel *statusIconLabel = new QLabel(this);
 }; // class StatusBar
 
 #endif // STATUSBAR_H

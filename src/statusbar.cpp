@@ -21,3 +21,13 @@ StatusBar::~StatusBar()
 {
     qDebug() << Q_FUNC_INFO;
 }
+
+void StatusBar::setStatusText(const QString &text)
+{
+    statusTextLabel->setText(text);
+}
+
+void StatusBar::setStatusIcon(const QIcon &icon)
+{
+    statusIconLabel->setPixmap(icon.pixmap(16, 16));
+}

@@ -136,7 +136,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
 
     // info and notifications
-    connect(manager, &Manager::setStatusbarText, statusBar->statusTextLabel, &ClickableLabel::setText);
+    connect(manager, &Manager::setStatusbarText, statusBar, &StatusBar::setStatusText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
     connect(manager, &Manager::folderChecked, ui->treeView, &View::setMismatchFiltering);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
@@ -363,7 +363,7 @@ void MainWindow::updateStatusIcon()
             statusIcon = modeSelect->iconProvider.iconFolder();
     }
 
-    statusBar->statusIconLabel->setPixmap(statusIcon.pixmap(16, 16));
+    statusBar->setStatusIcon(statusIcon);
 }
 
 void MainWindow::updatePermanentStatus()
