@@ -11,7 +11,7 @@ StatusBar::StatusBar(QWidget *parent)
 {
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusIconLabel->setContentsMargins(5, 0, 0, 0);
-    permanentStatus->setContentsMargins(20, 0, 0, 0);
+    statusTextLabel->setContentsMargins(0, 0, 30, 0);
     addWidget(statusIconLabel);
     addWidget(statusTextLabel, 1);
     addPermanentWidget(permanentStatus);
