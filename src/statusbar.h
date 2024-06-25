@@ -23,6 +23,9 @@ public:
     void setStatusText(const QString &text);
     void setStatusIcon(const QIcon &icon);
 
+    void setModeFs(bool addButtonFilter);
+    void setModeDb(const QString &permStatus);
+
     ClickableLabel *permanentStatus = new ClickableLabel(this);
 
 private:
@@ -32,6 +35,10 @@ private:
     const IconProvider *icons_ = nullptr;
     QLabel *statusTextLabel = new QLabel(this);
     QLabel *statusIconLabel = new QLabel(this);
+    QPushButton *buttonFsFilter = nullptr;
+
+signals:
+    void buttonFsFilterClicked();
 }; // class StatusBar
 
 #endif // STATUSBAR_H

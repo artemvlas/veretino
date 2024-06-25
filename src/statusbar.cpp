@@ -9,7 +9,7 @@
 StatusBar::StatusBar(QWidget *parent)
     : QStatusBar(parent)
 {
-    //setStyleSheet("QWidget { margin: 0; }");
+    setStyleSheet("QWidget { margin: 0; }");
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusIconLabel->setContentsMargins(5, 0, 0, 0);
     statusTextLabel->setContentsMargins(0, 0, 30, 0);
@@ -36,6 +36,29 @@ void StatusBar::setStatusText(const QString &text)
 void StatusBar::setStatusIcon(const QIcon &icon)
 {
     statusIconLabel->setPixmap(icon.pixmap(16, 16));
+}
+
+void StatusBar::setModeFs(bool addButtonFilter)
+{
+    clearButtons();
+    permanentStatus->clear();
+
+    if (addButtonFilter) {
+        if (!buttonFsFilter) {
+            buttonFsFilter = createButton();
+            buttonFsFilter->setIcon(icons_->icon(Icons::Filter));
+            buttonFsFilter->setToolTip("View/Change Permanent Filter");
+            connect(buttonFsFilter, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+        }
+        addPermanentWidget(buttonFsFilter);
+        buttonFsFilter->show();
+    }
+}
+
+void StatusBar::setModeDb(const QString &permStatus)
+{
+    clearButtons();
+    permanentStatus->setText(permStatus);
 }
 
 void StatusBar::clearButtons()

@@ -104,6 +104,9 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
     connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, modeSelect->menuAct_->actionSave, &QAction::setEnabled);
+
+    // statusbar
+    connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::handlePermanentStatusClick); // TMP
 }
 
 void MainWindow::connectManager()
@@ -374,14 +377,15 @@ void MainWindow::updatePermanentStatus()
             QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
                 permStatus.prepend("filtered >> ");
-            statusBar->permanentStatus->setText(permStatus);
+            statusBar->setModeDb(permStatus);
         }
         else
-            statusBar->permanentStatus->setText(getDatabaseStatusSummary());
+            statusBar->setModeDb(getDatabaseStatusSummary());
     }
-    else if (ui->treeView->isViewFileSystem() && settings_->filter.isFilterEnabled()) {
-        static const QPixmap pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16);
-        statusBar->permanentStatus->setPixmap(pixFilter);
+    else if (ui->treeView->isViewFileSystem()) {
+        statusBar->setModeFs(settings_->filter.isFilterEnabled());
+        //static const QPixmap pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16);
+        //statusBar->permanentStatus->setPixmap(pixFilter);
     }
     else
         statusBar->permanentStatus->clear();
@@ -433,9 +437,9 @@ void MainWindow::handlePermanentStatusClick()
     if (proc_->isStarted())
         return;
 
-    if (ui->treeView->isViewFileSystem() && !settings_->filter.extensionsList.isEmpty())
+    if (ui->treeView->isViewFileSystem() && settings_->filter.isFilterEnabled())
         dialogSettings();
-    else if (ui->treeView->isViewDatabase())
+    if (ui->treeView->isViewDatabase())
         showDbStatus();
 }
 
