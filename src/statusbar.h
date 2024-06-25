@@ -8,6 +8,7 @@
 
 #include <QStatusBar>
 #include <QIcon>
+#include <QPushButton>
 #include "clickablelabel.h"
 
 class StatusBar : public QStatusBar
@@ -23,6 +24,8 @@ public:
     ClickableLabel *permanentStatus = new ClickableLabel(this);
 
 private:
+    void clearButtons();
+    QPushButton* createButton();
     QLabel *statusTextLabel = new QLabel(this);
     QLabel *statusIconLabel = new QLabel(this);
 }; // class StatusBar

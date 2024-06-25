@@ -9,6 +9,7 @@
 StatusBar::StatusBar(QWidget *parent)
     : QStatusBar(parent)
 {
+    //setStyleSheet("QWidget { margin: 0; }");
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusIconLabel->setContentsMargins(5, 0, 0, 0);
     statusTextLabel->setContentsMargins(0, 0, 30, 0);
@@ -30,4 +31,22 @@ void StatusBar::setStatusText(const QString &text)
 void StatusBar::setStatusIcon(const QIcon &icon)
 {
     statusIconLabel->setPixmap(icon.pixmap(16, 16));
+}
+
+void StatusBar::clearButtons()
+{
+    QList<QPushButton*> list = findChildren<QPushButton*>();
+    for (int i = 0; i < list.size(); ++i) {
+        removeWidget(list.at(i));
+    }
+}
+
+QPushButton* StatusBar::createButton()
+{
+    QPushButton *button = new QPushButton(this);
+    button->setFlat(true);
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setCursor(Qt::PointingHandCursor);
+
+    return button;
 }
