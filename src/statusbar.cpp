@@ -23,6 +23,11 @@ StatusBar::~StatusBar()
     qDebug() << Q_FUNC_INFO;
 }
 
+void StatusBar::setIconProvider(const IconProvider *iconProvider)
+{
+    icons_ = iconProvider;
+}
+
 void StatusBar::setStatusText(const QString &text)
 {
     statusTextLabel->setText(text);

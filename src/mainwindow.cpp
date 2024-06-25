@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     modeSelect->menuAct_->populateMenuFile(ui->menuFile);
     ui->menuHelp->addAction(modeSelect->menuAct_->actionAbout);
 
+    statusBar->setIconProvider(&modeSelect->iconProvider);
     setStatusBar(statusBar);
     updatePermanentStatus();
 
