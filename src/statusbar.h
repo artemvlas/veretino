@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include "clickablelabel.h"
 #include "iconprovider.h"
+#include "datacontainer.h"
 
 class StatusBar : public QStatusBar
 {
@@ -25,6 +26,7 @@ public:
 
     void setModeFs(bool addButtonFilter);
     void setModeDb(const QString &permStatus);
+    void setModeDb(const DataContainer *data);
 
     ClickableLabel *permanentStatus = new ClickableLabel(this);
 
@@ -36,6 +38,9 @@ private:
     QLabel *statusTextLabel = new QLabel(this);
     QLabel *statusIconLabel = new QLabel(this);
     QPushButton *buttonFsFilter = nullptr;
+    QPushButton *buttonDbHash = nullptr;
+    QPushButton *buttonDbSize = nullptr;
+    QPushButton *buttonDbMain = nullptr;
 
 signals:
     void buttonFsFilterClicked();

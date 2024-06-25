@@ -5,6 +5,7 @@
 */
 #include "statusbar.h"
 #include <QDebug>
+#include "tools.h"
 
 StatusBar::StatusBar(QWidget *parent)
     : QStatusBar(parent)
@@ -59,6 +60,46 @@ void StatusBar::setModeDb(const QString &permStatus)
 {
     clearButtons();
     permanentStatus->setText(permStatus);
+}
+
+void StatusBar::setModeDb(const DataContainer *data)
+{
+    clearButtons();
+    permanentStatus->clear();
+
+    if (!buttonDbHash) {
+        buttonDbHash = createButton();
+        if (icons_)
+            buttonDbHash->setIcon(icons_->icon(Icons::HashFile));
+        connect(buttonDbHash, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+    }
+
+    if (!buttonDbSize) {
+        buttonDbSize = createButton();
+        if (icons_)
+            buttonDbSize->setIcon(icons_->icon(Icons::ChartPie));
+        connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+    }
+
+    if (!buttonDbMain) {
+        buttonDbMain = createButton();
+        if (icons_)
+            buttonDbMain->setIcon(icons_->icon(Icons::Database));
+        connect(buttonDbMain, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+    }
+
+    const Numbers &numbers = data->numbers;
+
+    buttonDbHash->setText(format::algoToStr(data->metaData.algorithm));
+    buttonDbSize->setText(format::dataSizeReadable(numbers.totalSize(FileStatus::FlagAvailable)));
+    buttonDbMain->setText(QString::number(numbers.numberOf(FileStatus::FlagAvailable)));
+
+    addPermanentWidget(buttonDbHash);
+    addPermanentWidget(buttonDbSize);
+    addPermanentWidget(buttonDbMain);
+    buttonDbHash->show();
+    buttonDbSize->show();
+    buttonDbMain->show();
 }
 
 void StatusBar::clearButtons()

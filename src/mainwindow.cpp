@@ -379,8 +379,9 @@ void MainWindow::updatePermanentStatus()
                 permStatus.prepend("filtered >> ");
             statusBar->setModeDb(permStatus);
         }
-        else
-            statusBar->setModeDb(getDatabaseStatusSummary());
+        else if (!proc_->isStarted())
+            statusBar->setModeDb(ui->treeView->data_);
+            //statusBar->setModeDb(getDatabaseStatusSummary());
     }
     else if (ui->treeView->isViewFileSystem()) {
         statusBar->setModeFs(settings_->filter.isFilterEnabled());
@@ -439,7 +440,7 @@ void MainWindow::handlePermanentStatusClick()
 
     if (ui->treeView->isViewFileSystem() && settings_->filter.isFilterEnabled())
         dialogSettings();
-    if (ui->treeView->isViewDatabase())
+    else if (ui->treeView->isViewDatabase())
         showDbStatus();
 }
 
