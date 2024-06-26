@@ -9,7 +9,8 @@
 #include <QStatusBar>
 #include <QIcon>
 #include <QPushButton>
-#include "clickablelabel.h"
+#include <QLabel>
+//#include "clickablelabel.h"
 #include "iconprovider.h"
 #include "datacontainer.h"
 
@@ -25,13 +26,15 @@ public:
     void setStatusIcon(const QIcon &icon);
 
     void setModeFs(bool addButtonFilter);
-    void setModeDb(const QString &permStatus);
+    //void setModeDb(const QString &permStatus);
     void setModeDb(const DataContainer *data);
+    void setModeDbCreating();
 
-    ClickableLabel *permanentStatus = new ClickableLabel(this);
+    void clearButtons();
+
+    //ClickableLabel *permanentStatus = new ClickableLabel(this);
 
 private:
-    void clearButtons();
     QPushButton* createButton();
 
     const IconProvider *icons_ = nullptr;
@@ -41,6 +44,7 @@ private:
     QPushButton *buttonDbHash = nullptr;
     QPushButton *buttonDbSize = nullptr;
     QPushButton *buttonDbMain = nullptr;
+    QPushButton *buttonDbCreating = nullptr;
 
 signals:
     void buttonFsFilterClicked();

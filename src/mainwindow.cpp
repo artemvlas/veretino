@@ -95,7 +95,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
-    connect(statusBar->permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
+    //connect(statusBar->permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
     connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -374,10 +374,11 @@ void MainWindow::updatePermanentStatus()
 {
     if (ui->treeView->isViewDatabase()) {
         if (modeSelect->isMode(Mode::DbCreating)) {
-            QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
+            /*QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
             if (ui->treeView->data_->isFilterApplied())
                 permStatus.prepend("filtered >> ");
-            statusBar->setModeDb(permStatus);
+            statusBar->setModeDb(permStatus);*/
+            statusBar->setModeDbCreating();
         }
         else if (!proc_->isStarted())
             statusBar->setModeDb(ui->treeView->data_);
@@ -389,7 +390,8 @@ void MainWindow::updatePermanentStatus()
         //statusBar->permanentStatus->setPixmap(pixFilter);
     }
     else
-        statusBar->permanentStatus->clear();
+        statusBar->clearButtons();
+        //statusBar->permanentStatus->clear();
 }
 
 QString MainWindow::getDatabaseStatusSummary()

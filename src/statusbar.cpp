@@ -16,7 +16,7 @@ StatusBar::StatusBar(QWidget *parent)
     statusTextLabel->setContentsMargins(0, 0, 30, 0);
     addWidget(statusIconLabel);
     addWidget(statusTextLabel, 1);
-    addPermanentWidget(permanentStatus);
+    //addPermanentWidget(permanentStatus);
 }
 
 StatusBar::~StatusBar()
@@ -42,7 +42,7 @@ void StatusBar::setStatusIcon(const QIcon &icon)
 void StatusBar::setModeFs(bool addButtonFilter)
 {
     clearButtons();
-    permanentStatus->clear();
+    //permanentStatus->clear();
 
     if (addButtonFilter) {
         if (!buttonFsFilter) {
@@ -55,17 +55,17 @@ void StatusBar::setModeFs(bool addButtonFilter)
         buttonFsFilter->show();
     }
 }
-
+/*
 void StatusBar::setModeDb(const QString &permStatus)
 {
     clearButtons();
     permanentStatus->setText(permStatus);
-}
+}*/
 
 void StatusBar::setModeDb(const DataContainer *data)
 {
     clearButtons();
-    permanentStatus->clear();
+    //permanentStatus->clear();
 
     if (!buttonDbHash) {
         buttonDbHash = createButton();
@@ -100,6 +100,21 @@ void StatusBar::setModeDb(const DataContainer *data)
     buttonDbHash->show();
     buttonDbSize->show();
     buttonDbMain->show();
+}
+
+void StatusBar::setModeDbCreating()
+{
+    clearButtons();
+
+    if (!buttonDbCreating) {
+        buttonDbCreating = createButton();
+        if (icons_)
+            buttonDbCreating->setIcon(icons_->icon(Icons::Database));
+        buttonDbCreating->setText("Creating...");
+    }
+
+    addPermanentWidget(buttonDbCreating);
+    buttonDbCreating->show();
 }
 
 void StatusBar::clearButtons()
