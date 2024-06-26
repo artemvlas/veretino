@@ -1,4 +1,5 @@
 Veretino 0.4.1
+* Redesigned and improved Status Bar.
 * Now the process cancelation prompt disappears automatically if it is no longer relevant.
 
 ---
