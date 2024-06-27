@@ -95,7 +95,6 @@ void MainWindow::connections()
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
-    //connect(statusBar->permanentStatus, &ClickableLabel::clicked, this, &MainWindow::handlePermanentStatusClick);
 
     // menu actions
     connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
@@ -106,7 +105,8 @@ void MainWindow::connections()
     connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, modeSelect->menuAct_->actionSave, &QAction::setEnabled);
 
     // statusbar
-    connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::handlePermanentStatusClick); // TMP
+    connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
+    connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
 }
 
 void MainWindow::connectManager()
@@ -191,8 +191,13 @@ void MainWindow::saveSettings()
 
 void MainWindow::showDbStatus()
 {
-    if (ui->treeView->data_) {
+    if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
+
         DialogDbStatus statusDialog(ui->treeView->data_, this);
+
+        if (proc_->isStarted())
+            connect(proc_, &ProcState::progressFinished, &statusDialog, &DialogDbStatus::reject); // TMP
+
         statusDialog.exec();
     }
 }
@@ -288,6 +293,9 @@ void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &
 void MainWindow::dialogSettings()
 {
     DialogSettings dialog(settings_, this);
+
+    if (proc_->isState(State::StartVerbose))
+        connect(proc_, &ProcState::progressFinished, &dialog, &DialogSettings::reject);
 
     if (dialog.exec() == QDialog::Accepted) {
         dialog.updateSettings();
@@ -435,17 +443,6 @@ QString MainWindow::getDatabaseStatusSummary()
                          format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
 }
 
-void MainWindow::handlePermanentStatusClick()
-{
-    if (proc_->isStarted())
-        return;
-
-    if (ui->treeView->isViewFileSystem() && settings_->filter.isFilterEnabled())
-        dialogSettings();
-    else if (ui->treeView->isViewDatabase())
-        showDbStatus();
-}
-
 void MainWindow::handlePathEdit()
 {
     if (ui->pathEdit->text() == ui->treeView->curPathFileSystem)
@@ -535,7 +532,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
         }
     }
     // temporary solution until appropriate Actions are added
-    else if (event->key() == Qt::Key_F1 && modeSelect->isMode(Mode::DbIdle))
+    else if (event->key() == Qt::Key_F1 && modeSelect->isMode(Mode::DbIdle | Mode::DbCreating))
         showDbStatus();
     else if (event->key() == Qt::Key_F5 && modeSelect->isMode(Mode::DbIdle))
         emit modeSelect->resetDatabase();

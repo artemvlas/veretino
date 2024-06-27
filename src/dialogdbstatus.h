@@ -34,6 +34,7 @@ private:
     void setVisibleTabs();
     void setLabelsInfo();
 
+    bool isCreating();
     bool isJustCreated();
     bool isSavedToDesktop();
 }; // class DialogDbStatus

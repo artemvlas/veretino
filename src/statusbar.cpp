@@ -63,21 +63,21 @@ void StatusBar::setModeDb(const DataContainer *data)
         buttonDbHash = addPermanentButton();
         if (icons_)
             buttonDbHash->setIcon(icons_->icon(Icons::HashFile));
-        connect(buttonDbHash, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+        connect(buttonDbHash, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     if (!buttonDbSize) {
         buttonDbSize = addPermanentButton();
         if (icons_)
             buttonDbSize->setIcon(icons_->icon(Icons::ChartPie));
-        connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+        connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     if (!buttonDbMain) {
         buttonDbMain = addPermanentButton();
         if (icons_)
             buttonDbMain->setIcon(icons_->icon(Icons::Database));
-        connect(buttonDbMain, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+        connect(buttonDbMain, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     // update info
@@ -106,6 +106,7 @@ void StatusBar::setModeDbCreating()
         if (icons_)
             buttonDbCreating->setIcon(icons_->icon(Icons::Database));
         buttonDbCreating->setText("Creating...");
+        connect(buttonDbCreating, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     buttonDbCreating->show();

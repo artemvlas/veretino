@@ -121,6 +121,9 @@ QStringList DialogDbStatus::infoContent()
     int available = data_->numbers.numberOf(FileStatus::FlagAvailable);
     qint64 totalSize = data_->numbers.totalSize(FileStatus::FlagAvailable);
 
+    if (isCreating())
+        return { "New data is being added at the moment." };
+
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
 
@@ -226,9 +229,14 @@ QStringList DialogDbStatus::infoChanges()
     return result;
 }
 
+bool DialogDbStatus::isCreating()
+{
+    return data_->isDbFileState(MetaData::NoFile);
+}
+
 bool DialogDbStatus::isJustCreated()
 {
-    return (data_->isDbFileState(MetaData::Created));
+    return data_->isDbFileState(MetaData::Created);
 }
 
 bool DialogDbStatus::isSavedToDesktop()
