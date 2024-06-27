@@ -16,7 +16,6 @@ StatusBar::StatusBar(QWidget *parent)
     statusTextLabel->setContentsMargins(0, 0, 30, 0);
     addWidget(statusIconLabel);
     addWidget(statusTextLabel, 1);
-    //addPermanentWidget(permanentStatus);
 }
 
 StatusBar::~StatusBar()
@@ -42,61 +41,57 @@ void StatusBar::setStatusIcon(const QIcon &icon)
 void StatusBar::setModeFs(bool addButtonFilter)
 {
     clearButtons();
-    //permanentStatus->clear();
 
     if (addButtonFilter) {
         if (!buttonFsFilter) {
-            buttonFsFilter = createButton();
+            buttonFsFilter = addPermanentButton();
             buttonFsFilter->setIcon(icons_->icon(Icons::Filter));
             buttonFsFilter->setToolTip("View/Change Permanent Filter");
             connect(buttonFsFilter, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
         }
-        addPermanentWidget(buttonFsFilter);
+
         buttonFsFilter->show();
     }
 }
-/*
-void StatusBar::setModeDb(const QString &permStatus)
-{
-    clearButtons();
-    permanentStatus->setText(permStatus);
-}*/
 
 void StatusBar::setModeDb(const DataContainer *data)
 {
     clearButtons();
-    //permanentStatus->clear();
 
+    // adding buttons if needed
     if (!buttonDbHash) {
-        buttonDbHash = createButton();
+        buttonDbHash = addPermanentButton();
         if (icons_)
             buttonDbHash->setIcon(icons_->icon(Icons::HashFile));
         connect(buttonDbHash, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
     }
 
     if (!buttonDbSize) {
-        buttonDbSize = createButton();
+        buttonDbSize = addPermanentButton();
         if (icons_)
             buttonDbSize->setIcon(icons_->icon(Icons::ChartPie));
         connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
     }
 
     if (!buttonDbMain) {
-        buttonDbMain = createButton();
+        buttonDbMain = addPermanentButton();
         if (icons_)
             buttonDbMain->setIcon(icons_->icon(Icons::Database));
         connect(buttonDbMain, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
     }
 
+    // update info
     const Numbers &numbers = data->numbers;
 
     buttonDbHash->setText(format::algoToStr(data->metaData.algorithm));
     buttonDbSize->setText(format::dataSizeReadable(numbers.totalSize(FileStatus::FlagAvailable)));
-    buttonDbMain->setText(QString::number(numbers.numberOf(FileStatus::FlagAvailable)));
 
-    addPermanentWidget(buttonDbHash);
-    addPermanentWidget(buttonDbSize);
-    addPermanentWidget(buttonDbMain);
+    QString strDbMain = QString::number(numbers.numberOf(FileStatus::FlagAvailable));
+    if (numbers.contains(FileStatus::Missing)) // if not all files are available, display "available/total"
+        strDbMain.append(QString("/%1").arg(numbers.numberOf(FileStatus::FlagHasChecksum)));
+
+    buttonDbMain->setText(strDbMain);
+
     buttonDbHash->show();
     buttonDbSize->show();
     buttonDbMain->show();
@@ -107,13 +102,12 @@ void StatusBar::setModeDbCreating()
     clearButtons();
 
     if (!buttonDbCreating) {
-        buttonDbCreating = createButton();
+        buttonDbCreating = addPermanentButton();
         if (icons_)
             buttonDbCreating->setIcon(icons_->icon(Icons::Database));
         buttonDbCreating->setText("Creating...");
     }
 
-    addPermanentWidget(buttonDbCreating);
     buttonDbCreating->show();
 }
 
@@ -121,7 +115,8 @@ void StatusBar::clearButtons()
 {
     QList<QPushButton*> list = findChildren<QPushButton*>();
     for (int i = 0; i < list.size(); ++i) {
-        removeWidget(list.at(i));
+        //removeWidget(list.at(i));
+        list.at(i)->hide();
     }
 }
 
@@ -131,6 +126,14 @@ QPushButton* StatusBar::createButton()
     button->setFlat(true);
     button->setFocusPolicy(Qt::NoFocus);
     button->setCursor(Qt::PointingHandCursor);
+
+    return button;
+}
+
+QPushButton* StatusBar::addPermanentButton()
+{
+    QPushButton *button = createButton();
+    addPermanentWidget(button);
 
     return button;
 }
