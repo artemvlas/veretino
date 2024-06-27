@@ -305,7 +305,7 @@ void MainWindow::dialogSettings()
 
 void MainWindow::dialogChooseFolder()
 {
-    QString path = QFileDialog::getExistingDirectory(this, "Select a Folder", QDir::homePath());
+    QString path = QFileDialog::getExistingDirectory(this, QString(), QDir::homePath());
 
     if (!path.isEmpty()) {
         modeSelect->openFsPath(path);
