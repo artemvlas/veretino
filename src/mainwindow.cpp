@@ -206,9 +206,9 @@ void MainWindow::showDialogFolderContents(const QString &folderName, const QList
 {
     if (!extList.isEmpty()) {
         DialogFolderContents dialog(folderName, extList, this);
-        if (dialog.exec() == QDialog::Accepted) {
+        if (dialog.exec()) {
             FilterRule filter = dialog.resultFilter();
-            if (!filter.isFilter(FilterRule::NotSet)) {
+            if (filter.isFilterEnabled()) {
                 settings_->filter = filter;
                 updatePermanentStatus();
             }
@@ -223,13 +223,11 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
         dialog.setFilterCreatingEnabled();
         FilterRule filter;
 
-        if (dialog.exec() == QDialog::Accepted) {
+        if (dialog.exec())
             filter = dialog.resultFilter();
-        }
 
-        if (!filter.isFilter(FilterRule::NotSet)) {
+        if (filter.isFilterEnabled())
             modeSelect->processFolderChecksums(filter);
-        }
         else {
             QMessageBox msgBox(this);
             msgBox.setWindowTitle("No filter specified");
@@ -297,7 +295,7 @@ void MainWindow::dialogSettings()
     if (proc_->isState(State::StartVerbose))
         connect(proc_, &ProcState::progressFinished, &dialog, &DialogSettings::reject);
 
-    if (dialog.exec() == QDialog::Accepted) {
+    if (dialog.exec()) {
         dialog.updateSettings();
         updatePermanentStatus();
     }
@@ -381,27 +379,17 @@ void MainWindow::updateStatusIcon()
 void MainWindow::updatePermanentStatus()
 {
     if (ui->treeView->isViewDatabase()) {
-        if (modeSelect->isMode(Mode::DbCreating)) {
-            /*QString permStatus = format::algoToStr(ui->treeView->data_->metaData.algorithm);
-            if (ui->treeView->data_->isFilterApplied())
-                permStatus.prepend("filtered >> ");
-            statusBar->setModeDb(permStatus);*/
+        if (modeSelect->isMode(Mode::DbCreating))
             statusBar->setModeDbCreating();
-        }
         else if (!proc_->isStarted())
             statusBar->setModeDb(ui->treeView->data_);
-            //statusBar->setModeDb(getDatabaseStatusSummary());
     }
-    else if (ui->treeView->isViewFileSystem()) {
+    else if (ui->treeView->isViewFileSystem())
         statusBar->setModeFs(settings_->filter.isFilterEnabled());
-        //static const QPixmap pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(16, 16);
-        //statusBar->permanentStatus->setPixmap(pixFilter);
-    }
     else
         statusBar->clearButtons();
-        //statusBar->permanentStatus->clear();
 }
-
+/*
 QString MainWindow::getDatabaseStatusSummary()
 {
     if (!ui->treeView->data_)
@@ -441,7 +429,7 @@ QString MainWindow::getDatabaseStatusSummary()
                          availNumber, // %2
                          availSize, // %3
                          format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
-}
+}*/
 
 void MainWindow::handlePathEdit()
 {

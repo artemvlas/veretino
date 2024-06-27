@@ -122,7 +122,7 @@ QStringList DialogDbStatus::infoContent()
     qint64 totalSize = data_->numbers.totalSize(FileStatus::FlagAvailable);
 
     if (isCreating())
-        return { "New data is being added at the moment." };
+        return { "The checksum list is being calculated..." };
 
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
