@@ -86,10 +86,13 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 
 FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses flag, const QModelIndex &rootIndex)
 {
+    if (!model || !proc_)
+        return FileList();
+
     FileList fileList;
     TreeModelIterator it(model, rootIndex);
 
-    while (it.hasNext()) {
+    while (it.hasNext() && !proc_->isCanceled()) {
         it.nextFile();
         if (it.status() & flag) {
             fileList.insert(it.path(), FileValues(it.status(), it.size()));

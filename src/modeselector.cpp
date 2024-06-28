@@ -395,6 +395,12 @@ void ModeSelector::openBranchDb()
         openJsonDatabase(assumedPath);
 }
 
+void ModeSelector::_makeDbContentsList()
+{
+    if (!proc_->isStarted() && view_->isViewDatabase())
+        emit makeDbContentsList();
+}
+
 QString ModeSelector::composeDbFilePath()
 {
     QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem) : QString();

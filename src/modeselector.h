@@ -56,6 +56,7 @@ public:
     void openJsonDatabase(const QString &filePath);
     void openRecentDatabase(const QAction *action);
     void openBranchDb();
+    void _makeDbContentsList();
 
     // prompts
     bool promptProcessStop();

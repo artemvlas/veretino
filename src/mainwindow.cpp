@@ -107,7 +107,7 @@ void MainWindow::connections()
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
     connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
-    connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::makeDbContentsList);
+    connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::_makeDbContentsList);
     connect(manager->procState, &ProcState::progressStarted, this, [&] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); });
     connect(manager->procState, &ProcState::progressFinished, this, [&] { if (ui->treeView->isViewDatabase()) statusBar->setButtonsEnabled(true); });
 }
@@ -258,7 +258,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const QList<Ext
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
         QString strWindowTitle = "Database Contents";
         if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))
-            strWindowTitle.append(" [available only]");
+            strWindowTitle.append(" [available ones]");
         dialog.setWindowTitle(strWindowTitle);
         dialog.setFilterCreationPossible(false);
         dialog.exec();
