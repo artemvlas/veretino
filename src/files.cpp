@@ -84,6 +84,25 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
     return resultList;
 }
 
+FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses flag, const QModelIndex &rootIndex)
+{
+    FileList fileList;
+    TreeModelIterator it(model, rootIndex);
+
+    while (it.hasNext()) {
+        it.nextFile();
+
+        if (it.status() & flag) {
+            FileValues values(it.status());
+            values.size = it.size();
+
+            fileList.insert(it.path(), values);
+        }
+    }
+
+    return fileList;
+}
+
 bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 {
     bool result = true;
@@ -171,19 +190,7 @@ QList<ExtNumSize> Files::getFileTypes(const QString &folderPath)
 
 QList<ExtNumSize> Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)
 {
-    FileList fileList;
-    TreeModelIterator it(model, rootIndex);
-
-    while (it.hasNext()) {
-        it.nextFile();
-
-        FileValues values(it.status());
-        values.size = it.size();
-
-        fileList.insert(it.path(), values);
-    }
-
-    return getFileTypes(fileList);
+    return getFileTypes(getFileList(model, FileStatus::FlagAvailable));
 }
 
 QList<ExtNumSize> Files::getFileTypes(const FileList &fileList)

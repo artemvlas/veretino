@@ -251,7 +251,10 @@ void MainWindow::showDialogDbContents(const QString &folderName, const QList<Ext
 {
     if (!extList.isEmpty()) {
         DialogFolderContents dialog(folderName, extList, this);
-        dialog.setWindowTitle("Database Contents");
+        QString strWindowTitle = "Database Contents";
+        if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))
+            strWindowTitle.append(" [available only]");
+        dialog.setWindowTitle(strWindowTitle);
         dialog.setFilterCreationPossible(false);
         dialog.exec();
     }

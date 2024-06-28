@@ -62,6 +62,7 @@ public:
     FileList getFileList(); // 'fsPath_' --> getFileList(const QString &rootFolder)
     FileList getFileList(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
     FileList getFileList(const QString &rootFolder, const FilterRule &filter = FilterRule());
+    FileList getFileList(const QAbstractItemModel *model, const FileStatuses flag, const QModelIndex &rootIndex = QModelIndex());
 
     qint64 dataSize(); // total size of all files in the 'fsPath_' folder
     qint64 dataSize(const QString &folder); // total size of getFileList('folder')
