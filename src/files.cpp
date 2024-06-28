@@ -190,7 +190,7 @@ QList<ExtNumSize> Files::getFileTypes(const QString &folderPath)
 
 QList<ExtNumSize> Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)
 {
-    return getFileTypes(getFileList(model, FileStatus::FlagAvailable));
+    return getFileTypes(getFileList(model, FileStatus::FlagAvailable, rootIndex));
 }
 
 QList<ExtNumSize> Files::getFileTypes(const FileList &fileList)

@@ -223,6 +223,8 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
 {
     if (!extList.isEmpty()) {
         DialogFolderContents dialog(folderName, extList, this);
+        dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
+        dialog.setWindowTitle("File types to work with...");
         dialog.setFilterCreationEnabled();
         FilterRule filter;
 
