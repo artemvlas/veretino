@@ -91,12 +91,8 @@ FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses 
 
     while (it.hasNext()) {
         it.nextFile();
-
         if (it.status() & flag) {
-            FileValues values(it.status());
-            values.size = it.size();
-
-            fileList.insert(it.path(), values);
+            fileList.insert(it.path(), FileValues(it.status(), it.size()));
         }
     }
 

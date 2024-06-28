@@ -93,9 +93,8 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
             break;
     }
 
-    FileValues fileVal(purpose);
+    FileValues fileVal(purpose, QFileInfo(filePath).size());
     fileVal.checksum = sum.toLower();
-    fileVal.size = QFileInfo(filePath).size();
 
     emit fileProcessed(filePath, fileVal);
 }
@@ -515,9 +514,8 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)
 {
     FileStatus status = (checksumEstimated.toLower() == checksumCalculated.toLower()) ? FileStatus::Matched : FileStatus::Mismatched;
-    FileValues fileVal(status);
+    FileValues fileVal(status, QFileInfo(filePath).size());
     fileVal.checksum = checksumEstimated.toLower();
-    fileVal.size = QFileInfo(filePath).size();
 
     if (fileVal.status == FileStatus::Mismatched) {
         fileVal.reChecksum = checksumCalculated;

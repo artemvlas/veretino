@@ -203,12 +203,12 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
-        if (parsedData->metaData.filter.isFileAllowed(relPath) && !filelistData.contains(relPath)) {
+        if (parsedData->metaData.filter.isFileAllowed(relPath)
+            && !filelistData.contains(relPath)) {
+
             QFileInfo fileInfo(fullPath);
             if (fileInfo.isReadable()) {
-                FileValues curFileValues(FileStatus::New);
-                curFileValues.size = fileInfo.size();
-                parsedData->model_->addFile(relPath, curFileValues);
+                parsedData->model_->addFile(relPath, FileValues(FileStatus::New, fileInfo.size()));
             }
         }
     }
@@ -237,7 +237,8 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
             for (int var = 0; !proc_->isCanceled() && var < unreadableFiles.size(); ++var) {
-                parsedData->model_->addFile(unreadableFiles.at(var).toString(), FileValues(FileStatus::Unreadable));
+                parsedData->model_->addFile(unreadableFiles.at(var).toString(),
+                                            FileValues(FileStatus::Unreadable));
             }
         }
     }
