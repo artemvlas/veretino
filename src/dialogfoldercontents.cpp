@@ -6,7 +6,6 @@
 #include "dialogfoldercontents.h"
 #include "ui_dialogfoldercontents.h"
 #include "tools.h"
-#include "iconprovider.h"
 #include <QPushButton>
 #include <QDebug>
 
@@ -16,7 +15,8 @@ DialogFolderContents::DialogFolderContents(const QString &folderPath, const QLis
     , extList_(extList)
 {
     ui->setupUi(this);
-    setWindowIcon(IconProvider::appIcon());
+    icons_.setTheme(palette());
+    setWindowIcon(icons_.iconFolder());
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnType, 130);
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
@@ -70,17 +70,15 @@ void DialogFolderContents::connections()
 
 void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
 {
-    IconProvider icons(palette());
-
     for (int i = 0; i < extList.size(); ++i) {
         QIcon icon;
 
         if (extList.at(i).extension == ExtNumSize::strVeretinoDb)
-            icon = icons.icon(Icons::Database);
+            icon = icons_.icon(Icons::Database);
         else if (extList.at(i).extension == ExtNumSize::strShaFiles)
-            icon = icons.icon(Icons::HashFile);
+            icon = icons_.icon(Icons::HashFile);
         else
-            icon = icons.icon("file." + extList.at(i).extension);
+            icon = icons_.icon("file." + extList.at(i).extension);
 
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
         item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, extList.at(i).extension);

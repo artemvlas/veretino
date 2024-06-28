@@ -9,6 +9,7 @@
 #include <QDialog>
 #include <QTreeWidgetItem>
 #include "files.h"
+#include "iconprovider.h"
 
 class TreeWidgetItem : public QTreeWidgetItem
 {
@@ -90,6 +91,8 @@ private:
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items;
     QStringList filterExtensions;
+
+    IconProvider icons_;
 
 }; // class DialogFolderContents
 
