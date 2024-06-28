@@ -166,8 +166,28 @@ QList<ExtNumSize> Files::getFileTypes()
 
 QList<ExtNumSize> Files::getFileTypes(const QString &folderPath)
 {
-    FileList fileList = getFileList(folderPath, FilterRule(false));
+    return getFileTypes(getFileList(folderPath, FilterRule(false)));
+}
 
+QList<ExtNumSize> Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)
+{
+    FileList fileList;
+    TreeModelIterator it(model, rootIndex);
+
+    while (it.hasNext()) {
+        it.nextFile();
+
+        FileValues values(it.status());
+        values.size = it.size();
+
+        fileList.insert(it.path(), values);
+    }
+
+    return getFileTypes(fileList);
+}
+
+QList<ExtNumSize> Files::getFileTypes(const FileList &fileList)
+{
     if (fileList.isEmpty())
         return QList<ExtNumSize>();
 

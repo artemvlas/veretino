@@ -71,6 +71,8 @@ public:
     QString getFolderSize(const QString &path);
     QList<ExtNumSize> getFileTypes(); // returns a list of file types (extensions) with files number and their size
     QList<ExtNumSize> getFileTypes(const QString &folderPath);
+    QList<ExtNumSize> getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
+    QList<ExtNumSize> getFileTypes(const FileList &fileList);
 
     static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
@@ -95,6 +97,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Files::FileStatuses)
 
 struct FileValues {
     FileValues(FileStatus initStatus = FileStatus::New) : status(initStatus) {}
+    //FileValues(FileStatus initStatus, qint64 fileSize) : status(initStatus), size(fileSize) {}
 
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'

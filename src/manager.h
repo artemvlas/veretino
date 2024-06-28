@@ -55,6 +55,7 @@ public slots:
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);
+    void makeDbContentsList();
 
 private:
     void runTask(std::function<void()> task);
@@ -66,7 +67,8 @@ private:
     void _verifyFolderItem(const QModelIndex &folderItemIndex);
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
     void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
-    void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
+    void _folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
+    void _dbContentsList();
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
@@ -87,6 +89,7 @@ signals:
     void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderContentsFilterCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
+    void dbContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderChecked(const Numbers &result, const QString &subFolder = QString());
     void fileProcessed(const QString &fileName, const FileValues &result);
     void showMessage(const QString &text, const QString &title = "Info");

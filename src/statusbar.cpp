@@ -70,7 +70,7 @@ void StatusBar::setModeDb(const DataContainer *data)
         buttonDbSize = addPermanentButton();
         if (icons_)
             buttonDbSize->setIcon(icons_->icon(Icons::ChartPie));
-        connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonDbContentsClicked);
     }
 
     if (!buttonDbMain) {

@@ -107,6 +107,7 @@ void MainWindow::connections()
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
     connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
+    connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::makeDbContentsList);
 }
 
 void MainWindow::connectManager()
@@ -149,9 +150,11 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
     connect(modeSelect, &ModeSelector::makeFolderContentsList, manager, &Manager::makeFolderContentsList);
     connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
+    connect(modeSelect, &ModeSelector::makeDbContentsList, manager, &Manager::makeDbContentsList);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogFolderContents);
     connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
     connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
+    connect(manager, &Manager::dbContentsListCreated, this, &MainWindow::showDialogDbContents);
 
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
@@ -220,7 +223,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
 {
     if (!extList.isEmpty()) {
         DialogFolderContents dialog(folderName, extList, this);
-        dialog.setFilterCreatingEnabled();
+        dialog.setFilterCreationEnabled();
         FilterRule filter;
 
         if (dialog.exec())
@@ -241,6 +244,16 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
             if (msgBox.exec() == QMessageBox::Yes)
                 modeSelect->processFolderChecksums(filter);
         }
+    }
+}
+
+void MainWindow::showDialogDbContents(const QString &folderName, const QList<ExtNumSize> &extList)
+{
+    if (!extList.isEmpty()) {
+        DialogFolderContents dialog(folderName, extList, this);
+        dialog.setWindowTitle("Database Contents");
+        dialog.setFilterCreationPossible(false);
+        dialog.exec();
     }
 }
 

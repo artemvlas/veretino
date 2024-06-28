@@ -55,7 +55,8 @@ void DialogFolderContents::connections()
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frameFilterExtensions, &QFrame::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->labelTotalFiltered, &QLabel::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, [=](bool isChecked){isChecked ? enableFilterCreating() : disableFilterCreating();});
+    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
+            [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
 
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogFolderContents::updateTotalFiltered);
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogFolderContents::updateFilterExtensionsList);
@@ -64,7 +65,7 @@ void DialogFolderContents::connections()
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogFolderContents::reject);
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogFolderContents::enableFilterCreating);
 
-    connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{paths::browsePath(ui->labelFolderName->toolTip());});
+    connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(ui->labelFolderName->toolTip()); });
 }
 
 void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
@@ -171,8 +172,11 @@ void DialogFolderContents::disableFilterCreating()
 
 void DialogFolderContents::handleDoubleClickedItem(QTreeWidgetItem *item)
 {
+    if (!ui->frameCreateFilter->isVisible())
+        return;
+
     if (!isFilterCreatingEnabled()) {
-        setFilterCreatingEnabled();
+        setFilterCreationEnabled();
         return;
     }
 
@@ -237,9 +241,15 @@ FilterRule DialogFolderContents::resultFilter()
     return FilterRule(true);
 }
 
-void DialogFolderContents::setFilterCreatingEnabled(bool enabled)
+void DialogFolderContents::setFilterCreationEnabled(bool enabled)
 {
     ui->checkBox_CreateFilter->setChecked(enabled);
+}
+
+void DialogFolderContents::setFilterCreationPossible(bool possible)
+{
+    ui->frameCreateFilter->setVisible(possible);
+    //ui->checkBox_CreateFilter->setEnabled(possible);
 }
 
 bool DialogFolderContents::isFilterCreatingEnabled()

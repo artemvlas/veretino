@@ -14,7 +14,7 @@ class TreeWidgetItem : public QTreeWidgetItem
 {
 public:
     TreeWidgetItem(QTreeWidget* parent) : QTreeWidgetItem(parent){}
-    enum Column {ColumnType, ColumnFilesNumber, ColumnTotalSize};
+    enum Column { ColumnType, ColumnFilesNumber, ColumnTotalSize };
 
     QString extension() const
     {
@@ -70,7 +70,8 @@ public:
     explicit DialogFolderContents(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
     ~DialogFolderContents();
     FilterRule resultFilter();
-    void setFilterCreatingEnabled(bool enabled = true);
+    void setFilterCreationEnabled(bool enabled = true);
+    void setFilterCreationPossible(bool possible);
 
 private:
     Ui::DialogFolderContents *ui;

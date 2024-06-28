@@ -46,6 +46,7 @@ private:
 signals:
     void buttonFsFilterClicked();
     void buttonDbStatusClicked();
+    void buttonDbContentsClicked();
 }; // class StatusBar
 
 #endif // STATUSBAR_H

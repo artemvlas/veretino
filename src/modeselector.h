@@ -110,6 +110,7 @@ signals:
     void dbItemContents(const QString &itemPath);
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);
+    void makeDbContentsList();
     void branchSubfolder(const QModelIndex &subfolder);
     void makeSumFile(const QString &originFilePath, const QString &checksum);
     void saveData();

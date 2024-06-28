@@ -1,5 +1,6 @@
 Veretino 0.4.1
 * Redesigned and improved Status Bar.
+* Added the ability to analyze the contents of a database by type and size, similar to how the "Folder Contents" do.
 * Now the process cancelation prompt disappears automatically if it is no longer relevant.
 
 ---

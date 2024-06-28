@@ -550,15 +550,15 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
 
 void Manager::makeFolderContentsList(const QString &folderPath)
 {
-    runTask([&]{ folderContentsList(folderPath, false); });
+    runTask([&]{ _folderContentsList(folderPath, false); });
 }
 
 void Manager::makeFolderContentsFilter(const QString &folderPath)
 {
-    runTask([&]{ folderContentsList(folderPath, true); });
+    runTask([&]{ _folderContentsList(folderPath, true); });
 }
 
-void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
+void Manager::_folderContentsList(const QString &folderPath, bool filterCreation)
 {
     if (isViewFileSysytem) {
         if (Files::isEmptyFolder(folderPath)) {
@@ -575,6 +575,22 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
                 emit folderContentsListCreated(folderPath, typesList);
         }
     }
+}
+
+void Manager::makeDbContentsList()
+{
+    runTask([&]{ _dbContentsList(); });
+}
+
+void Manager::_dbContentsList()
+{
+    if (!dataMaintainer->data_)
+        return;
+
+    QList<ExtNumSize> typesList = files_->getFileTypes(dataMaintainer->data_->model_);
+
+    if (!typesList.isEmpty())
+        emit dbContentsListCreated(dataMaintainer->data_->metaData.workDir, typesList);
 }
 
 void Manager::modelChanged(ModelView modelView)
