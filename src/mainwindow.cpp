@@ -107,7 +107,9 @@ void MainWindow::connections()
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
     connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
-    connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::_makeDbContentsList);
+    connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::makeDbContentsList);
+    connect(manager->procState, &ProcState::progressStarted, this, [&] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); });
+    connect(manager->procState, &ProcState::progressFinished, this, [&] { if (ui->treeView->isViewDatabase()) statusBar->setButtonsEnabled(true); });
 }
 
 void MainWindow::connectManager()

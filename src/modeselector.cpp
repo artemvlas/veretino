@@ -478,12 +478,6 @@ bool ModeSelector::emptyFolderPrompt()
     return true;
 }
 
-void ModeSelector::_makeDbContentsList()
-{
-    if (isMode(Mode::DbIdle))
-        emit makeDbContentsList();
-}
-
 void ModeSelector::doWork()
 {
     switch (mode()) {

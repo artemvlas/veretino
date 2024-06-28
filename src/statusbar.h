@@ -29,6 +29,7 @@ public:
     void setModeDbCreating();
 
     void clearButtons();
+    void setButtonsEnabled(bool enable);
 
 private:
     QPushButton* createButton();

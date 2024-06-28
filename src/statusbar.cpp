@@ -138,3 +138,12 @@ QPushButton* StatusBar::addPermanentButton()
 
     return button;
 }
+
+void StatusBar::setButtonsEnabled(bool enable)
+{
+    QList<QPushButton*> list = findChildren<QPushButton*>();
+    for (int i = 0; i < list.size(); ++i) {
+        if (list.at(i)->isVisible())
+            list.at(i)->setEnabled(enable);
+    }
+}
