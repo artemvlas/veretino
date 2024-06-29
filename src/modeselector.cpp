@@ -203,7 +203,7 @@ QString ModeSelector::getButtonToolTip()
 
 Mode ModeSelector::mode() const
 {
-    if (proc_ && proc_->isStarted()) {
+    /*if (proc_ && proc_->isStarted()) {
         if (view_->isViewDatabase() && view_->data_->isInCreation())
             return DbCreating;
         if (proc_->isState(State::StartVerbose)) {
@@ -212,9 +212,16 @@ Mode ModeSelector::mode() const
             else
                 return FileProcessing;
         }
-    }
+    }*/
 
     if (view_->isViewDatabase()) {
+        if (proc_ && proc_->isStarted()) {
+            if (view_->data_->isInCreation())
+                return DbCreating;
+            else if (proc_->isState(State::StartVerbose))
+                return DbProcessing;
+        }
+
         if (view_->data_->numbers.contains(FileStatus::Mismatched))
             return UpdateMismatch;
         else if (view_->data_->numbers.contains(FileStatus::FlagNewLost))
@@ -224,6 +231,9 @@ Mode ModeSelector::mode() const
     }
 
     if (view_->isViewFileSystem()) {
+        if (proc_ && proc_->isState(State::StartVerbose))
+            return FileProcessing;
+
         QFileInfo pathInfo(view_->curPathFileSystem);
         if (pathInfo.isDir())
             return Folder;
