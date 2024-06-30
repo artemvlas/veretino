@@ -211,6 +211,7 @@ void MainWindow::showDialogContentsList(const QString &folderName, const QList<E
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
+        dialog.setFilterCreation(DialogContentsList::FC_Disabled);
         if (dialog.exec()) {
             FilterRule filter = dialog.resultFilter();
             if (filter.isFilterEnabled()) {
@@ -227,7 +228,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
         dialog.setWindowTitle("File types to work with...");
-        dialog.setFilterCreationEnabled();
+        dialog.setFilterCreation(DialogContentsList::FC_Enabled);
         FilterRule filter;
 
         if (dialog.exec())
@@ -260,7 +261,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const QList<Ext
         if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))
             strWindowTitle.append(" [available ones]");
         dialog.setWindowTitle(strWindowTitle);
-        dialog.setFilterCreationPossible(false);
+        dialog.setFilterCreation(DialogContentsList::FC_Hidden);
         dialog.exec();
     }
 }

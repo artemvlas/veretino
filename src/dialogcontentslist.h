@@ -70,9 +70,10 @@ class DialogContentsList : public QDialog
 public:
     explicit DialogContentsList(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
     ~DialogContentsList();
+
+    enum FilterCreation { FC_Hidden, FC_Disabled, FC_Enabled };
+    void setFilterCreation(FilterCreation mode);
     FilterRule resultFilter();
-    void setFilterCreationEnabled(bool enabled = true);
-    void setFilterCreationPossible(bool possible);
 
 private:
     Ui::DialogContentsList *ui;
@@ -80,6 +81,7 @@ private:
     void setTotalInfo();
     void makeItemsList(const QList<ExtNumSize> &extList);
     void setItemsVisibility(bool isTop10Checked);
+    void updateViewMode();
     void enableFilterCreating();
     void disableFilterCreating();
     void handleDoubleClickedItem(QTreeWidgetItem *item);
@@ -93,6 +95,7 @@ private:
     QStringList filterExtensions;
 
     IconProvider icons_;
+    FilterCreation mode_ = FC_Hidden;
 
 }; // class DialogContentsList
 

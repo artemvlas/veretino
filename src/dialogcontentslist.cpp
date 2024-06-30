@@ -26,6 +26,7 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const QList<Ex
     ui->frameFilterExtensions->setVisible(false);
     ui->labelTotalFiltered->setVisible(false);
     ui->buttonBox->setVisible(false);
+    ui->labelFilterExtensions->clear();
 
     QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
                                                                         : ".../" + paths::basicName(folderPath);
@@ -170,11 +171,11 @@ void DialogContentsList::disableFilterCreating()
 
 void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *item)
 {
-    if (!ui->frameCreateFilter->isVisible())
+    if (mode_ == FC_Hidden)
         return;
 
     if (!isFilterCreatingEnabled()) {
-        setFilterCreationEnabled();
+        setFilterCreation(DialogContentsList::FC_Enabled);
         return;
     }
 
@@ -239,15 +240,17 @@ FilterRule DialogContentsList::resultFilter()
     return FilterRule(true);
 }
 
-void DialogContentsList::setFilterCreationEnabled(bool enabled)
+void DialogContentsList::setFilterCreation(FilterCreation mode)
 {
-    ui->checkBox_CreateFilter->setChecked(enabled);
+    mode_ = mode;
+    updateViewMode();
 }
 
-void DialogContentsList::setFilterCreationPossible(bool possible)
+void DialogContentsList::updateViewMode()
 {
-    ui->frameCreateFilter->setVisible(possible);
-    //ui->checkBox_CreateFilter->setEnabled(possible);
+    ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
+    ui->frameFilterExtensions->setVisible(mode_ != FC_Hidden);
+    ui->checkBox_CreateFilter->setChecked(mode_ == FC_Enabled);
 }
 
 bool DialogContentsList::isFilterCreatingEnabled()
