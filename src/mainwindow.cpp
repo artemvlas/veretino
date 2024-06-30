@@ -261,7 +261,6 @@ void MainWindow::showDialogDbContents(const QString &folderName, const QList<Ext
         if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))
             strWindowTitle.append(" [available ones]");
         dialog.setWindowTitle(strWindowTitle);
-        dialog.setFilterCreation(DialogContentsList::FC_Hidden);
         dialog.exec();
     }
 }

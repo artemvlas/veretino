@@ -97,6 +97,8 @@ private:
     IconProvider icons_;
     FilterCreation mode_ = FC_Hidden;
 
+protected:
+    void showEvent(QShowEvent *event) override;
 }; // class DialogContentsList
 
 #endif // DIALOGCONTENTSLIST_H

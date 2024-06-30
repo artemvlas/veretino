@@ -21,13 +21,6 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const QList<Ex
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
 
-    ui->rbIgnore->setVisible(false);
-    ui->rbInclude->setVisible(false);
-    ui->frameFilterExtensions->setVisible(false);
-    ui->labelTotalFiltered->setVisible(false);
-    ui->buttonBox->setVisible(false);
-    ui->labelFilterExtensions->clear();
-
     QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
                                                                         : ".../" + paths::basicName(folderPath);
     ui->labelFolderName->setText(folderName);
@@ -242,14 +235,23 @@ FilterRule DialogContentsList::resultFilter()
 
 void DialogContentsList::setFilterCreation(FilterCreation mode)
 {
-    mode_ = mode;
-    updateViewMode();
+    if (mode_ != mode) {
+        mode_ = mode;
+        updateViewMode();
+    }
 }
 
 void DialogContentsList::updateViewMode()
 {
+    ui->rbIgnore->setVisible(mode_ == FC_Enabled);
+    ui->rbInclude->setVisible(mode_ == FC_Enabled);
+    ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
+    ui->labelTotalFiltered->setVisible(mode_ == FC_Enabled);
+    ui->buttonBox->setVisible(mode_ == FC_Enabled);
+    //ui->labelFilterExtensions->clear();
+
     ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
-    ui->frameFilterExtensions->setVisible(mode_ != FC_Hidden);
+    //ui->frameFilterExtensions->setVisible(mode_ != FC_Hidden);
     ui->checkBox_CreateFilter->setChecked(mode_ == FC_Enabled);
 }
 
@@ -261,4 +263,11 @@ bool DialogContentsList::isFilterCreatingEnabled()
 bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item)
 {
     return ((item->extension() != ExtNumSize::strVeretinoDb) && (item->extension() != ExtNumSize::strShaFiles));
+}
+
+void DialogContentsList::showEvent(QShowEvent *event)
+{
+    // qDebug() << Q_FUNC_INFO;
+    updateViewMode();
+    QDialog::showEvent(event);
 }
