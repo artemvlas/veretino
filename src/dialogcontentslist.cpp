@@ -3,15 +3,15 @@
  * licensed under the GNU GPLv3.
  * https://github.com/artemvlas/veretino
 */
-#include "dialogfoldercontents.h"
-#include "ui_dialogfoldercontents.h"
+#include "dialogcontentslist.h"
+#include "ui_dialogcontentslist.h"
 #include "tools.h"
 #include <QPushButton>
 #include <QDebug>
 
-DialogFolderContents::DialogFolderContents(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
+DialogContentsList::DialogContentsList(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::DialogFolderContents)
+    , ui(new Ui::DialogContentsList)
     , extList_(extList)
 {
     ui->setupUi(this);
@@ -38,17 +38,17 @@ DialogFolderContents::DialogFolderContents(const QString &folderPath, const QLis
     connections();
 }
 
-DialogFolderContents::~DialogFolderContents()
+DialogContentsList::~DialogContentsList()
 {
     delete ui;
 }
 
-void DialogFolderContents::connections()
+void DialogContentsList::connections()
 {
-    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogFolderContents::setItemsVisibility);
+    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
 
-    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogFolderContents::updateFilterExtensionsList);
-    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogFolderContents::handleDoubleClickedItem);
+    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterExtensionsList);
+    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::handleDoubleClickedItem);
 
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
@@ -58,17 +58,17 @@ void DialogFolderContents::connections()
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
             [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
 
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogFolderContents::updateTotalFiltered);
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogFolderContents::updateFilterExtensionsList);
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateTotalFiltered);
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterExtensionsList);
 
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogFolderContents::accept);
-    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogFolderContents::reject);
-    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogFolderContents::enableFilterCreating);
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogContentsList::accept);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogContentsList::reject);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogContentsList::enableFilterCreating);
 
     connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(ui->labelFolderName->toolTip()); });
 }
 
-void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
+void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
 {
     for (int i = 0; i < extList.size(); ++i) {
         QIcon icon;
@@ -90,7 +90,7 @@ void DialogFolderContents::makeItemsList(const QList<ExtNumSize> &extList)
     }
 }
 
-void DialogFolderContents::setItemsVisibility(bool isTop10Checked)
+void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 {
     if (!isTop10Checked) {
         ui->checkBox_Top10->setText("Top10");
@@ -124,7 +124,7 @@ void DialogFolderContents::setItemsVisibility(bool isTop10Checked)
     updateFilterExtensionsList();
 }
 
-void DialogFolderContents::setTotalInfo()
+void DialogContentsList::setTotalInfo()
 {
     qint64 totalSize = 0;
     int totalFilesNumber = 0;
@@ -140,7 +140,7 @@ void DialogFolderContents::setTotalInfo()
                                 .arg(format::dataSizeReadable(totalSize)));
 }
 
-void DialogFolderContents::enableFilterCreating()
+void DialogContentsList::enableFilterCreating()
 {
     ui->rbIgnore->setChecked(true);
     filterExtensions.clear();
@@ -158,7 +158,7 @@ void DialogFolderContents::enableFilterCreating()
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
 }
 
-void DialogFolderContents::disableFilterCreating()
+void DialogContentsList::disableFilterCreating()
 {
     ui->labelFilterExtensions->clear();
     filterExtensions.clear();
@@ -168,7 +168,7 @@ void DialogFolderContents::disableFilterCreating()
     }
 }
 
-void DialogFolderContents::handleDoubleClickedItem(QTreeWidgetItem *item)
+void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *item)
 {
     if (!ui->frameCreateFilter->isVisible())
         return;
@@ -185,7 +185,7 @@ void DialogFolderContents::handleDoubleClickedItem(QTreeWidgetItem *item)
     item->setCheckState(TreeWidgetItem::ColumnType, checkState);
 }
 
-void DialogFolderContents::updateFilterExtensionsList()
+void DialogContentsList::updateFilterExtensionsList()
 {
     if (!isFilterCreatingEnabled())
         return;
@@ -204,7 +204,7 @@ void DialogFolderContents::updateFilterExtensionsList()
     updateTotalFiltered();
 }
 
-void DialogFolderContents::updateTotalFiltered()
+void DialogContentsList::updateTotalFiltered()
 {
     if (!isFilterCreatingEnabled())
         return;
@@ -229,7 +229,7 @@ void DialogFolderContents::updateTotalFiltered()
                                                                  .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
 }
 
-FilterRule DialogFolderContents::resultFilter()
+FilterRule DialogContentsList::resultFilter()
 {
     if (isFilterCreatingEnabled() && !filterExtensions.isEmpty()) {
         FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
@@ -239,23 +239,23 @@ FilterRule DialogFolderContents::resultFilter()
     return FilterRule(true);
 }
 
-void DialogFolderContents::setFilterCreationEnabled(bool enabled)
+void DialogContentsList::setFilterCreationEnabled(bool enabled)
 {
     ui->checkBox_CreateFilter->setChecked(enabled);
 }
 
-void DialogFolderContents::setFilterCreationPossible(bool possible)
+void DialogContentsList::setFilterCreationPossible(bool possible)
 {
     ui->frameCreateFilter->setVisible(possible);
     //ui->checkBox_CreateFilter->setEnabled(possible);
 }
 
-bool DialogFolderContents::isFilterCreatingEnabled()
+bool DialogContentsList::isFilterCreatingEnabled()
 {
     return ui->checkBox_CreateFilter->isChecked();
 }
 
-bool DialogFolderContents::isItemFilterable(const TreeWidgetItem *item)
+bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item)
 {
     return ((item->extension() != ExtNumSize::strVeretinoDb) && (item->extension() != ExtNumSize::strShaFiles));
 }

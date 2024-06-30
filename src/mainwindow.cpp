@@ -6,7 +6,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dialogdbstatus.h"
-#include "dialogfoldercontents.h"
+#include "dialogcontentslist.h"
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"
 #include "dialogabout.h"
@@ -153,7 +153,7 @@ void MainWindow::connectManager()
     connect(modeSelect, &ModeSelector::makeFolderContentsList, manager, &Manager::makeFolderContentsList);
     connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
     connect(modeSelect, &ModeSelector::makeDbContentsList, manager, &Manager::makeDbContentsList);
-    connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogFolderContents);
+    connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogContentsList);
     connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
     connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
     connect(manager, &Manager::dbContentsListCreated, this, &MainWindow::showDialogDbContents);
@@ -207,10 +207,10 @@ void MainWindow::showDbStatus()
     }
 }
 
-void MainWindow::showDialogFolderContents(const QString &folderName, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogContentsList(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        DialogFolderContents dialog(folderName, extList, this);
+        DialogContentsList dialog(folderName, extList, this);
         if (dialog.exec()) {
             FilterRule filter = dialog.resultFilter();
             if (filter.isFilterEnabled()) {
@@ -224,7 +224,7 @@ void MainWindow::showDialogFolderContents(const QString &folderName, const QList
 void MainWindow::showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        DialogFolderContents dialog(folderName, extList, this);
+        DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
         dialog.setWindowTitle("File types to work with...");
         dialog.setFilterCreationEnabled();
@@ -254,7 +254,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
 void MainWindow::showDialogDbContents(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        DialogFolderContents dialog(folderName, extList, this);
+        DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
         QString strWindowTitle = "Database Contents";
         if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))

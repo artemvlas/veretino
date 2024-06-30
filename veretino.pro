@@ -12,9 +12,9 @@ SOURCES += \
     src/datacontainer.cpp \
     src/datamaintainer.cpp \
     src/dialogabout.cpp \
+    src/dialogcontentslist.cpp \
     src/dialogdbstatus.cpp \
     src/dialogfileprocresult.cpp \
-    src/dialogfoldercontents.cpp \
     src/dialogsettings.cpp \
     src/files.cpp \
     src/filterrule.cpp \
@@ -43,9 +43,9 @@ HEADERS += \
     src/datacontainer.h \
     src/datamaintainer.h \
     src/dialogabout.h \
+    src/dialogcontentslist.h \
     src/dialogdbstatus.h \
     src/dialogfileprocresult.h \
-    src/dialogfoldercontents.h \
     src/dialogsettings.h \
     src/files.h \
     src/filterrule.h \
@@ -70,9 +70,9 @@ HEADERS += \
 
 FORMS += \
     src/dialogabout.ui \
+    src/dialogcontentslist.ui \
     src/dialogdbstatus.ui \
     src/dialogfileprocresult.ui \
-    src/dialogfoldercontents.ui \
     src/dialogsettings.ui \
     src/mainwindow.ui
 
