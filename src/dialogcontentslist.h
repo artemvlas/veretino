@@ -81,6 +81,7 @@ private:
     void setTotalInfo();
     void makeItemsList(const QList<ExtNumSize> &extList);
     void setItemsVisibility(bool isTop10Checked);
+    void setCheckboxesVisible(bool visible);
     void updateViewMode();
     void enableFilterCreating();
     void disableFilterCreating();
@@ -91,7 +92,7 @@ private:
     bool isItemFilterable(const TreeWidgetItem *item);
 
     QList<ExtNumSize> extList_;
-    QList<TreeWidgetItem *> items;
+    QList<TreeWidgetItem *> items_;
     QStringList filterExtensions;
 
     IconProvider icons_;

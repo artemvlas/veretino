@@ -81,7 +81,7 @@ void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
         item->setIcon(TreeWidgetItem::ColumnType, icon);
-        items.append(item);
+        items_.append(item);
     }
 }
 
@@ -135,6 +135,16 @@ void DialogContentsList::setTotalInfo()
                                 .arg(format::dataSizeReadable(totalSize)));
 }
 
+void DialogContentsList::setCheckboxesVisible(bool visible)
+{
+    static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
+
+    for (int i = 0; i < items_.size(); ++i) {
+        items_.at(i)->setCheckBoxVisible(visible
+                                         && !excluded.contains(items_.at(i)->extension()));
+    }
+}
+
 void DialogContentsList::enableFilterCreating()
 {
     setFilterCreation(FC_Enabled);
@@ -143,12 +153,7 @@ void DialogContentsList::enableFilterCreating()
     ui->labelFilterExtensions->clear();
     ui->labelTotalFiltered->clear();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
-    const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
-
-    for (int i = 0; i < items.size(); ++i) {
-        if (!excluded.contains(items.at(i)->extension()))
-            items.at(i)->setCheckBoxVisible(true);
-    }
+    setCheckboxesVisible(true);
 
     if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
@@ -159,10 +164,7 @@ void DialogContentsList::disableFilterCreating()
     setFilterCreation(FC_Disabled);
     ui->labelFilterExtensions->clear();
     filterExtensions.clear();
-
-    for (int i = 0; i < items.size(); ++i) {
-        items.at(i)->setCheckBoxVisible(false);
-    }
+    setCheckboxesVisible(false);
 }
 
 void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *item)
@@ -189,9 +191,9 @@ void DialogContentsList::updateFilterExtensionsList()
 
     filterExtensions.clear();
 
-    for (int i = 0; i < items.size(); ++i) {
-        if (!items.at(i)->isHidden() && items.at(i)->isChecked()) {
-            filterExtensions.append(items.at(i)->extension());
+    for (int i = 0; i < items_.size(); ++i) {
+        if (!items_.at(i)->isHidden() && items_.at(i)->isChecked()) {
+            filterExtensions.append(items_.at(i)->extension());
         }
     }
 
@@ -209,8 +211,8 @@ void DialogContentsList::updateTotalFiltered()
     int filteredFilesNumber = 0;
     qint64 filteredFilesSize = 0;
 
-    for (int i = 0; i < items.size(); ++i) {
-        TreeWidgetItem *item = items.at(i);
+    for (int i = 0; i < items_.size(); ++i) {
+        TreeWidgetItem *item = items_.at(i);
         if ((ui->rbInclude->isChecked() && !item->isHidden() && item->isChecked()) // Include only visible and checked
             || (ui->rbIgnore->isChecked() && isItemFilterable(item) && (item->isHidden() || !item->isChecked()))) { // Include all except visible and checked
 
