@@ -44,12 +44,6 @@ void DialogContentsList::connections()
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterExtensionsList);
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::handleDoubleClickedItem);
 
-    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
-    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
-    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frameFilterExtensions, &QFrame::setVisible);
-    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->labelTotalFiltered, &QLabel::setVisible);
-    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
-    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, &DialogContentsList::updateViewMode);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
             [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
 
@@ -167,21 +161,18 @@ void DialogContentsList::disableFilterCreating()
     setCheckboxesVisible(false);
 }
 
-void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *item)
+void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
 {
     if (mode_ == FC_Hidden)
         return;
 
-    if (!isFilterCreatingEnabled()) {
-        setFilterCreation(DialogContentsList::FC_Enabled);
+    if (mode_ == FC_Disabled) {
+        setFilterCreation(FC_Enabled);
         return;
     }
 
-    if (!item->data(TreeWidgetItem::ColumnType, Qt::CheckStateRole).isValid())
-        return;
-
-    Qt::CheckState checkState = (item->checkState(TreeWidgetItem::ColumnType) == Qt::Unchecked) ? Qt::Checked : Qt::Unchecked;
-    item->setCheckState(TreeWidgetItem::ColumnType, checkState);
+    TreeWidgetItem *item = static_cast<TreeWidgetItem*>(t_item);
+    item->toggle();
 }
 
 void DialogContentsList::updateFilterExtensionsList()
@@ -253,10 +244,8 @@ void DialogContentsList::updateViewMode()
     ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
     ui->labelTotalFiltered->setVisible(mode_ == FC_Enabled);
     ui->buttonBox->setVisible(mode_ == FC_Enabled);
-    //ui->labelFilterExtensions->clear();
 
     ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
-    //ui->frameFilterExtensions->setVisible(mode_ != FC_Hidden);
     ui->checkBox_CreateFilter->setChecked(mode_ == FC_Enabled);
 }
 

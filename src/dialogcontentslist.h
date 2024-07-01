@@ -34,7 +34,7 @@ public:
 
     void setChecked(bool checked)
     {
-        checked ? setCheckState(ColumnType, Qt::Checked) : setCheckState(ColumnType, Qt::Unchecked);
+        setCheckState(ColumnType, checked ? Qt::Checked : Qt::Unchecked);
     }
 
     void setCheckBoxVisible(bool visible)
@@ -46,6 +46,17 @@ public:
     {
         QVariant checkState = data(ColumnType, Qt::CheckStateRole);
         return (checkState.isValid() && checkState == Qt::Checked);
+    }
+
+    bool isCheckBoxVisible()
+    {
+        return data(ColumnType, Qt::CheckStateRole).isValid();
+    }
+
+    void toggle()
+    {
+        if (isCheckBoxVisible())
+            setChecked(!isChecked());
     }
 
 private:
@@ -85,7 +96,7 @@ private:
     void updateViewMode();
     void enableFilterCreating();
     void disableFilterCreating();
-    void handleDoubleClickedItem(QTreeWidgetItem *item);
+    void handleDoubleClickedItem(QTreeWidgetItem *t_item);
     void updateFilterExtensionsList();
     void updateTotalFiltered();
     bool isFilterCreatingEnabled();
