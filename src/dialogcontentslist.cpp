@@ -22,7 +22,7 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const QList<Ex
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
 
     QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
-                                                                        : ".../" + paths::basicName(folderPath);
+                                                                        : "../" + paths::basicName(folderPath);
     ui->labelFolderName->setText(folderName);
     ui->labelFolderName->setToolTip(folderPath);
     ui->checkBox_Top10->setVisible(extList.size() > 15);
@@ -44,11 +44,12 @@ void DialogContentsList::connections()
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterExtensionsList);
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::handleDoubleClickedItem);
 
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frameFilterExtensions, &QFrame::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->labelTotalFiltered, &QLabel::setVisible);
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
+    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbIgnore, &QRadioButton::setVisible);
+    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->rbInclude, &QRadioButton::setVisible);
+    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->frameFilterExtensions, &QFrame::setVisible);
+    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->labelTotalFiltered, &QLabel::setVisible);
+    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, ui->buttonBox, &QDialogButtonBox::setVisible);
+    //connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this, &DialogContentsList::updateViewMode);
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
             [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
 
@@ -136,12 +137,13 @@ void DialogContentsList::setTotalInfo()
 
 void DialogContentsList::enableFilterCreating()
 {
+    setFilterCreation(FC_Enabled);
     ui->rbIgnore->setChecked(true);
     filterExtensions.clear();
     ui->labelFilterExtensions->clear();
     ui->labelTotalFiltered->clear();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
-    const QStringList excluded({ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles});
+    const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
 
     for (int i = 0; i < items.size(); ++i) {
         if (!excluded.contains(items.at(i)->extension()))
@@ -154,6 +156,7 @@ void DialogContentsList::enableFilterCreating()
 
 void DialogContentsList::disableFilterCreating()
 {
+    setFilterCreation(FC_Disabled);
     ui->labelFilterExtensions->clear();
     filterExtensions.clear();
 
