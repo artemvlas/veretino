@@ -39,6 +39,9 @@ DialogContentsList::~DialogContentsList()
 
 void DialogContentsList::connections()
 {
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogContentsList::accept);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogContentsList::reject);
+
     connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
 
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterExtensionsList);
@@ -50,8 +53,6 @@ void DialogContentsList::connections()
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateTotalFiltered);
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterExtensionsList);
 
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogContentsList::accept);
-    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogContentsList::reject);
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogContentsList::enableFilterCreating);
 
     connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(ui->labelFolderName->toolTip()); });
@@ -143,9 +144,9 @@ void DialogContentsList::enableFilterCreating()
 {
     setFilterCreation(FC_Enabled);
     ui->rbIgnore->setChecked(true);
-    filterExtensions.clear();
-    ui->labelFilterExtensions->clear();
-    ui->labelTotalFiltered->clear();
+    //filterExtensions.clear();
+    //ui->labelFilterExtensions->clear();
+    //ui->labelTotalFiltered->clear();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
     setCheckboxesVisible(true);
 
@@ -156,8 +157,8 @@ void DialogContentsList::enableFilterCreating()
 void DialogContentsList::disableFilterCreating()
 {
     setFilterCreation(FC_Disabled);
-    ui->labelFilterExtensions->clear();
-    filterExtensions.clear();
+    //ui->labelFilterExtensions->clear();
+    //filterExtensions.clear();
     setCheckboxesVisible(false);
 }
 
@@ -247,6 +248,10 @@ void DialogContentsList::updateViewMode()
 
     ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
     ui->checkBox_CreateFilter->setChecked(mode_ == FC_Enabled);
+
+    ui->labelTotalFiltered->clear();
+    ui->labelFilterExtensions->clear();
+    filterExtensions.clear();
 }
 
 bool DialogContentsList::isFilterCreatingEnabled()

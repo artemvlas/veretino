@@ -60,7 +60,7 @@ public:
     }
 
 private:
-    bool operator <(const QTreeWidgetItem &other)const override
+    bool operator <(const QTreeWidgetItem &other) const override
     {
         int column = treeWidget()->sortColumn();
         if (column == ColumnTotalSize)
