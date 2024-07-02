@@ -83,6 +83,11 @@ void StatusBar::setModeDb(const DataContainer *data)
     // update info
     const Numbers &numbers = data->numbers;
 
+    QString checkResult = QString("☒ %1\n✓ %2")
+                              .arg(numbers.numberOf(FileStatus::Mismatched))
+                              .arg(numbers.numberOf(FileStatus::FlagMatched));
+
+    buttonDbHash->setToolTip(checkResult);
     buttonDbHash->setText(format::algoToStr(data->metaData.algorithm));
     buttonDbSize->setText(format::dataSizeReadable(numbers.totalSize(FileStatus::FlagAvailable)));
 
@@ -146,4 +151,10 @@ void StatusBar::setButtonsEnabled(bool enable)
         if (list.at(i)->isVisible())
             list.at(i)->setEnabled(enable);
     }
+}
+
+void StatusBar::clearToolTips()
+{
+    if (buttonDbHash)
+        buttonDbHash->setToolTip(QString());
 }

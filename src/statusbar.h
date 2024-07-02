@@ -30,6 +30,7 @@ public:
 
     void clearButtons();
     void setButtonsEnabled(bool enable);
+    void clearToolTips();
 
 private:
     QPushButton* createButton();
