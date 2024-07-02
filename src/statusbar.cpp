@@ -47,7 +47,7 @@ void StatusBar::setModeFs(bool addButtonFilter)
             buttonFsFilter = addPermanentButton();
             buttonFsFilter->setIcon(icons_->icon(Icons::Filter));
             buttonFsFilter->setToolTip("View/Change Permanent Filter");
-            connect(buttonFsFilter, &QPushButton::clicked, this, &StatusBar::buttonFsFilterClicked);
+            connect(buttonFsFilter, &StatusBarButton::clicked, this, &StatusBar::buttonFsFilterClicked);
         }
 
         buttonFsFilter->show();
@@ -63,21 +63,21 @@ void StatusBar::setModeDb(const DataContainer *data)
         buttonDbHash = addPermanentButton();
         if (icons_)
             buttonDbHash->setIcon(icons_->icon(Icons::HashFile));
-        connect(buttonDbHash, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbHash, &StatusBarButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     if (!buttonDbSize) {
         buttonDbSize = addPermanentButton();
         if (icons_)
             buttonDbSize->setIcon(icons_->icon(Icons::ChartPie));
-        connect(buttonDbSize, &QPushButton::clicked, this, &StatusBar::buttonDbContentsClicked);
+        connect(buttonDbSize, &StatusBarButton::clicked, this, &StatusBar::buttonDbContentsClicked);
     }
 
     if (!buttonDbMain) {
         buttonDbMain = addPermanentButton();
         if (icons_)
             buttonDbMain->setIcon(icons_->icon(Icons::Database));
-        connect(buttonDbMain, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbMain, &StatusBarButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     // update info
@@ -111,34 +111,15 @@ void StatusBar::setModeDbCreating()
         if (icons_)
             buttonDbCreating->setIcon(icons_->icon(Icons::Database));
         buttonDbCreating->setText("Creating...");
-        connect(buttonDbCreating, &QPushButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbCreating, &StatusBarButton::clicked, this, &StatusBar::buttonDbStatusClicked);
     }
 
     buttonDbCreating->show();
 }
 
-void StatusBar::clearButtons()
+StatusBarButton* StatusBar::addPermanentButton()
 {
-    QList<QPushButton*> list = findChildren<QPushButton*>();
-    for (int i = 0; i < list.size(); ++i) {
-        //removeWidget(list.at(i));
-        list.at(i)->hide();
-    }
-}
-
-QPushButton* StatusBar::createButton()
-{
-    QPushButton *button = new QPushButton(this);
-    button->setFlat(true);
-    button->setFocusPolicy(Qt::NoFocus);
-    button->setCursor(Qt::PointingHandCursor);
-
-    return button;
-}
-
-QPushButton* StatusBar::addPermanentButton()
-{
-    QPushButton *button = createButton();
+    StatusBarButton *button = new StatusBarButton(this);
     addPermanentWidget(button);
 
     return button;
@@ -146,15 +127,18 @@ QPushButton* StatusBar::addPermanentButton()
 
 void StatusBar::setButtonsEnabled(bool enable)
 {
-    QList<QPushButton*> list = findChildren<QPushButton*>();
+    QList<StatusBarButton*> list = findChildren<StatusBarButton*>();
     for (int i = 0; i < list.size(); ++i) {
         if (list.at(i)->isVisible())
             list.at(i)->setEnabled(enable);
     }
 }
 
-void StatusBar::clearToolTips()
+void StatusBar::clearButtons()
 {
-    if (buttonDbHash)
-        buttonDbHash->setToolTip(QString());
+    QList<StatusBarButton*> list = findChildren<StatusBarButton*>();
+    for (int i = 0; i < list.size(); ++i) {
+        //removeWidget(list.at(i));
+        list.at(i)->hide();
+    }
 }

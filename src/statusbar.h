@@ -10,8 +10,30 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QLabel>
+#include <QEvent>
 #include "iconprovider.h"
 #include "datacontainer.h"
+
+class StatusBarButton : public QPushButton
+{
+public:
+    StatusBarButton(QWidget *parent = nullptr)
+        : QPushButton(parent)
+    {
+        setFlat(true);
+        setFocusPolicy(Qt::NoFocus);
+        setCursor(Qt::PointingHandCursor);
+    }
+
+protected:
+    bool event(QEvent *event) override
+    {
+        if (event->type() == QEvent::ToolTip && !isEnabled())
+            return true;
+
+        return QPushButton::event(event);
+    }
+}; // class StatusBarButton
 
 class StatusBar : public QStatusBar
 {
@@ -30,20 +52,18 @@ public:
 
     void clearButtons();
     void setButtonsEnabled(bool enable);
-    void clearToolTips();
 
 private:
-    QPushButton* createButton();
-    QPushButton* addPermanentButton();
+    StatusBarButton* addPermanentButton();
 
     const IconProvider *icons_ = nullptr;
     QLabel *statusTextLabel = new QLabel(this);
     QLabel *statusIconLabel = new QLabel(this);
-    QPushButton *buttonFsFilter = nullptr;
-    QPushButton *buttonDbHash = nullptr;
-    QPushButton *buttonDbSize = nullptr;
-    QPushButton *buttonDbMain = nullptr;
-    QPushButton *buttonDbCreating = nullptr;
+    StatusBarButton *buttonFsFilter = nullptr;
+    StatusBarButton *buttonDbHash = nullptr;
+    StatusBarButton *buttonDbSize = nullptr;
+    StatusBarButton *buttonDbMain = nullptr;
+    StatusBarButton *buttonDbCreating = nullptr;
 
 signals:
     void buttonFsFilterClicked();

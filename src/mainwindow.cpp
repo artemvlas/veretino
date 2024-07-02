@@ -109,9 +109,9 @@ void MainWindow::connections()
     connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
     connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::_makeDbContentsList);
     connect(manager->procState, &ProcState::progressStarted, this,
-            [&] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); statusBar->clearToolTips(); });
+            [&] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); });
     connect(manager->procState, &ProcState::progressFinished, this,
-            [&] { if (ui->treeView->isViewDatabase()) statusBar->setButtonsEnabled(true); updatePermanentStatus(); });
+            [&] { if (ui->treeView->isViewDatabase()) statusBar->setButtonsEnabled(true); });
 }
 
 void MainWindow::connectManager()
