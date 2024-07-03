@@ -42,13 +42,13 @@ public:
         visible ? setChecked(false) : setData(ColumnType, Qt::CheckStateRole, QVariant());
     }
 
-    bool isChecked()
+    bool isChecked() const
     {
         QVariant checkState = data(ColumnType, Qt::CheckStateRole);
         return (checkState.isValid() && checkState == Qt::Checked);
     }
 
-    bool isCheckBoxVisible()
+    bool isCheckBoxVisible() const
     {
         return data(ColumnType, Qt::CheckStateRole).isValid();
     }
@@ -97,14 +97,15 @@ private:
     void enableFilterCreating();
     void disableFilterCreating();
     void handleDoubleClickedItem(QTreeWidgetItem *t_item);
+    void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
     bool isItemFilterable(const TreeWidgetItem *item);
+    QList<TreeWidgetItem *> checkedItems();
     QStringList checkedExtensions();
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items_;
-    QStringList filterExtensions_;
 
     IconProvider icons_;
     FilterCreation mode_ = FC_Hidden;

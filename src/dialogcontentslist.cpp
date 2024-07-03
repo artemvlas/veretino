@@ -44,14 +44,13 @@ void DialogContentsList::connections()
 
     connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
 
-    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateLabelFilterExtensions);
+    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterDisplay);
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::handleDoubleClickedItem);
 
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
             [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
 
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateLabelTotalFiltered);
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateLabelFilterExtensions);
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterDisplay);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogContentsList::enableFilterCreating);
 
@@ -111,7 +110,7 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
                                             .arg(format::dataSizeReadable(top10FilesSize)));
     }
 
-    updateLabelFilterExtensions();
+    updateFilterDisplay();
 }
 
 void DialogContentsList::setTotalInfo()
@@ -171,17 +170,34 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
-QStringList DialogContentsList::checkedExtensions()
+QList<TreeWidgetItem *> DialogContentsList::checkedItems()
 {
-    QStringList result;
+    QList<TreeWidgetItem *> resultList;
 
-    for (int i = 0; i < items_.size(); ++i) {
-        if (!items_.at(i)->isHidden() && items_.at(i)->isChecked()) {
-            result.append(items_.at(i)->extension());
-        }
+    foreach (TreeWidgetItem *item, items_) {
+        if (!item->isHidden() && item->isChecked())
+            resultList.append(item);
     }
 
-    return result;
+    return resultList;
+}
+
+QStringList DialogContentsList::checkedExtensions()
+{
+    QStringList extensions;
+    QList<TreeWidgetItem *> checked_items = checkedItems();
+
+    foreach (const TreeWidgetItem *item, checked_items) {
+        extensions.append(item->extension());
+    }
+
+    return extensions;
+}
+
+void DialogContentsList::updateFilterDisplay()
+{
+    updateLabelFilterExtensions();
+    updateLabelTotalFiltered();
 }
 
 void DialogContentsList::updateLabelFilterExtensions()
@@ -189,12 +205,8 @@ void DialogContentsList::updateLabelFilterExtensions()
     if (mode_ != FC_Enabled)
         return;
 
-    filterExtensions_ = checkedExtensions();
-
     ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
-    ui->labelFilterExtensions->setText(filterExtensions_.join(" "));
-
-    updateLabelTotalFiltered();
+    ui->labelFilterExtensions->setText(checkedExtensions().join(" "));
 }
 
 void DialogContentsList::updateLabelTotalFiltered()
@@ -215,18 +227,20 @@ void DialogContentsList::updateLabelTotalFiltered()
         }
     }
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!filterExtensions_.isEmpty() && filteredFilesNumber > 0);
+    QStringList filterExtensions = checkedExtensions();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!filterExtensions.isEmpty() && filteredFilesNumber > 0);
 
-    filterExtensions_.isEmpty() ? ui->labelTotalFiltered->clear()
-                                : ui->labelTotalFiltered->setText(QString("Filtered: %1")
-                                                                  .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
+    filterExtensions.isEmpty() ? ui->labelTotalFiltered->clear()
+                               : ui->labelTotalFiltered->setText(QString("Filtered: %1")
+                                                                .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
 }
 
 FilterRule DialogContentsList::resultFilter()
 {
-    if ((mode_ == FC_Enabled) && !filterExtensions_.isEmpty()) {
+    QStringList filterExtensions = checkedExtensions();
+    if ((mode_ == FC_Enabled) && !filterExtensions.isEmpty()) {
         FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-        return FilterRule(filterType, filterExtensions_);
+        return FilterRule(filterType, filterExtensions);
     }
 
     return FilterRule(true);
@@ -253,7 +267,6 @@ void DialogContentsList::updateViewMode()
 
     ui->labelTotalFiltered->clear();
     ui->labelFilterExtensions->clear();
-    filterExtensions_.clear();
 }
 
 bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item)
