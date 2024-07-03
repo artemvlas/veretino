@@ -170,11 +170,11 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
-QList<TreeWidgetItem *> DialogContentsList::checkedItems()
+QList<TreeWidgetItem *> DialogContentsList::checkedItems() const
 {
     QList<TreeWidgetItem *> resultList;
 
-    foreach (TreeWidgetItem *item, items_) {
+    for (TreeWidgetItem *item : qAsConst(items_)) {
         if (!item->isHidden() && item->isChecked())
             resultList.append(item);
     }
@@ -182,12 +182,12 @@ QList<TreeWidgetItem *> DialogContentsList::checkedItems()
     return resultList;
 }
 
-QStringList DialogContentsList::checkedExtensions()
+QStringList DialogContentsList::checkedExtensions() const
 {
     QStringList extensions;
-    QList<TreeWidgetItem *> checked_items = checkedItems();
+    const QList<TreeWidgetItem *> checked_items = checkedItems();
 
-    foreach (const TreeWidgetItem *item, checked_items) {
+    for (const TreeWidgetItem *item : checked_items) {
         extensions.append(item->extension());
     }
 
@@ -269,7 +269,7 @@ void DialogContentsList::updateViewMode()
     ui->labelFilterExtensions->clear();
 }
 
-bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item)
+bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item) const
 {
     return ((item->extension() != ExtNumSize::strVeretinoDb) && (item->extension() != ExtNumSize::strShaFiles));
 }

@@ -100,9 +100,9 @@ private:
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
-    bool isItemFilterable(const TreeWidgetItem *item);
-    QList<TreeWidgetItem *> checkedItems();
-    QStringList checkedExtensions();
+    bool isItemFilterable(const TreeWidgetItem *item) const;
+    QList<TreeWidgetItem *> checkedItems() const;
+    QStringList checkedExtensions() const;
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items_;
