@@ -170,6 +170,22 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
+// Include all except visible and checked
+QList<TreeWidgetItem *> DialogContentsList::uncheckedItems() const
+{
+    //static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
+    QList<TreeWidgetItem *> resultList;
+
+    for (TreeWidgetItem *item : qAsConst(items_)) {
+        if ((!item->isChecked() || item->isHidden())
+            && isItemFilterable(item))
+            resultList.append(item);
+    }
+
+    return resultList;
+}
+
+// Include only visible and checked
 QList<TreeWidgetItem *> DialogContentsList::checkedItems() const
 {
     QList<TreeWidgetItem *> resultList;
@@ -214,17 +230,15 @@ void DialogContentsList::updateLabelTotalFiltered()
     if (mode_ != FC_Enabled)
         return;
 
+    // ? Include only visible and checked : Include all except visible and checked
+    const QList<TreeWidgetItem *> itemList = ui->rbInclude->isChecked() ? checkedItems() : uncheckedItems();
+
     int filteredFilesNumber = 0;
     qint64 filteredFilesSize = 0;
 
-    for (int i = 0; i < items_.size(); ++i) {
-        TreeWidgetItem *item = items_.at(i);
-        if ((ui->rbInclude->isChecked() && !item->isHidden() && item->isChecked()) // Include only visible and checked
-            || (ui->rbIgnore->isChecked() && isItemFilterable(item) && (item->isHidden() || !item->isChecked()))) { // Include all except visible and checked
-
-            filteredFilesNumber += item->filesNumber();
-            filteredFilesSize += item->filesSize();
-        }
+    for (const TreeWidgetItem *item : itemList) {
+        filteredFilesNumber += item->filesNumber();
+        filteredFilesSize += item->filesSize();
     }
 
     QStringList filterExtensions = checkedExtensions();
@@ -271,7 +285,8 @@ void DialogContentsList::updateViewMode()
 
 bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item) const
 {
-    return ((item->extension() != ExtNumSize::strVeretinoDb) && (item->extension() != ExtNumSize::strShaFiles));
+    QString ext = item->extension();
+    return ((ext != ExtNumSize::strVeretinoDb) && (ext != ExtNumSize::strShaFiles));
 }
 
 void DialogContentsList::showEvent(QShowEvent *event)
