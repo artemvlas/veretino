@@ -144,9 +144,6 @@ void DialogContentsList::enableFilterCreating()
 {
     setFilterCreation(FC_Enabled);
     ui->rbIgnore->setChecked(true);
-    //filterExtensions.clear();
-    //ui->labelFilterExtensions->clear();
-    //ui->labelTotalFiltered->clear();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
     setCheckboxesVisible(true);
 
@@ -157,8 +154,6 @@ void DialogContentsList::enableFilterCreating()
 void DialogContentsList::disableFilterCreating()
 {
     setFilterCreation(FC_Disabled);
-    //ui->labelFilterExtensions->clear();
-    //filterExtensions.clear();
     setCheckboxesVisible(false);
 }
 
@@ -178,26 +173,26 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
 
 void DialogContentsList::updateFilterExtensionsList()
 {
-    if (!isFilterCreatingEnabled())
+    if (mode_ != FC_Enabled)
         return;
 
-    filterExtensions.clear();
+    filterExtensions_.clear();
 
     for (int i = 0; i < items_.size(); ++i) {
         if (!items_.at(i)->isHidden() && items_.at(i)->isChecked()) {
-            filterExtensions.append(items_.at(i)->extension());
+            filterExtensions_.append(items_.at(i)->extension());
         }
     }
 
     ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
-    ui->labelFilterExtensions->setText(filterExtensions.join(" "));
+    ui->labelFilterExtensions->setText(filterExtensions_.join(" "));
 
     updateTotalFiltered();
 }
 
 void DialogContentsList::updateTotalFiltered()
 {
-    if (!isFilterCreatingEnabled())
+    if (mode_ != FC_Enabled)
         return;
 
     int filteredFilesNumber = 0;
@@ -213,18 +208,18 @@ void DialogContentsList::updateTotalFiltered()
         }
     }
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!filterExtensions.isEmpty() && filteredFilesNumber > 0);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!filterExtensions_.isEmpty() && filteredFilesNumber > 0);
 
-    filterExtensions.isEmpty() ? ui->labelTotalFiltered->clear()
-                               : ui->labelTotalFiltered->setText(QString("Filtered: %1")
-                                                                 .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
+    filterExtensions_.isEmpty() ? ui->labelTotalFiltered->clear()
+                                : ui->labelTotalFiltered->setText(QString("Filtered: %1")
+                                                                  .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
 }
 
 FilterRule DialogContentsList::resultFilter()
 {
-    if (isFilterCreatingEnabled() && !filterExtensions.isEmpty()) {
+    if ((mode_ == FC_Enabled) && !filterExtensions_.isEmpty()) {
         FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-        return FilterRule(filterType, filterExtensions);
+        return FilterRule(filterType, filterExtensions_);
     }
 
     return FilterRule(true);
@@ -251,12 +246,7 @@ void DialogContentsList::updateViewMode()
 
     ui->labelTotalFiltered->clear();
     ui->labelFilterExtensions->clear();
-    filterExtensions.clear();
-}
-
-bool DialogContentsList::isFilterCreatingEnabled()
-{
-    return ui->checkBox_CreateFilter->isChecked();
+    filterExtensions_.clear();
 }
 
 bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item)

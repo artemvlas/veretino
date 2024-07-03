@@ -99,12 +99,11 @@ private:
     void handleDoubleClickedItem(QTreeWidgetItem *t_item);
     void updateFilterExtensionsList();
     void updateTotalFiltered();
-    bool isFilterCreatingEnabled();
     bool isItemFilterable(const TreeWidgetItem *item);
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items_;
-    QStringList filterExtensions;
+    QStringList filterExtensions_;
 
     IconProvider icons_;
     FilterCreation mode_ = FC_Hidden;
