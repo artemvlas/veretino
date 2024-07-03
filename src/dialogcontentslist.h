@@ -97,8 +97,8 @@ private:
     void enableFilterCreating();
     void disableFilterCreating();
     void handleDoubleClickedItem(QTreeWidgetItem *t_item);
-    void updateFilterExtensionsList();
-    void updateTotalFiltered();
+    void updateLabelFilterExtensions();
+    void updateLabelTotalFiltered();
     bool isItemFilterable(const TreeWidgetItem *item);
     QStringList checkedExtensions();
 

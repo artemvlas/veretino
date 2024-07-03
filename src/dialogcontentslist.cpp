@@ -44,14 +44,14 @@ void DialogContentsList::connections()
 
     connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
 
-    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterExtensionsList);
+    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateLabelFilterExtensions);
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::handleDoubleClickedItem);
 
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
             [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
 
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateTotalFiltered);
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterExtensionsList);
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateLabelTotalFiltered);
+    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateLabelFilterExtensions);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogContentsList::enableFilterCreating);
 
@@ -111,7 +111,7 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
                                             .arg(format::dataSizeReadable(top10FilesSize)));
     }
 
-    updateFilterExtensionsList();
+    updateLabelFilterExtensions();
 }
 
 void DialogContentsList::setTotalInfo()
@@ -184,7 +184,7 @@ QStringList DialogContentsList::checkedExtensions()
     return result;
 }
 
-void DialogContentsList::updateFilterExtensionsList()
+void DialogContentsList::updateLabelFilterExtensions()
 {
     if (mode_ != FC_Enabled)
         return;
@@ -194,10 +194,10 @@ void DialogContentsList::updateFilterExtensionsList()
     ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
     ui->labelFilterExtensions->setText(filterExtensions_.join(" "));
 
-    updateTotalFiltered();
+    updateLabelTotalFiltered();
 }
 
-void DialogContentsList::updateTotalFiltered()
+void DialogContentsList::updateLabelTotalFiltered()
 {
     if (mode_ != FC_Enabled)
         return;
