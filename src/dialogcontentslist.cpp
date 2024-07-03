@@ -171,18 +171,25 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
+QStringList DialogContentsList::checkedExtensions()
+{
+    QStringList result;
+
+    for (int i = 0; i < items_.size(); ++i) {
+        if (!items_.at(i)->isHidden() && items_.at(i)->isChecked()) {
+            result.append(items_.at(i)->extension());
+        }
+    }
+
+    return result;
+}
+
 void DialogContentsList::updateFilterExtensionsList()
 {
     if (mode_ != FC_Enabled)
         return;
 
-    filterExtensions_.clear();
-
-    for (int i = 0; i < items_.size(); ++i) {
-        if (!items_.at(i)->isHidden() && items_.at(i)->isChecked()) {
-            filterExtensions_.append(items_.at(i)->extension());
-        }
-    }
+    filterExtensions_ = checkedExtensions();
 
     ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
     ui->labelFilterExtensions->setText(filterExtensions_.join(" "));

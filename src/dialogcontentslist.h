@@ -100,6 +100,7 @@ private:
     void updateFilterExtensionsList();
     void updateTotalFiltered();
     bool isItemFilterable(const TreeWidgetItem *item);
+    QStringList checkedExtensions();
 
     QList<ExtNumSize> extList_;
     QList<TreeWidgetItem *> items_;
