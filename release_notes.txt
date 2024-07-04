@@ -5,6 +5,7 @@ Veretino 0.4.1
 Fixes and Minor Enhancements:
 * Now the process cancelation prompt disappears automatically if it is no longer relevant.
 * Improved icons and titles of some dialog boxes.
+* Improved keyboard operation in the Filter Creation Dialog.
 
 ---
 Veretino 0.4.0
