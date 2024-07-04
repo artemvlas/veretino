@@ -170,25 +170,32 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
-// Include all except visible and checked
+// Include all except visible_checked and Db-Sha
 QList<TreeWidgetItem *> DialogContentsList::uncheckedItems() const
 {
-    //static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
     QList<TreeWidgetItem *> resultList;
+
+    if (mode_ != FC_Enabled)
+        return resultList;
+
+    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
 
     for (TreeWidgetItem *item : qAsConst(items_)) {
         if ((!item->isChecked() || item->isHidden())
-            && isItemFilterable(item))
+            && !unfilterable.contains(item->extension()))
             resultList.append(item);
     }
 
     return resultList;
 }
 
-// Include only visible and checked
+// Include only visible_checked
 QList<TreeWidgetItem *> DialogContentsList::checkedItems() const
 {
     QList<TreeWidgetItem *> resultList;
+
+    if (mode_ != FC_Enabled)
+        return resultList;
 
     for (TreeWidgetItem *item : qAsConst(items_)) {
         if (!item->isHidden() && item->isChecked())
@@ -230,7 +237,7 @@ void DialogContentsList::updateLabelTotalFiltered()
     if (mode_ != FC_Enabled)
         return;
 
-    // ? Include only visible and checked : Include all except visible and checked
+    // ? Include only visible_checked : Include all except visible_checked and Db-Sha
     const QList<TreeWidgetItem *> itemList = ui->rbInclude->isChecked() ? checkedItems() : uncheckedItems();
 
     int filteredFilesNumber = 0;
@@ -251,13 +258,9 @@ void DialogContentsList::updateLabelTotalFiltered()
 
 FilterRule DialogContentsList::resultFilter()
 {
-    QStringList filterExtensions = checkedExtensions();
-    if ((mode_ == FC_Enabled) && !filterExtensions.isEmpty()) {
-        FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-        return FilterRule(filterType, filterExtensions);
-    }
-
-    return FilterRule(true);
+    // (mode_ == FC_Enabled)
+    FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
+    return FilterRule(filterType, checkedExtensions());
 }
 
 void DialogContentsList::setFilterCreation(FilterCreation mode)
@@ -282,13 +285,13 @@ void DialogContentsList::updateViewMode()
     ui->labelTotalFiltered->clear();
     ui->labelFilterExtensions->clear();
 }
-
+/*
 bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item) const
 {
     QString ext = item->extension();
     return ((ext != ExtNumSize::strVeretinoDb) && (ext != ExtNumSize::strShaFiles));
 }
-
+*/
 void DialogContentsList::showEvent(QShowEvent *event)
 {
     // qDebug() << Q_FUNC_INFO;
