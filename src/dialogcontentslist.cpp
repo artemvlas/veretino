@@ -133,9 +133,10 @@ void DialogContentsList::setCheckboxesVisible(bool visible)
 {
     static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
 
-    for (int i = 0; i < items_.size(); ++i) {
-        items_.at(i)->setCheckBoxVisible(visible
-                                         && !excluded.contains(items_.at(i)->extension()));
+    QList<TreeWidgetItem *>::const_iterator i;
+    for (i = items_.constBegin(); i != items_.constEnd(); ++i) {
+        (*i)->setCheckBoxVisible(visible
+                                 && !excluded.contains((*i)->extension()));
     }
 }
 
@@ -170,27 +171,45 @@ void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
-// Include all except visible_checked and Db-Sha
-QList<TreeWidgetItem *> DialogContentsList::uncheckedItems() const
+bool DialogContentsList::isPassedChecked(const TreeWidgetItem *item) const
 {
-    QList<TreeWidgetItem *> resultList;
-
-    if (mode_ != FC_Enabled)
-        return resultList;
-
-    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
-
-    for (TreeWidgetItem *item : qAsConst(items_)) {
-        if ((!item->isChecked() || item->isHidden())
-            && !unfilterable.contains(item->extension()))
-            resultList.append(item);
-    }
-
-    return resultList;
+    // allow only visible_checked
+    return !item->isHidden() && item->isChecked();
 }
 
-// Include only visible_checked
-QList<TreeWidgetItem *> DialogContentsList::checkedItems() const
+bool DialogContentsList::isPassedUnChecked(const TreeWidgetItem *item) const
+{
+    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
+
+    // allow all except visible_checked and Db-Sha
+    return (!item->isChecked() || item->isHidden())
+           && !unfilterable.contains(item->extension());
+}
+
+bool DialogContentsList::isPassed(CheckState state, const TreeWidgetItem *item) const
+{
+    return (state == Checked && isPassedChecked(item))
+           || (state == UnChecked && isPassedUnChecked(item));
+}
+
+bool DialogContentsList::itemsContain(CheckState state) const
+{
+    if (mode_ != FC_Enabled)
+        return false;
+
+    bool contains = false;
+
+    for (const TreeWidgetItem *item : qAsConst(items_)) {
+        if (isPassed(state, item)) {
+            contains = true;
+            break;
+        }
+    }
+
+    return contains;
+}
+
+QList<TreeWidgetItem *> DialogContentsList::items(CheckState state) const
 {
     QList<TreeWidgetItem *> resultList;
 
@@ -198,7 +217,7 @@ QList<TreeWidgetItem *> DialogContentsList::checkedItems() const
         return resultList;
 
     for (TreeWidgetItem *item : qAsConst(items_)) {
-        if (!item->isHidden() && item->isChecked())
+        if (isPassed(state, item))
             resultList.append(item);
     }
 
@@ -208,7 +227,7 @@ QList<TreeWidgetItem *> DialogContentsList::checkedItems() const
 QStringList DialogContentsList::checkedExtensions() const
 {
     QStringList extensions;
-    const QList<TreeWidgetItem *> checked_items = checkedItems();
+    const QList<TreeWidgetItem *> checked_items = items(Checked);
 
     for (const TreeWidgetItem *item : checked_items) {
         extensions.append(item->extension());
@@ -222,8 +241,8 @@ void DialogContentsList::updateFilterDisplay()
     updateLabelFilterExtensions();
     updateLabelTotalFiltered();
 
-    bool isFiltered = ui->rbInclude->isChecked() ? !checkedItems().isEmpty()
-                                                 : !checkedItems().isEmpty() && !uncheckedItems().isEmpty();
+    bool isFiltered = ui->rbInclude->isChecked() ? itemsContain(Checked)
+                                                 : itemsContain(Checked) && itemsContain(UnChecked);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isFiltered);
 }
@@ -234,7 +253,7 @@ void DialogContentsList::updateLabelFilterExtensions()
         return;
 
     ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
-    ui->labelFilterExtensions->setText(checkedExtensions().join(" "));
+    ui->labelFilterExtensions->setText(checkedExtensions().join(", "));
 }
 
 void DialogContentsList::updateLabelTotalFiltered()
@@ -243,7 +262,7 @@ void DialogContentsList::updateLabelTotalFiltered()
         return;
 
     // ? Include only visible_checked : Include all except visible_checked and Db-Sha
-    const QList<TreeWidgetItem *> itemList = ui->rbInclude->isChecked() ? checkedItems() : uncheckedItems();
+    const QList<TreeWidgetItem *> itemList = items(ui->rbInclude->isChecked() ? Checked : UnChecked);
 
     int filteredFilesNumber = 0;
     qint64 filteredFilesSize = 0;
@@ -253,9 +272,12 @@ void DialogContentsList::updateLabelTotalFiltered()
         filteredFilesSize += item->filesSize();
     }
 
-    checkedItems().isEmpty() ? ui->labelTotalFiltered->clear()
-                             : ui->labelTotalFiltered->setText(QString("Filtered: %1")
-                                                                .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
+    if (itemsContain(Checked)) {
+        ui->labelTotalFiltered->setText(QString("Filtered: %1")
+                                        .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
+    }
+    else
+        ui->labelTotalFiltered->clear();
 }
 
 FilterRule DialogContentsList::resultFilter()

@@ -88,6 +88,7 @@ public:
 
 private:
     Ui::DialogContentsList *ui;
+    enum CheckState { Checked, UnChecked };
     void connections();
     void setTotalInfo();
     void makeItemsList(const QList<ExtNumSize> &extList);
@@ -100,8 +101,11 @@ private:
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
-    QList<TreeWidgetItem *> uncheckedItems() const;
-    QList<TreeWidgetItem *> checkedItems() const;
+    bool isPassedChecked(const TreeWidgetItem *item) const;
+    bool isPassedUnChecked(const TreeWidgetItem *item) const;
+    bool isPassed(CheckState state, const TreeWidgetItem *item) const;
+    bool itemsContain(CheckState state) const;
+    QList<TreeWidgetItem *> items(CheckState state) const;
     QStringList checkedExtensions() const;
 
     QList<ExtNumSize> extList_;
