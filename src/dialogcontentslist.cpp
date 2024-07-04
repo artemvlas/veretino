@@ -221,6 +221,11 @@ void DialogContentsList::updateFilterDisplay()
 {
     updateLabelFilterExtensions();
     updateLabelTotalFiltered();
+
+    bool isFiltered = ui->rbInclude->isChecked() ? !checkedItems().isEmpty()
+                                                 : !checkedItems().isEmpty() && !uncheckedItems().isEmpty();
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isFiltered);
 }
 
 void DialogContentsList::updateLabelFilterExtensions()
@@ -248,11 +253,8 @@ void DialogContentsList::updateLabelTotalFiltered()
         filteredFilesSize += item->filesSize();
     }
 
-    QStringList filterExtensions = checkedExtensions();
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!filterExtensions.isEmpty() && filteredFilesNumber > 0);
-
-    filterExtensions.isEmpty() ? ui->labelTotalFiltered->clear()
-                               : ui->labelTotalFiltered->setText(QString("Filtered: %1")
+    checkedItems().isEmpty() ? ui->labelTotalFiltered->clear()
+                             : ui->labelTotalFiltered->setText(QString("Filtered: %1")
                                                                 .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
 }
 
@@ -285,13 +287,7 @@ void DialogContentsList::updateViewMode()
     ui->labelTotalFiltered->clear();
     ui->labelFilterExtensions->clear();
 }
-/*
-bool DialogContentsList::isItemFilterable(const TreeWidgetItem *item) const
-{
-    QString ext = item->extension();
-    return ((ext != ExtNumSize::strVeretinoDb) && (ext != ExtNumSize::strShaFiles));
-}
-*/
+
 void DialogContentsList::showEvent(QShowEvent *event)
 {
     // qDebug() << Q_FUNC_INFO;
