@@ -8,6 +8,7 @@
 
 #include <QDialog>
 #include <QTreeWidgetItem>
+#include <QKeyEvent>
 #include "files.h"
 #include "iconprovider.h"
 
@@ -116,6 +117,7 @@ private:
 
 protected:
     void showEvent(QShowEvent *event) override;
+    void keyPressEvent(QKeyEvent* event) override;
 }; // class DialogContentsList
 
 #endif // DIALOGCONTENTSLIST_H

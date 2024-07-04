@@ -319,3 +319,23 @@ void DialogContentsList::showEvent(QShowEvent *event)
     updateViewMode();
     QDialog::showEvent(event);
 }
+
+void DialogContentsList::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        if (ui->treeWidget->currentItem()->isSelected())
+            handleDoubleClickedItem(ui->treeWidget->currentItem());
+        /*TreeWidgetItem *item = static_cast<TreeWidgetItem*>(ui->treeWidget->currentItem());
+        if (item->isCheckBoxVisible())
+            item->toggle();*/
+
+        return;
+    }
+
+    if (event->key() == Qt::Key_Escape && (mode_ == FC_Enabled) && itemsContain(Checked)) {
+        enableFilterCreating();
+        return;
+    }
+
+    QDialog::keyPressEvent(event);
+}
