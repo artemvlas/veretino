@@ -158,7 +158,7 @@ void DialogContentsList::enableFilterCreating()
 {
     setFilterCreation(FC_Enabled);
     ui->rbIgnore->setChecked(true);
-    setCheckboxesVisible(true);
+    //setCheckboxesVisible(true);
 
     if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
@@ -167,7 +167,7 @@ void DialogContentsList::enableFilterCreating()
 void DialogContentsList::disableFilterCreating()
 {
     setFilterCreation(FC_Disabled);
-    setCheckboxesVisible(false);
+    //setCheckboxesVisible(false);
 }
 
 void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
@@ -319,8 +319,9 @@ void DialogContentsList::updateViewMode()
     ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
     ui->checkBox_CreateFilter->setChecked(mode_ == FC_Enabled);
 
-    //if (mode_ != FC_Hidden) // disabled here due to extra call
-    //    setCheckboxesVisible(mode_ == FC_Enabled);
+    // the isVisible() condition is used to prevent an unnecessary call when opening the Dialog with FC_Disabled mode
+    if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
+        setCheckboxesVisible(mode_ == FC_Enabled);
 
     ui->labelTotalFiltered->clear();
     ui->labelFilterExtensions->clear();
