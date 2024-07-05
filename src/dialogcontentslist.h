@@ -95,6 +95,7 @@ private:
     void makeItemsList(const QList<ExtNumSize> &extList);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
+    void clearChecked();
     void updateViewMode();
     void enableFilterCreating();
     void disableFilterCreating();
