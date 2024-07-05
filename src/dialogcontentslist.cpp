@@ -332,8 +332,11 @@ void DialogContentsList::keyPressEvent(QKeyEvent* event)
         return;
     }
 
-    if (event->key() == Qt::Key_Escape && (mode_ == FC_Enabled) && itemsContain(Checked)) {
-        enableFilterCreating();
+    if (event->key() == Qt::Key_Escape && (mode_ == FC_Enabled)) {
+        if (itemsContain(Checked))
+            enableFilterCreating();
+        else
+            disableFilterCreating();
         return;
     }
 
