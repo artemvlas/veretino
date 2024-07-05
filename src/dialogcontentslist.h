@@ -98,7 +98,7 @@ private:
     void updateViewMode();
     void enableFilterCreating();
     void disableFilterCreating();
-    void handleDoubleClickedItem(QTreeWidgetItem *t_item);
+    void activateItem(QTreeWidgetItem *t_item);
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();

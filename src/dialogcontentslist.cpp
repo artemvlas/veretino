@@ -45,7 +45,7 @@ void DialogContentsList::connections()
     connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
 
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterDisplay);
-    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::handleDoubleClickedItem);
+    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::activateItem);
 
     connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
             [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
@@ -160,7 +160,7 @@ void DialogContentsList::disableFilterCreating()
     setCheckboxesVisible(false);
 }
 
-void DialogContentsList::handleDoubleClickedItem(QTreeWidgetItem *t_item)
+void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
 {
     if (mode_ == FC_Hidden)
         return;
@@ -323,12 +323,7 @@ void DialogContentsList::showEvent(QShowEvent *event)
 void DialogContentsList::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-        if (ui->treeWidget->currentItem()->isSelected())
-            handleDoubleClickedItem(ui->treeWidget->currentItem());
-        /*TreeWidgetItem *item = static_cast<TreeWidgetItem*>(ui->treeWidget->currentItem());
-        if (item->isCheckBoxVisible())
-            item->toggle();*/
-
+        activateItem(ui->treeWidget->currentItem());
         return;
     }
 
