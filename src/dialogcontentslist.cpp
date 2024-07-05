@@ -25,7 +25,7 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const QList<Ex
                                                                         : "../" + paths::basicName(folderPath);
     ui->labelFolderName->setText(folderName);
     ui->labelFolderName->setToolTip(folderPath);
-    ui->checkBox_Top10->setVisible(extList.size() > 15);
+    ui->chbTop10->setVisible(extList.size() > 15);
 
     setTotalInfo();
     makeItemsList(extList);
@@ -42,13 +42,13 @@ void DialogContentsList::connections()
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogContentsList::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogContentsList::reject);
 
-    connect(ui->checkBox_Top10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
+    connect(ui->chbTop10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
 
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterDisplay);
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::activateItem);
 
-    connect(ui->checkBox_CreateFilter, &QCheckBox::toggled, this,
-            [=](bool isChecked){ isChecked ? enableFilterCreating() : disableFilterCreating(); });
+    connect(ui->chbCreateFilter, &QCheckBox::toggled, this,
+            [=](bool isChecked){ isChecked ? enableFilterCreating() : setFilterCreation(FC_Disabled); });
 
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterDisplay);
 
@@ -82,7 +82,7 @@ void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
 void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 {
     if (!isTop10Checked) {
-        ui->checkBox_Top10->setText("Top10");
+        ui->chbTop10->setText("Top10");
 
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
             ui->treeWidget->topLevelItem(i)->setHidden(false);
@@ -105,9 +105,9 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
             }
         }
 
-        ui->checkBox_Top10->setText(QString("Top10: %1 files (%2)")
-                                            .arg(top10FilesNumber)
-                                            .arg(format::dataSizeReadable(top10FilesSize)));
+        ui->chbTop10->setText(QString("Top10: %1 files (%2)")
+                                    .arg(top10FilesNumber)
+                                    .arg(format::dataSizeReadable(top10FilesSize)));
     }
 
     updateFilterDisplay();
@@ -163,12 +163,12 @@ void DialogContentsList::enableFilterCreating()
     if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
 }
-
+/*
 void DialogContentsList::disableFilterCreating()
 {
     setFilterCreation(FC_Disabled);
     //setCheckboxesVisible(false);
-}
+}*/
 
 void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
 {
@@ -262,8 +262,10 @@ void DialogContentsList::updateFilterDisplay()
 
 void DialogContentsList::updateLabelFilterExtensions()
 {
-    if (mode_ != FC_Enabled)
+    if (mode_ != FC_Enabled) {
+        ui->labelFilterExtensions->clear();
         return;
+    }
 
     ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
     ui->labelFilterExtensions->setText(checkedExtensions().join(", "));
@@ -271,8 +273,10 @@ void DialogContentsList::updateLabelFilterExtensions()
 
 void DialogContentsList::updateLabelTotalFiltered()
 {
-    if (mode_ != FC_Enabled)
+    if (mode_ != FC_Enabled) {
+        ui->labelTotalFiltered->clear();
         return;
+    }
 
     // ? Include only visible_checked : Include all except visible_checked and Db-Sha
     const QList<TreeWidgetItem *> itemList = items(ui->rbInclude->isChecked() ? Checked : UnChecked);
@@ -317,14 +321,13 @@ void DialogContentsList::updateViewMode()
     ui->buttonBox->setVisible(mode_ == FC_Enabled);
 
     ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
-    ui->checkBox_CreateFilter->setChecked(mode_ == FC_Enabled);
+    ui->chbCreateFilter->setChecked(mode_ == FC_Enabled);
 
     // the isVisible() condition is used to prevent an unnecessary call when opening the Dialog with FC_Disabled mode
     if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
         setCheckboxesVisible(mode_ == FC_Enabled);
 
-    ui->labelTotalFiltered->clear();
-    ui->labelFilterExtensions->clear();
+    // updateFilterDisplay();
 }
 
 void DialogContentsList::showEvent(QShowEvent *event)
@@ -346,7 +349,7 @@ void DialogContentsList::keyPressEvent(QKeyEvent* event)
         if (itemsContain(Checked))
             clearChecked();
         else
-            disableFilterCreating();
+            setFilterCreation(FC_Disabled);
         return;
     }
 
