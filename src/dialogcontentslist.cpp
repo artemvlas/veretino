@@ -162,12 +162,6 @@ void DialogContentsList::enableFilterCreating()
     if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
 }
-/*
-void DialogContentsList::disableFilterCreating()
-{
-    setFilterCreation(FC_Disabled);
-    //setCheckboxesVisible(false);
-}*/
 
 void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
 {

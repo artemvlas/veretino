@@ -50,7 +50,6 @@ private:
     void connectManager(); // connections are separated for convenience
     void connections();
     bool argumentInput(); // using the path argument if it's provided
-    //QString getDatabaseStatusSummary();
     void handleChangedModel();
     void updateStatusIcon();
     void updateButtonInfo(); // sets the Button icon and text according the current Mode

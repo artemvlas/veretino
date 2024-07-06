@@ -415,47 +415,6 @@ void MainWindow::updatePermanentStatus()
     else
         statusBar->clearButtons();
 }
-/*
-QString MainWindow::getDatabaseStatusSummary()
-{
-    if (!ui->treeView->data_)
-        return QString();
-
-    const Numbers &numbers = ui->treeView->data_->numbers;
-    QString checkStatus;
-    static QString availNumber;
-    static QString availSize;
-
-    if (!proc_->isStarted()) {
-        QString newmissing;
-        QString mismatched;
-        QString matched;
-        QString sep;
-
-        if (numbers.contains(FileStatus::FlagNewLost))
-            newmissing = "* ";
-
-        if (numbers.contains(FileStatus::Mismatched))
-            mismatched = QString("☒%1").arg(numbers.numberOf(FileStatus::Mismatched));
-        if (numbers.contains(FileStatus::Matched))
-            matched = QString(" ✓%1").arg(numbers.numberOf(FileStatus::FlagMatched));
-
-        if (numbers.contains(FileStatus::FlagChecked))
-            sep = " : ";
-
-        checkStatus = QString("%1%2%3%4").arg(newmissing, mismatched, matched, sep);
-
-        // update only if the process is not running (there are no files with the "queued" status)
-        availNumber = QString("%1 avail.").arg(numbers.numberOf(FileStatus::FlagAvailable));
-        availSize = format::dataSizeReadable(numbers.totalSize(FileStatus::FlagAvailable));
-    }
-
-    return QString("%1%2 | %3 | %4")
-                    .arg(checkStatus, // %1
-                         availNumber, // %2
-                         availSize, // %3
-                         format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
-}*/
 
 void MainWindow::setWinTitleMismatchFound()
 {
