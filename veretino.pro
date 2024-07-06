@@ -6,6 +6,7 @@ CONFIG += c++17
 
 VERSION = 0.4.1
 DEFINES += APP_VERSION=\\\"$${VERSION}\\\"
+DEFINES += APP_NAME=\\\"Veretino\\\"
 
 SOURCES += \
     src/clickablelabel.cpp \

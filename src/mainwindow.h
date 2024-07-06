@@ -29,6 +29,10 @@ public slots:
     void showMessage(const QString &message, const QString &title = "Info");
     void updatePermanentStatus();
     void handlePathEdit();
+    void setWinTitleMismatched();
+    void updateWindowTitle();
+
+    // dialogs
     void showDbStatus();
     void showDialogContentsList(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
     void showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList); // the same^ dialog, but with filter creation mode enabled

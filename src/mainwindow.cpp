@@ -91,6 +91,7 @@ void MainWindow::connections()
     connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateStatusIcon);
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::handleChangedModel);
     connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
+    connect(ui->treeView, &View::modelChanged, this, &MainWindow::updateWindowTitle);
     connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
     connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
@@ -165,6 +166,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
+    connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updateWindowTitle);
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
 
     // process status
@@ -453,6 +455,20 @@ QString MainWindow::getDatabaseStatusSummary()
                          availSize, // %3
                          format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
 }*/
+
+void MainWindow::setWinTitleMismatched()
+{
+    setWindowTitle(QString("%1 | <!> mismatches found").arg(APP_NAME));
+}
+
+void MainWindow::updateWindowTitle()
+{
+    if (ui->treeView->isViewDatabase()
+        && ui->treeView->data_->numbers.contains(FileStatus::Mismatched))
+        setWinTitleMismatched();
+    else
+        setWindowTitle(APP_NAME);
+}
 
 void MainWindow::handlePathEdit()
 {
