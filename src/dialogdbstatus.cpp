@@ -38,7 +38,7 @@ void DialogDbStatus::setLabelsInfo()
     QString dbFileName = data_->databaseFileName();
 
     if (isSavedToDesktop())
-        dbFileName.prepend(".../DESKTOP/");
+        dbFileName.prepend("../DESKTOP/");
 
     ui->labelDbFileName->setText(dbFileName);
     ui->labelDbFileName->setToolTip(data_->metaData.databaseFilePath);

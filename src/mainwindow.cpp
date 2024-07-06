@@ -364,7 +364,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
 
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("A new Branch has been created");
-    msgBox.setText(QString("The subfolder data is forked:\n%1").arg(".../" + paths::basicName(dbFilePath)));
+    msgBox.setText(QString("The subfolder data is forked:\n%1").arg(paths::shortenPath(dbFilePath)));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
@@ -474,7 +474,7 @@ void MainWindow::updateWindowTitle()
 
         QString str = data->isAllMatched()
                       && !data->contains(FileStatus::Added | FileStatus::Updated)
-                          ? "✓ verified" : "DB ../" + paths::basicName(data->metaData.workDir);
+                          ? "✓ verified" : "DB > " + paths::shortenPath(data->metaData.workDir);
 
         setWindowTitle(QString("%1 | %2").arg(APP_NAME, str));
     }

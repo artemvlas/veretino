@@ -27,6 +27,7 @@ QStringList strToList(const QString &str); // finds a common separator and split
 namespace paths {
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
+QString shortenPath(const QString &path); // if not a root (or child of root) path, returns "../path"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 void browsePath(const QString &path);
 bool isRoot(const QString &path); // true: "/" or "C:/" or "C:"; else false
@@ -35,7 +36,7 @@ bool isRoot(const QString &path); // true: "/" or "C:/" or "C:"; else false
 namespace format {
 QString currentDateTime();
 
-QString numString(qint64 num); // Returns a string of numbers separated by commas: 1,234,567,890
+QString numString(qint64 num); // Returns a string with numbers separated by commas: 1,234,567,890
 QString millisecToReadable(qint64 milliseconds, bool approx = false); // converts milliseconds to readable time like "1 min 23 sec"
 QString dataSizeReadable(qint64 sizeBytes); // converts size in bytes to human readable form like "129.17 GiB"
 QString dataSizeReadableExt(qint64 sizeBytes); // returning style example: "6.08 GiB (6,532,974,324 bytes)"

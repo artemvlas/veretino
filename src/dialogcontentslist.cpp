@@ -21,8 +21,7 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const QList<Ex
     ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
     ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
 
-    QString folderName = paths::isRoot(paths::parentFolder(folderPath)) ? folderPath
-                                                                        : "../" + paths::basicName(folderPath);
+    QString folderName = paths::shortenPath(folderPath);
     ui->labelFolderName->setText(folderName);
     ui->labelFolderName->setToolTip(folderPath);
     ui->chbTop10->setVisible(extList.size() > 15);

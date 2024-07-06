@@ -124,6 +124,12 @@ QString basicName(const QString &path)
     */
 }
 
+QString shortenPath(const QString &path)
+{
+    return paths::isRoot(paths::parentFolder(path)) ? path
+                                                    : "../" + paths::basicName(path);
+}
+
 QString parentFolder(const QString &path)
 {
     if (path.isEmpty() || isRoot(path))
