@@ -93,6 +93,12 @@ bool DataContainer::isAllChecked() const
     return (contains(FileStatus::FlagChecked) && !contains(FileStatus::NotChecked));
 }
 
+bool DataContainer::isAllMatched() const
+{
+    return contains(FileStatus::Matched)
+           && !contains(FileStatus::Missing | FileStatus::Mismatched | FileStatus::NotChecked);
+}
+
 bool DataContainer::isDbFileState(DbFileState state) const
 {
     return (state == metaData.dbFileState);

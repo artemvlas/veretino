@@ -463,9 +463,18 @@ void MainWindow::setWinTitleMismatched()
 
 void MainWindow::updateWindowTitle()
 {
-    if (ui->treeView->isViewDatabase()
-        && ui->treeView->data_->numbers.contains(FileStatus::Mismatched))
-        setWinTitleMismatched();
+    if (ui->treeView->isViewDatabase()) {
+        const DataContainer *data = ui->treeView->data_;
+
+        if (data->numbers.contains(FileStatus::Mismatched)) {
+            setWinTitleMismatched();
+            return;
+        }
+
+        QString str = data->isAllMatched() ? "✓ verified" : "DB ../" + paths::basicName(data->metaData.workDir);
+
+        setWindowTitle(QString("%1 | %2").arg(APP_NAME, str));
+    }
     else
         setWindowTitle(APP_NAME);
 }

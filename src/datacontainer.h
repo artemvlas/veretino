@@ -49,6 +49,7 @@ public:
     bool isFilterApplied() const;
     bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
+    bool isAllMatched() const;
     bool isInCreation() const;
 
     bool isBackupExists() const;
