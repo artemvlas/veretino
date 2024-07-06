@@ -1,11 +1,12 @@
 Veretino 0.4.1
 * Redesigned and improved Status Bar.
 * Added the ability to analyze the contents of a database by type and size, similar to how the "Folder Contents" do.
+* The window title now displays some info about the database. A hint will also appear if any Mismatches are found during the verification process.
 
 Fixes and Minor Enhancements:
+* Improved keyboard operation in the Filter Creation Dialog.
 * Now the process cancelation prompt disappears automatically if it is no longer relevant.
 * Improved icons and titles of some dialog boxes.
-* Improved keyboard operation in the Filter Creation Dialog.
 
 ---
 Veretino 0.4.0
