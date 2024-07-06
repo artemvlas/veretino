@@ -453,6 +453,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     ShaCalculator shaCalc(dataMaintainer->data_->metaData.algorithm);
     shaCalc.setProcState(procState);
     int doneNum = 0;
+    bool isMismatchFound = false;
 
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
@@ -482,7 +483,12 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
                 if (checksum.isEmpty())
                     dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
                 else {
-                    dataMaintainer->updateChecksum(iter.index(), checksum);
+                    if (!dataMaintainer->updateChecksum(iter.index(), checksum)) {
+                        if (!isMismatchFound) { // the signal is only needed once
+                            emit mismatchFound();
+                            isMismatchFound = true;
+                        }
+                    }
                     ++doneNum;
                 }
             }

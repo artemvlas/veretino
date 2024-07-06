@@ -160,6 +160,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
     connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
     connect(manager, &Manager::dbContentsListCreated, this, &MainWindow::showDialogDbContents);
+    connect(manager, &Manager::mismatchFound, this, &MainWindow::setWinTitleMismatchFound);
 
     // results processing
     connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
@@ -456,7 +457,7 @@ QString MainWindow::getDatabaseStatusSummary()
                          format::algoToStr(ui->treeView->data_->metaData.algorithm)); // %4
 }*/
 
-void MainWindow::setWinTitleMismatched()
+void MainWindow::setWinTitleMismatchFound()
 {
     setWindowTitle(QString("%1 | <!> mismatches found").arg(APP_NAME));
 }
@@ -467,7 +468,7 @@ void MainWindow::updateWindowTitle()
         const DataContainer *data = ui->treeView->data_;
 
         if (data->numbers.contains(FileStatus::Mismatched)) {
-            setWinTitleMismatched();
+            setWinTitleMismatchFound();
             return;
         }
 

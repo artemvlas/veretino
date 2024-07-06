@@ -95,6 +95,7 @@ signals:
     void showMessage(const QString &text, const QString &title = "Info");
     void finishedCalcFileChecksum();
     void switchToFsPrepared();
+    void mismatchFound();
 }; // class Manager
 
 using DestFileProc = Manager::DestFileProc;

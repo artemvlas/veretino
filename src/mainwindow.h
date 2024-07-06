@@ -29,7 +29,7 @@ public slots:
     void showMessage(const QString &message, const QString &title = "Info");
     void updatePermanentStatus();
     void handlePathEdit();
-    void setWinTitleMismatched();
+    void setWinTitleMismatchFound();
     void updateWindowTitle();
 
     // dialogs
