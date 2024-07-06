@@ -22,9 +22,11 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 * And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
 
 <p align="center">
-  <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.
-  <br>Filters also can be applied to exclude unnecessary files.</em>
+  <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
   <br><img src="screenshots/veretino_mainview.png">
+  <br>
+  <br>Filters also can be applied to exclude unnecessary files.</em>
+  <br><img src="screenshots/veretino_fc.png">
   <br>
   <br><em>The resulting database is a local json file containing a list of paths and checksums.</em>
   <br><img src="screenshots/jsondb_example.png">
