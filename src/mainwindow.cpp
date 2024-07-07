@@ -553,7 +553,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     // temporary solution until appropriate Actions are added
     else if (event->key() == Qt::Key_F1 && modeSelect->isMode(Mode::DbIdle | Mode::DbCreating))
         showDbStatus();
-    else if (event->key() == Qt::Key_F5 && modeSelect->isMode(Mode::DbIdle))
+    else if (event->key() == Qt::Key_F5 && !proc_->isStarted() && modeSelect->isMode(Mode::DbIdle))
         emit modeSelect->resetDatabase();
     // TMP ^^^
 }
