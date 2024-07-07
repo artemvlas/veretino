@@ -202,6 +202,9 @@ void MainWindow::saveSettings()
 
 void MainWindow::showDbStatus()
 {
+    if (proc_->isState(State::StartSilently))
+        return;
+
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
         DialogDbStatus statusDialog(ui->treeView->data_, this);
 
