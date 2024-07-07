@@ -63,7 +63,7 @@ void StatusBar::setModeDb(const DataContainer *data)
         buttonDbHash = addPermanentButton();
         if (icons_)
             buttonDbHash->setIcon(icons_->icon(Icons::HashFile));
-        connect(buttonDbHash, &StatusBarButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbHash, &StatusBarButton::clicked, this, &StatusBar::buttonDbHashClicked);
     }
 
     if (!buttonDbSize) {

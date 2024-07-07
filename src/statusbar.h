@@ -69,6 +69,7 @@ signals:
     void buttonFsFilterClicked();
     void buttonDbStatusClicked();
     void buttonDbContentsClicked();
+    void buttonDbHashClicked();
 }; // class StatusBar
 
 #endif // STATUSBAR_H

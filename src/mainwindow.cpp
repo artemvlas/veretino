@@ -109,6 +109,7 @@ void MainWindow::connections()
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
     connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
     connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::_makeDbContentsList);
+    connect(statusBar, &StatusBar::buttonDbHashClicked, this, &MainWindow::handleButtonDbHashClick);
     connect(manager->procState, &ProcState::progressStarted, this,
             [=] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); });
     connect(manager->procState, &ProcState::progressFinished, this,
@@ -202,7 +203,6 @@ void MainWindow::saveSettings()
 void MainWindow::showDbStatus()
 {
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
-
         DialogDbStatus statusDialog(ui->treeView->data_, this);
 
         if (proc_->isStarted())
@@ -459,6 +459,16 @@ void MainWindow::handleChangedModel()
     modeSelect->menuAct_->actionShowFilesystem->setEnabled(!isViewFS);
     modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->isViewDatabase()
                                                  && ui->treeView->data_->isDbFileState(DbFileState::NotSaved));
+}
+
+void MainWindow::handleButtonDbHashClick()
+{
+    if (!proc_->isStarted() && ui->treeView->isViewDatabase()) {
+        if (ui->treeView->data_->numbers.contains(FileStatus::FlagChecked))
+            showDbStatus();
+        else
+            showMessage("There are no checked items yet.", "Unchecked DB");
+    }
 }
 
 void MainWindow::createContextMenu_Button(const QPoint &point)
