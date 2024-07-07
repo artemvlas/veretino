@@ -7,7 +7,7 @@ Fixes and Minor Enhancements:
 * Improved keyboard operation in the Filter Creation Dialog.
 * Now the process cancelation prompt disappears automatically if it is no longer relevant.
 * Improved icons, titles, and behavior of some dialog boxes.
-* Fixed unwanted behavior when pressing a button during a silent process (big data).
+* Fixed unwanted behavior when pressing the main Button and some keys during a silent process (big data).
 
 ---
 Veretino 0.4.0
