@@ -517,13 +517,16 @@ void ModeSelector::doWork()
             emit checkSummaryFile(view_->curPathFileSystem);
             break;
         case Model:
-            emit verify();
+            if (!proc_->isStarted())
+                emit verify();
             break;
         case ModelNewLost:
-            emit updateDatabase(DestDbUpdate::DestUpdateNewLost);
+            if (!proc_->isStarted())
+                emit updateDatabase(DestDbUpdate::DestUpdateNewLost);
             break;
         case UpdateMismatch:
-            emit updateDatabase(DestDbUpdate::DestUpdateMismatches);
+            if (!proc_->isStarted())
+                emit updateDatabase(DestDbUpdate::DestUpdateMismatches);
             break;
         case NoMode:
             showFileSystem();

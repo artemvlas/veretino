@@ -346,7 +346,7 @@ void MainWindow::dialogChooseFolder()
 
 void MainWindow::dialogOpenJson()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Select a Vereteno database", QDir::homePath(), "Veretino DB (*.ver *.ver.json)");
+    QString path = QFileDialog::getOpenFileName(this, "Select Vereteno Database", QDir::homePath(), "Veretino DB (*.ver *.ver.json)");
 
     if (!path.isEmpty()) {
         modeSelect->openJsonDatabase(path);
