@@ -511,7 +511,7 @@ void ModeSelector::doWork()
             emit processFileSha(view_->curPathFileSystem, settings_->algorithm());
             break;
         case DbFile:
-            emit parseJsonFile(view_->curPathFileSystem);
+            openJsonDatabase(view_->curPathFileSystem);
             break;
         case SumFile:
             emit checkSummaryFile(view_->curPathFileSystem);
