@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QThread>
+#include <QTimer>
 #include <QDebug>
 #include "files.h"
 #include "shacalculator.h"
@@ -68,7 +69,7 @@ void Manager::_processFolderSha(const MetaData &metaData)
     if (!procState->isCanceled()) { // saving to json
         dataMaintainer->updateDateTime();
         dataMaintainer->exportToJson();
-        emit dataMaintainer->databaseUpdated();
+        QTimer::singleShot(0, dataMaintainer, &DataMaintainer::databaseUpdated);
     }
 }
 
@@ -198,7 +199,7 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
         if (settings_->instantSaving)
             dataMaintainer->saveData();            
 
-        emit dataMaintainer->databaseUpdated();
+        QTimer::singleShot(0, dataMaintainer, &DataMaintainer::databaseUpdated);
     }
 }
 
