@@ -40,7 +40,6 @@ class StatusBar : public QStatusBar
     Q_OBJECT
 public:
     explicit StatusBar(QWidget *parent = nullptr);
-    ~StatusBar();
 
     void setIconProvider(const IconProvider *iconProvider);
     void setStatusText(const QString &text);
@@ -67,7 +66,7 @@ private:
 
 signals:
     void buttonFsFilterClicked();
-    void buttonDbStatusClicked();
+    void buttonDbListedClicked();
     void buttonDbContentsClicked();
     void buttonDbHashClicked();
 }; // class StatusBar

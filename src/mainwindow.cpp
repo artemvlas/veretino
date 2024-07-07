@@ -5,7 +5,6 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "dialogdbstatus.h"
 #include "dialogcontentslist.h"
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"
@@ -107,7 +106,7 @@ void MainWindow::connections()
 
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
-    connect(statusBar, &StatusBar::buttonDbStatusClicked, this, &MainWindow::showDbStatus);
+    connect(statusBar, &StatusBar::buttonDbListedClicked, this, [=]{ showDbStatusTab(DialogDbStatus::TabListed); });
     connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::_makeDbContentsList);
     connect(statusBar, &StatusBar::buttonDbHashClicked, this, &MainWindow::handleButtonDbHashClick);
     connect(manager->procState, &ProcState::progressStarted, this,
@@ -202,11 +201,17 @@ void MainWindow::saveSettings()
 
 void MainWindow::showDbStatus()
 {
+    showDbStatusTab(DialogDbStatus::TabAutoSelect);
+}
+
+void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
+{
     if (proc_->isState(State::StartSilently))
         return;
 
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
         DialogDbStatus statusDialog(ui->treeView->data_, this);
+        statusDialog.setCurrentTab(tab);
 
         if (proc_->isStarted())
             connect(proc_, &ProcState::progressFinished, &statusDialog, &DialogDbStatus::reject); // TMP
@@ -467,8 +472,11 @@ void MainWindow::handleChangedModel()
 void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->treeView->isViewDatabase()) {
-        if (ui->treeView->data_->numbers.contains(FileStatus::FlagChecked))
-            showDbStatus();
+        Numbers &numbers = ui->treeView->data_->numbers;
+        if (numbers.contains(FileStatus::FlagChecked))
+            showDbStatusTab(DialogDbStatus::TabVerification);
+        else if (numbers.contains(FileStatus::FlagDbChanged))
+            showDbStatusTab(DialogDbStatus::TabChanges);
         else
             showMessage("There are no checked items yet.", "Unchecked DB");
     }

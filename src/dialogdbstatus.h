@@ -20,11 +20,14 @@ class DialogDbStatus : public QDialog
 public:
     explicit DialogDbStatus(const DataContainer *data, QWidget *parent = nullptr);
     ~DialogDbStatus();
+
+    enum Tabs { TabListed, TabFilter, TabVerification, TabChanges, TabAutoSelect = 1000 };
+    void setCurrentTab(Tabs tab);
+
 private:
     Ui::DialogDbStatus *ui;
     const DataContainer *data_;
 
-    enum Tabs{ TabListed, TabFilter, TabVerification, TabChanges };
     QStringList infoContent();
     QStringList infoVerification();
     QStringList infoChanges();
@@ -37,6 +40,12 @@ private:
     bool isCreating();
     bool isJustCreated();
     bool isSavedToDesktop();
+
+    void selectCurTab();
+    bool autoTabSelection = true; // automatic selection of the current tab during execution
+
+protected:
+    void showEvent(QShowEvent *event) override;
 }; // class DialogDbStatus
 
 #endif // DIALOGDBSTATUS_H

@@ -27,6 +27,11 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     connections();
 }
 
+DialogDbStatus::~DialogDbStatus()
+{
+    delete ui;
+}
+
 void DialogDbStatus::connections()
 {
     connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [&]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
@@ -94,23 +99,6 @@ void DialogDbStatus::setTabsInfo()
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join("\n"));
     }
-}
-
-void DialogDbStatus::setVisibleTabs()
-{
-    // hide disabled tabs
-    for (int var = 0; var < ui->tabWidget->count(); ++var) {
-        ui->tabWidget->setTabVisible(var, ui->tabWidget->isTabEnabled(var));
-    }
-
-    // selecting the tab to open
-    Tabs curTab = TabListed;
-    if (ui->tabWidget->isTabEnabled(TabChanges))
-        curTab = TabChanges;
-    else if (ui->tabWidget->isTabEnabled(TabVerification))
-        curTab = TabVerification;
-
-    ui->tabWidget->setCurrentIndex(curTab);
 }
 
 QStringList DialogDbStatus::infoContent()
@@ -229,6 +217,33 @@ QStringList DialogDbStatus::infoChanges()
     return result;
 }
 
+void DialogDbStatus::setVisibleTabs()
+{
+    // hide disabled tabs
+    for (int var = 0; var < ui->tabWidget->count(); ++var) {
+        ui->tabWidget->setTabVisible(var, ui->tabWidget->isTabEnabled(var));
+    }
+}
+void DialogDbStatus::selectCurTab()
+{
+    // selecting the tab to open
+    Tabs curTab = TabListed;
+    if (ui->tabWidget->isTabEnabled(TabChanges))
+        curTab = TabChanges;
+    else if (ui->tabWidget->isTabEnabled(TabVerification))
+        curTab = TabVerification;
+
+    ui->tabWidget->setCurrentIndex(curTab);
+}
+
+void DialogDbStatus::setCurrentTab(Tabs tab)
+{
+    if (tab != TabAutoSelect && ui->tabWidget->isTabEnabled(tab)) {
+        ui->tabWidget->setCurrentIndex(tab);
+        autoTabSelection = false;
+    }
+}
+
 bool DialogDbStatus::isCreating()
 {
     return data_->isDbFileState(MetaData::NoFile);
@@ -245,7 +260,10 @@ bool DialogDbStatus::isSavedToDesktop()
             && (paths::parentFolder(data_->metaData.databaseFilePath) == Files::desktopFolderPath));
 }
 
-DialogDbStatus::~DialogDbStatus()
+void DialogDbStatus::showEvent(QShowEvent *event)
 {
-    delete ui;
+    if (autoTabSelection)
+        selectCurTab();
+
+    QDialog::showEvent(event);
 }

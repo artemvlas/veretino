@@ -18,11 +18,6 @@ StatusBar::StatusBar(QWidget *parent)
     addWidget(statusTextLabel, 1);
 }
 
-StatusBar::~StatusBar()
-{
-    qDebug() << Q_FUNC_INFO;
-}
-
 void StatusBar::setIconProvider(const IconProvider *iconProvider)
 {
     icons_ = iconProvider;
@@ -77,7 +72,7 @@ void StatusBar::setModeDb(const DataContainer *data)
         buttonDbMain = addPermanentButton();
         if (icons_)
             buttonDbMain->setIcon(icons_->icon(Icons::Database));
-        connect(buttonDbMain, &StatusBarButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbMain, &StatusBarButton::clicked, this, &StatusBar::buttonDbListedClicked);
     }
 
     // update info
@@ -111,7 +106,7 @@ void StatusBar::setModeDbCreating()
         if (icons_)
             buttonDbCreating->setIcon(icons_->icon(Icons::Database));
         buttonDbCreating->setText("Creating...");
-        connect(buttonDbCreating, &StatusBarButton::clicked, this, &StatusBar::buttonDbStatusClicked);
+        connect(buttonDbCreating, &StatusBarButton::clicked, this, &StatusBar::buttonDbListedClicked);
     }
 
     buttonDbCreating->show();

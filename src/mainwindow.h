@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "modeselector.h"
 #include "statusbar.h"
+#include "dialogdbstatus.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,6 +35,7 @@ public slots:
 
     // dialogs
     void showDbStatus();
+    void showDbStatusTab(DialogDbStatus::Tabs tab);
     void showDialogContentsList(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
     void showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList); // the same^ dialog, but with filter creation mode enabled
     void showDialogDbContents(const QString &folderName, const QList<ExtNumSize> &extList); // view DB contents
