@@ -142,7 +142,7 @@ void DialogContentsList::setCheckboxesVisible(bool visible)
     ui->treeWidget->blockSignals(false);
     updateFilterDisplay();
 
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 }
 
 void DialogContentsList::clearChecked()
@@ -157,7 +157,6 @@ void DialogContentsList::enableFilterCreating()
 {
     setFilterCreation(FC_Enabled);
     ui->rbIgnore->setChecked(true);
-    //setCheckboxesVisible(true);
 
     if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
         setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
@@ -292,7 +291,6 @@ void DialogContentsList::updateLabelTotalFiltered()
 
 FilterRule DialogContentsList::resultFilter()
 {
-    // (mode_ == FC_Enabled)
     FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
     return FilterRule(filterType, checkedExtensions());
 }
