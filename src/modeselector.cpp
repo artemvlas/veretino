@@ -203,17 +203,6 @@ QString ModeSelector::getButtonToolTip()
 
 Mode ModeSelector::mode() const
 {
-    /*if (proc_ && proc_->isStarted()) {
-        if (view_->isViewDatabase() && view_->data_->isInCreation())
-            return DbCreating;
-        if (proc_->isState(State::StartVerbose)) {
-            if (view_->isViewDatabase())
-                return DbProcessing;
-            else
-                return FileProcessing;
-        }
-    }*/
-
     if (view_->isViewDatabase()) {
         if (proc_ && proc_->isStarted()) {
             if (view_->data_->isInCreation())
@@ -276,8 +265,8 @@ void ModeSelector::promptItemFileUpd()
     switch (storedStatus) {
     case FileStatus::New:
         msgBox.setWindowTitle("No Checksum yet...");
-        msgBox.setText("This is a new file.");
-        msgBox.setInformativeText("Would you like to add it to the database?");
+        msgBox.setText("This is a new file.\nThe database does not yet contain a corresponding checksum.");
+        msgBox.setInformativeText("Would you like to calculate and add it?");
         msgBox.button(QMessageBox::Ok)->setText("Add");
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Added));
         break;
