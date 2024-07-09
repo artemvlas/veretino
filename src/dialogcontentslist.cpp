@@ -134,7 +134,7 @@ void DialogContentsList::setCheckboxesVisible(bool visible)
 
     ui->treeWidget->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
-    for (TreeWidgetItem *item : qAsConst(items_)) {
+    for (TreeWidgetItem *item : std::as_const(items_)) {
         item->setCheckBoxVisible(visible
                                  && !excluded.contains(item->extension()));
     }
@@ -204,7 +204,7 @@ bool DialogContentsList::itemsContain(CheckState state) const
 
     bool contains = false;
 
-    for (const TreeWidgetItem *item : qAsConst(items_)) {
+    for (const TreeWidgetItem *item : std::as_const(items_)) {
         if (isPassed(state, item)) {
             contains = true;
             break;
@@ -221,7 +221,7 @@ QList<TreeWidgetItem *> DialogContentsList::items(CheckState state) const
     if (mode_ != FC_Enabled)
         return resultList;
 
-    for (TreeWidgetItem *item : qAsConst(items_)) {
+    for (TreeWidgetItem *item : std::as_const(items_)) {
         if (isPassed(state, item))
             resultList.append(item);
     }

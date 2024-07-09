@@ -16,6 +16,7 @@
 
 class StatusBarButton : public QPushButton
 {
+    Q_OBJECT
 public:
     StatusBarButton(QWidget *parent = nullptr)
         : QPushButton(parent)
