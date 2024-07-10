@@ -15,60 +15,20 @@
 class TreeWidgetItem : public QTreeWidgetItem
 {
 public:
-    TreeWidgetItem(QTreeWidget* parent) : QTreeWidgetItem(parent){}
+    TreeWidgetItem(QTreeWidget* parent);
     enum Column { ColumnType, ColumnFilesNumber, ColumnTotalSize };
 
-    QString extension() const
-    {
-        return data(ColumnType, Qt::DisplayRole).toString();
-    }
-
-    int filesNumber() const
-    {
-        return data(ColumnFilesNumber, Qt::DisplayRole).toInt();
-    }
-
-    qint64 filesSize() const
-    {
-        return data(ColumnTotalSize, Qt::UserRole).toLongLong();
-    }
-
-    void setChecked(bool checked)
-    {
-        setCheckState(ColumnType, checked ? Qt::Checked : Qt::Unchecked);
-    }
-
-    void setCheckBoxVisible(bool visible)
-    {
-        visible ? setChecked(false) : setData(ColumnType, Qt::CheckStateRole, QVariant());
-    }
-
-    bool isChecked() const
-    {
-        QVariant checkState = data(ColumnType, Qt::CheckStateRole);
-        return (checkState.isValid() && checkState == Qt::Checked);
-    }
-
-    bool isCheckBoxVisible() const
-    {
-        return data(ColumnType, Qt::CheckStateRole).isValid();
-    }
-
-    void toggle()
-    {
-        if (isCheckBoxVisible())
-            setChecked(!isChecked());
-    }
+    void toggle();
+    void setChecked(bool checked);
+    void setCheckBoxVisible(bool visible);
+    bool isChecked() const;
+    bool isCheckBoxVisible() const;
+    int filesNumber() const;
+    qint64 filesSize() const;
+    QString extension() const;
 
 private:
-    bool operator <(const QTreeWidgetItem &other) const override
-    {
-        int column = treeWidget()->sortColumn();
-        if (column == ColumnTotalSize)
-            return data(column, Qt::UserRole).toLongLong() < other.data(column, Qt::UserRole).toLongLong();
-
-        return QTreeWidgetItem::operator <(other);
-    }
+    bool operator <(const QTreeWidgetItem &other) const override;
 }; // class TreeWidgetItem
 
 namespace Ui {
@@ -78,7 +38,6 @@ class DialogContentsList;
 class DialogContentsList : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit DialogContentsList(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
     ~DialogContentsList();
