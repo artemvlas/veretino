@@ -68,7 +68,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
     Numbers numbers = DataContainer::getNumbers(data->model_, rootFolder);
 
-    header["App/Origin"] = QString("Veretino %1 >> https://github.com/artemvlas/veretino").arg(APP_VERSION);
+    header["App/Origin"] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
     header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(data->metaData.workDir);
     header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
     header["Total Checksums"] = numbers.numberOf(FileStatus::FlagHasChecksum);

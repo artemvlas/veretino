@@ -16,12 +16,12 @@ DialogAbout::DialogAbout(QWidget *parent) :
     setWindowIcon(IconProvider::appIcon());
     ui->labelPix->setPixmap(IconProvider::appIcon().pixmap(100, 100));
 
-    ui->labelInfo->setText(QString("Veretino %1\n"
+    ui->labelInfo->setText(QString("%1\n"
                                    "Built: %2\n"
                                    "Qt at run-time: %3\n\n"
                                    "Free and open-source software\n"
                                    "GNU General Public License v3")
-                               .arg(APP_VERSION, __DATE__, qVersion()));
+                               .arg(APP_NAME_VERSION, __DATE__, qVersion()));
 
     ui->labelAuthor->setTextFormat(Qt::RichText);
     ui->labelAuthor->setOpenExternalLinks(true);
