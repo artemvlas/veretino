@@ -5,14 +5,14 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 ### The app allows you to check the folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
+* **Multiple** checksums calculator and organizer.
+* Validation of the _copied/moved/long-stored_ **folder**.
 * Checking the integrity of file **arrays.**
 * Verification of **folder** immutability.
-* Validation of the copied/moved/long-stored **folder**.
 * **Data audit**: analysis of folder contents, looking for folder-wide data changes.
 * Finding damaged files in a folder.
 * Checksums calculation, store and verification for **individual** files.
 * Comparing files by checksum.
-* Multiple checksums calculator and organizer.
 
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 
