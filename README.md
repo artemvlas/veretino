@@ -7,12 +7,12 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 #### Key features:
 * Checking the integrity of file **arrays.**
 * Verification of **folder** immutability.
-* Validation of the copied folder.
-* Multiple checksums calculator.
-* Folder/file-list data audit: analysis and verification of folder contents, looking for folder-wide data changes.
+* Validation of the copied/moved/long-stored **folder**.
+* **Data audit**: analysis of folder contents, looking for folder-wide data changes.
 * Finding damaged files in a folder.
 * Checksums calculation, store and verification for **individual** files.
 * Comparing files by checksum.
+* Multiple checksums calculator and organizer.
 
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 
