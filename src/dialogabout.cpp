@@ -28,12 +28,14 @@ DialogAbout::DialogAbout(QWidget *parent) :
                                     "<br>Home Page: <a href='https://github.com/artemvlas/veretino'>GitHub</a>")
                                 .arg(APP_NAME_VERSION, __DATE__, qVersion()));
 
+    ui->labelAuthor->setAlignment(Qt::AlignCenter);
     ui->labelAuthor->setTextFormat(Qt::RichText);
     ui->labelAuthor->setOpenExternalLinks(true);
-    ui->labelAuthor->setText("<center>Author/Developer: Artem Vlasenko"
-                             "<div><center>"
+
+    ui->labelAuthor->setText("Author/Developer: Artem Vlasenko"
+                             "<br>"
                              "<a href='mailto:artemvlas@proton.me?subject=Veretino'>artemvlas@proton.me</a>"
-                             "<div><center>"
+                             "<br>"
                              "<a href='https://github.com/artemvlas'>GitHub</a>"
                              "<br>"
                              "<br>"
