@@ -1,3 +1,8 @@
+Veretino 0.4.3
+* Added CMake build system.
+* Improved appearance of the "About box".
+
+---
 Veretino 0.4.2
 * Fixed Qt6 builds.
 
