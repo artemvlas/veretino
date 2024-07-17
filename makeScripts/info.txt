@@ -1,7 +1,9 @@
-# Script files must be executable
-chmod +x makeAppImage.sh
-chmod +x makeInstall.sh
+# Script files must be executable, if it's not:
+chmod +x scriptFileName.sh
 
-System requirements based on Manjaro Linux:
-makeInstall.sh: 'make' needed (sudo pacman -S make)
-makeAppImage.sh: 'libjxl' additionally required (sudo pacman -S libjxl)
+# Scripts were created and tested on Arch Linux (or based).
+# Other distros may have different command and package names, so some changes may need to be made.
+
+# It is assumed that the "base-devel" and "cmake" packages are already installed on the system.
+# If it's not, do:
+sudo pacman -S base-devel cmake
