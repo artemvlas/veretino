@@ -58,7 +58,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // if a computing process is running, show a hint when user wants to close the app
+    // if a computing process is running, show a prompt when user wants to close the app
     if (modeSelect->promptProcessAbort()) {
         proc_->setState(State::Abort); // just in case
         emit modeSelect->saveData();
@@ -340,7 +340,7 @@ void MainWindow::dialogChooseFolder()
     QString path = QFileDialog::getExistingDirectory(this, QString(), QDir::homePath());
 
     if (!path.isEmpty()) {
-        modeSelect->openFsPath(path);
+        modeSelect->showFileSystem(path);
     }
 }
 
@@ -524,7 +524,7 @@ void MainWindow::dropEvent(QDropEvent *event)
             modeSelect->openJsonDatabase(path);
         }
         else {
-            modeSelect->openFsPath(path);
+            modeSelect->showFileSystem(path);
         }
     }
 }

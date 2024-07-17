@@ -52,7 +52,6 @@ public:
     void processChecksumsPermFilter();
     void processChecksumsFiltered();
     void processFolderChecksums(const FilterRule &filter);
-    void openFsPath(const QString &path);
     void openJsonDatabase(const QString &filePath);
     void openRecentDatabase(const QAction *action);
     void openBranchDb();
@@ -73,6 +72,7 @@ public:
     void copyItem();
 
     void showFileSystem();
+    void showFileSystem(const QString &path);
 
     IconProvider iconProvider;
     MenuActions *menuAct_ = new MenuActions(this);

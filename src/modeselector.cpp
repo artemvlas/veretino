@@ -34,7 +34,7 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 void ModeSelector::connectActions()
 {
     // MainWindow menu
-    connect(menuAct_->actionShowFilesystem, &QAction::triggered, this, &ModeSelector::showFileSystem);
+    connect(menuAct_->actionShowFilesystem, &QAction::triggered, this, qOverload<>(&ModeSelector::showFileSystem));
     connect(menuAct_->actionClearRecent, &QAction::triggered, settings_, &Settings::clearRecentFiles);
     connect(menuAct_->actionSave, &QAction::triggered, this, &ModeSelector::saveData);
 
@@ -55,7 +55,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
     // DB Model View
-    connect(menuAct_->actionCancelBackToFS, &QAction::triggered, this, &ModeSelector::showFileSystem);
+    connect(menuAct_->actionCancelBackToFS, &QAction::triggered, this, qOverload<>(&ModeSelector::showFileSystem));
     connect(menuAct_->actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(menuAct_->actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(menuAct_->actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
@@ -337,14 +337,21 @@ void ModeSelector::copyItem()
 
 void ModeSelector::showFileSystem()
 {
-    if (view_->data_
-        && view_->data_->isDbFileState(DbFileState::NotSaved)) {
+    showFileSystem(QString());
+}
 
-        if (promptProcessAbort())
+void ModeSelector::showFileSystem(const QString &path)
+{
+    if (promptProcessAbort()) {
+        if (QFileInfo::exists(path))
+            view_->curPathFileSystem = path;
+
+        if (view_->data_
+            && view_->data_->isDbFileState(DbFileState::NotSaved))
             emit prepareSwitchToFs();
+        else
+            view_->setFileSystemModel();
     }
-    else
-        openFsPath(QString());
 }
 
 void ModeSelector::copyDataToClipboard(Column column)
@@ -355,16 +362,6 @@ void ModeSelector::copyDataToClipboard(Column column)
         QString strData = TreeModel::siblingAtRow(view_->curIndexSource, column).data().toString();
         if (!strData.isEmpty())
             QGuiApplication::clipboard()->setText(strData);
-    }
-}
-
-void ModeSelector::openFsPath(const QString &path)
-{
-    if (promptProcessAbort()) {
-        if (QFileInfo::exists(path))
-            view_->curPathFileSystem = path;
-
-        view_->setFileSystemModel();
     }
 }
 
