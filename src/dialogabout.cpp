@@ -12,7 +12,6 @@ DialogAbout::DialogAbout(QWidget *parent) :
     ui(new Ui::DialogAbout)
 {
     ui->setupUi(this);
-    //setFixedSize(400, 200);
     setWindowIcon(IconProvider::appIcon());
     ui->labelPix->setPixmap(IconProvider::appIcon().pixmap(100, 100));
 
@@ -40,7 +39,7 @@ DialogAbout::DialogAbout(QWidget *parent) :
                              "<br>"
                              "<br>"
                              "<br>"
-                             "Thanks to the Breeze Theme authors for the icons.");
+                             "Thanks to the Breeze Theme creators for the icons.");
 }
 
 DialogAbout::~DialogAbout()
