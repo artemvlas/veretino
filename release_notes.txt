@@ -1,4 +1,5 @@
 Veretino 0.4.3
+* Fixed a missed database save that occurred when there was unsaved data and a drag-and-drop event from the file system, or opening a folder from the menu.
 * Added CMake build system.
 * Improved appearance of the "About box".
 
