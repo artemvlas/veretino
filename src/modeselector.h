@@ -71,13 +71,11 @@ public:
     void checkFileByClipboardChecksum();
     void copyItem();
 
-    void showFileSystem();
-    void showFileSystem(const QString &path);
-
     IconProvider iconProvider;
     MenuActions *menuAct_ = new MenuActions(this);
 
 public slots:
+    void showFileSystem(const QString &path = QString());
     void createContextMenu_View(const QPoint &point);
     void getInfoPathItem();
 

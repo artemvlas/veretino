@@ -34,7 +34,7 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 void ModeSelector::connectActions()
 {
     // MainWindow menu
-    connect(menuAct_->actionShowFilesystem, &QAction::triggered, this, qOverload<>(&ModeSelector::showFileSystem));
+    connect(menuAct_->actionShowFilesystem, SIGNAL(triggered()), this, SLOT(showFileSystem())); // the old syntax is used to apply the default argument
     connect(menuAct_->actionClearRecent, &QAction::triggered, settings_, &Settings::clearRecentFiles);
     connect(menuAct_->actionSave, &QAction::triggered, this, &ModeSelector::saveData);
 
@@ -55,7 +55,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
     // DB Model View
-    connect(menuAct_->actionCancelBackToFS, &QAction::triggered, this, qOverload<>(&ModeSelector::showFileSystem));
+    connect(menuAct_->actionCancelBackToFS, SIGNAL(triggered()), this, SLOT(showFileSystem()));
     connect(menuAct_->actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(menuAct_->actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(menuAct_->actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
@@ -333,11 +333,6 @@ void ModeSelector::copyItem()
     QMimeData* mimeData = new QMimeData();
     mimeData->setUrls({QUrl::fromLocalFile(itemPath)});
     QGuiApplication::clipboard()->setMimeData(mimeData);
-}
-
-void ModeSelector::showFileSystem()
-{
-    showFileSystem(QString());
 }
 
 void ModeSelector::showFileSystem(const QString &path)
