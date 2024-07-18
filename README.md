@@ -30,7 +30,7 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
   <br><em>Filters also can be applied to exclude unnecessary files.</em>
   <br><img src="screenshots/veretino_fc.png">
   <br>
-  <br><em>The resulting database is a local json file containing a list of paths and checksums. (See  <a href="wiki/Veretino-Database-format">Veretino Database format</a>)</em>
+  <br><em>The resulting database is a local json file containing a list of paths and checksums. (See  <a href="https://github.com/artemvlas/veretino/wiki/Veretino-Database-format">Veretino Database format</a>)</em>
   <br><img src="screenshots/jsondb_example.png">
 </p>
 
