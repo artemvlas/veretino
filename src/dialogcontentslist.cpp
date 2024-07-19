@@ -102,7 +102,7 @@ void DialogContentsList::connections()
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::activateItem);
 
     connect(ui->chbCreateFilter, &QCheckBox::toggled, this,
-            [=](bool isChecked){ isChecked ? enableFilterCreating() : setFilterCreation(FC_Disabled); });
+            [=](bool isChecked){ setFilterCreation(isChecked ? FC_Enabled : FC_Disabled); });
 
     connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterDisplay);
 
@@ -206,15 +206,6 @@ void DialogContentsList::clearChecked()
         ui->rbIgnore->setChecked(true);
         setCheckboxesVisible(true);
     }
-}
-
-void DialogContentsList::enableFilterCreating()
-{
-    setFilterCreation(FC_Enabled);
-    ui->rbIgnore->setChecked(true);
-
-    if (geometry().height() < 450 && geometry().x() > 0) // geometry().x() == 0 if the function is called from the constructor
-        setGeometry(geometry().x(), geometry().y(), geometry().width(), 450);
 }
 
 void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
@@ -372,6 +363,9 @@ void DialogContentsList::updateViewMode()
     // the isVisible() condition is used to prevent an unnecessary call when opening the Dialog with FC_Disabled mode
     if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
         setCheckboxesVisible(mode_ == FC_Enabled);
+
+    if (mode_ == FC_Enabled)
+        ui->rbIgnore->setChecked(true);
 
     // updateFilterDisplay();
 }

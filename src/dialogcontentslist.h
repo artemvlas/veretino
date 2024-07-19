@@ -56,7 +56,6 @@ private:
     void setCheckboxesVisible(bool visible);
     void clearChecked();
     void updateViewMode();
-    void enableFilterCreating();
     void activateItem(QTreeWidgetItem *t_item);
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
