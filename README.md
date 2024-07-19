@@ -17,11 +17,13 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 
 #### How it works:
-* To begin with, the program calculates a list of checksums for all files (or for certain types of files) in the specified folder (and its subfolders) and stores it in the local database.
-* Once the list is ready, you can check the integrity of the data in this folder by comparing their checksums with those calculated and saved earlier. This can also be done only with selected file types by applying filters.
-* Also, the saved list (a database of folder contents) makes it possible to find new or missing files in a folder by comparing the current contents with a previously saved list.
-* The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
-* And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
+* To begin with, the program calculates a list of checksums for all files (or for selected file types using a filter) in the specified folder (and its subfolders) and stores it in the local database (see [Veretino Database format](https://github.com/artemvlas/veretino/wiki/Veretino-Database)).
+* Having a ready-made database, the program becomes able to check the integrity of the folder's data by reading its current contents and comparing it with the previously created data set.
+* The resulting data also makes it possible to find new or missing items by comparing the current contents with a previously one.
+
+The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
+
+And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
 
 <p align="center">
   <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
@@ -30,7 +32,7 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
   <br><em>Filters also can be applied to exclude unnecessary files.</em>
   <br><img src="screenshots/veretino_fc.png">
   <br>
-  <br><em>The resulting database is a local json file containing a list of paths and checksums. (See  <a href="https://github.com/artemvlas/veretino/wiki/Veretino-Database#format">Veretino Database format</a>)</em>
+  <br><em>The resulting database is a local json file containing a list of paths and checksums.</em>
   <br><img src="screenshots/jsondb_example.png">
 </p>
 
