@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>240</height>
+    <height>246</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,10 +27,10 @@
        <item>
         <widget class="QFrame" name="frame">
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::Shadow::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -60,7 +60,7 @@
        <item>
         <widget class="Line" name="line_2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -104,7 +104,7 @@ immediately after any changes are made.</string>
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -137,7 +137,7 @@ immediately after any changes are made.</string>
           <string>labelDatabaseFilename</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -154,10 +154,10 @@ immediately after any changes are made.</string>
        <item row="2" column="1">
         <widget class="QFrame" name="frame_3">
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::Shadow::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -186,7 +186,7 @@ immediately after any changes are made.</string>
        <item row="3" column="0" colspan="2">
         <widget class="Line" name="line">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -220,10 +220,10 @@ immediately after any changes are made.</string>
        <item row="1" column="2" colspan="2">
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::Shadow::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -246,7 +246,7 @@ immediately after any changes are made.</string>
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -292,7 +292,7 @@ immediately after any changes are made.</string>
        <item row="4" column="1">
         <widget class="QCheckBox" name="ignoreDbFiles">
          <property name="toolTip">
-          <string>Exclude *.ver.json files from the filelist</string>
+          <string>Exclude *.ver and *.ver.json files from the filelist</string>
          </property>
          <property name="text">
           <string>Ignore Veretino DB files</string>
@@ -302,7 +302,7 @@ immediately after any changes are made.</string>
        <item row="5" column="1">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -322,10 +322,10 @@ immediately after any changes are made.</string>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok|QDialogButtonBox::StandardButton::RestoreDefaults</set>
      </property>
     </widget>
    </item>
