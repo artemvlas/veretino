@@ -65,10 +65,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
         emit modeSelect->saveData();
         saveSettings();
 
+        if (ui->treeView->isViewDatabase())
+            ui->treeView->setModel(nullptr);
+
         event->accept();
     }
-    else
+    else {
         event->ignore();
+    }
 }
 
 void MainWindow::connections()
