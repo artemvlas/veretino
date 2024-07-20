@@ -1,4 +1,4 @@
-# Veretino: a new way to organize checksums
+# Veretino: a new way to verify data integrity
 _With this application, the integrity of both individual files and entire lists can be verified.
 Analyze the contents of folders, calculate checksums, and easily find modified or corrupted data..._
 
