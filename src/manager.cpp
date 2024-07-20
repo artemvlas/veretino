@@ -13,6 +13,7 @@
 #include "files.h"
 #include "shacalculator.h"
 #include "treemodeliterator.h"
+#include "tools.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)

@@ -9,7 +9,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include "treemodeliterator.h"
-#include "datamaintainer.h"
 #include <QDirIterator>
 
 JsonDb::JsonDb(QObject *parent)

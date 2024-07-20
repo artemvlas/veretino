@@ -22,6 +22,6 @@ protected:
 signals:
     void clicked();
     void doubleClicked();
-};
+}; // class ClickableLabel
 
 #endif // CLICKABLELABEL_H

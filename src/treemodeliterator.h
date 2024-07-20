@@ -6,7 +6,6 @@
 #ifndef TREEMODELITERATOR_H
 #define TREEMODELITERATOR_H
 #include <QAbstractItemModel>
-#include "tools.h"
 #include "treemodel.h"
 
 class TreeModelIterator
@@ -32,6 +31,6 @@ private:
     QModelIndex nextIndex_; // the next index is found in advance and used as a cache to avoid calling the function twice when hasNext()
 
     bool endReached = false;
-};
+}; // class TreeModelIterator
 
 #endif // TREEMODELITERATOR_H

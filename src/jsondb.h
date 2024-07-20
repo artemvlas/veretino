@@ -45,6 +45,6 @@ private:
 signals:
     void showMessage(const QString &text, const QString &title = "Info");
     void setStatusbarText(const QString &text = QString()); // text to statusbar
-};
+}; // class JsonDb
 
 #endif // JSONDB_H

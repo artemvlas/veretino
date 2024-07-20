@@ -47,9 +47,9 @@ public:
 
 private:
     QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;
+
 signals:
     void algorithmChanged();
-
 }; // class Settings
 
 #endif // SETTINGS_H

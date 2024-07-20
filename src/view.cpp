@@ -7,10 +7,11 @@
 #include <QTimer>
 #include <QDebug>
 #include <QKeyEvent>
-#include "treemodeliterator.h"
 #include <QHeaderView>
 #include <QAction>
 #include <QMenu>
+#include "tools.h"
+#include "treemodeliterator.h"
 
 View::View(QWidget *parent)
     : QTreeView(parent)

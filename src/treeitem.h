@@ -26,6 +26,6 @@ private:
     QList<TreeItem*> childItems;
     QVector<QVariant> itemData;
     TreeItem *parentItem;
-};
+}; // class TreeItem
 
 #endif // TREEITEM_H

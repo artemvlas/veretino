@@ -5,6 +5,7 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "tools.h"
 #include "dialogcontentslist.h"
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"

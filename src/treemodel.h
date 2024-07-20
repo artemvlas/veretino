@@ -9,7 +9,6 @@
 #include <QAbstractItemModel>
 #include "treeitem.h"
 #include "files.h"
-#include "tools.h"
 #include "iconprovider.h"
 
 class TreeItem;
@@ -21,8 +20,8 @@ public:
     explicit TreeModel(QObject *parent = nullptr);
     ~TreeModel();
 
-    enum ItemDataRoles {RawDataRole = 1000};
-    enum Column {ColumnName, ColumnSize, ColumnStatus, ColumnChecksum, ColumnReChecksum};
+    enum ItemDataRoles { RawDataRole = 1000 };
+    enum Column { ColumnName, ColumnSize, ColumnStatus, ColumnChecksum, ColumnReChecksum };
     Q_ENUM(Column)
 
     QVariant data(const QModelIndex &curIndex, int role) const override;

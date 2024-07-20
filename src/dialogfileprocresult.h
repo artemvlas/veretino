@@ -42,6 +42,6 @@ private:
     IconProvider icons_;
     QString filePath_;
     FileValues values_;
-};
+}; // class DialogFileProcResult
 
 #endif // DIALOGFILEPROCRESULT_H

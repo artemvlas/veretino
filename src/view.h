@@ -8,10 +8,7 @@
 
 #include <QTreeView>
 #include <QFileSystemModel>
-#include "tools.h"
 #include <QSortFilterProxyModel>
-#include "treemodel.h"
-#include "proxymodel.h"
 #include "datacontainer.h"
 #include "settings.h"
 

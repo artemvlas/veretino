@@ -4,7 +4,6 @@
  * https://github.com/artemvlas/veretino
 */
 #include "proxymodel.h"
-#include "tools.h"
 #include "treemodel.h"
 
 ProxyModel::ProxyModel(QObject *parent)
@@ -18,11 +17,6 @@ ProxyModel::ProxyModel(QAbstractItemModel *sourceModel, QObject *parent)
 {
     setInitSettings();
     setSourceModel(sourceModel);
-}
-
-ProxyModel::~ProxyModel()
-{
-    // qDebug() << Q_FUNC_INFO << this;
 }
 
 void ProxyModel::setInitSettings()

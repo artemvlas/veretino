@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QDebug>
 #include "iconprovider.h"
+#include "tools.h"
 
 DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     : QDialog(parent)
@@ -34,8 +35,8 @@ DialogDbStatus::~DialogDbStatus()
 
 void DialogDbStatus::connections()
 {
-    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [&]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
-    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [&]{ paths::browsePath(data_->metaData.workDir); });
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
+    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData.workDir); });
 }
 
 void DialogDbStatus::setLabelsInfo()

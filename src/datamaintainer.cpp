@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QDirIterator>
 #include "treemodeliterator.h"
+#include "tools.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)

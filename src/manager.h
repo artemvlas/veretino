@@ -7,8 +7,6 @@
 #define MANAGER_H
 
 #include <QObject>
-#include "tools.h"
-#include "treemodel.h"
 #include "datamaintainer.h"
 #include "view.h"
 #include "procstate.h"

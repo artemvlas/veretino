@@ -35,6 +35,6 @@ private:
     QElapsedTimer elapsedTimer;
     qint64 pieceTime_; // milliseconds
     qint64 pieceSize_;
-};
+}; // class ProgressBar
 
 #endif // PROGRESSBAR_H

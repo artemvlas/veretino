@@ -21,6 +21,6 @@ public:
     ~DialogAbout();
 private:
     Ui::DialogAbout *ui;
-};
+}; // class DialogAbout
 
 #endif // DIALOGABOUT_H

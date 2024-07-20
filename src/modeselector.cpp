@@ -11,6 +11,7 @@
 #include <QMimeData>
 #include <QDebug>
 #include <QAbstractButton>
+#include "tools.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), settings_(settings)

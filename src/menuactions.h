@@ -12,8 +12,8 @@
 #include <QAction>
 #include <QActionGroup>
 #include "iconprovider.h"
-#include "datacontainer.h"
 #include "settings.h"
+#include "numbers.h"
 
 class MenuActions : public QObject
 {
