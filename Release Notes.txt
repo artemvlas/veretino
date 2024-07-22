@@ -1,3 +1,7 @@
+Veretino 0.4.4
+* Window Title: fixed false "✓ verified" mark when resuming the process.
+
+---
 Veretino 0.4.3
 * Fixed a missed database save that occurred when there was unsaved data and a drag-and-drop event from the file system, or opening a folder from the menu.
 * Fixed a silent crash (occurred when closing the app with a setted database) on Qt6.
