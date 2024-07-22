@@ -89,7 +89,6 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateVerifDateTime()
 {
     if (data_ && data_->isAllMatched()) {
-
         data_->metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + format::currentDateTime();
         setDbFileState(DbFileState::NotSaved);
     }

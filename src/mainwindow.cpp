@@ -444,9 +444,9 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        QString str = data->isAllMatched()
-                      && !data->contains(FileStatus::Added | FileStatus::Updated)
-                          ? "✓ verified" : "DB > " + paths::shortenPath(data->metaData.workDir);
+        // && !data->contains(FileStatus::Added | FileStatus::Updated)
+        QString str = data->isAllMatched() ? "✓ verified"
+                                           : "DB > " + paths::shortenPath(data->metaData.workDir);
 
         setWindowTitle(QString("%1 | %2").arg(APP_NAME, str));
     }
