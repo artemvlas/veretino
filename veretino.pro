@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 
-VERSION = 0.4.3
+VERSION = 0.4.4
 DEFINES += APP_VERSION=\\\"$${VERSION}\\\"
 DEFINES += APP_NAME=\\\"Veretino\\\"
 DEFINES += "APP_NAME_VERSION=\"\\\"Veretino $${VERSION}\\\"\""
