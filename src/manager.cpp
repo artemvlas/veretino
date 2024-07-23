@@ -320,15 +320,23 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
         return;
     }
 
-    dataMaintainer->changeFilesStatus((FileStatus::Added | FileStatus::Updated), FileStatus::Matched, folderItemIndex);
+    // main job
     calculateChecksums(folderItemIndex, FileStatus::NotChecked);
 
     if (procState->isCanceled())
         return;
 
+    const Numbers &num = folderItemIndex.isValid() ? dataMaintainer->data_->getNumbers(folderItemIndex) // subfolder
+                                                   : dataMaintainer->data_->numbers; // root
+
+    // changing accompanying statuses to "Matched"
+    if (num.contains(FileStatus::Added | FileStatus::Updated)) {
+        dataMaintainer->changeFilesStatus((FileStatus::Added | FileStatus::Updated), FileStatus::Matched, folderItemIndex);
+    }
+
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        emit folderChecked(dataMaintainer->data_->numbers);
+        emit folderChecked(num);
 
         // Save the verification datetime, if needed
         if (settings_->saveVerificationDateTime) {
@@ -337,8 +345,6 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
     }
     else { // if subfolder
         QString subfolderName = TreeModel::itemName(folderItemIndex);
-        Numbers num = dataMaintainer->data_->getNumbers(folderItemIndex);
-
         emit folderChecked(num, subfolderName);
     }
 }
@@ -434,8 +440,8 @@ int Manager::calculateChecksums(FileStatus status)
 int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 {
     if (!dataMaintainer->data_
-        || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_)) {
-
+        || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_))
+    {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
     }
