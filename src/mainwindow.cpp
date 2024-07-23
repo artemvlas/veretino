@@ -308,7 +308,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     }
     else {
         messageText.append(QString("ALL %1 files passed verification.")
-                            .arg(result.numberOf(FileStatus::Matched)));
+                            .arg(result.numberOf(FileStatus::FlagMatched)));
     }
 
     msgBox.setWindowTitle(titleText);
