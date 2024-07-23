@@ -344,17 +344,20 @@ void ModeSelector::showFileSystem(const QString &path)
 
         if (view_->data_
             && view_->data_->isDbFileState(DbFileState::NotSaved))
+        {
             emit prepareSwitchToFs();
-        else
+        }
+        else {
             view_->setFileSystemModel();
+        }
     }
 }
 
 void ModeSelector::copyDataToClipboard(Column column)
 {
     if (view_->isViewDatabase()
-        && view_->curIndexSource.isValid()) {
-
+        && view_->curIndexSource.isValid())
+    {
         QString strData = TreeModel::siblingAtRow(view_->curIndexSource, column).data().toString();
         if (!strData.isEmpty())
             QGuiApplication::clipboard()->setText(strData);
@@ -571,8 +574,9 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
     viewContextMenu->addAction(menuAct_->actionToHome);
     viewContextMenu->addSeparator();
 
-    if (proc_->isState(State::StartVerbose))
+    if (proc_->isState(State::StartVerbose)) {
         viewContextMenu->addAction(menuAct_->actionStop);
+    }
     else if (index.isValid()) {
         if (isMode(Folder)) {
             viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
@@ -625,7 +629,9 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
         if (view_->data_->isDbFileState(DbFileState::NotSaved)
             || QFile::exists(view_->data_->backupFilePath()))
+        {
             viewContextMenu->addAction(menuAct_->actionForgetChanges);
+        }
 
         viewContextMenu->addSeparator();
         viewContextMenu->addAction(menuAct_->actionShowFilesystem);

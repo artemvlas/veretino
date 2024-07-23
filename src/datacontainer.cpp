@@ -96,9 +96,6 @@ bool DataContainer::isAllChecked() const
 
 bool DataContainer::isAllMatched() const
 {
-    //return contains(FileStatus::Matched)
-    //       && !contains(FileStatus::Missing | FileStatus::Mismatched | FileStatus::NotChecked);
-
     return !contains(FileStatus::FlagProcessing)
            && numbers.numberOf(FileStatus::Matched) == numbers.numberOf(FileStatus::FlagHasChecksum);
 }

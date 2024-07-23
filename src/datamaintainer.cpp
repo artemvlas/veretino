@@ -30,7 +30,7 @@ void DataMaintainer::connections()
     connect(json_, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
     connect(json_, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
-    connect(this, &DataMaintainer::numbersUpdated, this, [&]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
+    connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
                                                                   data_->metaData.datetime[DateTimeStr::DateVerified].clear(); });
 }
 
@@ -77,8 +77,9 @@ void DataMaintainer::clearOldData()
 void DataMaintainer::updateDateTime()
 {
     if (data_) {
-        if (data_->isDbFileState(DbFileState::NoFile))
+        if (data_->isDbFileState(DbFileState::NoFile)) {
             data_->metaData.datetime[DateTimeStr::DateCreated] = "Created: " + format::currentDateTime();
+        }
         else if (data_->contains(FileStatus::FlagDbChanged)) {
             data_->metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + format::currentDateTime();
             data_->metaData.datetime[DateTimeStr::DateVerified].clear();
@@ -163,8 +164,8 @@ void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatu
     if (data_
         && data_->numbers.moveFile(statusBefore,
                                    TreeModel::itemFileStatus(fileIndex),
-                                   TreeModel::itemFileSize(fileIndex))) {
-
+                                   TreeModel::itemFileSize(fileIndex)))
+    {
         emit numbersUpdated();
     }
 }
@@ -374,8 +375,9 @@ void DataMaintainer::exportToJson()
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
         data_->metaData.databaseFilePath = dbFilePath;
     }
-    else
+    else {
         setDbFileState(DbFileState::NotSaved);
+    }
 
     // debug info
     if (data_->isDbFileState(DbFileState::Saved))

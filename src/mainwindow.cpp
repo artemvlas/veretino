@@ -444,7 +444,6 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        // && !data->contains(FileStatus::Added | FileStatus::Updated)
         QString str = data->isAllMatched() ? "✓ verified"
                                            : "DB > " + paths::shortenPath(data->metaData.workDir);
 
