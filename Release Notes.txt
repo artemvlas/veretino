@@ -1,5 +1,6 @@
 Veretino 0.4.4
 * Window Title: fixed false "✓ verified" mark when resuming the process.
+* Minor performance optimization.
 
 ---
 Veretino 0.4.3
