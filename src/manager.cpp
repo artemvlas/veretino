@@ -326,17 +326,15 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
     if (procState->isCanceled())
         return;
 
-    const Numbers &num = folderItemIndex.isValid() ? dataMaintainer->data_->getNumbers(folderItemIndex) // subfolder
-                                                   : dataMaintainer->data_->numbers; // root
-
     // changing accompanying statuses to "Matched"
-    if (num.contains(FileStatus::Added | FileStatus::Updated)) {
-        dataMaintainer->changeFilesStatus((FileStatus::Added | FileStatus::Updated), FileStatus::Matched, folderItemIndex);
+    FileStatuses flagAddedUpdated = (FileStatus::Added | FileStatus::Updated);
+    if (dataMaintainer->data_->contains(flagAddedUpdated, folderItemIndex)) {
+        dataMaintainer->changeFilesStatus(flagAddedUpdated, FileStatus::Matched, folderItemIndex);
     }
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        emit folderChecked(num);
+        emit folderChecked(dataMaintainer->data_->numbers);
 
         // Save the verification datetime, if needed
         if (settings_->saveVerificationDateTime) {
@@ -344,7 +342,9 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
         }
     }
     else { // if subfolder
+        Numbers num = dataMaintainer->data_->getNumbers(folderItemIndex);
         QString subfolderName = TreeModel::itemName(folderItemIndex);
+
         emit folderChecked(num, subfolderName);
     }
 }
