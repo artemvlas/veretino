@@ -328,7 +328,7 @@ void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
 
     // changing accompanying statuses to "Matched"
     FileStatuses flagAddedUpdated = (FileStatus::Added | FileStatus::Updated);
-    if (dataMaintainer->data_->contains(flagAddedUpdated, folderItemIndex)) {
+    if (dataMaintainer->data_->numbers.contains(flagAddedUpdated)) {
         dataMaintainer->changeFilesStatus(flagAddedUpdated, FileStatus::Matched, folderItemIndex);
     }
 
