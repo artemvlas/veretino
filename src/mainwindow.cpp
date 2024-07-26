@@ -218,8 +218,9 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
         DialogDbStatus statusDialog(ui->treeView->data_, this);
         statusDialog.setCurrentTab(tab);
 
-        if (proc_->isStarted())
+        if (proc_->isStarted()) {
             connect(proc_, &ProcState::progressFinished, &statusDialog, &DialogDbStatus::reject); // TMP
+        }
 
         statusDialog.exec();
     }
@@ -331,8 +332,9 @@ void MainWindow::dialogSettings()
 {
     DialogSettings dialog(settings_, this);
 
-    if (proc_->isState(State::StartVerbose))
+    if (proc_->isState(State::StartVerbose)) {
         connect(proc_, &ProcState::progressFinished, &dialog, &DialogSettings::reject);
+    }
 
     if (dialog.exec()) {
         dialog.updateSettings();
@@ -423,10 +425,12 @@ void MainWindow::updatePermanentStatus()
         else if (!proc_->isStarted())
             statusBar->setModeDb(ui->treeView->data_);
     }
-    else if (ui->treeView->isViewFileSystem())
+    else if (ui->treeView->isViewFileSystem()) {
         statusBar->setModeFs(settings_->filter.isFilterEnabled());
-    else
+    }
+    else {
         statusBar->clearButtons();
+    }
 }
 
 void MainWindow::setWinTitleMismatchFound()
@@ -449,8 +453,9 @@ void MainWindow::updateWindowTitle()
 
         setWindowTitle(QString("%1 | %2").arg(APP_NAME, str));
     }
-    else
+    else {
         setWindowTitle(APP_NAME);
+    }
 }
 
 void MainWindow::handlePathEdit()
@@ -488,8 +493,9 @@ void MainWindow::handleButtonDbHashClick()
 
 void MainWindow::createContextMenu_Button(const QPoint &point)
 {
-    if (modeSelect->isMode(Mode::File | Mode::Folder))
+    if (modeSelect->isMode(Mode::File | Mode::Folder)) {
         modeSelect->menuAct_->menuAlgorithm(settings_->algorithm())->exec(ui->button->mapToGlobal(point));
+    }
 }
 
 bool MainWindow::argumentInput()
@@ -561,7 +567,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
         showDbStatus();
     }
     else if (event->key() == Qt::Key_F5
-               && !proc_->isStarted() && modeSelect->isMode(Mode::DbIdle))
+             && !proc_->isStarted() && modeSelect->isMode(Mode::DbIdle))
     {
         emit modeSelect->resetDatabase();
     }
