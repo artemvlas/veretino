@@ -1,4 +1,6 @@
 Veretino 0.4.4
+* Added exclusion of items added to the queue that became unavailable during the process.
+  They receive the status "missing/removed" and are skipped during processing.
 * Window Title: fixed premature "✓ verified" mark when resuming the process.
 * Minor UI improvements and performance optimizations.
 

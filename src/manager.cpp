@@ -489,7 +489,11 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
             if (!procState->isCanceled()) {
                 if (checksum.isEmpty()) {
-                    FileStatus _unread = QFileInfo::exists(dataMaintainer->data_->itemAbsolutePath(iter.index())) ? FileStatus::Unreadable: FileStatus::Removed;
+                    FileStatus _unread = FileStatus::Unreadable;
+                    if (!QFileInfo::exists(dataMaintainer->data_->itemAbsolutePath(iter.index()))) {
+                        _unread = dataMaintainer->data_->isInCreation() ? FileStatus::Removed : FileStatus::Missing;
+                    }
+
                     dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus,  _unread);
 
                     totalSize -= iter.size();
