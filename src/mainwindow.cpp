@@ -543,21 +543,29 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             else if (QMessageBox::question(this, "Exit...", "Close the Database?") == QMessageBox::Yes)
                 modeSelect->showFileSystem();
         }
-        // Verifying/Updating (not creating) DB
-        else if (modeSelect->isMode(Mode::DbProcessing)) {
+        // Verifying/Updating (not creating) DB || filesystem process
+        else if (modeSelect->isMode(Mode::DbProcessing | Mode::FileProcessing)) {
             modeSelect->promptProcessStop();
         }
         // other cases
         else if (modeSelect->promptProcessAbort()
-                 && !ui->treeView->isViewFileSystem()) {
-
+                 && !ui->treeView->isViewFileSystem())
+        {
             modeSelect->showFileSystem();
         }
     }
     // temporary solution until appropriate Actions are added
-    else if (event->key() == Qt::Key_F1 && modeSelect->isMode(Mode::DbIdle | Mode::DbCreating))
+    else if (event->key() == Qt::Key_F1
+             && modeSelect->isMode(Mode::DbIdle | Mode::DbCreating))
+    {
         showDbStatus();
-    else if (event->key() == Qt::Key_F5 && !proc_->isStarted() && modeSelect->isMode(Mode::DbIdle))
+    }
+    else if (event->key() == Qt::Key_F5
+               && !proc_->isStarted() && modeSelect->isMode(Mode::DbIdle))
+    {
         emit modeSelect->resetDatabase();
+    }
     // TMP ^^^
+
+    QMainWindow::keyPressEvent(event);
 }
