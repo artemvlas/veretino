@@ -14,6 +14,7 @@ class ProcState : public QObject
 public:
     explicit ProcState(QObject *parent = nullptr);
     void setTotalSize(qint64 totalSize);
+    void changeTotalSize(qint64 totalSize);
 
     enum State {
         Idle = 1 << 0,

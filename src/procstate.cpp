@@ -46,6 +46,13 @@ void ProcState::setTotalSize(qint64 totalSize)
     doneSize_ = 0;
 }
 
+void ProcState::changeTotalSize(qint64 totalSize)
+{
+    if (totalSize > doneSize_) {
+        totalSize_ = totalSize;
+    }
+}
+
 void ProcState::startProgress()
 {
     prevDoneSize_ = 0;
