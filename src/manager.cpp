@@ -491,7 +491,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
                 if (checksum.isEmpty()) {
                     FileStatus _unread = FileStatus::Unreadable;
                     if (!QFileInfo::exists(dataMaintainer->data_->itemAbsolutePath(iter.index()))) {
-                        _unread = dataMaintainer->data_->isInCreation() ? FileStatus::Removed : FileStatus::Missing;
+                        _unread = TreeModel::hasChecksum(iter.index()) ? FileStatus::Missing : FileStatus::Removed;
                     }
 
                     dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus,  _unread);
