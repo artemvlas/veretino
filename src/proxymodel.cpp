@@ -42,7 +42,9 @@ bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) con
     // folder + folder || file + file
     if ((sourceModel()->hasChildren(left) && sourceModel()->hasChildren(right))
         || (!sourceModel()->hasChildren(left) && !sourceModel()->hasChildren(right)))
+    {
         return QSortFilterProxyModel::lessThan(left, right);
+    }
 
     // folder + file
     return sourceModel()->hasChildren(left);

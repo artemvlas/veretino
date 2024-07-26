@@ -133,7 +133,6 @@ void StatusBar::clearButtons()
 {
     QList<StatusBarButton*> list = findChildren<StatusBarButton*>();
     for (int i = 0; i < list.size(); ++i) {
-        //removeWidget(list.at(i));
         list.at(i)->hide();
     }
 }

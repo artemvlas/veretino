@@ -747,6 +747,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
         abort ? abortProcess() : stopProcess();
         return true;
     }
-    else
+    else {
         return false;
+    }
 }

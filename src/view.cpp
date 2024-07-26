@@ -147,8 +147,9 @@ void View::setMismatchFiltering(const Numbers &num)
         showAllColumns();
         setFilter(FileStatus::Mismatched);
     }
-    else
+    else {
         hideColumn(Column::ColumnReChecksum);
+    }
 }
 
 void View::changeCurIndexAndPath(const QModelIndex &curIndex)
@@ -183,8 +184,9 @@ void View::setIndexByPath()
 
         QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
     }
-    else if (isViewDatabase())
+    else if (isViewDatabase()) {
         setIndexByPath(curPathModel);
+    }
 }
 
 void View::setIndexByPath(const QString &path)
@@ -225,8 +227,9 @@ void View::setFilter(const FileStatuses flags)
         setIndexByPath(prePathModel);
         setBackgroundColor();
     }
-    else if (isCurrentViewModel(ModelSource))
+    else if (isCurrentViewModel(ModelSource)) {
         data_->proxyModel_->setFilter(flags);
+    }
 }
 
 void View::editFilter(const FileStatuses flags, bool add)
@@ -287,7 +290,7 @@ bool View::isViewFiltered()
 bool View::isViewFiltered(const FileStatus status)
 {
     return isCurrentViewModel(ModelView::ModelProxy)
-           && data_->proxyModel_->currentlyFiltered() & status;
+           && (data_->proxyModel_->currentlyFiltered() & status);
 }
 
 void View::deleteOldSelModel()

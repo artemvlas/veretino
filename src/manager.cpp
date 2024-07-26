@@ -110,8 +110,8 @@ void Manager::resetDatabase()
 void Manager::restoreDatabase()
 {
     if (dataMaintainer->data_
-        && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved())) {
-
+        && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved()))
+    {
         runTask([&] { _createDataModel(dataMaintainer->data_->metaData.databaseFilePath); });
     }
     else
@@ -488,8 +488,9 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
             QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()));
 
             if (!procState->isCanceled()) {
-                if (checksum.isEmpty())
+                if (checksum.isEmpty()) {
                     dataMaintainer->data_->model_->setRowData(iter.index(), Column::ColumnStatus, FileStatus::Unreadable);
+                }
                 else {
                     if (!dataMaintainer->updateChecksum(iter.index(), checksum)) {
                         if (!isMismatchFound) { // the signal is only needed once

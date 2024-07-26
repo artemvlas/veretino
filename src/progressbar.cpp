@@ -35,8 +35,9 @@ void ProgressBar::setProgEnabled(bool enabled)
         timer->start(1000);
         elapsedTimer.start();
     }
-    else
+    else {
         timer->stop();
+    }
 
     setVisible(enabled);
     setValue(0);
@@ -49,8 +50,9 @@ void ProgressBar::updateProgressInfo()
         setFormat(QString("%p% | %1 | %2")
                       .arg(progSpeed(), progTimeLeft()));
     }
-    else
+    else {
         resetFormat();
+    }
 }
 
 void ProgressBar::updateDonePiece()
@@ -67,8 +69,9 @@ QString ProgressBar::progTimeLeft()
         qint64 timeleft = (procState_->remainingSize() / pieceSize_) * pieceTime_;
         result = format::millisecToReadable(timeleft, true);
     }
-    else
+    else {
         result = "∞";
+    }
 
     return result;
 }
@@ -81,8 +84,9 @@ QString ProgressBar::progSpeed()
         result = QString("%1/s")
                      .arg(format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000));
     }
-    else
+    else {
         result = "idle";
+    }
 
     return result;
 }

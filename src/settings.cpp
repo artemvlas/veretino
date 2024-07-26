@@ -38,13 +38,16 @@ QString Settings::dbFileExtension(bool isLong)
 void Settings::addRecentFile(const QString &filePath)
 {
     int ind = recentFiles.indexOf(filePath);
-    if (ind == -1)
+    if (ind == -1) {
         recentFiles.prepend(filePath); // add to the top of the list
-    else if (ind > 0)
+    }
+    else if (ind > 0) {
         recentFiles.move(ind, 0); // move the recent file to the top
+    }
 
-    if (recentFiles.size() > 15)
+    if (recentFiles.size() > 15) {
         recentFiles.removeLast();
+    }
 }
 
 void Settings::clearRecentFiles()
@@ -57,8 +60,9 @@ void Settings::saveSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
-    if (lastFsPath)
+    if (lastFsPath) {
         storedSettings.setValue("history/lastFsPath", restoreLastPathOnStartup ? *lastFsPath : QString());
+    }
 
     storedSettings.setValue("algorithm", algorithm_);
     storedSettings.setValue("dbPrefix", dbPrefix);
@@ -92,8 +96,9 @@ void Settings::loadSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
-    if (lastFsPath)
+    if (lastFsPath) {
         *lastFsPath = storedSettings.value("history/lastFsPath").toString();
+    }
 
     Settings defaults;
     algorithm_ = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm()).toInt());
