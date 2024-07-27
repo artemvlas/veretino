@@ -261,24 +261,31 @@ void ModeSelector::promptItemFileUpd()
     QMessageBox msgBox(view_);
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
-    msgBox.setIcon(QMessageBox::Question);
 
     switch (storedStatus) {
     case FileStatus::New:
+        static const QPixmap icoNew = iconProvider.icon(FileStatus::New).pixmap(64, 64);
+        msgBox.setIconPixmap(icoNew);
         msgBox.setWindowTitle("No Checksum yet...");
-        msgBox.setText("This is a new file.\nThe database does not yet contain a corresponding checksum.");
+        msgBox.setText("This is a new file.\n"
+                       "The database does not yet contain\n"
+                       "a corresponding checksum.");
         msgBox.setInformativeText("Would you like to calculate and add it?");
         msgBox.button(QMessageBox::Ok)->setText("Add");
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Added));
         break;
     case FileStatus::Missing:
+        static const QPixmap icoMissing = iconProvider.icon(FileStatus::Missing).pixmap(64, 64);
+        msgBox.setIconPixmap(icoMissing);
         msgBox.setWindowTitle("Missing File...");
         msgBox.setText("File does not exist.");
-        msgBox.setInformativeText("Would you like to remove it from the database?");
+        msgBox.setInformativeText("Remove the Item from the database?");
         msgBox.button(QMessageBox::Ok)->setText("Remove");
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Removed));
         break;
     case FileStatus::Mismatched:
+        static const QPixmap icoMismatch = iconProvider.icon(FileStatus::Mismatched).pixmap(64, 64);
+        msgBox.setIconPixmap(icoMismatch);
         msgBox.setWindowTitle("Mismatched Checksum...");
         msgBox.setText("The calculated and stored checksums do not match.");
         msgBox.setInformativeText("Do you want to update the stored one?");
