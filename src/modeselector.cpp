@@ -729,13 +729,14 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
 
     QString strAct = abort ? "Abort" : "Stop";
     QIcon icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
+    static const QPixmap icoMsgBox = iconProvider.icon(FileStatus::Calculating).pixmap(64, 64);
 
     QMessageBox msgBox(view_);
     connect(proc_, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
 
+    msgBox.setIconPixmap(icoMsgBox);
     msgBox.setWindowTitle("Processing...");
     msgBox.setText(QString("%1 current process?").arg(strAct));
-    msgBox.setIcon(QMessageBox::Question);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
     msgBox.button(QMessageBox::Yes)->setText(strAct);
