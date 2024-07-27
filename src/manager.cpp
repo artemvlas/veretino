@@ -485,12 +485,13 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
                                       .arg(numQueued)
                                       .arg(doneData));
 
-            QString checksum = shaCalc.calculate(paths::joinPath(dataMaintainer->data_->metaData.workDir, iter.path()));
+            QString curFilePath = dataMaintainer->data_->itemAbsolutePath(iter.index());
+            QString checksum = shaCalc.calculate(curFilePath);
 
             if (!procState->isCanceled()) {
                 if (checksum.isEmpty()) {
                     FileStatus _unread = FileStatus::Unreadable;
-                    if (!QFileInfo::exists(dataMaintainer->data_->itemAbsolutePath(iter.index()))) {
+                    if (!QFileInfo::exists(curFilePath)) {
                         _unread = TreeModel::hasChecksum(iter.index()) ? FileStatus::Missing : FileStatus::Removed;
                     }
 
