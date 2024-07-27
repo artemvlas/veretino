@@ -266,9 +266,8 @@ void ModeSelector::promptItemFileUpd()
     case FileStatus::New:
         static const QPixmap icoNew = iconProvider.icon(FileStatus::New).pixmap(64, 64);
         msgBox.setIconPixmap(icoNew);
-        msgBox.setWindowTitle("No Checksum yet...");
-        msgBox.setText("This is a new file.\n"
-                       "The database does not yet contain\n"
+        msgBox.setWindowTitle("New File...");
+        msgBox.setText("The database does not yet contain\n"
                        "a corresponding checksum.");
         msgBox.setInformativeText("Would you like to calculate and add it?");
         msgBox.button(QMessageBox::Ok)->setText("Add");
