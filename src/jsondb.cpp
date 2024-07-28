@@ -114,7 +114,9 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     while (iter.hasNext() && !proc_->isCanceled()) {
         iter.nextFile();
-        if (iter.status() == FileStatus::Unreadable) {
+        if (iter.status() == FileStatus::Unreadable
+            && iter.checksum().isEmpty())
+        {
             unreadableFiles.append(iter.path(rootFolder));
         }
         else {
