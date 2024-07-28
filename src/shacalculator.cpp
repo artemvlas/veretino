@@ -44,13 +44,12 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
                 emit doneChunk(buf.size());
             }
             else {
+                qDebug() << "ShaCalculator::calculate >> ERROR:" << filePath;
                 return QString();
             }
         }
 
-        if (proc_->isCanceled())
-            qDebug() << "ShaCalculator::calculate | Canceled";
-        else
+        if (!isCanceled())
             result = hash.result().toHex();
     }
 
