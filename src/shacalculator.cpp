@@ -39,8 +39,13 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
         QCryptographicHash hash(algo);
         while (!file.atEnd() && !isCanceled()) {
             const QByteArray &buf = file.read(chunk);
-            hash.addData(buf);
-            emit doneChunk(buf.size());
+            if (buf.size() > 0) {
+                hash.addData(buf);
+                emit doneChunk(buf.size());
+            }
+            else {
+                return QString();
+            }
         }
 
         if (proc_->isCanceled())
