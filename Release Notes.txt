@@ -1,3 +1,7 @@
+Veretino 0.4.5
+* Improved handling of damaged and unreadable files.
+
+---
 Veretino 0.4.4
 * Implemented skipping of queued items that became unavailable during the process.
 * Window Title: fixed premature "✓ verified" mark when resuming the process.
