@@ -18,8 +18,9 @@ public:
     const QModelIndex& index();
     QVariant data(Column column = Column::ColumnName, int role = TreeModel::RawDataRole);
     QString path(const QModelIndex &root = QModelIndex());
-    FileStatus status();
     qint64 size();
+    FileStatus status();
+    QString checksum();
 
 private:
     QModelIndex nextRow(const QModelIndex &curIndex);

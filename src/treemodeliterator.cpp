@@ -89,12 +89,17 @@ QString TreeModelIterator::path(const QModelIndex &root)
     return TreeModel::getPath(index_, root);
 }
 
+qint64 TreeModelIterator::size()
+{
+    return data(Column::ColumnSize).toLongLong();
+}
+
 FileStatus TreeModelIterator::status()
 {
     return data(Column::ColumnStatus).value<FileStatus>();
 }
 
-qint64 TreeModelIterator::size()
+QString TreeModelIterator::checksum()
 {
-    return data(Column::ColumnSize).toLongLong();
+    return data(Column::ColumnChecksum).toString();
 }
