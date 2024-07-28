@@ -120,7 +120,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
             unreadableFiles.append(iter.path(rootFolder));
         }
         else {
-            QString checksum = iter.data(Column::ColumnChecksum).toString();
+            QString checksum = iter.checksum();
             if (!checksum.isEmpty())
                 storedData.insert(iter.path(rootFolder), checksum);
         }
