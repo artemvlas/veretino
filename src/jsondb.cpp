@@ -206,8 +206,8 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         QString relPath = dir.relativeFilePath(fullPath);
 
         if (parsedData->metaData.filter.isFileAllowed(relPath)
-            && !filelistData.contains(relPath)) {
-
+            && !filelistData.contains(relPath))
+        {
             QFileInfo fileInfo(fullPath);
             if (fileInfo.isReadable()) {
                 parsedData->model_->addFile(relPath, FileValues(FileStatus::New, fileInfo.size()));
@@ -265,16 +265,25 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
 
     // [checking for files in the intended WorkDir]
     QString strWorkDir = findValueStr(header, strHeaderWorkDir);
+    bool isSpecWorkDir = strWorkDir.contains('/') && (isPresentInWorkDir(strWorkDir, fileList)
+                                                      || !isPresentInWorkDir(paths::parentFolder(filePath), fileList));
 
+    metaData.workDir = isSpecWorkDir ? strWorkDir : paths::parentFolder(filePath);
+
+    /* ^^^ reimplemented
     if (strWorkDir.contains('/')) {
         if (!isPresentInWorkDir(strWorkDir, fileList)
             && isPresentInWorkDir(paths::parentFolder(filePath), fileList))
+        {
             metaData.workDir = paths::parentFolder(filePath);
-        else
+        }
+        else {
             metaData.workDir = strWorkDir;
+        }
     }
-    else
+    else {
         metaData.workDir = paths::parentFolder(filePath);
+    }*/
 
     // [filter rule]
     QString strIgnored = findValueStr(header, strHeaderIgnored);
