@@ -163,7 +163,6 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
             emit setStatusbarText("Saved to Desktop");
             return resPathToSave;
         }
-
         else {
             emit setStatusbarText("NOT Saved");
             emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
@@ -269,21 +268,6 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
                                                       || !isPresentInWorkDir(paths::parentFolder(filePath), fileList));
 
     metaData.workDir = isSpecWorkDir ? strWorkDir : paths::parentFolder(filePath);
-
-    /* ^^^ reimplemented
-    if (strWorkDir.contains('/')) {
-        if (!isPresentInWorkDir(strWorkDir, fileList)
-            && isPresentInWorkDir(paths::parentFolder(filePath), fileList))
-        {
-            metaData.workDir = paths::parentFolder(filePath);
-        }
-        else {
-            metaData.workDir = strWorkDir;
-        }
-    }
-    else {
-        metaData.workDir = paths::parentFolder(filePath);
-    }*/
 
     // [filter rule]
     QString strIgnored = findValueStr(header, strHeaderIgnored);
