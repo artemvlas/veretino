@@ -358,7 +358,7 @@ QString fileItemStatus(FileStatus status)
         result = "missing";
         break;
     case FileStatus::Unreadable:
-        result = "ureadable";
+        result = "unreadable";
         break;
     case FileStatus::Added:
         result = "added";

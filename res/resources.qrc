@@ -70,5 +70,6 @@
         <file>icons/dark/process-stop.svg</file>
         <file>icons/light/help-about.svg</file>
         <file>icons/light/process-stop.svg</file>
+        <file>icons/generic/unreadable.svg</file>
     </qresource>
 </RCC>

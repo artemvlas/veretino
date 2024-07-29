@@ -71,7 +71,7 @@ QString IconProvider::svgFilePath(FileStatus status) const
         iconFileName = "missing";
         break;
     case FileStatus::Unreadable:
-        iconFileName = "unknown";
+        iconFileName = "unreadable";
         break;
     case FileStatus::Added:
         iconFileName = "added";
