@@ -277,7 +277,8 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
             emit showMessage("The checksum has been removed from the database.", "No Checksum");
             break;
         case FileStatus::Unreadable:
-            emit showMessage("This file has been excluded (Unreadable).\nNo checksum in the database.", "Unreadable File");
+            emit showMessage("The integrity of this file is not verifiable.\n"
+                             "Failed to read this file: no access or disk error.", "Unreadable File");
             break;
         default:
             emit showMessage("No checksum in the database.", "No Checksum");
