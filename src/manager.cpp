@@ -114,8 +114,9 @@ void Manager::restoreDatabase()
     {
         runTask([&] { _createDataModel(dataMaintainer->data_->metaData.databaseFilePath); });
     }
-    else
+    else {
         emit setStatusbarText("No saved changes");
+    }
 }
 
 void Manager::createDataModel(const QString &databaseFilePath)
@@ -135,8 +136,9 @@ void Manager::_createDataModel(const QString &databaseFilePath)
         dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
     }
-    else
+    else {
         emit setViewData();
+    }
 }
 
 void Manager::saveData()
@@ -177,8 +179,8 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
 
     else {
         if ((dest & DestAddNew)
-            && dataMaintainer->data_->contains(FileStatus::New)) {
-
+            && dataMaintainer->data_->contains(FileStatus::New))
+        {
             int numAdded = calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
 
             if (procState->isCanceled())
@@ -188,8 +190,8 @@ void Manager::_updateDatabase(const DestDbUpdate dest)
         }
 
         if ((dest & DestClearLost)
-            && dataMaintainer->data_->contains(FileStatus::Missing)) {
-
+            && dataMaintainer->data_->contains(FileStatus::Missing))
+        {
             dataMaintainer->clearLostFiles();
         }
     }
@@ -220,8 +222,9 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
         if (sum.isEmpty()) { // return previous status
             dataMaintainer->data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::New);
         }
-        else
+        else {
             dataMaintainer->updateChecksum(fileIndex, sum);
+        }
     }
     else if (fileStatusBefore == FileStatus::Missing) {
         dataMaintainer->itemFileRemoveLost(fileIndex);
@@ -268,7 +271,8 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     if (!tools::canBeChecksum(storedSum) || !(storedStatus & FileStatus::FlagAvailable)) {
         switch (storedStatus) {
         case FileStatus::New:
-            emit showMessage("The checksum is not yet in the database.\nPlease Update New/Lost", "New File");
+            emit showMessage("The checksum is not yet in the database.\n"
+                             "Please Update New/Lost", "New File");
             break;
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");
@@ -278,7 +282,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
             break;
         case FileStatus::Unreadable:
             emit showMessage("The integrity of this file is not verifiable.\n"
-                             "Failed to read this file: no access or disk error.", "Unreadable File");
+                             "Failed to read: no access or disk error.", "Unreadable File");
             break;
         default:
             emit showMessage("No checksum in the database.", "No Checksum");
@@ -309,8 +313,9 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 
 void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
 {
-    if (!dataMaintainer->data_)
+    if (!dataMaintainer->data_) {
         return;
+    }
 
     if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable, folderItemIndex)) {
         QString warningText = "There are no files available for verification.";
