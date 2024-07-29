@@ -72,6 +72,7 @@ public:
     QAction *actionDbClearLost = new QAction("Clear Lost files", this);
     QAction *actionFilterNewLost = new QAction("Filter New/Lost", this);
     QAction *actionFilterMismatches = new QAction("Filter Mismatches", this);
+    QAction *actionFilterUnreadable = new QAction("Filter Unreadable", this);
     QAction *actionShowAll = new QAction("Show All", this);
     QAction *actionCheckCurFileFromModel = new QAction("Check File", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check Folder", this);

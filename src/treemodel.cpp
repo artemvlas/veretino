@@ -157,7 +157,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
             else if (status == FileStatus::Mismatched)
                 return QColor(Qt::red);
             else if (status == FileStatus::Unreadable)
-                return QColor(Qt::darkYellow);
+                return QColor(Qt::darkRed);
         }
         else if (curIndex.column() == ColumnReChecksum)
             return QColor(Qt::darkGreen);

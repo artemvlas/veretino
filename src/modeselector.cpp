@@ -68,6 +68,8 @@ void ModeSelector::connectActions()
             [=](bool isChecked){ view_->editFilter(FileStatus::FlagNewLost, isChecked); });
     connect(menuAct_->actionFilterMismatches, &QAction::triggered, this,
             [=](bool isChecked){ view_->editFilter(FileStatus::Mismatched, isChecked); });
+    connect(menuAct_->actionFilterUnreadable, &QAction::triggered, this,
+            [=](bool isChecked){ view_->editFilter(FileStatus::Unreadable, isChecked); });
     connect(menuAct_->actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(menuAct_->actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(menuAct_->actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
@@ -649,6 +651,11 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
             if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
                 menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
                 viewContextMenu->addAction(menuAct_->actionFilterMismatches);
+            }
+
+            if (view_->data_->numbers.contains(FileStatus::Unreadable)) {
+                menuAct_->actionFilterUnreadable->setChecked(view_->isViewFiltered(FileStatus::Unreadable));
+                viewContextMenu->addAction(menuAct_->actionFilterUnreadable);
             }
 
             if (view_->data_->numbers.contains(FileStatus::FlagNewLost)) {

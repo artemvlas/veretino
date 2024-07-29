@@ -13,6 +13,7 @@ MenuActions::MenuActions(QObject *parent)
 {
     actionFilterNewLost->setCheckable(true);
     actionFilterMismatches->setCheckable(true);
+    actionFilterUnreadable->setCheckable(true);
 
     actionSetAlgoSha1->setCheckable(true);
     actionSetAlgoSha256->setCheckable(true);
@@ -87,6 +88,7 @@ void MenuActions::setActionsIcons()
     actionDbClearLost->setIcon(iconProvider.icon(FileStatus::Removed));
     actionFilterNewLost->setIcon(iconProvider.icon(Icons::NewFile));
     actionFilterMismatches->setIcon(iconProvider.icon(Icons::DocClose));
+    actionFilterUnreadable->setIcon(iconProvider.icon(FileStatus::Unreadable));
     actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
     actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
