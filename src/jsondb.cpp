@@ -219,16 +219,12 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     emit setStatusbarText("Parsing Json database...");
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); !proc_->isCanceled() && i != filelistData.constEnd(); ++i) {
-        FileValues curFileValues;
+        QString _fullPath = paths::joinPath(workDir, i.key());
+        bool _exist = QFileInfo::exists(_fullPath);
+        qint64 _size = _exist ? QFileInfo(_fullPath).size() : 0;
+        FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
 
-        QString fullPath = paths::joinPath(workDir, i.key());
-        if (QFileInfo::exists(fullPath)) {
-            curFileValues.size = QFileInfo(fullPath).size();
-            curFileValues.status = FileStatus::NotChecked;
-        }
-        else
-            curFileValues.status = FileStatus::Missing;
-
+        FileValues curFileValues(_status, _size);
         curFileValues.checksum = i.value().toString();
 
         parsedData->model_->addFile(i.key(), curFileValues);
@@ -243,8 +239,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
             for (int var = 0; !proc_->isCanceled() && var < unreadableFiles.size(); ++var) {
                 QString _unrFile = unreadableFiles.at(var).toString();
                 if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
-                    parsedData->model_->addFile(unreadableFiles.at(var).toString(),
-                                                FileValues(FileStatus::Unreadable));
+                    parsedData->model_->addFile(_unrFile, FileValues(FileStatus::Unreadable));
                 }
             }
         }
