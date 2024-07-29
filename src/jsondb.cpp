@@ -192,13 +192,14 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     }
 
     DataContainer* parsedData = new DataContainer(getMetaData(filePath, mainArray.at(0).toObject(), filelistData));
+    const QString &workDir = parsedData->metaData.workDir;
 
     // Filling in the Main Data
     // with very big Data, it is faster to add new files first, and then the main ones
     emit setStatusbarText("Looking for new files...");
 
-    QDir dir(parsedData->metaData.workDir);
-    QDirIterator it(parsedData->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
+    QDir dir(workDir);
+    QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !proc_->isCanceled()) {
         QString fullPath = it.next();
@@ -220,7 +221,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     for (i = filelistData.constBegin(); !proc_->isCanceled() && i != filelistData.constEnd(); ++i) {
         FileValues curFileValues;
 
-        QString fullPath = paths::joinPath(parsedData->metaData.workDir, i.key());
+        QString fullPath = paths::joinPath(workDir, i.key());
         if (QFileInfo::exists(fullPath)) {
             curFileValues.size = QFileInfo(fullPath).size();
             curFileValues.status = FileStatus::NotChecked;
@@ -233,17 +234,23 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         parsedData->model_->addFile(i.key(), curFileValues);
     }
 
-    QJsonObject excludedFiles(mainArray.at(2).toObject());
+    // additional data
+    QJsonObject excludedFiles = (mainArray.size() > 2) ? mainArray.at(2).toObject() : QJsonObject();
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
             QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
+
             for (int var = 0; !proc_->isCanceled() && var < unreadableFiles.size(); ++var) {
-                parsedData->model_->addFile(unreadableFiles.at(var).toString(),
-                                            FileValues(FileStatus::Unreadable));
+                QString _unrFile = unreadableFiles.at(var).toString();
+                if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
+                    parsedData->model_->addFile(unreadableFiles.at(var).toString(),
+                                                FileValues(FileStatus::Unreadable));
+                }
             }
         }
     }
 
+    // end
     emit setStatusbarText();
 
     if (proc_->isCanceled()) {
