@@ -1,3 +1,7 @@
+Veretino 0.5.0
+Internal changes:
+* Redesigned task management system.
+
 Veretino 0.4.5
 * Improved handling of damaged and unreadable files.
 
