@@ -30,12 +30,22 @@ public:
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
     ProcState *procState = new ProcState(this);
 
+    template<typename _Callable, typename... _Args>
+    void queueTask(_Callable&& __f, _Args&&... __args)
+    {
+        std::function<void()> func = std::bind(std::forward<_Callable>(__f), this, std::forward<_Args>(__args)...);
+        taskQueue_.append(func);
+
+        if (!procState->isStarted() && taskQueue_.size() == 1)
+            emit taskAdded();
+    }
+
 public slots:
     void processFolderSha(const MetaData &metaData);
     void branchSubfolder(const QModelIndex &subfolder);
     void updateDatabase(const DestDbUpdate dest);
     void updateItemFile(const QModelIndex &fileIndex);
-    void verify(const QModelIndex &curIndex);
+    //void verify(const QModelIndex &curIndex);
 
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
@@ -43,7 +53,7 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
     void createDataModel(const QString &databaseFilePath);
-    void resetDatabase(); // reopening and reparsing current database
+    //void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void saveData();
     void prepareSwitchToFs();
@@ -51,22 +61,27 @@ public slots:
     void getPathInfo(const QString &path); // info about file (size) or folder contents
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
-    void makeFolderContentsList(const QString &folderPath);
-    void makeFolderContentsFilter(const QString &folderPath);
+    //void makeFolderContentsList(const QString &folderPath);
+    //void makeFolderContentsFilter(const QString &folderPath);
     void makeDbContentsList();
+
+    void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
+    void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
+
+    void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
+
+    void runTasks();
 
 private:
     void runTask(std::function<void()> task);
 
-    void _processFolderSha(const MetaData &metaData);
-    void _updateDatabase(const DestDbUpdate dest);
-    void _createDataModel(const QString &databaseFilePath); // making the tree data model
-    void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
-    void _verifyFolderItem(const QModelIndex &folderItemIndex);
-    void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
+    //void _processFolderSha(const MetaData &metaData);
+    //void _updateDatabase(const DestDbUpdate dest);
+    //void _createDataModel(const QString &databaseFilePath); // making the tree data model
+    //void _verifyFolderItem(const QModelIndex &folderItemIndex);
+
     void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
-    void _folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
-    void _dbContentsList();
+    //void _dbContentsList();
 
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
@@ -78,6 +93,7 @@ private:
     bool isViewFileSysytem;
     Settings *settings_;
     Files *files_ = new Files(this);
+    QList<std::function<void()>> taskQueue_;
 
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
 
@@ -94,6 +110,7 @@ signals:
     void finishedCalcFileChecksum();
     void switchToFsPrepared();
     void mismatchFound();
+    void taskAdded();
 }; // class Manager
 
 using DestFileProc = Manager::DestFileProc;

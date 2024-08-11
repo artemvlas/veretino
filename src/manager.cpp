@@ -24,6 +24,8 @@ Manager::Manager(Settings *settings, QObject *parent)
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     connect(files_, &Files::setStatusbarText, this, &Manager::setStatusbarText);
+
+    connect(this, &Manager::taskAdded, this, &Manager::runTasks);
 }
 
 void Manager::runTask(std::function<void()> task)
@@ -35,18 +37,34 @@ void Manager::runTask(std::function<void()> task)
     procState->setState(State::Idle);
 }
 
-void Manager::processFolderSha(const MetaData &metaData)
+void Manager::runTasks()
 {
-    runTask([&] { _processFolderSha(metaData); });
+    qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
+
+    procState->setState(State::StartSilently);
+
+    while (!taskQueue_.isEmpty()) {
+        std::function<void()> func = taskQueue_.takeFirst();
+        func();
+    }
+
+    procState->setState(State::Idle);
 }
 
-void Manager::_processFolderSha(const MetaData &metaData)
+void Manager::processFolderSha(const MetaData &metaData)
 {
+    //runTask([&] { _processFolderSha(metaData); });
+//}
+
+//void Manager::_processFolderSha(const MetaData &metaData)
+//{
     if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
         emit showMessage("All files have been excluded.\n"
                          "Filtering rules can be changed in the settings.", "No proper files");
         return;
     }
+
+    qDebug() << thread()->objectName() << Q_FUNC_INFO;
 
     dataMaintainer->setSourceData();
     dataMaintainer->data_->metaData = metaData;
@@ -76,6 +94,8 @@ void Manager::_processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
+    qDebug() << thread()->objectName() << Q_FUNC_INFO;
+
     QString sum = calculateChecksum(filePath, algo);
 
     if (sum.isEmpty())
@@ -101,18 +121,20 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     emit fileProcessed(filePath, fileVal);
 }
 
-void Manager::resetDatabase()
+/*void Manager::resetDatabase()
 {
-    if (dataMaintainer->data_)
-        createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
-}
+    if (dataMaintainer->data_) {
+        //createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
+    }
+}*/
 
 void Manager::restoreDatabase()
 {
     if (dataMaintainer->data_
         && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved()))
     {
-        runTask([&] { _createDataModel(dataMaintainer->data_->metaData.databaseFilePath); });
+        //runTask([&] { _createDataModel(dataMaintainer->data_->metaData.databaseFilePath); });
+        createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
     }
     else {
         emit setStatusbarText("No saved changes");
@@ -122,16 +144,19 @@ void Manager::restoreDatabase()
 void Manager::createDataModel(const QString &databaseFilePath)
 {
     if (!tools::isDatabaseFile(databaseFilePath)) {
-        emit showMessage(QString("Wrong file: %1\nExpected file extension '*.ver' or '*.ver.json'").arg(databaseFilePath), "Wrong DB file!");
+        QString str = QString("Wrong file: %1\n"
+                              "Expected file extension '*.ver' or '*.ver.json'").arg(databaseFilePath);
+
+        emit showMessage(str, "Wrong DB file!");
         emit setViewData();
         return;
     }
 
-    runTask([&] { dataMaintainer->saveData(); _createDataModel(databaseFilePath); });
-}
+    qDebug() << thread()->objectName() << Q_FUNC_INFO;
+    //runTask([&] { dataMaintainer->saveData(); _createDataModel(databaseFilePath); });
 
-void Manager::_createDataModel(const QString &databaseFilePath)
-{
+    //dataMaintainer->saveData();
+
     if (dataMaintainer->importJson(databaseFilePath)) {
         dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
@@ -141,10 +166,23 @@ void Manager::_createDataModel(const QString &databaseFilePath)
     }
 }
 
+/*void Manager::_createDataModel(const QString &databaseFilePath)
+{
+    if (dataMaintainer->importJson(databaseFilePath)) {
+        dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
+        emit setViewData(dataMaintainer->data_);
+    }
+    else {
+        emit setViewData();
+    }
+}*/
+
 void Manager::saveData()
 {
-    if (dataMaintainer->isDataNotSaved())
-        runTask([&] { dataMaintainer->saveData(); });
+    if (dataMaintainer->isDataNotSaved()) {
+        //runTask([&] { dataMaintainer->saveData(); });
+        dataMaintainer->saveData();
+    }
 }
 
 void Manager::prepareSwitchToFs()
@@ -161,11 +199,11 @@ void Manager::prepareSwitchToFs()
 
 void Manager::updateDatabase(const DestDbUpdate dest)
 {
-    runTask([&] { _updateDatabase(dest); });
-}
+    //runTask([&] { _updateDatabase(dest); });
+//}
 
-void Manager::_updateDatabase(const DestDbUpdate dest)
-{
+//void Manager::_updateDatabase(const DestDbUpdate dest)
+//{
     if (!dataMaintainer->data_)
         return;
 
@@ -247,16 +285,17 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
 
 void Manager::branchSubfolder(const QModelIndex &subfolder)
 {
-    runTask([&] { dataMaintainer->forkJsonDb(subfolder); });
+    //runTask([&] { dataMaintainer->forkJsonDb(subfolder); });
+    dataMaintainer->forkJsonDb(subfolder);
 }
 
-void Manager::verify(const QModelIndex &curIndex)
+/*void Manager::verify(const QModelIndex &curIndex)
 {
     if (TreeModel::isFileRow(curIndex))
         verifyFileItem(curIndex);
     else
         verifyFolderItem(curIndex);
-}
+}*/
 
 // check only selected file instead of full database verification
 void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
@@ -308,11 +347,10 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
 void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 {
-    runTask([&] { _verifyFolderItem(folderItemIndex); });
-}
-
-void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
-{
+    //runTask([&] { _verifyFolderItem(folderItemIndex); });
+//}
+//void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
+//{
     if (!dataMaintainer->data_) {
         return;
     }
@@ -567,7 +605,8 @@ void Manager::getPathInfo(const QString &path)
         }
         else if (fileInfo.isDir()) {
             emit setStatusbarText("counting...");
-            runTask([&] { emit setStatusbarText(files_->getFolderSize(path)); });
+            //runTask([&] { emit setStatusbarText(files_->getFolderSize(path)); });
+            emit setStatusbarText(files_->getFolderSize(path));
         }
     }
 }
@@ -577,7 +616,7 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
     if (!isViewFileSysytem && dataMaintainer->data_)
         emit setStatusbarText(dataMaintainer->itemContentsInfo(curIndex));
 }
-
+/*
 void Manager::makeFolderContentsList(const QString &folderPath)
 {
     runTask([&]{ _folderContentsList(folderPath, false); });
@@ -586,9 +625,9 @@ void Manager::makeFolderContentsList(const QString &folderPath)
 void Manager::makeFolderContentsFilter(const QString &folderPath)
 {
     runTask([&]{ _folderContentsList(folderPath, true); });
-}
+}*/
 
-void Manager::_folderContentsList(const QString &folderPath, bool filterCreation)
+void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 {
     if (isViewFileSysytem) {
         if (Files::isEmptyFolder(folderPath)) {
@@ -609,11 +648,10 @@ void Manager::_folderContentsList(const QString &folderPath, bool filterCreation
 
 void Manager::makeDbContentsList()
 {
-    runTask([&]{ _dbContentsList(); });
-}
-
-void Manager::_dbContentsList()
-{
+    //runTask([&]{ _dbContentsList(); });
+//}
+//void Manager::_dbContentsList()
+//{
     if (!dataMaintainer->data_)
         return;
 

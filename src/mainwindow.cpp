@@ -22,7 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowIcon(IconProvider::appIcon());
-    QThread::currentThread()->setObjectName("MAIN Thread");
+    QThread::currentThread()->setObjectName("Main Thread");
+    thread->setObjectName("Manager Thread");
 
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->treeView->setSettings(settings_);
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     restoreGeometry(settings_->geometryMainWindow);
 
     modeSelect = new ModeSelector(ui->treeView, settings_, this);
+    modeSelect->setManager(manager);
     modeSelect->setProcState(manager->procState);
     ui->progressBar->setProcState(manager->procState);
     proc_ = manager->procState;
@@ -62,7 +64,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     // if a computing process is running, show a prompt when user wants to close the app
     if (modeSelect->promptProcessAbort()) {
         proc_->setState(State::Abort); // just in case
-        emit modeSelect->saveData();
+        modeSelect->saveData();
         saveSettings();
 
         if (ui->treeView->isViewDatabase())
@@ -126,11 +128,11 @@ void MainWindow::connectManager()
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<ModelView>("ModelView");
     qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");
-    qRegisterMetaType<MetaData>("MetaData");
+    //qRegisterMetaType<MetaData>("MetaData");
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
-    qRegisterMetaType<DestFileProc>("DestFileProc");
-    qRegisterMetaType<DestDbUpdate>("DestDbUpdate");
+    //qRegisterMetaType<DestFileProc>("DestFileProc");
+    //qRegisterMetaType<DestDbUpdate>("DestDbUpdate");
 
     manager->moveToThread(thread);
 
@@ -139,16 +141,16 @@ void MainWindow::connectManager()
     connect(thread, &QThread::finished, manager, &Manager::deleteLater);
 
     // signals for execution tasks
-    connect(modeSelect, &ModeSelector::parseJsonFile, manager, &Manager::createDataModel);
-    connect(modeSelect, &ModeSelector::processFolderSha, manager, &Manager::processFolderSha);
-    connect(modeSelect, &ModeSelector::processFileSha, manager, &Manager::processFileSha);
-    connect(modeSelect, &ModeSelector::verify, manager, &Manager::verify);
-    connect(modeSelect, &ModeSelector::updateDatabase, manager, &Manager::updateDatabase);
-    connect(modeSelect, &ModeSelector::updateItemFile, manager, &Manager::updateItemFile);
-    connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
-    connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
-    connect(modeSelect, &ModeSelector::branchSubfolder, manager, &Manager::branchSubfolder);
-    connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
+    //connect(modeSelect, &ModeSelector::parseJsonFile, manager, &Manager::createDataModel);
+    //connect(modeSelect, &ModeSelector::processFolderSha, manager, &Manager::processFolderSha);
+    //connect(modeSelect, &ModeSelector::processFileSha, manager, &Manager::processFileSha);
+    //connect(modeSelect, &ModeSelector::verify, manager, &Manager::verify);
+    //connect(modeSelect, &ModeSelector::updateDatabase, manager, &Manager::updateDatabase);
+    //connect(modeSelect, &ModeSelector::updateItemFile, manager, &Manager::updateItemFile);
+    //connect(modeSelect, &ModeSelector::checkSummaryFile, manager, &Manager::checkSummaryFile); // check *.sha1 *.sha256 *.sha512 summaries
+    //connect(modeSelect, &ModeSelector::checkFile, manager, qOverload<const QString&, const QString&>(&Manager::checkFile));
+    //connect(modeSelect, &ModeSelector::branchSubfolder, manager, &Manager::branchSubfolder);
+    //connect(modeSelect, &ModeSelector::saveData, manager, &Manager::saveData);
 
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusBar, &StatusBar::setStatusText);
@@ -156,11 +158,11 @@ void MainWindow::connectManager()
     connect(manager, &Manager::folderChecked, ui->treeView, &View::setMismatchFiltering);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
     connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
-    connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
-    connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
-    connect(modeSelect, &ModeSelector::makeFolderContentsList, manager, &Manager::makeFolderContentsList);
-    connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
-    connect(modeSelect, &ModeSelector::makeDbContentsList, manager, &Manager::makeDbContentsList);
+    //connect(modeSelect, &ModeSelector::getPathInfo, manager, &Manager::getPathInfo);
+    //connect(modeSelect, &ModeSelector::getIndexInfo, manager, &Manager::getIndexInfo);
+    //connect(modeSelect, &ModeSelector::makeFolderContentsList, manager, &Manager::makeFolderContentsList);
+    //connect(modeSelect, &ModeSelector::makeFolderContentsFilter, manager, &Manager::makeFolderContentsFilter);
+    //connect(modeSelect, &ModeSelector::makeDbContentsList, manager, &Manager::makeDbContentsList);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogContentsList);
     connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
     connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
@@ -184,10 +186,10 @@ void MainWindow::connectManager()
     connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateStatusIcon);
 
     // change view
-    connect(modeSelect, &ModeSelector::prepareSwitchToFs, manager, &Manager::prepareSwitchToFs);
+    //connect(modeSelect, &ModeSelector::prepareSwitchToFs, manager, &Manager::prepareSwitchToFs);
     connect(manager, &Manager::switchToFsPrepared, ui->treeView, &View::setFileSystemModel);
-    connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
-    connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
+    //connect(modeSelect, &ModeSelector::resetDatabase, manager, &Manager::resetDatabase); // reopening and reparsing current database
+    //connect(modeSelect, &ModeSelector::restoreDatabase, manager, &Manager::restoreDatabase);
     connect(ui->treeView, &View::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
@@ -318,7 +320,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
     int ret = msgBox.exec();
     if (result.contains(FileStatus::Mismatched) && ret == QMessageBox::Ok) {
-        emit modeSelect->updateDatabase(DestDbUpdate::DestUpdateMismatches);
+        modeSelect->updateDatabase(DestDbUpdate::DestUpdateMismatches);
     }
 }
 
@@ -505,7 +507,8 @@ bool MainWindow::argumentInput()
         argPath.replace("\\", "/"); // win-->posix
         if (QFileInfo::exists(argPath)) {
             if (QFileInfo(argPath).isFile() && tools::isDatabaseFile(argPath)) {
-                emit modeSelect->parseJsonFile(argPath);
+                //emit modeSelect->parseJsonFile(argPath);
+                modeSelect->openJsonDatabase(argPath);
             }
             else {
                 ui->treeView->setFileSystemModel();
@@ -569,7 +572,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     else if (event->key() == Qt::Key_F5
              && !proc_->isStarted() && modeSelect->isMode(Mode::DbIdle))
     {
-        emit modeSelect->resetDatabase();
+        modeSelect->resetDatabase();
     }
     // TMP ^^^
 
