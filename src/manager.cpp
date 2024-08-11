@@ -27,7 +27,7 @@ Manager::Manager(Settings *settings, QObject *parent)
 
     connect(this, &Manager::taskAdded, this, &Manager::runTasks);
 }
-
+/*
 void Manager::runTask(std::function<void()> task)
 {
     procState->setState(State::StartSilently);
@@ -35,20 +35,26 @@ void Manager::runTask(std::function<void()> task)
     task();
 
     procState->setState(State::Idle);
-}
+}*/
 
 void Manager::runTasks()
 {
     qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
 
-    procState->setState(State::StartSilently);
-
     while (!taskQueue_.isEmpty()) {
+        if (!procState->isStarted())
+            procState->setState(State::StartSilently);
+
         std::function<void()> func = taskQueue_.takeFirst();
         func();
     }
 
     procState->setState(State::Idle);
+}
+
+void Manager::clearTasks()
+{
+    taskQueue_.clear();
 }
 
 void Manager::processFolderSha(const MetaData &metaData)

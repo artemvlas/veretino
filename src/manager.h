@@ -36,9 +36,11 @@ public:
         std::function<void()> func = std::bind(std::forward<_Callable>(__f), this, std::forward<_Args>(__args)...);
         taskQueue_.append(func);
 
-        if (!procState->isStarted() && taskQueue_.size() == 1)
+        if (procState->isState(State::Idle) && taskQueue_.size() == 1)
             emit taskAdded();
     }
+
+    void clearTasks();
 
 public slots:
     void processFolderSha(const MetaData &metaData);
@@ -73,7 +75,7 @@ public slots:
     void runTasks();
 
 private:
-    void runTask(std::function<void()> task);
+    //void runTask(std::function<void()> task);
 
     //void _processFolderSha(const MetaData &metaData);
     //void _updateDatabase(const DestDbUpdate dest);

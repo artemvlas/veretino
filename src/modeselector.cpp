@@ -107,8 +107,10 @@ void ModeSelector::setProcState(ProcState *procState)
 
 void ModeSelector::abortProcess()
 {
-    if (proc_->isStarted())
+    if (proc_->isStarted()) {
         proc_->setState(State::Abort);
+        manager_->clearTasks();
+    }
 }
 
 void ModeSelector::stopProcess()
