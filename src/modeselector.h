@@ -112,26 +112,7 @@ private:
     Manager *manager_ = nullptr;
 
 signals:
-    //void getPathInfo(const QString &path); // info about folder contents or file (size)
-    //void getIndexInfo(const QModelIndex &curIndex); // info about database item (file or subfolder index)
-    //void processFolderSha(const MetaData &metaData);
-    //void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result = DestFileProc::Generic);
-    //void parseJsonFile(const QString &path);
-    //void verify(const QModelIndex& index = QModelIndex());
-    //void updateDatabase(const DestDbUpdate task);
-    //void updateItemFile(const QModelIndex &fileIndex);
-    //void checkSummaryFile(const QString &path);
-    //void checkFile(const QString &filePath, const QString &checkSum);
-    //void resetDatabase(); // reopening and reparsing current database
-    //void restoreDatabase();
-    //void dbItemContents(const QString &itemPath);
-    //void makeFolderContentsList(const QString &folderPath);
-    //void makeFolderContentsFilter(const QString &folderPath);
-    //void makeDbContentsList();
-    //void branchSubfolder(const QModelIndex &subfolder);
-    //void makeSumFile(const QString &originFilePath, const QString &checksum);
-    //void saveData();
-    //void prepareSwitchToFs();
+
 }; // class ModeSelector
 
 using Mode = ModeSelector::Mode;

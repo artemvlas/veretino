@@ -16,15 +16,6 @@
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), settings_(settings)
 {
-    //connect(this, &ModeSelector::getPathInfo, this, &ModeSelector::abortProcess);
-    //connect(this, &ModeSelector::makeFolderContentsList, this, &ModeSelector::abortProcess);
-    //connect(this, &ModeSelector::makeFolderContentsFilter, this, &ModeSelector::abortProcess);
-
-    //connect(this, &ModeSelector::updateDatabase, view_, &View::setViewSource);
-    //connect(this, &ModeSelector::verify, this, [=](const QModelIndex &ind){ if (!TreeModel::isFileRow(ind)) view_->setViewSource(); });
-
-    //connect(this, &ModeSelector::resetDatabase, view_, &View::saveHeaderState);
-
     iconProvider.setTheme(view_->palette());
     menuAct_->setIconTheme(view_->palette());
     menuAct_->setSettings(settings_);
@@ -108,15 +99,17 @@ void ModeSelector::setProcState(ProcState *procState)
 void ModeSelector::abortProcess()
 {
     if (proc_->isStarted()) {
-        proc_->setState(State::Abort);
         manager_->clearTasks();
+        proc_->setState(State::Abort);
     }
 }
 
 void ModeSelector::stopProcess()
 {
-    if (proc_->isStarted())
+    if (proc_->isStarted()) {
+        manager_->clearTasks();
         proc_->setState(State::Stop);
+    }
 }
 
 void ModeSelector::getInfoPathItem()
@@ -126,12 +119,10 @@ void ModeSelector::getInfoPathItem()
 
     abortProcess();
     if (view_->isViewFileSystem()) {
-        //emit getPathInfo(view_->curPathFileSystem);
         manager_->queueTask(&Manager::getPathInfo, view_->curPathFileSystem);
     }
     else if (view_->isViewDatabase()) {
-        //emit getIndexInfo(view_->curIndexSource);
-        manager_->queueTask(&Manager::getIndexInfo, view_->curIndexSource);
+        manager_->queueTask(&Manager::getIndexInfo, view_->curIndexSource); // info about database item (file or subfolder index)
     }
 }
 
@@ -330,7 +321,6 @@ void ModeSelector::updateDbItem()
     if (view_->isViewFiltered())
         view_->disableFilter();
 
-    //emit updateItemFile(view_->curIndexSource);
     manager_->queueTask(&Manager::updateItemFile, view_->curIndexSource);
 }
 
@@ -364,7 +354,6 @@ void ModeSelector::showFileSystem(const QString &path)
         if (view_->data_
             && view_->data_->isDbFileState(DbFileState::NotSaved))
         {
-            //emit prepareSwitchToFs();
             manager_->queueTask(&Manager::prepareSwitchToFs);
         }
         else {
@@ -413,7 +402,6 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
     if (promptProcessAbort()) {
         manager_->queueTask(&Manager::saveData);
         manager_->queueTask(&Manager::createDataModel, filePath);
-        //emit parseJsonFile(filePath);
     }
 }
 
@@ -483,7 +471,6 @@ void ModeSelector::makeFolderContentsFilter(const QString &folderPath)
 void ModeSelector::_makeDbContentsList()
 {
     if (!proc_->isStarted() && view_->isViewDatabase()) {
-        //emit makeDbContentsList();
         manager_->queueTask(&Manager::makeDbContentsList);
     }
 }
@@ -522,7 +509,6 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.filter = filter;
     metaData.databaseFilePath = composeDbFilePath();
 
-    //emit processFolderSha(metaData);
     manager_->queueTask(&Manager::processFolderSha, metaData);
 }
 
@@ -557,7 +543,6 @@ bool ModeSelector::overwriteDbPrompt()
 
     if (ret == QMessageBox::Open)
         openJsonDatabase(dbFilePath);
-        //emit parseJsonFile(dbFilePath);
 
     return (ret == QMessageBox::Save);
 }
@@ -626,7 +611,6 @@ void ModeSelector::quickAction()
             doWork();
             break;
         case DbFile:
-            //emit parseJsonFile(view_->curPathFileSystem);
             openJsonDatabase(view_->curPathFileSystem);
             break;
         case SumFile:

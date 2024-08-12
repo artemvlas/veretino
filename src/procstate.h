@@ -21,12 +21,11 @@ public:
         StartSilently = 1 << 1,
         StartVerbose = 1 << 2, // set processing view (enable progress bar, change view model, etc...)
         Started = StartSilently | StartVerbose,
-        Stop = 1 << 3, // stops the current task only
-        Abort = 1 << 4, // terminates the current task and clears the queue
+        Stop = 1 << 3, // stops the current operation, it is assumed that the list of done things will be saved
+        Abort = 1 << 4, // interrupts the process, an immediate exit is expected (switching to the file system)
         Canceled = Stop | Abort
     };
     Q_ENUM(State)
-    Q_DECLARE_FLAGS(States, State)
 
     void setState(State state);
     State state() const; // returns current state_
@@ -60,6 +59,5 @@ signals:
 }; // class ProcState
 
 using State = ProcState::State;
-Q_DECLARE_OPERATORS_FOR_FLAGS(ProcState::States)
 
 #endif // PROCSTATE_H

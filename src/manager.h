@@ -47,7 +47,6 @@ public slots:
     void branchSubfolder(const QModelIndex &subfolder);
     void updateDatabase(const DestDbUpdate dest);
     void updateItemFile(const QModelIndex &fileIndex);
-    //void verify(const QModelIndex &curIndex);
 
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
@@ -55,7 +54,6 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
     void createDataModel(const QString &databaseFilePath);
-    //void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
     void saveData();
     void prepareSwitchToFs();
@@ -63,8 +61,6 @@ public slots:
     void getPathInfo(const QString &path); // info about file (size) or folder contents
     void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
-    //void makeFolderContentsList(const QString &folderPath);
-    //void makeFolderContentsFilter(const QString &folderPath);
     void makeDbContentsList();
 
     void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
@@ -77,14 +73,7 @@ public slots:
 private:
     //void runTask(std::function<void()> task);
 
-    //void _processFolderSha(const MetaData &metaData);
-    //void _updateDatabase(const DestDbUpdate dest);
-    //void _createDataModel(const QString &databaseFilePath); // making the tree data model
-    //void _verifyFolderItem(const QModelIndex &folderItemIndex);
-
     void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
-    //void _dbContentsList();
-
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
 

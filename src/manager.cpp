@@ -59,11 +59,6 @@ void Manager::clearTasks()
 
 void Manager::processFolderSha(const MetaData &metaData)
 {
-    //runTask([&] { _processFolderSha(metaData); });
-//}
-
-//void Manager::_processFolderSha(const MetaData &metaData)
-//{
     if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
         emit showMessage("All files have been excluded.\n"
                          "Filtering rules can be changed in the settings.", "No proper files");
@@ -127,19 +122,11 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     emit fileProcessed(filePath, fileVal);
 }
 
-/*void Manager::resetDatabase()
-{
-    if (dataMaintainer->data_) {
-        //createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
-    }
-}*/
-
 void Manager::restoreDatabase()
 {
     if (dataMaintainer->data_
         && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved()))
     {
-        //runTask([&] { _createDataModel(dataMaintainer->data_->metaData.databaseFilePath); });
         createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
     }
     else {
@@ -158,11 +145,6 @@ void Manager::createDataModel(const QString &databaseFilePath)
         return;
     }
 
-    qDebug() << thread()->objectName() << Q_FUNC_INFO;
-    //runTask([&] { dataMaintainer->saveData(); _createDataModel(databaseFilePath); });
-
-    //dataMaintainer->saveData();
-
     if (dataMaintainer->importJson(databaseFilePath)) {
         dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
         emit setViewData(dataMaintainer->data_);
@@ -172,21 +154,9 @@ void Manager::createDataModel(const QString &databaseFilePath)
     }
 }
 
-/*void Manager::_createDataModel(const QString &databaseFilePath)
-{
-    if (dataMaintainer->importJson(databaseFilePath)) {
-        dataMaintainer->data_->model_->setColoredItems(settings_->coloredDbItems);
-        emit setViewData(dataMaintainer->data_);
-    }
-    else {
-        emit setViewData();
-    }
-}*/
-
 void Manager::saveData()
 {
     if (dataMaintainer->isDataNotSaved()) {
-        //runTask([&] { dataMaintainer->saveData(); });
         dataMaintainer->saveData();
     }
 }
@@ -205,11 +175,6 @@ void Manager::prepareSwitchToFs()
 
 void Manager::updateDatabase(const DestDbUpdate dest)
 {
-    //runTask([&] { _updateDatabase(dest); });
-//}
-
-//void Manager::_updateDatabase(const DestDbUpdate dest)
-//{
     if (!dataMaintainer->data_)
         return;
 
@@ -225,7 +190,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
         if ((dest & DestAddNew)
             && dataMaintainer->data_->contains(FileStatus::New))
         {
-            int numAdded = calculateChecksums(FileStatus::New); // !!! here was the only place where <finalProcess = false> was used
+            int numAdded = calculateChecksums(FileStatus::New);
 
             if (procState->isCanceled())
                 return;
@@ -282,26 +247,19 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
         dataMaintainer->updateNumbers(fileIndex, fileStatusBefore);
         dataMaintainer->updateDateTime();
 
-        if (settings_->instantSaving)
+        if (settings_->instantSaving) {
             saveData();
-        else
+        }
+        else {
             emit procState->stateChanged(); // temp solution to update Button info
+        }
     }
 }
 
 void Manager::branchSubfolder(const QModelIndex &subfolder)
 {
-    //runTask([&] { dataMaintainer->forkJsonDb(subfolder); });
     dataMaintainer->forkJsonDb(subfolder);
 }
-
-/*void Manager::verify(const QModelIndex &curIndex)
-{
-    if (TreeModel::isFileRow(curIndex))
-        verifyFileItem(curIndex);
-    else
-        verifyFolderItem(curIndex);
-}*/
 
 // check only selected file instead of full database verification
 void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
@@ -353,10 +311,6 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
 void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 {
-    //runTask([&] { _verifyFolderItem(folderItemIndex); });
-//}
-//void Manager::_verifyFolderItem(const QModelIndex &folderItemIndex)
-//{
     if (!dataMaintainer->data_) {
         return;
     }
@@ -611,7 +565,6 @@ void Manager::getPathInfo(const QString &path)
         }
         else if (fileInfo.isDir()) {
             emit setStatusbarText("counting...");
-            //runTask([&] { emit setStatusbarText(files_->getFolderSize(path)); });
             emit setStatusbarText(files_->getFolderSize(path));
         }
     }
@@ -622,16 +575,6 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
     if (!isViewFileSysytem && dataMaintainer->data_)
         emit setStatusbarText(dataMaintainer->itemContentsInfo(curIndex));
 }
-/*
-void Manager::makeFolderContentsList(const QString &folderPath)
-{
-    runTask([&]{ _folderContentsList(folderPath, false); });
-}
-
-void Manager::makeFolderContentsFilter(const QString &folderPath)
-{
-    runTask([&]{ _folderContentsList(folderPath, true); });
-}*/
 
 void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 {
@@ -654,10 +597,6 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 
 void Manager::makeDbContentsList()
 {
-    //runTask([&]{ _dbContentsList(); });
-//}
-//void Manager::_dbContentsList()
-//{
     if (!dataMaintainer->data_)
         return;
 
