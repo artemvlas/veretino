@@ -117,12 +117,12 @@ void ModeSelector::getInfoPathItem()
     if (proc_->isState(State::StartVerbose))
         return;
 
-    abortProcess();
     if (view_->isViewFileSystem()) {
+        abortProcess();
         manager_->queueTask(&Manager::getPathInfo, view_->curPathFileSystem);
     }
     else if (view_->isViewDatabase()) {
-        manager_->queueTask(&Manager::getIndexInfo, view_->curIndexSource); // info about database item (file or subfolder index)
+        manager_->queueTask(&Manager::getIndexInfo, view_->curIndexSource); // info about db item (file or subfolder index)
     }
 }
 
