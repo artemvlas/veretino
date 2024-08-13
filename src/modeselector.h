@@ -65,7 +65,7 @@ public:
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
     void verify(const QModelIndex& index = QModelIndex());
-    void branchSubfolder(const QModelIndex &subfolder);
+    void branchSubfolder();
 
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);

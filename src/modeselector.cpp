@@ -68,7 +68,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
     connect(menuAct_->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
     connect(menuAct_->actionCopyItem, &QAction::triggered, this, &ModeSelector::copyItem);
-    connect(menuAct_->actionBranchMake, &QAction::triggered, this, [=]{ branchSubfolder(view_->curIndexSource); });
+    connect(menuAct_->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
     connect(menuAct_->actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
     connect(menuAct_->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
@@ -341,7 +341,7 @@ void ModeSelector::copyItem()
 
     QString itemPath = view_->data_->itemAbsolutePath(view_->curIndexSource);
     QMimeData* mimeData = new QMimeData();
-    mimeData->setUrls({QUrl::fromLocalFile(itemPath)});
+    mimeData->setUrls({ QUrl::fromLocalFile(itemPath) });
     QGuiApplication::clipboard()->setMimeData(mimeData);
 }
 
@@ -451,9 +451,10 @@ void ModeSelector::verify(const QModelIndex& index)
     }
 }
 
-void ModeSelector::branchSubfolder(const QModelIndex &subfolder)
+void ModeSelector::branchSubfolder()
 {
-    manager_->addTask(&Manager::branchSubfolder, subfolder);
+    if (view_->curIndexSource.isValid())
+        manager_->addTask(&Manager::branchSubfolder, view_->curIndexSource);
 }
 
 void ModeSelector::makeFolderContentsList(const QString &folderPath)
