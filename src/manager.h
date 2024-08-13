@@ -30,14 +30,11 @@ public:
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
     ProcState *procState = new ProcState(this);
 
-    template<typename _Callable, typename... _Args>
-    void queueTask(_Callable&& __f, _Args&&... __args)
+    template<typename Callable, typename... Args>
+    void addTask(Callable&& _func, Args&&... _args)
     {
-        std::function<void()> func = std::bind(std::forward<_Callable>(__f), this, std::forward<_Args>(__args)...);
-        taskQueue_.append(func);
-
-        if (procState->isState(State::Idle) && taskQueue_.size() == 1)
-            emit taskAdded();
+        std::function<void()> _task = std::bind(std::forward<Callable>(_func), this, std::forward<Args>(_args)...);
+        queueTask(_task);
     }
 
     void clearTasks();
@@ -71,7 +68,7 @@ public slots:
     void runTasks();
 
 private:
-    //void runTask(std::function<void()> task);
+    void queueTask(std::function<void()> task);
 
     void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,

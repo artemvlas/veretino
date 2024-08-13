@@ -119,10 +119,10 @@ void ModeSelector::getInfoPathItem()
 
     if (view_->isViewFileSystem()) {
         abortProcess();
-        manager_->queueTask(&Manager::getPathInfo, view_->curPathFileSystem);
+        manager_->addTask(&Manager::getPathInfo, view_->curPathFileSystem);
     }
     else if (view_->isViewDatabase()) {
-        manager_->queueTask(&Manager::getIndexInfo, view_->curIndexSource); // info about db item (file or subfolder index)
+        manager_->addTask(&Manager::getIndexInfo, view_->curIndexSource); // info about db item (file or subfolder index)
     }
 }
 
@@ -321,7 +321,7 @@ void ModeSelector::updateDbItem()
     if (view_->isViewFiltered())
         view_->disableFilter();
 
-    manager_->queueTask(&Manager::updateItemFile, view_->curIndexSource);
+    manager_->addTask(&Manager::updateItemFile, view_->curIndexSource);
 }
 
 void ModeSelector::showFolderContentTypes()
@@ -354,7 +354,7 @@ void ModeSelector::showFileSystem(const QString &path)
         if (view_->data_
             && view_->data_->isDbFileState(DbFileState::NotSaved))
         {
-            manager_->queueTask(&Manager::prepareSwitchToFs);
+            manager_->addTask(&Manager::prepareSwitchToFs);
         }
         else {
             view_->setFileSystemModel();
@@ -364,7 +364,7 @@ void ModeSelector::showFileSystem(const QString &path)
 
 void ModeSelector::saveData()
 {
-    manager_->queueTask(&Manager::saveData);
+    manager_->addTask(&Manager::saveData);
 }
 
 void ModeSelector::copyDataToClipboard(Column column)
@@ -381,7 +381,7 @@ void ModeSelector::copyDataToClipboard(Column column)
 void ModeSelector::updateDatabase(const DestDbUpdate task)
 {
     view_->setViewSource();
-    manager_->queueTask(&Manager::updateDatabase, task);
+    manager_->addTask(&Manager::updateDatabase, task);
 }
 
 void ModeSelector::resetDatabase()
@@ -394,14 +394,14 @@ void ModeSelector::resetDatabase()
 
 void ModeSelector::restoreDatabase()
 {
-    manager_->queueTask(&Manager::restoreDatabase);
+    manager_->addTask(&Manager::restoreDatabase);
 }
 
 void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (promptProcessAbort()) {
-        manager_->queueTask(&Manager::saveData);
-        manager_->queueTask(&Manager::createDataModel, filePath);
+        manager_->addTask(&Manager::saveData);
+        manager_->addTask(&Manager::createDataModel, filePath);
     }
 }
 
@@ -427,51 +427,51 @@ void ModeSelector::openBranchDb()
 
 void ModeSelector::processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
-    manager_->queueTask(&Manager::processFileSha, path, algo, result);
+    manager_->addTask(&Manager::processFileSha, path, algo, result);
 }
 
 void ModeSelector::checkSummaryFile(const QString &path)
 {
-    manager_->queueTask(&Manager::checkSummaryFile, path);
+    manager_->addTask(&Manager::checkSummaryFile, path);
 }
 
 void ModeSelector::checkFile(const QString &filePath, const QString &checkSum)
 {
-    manager_->queueTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
+    manager_->addTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
 }
 
 void ModeSelector::verify(const QModelIndex& index)
 {
     if (TreeModel::isFileRow(index)) {
-        manager_->queueTask(&Manager::verifyFileItem, index);
+        manager_->addTask(&Manager::verifyFileItem, index);
     }
     else {
         view_->setViewSource();
-        manager_->queueTask(&Manager::verifyFolderItem, index);
+        manager_->addTask(&Manager::verifyFolderItem, index);
     }
 }
 
 void ModeSelector::branchSubfolder(const QModelIndex &subfolder)
 {
-    manager_->queueTask(&Manager::branchSubfolder, subfolder);
+    manager_->addTask(&Manager::branchSubfolder, subfolder);
 }
 
 void ModeSelector::makeFolderContentsList(const QString &folderPath)
 {
     abortProcess();
-    manager_->queueTask(&Manager::folderContentsList, folderPath, false);
+    manager_->addTask(&Manager::folderContentsList, folderPath, false);
 }
 
 void ModeSelector::makeFolderContentsFilter(const QString &folderPath)
 {
     abortProcess();
-    manager_->queueTask(&Manager::folderContentsList, folderPath, true);
+    manager_->addTask(&Manager::folderContentsList, folderPath, true);
 }
 
 void ModeSelector::_makeDbContentsList()
 {
     if (!proc_->isStarted() && view_->isViewDatabase()) {
-        manager_->queueTask(&Manager::makeDbContentsList);
+        manager_->addTask(&Manager::makeDbContentsList);
     }
 }
 
@@ -509,7 +509,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.filter = filter;
     metaData.databaseFilePath = composeDbFilePath();
 
-    manager_->queueTask(&Manager::processFolderSha, metaData);
+    manager_->addTask(&Manager::processFolderSha, metaData);
 }
 
 bool ModeSelector::isSelectedCreateDb()

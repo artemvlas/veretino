@@ -27,15 +27,14 @@ Manager::Manager(Settings *settings, QObject *parent)
 
     connect(this, &Manager::taskAdded, this, &Manager::runTasks);
 }
-/*
-void Manager::runTask(std::function<void()> task)
+
+void Manager::queueTask(std::function<void()> task)
 {
-    procState->setState(State::StartSilently);
+    taskQueue_.append(task);
 
-    task();
-
-    procState->setState(State::Idle);
-}*/
+    if (procState->isState(State::Idle) && taskQueue_.size() == 1)
+        emit taskAdded();
+}
 
 void Manager::runTasks()
 {
