@@ -21,13 +21,13 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 * Having a ready-made database, the program becomes able to check the integrity of the folder's data by reading its current contents and comparing it with the previously created data set.
 * The resulting data also makes it possible to find new or missing items by comparing the current contents with a previously one.
 
-The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
-
-And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
-
 | ![Main](screenshots/veretino_mainview.png)   | ![Filter](screenshots/veretino_fc.png)        |
 |----------------------------------------------|-----------------------------------------------|
 | ![Database](screenshots/jsondb_example.png)  | ![Db_View](screenshots/veretino_newlost.png)  |
+
+The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
+
+And when working with individual files, the calculated checksum can be either simply copied to the clipboard or saved as a digest (*.sha1/256/512). The integrity of the file can also be checked using both the checksum from the clipboard or the digest.
 
 The App allows you to avoid unexpected data loss*, for example, in case of a disk error or incomplete download. Checking across the entire folder and multiple subfolders allows you to detect data loss in any of the contained files.
 
