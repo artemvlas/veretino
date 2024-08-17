@@ -5,14 +5,14 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 ### The app allows you to check the folder-wide data integrity, for example, after numerous transfers and recopies, uploads/downloads from clouds and storages, transfer to other devices, and so on...
 
 #### Key features:
-* **Multiple** checksums calculator and organizer.
-* Validation of the _copied/moved/long-stored_ **folder**.
-* Checking the integrity of file **arrays.**
-* Verification of **folder** immutability.
-* **Data audit**: analysis of folder contents, looking for folder-wide data changes.
-* Finding damaged files in a folder.
-* Checksums calculation, store and verification for **individual** files.
-* Comparing files by checksum.
+* [x] **Multiple** checksums calculator and organizer.
+* [x] Validation of the _copied/moved/long-stored_ **folder**.
+* [x] Checking the integrity of file **arrays.**
+* [x] Verification of **folder** immutability.
+* [x] **Data audit**: analysis of folder contents, looking for folder-wide data changes.
+* [x] Finding damaged files in a folder.
+* [x] Creation and verification of **Digest** files.
+* [x] Comparing files by checksum.
 
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 
@@ -25,22 +25,9 @@ The program allows analyzing the contents of folders by file types, their number
 
 And when working with individual files, you can calculate the checksum and save it in the summary (*.sha1/256/512). And also check the integrity of the file using both the existing summary and the checksum from the clipboard.
 
-<p align="center">
-  <br><em>Veretino calculates checksums for each file in the specified folder and saves this list for later checks.</em>
-  <br><img src="screenshots/veretino_mainview.png">
-  <br>
-  <br><em>Filters also can be applied to exclude unnecessary files.</em>
-  <br><img src="screenshots/veretino_fc.png">
-  <br>
-  <br><em>The resulting database is a local json file containing a list of paths and checksums.</em>
-  <br><img src="screenshots/jsondb_example.png">
-</p>
-
-<p align="center">
-  <br><em>It can be used to check the integrity of individual files, as well as to check the entire folder contents for data changes. Veretino can also determine if there are new or missing files in the given directory relative to the list.
-  <br>This information can be easily updated if needed.</em>
-  <br><img src="screenshots/veretino_newlost.png">
-</p>
+| ![Main](screenshots/veretino_mainview.png)   | ![Filter](screenshots/veretino_fc.png)        |
+|----------------------------------------------|-----------------------------------------------|
+| ![Database](screenshots/jsondb_example.png)  | ![Db_View](screenshots/veretino_newlost.png)  |
 
 The App allows you to avoid unexpected data loss*, for example, in case of a disk error or incomplete download. Checking across the entire folder and multiple subfolders allows you to detect data loss in any of the contained files.
 
