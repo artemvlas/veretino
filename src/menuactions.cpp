@@ -100,6 +100,7 @@ void MenuActions::setActionsIcons()
     actionUpdFileAdd->setIcon(iconProvider.icon(FileStatus::Added));
     actionUpdFileRemove->setIcon(iconProvider.icon(FileStatus::Removed));
     actionUpdFileReChecksum->setIcon(iconProvider.icon(FileStatus::Updated));
+    actionExportSum->setIcon(iconProvider.icon(Icons::HashFile));
 }
 
 void MenuActions::setShortcuts()

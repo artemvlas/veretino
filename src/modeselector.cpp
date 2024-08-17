@@ -73,6 +73,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
+    connect(menuAct_->actionExportSum, &QAction::triggered, this, &ModeSelector::exportItemSum);
 
     connect(menuAct_->actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -457,6 +458,20 @@ void ModeSelector::branchSubfolder()
         manager_->addTask(&Manager::branchSubfolder, view_->curIndexSource);
 }
 
+void ModeSelector::exportItemSum()
+{
+    if (!TreeModel::hasStatus(FileStatus::FlagAvailable, view_->curIndexSource)) {
+        return;
+    }
+
+    QString filePath = view_->data_->itemAbsolutePath(view_->curIndexSource);
+
+    FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
+    fileVal.checksum = TreeModel::itemFileChecksum(view_->curIndexSource);
+
+    emit manager_->fileProcessed(filePath, fileVal);
+}
+
 void ModeSelector::makeFolderContentsList(const QString &folderPath)
 {
     abortProcess();
@@ -759,6 +774,8 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
                 // Available file item
                 if (TreeModel::hasStatus(FileStatus::FlagAvailable, index)) {
+                    viewContextMenu->addAction(menuAct_->actionExportSum);
+
                     menuAct_->actionCopyItem->setText("Copy File");
                     viewContextMenu->addAction(menuAct_->actionCopyItem);
 

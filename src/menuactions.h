@@ -82,6 +82,7 @@ public:
     QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
     QAction *actionCopyItem = new QAction("Copy", this);
+    QAction *actionExportSum = new QAction("Export to *.sha", this);
 
     QAction *actionUpdFileAdd = new QAction("Add to DB", this);
     QAction *actionUpdFileRemove = new QAction("Remove from DB", this);

@@ -1,7 +1,11 @@
 Veretino 0.5.0
+What's new:
+* Added the ability to export individual checksums from the database to a digest file (*.sha1/256/512).
+
 Internal changes:
 * Redesigned task management system.
 
+---
 Veretino 0.4.5
 * Improved handling of damaged and unreadable files.
 
