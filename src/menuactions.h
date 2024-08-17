@@ -99,7 +99,7 @@ public:
 
     // Menu
     QMenu *menuAlgo = new QMenu;
-    QMenu *menuStoreSummary = new QMenu("Calculate checksum → Summary");
+    QMenu *menuStoreSummary = new QMenu("Calculate checksum → Digest");
     QMenu *menuOpenRecent = new QMenu("Open Recent");
     QMenu *menuUpdateDatabase = nullptr;
     QList<QMenu*> listOfMenus = { menuAlgo, menuStoreSummary, menuOpenRecent, menuUpdateDatabase };

@@ -454,20 +454,25 @@ void ModeSelector::verify(const QModelIndex& index)
 
 void ModeSelector::branchSubfolder()
 {
-    if (view_->curIndexSource.isValid())
+    if (view_->curIndexSource.isValid()) {
         manager_->addTask(&Manager::branchSubfolder, view_->curIndexSource);
+    }
 }
 
 void ModeSelector::exportItemSum()
 {
-    if (!TreeModel::hasStatus(FileStatus::FlagAvailable, view_->curIndexSource)) {
+    const QModelIndex &_ind = view_->curIndexSource;
+
+    if (!view_->data_ ||
+        !TreeModel::hasStatus(FileStatus::FlagAvailable, _ind))
+    {
         return;
     }
 
-    QString filePath = view_->data_->itemAbsolutePath(view_->curIndexSource);
+    QString filePath = view_->data_->itemAbsolutePath(_ind);
 
     FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
-    fileVal.checksum = TreeModel::itemFileChecksum(view_->curIndexSource);
+    fileVal.checksum = TreeModel::itemFileChecksum(_ind);
 
     emit manager_->fileProcessed(filePath, fileVal);
 }
