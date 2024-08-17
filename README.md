@@ -27,7 +27,7 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 
 The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
 
-And when working with individual files, the calculated checksum can be either simply copied to the clipboard or saved as a digest (*.sha1/256/512). The integrity of the file can also be checked using both the checksum from the clipboard or the digest.
+When working with individual files: the program can operate with checksums (copy, store, check) both from the clipboard and digests (*.sha1/256/512).
 
 The App allows you to avoid unexpected data loss*, for example, in case of a disk error or incomplete download. Checking across the entire folder and multiple subfolders allows you to detect data loss in any of the contained files.
 
