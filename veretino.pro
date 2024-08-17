@@ -95,8 +95,8 @@ unix {
 
     shortcutfiles.files = res/veretino.desktop
     shortcutfiles.path = $$PREFIX/share/applications/
-    data.files += res/veretino.png
-    data.path = $$PREFIX/share/pixmaps/
+    data.files += res/icons/generic/veretino.svg
+    data.path = $$PREFIX/share/icons/hicolor/scalable/apps
 
     INSTALLS += shortcutfiles
     INSTALLS += data
@@ -104,6 +104,6 @@ unix {
 
 DISTFILES += \
     res/veretino.desktop \
-    res/veretino.png
+    res/icons/generic/veretino.svg
 
 !isEmpty(target.path): INSTALLS += target
