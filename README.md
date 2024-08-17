@@ -17,13 +17,13 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 
 #### How it works:
-* To begin with, the program calculates a list of checksums for all files (or for selected file types using a filter) in the specified folder (and its subfolders) and stores it in the local database (see [Veretino Database format](https://github.com/artemvlas/veretino/wiki/Veretino-Database)).
+* To begin with, the program calculates a list of checksums for all files (or for selected file types using a filter) in the specified folder (and its subfolders) and stores it in the local json file (see [Veretino Database format](https://github.com/artemvlas/veretino/wiki/Veretino-Database)).
 * Having a ready-made database, the program becomes able to check the integrity of the folder's data by reading its current contents and comparing it with the previously created data set.
 * The resulting data also makes it possible to find new or missing items by comparing the current contents with a previously one.
 
-| ![Main](screenshots/veretino_mainview.png)   | ![Filter](screenshots/veretino_fc.png)        |
-|----------------------------------------------|-----------------------------------------------|
-| ![Database](screenshots/jsondb_example.png)  | ![Db_View](screenshots/veretino_newlost.png)  |
+| ![Main](screenshots/veretino_mainview.png)              | ![Filter](screenshots/veretino_fc.png)       |
+|---------------------------------------------------------|----------------------------------------------|
+| ![Database](screenshots/veretino_db_format_example.png) | ![Db_View](screenshots/veretino_newlost.png) |
 
 The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
 
