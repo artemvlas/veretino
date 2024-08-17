@@ -53,6 +53,7 @@ public:
 
     int clearLostFiles(); // returns the number of cleared
     int updateMismatchedChecksums(); // returns the number of updated checksums
+    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus status);
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);

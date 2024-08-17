@@ -357,6 +357,16 @@ bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
     return false;
 }
 
+void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus status)
+{
+    if (status != FileStatus::Queued) { // data_ && !data_->isInCreation()
+        if (status == FileStatus::New)
+            clearChecksums(FileStatus::Added, rootIndex);
+
+        changeFilesStatus((FileStatus::FlagProcessing | FileStatus::Added), status, rootIndex);
+    }
+}
+
 bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
     return setSourceData(json_->parseJson(jsonFilePath));

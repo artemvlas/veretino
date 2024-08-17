@@ -518,21 +518,15 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
         }
     }
 
-    if (procState->isState(State::Abort)) {
-        qDebug() << "Manager::calculateChecksums >> Aborted";
-        return 0;
-    }
-
-    // rolling back file statuses
     if (procState->isCanceled()) {
-        if (status != FileStatus::Queued) {
-            if (status == FileStatus::New)
-                dataMaintainer->clearChecksums(FileStatus::Added, rootIndex);
-
-            dataMaintainer->changeFilesStatus((FileStatus::FlagProcessing | FileStatus::Added), status, rootIndex);
+        if (procState->isState(State::Abort)) {
+            qDebug() << "Manager::calculateChecksums >> Aborted";
+            return 0;
         }
 
-        qDebug() << "Manager::calculateChecksums | Stoped | Done" << doneNum;
+        // rolling back file statuses
+        dataMaintainer->rollBackStoppedCalc(rootIndex, status);
+        qDebug() << "Manager::calculateChecksums >> Stopped | Done" << doneNum;
     }
 
     // end
