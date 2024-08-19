@@ -13,7 +13,7 @@
 
 const QString ExtNumSize::strNoType = "No type";
 const QString ExtNumSize::strVeretinoDb = "Veretino DB";
-const QString ExtNumSize::strShaFiles = "Sha-files";
+const QString ExtNumSize::strShaFiles = "sha1/256/512";
 
 const QString Files::desktopFolderPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 

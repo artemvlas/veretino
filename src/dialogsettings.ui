@@ -275,7 +275,7 @@ immediately after any changes are made.</string>
        <item row="4" column="2" colspan="2">
         <widget class="QCheckBox" name="ignoreShaFiles">
          <property name="toolTip">
-          <string>Exclude the summary files from the filelist</string>
+          <string>Exclude the digest files from the filelist</string>
          </property>
          <property name="text">
           <string>Ignore *.sha1/256/512 files</string>

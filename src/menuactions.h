@@ -59,7 +59,7 @@ public:
     QAction *actionOpenDatabase = new QAction("Open Database", this);
     QAction *actionCheckSumFile = new QAction("Check the Checksum", this);
 
-    QList<QAction*> actionsMakeSummaries { actionProcessSha1File, actionProcessSha256File, actionProcessSha512File };
+    QList<QAction*> actionsMakeDigest { actionProcessSha1File, actionProcessSha256File, actionProcessSha512File };
 
     // DB Model View
     QAction *actionCancelBackToFS = new QAction("Close the Database", this);
@@ -99,10 +99,10 @@ public:
 
     // Menu
     QMenu *menuAlgo = new QMenu;
-    QMenu *menuStoreSummary = new QMenu("Calculate checksum → Digest");
+    QMenu *menuCreateDigest = new QMenu("Create Digest");
     QMenu *menuOpenRecent = new QMenu("Open Recent");
     QMenu *menuUpdateDatabase = nullptr;
-    QList<QMenu*> listOfMenus = { menuAlgo, menuStoreSummary, menuOpenRecent, menuUpdateDatabase };
+    QList<QMenu*> listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase };
 
 private:
     void setActionsIcons();

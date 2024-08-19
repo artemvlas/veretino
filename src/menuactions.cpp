@@ -24,7 +24,7 @@ MenuActions::MenuActions(QObject *parent)
     actionGroupSelectAlgo->addAction(actionSetAlgoSha512);
 
     menuAlgo->addActions(actionGroupSelectAlgo->actions());
-    menuStoreSummary->addActions(actionsMakeSummaries);
+    menuCreateDigest->addActions(actionsMakeDigest);
 
     menuOpenRecent->setToolTipsVisible(true);
 
@@ -75,7 +75,7 @@ void MenuActions::setActionsIcons()
     actionCheckSumFile->setIcon(iconProvider.icon(Icons::Scan));
 
     menuAlgo->menuAction()->setIcon(iconProvider.icon(Icons::DoubleGear));
-    menuStoreSummary->menuAction()->setIcon(iconProvider.icon(Icons::Save));
+    menuCreateDigest->menuAction()->setIcon(iconProvider.icon(Icons::Save));
 
     // DB Model View
     actionCancelBackToFS->setIcon(iconProvider.icon(Icons::ProcessAbort));

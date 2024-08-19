@@ -691,7 +691,7 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
         else if (isMode(File)) {
             viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
             viewContextMenu->addAction(menuAct_->actionProcessSha_toClipboard);
-            viewContextMenu->addMenu(menuAct_->menuStoreSummary);
+            viewContextMenu->addMenu(menuAct_->menuCreateDigest);
 
             QString clipboardText = QGuiApplication::clipboard()->text();
             if (tools::canBeChecksum(clipboardText)) {
