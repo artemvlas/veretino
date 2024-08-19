@@ -77,7 +77,7 @@ void Settings::saveSettings()
     // FilterRule
     storedSettings.setValue("filter/ignoreDbFiles", filter.ignoreDbFiles);
     storedSettings.setValue("filter/ignoreShaFiles", filter.ignoreShaFiles);
-    storedSettings.setValue("filter/filterMode", filter.mode_);
+    storedSettings.setValue("filter/filterMode", filter.mode());
     storedSettings.setValue("filter/filterExtensionsList", filter.extensionsList);
 
     // recent files

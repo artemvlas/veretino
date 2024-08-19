@@ -114,22 +114,21 @@ void DialogSettings::updateSettings()
 
 QStringList DialogSettings::extensionsList() const
 {
-    if (!ui->inputExtensions->text().isEmpty()) {
-        QString ignoreExtensions = ui->inputExtensions->text().toLower();
-        ignoreExtensions.remove('*');
-        ignoreExtensions.replace(" ."," ");
-        ignoreExtensions.replace(' ',',');
-
-        if (ignoreExtensions.startsWith('.'))
-            ignoreExtensions.remove(0, 1);
-
-        QStringList ext = ignoreExtensions.split(',');
-        ext.removeDuplicates();
-        ext.removeOne("");
-        return ext;
-    }
-    else
+    if (ui->inputExtensions->text().isEmpty())
         return QStringList();
+
+    QString _inputed = ui->inputExtensions->text().toLower();
+    _inputed.remove('*');
+    _inputed.replace(" ."," ");
+    _inputed.replace(' ',',');
+
+    if (_inputed.startsWith('.'))
+        _inputed.remove(0, 1);
+
+    QStringList ext = _inputed.split(',');
+    ext.removeDuplicates();
+    ext.removeOne("");
+    return ext;
 }
 
 void DialogSettings::updateLabelDatabaseFilename()

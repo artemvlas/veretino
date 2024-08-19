@@ -79,7 +79,7 @@ bool DataContainer::isWorkDirRelative() const
 
 bool DataContainer::isFilterApplied() const
 {
-    return (metaData.filter.isFilterEnabled() && !metaData.filter.extensionsList.isEmpty());
+    return metaData.filter.isFilterEnabled();
 }
 
 bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfolder) const
@@ -91,13 +91,14 @@ bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfol
 
 bool DataContainer::isAllChecked() const
 {
-    return (contains(FileStatus::FlagChecked) && !contains(FileStatus::NotChecked | FileStatus::FlagProcessing));
+    return (contains(FileStatus::FlagChecked)
+            && !contains(FileStatus::NotChecked | FileStatus::FlagProcessing));
 }
 
 bool DataContainer::isAllMatched() const
 {
-    return !contains(FileStatus::FlagProcessing)
-           && numbers.numberOf(FileStatus::Matched) == numbers.numberOf(FileStatus::FlagHasChecksum);
+    return (!contains(FileStatus::FlagProcessing)
+            && numbers.numberOf(FileStatus::Matched) == numbers.numberOf(FileStatus::FlagHasChecksum));
 }
 
 bool DataContainer::isDbFileState(DbFileState state) const

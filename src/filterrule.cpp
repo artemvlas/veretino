@@ -16,10 +16,20 @@ FilterRule::FilterRule(const FilterMode filterMode, const QStringList &extension
     setFilter(filterMode, extensions);
 }
 
+FilterMode FilterRule::mode() const
+{
+    return mode_;
+}
+
+void FilterRule::setFilter(const FilterMode filterMode, const QString &extensions)
+{
+    setFilter(filterMode, tools::strToList(extensions));
+}
+
 void FilterRule::setFilter(const FilterMode filterMode, const QStringList &extensions)
 {
     extensionsList = extensions;
-    extensionsList.isEmpty() ? mode_ = NotSet : mode_ = filterMode;
+    mode_ = extensions.isEmpty() ? NotSet : filterMode;
 }
 
 void FilterRule::clearFilter()

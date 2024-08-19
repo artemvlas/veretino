@@ -19,19 +19,23 @@ public:
     FilterRule(bool ignoreSummaries = true);
     FilterRule(const FilterMode filterMode, const QStringList &extensions);
 
+    FilterMode mode() const;
+    void setFilter(const FilterMode filterMode, const QString &extensions);
     void setFilter(const FilterMode filterMode, const QStringList &extensions);
     void clearFilter(); // set defaults
     bool isFilter(const FilterMode filterMode) const;
     bool isFilterEnabled() const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
-
     QString extensionString(const QString &sep = ", ") const;
 
-    FilterMode mode_ = NotSet;
     QStringList extensionsList;
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
 
+private:
+    FilterMode mode_ = NotSet;
 }; // class FilterRule
+
+using FilterMode = FilterRule::FilterMode;
 
 #endif // FILTERRULE_H

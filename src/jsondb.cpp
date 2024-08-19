@@ -273,10 +273,10 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     QString strIncluded = findValueStr(header, strHeaderIncluded);
 
     if (!strIgnored.isEmpty()) {
-        metaData.filter.setFilter(FilterRule::Ignore, tools::strToList(strIgnored));
+        metaData.filter.setFilter(FilterRule::Ignore, strIgnored);
     }
     else if (!strIncluded.isEmpty()) {
-        metaData.filter.setFilter(FilterRule::Include, tools::strToList(strIncluded));
+        metaData.filter.setFilter(FilterRule::Include, strIncluded);
     }
 
     // [algorithm]
