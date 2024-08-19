@@ -52,7 +52,7 @@ public:
     QAction *actionProcessChecksumsPermFilter = new QAction("Calculate checksums [Permanent Filter]", this);
     QAction *actionProcessChecksumsCustomFilter = new QAction("Calculate checksums", this);
     QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
-    QAction *actionProcessSha_toClipboard = new QAction("Calculate checksum → Clipboard", this);
+    QAction *actionProcessSha_toClipboard = new QAction("Copy Checksum", this);
     QAction *actionProcessSha1File = new QAction("SHA-1 → *.sha1", this);
     QAction *actionProcessSha256File = new QAction("SHA-256 → *.sha256", this);
     QAction *actionProcessSha512File = new QAction("SHA-512 → *.sha512", this);
@@ -99,7 +99,7 @@ public:
 
     // Menu
     QMenu *menuAlgo = new QMenu;
-    QMenu *menuCreateDigest = new QMenu("Create Digest");
+    QMenu *menuCreateDigest = new QMenu("Create Digest file");
     QMenu *menuOpenRecent = new QMenu("Open Recent");
     QMenu *menuUpdateDatabase = nullptr;
     QList<QMenu*> listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase };
