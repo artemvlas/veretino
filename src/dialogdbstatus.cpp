@@ -82,7 +82,7 @@ void DialogDbStatus::setTabsInfo()
 
         ui->labelFiltersInfo->setStyleSheet(format::coloredText(data_->metaData.filter.isFilter(FilterRule::Ignore)));
 
-        QString extensions = data_->metaData.filter.extensionsList.join(", ");
+        QString extensions = data_->metaData.filter.extensionString();
         data_->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText(QString("Included:\n%1").arg(extensions))
                                                              : ui->labelFiltersInfo->setText(QString("Ignored:\n%1").arg(extensions));
     }

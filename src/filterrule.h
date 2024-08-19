@@ -10,7 +10,12 @@
 class FilterRule
 {
 public:
-    enum FilterMode {NotSet, Include, Ignore};
+    enum FilterMode {
+        NotSet,
+        Include, // only files with extensions from [extensionsList] are allowed, others are ignored
+        Ignore   // files with extensions from [extensionsList] are ignored (not included in the database)
+    };
+
     FilterRule(bool ignoreSummaries = true);
     FilterRule(const FilterMode filterMode, const QStringList &extensions);
 
@@ -19,6 +24,8 @@ public:
     bool isFilter(const FilterMode filterMode) const;
     bool isFilterEnabled() const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
+
+    QString extensionString(const QString &sep = ", ") const;
 
     FilterMode mode_ = NotSet;
     QStringList extensionsList;

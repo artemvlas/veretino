@@ -79,7 +79,7 @@ bool DataContainer::isWorkDirRelative() const
 
 bool DataContainer::isFilterApplied() const
 {
-    return !metaData.filter.extensionsList.isEmpty();
+    return (metaData.filter.isFilterEnabled() && !metaData.filter.extensionsList.isEmpty());
 }
 
 bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfolder) const

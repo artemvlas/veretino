@@ -180,7 +180,7 @@ void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
 
 void DialogSettings::setFilterRule(const FilterRule &filter)
 {
-    ui->inputExtensions->setText(filter.extensionsList.join(" "));
+    ui->inputExtensions->setText(filter.extensionString(" "));
     filter.isFilter(FilterRule::Include) ? ui->rbInclude->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
 
     ui->ignoreDbFiles->setChecked(filter.ignoreDbFiles);

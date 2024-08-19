@@ -68,33 +68,30 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
+    const MetaData &meta = data->metaData;
     QJsonObject header;
-    bool isWorkDirRelative = (data->metaData.workDir == paths::parentFolder(data->metaData.databaseFilePath));
+    bool isWorkDirRelative = (meta.workDir == paths::parentFolder(meta.databaseFilePath));
     Numbers numbers = DataContainer::getNumbers(data->model_, rootFolder);
 
     header["App/Origin"] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
-    header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(data->metaData.workDir);
-    header[strHeaderAlgo] = format::algoToStr(data->metaData.algorithm);
+    header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(meta.workDir);
+    header[strHeaderAlgo] = format::algoToStr(meta.algorithm);
     header["Total Checksums"] = numbers.numberOf(FileStatus::FlagHasChecksum);
     header["Total Size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagAvailable));
 
-    // TMP
-    header[strHeaderDateTime] = QString("%1, %2, %3").arg(data->metaData.datetime[DateTimeStr::DateCreated],
-                                                          data->metaData.datetime[DateTimeStr::DateUpdated],
-                                                          data->metaData.datetime[DateTimeStr::DateVerified]);
+    // DateTime
+    header[strHeaderDateTime] = QString("%1, %2, %3").arg(meta.datetime[DateTimeStr::DateCreated],
+                                                          meta.datetime[DateTimeStr::DateUpdated],
+                                                          meta.datetime[DateTimeStr::DateVerified]);
 
+    // WorkDir
     if (!isWorkDirRelative && !rootFolder.isValid())
-        header[strHeaderWorkDir] = data->metaData.workDir;
+        header[strHeaderWorkDir] = meta.workDir;
 
+    // Filter
     if (data->isFilterApplied()) {
-        if (data->metaData.filter.isFilter(FilterRule::Include)) {
-            // only files with extensions from this list are included in the database, others are ignored
-            header[strHeaderIncluded] = data->metaData.filter.extensionsList.join(" ");
-        }
-        else if (data->metaData.filter.isFilter(FilterRule::Ignore)) {
-            // files with extensions from this list are ignored (not included in the database)
-            header[strHeaderIgnored] = data->metaData.filter.extensionsList.join(" ");
-        }
+        QString _strFilterKey = meta.filter.isFilter(FilterRule::Include) ? strHeaderIncluded : strHeaderIgnored;
+        header[_strFilterKey] = meta.filter.extensionString();
     }
 
     return header;
@@ -286,11 +283,11 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     QString strAlgo = findValueStr(header, "Algo");
     if (!strAlgo.isEmpty()) {
         metaData.algorithm = tools::strToAlgo(strAlgo);
-        qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;
+        //qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;
     }
     else {
         metaData.algorithm = tools::algorithmByStrLen(fileList.begin().value().toString().length());
-        qDebug() << "JsonDb::getMetaData | The algorithm is determined by the length of the checksum string:" << metaData.algorithm;
+        //qDebug() << "JsonDb::getMetaData | The algorithm is determined by the length of the checksum string:" << metaData.algorithm;
     }
 
     // [date]

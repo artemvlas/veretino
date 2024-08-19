@@ -66,3 +66,8 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
 
     return allowed;
 }
+
+QString FilterRule::extensionString(const QString &sep) const
+{
+    return extensionsList.join(sep);
+}
