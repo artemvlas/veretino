@@ -35,6 +35,11 @@ void Files::setPath(const QString &path)
     fsPath_ = path;
 }
 
+bool Files::isCanceled() const
+{
+    return proc_ && proc_->isCanceled();
+}
+
 FileList Files::getFileList()
 {
     return getFileList(fsPath_);
@@ -47,7 +52,7 @@ FileList Files::getFileList(const FilterRule &filter)
 
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 {
-    if (!QFileInfo(rootFolder).isDir() || !proc_) {
+    if (!QFileInfo(rootFolder).isDir()) {
         return FileList();
     }
 
@@ -58,7 +63,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
     QDir dir(rootFolder);
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext() && !proc_->isCanceled()) {
+    while (it.hasNext() && !isCanceled()) {
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
@@ -74,7 +79,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
         }
     }
 
-    if (proc_->isCanceled()) {
+    if (isCanceled()) {
         qDebug() << "Files::getFileList | Canceled:" << rootFolder;
         emit setStatusbarText();
         return FileList();
@@ -86,13 +91,13 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 
 FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses flag, const QModelIndex &rootIndex)
 {
-    if (!model || !proc_)
+    if (!model)
         return FileList();
 
     FileList fileList;
     TreeModelIterator it(model, rootIndex);
 
-    while (it.hasNext() && !proc_->isCanceled()) {
+    while (it.hasNext() && !isCanceled()) {
         it.nextFile();
         if (it.status() & flag) {
             fileList.insert(it.path(), FileValues(it.status(), it.size()));
@@ -137,13 +142,13 @@ QString Files::getFolderSize(const QString &path)
 
         // iterating
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext() && !proc_->isCanceled()) {
+        while (it.hasNext() && !isCanceled()) {
             totalSize += QFileInfo(it.next()).size();
             ++filesNumber;
         }
 
         // result processing
-        if (!proc_->isCanceled()) {
+        if (!isCanceled()) {
             QString folderName = paths::basicName(path);
             QString folderSize = (filesNumber > 0) ? format::filesNumberAndSize(filesNumber, totalSize) : "no files";
 

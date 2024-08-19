@@ -78,7 +78,9 @@ public slots:
 
 private:
     void connections();
-    DataContainer *oldData_ = nullptr; // backup for the duration of data_ setup, deleted by a signal after setting the data_ to View
+    bool isCanceled() const;
+
+    DataContainer *oldData_ = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
     const ProcState *proc_ = nullptr;
 
 signals:

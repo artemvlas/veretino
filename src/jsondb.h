@@ -32,6 +32,7 @@ private:
     MetaData getMetaData(const QString &filePath, const QJsonObject &header, const QJsonObject &fileList);
     bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList);
     QString findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength = 4);
+    bool isCanceled() const;
 
     const QString strHeaderDateTime = "DateTime";
     const QString strHeaderIgnored = "Ignored";

@@ -98,7 +98,7 @@ void DataMaintainer::updateVerifDateTime()
 // add new files to data_->model_
 int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
 {
-    if (!data_ || !proc_)
+    if (!data_)
         return 0;
 
     if (!QFileInfo(data_->metaData.workDir).isDir()) {
@@ -113,7 +113,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     QDir dir(data_->metaData.workDir);
     QDirIterator it(data_->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
 
-    while (it.hasNext() && !proc_->isCanceled()) {
+    while (it.hasNext() && !isCanceled()) {
         QString fullPath = it.next();
         QString relPath = dir.relativeFilePath(fullPath);
 
@@ -134,7 +134,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         }
     }
 
-    if (proc_->isCanceled()) {
+    if (isCanceled()) {
         qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
         clearData();
         emit setStatusbarText();
@@ -226,7 +226,7 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
         data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
     }
 
-    return (result);
+    return result;
 }
 
 
@@ -449,6 +449,11 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
 
     return text;
+}
+
+bool DataMaintainer::isCanceled() const
+{
+    return proc_ && proc_->isCanceled();
 }
 
 bool DataMaintainer::isDataNotSaved() const

@@ -84,6 +84,8 @@ public:
     static const QString desktopFolderPath; // path to the user's Desktop folder
 
 private:
+    bool isCanceled() const;
+
     // variables
     QString fsPath_; // path to the File or Folder specified when creating the object
     const ProcState *proc_ = nullptr;
