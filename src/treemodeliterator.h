@@ -14,16 +14,16 @@ public:
     TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex = QModelIndex());
     TreeModelIterator& next();
     TreeModelIterator& nextFile();
-    bool hasNext();
-    const QModelIndex& index();
-    QVariant data(Column column = Column::ColumnName, int role = TreeModel::RawDataRole);
-    QString path(const QModelIndex &root = QModelIndex());
-    qint64 size();
-    FileStatus status();
-    QString checksum();
+    bool hasNext() const;
+    const QModelIndex& index() const;
+    QVariant data(Column column = Column::ColumnName, int role = TreeModel::RawDataRole) const;
+    QString path(const QModelIndex &root = QModelIndex()) const;
+    qint64 size() const;
+    FileStatus status() const;
+    QString checksum() const;
 
 private:
-    QModelIndex nextRow(const QModelIndex &curIndex);
+    QModelIndex nextRow(const QModelIndex &curIndex) const;
     QModelIndex stepForward(const QModelIndex &curIndex);
 
     const QAbstractItemModel *model_;

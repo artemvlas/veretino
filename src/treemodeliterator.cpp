@@ -22,7 +22,7 @@ TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelInde
     nextIndex_ = stepForward(index_);
 }
 
-bool TreeModelIterator::hasNext()
+bool TreeModelIterator::hasNext() const
 {
     return nextIndex_.isValid();
 }
@@ -69,37 +69,37 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
     return estimatedIndex.isValid() ? estimatedIndex : QModelIndex();
 }
 
-QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex)
+QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex) const
 {
     return model_->index(curIndex.row() + 1, 0, curIndex.parent());
 }
 
-const QModelIndex& TreeModelIterator::index()
+const QModelIndex& TreeModelIterator::index() const
 {
     return index_;
 }
 
-QVariant TreeModelIterator::data(Column column, int role)
+QVariant TreeModelIterator::data(Column column, int role) const
 {
     return model_->data(model_->sibling(index_.row(), column, index_), role);
 }
 
-QString TreeModelIterator::path(const QModelIndex &root)
+QString TreeModelIterator::path(const QModelIndex &root) const
 {
     return TreeModel::getPath(index_, root);
 }
 
-qint64 TreeModelIterator::size()
+qint64 TreeModelIterator::size() const
 {
     return data(Column::ColumnSize).toLongLong();
 }
 
-FileStatus TreeModelIterator::status()
+FileStatus TreeModelIterator::status() const
 {
     return data(Column::ColumnStatus).value<FileStatus>();
 }
 
-QString TreeModelIterator::checksum()
+QString TreeModelIterator::checksum() const
 {
     return data(Column::ColumnChecksum).toString();
 }
