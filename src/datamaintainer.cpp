@@ -229,16 +229,12 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
     return result;
 }
 
-
 int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
     if (!data_) {
         qDebug() << "DataMaintainer::changeFilesStatus | NO data_";
         return 0;
     }
-
-    if (newStatus == FileStatus::Queued)
-        qDebug() << "adding to queue...";
 
     int number = 0;
     TreeModelIterator iter(data_->model_, rootIndex);
@@ -252,9 +248,6 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
 
     if (number > 0)
         updateNumbers();
-
-    if (newStatus == FileStatus::Queued)
-        qDebug() << QString("%1 files added to queue").arg(number);
 
     return number;
 }

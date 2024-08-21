@@ -449,11 +449,15 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
         return 0;
     }
 
+    //qDebug() << "adding to queue...";
+
     int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);
 
+    qDebug() << QString("Manager::calculateChecksums: %1 files in queue").arg(numQueued);
+
     if (numQueued == 0) {
-        qDebug() << "Manager::calculateChecksums | No files in queue";
+        //qDebug() << "Manager::calculateChecksums | No files in queue";
         return 0;
     }
 
