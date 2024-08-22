@@ -175,7 +175,7 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     bool result = item->setData(curIndex.column(), value);
 
     if (result) { // to change the color of the checksum during the verification process
-        const QModelIndex &endIndex = (isColored && (curIndex.column() == ColumnStatus)) ? siblingAtRow(curIndex, ColumnChecksum)
+        const QModelIndex &endIndex = (isColored && (curIndex.column() == ColumnStatus)) ? curIndex.siblingAtColumn(ColumnChecksum)
                                                                                          : curIndex;
 
         emit dataChanged(curIndex, endIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
@@ -193,7 +193,7 @@ bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVa
         return false;
     }
 
-    const QModelIndex &_idx = index(curIndex.row(), column, curIndex.parent()); // sibling
+    const QModelIndex &_idx = curIndex.siblingAtColumn(column);
 
     return _idx.isValid() && setData(_idx, itemData);
 }
@@ -228,7 +228,7 @@ TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
 QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
 {
     QString path;
-    QModelIndex newIndex = siblingAtRow(curIndex, ColumnName);
+    QModelIndex newIndex = curIndex.siblingAtColumn(ColumnName);
 
     if (newIndex.isValid()) {
         path = newIndex.data().toString();
@@ -268,35 +268,29 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
     return curIndex;
 }
 
-QModelIndex TreeModel::siblingAtRow(const QModelIndex &curIndex, Column column)
-{
-    return curIndex.isValid() ? curIndex.model()->index(curIndex.row(), column, curIndex.parent())
-                              : QModelIndex();
-}
-
 // the TreeModel implies that if an item has children, then it is a folder (or invalid-root); if not, then it is a file
 bool TreeModel::isFileRow(const QModelIndex &curIndex)
 {
-    QModelIndex index = siblingAtRow(curIndex, ColumnName);
+    QModelIndex &&ind = curIndex.siblingAtColumn(ColumnName);
 
-    return (index.isValid() && !index.model()->hasChildren(index));
+    return (ind.isValid() && !ind.model()->hasChildren(ind));
 }
 
 bool TreeModel::isFolderRow(const QModelIndex &curIndex)
 {
-    QModelIndex index = siblingAtRow(curIndex, ColumnName);
+    QModelIndex &&ind = curIndex.siblingAtColumn(ColumnName);
 
-    return (index.isValid() && index.model()->hasChildren(index));
+    return (ind.isValid() && ind.model()->hasChildren(ind));
 }
 
 bool TreeModel::hasChecksum(const QModelIndex &fileIndex)
 {
-    return siblingAtRow(fileIndex, ColumnChecksum).data().isValid();
+    return fileIndex.siblingAtColumn(ColumnChecksum).data().isValid();
 }
 
 bool TreeModel::hasReChecksum(const QModelIndex &fileIndex)
 {
-    return siblingAtRow(fileIndex, ColumnReChecksum).data().isValid();
+    return fileIndex.siblingAtColumn(ColumnReChecksum).data().isValid();
 }
 
 bool TreeModel::hasStatus(const FileStatuses flag, const QModelIndex &fileIndex)
@@ -323,27 +317,27 @@ bool TreeModel::contains(const FileStatuses flag, const QModelIndex &folderIndex
 
 QString TreeModel::itemName(const QModelIndex &curIndex)
 {
-    return siblingAtRow(curIndex, ColumnName).data().toString();
+    return curIndex.siblingAtColumn(ColumnName).data().toString();
 }
 
 qint64 TreeModel::itemFileSize(const QModelIndex &fileIndex)
 {
-    return siblingAtRow(fileIndex, ColumnSize).data(RawDataRole).toLongLong();
+    return fileIndex.siblingAtColumn(ColumnSize).data(RawDataRole).toLongLong();
 }
 
 FileStatus TreeModel::itemFileStatus(const QModelIndex &fileIndex)
 {
-    return siblingAtRow(fileIndex, ColumnStatus).data(RawDataRole).value<FileStatus>();
+    return fileIndex.siblingAtColumn(ColumnStatus).data(RawDataRole).value<FileStatus>();
 }
 
 QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
 {
-    return siblingAtRow(fileIndex, ColumnChecksum).data().toString();
+    return fileIndex.siblingAtColumn(ColumnChecksum).data().toString();
 }
 
 QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 {
-    return siblingAtRow(fileIndex, ColumnReChecksum).data().toString();
+    return fileIndex.siblingAtColumn(ColumnReChecksum).data().toString();
 }
 
 void TreeModel::setColoredItems(const bool colored)

@@ -44,7 +44,6 @@ public:
 
     static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex()); // build path by current index data
     static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
-    static QModelIndex siblingAtRow(const QModelIndex &curIndex, Column column); // get the index of an item of the same row (curIndex row) and a specified column
     static bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or (folder(false) || invalid(false))
     static bool isFolderRow(const QModelIndex &curIndex); // same^, but folder(true); (file(false) || invalid(false))
     static bool hasChecksum(const QModelIndex &fileIndex);

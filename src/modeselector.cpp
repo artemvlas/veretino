@@ -373,7 +373,7 @@ void ModeSelector::copyDataToClipboard(Column column)
     if (view_->isViewDatabase()
         && view_->curIndexSource.isValid())
     {
-        QString strData = TreeModel::siblingAtRow(view_->curIndexSource, column).data().toString();
+        QString strData = view_->curIndexSource.siblingAtColumn(column).data().toString();
         if (!strData.isEmpty())
             QGuiApplication::clipboard()->setText(strData);
     }
