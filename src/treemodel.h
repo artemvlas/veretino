@@ -35,11 +35,11 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     bool setData(const QModelIndex &curIndex, const QVariant &value,
                         int role = Qt::EditRole) override;
+    bool setRowData(const QModelIndex &curIndex, Column column,
+                    const QVariant &itemData = QVariant());
 
     bool isEmpty() const;
     void populate(const FileList &filesData);
-    bool setRowData(const QModelIndex &curIndex, Column column,
-                    const QVariant &itemData = QVariant());
     void setColoredItems(const bool colored);
 
     static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex()); // build path by current index data

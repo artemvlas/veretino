@@ -77,18 +77,6 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
-bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
-{   
-    if (!curIndex.isValid() || curIndex.model() != this) {
-        qDebug() << "TreeModel::setRowData | Wrong index";
-        return false;
-    }
-
-    QModelIndex idx = siblingAtRow(curIndex, column);
-
-    return idx.isValid() && setData(idx, itemData);
-}
-
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.column() != 0)
@@ -196,6 +184,18 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     }
 
     return result;
+}
+
+bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
+{
+    if (!curIndex.isValid()) {
+        qDebug() << "TreeModel::setRowData | Invalid index";
+        return false;
+    }
+
+    const QModelIndex &_idx = index(curIndex.row(), column, curIndex.parent()); // sibling
+
+    return _idx.isValid() && setData(_idx, itemData);
 }
 
 Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const
