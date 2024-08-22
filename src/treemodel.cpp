@@ -139,22 +139,25 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 
     if (isColored && role == Qt::ForegroundRole) {
         if (curIndex.column() == ColumnStatus || curIndex.column() == ColumnChecksum) {
-            FileStatus status = itemFileStatus(curIndex);
-            if (status == FileStatus::Matched)
+            switch (itemFileStatus(curIndex)) {
+            case FileStatus::Matched:
                 return QColor(Qt::darkGreen);
-            else if (status == FileStatus::Mismatched)
+            case FileStatus::Mismatched:
                 return QColor(Qt::red);
-            else if (status == FileStatus::Unreadable)
+            case FileStatus::Unreadable:
                 return QColor(Qt::darkRed);
+            default: break;
+            }
         }
-        else if (curIndex.column() == ColumnReChecksum)
+        else if (curIndex.column() == ColumnReChecksum) {
             return QColor(Qt::darkGreen);
+        }
     }
 
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
         return QVariant();
 
-    QVariant iData = getItem(curIndex)->data(curIndex.column());
+    QVariant &&iData = getItem(curIndex)->data(curIndex.column());
 
     if (iData.isValid() && role != RawDataRole) {
         if (curIndex.column() == ColumnSize)
