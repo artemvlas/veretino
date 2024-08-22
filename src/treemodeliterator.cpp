@@ -71,7 +71,7 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
 
 QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex) const
 {
-    return model_->index(curIndex.row() + 1, 0, curIndex.parent());
+    return curIndex.siblingAtRow(curIndex.row() + 1);
 }
 
 const QModelIndex& TreeModelIterator::index() const
@@ -81,7 +81,7 @@ const QModelIndex& TreeModelIterator::index() const
 
 QVariant TreeModelIterator::data(Column column, int role) const
 {
-    return model_->data(model_->sibling(index_.row(), column, index_), role);
+    return index_.siblingAtColumn(column).data(role);
 }
 
 QString TreeModelIterator::path(const QModelIndex &root) const
