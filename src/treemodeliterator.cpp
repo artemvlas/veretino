@@ -50,11 +50,11 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
     if (model_->hasChildren(curIndex))
         return model_->index(0, 0, curIndex);
 
-    QModelIndex ind = nextRow(curIndex);
-    if (ind.isValid())
-        return ind;
+    QModelIndex&& _nextRow = nextRow(curIndex);
+    if (_nextRow.isValid())
+        return _nextRow;
 
-    ind = curIndex;
+    QModelIndex ind = curIndex;
     QModelIndex estimatedIndex;
 
     while (!estimatedIndex.isValid()) {

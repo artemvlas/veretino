@@ -77,7 +77,7 @@ public:
     QAction *actionCheckCurFileFromModel = new QAction("Check File", this);
     QAction *actionCheckCurSubfolderFromModel = new QAction("Check Folder", this);
     QAction *actionBranchMake = new QAction("Branch Folder", this);
-    QAction *actionBranchOpen = new QAction("Open the Branch", this);
+    QAction *actionBranchOpen = new QAction("Open Branch", this);
     QAction *actionCheckAll = new QAction("Check ALL available files", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
