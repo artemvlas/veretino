@@ -763,13 +763,18 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
             if (TreeModel::isFileRow(index)) {
                 // Updatable file item
                 if (TreeModel::hasStatus(FileStatus::FlagUpdatable, index)) {
-                    FileStatus status = TreeModel::itemFileStatus(index);
-                    if (status == FileStatus::New)
-                        viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
-                    else if (status == FileStatus::Missing)
-                        viewContextMenu->addAction(menuAct_->actionUpdFileRemove);
-                    else if (status == FileStatus::Mismatched)
-                        viewContextMenu->addAction(menuAct_->actionUpdFileReChecksum);
+                    switch (TreeModel::itemFileStatus(index)) {
+                        case FileStatus::New:
+                            viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
+                            break;
+                        case FileStatus::Missing:
+                            viewContextMenu->addAction(menuAct_->actionUpdFileRemove);
+                            break;
+                        case FileStatus::Mismatched:
+                            viewContextMenu->addAction(menuAct_->actionUpdFileReChecksum);
+                            break;
+                        default: break;
+                    }
                 }
 
                 if (TreeModel::hasReChecksum(index))
