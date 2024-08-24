@@ -32,12 +32,10 @@ bool JsonDb::isCanceled() const
 QJsonDocument JsonDb::readJsonFile(const QString &filePath)
 {
     if (!QFile::exists(filePath)) {
-        qDebug() << "JsonDb::readJsonFile | File not found:" << filePath;
         return QJsonDocument();
     }
 
     QFile jsonFile(filePath);
-
     return jsonFile.open(QFile::ReadOnly) ? QJsonDocument::fromJson(jsonFile.readAll()) : QJsonDocument();
 }
 
@@ -54,10 +52,10 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
         return QJsonArray();
     }
 
-    QJsonDocument readedDoc = readJsonFile(filePath);
+    const QJsonDocument &readedDoc = readJsonFile(filePath);
 
     if (readedDoc.isArray()) {
-        QJsonArray dataArray = readedDoc.array();
+        const QJsonArray &dataArray = readedDoc.array();
         if (dataArray.size() > 1 && dataArray.at(0).isObject() && dataArray.at(1).isObject())
             return dataArray;
     }
@@ -69,9 +67,9 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
     const MetaData &meta = data->metaData;
+    const bool isWorkDirRelative = (meta.workDir == paths::parentFolder(meta.databaseFilePath));
+    const Numbers &numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
-    bool isWorkDirRelative = (meta.workDir == paths::parentFolder(meta.databaseFilePath));
-    Numbers numbers = DataContainer::getNumbers(data->model_, rootFolder);
 
     header["App/Origin"] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
     header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(meta.workDir);
@@ -142,10 +140,8 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
         return QString();
     }
 
-    QString pathToSave;
-
-    pathToSave = rootFolder.isValid() ? data->getBranchFilePath(rootFolder) // branching
-                                      : data->metaData.databaseFilePath; // main database
+    QString pathToSave = rootFolder.isValid() ? data->getBranchFilePath(rootFolder) // branching
+                                              : data->metaData.databaseFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText("Saved");
@@ -172,7 +168,8 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
 DataContainer* JsonDb::parseJson(const QString &filePath)
 {
-    QJsonArray mainArray = loadJsonDB(filePath); // json database is QJsonArray of QJsonObjects
+    // the database is QJsonArray of QJsonObjects [{}, {}, ...]
+    const QJsonArray &mainArray = loadJsonDB(filePath);
 
     if (mainArray.isEmpty()) {
         return nullptr;
@@ -180,16 +177,18 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     emit setStatusbarText("Importing Json database...");
 
-    QJsonObject filelistData(mainArray.at(1).toObject());
+    const QJsonObject &filelistData = mainArray.at(1).toObject();
 
     if (filelistData.isEmpty()) {
-        emit showMessage(QString("%1\n\nThe database doesn't contain checksums.\nProbably all files have been ignored.")
-                                                                    .arg(paths::basicName(filePath)), "Empty Database!");
+        emit showMessage(QString("%1\n\n"
+                                 "The database doesn't contain checksums.\n"
+                                 "Probably all files have been ignored.")
+                                .arg(paths::basicName(filePath)), "Empty Database!");
         emit setStatusbarText();
         return nullptr;
     }
 
-    DataContainer* parsedData = new DataContainer(getMetaData(filePath, mainArray.at(0).toObject(), filelistData));
+    DataContainer *parsedData = new DataContainer(getMetaData(filePath, mainArray.at(0).toObject(), filelistData));
     const QString &workDir = parsedData->metaData.workDir;
 
     // Filling in the Main Data
@@ -200,15 +199,15 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        QString fullPath = it.next();
-        QString relPath = dir.relativeFilePath(fullPath);
+        const QString &_fullPath = it.next();
+        const QString &_relPath = dir.relativeFilePath(_fullPath);
 
-        if (parsedData->metaData.filter.isFileAllowed(relPath)
-            && !filelistData.contains(relPath))
+        if (parsedData->metaData.filter.isFileAllowed(_relPath)
+            && !filelistData.contains(_relPath))
         {
-            QFileInfo fileInfo(fullPath);
+            QFileInfo fileInfo(_fullPath);
             if (fileInfo.isReadable()) {
-                parsedData->model_->addFile(relPath, FileValues(FileStatus::New, fileInfo.size()));
+                parsedData->model_->addFile(_relPath, FileValues(FileStatus::New, fileInfo.size()));
             }
         }
     }
@@ -217,7 +216,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     emit setStatusbarText("Parsing Json database...");
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); !isCanceled() && i != filelistData.constEnd(); ++i) {
-        QString _fullPath = paths::joinPath(workDir, i.key());
+        const QString &_fullPath = paths::joinPath(workDir, i.key());
         bool _exist = QFileInfo::exists(_fullPath);
         qint64 _size = _exist ? QFileInfo(_fullPath).size() : 0;
         FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
@@ -229,13 +228,13 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     }
 
     // additional data
-    QJsonObject excludedFiles = (mainArray.size() > 2) ? mainArray.at(2).toObject() : QJsonObject();
+    const QJsonObject &excludedFiles = (mainArray.size() > 2) ? mainArray.at(2).toObject() : QJsonObject();
     if (!excludedFiles.isEmpty()) {
         if (excludedFiles.contains("Unreadable files")) {
-            QJsonArray unreadableFiles = excludedFiles.value("Unreadable files").toArray();
+            const QJsonArray &unreadableFiles = excludedFiles.value("Unreadable files").toArray();
 
             for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
-                QString _unrFile = unreadableFiles.at(var).toString();
+                const QString &_unrFile = unreadableFiles.at(var).toString();
                 if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
                     parsedData->model_->addFile(_unrFile, FileValues(FileStatus::Unreadable));
                 }
