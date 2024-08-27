@@ -9,6 +9,7 @@
 #include <cmath>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QRegularExpression>
 #include <QDebug>
 #include "files.h"
 
@@ -104,16 +105,22 @@ QStringList strToList(const QString &str)
 namespace paths {
 QString basicName(const QString &path)
 {
-    if (path == "/")
-        return "Root";
+    if (isRoot(path)) {
+        const QChar _ch = path.at(0);
+        return _ch.isLetter() ? QString("Drive_%1").arg(_ch.toUpper()) : "Root";
+    }
 
-    if (path.size() == 3 && path.at(0).isLetter() && path.at(1) == ':') // if provided Windows-style root path like "C:"
-        return QString("Drive_%1").arg(path.at(0).toUpper());
+    static const QRegularExpression pathSep("[/\\\\]");
+    const QStringList &components = path.split(pathSep, Qt::SkipEmptyParts);
+
+    return components.isEmpty() ? QString() : components.last();
 
     // #1 impl.
+    /*
     QChar pathSep = path.contains('\\') ? '\\' : '/';
     QStringList components = path.split(pathSep, Qt::SkipEmptyParts);
     return components.isEmpty() ? QString() : components.last();
+    */
 
     // #2 impl. (for single '/' only)
     /*
