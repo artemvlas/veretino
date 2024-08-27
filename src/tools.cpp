@@ -209,11 +209,12 @@ QString dataSizeReadable(const qint64 sizeBytes)
         return QString("%1 bytes").arg(sizeBytes);
 
     long double converted = sizeBytes;
+    int it = 0; // number of divisions
 
-    int it = 0;
-    for (; (it < 4) && (converted > 1000); ++it) {
+    do {
         converted /= 1024;
-    }
+        ++it;
+    } while (converted > 1000);
 
     QChar _ch;
     switch (it) {
@@ -331,51 +332,21 @@ QString fileNameAndSize(const QString &filePath)
 
 QString fileItemStatus(FileStatus status)
 {
-    QString result;
-
     switch (status) {
-    case FileStatus::Queued:
-        result = "queued";
-        break;
-    case FileStatus::Calculating:
-        result = "calculating...";
-        break;
-    case FileStatus::Verifying:
-        result = "verifying...";
-        break;
-    case FileStatus::NotChecked:
-        result = "ready...";
-        break;
-    case FileStatus::Matched:
-        result = "match";
-        break;
-    case FileStatus::Mismatched:
-        result = "not match";
-        break;
-    case FileStatus::New:
-        result = "new file";
-        break;
-    case FileStatus::Missing:
-        result = "missing";
-        break;
-    case FileStatus::Unreadable:
-        result = "unreadable";
-        break;
-    case FileStatus::Added:
-        result = "added";
-        break;
-    case Files::Removed:
-        result = "removed";
-        break;
-    case FileStatus::Updated:
-        result = "updated";
-        break;
-    default:
-        result = "unknown";
-        break;
+    case FileStatus::Queued: return "queued";
+    case FileStatus::Calculating: return "calculating...";
+    case FileStatus::Verifying: return "verifying...";
+    case FileStatus::NotChecked: return "ready...";
+    case FileStatus::Matched: return "match";
+    case FileStatus::Mismatched: return "not match";
+    case FileStatus::New: return "new file";
+    case FileStatus::Missing: return "missing";
+    case FileStatus::Unreadable: return "unreadable";
+    case FileStatus::Added: return "added";
+    case Files::Removed: return "removed";
+    case FileStatus::Updated: return "updated";
+    default: return "unknown";
     }
-
-    return result;
 }
 
 QString coloredText(bool ignore)
