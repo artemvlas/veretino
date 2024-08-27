@@ -256,7 +256,7 @@ QString dataSizeReadable(qint64 sizeBytes)
             }
         }
 
-        float x = std::round(converted * 100) / 100;
+        const float x = std::round(converted * 100) / 100;
         return QString("%1 %2").arg(QString::number(x, 'f', 2), xB);
     }
     else
@@ -279,15 +279,19 @@ QString shortenString(const QString &string, int length, bool cutEnd)
 
 QString simplifiedChars(QString str)
 {
+    /* old impl.
     str = str.simplified();
 
-    QString forbSymb(" :*/\\%?|<>^&#");
+    QString forbSymb(" :/\\%*?|<>^&#");
 
     for (int i = 0; i < str.size(); ++i) {
         if (forbSymb.contains(str.at(i))) {
             str[i] = '_';
         }
-    }
+    }*/
+
+    static const QRegularExpression re("[ :/\\%*?|<>&#~^]");
+    str.replace(re, "_");
 
     while (str.contains("__"))
         str.replace("__", "_");
@@ -336,10 +340,8 @@ QString filesNumberAndSize(int filesNumber, qint64 filesSize)
     if (filesNumber == 0)
         return "no files";
 
-    QString s("files");
-
-    if (filesNumber == 1)
-        s = "file"; // if only 1 file the text is "file", if more the text is "files"
+    // if only 1 file the text is "file", if more the text is "files"
+    const QString s = (filesNumber == 1) ? "file" : "files";
 
     return QString("%1 %2 (%3)")
                     .arg(filesNumber)
