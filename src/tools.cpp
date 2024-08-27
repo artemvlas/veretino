@@ -165,9 +165,21 @@ void browsePath(const QString &path)
 
 bool isRoot(const QString &path)
 {
+    switch (path.length()) {
+    case 1:
+        return (path.at(0) == '/'); // Linux FS root
+    case 2:
+    case 3:
+        return (path.at(0).isLetter() && path.at(1) == ':'); // Windows drive root
+    default:
+        return false;
+    }
+
+    /* old impl.
     return (path == "/") // Linux FS root
            || ((path.length() == 2 || path.length() == 3) // Windows drive root
                && path.at(0).isLetter() && path.at(1) == ':');
+    */
 }
 } // namespace paths
 
