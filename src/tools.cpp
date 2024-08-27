@@ -85,6 +85,10 @@ bool canBeChecksum(const QString &str)
 
 QStringList strToList(const QString &str)
 {
+    static const QRegularExpression re("[, ]");
+    return str.split(re, Qt::SkipEmptyParts);
+
+    /* old impl.
     if (str.isEmpty())
         return QStringList();
 
@@ -99,6 +103,7 @@ QStringList strToList(const QString &str)
     }
 
     return str.split(sep);
+    */
 }
 } // namespace tools
 
