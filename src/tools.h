@@ -38,8 +38,8 @@ QString currentDateTime();
 
 QString numString(qint64 num); // Returns a string of numbers separated by commas: 1,234,567,890
 QString millisecToReadable(qint64 milliseconds, bool approx = false); // converts milliseconds to readable time like "1 min 23 sec"
-QString dataSizeReadable(qint64 sizeBytes); // converts size in bytes to human readable form like "129.17 GiB"
-QString dataSizeReadableExt(qint64 sizeBytes); // returning style example: "6.08 GiB (6,532,974,324 bytes)"
+QString dataSizeReadable(const qint64 sizeBytes); // converts size in bytes to human readable form like "129.17 GiB"
+QString dataSizeReadableExt(const qint64 sizeBytes); // returning style example: "6.08 GiB (6,532,974,324 bytes)"
 QString shortenString(const QString &string, int length = 64, bool cutEnd = true);
 QString simplifiedChars(QString str);
 QString joinStrings(const QString &str1, const QString &str2, const QString joint = "_");

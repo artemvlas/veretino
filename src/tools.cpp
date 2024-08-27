@@ -24,7 +24,6 @@ int algoStrLen(QCryptographicHash::Algorithm algo)
         case QCryptographicHash::Sha512:
             return 128;
         default:
-            //qDebug() << "tools::algoStrLen | Wrong input algo:" << algo;
             return 0;
     }
 }
@@ -39,7 +38,6 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
         case 128:
             return QCryptographicHash::Sha512;
         default:
-            //qDebug() << "tools::algorithmByStrLen | Wrong input strLen:" << strLen;
             return QCryptographicHash::Sha256;
     }
 }
@@ -87,23 +85,6 @@ QStringList strToList(const QString &str)
 {
     static const QRegularExpression re("[, ]");
     return str.split(re, Qt::SkipEmptyParts);
-
-    /* old impl.
-    if (str.isEmpty())
-        return QStringList();
-
-    QString sep = " ";
-    QStringList sepVariants { ", ", ",", "  " };
-
-    for (int i = 0; i < sepVariants.size(); ++i) {
-        if (str.contains(sepVariants.at(i))) {
-            sep = sepVariants.at(i);
-            break;
-        }
-    }
-
-    return str.split(sep);
-    */
 }
 } // namespace tools
 
@@ -119,13 +100,6 @@ QString basicName(const QString &path)
     const QStringList &components = path.split(pathSep, Qt::SkipEmptyParts);
 
     return components.isEmpty() ? QString() : components.last();
-
-    // #1 impl.
-    /*
-    QChar pathSep = path.contains('\\') ? '\\' : '/';
-    QStringList components = path.split(pathSep, Qt::SkipEmptyParts);
-    return components.isEmpty() ? QString() : components.last();
-    */
 
     // #2 impl. (for single '/' only)
     /*
@@ -186,12 +160,6 @@ bool isRoot(const QString &path)
     default:
         return false;
     }
-
-    /* old impl.
-    return (path == "/") // Linux FS root
-           || ((path.length() == 2 || path.length() == 3) // Windows drive root
-               && path.at(0).isLetter() && path.at(1) == ':');
-    */
 }
 } // namespace paths
 
@@ -235,35 +203,42 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
                                    : QString("%1 sec").arg(seconds);
 }
 
-QString dataSizeReadable(qint64 sizeBytes)
+QString dataSizeReadable(const qint64 sizeBytes)
 {
-    long double converted = sizeBytes;
-    QString xB;
-
-    if (converted > 1000) {
-        converted /= 1024;
-        xB = "KiB";
-        if (converted > 1000) {
-            converted /= 1024;
-            xB = "MiB";
-            if (converted > 1000) {
-                converted /= 1024;
-                xB = "GiB";
-                if (converted > 1000) {
-                    converted /= 1024;
-                    xB = "TiB";
-                }
-            }
-        }
-
-        const float x = std::round(converted * 100) / 100;
-        return QString("%1 %2").arg(QString::number(x, 'f', 2), xB);
-    }
-    else
+    if (sizeBytes <= 1000)
         return QString("%1 bytes").arg(sizeBytes);
+
+    long double converted = sizeBytes;
+
+    int it = 0;
+    for (; (it < 4) && (converted > 1000); ++it) {
+        converted /= 1024;
+    }
+
+    QChar _ch;
+    switch (it) {
+    case 1:
+        _ch = 'K';
+        break;
+    case 2:
+        _ch = 'M';
+        break;
+    case 3:
+        _ch = 'G';
+        break;
+    case 4:
+        _ch = 'T';
+        break;
+    default:
+        _ch = '?';
+        break;
+    }
+
+    const float x = std::round(converted * 100) / 100;
+    return QString("%1 %2iB").arg(QString::number(x, 'f', 2), _ch);
 }
 
-QString dataSizeReadableExt(qint64 sizeBytes)
+QString dataSizeReadableExt(const qint64 sizeBytes)
 {
     return QString("%1 (%2 bytes)").arg(dataSizeReadable(sizeBytes), numString(sizeBytes));
 }
@@ -290,7 +265,7 @@ QString simplifiedChars(QString str)
         }
     }*/
 
-    static const QRegularExpression re("[ :/\\%*?|<>&#~^]");
+    static const QRegularExpression re("[ /\\\\:;%*?|<>&#~^]");
     str.replace(re, "_");
 
     while (str.contains("__"))
