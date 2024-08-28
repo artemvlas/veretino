@@ -118,6 +118,18 @@ QString shortenPath(const QString &path)
 
 QString parentFolder(const QString &path)
 {
+    const int ind = path.lastIndexOf('/', -2);
+
+    switch (ind) {
+    case 0: // "/folder" --> "/"
+        return path.at(0);
+    case 2: // "C:/folder" --> "C:/"
+        return isRoot(path.left(3)) ? path.left(3) : path.left(2);
+    default: // /home/folder[/] --> /home
+        return path.left(ind);
+    }
+
+    /* OLD impl.
     if (path.isEmpty() || isRoot(path))
         return path;
 
@@ -134,6 +146,7 @@ QString parentFolder(const QString &path)
 
     return (sepIndex > rootSepIndex) ? path.left(sepIndex)
                                      : path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
+    */
 }
 
 QString joinPath(const QString &absolutePath, const QString &addPath)
