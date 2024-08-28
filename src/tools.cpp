@@ -121,44 +121,14 @@ QString parentFolder(const QString &path)
     const int ind = path.lastIndexOf('/', -2);
 
     switch (ind) {
-    case 0: // "/folder" --> "/"
-        return path.at(0);
-    case 2: // "C:/folder" --> "C:/"
-        return isRoot(path.left(3)) ? path.left(3) : path.left(2);
-    default: // /home/folder[/] --> /home
+    case -1: // root --> root; string'/' --> ""
+        return isRoot(path) ? path : QString();
+    case 0: // /folder'/' --> "/"
+        return path.at(ind);
+    case 2: // C:/folder'/' --> "C:/"
+        return isRoot(path.left(ind)) ? path.left(3) : path.left(ind);
+    default: // /folder/item'/' --> /folder
         return path.left(ind);
-    }
-
-    /* OLD impl.
-    if (path.isEmpty() || isRoot(path))
-        return path;
-
-    int rootSepIndex = path.indexOf('/'); // index of root '/': 0 for '/home/folder'; 2 for 'C:/folder'
-    if (rootSepIndex == -1)
-        return "/"; // if there is no '/' in 'path'
-
-    // if the path's root contains double '/' like 'ftp://folder' or 'smb://folder', increase index to next position
-    if (path.length() > rootSepIndex + 1
-        && path.at(rootSepIndex + 1) == '/')
-        ++rootSepIndex;
-
-    int sepIndex = path.lastIndexOf('/', -2); // skip the last char due the case /home/folder'/'
-
-    return (sepIndex > rootSepIndex) ? path.left(sepIndex)
-                                     : path.left(rootSepIndex + 1); // if the last 'sep' is also the root, keep it
-    */
-}
-
-QString joinPath(const QString &absolutePath, const QString &addPath)
-{
-    return absolutePath.endsWith('/') ? absolutePath + addPath
-                                      : QString("%1/%2").arg(absolutePath, addPath);
-}
-
-void browsePath(const QString &path)
-{
-    if (QFile::exists(path)) {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     }
 }
 
@@ -172,6 +142,19 @@ bool isRoot(const QString &path)
         return (path.at(0).isLetter() && path.at(1) == ':'); // Windows drive root
     default:
         return false;
+    }
+}
+
+QString joinPath(const QString &absolutePath, const QString &addPath)
+{
+    return absolutePath.endsWith('/') ? absolutePath + addPath
+                                      : QString("%1/%2").arg(absolutePath, addPath);
+}
+
+void browsePath(const QString &path)
+{
+    if (QFile::exists(path)) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     }
 }
 } // namespace paths

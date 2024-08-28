@@ -29,8 +29,8 @@ QString parentFolder(const QString &path); // returns the parent folder of the '
 QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
 QString shortenPath(const QString &path); // if not a root (or child of root) path, returns "../path"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
+bool isRoot(const QString &path); // true: "/" or "X:'/'"; else false
 void browsePath(const QString &path);
-bool isRoot(const QString &path); // true: "/" or "C:/" or "C:"; else false
 } // namespace paths
 
 namespace format {
