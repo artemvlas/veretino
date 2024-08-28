@@ -67,7 +67,6 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
     const MetaData &meta = data->metaData;
-    const bool isWorkDirRelative = (meta.workDir == paths::parentFolder(meta.databaseFilePath));
     const Numbers &numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
@@ -83,7 +82,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
                                                           meta.datetime[DateTimeStr::DateVerified]);
 
     // WorkDir
-    if (!isWorkDirRelative && !rootFolder.isValid())
+    if (!data->isWorkDirRelative() && !rootFolder.isValid())
         header[strHeaderWorkDir] = meta.workDir;
 
     // Filter
