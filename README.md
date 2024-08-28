@@ -1,4 +1,9 @@
-# Veretino: a new way to verify data integrity
+<div align="center">
+    <img src="res/icons/generic/veretino.svg" width="20%">
+<h2 align="center">Veretino</h2>
+<h3 align="center">Be confident in the integrity of your data.</h3>
+</div>
+
 _With this application, the integrity of both individual files and entire lists can be verified.
 Analyze the contents of folders, calculate checksums, and easily find modified or corrupted data..._
 
