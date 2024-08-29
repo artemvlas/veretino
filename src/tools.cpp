@@ -81,7 +81,7 @@ bool canBeChecksum(const QString &str)
     return isOK;
 }
 
-QString joinStrings(const QString &str1, const QString &str2, const QChar sep)
+QString joinStrings(const QString &str1, const QString &str2, QChar sep)
 {
     const bool s1Ends = str1.endsWith(sep);
     const bool s2Starts = str2.startsWith(sep);
@@ -161,8 +161,7 @@ bool isRoot(const QString &path)
 
 QString joinPath(const QString &absolutePath, const QString &addPath)
 {
-    return absolutePath.endsWith('/') ? absolutePath + addPath
-                                      : QString("%1/%2").arg(absolutePath, addPath);
+    return tools::joinStrings(absolutePath, addPath, '/');
 }
 
 void browsePath(const QString &path)
