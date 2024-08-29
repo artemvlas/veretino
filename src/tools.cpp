@@ -81,6 +81,20 @@ bool canBeChecksum(const QString &str)
     return isOK;
 }
 
+QString joinStrings(const QString &str1, const QString &str2, const QChar sep)
+{
+    const bool s1Ends = str1.endsWith(sep);
+    const bool s2Starts = str2.startsWith(sep);
+
+    if (s1Ends && s2Starts)
+        return str1.left(str1.length() - 1) + str2;
+
+    if (s1Ends || s2Starts)
+        return str1 + str2;
+
+    return QString("%1%2%3").arg(str1, sep, str2);
+}
+
 QStringList strToList(const QString &str)
 {
     static const QRegularExpression re("[, ]");
@@ -271,24 +285,10 @@ QString simplifiedChars(QString str)
     return str;
 }
 
-QString joinStrings(const QString &str1, const QString &str2, const QString sep)
-{
-    const bool s1Ends = str1.endsWith(sep);
-    const bool s2Starts = str2.startsWith(sep);
-
-    if (s1Ends && s2Starts)
-        return str1.chopped(sep.length()) + str2;
-
-    if (s1Ends || s2Starts)
-        return str1 + str2;
-
-    return QString("%1%2%3").arg(str1, sep, str2);
-}
-
 QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension)
 {
-    return folderName.isEmpty() ? joinStrings(prefix, extension, ".")
-                                : joinStrings(joinStrings(prefix, simplifiedChars(paths::basicName(folderName)), "_"), extension, ".");
+    return folderName.isEmpty() ? tools::joinStrings(prefix, extension, '.')
+                                : tools::joinStrings(tools::joinStrings(prefix, simplifiedChars(paths::basicName(folderName)), '_'), extension, '.');
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
