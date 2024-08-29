@@ -104,14 +104,14 @@ void DialogDbStatus::setTabsInfo()
 
 QStringList DialogDbStatus::infoContent()
 {
-    QStringList contentNumbers;
-    QString createdDataSize;
-    int numChecksums = data_->numbers.numberOf(FileStatus::FlagHasChecksum);
-    int available = data_->numbers.numberOf(FileStatus::FlagAvailable);
-    qint64 totalSize = data_->numbers.totalSize(FileStatus::FlagAvailable);
-
     if (isCreating())
         return { "The checksum list is being calculated..." };
+
+    QStringList contentNumbers;
+    QString createdDataSize;
+    const int numChecksums = data_->numbers.numberOf(FileStatus::FlagHasChecksum);
+    const int available = data_->numbers.numberOf(FileStatus::FlagAvailable);
+    const qint64 totalSize = data_->numbers.totalSize(FileStatus::FlagAvailable);
 
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
@@ -125,7 +125,7 @@ QStringList DialogDbStatus::infoContent()
     if (isSavedToDesktop()) {
         contentNumbers.append(QString());
         contentNumbers.append("Unable to save to working folder!");
-        contentNumbers.append("The database is saved in the Desktop folder.");
+        contentNumbers.append("The database is saved on the Desktop.");
     }
 
     if (isJustCreated())
@@ -176,10 +176,10 @@ QStringList DialogDbStatus::infoVerification()
     }
     else if (data_->contains(FileStatus::FlagChecked)) {
         // to account for added and updated files, the total number in parentheses is used
-        int numAddedUpdated = data_->numbers.numberOf(FileStatus::Added | FileStatus::Updated);
+        const int numAddedUpdated = data_->numbers.numberOf(FileStatus::Added | FileStatus::Updated);
 
         // info str
-        int numChecked = data_->numbers.numberOf(FileStatus::FlagChecked);
+        const int numChecked = data_->numbers.numberOf(FileStatus::FlagChecked);
         result.append(QString("%1%2 out of %3 files were checked")
                           .arg(numChecked)
                           .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numChecked + numAddedUpdated) : QString())
@@ -192,7 +192,7 @@ QStringList DialogDbStatus::infoVerification()
             result.append("No Mismatches found");
 
         if (data_->contains(FileStatus::Matched)) {
-            int numMatched = data_->numbers.numberOf(FileStatus::Matched);
+            const int numMatched = data_->numbers.numberOf(FileStatus::Matched);
             result.append(QString("%1%2 files matched")
                               .arg(numMatched)
                               .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numMatched + numAddedUpdated) : QString()));
