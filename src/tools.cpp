@@ -271,15 +271,18 @@ QString simplifiedChars(QString str)
     return str;
 }
 
-QString joinStrings(const QString &str1, const QString &str2, const QString joint)
+QString joinStrings(const QString &str1, const QString &str2, const QString sep)
 {
-    if (str1.endsWith(joint) && str2.startsWith(joint))
-        return str1.left(str1.length() - joint.length()) + str2;
+    const bool s1Ends = str1.endsWith(sep);
+    const bool s2Starts = str2.startsWith(sep);
 
-    if (str1.endsWith(joint) || str2.startsWith(joint))
+    if (s1Ends && s2Starts)
+        return str1.chopped(sep.length()) + str2;
+
+    if (s1Ends || s2Starts)
         return str1 + str2;
 
-    return QString("%1%2%3").arg(str1, joint, str2);
+    return QString("%1%2%3").arg(str1, sep, str2);
 }
 
 QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension)
