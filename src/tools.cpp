@@ -107,13 +107,30 @@ QString basicName(const QString &path)
 {
     if (isRoot(path)) {
         const QChar _ch = path.at(0);
-        return _ch.isLetter() ? QString("Drive_%1").arg(_ch.toUpper()) : "Root";
+        return _ch.isLetter() ? QString("Drive_").append(_ch.toUpper()) : "Root";
     }
 
+    QString result;
+    const int lastIndex = path.size() - 1;
+
+    for (int i = lastIndex; i >= 0; --i) {
+        const QChar _ch = path.at(i);
+        if (_ch != '/') {
+            result.prepend(_ch);
+        }
+        else if (i != lastIndex) {
+            break;
+        }
+    }
+
+    return result;
+
+    /* prev. impl.
     static const QRegularExpression pathSep("[/\\\\]");
     const QStringList &components = path.split(pathSep, Qt::SkipEmptyParts);
 
     return components.isEmpty() ? QString() : components.last();
+    */
 
     // #2 impl. (for single '/' only)
     /*
