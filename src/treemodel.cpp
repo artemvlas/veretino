@@ -43,7 +43,6 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
         }
 
         if (not_exist) {
-            TreeItem *ti;
             QVector<QVariant> iData(rootItem->columnCount());
             iData[ColumnName] = splitPath.at(var);
 
@@ -60,7 +59,7 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
                 isAdded = true;
             }
 
-            ti = new TreeItem(iData, parentItem);
+            TreeItem *ti = new TreeItem(iData, parentItem);
             parentItem->appendChild(ti);
             parentItem = ti;
         }
