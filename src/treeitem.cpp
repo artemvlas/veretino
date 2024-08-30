@@ -16,9 +16,7 @@ TreeItem::~TreeItem()
 
 TreeItem *TreeItem::child(int number)
 {
-    if (number < 0 || number >= childItems.size())
-        return nullptr;
-    return childItems.at(number);
+    return (number < childItems.size() && number >= 0) ? childItems.at(number) : nullptr;
 }
 
 int TreeItem::childCount() const
@@ -28,9 +26,7 @@ int TreeItem::childCount() const
 
 int TreeItem::childNumber() const
 {
-    if (parentItem)
-        return parentItem->childItems.indexOf(const_cast<TreeItem*>(this));
-    return 0;
+    return parentItem ? parentItem->childItems.indexOf(const_cast<TreeItem*>(this)) : 0;
 }
 
 int TreeItem::columnCount() const
@@ -40,9 +36,7 @@ int TreeItem::columnCount() const
 
 QVariant TreeItem::data(int column) const
 {
-    if (column < 0 || column >= itemData.size())
-        return QVariant();
-    return itemData.at(column);
+    return (column < itemData.size() && column >= 0) ? itemData.at(column) : QVariant();
 }
 
 TreeItem *TreeItem::parent()
@@ -74,17 +68,3 @@ TreeItem *TreeItem::findChild(const QString &str) const
 
     return nullptr;
 }
-/*
-bool TreeItem::containsChild(const QString &str) const
-{
-    bool _exist = false;
-
-    for (const TreeItem *chItem : childItems) {
-        if (str == chItem->data(0).toString()) {
-            _exist = true;
-            break;
-        }
-    }
-
-    return _exist;
-}*/

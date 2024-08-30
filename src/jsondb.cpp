@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include "treemodeliterator.h"
 #include <QDirIterator>
+#include <QElapsedTimer>
 
 JsonDb::JsonDb(QObject *parent)
     : QObject(parent)
@@ -167,6 +168,9 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
 DataContainer* JsonDb::parseJson(const QString &filePath)
 {
+    QElapsedTimer timer;
+    timer.start();
+
     // the database is QJsonArray of QJsonObjects [{}, {}, ...]
     const QJsonArray &mainArray = loadJsonDB(filePath);
 
@@ -250,6 +254,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
+    qDebug() << "Parsing time:" << timer.elapsed();
     return parsedData;
 }
 
