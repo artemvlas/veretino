@@ -39,6 +39,8 @@ public:
                     const QVariant &itemData = QVariant());
 
     bool isEmpty() const;
+    void add_file(const QString &filePath, const FileValues &values); // new func., with cache
+    bool add_file_unforced(const QString &filePath, const FileValues &values); // checks for presence in the folder, adds if missing; slower for large quantities
     void populate(const FileList &filesData);
     void setColoredItems(const bool colored);
 
@@ -58,12 +60,14 @@ public:
     static QString itemFileReChecksum(const QModelIndex &fileIndex);
 
 public slots:
-    bool addFile(const QString &filePath, const FileValues &values);
+    bool addFile(const QString &filePath, const FileValues &values); // OLD, no chache
 
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
+    TreeItem *add_folder(const QString &path);
     TreeItem *rootItem;
     IconProvider icons_;
+    QHash<QString, TreeItem*> cacheFolderItems_;
     bool isColored = false;
 }; // class TreeModel
 

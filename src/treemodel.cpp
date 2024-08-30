@@ -76,6 +76,67 @@ void TreeModel::populate(const FileList &filesData)
     }
 }
 
+bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &values)
+{
+    const TreeItem *parentItem = add_folder(paths::parentFolder(filePath));
+
+    if (parentItem->findChild(paths::basicName(filePath))) {
+        return false;
+    }
+
+    add_file(filePath, values);
+    return true;
+}
+
+void TreeModel::add_file(const QString &filePath, const FileValues &values)
+{
+    // data preparation
+    QVector<QVariant> _tiData(rootItem->columnCount());
+    _tiData[ColumnName] = paths::basicName(filePath);
+
+    if (values.size > 0)
+        _tiData[ColumnSize] = values.size;
+
+    _tiData[ColumnStatus] = QVariant::fromValue(values.status);
+
+    if (!values.checksum.isEmpty())
+        _tiData[ColumnChecksum] = values.checksum;
+
+    // item adding
+    TreeItem *parentItem = add_folder(paths::parentFolder(filePath));
+    parentItem->addChild(_tiData);
+}
+
+TreeItem *TreeModel::add_folder(const QString &path)
+{
+    if (path.isEmpty())
+        return rootItem;
+
+    if (cacheFolderItems_.contains(path)) {
+        //qDebug() << "add_folder >> returned cached value:" << path;
+        return cacheFolderItems_.value(path);
+    }
+
+    TreeItem *parentItem = rootItem;
+    const QStringList &pathParts = path.split('/');
+
+    for (const QString &_subFolder : pathParts) {
+        TreeItem *_ti = parentItem->findChild(_subFolder);
+        if (_ti) {
+            parentItem = _ti;
+        }
+        else {
+            QVector<QVariant> _tiData(rootItem->columnCount());
+            _tiData[ColumnName] = _subFolder;
+            parentItem = parentItem->addChild(_tiData);
+        }
+    }
+
+    cacheFolderItems_.insert(path, parentItem);
+    //qDebug() << "add_folder >> value cached:" << path;
+    return parentItem;
+}
+
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.column() != 0)

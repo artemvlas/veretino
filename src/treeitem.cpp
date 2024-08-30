@@ -58,9 +58,9 @@ void TreeItem::appendChild(TreeItem *item)
     childItems.append(item);
 }
 
-TreeItem *TreeItem::addChild(const QVector<QVariant> &rowData)
+TreeItem *TreeItem::addChild(const QVector<QVariant> &tiData)
 {
-    TreeItem *ti = new TreeItem(rowData, this);
+    TreeItem *ti = new TreeItem(tiData, this);
     childItems.append(ti);
     return ti;
 }
