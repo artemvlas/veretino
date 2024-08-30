@@ -14,11 +14,6 @@ TreeItem::~TreeItem()
     qDeleteAll(childItems);
 }
 
-void TreeItem::appendChild(TreeItem *item)
-{
-    childItems.append(item);
-}
-
 TreeItem *TreeItem::child(int number)
 {
     if (number < 0 || number >= childItems.size())
@@ -62,4 +57,23 @@ bool TreeItem::setData(int column, const QVariant &value)
 
     itemData[column] = value;
     return true;
+}
+
+void TreeItem::appendChild(TreeItem *item)
+{
+    childItems.append(item);
+}
+
+bool TreeItem::containsChild(const QString &str) const
+{
+    bool _exist = false;
+
+    for (const TreeItem *chItem : childItems) {
+        if (str == chItem->data(0).toString()) {
+            _exist = true;
+            break;
+        }
+    }
+
+    return _exist;
 }
