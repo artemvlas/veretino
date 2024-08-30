@@ -21,6 +21,7 @@ public:
     QVariant data(int column) const;
     bool setData(int column, const QVariant &value);
     void appendChild(TreeItem *child);
+    TreeItem *addChild(const QVector<QVariant> &rowData); // creates and appends a new child item, returns a pointer to it
     TreeItem *findChild(const QString &str) const; // looks for matches in column 0
 
 private:

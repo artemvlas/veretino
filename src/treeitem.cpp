@@ -58,6 +58,13 @@ void TreeItem::appendChild(TreeItem *item)
     childItems.append(item);
 }
 
+TreeItem *TreeItem::addChild(const QVector<QVariant> &rowData)
+{
+    TreeItem *ti = new TreeItem(rowData, this);
+    childItems.append(ti);
+    return ti;
+}
+
 TreeItem *TreeItem::findChild(const QString &str) const
 {
     for (TreeItem *chItem : childItems) {
