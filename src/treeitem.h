@@ -21,7 +21,8 @@ public:
     QVariant data(int column) const;
     bool setData(int column, const QVariant &value);
     void appendChild(TreeItem *child);
-    bool containsChild(const QString &str) const; // looks for matches in column 0
+    TreeItem *findChild(const QString &str) const; // looks for matches in column 0
+    //bool containsChild(const QString &str) const;
 
 private:
     QList<TreeItem*> childItems;

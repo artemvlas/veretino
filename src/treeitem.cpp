@@ -64,6 +64,17 @@ void TreeItem::appendChild(TreeItem *item)
     childItems.append(item);
 }
 
+TreeItem *TreeItem::findChild(const QString &str) const
+{
+    for (TreeItem *chItem : childItems) {
+        if (str == chItem->data(0).toString()) {
+            return chItem;
+        }
+    }
+
+    return nullptr;
+}
+/*
 bool TreeItem::containsChild(const QString &str) const
 {
     bool _exist = false;
@@ -76,4 +87,4 @@ bool TreeItem::containsChild(const QString &str) const
     }
 
     return _exist;
-}
+}*/
