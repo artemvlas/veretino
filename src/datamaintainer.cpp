@@ -129,8 +129,8 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
             else
                 continue;
 
-            if (data_->model_->addFile(relPath, curFileValues))
-                ++numAdded;
+            data_->model_->add_file(relPath, curFileValues);
+            ++numAdded;
         }
     }
 
@@ -144,6 +144,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     if (numAdded > 0)
         updateNumbers();
 
+    data_->model_->clearCreationCache();
     return numAdded;
 }
 

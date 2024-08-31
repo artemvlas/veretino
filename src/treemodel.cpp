@@ -25,6 +25,7 @@ bool TreeModel::isEmpty() const
     return (rootItem->childCount() == 0);
 }
 
+/* // OLD, no cache; will be removed until the next release
 bool TreeModel::addFile(const QString &filePath, const FileValues &values)
 {
     bool isAdded = false;
@@ -66,13 +67,13 @@ bool TreeModel::addFile(const QString &filePath, const FileValues &values)
     }
 
     return isAdded;
-}
+} */ // DEPRECATED ^^^
 
 void TreeModel::populate(const FileList &filesData)
 {
     FileList::const_iterator iter;
     for (iter = filesData.constBegin(); iter != filesData.constEnd(); ++iter) {
-        addFile(iter.key(), iter.value());
+        add_file(iter.key(), iter.value());
     }
 }
 
@@ -328,6 +329,12 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
     //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
 
     return curIndex;
+}
+
+void TreeModel::clearCreationCache()
+{
+    qDebug() << "TreeModel::clearCreationCache >>" << cacheFolderItems_.size();
+    cacheFolderItems_.clear();
 }
 
 // the TreeModel implies that if an item has children, then it is a folder (or invalid-root); if not, then it is a file

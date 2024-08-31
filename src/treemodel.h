@@ -40,7 +40,7 @@ public:
 
     bool isEmpty() const;
     void add_file(const QString &filePath, const FileValues &values); // new func., with cache
-    bool add_file_unforced(const QString &filePath, const FileValues &values); // checks for presence in the folder, adds if missing; slower for large quantities
+    bool add_file_unforced(const QString &filePath, const FileValues &values); // checks for presence first; much slower for large lists
     void populate(const FileList &filesData);
     void setColoredItems(const bool colored);
 
@@ -60,7 +60,8 @@ public:
     static QString itemFileReChecksum(const QModelIndex &fileIndex);
 
 public slots:
-    bool addFile(const QString &filePath, const FileValues &values); // OLD, no chache
+    void clearCreationCache();
+    //bool addFile(const QString &filePath, const FileValues &values); // DEPRECATED; will be removed until the next release
 
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;

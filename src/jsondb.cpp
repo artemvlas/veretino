@@ -210,7 +210,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         {
             QFileInfo fileInfo(_fullPath);
             if (fileInfo.isReadable()) {
-                parsedData->model_->addFile(_relPath, FileValues(FileStatus::New, fileInfo.size()));
+                parsedData->model_->add_file(_relPath, FileValues(FileStatus::New, fileInfo.size()));
             }
         }
     }
@@ -227,7 +227,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         FileValues curFileValues(_status, _size);
         curFileValues.checksum = i.value().toString();
 
-        parsedData->model_->addFile(i.key(), curFileValues);
+        parsedData->model_->add_file(i.key(), curFileValues);
     }
 
     // additional data
@@ -239,7 +239,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
             for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
                 const QString &_unrFile = unreadableFiles.at(var).toString();
                 if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
-                    parsedData->model_->addFile(_unrFile, FileValues(FileStatus::Unreadable));
+                    parsedData->model_->add_file(_unrFile, FileValues(FileStatus::Unreadable));
                 }
             }
         }
@@ -254,7 +254,9 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
+    parsedData->model_->clearCreationCache();
     qDebug() << "Parsing time:" << timer.elapsed();
+
     return parsedData;
 }
 
