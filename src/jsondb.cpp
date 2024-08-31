@@ -221,7 +221,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     for (i = filelistData.constBegin(); !isCanceled() && i != filelistData.constEnd(); ++i) {
         const QString &_fullPath = paths::joinPath(workDir, i.key());
         bool _exist = QFileInfo::exists(_fullPath);
-        qint64 _size = _exist ? QFileInfo(_fullPath).size() : 0;
+        qint64 _size = _exist ? QFileInfo(_fullPath).size() : -1;
         FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
 
         FileValues curFileValues(_status, _size);

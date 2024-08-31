@@ -95,7 +95,7 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
     QVector<QVariant> _tiData(rootItem->columnCount());
     _tiData[ColumnName] = paths::basicName(filePath);
 
-    if (values.size > 0)
+    if (values.size >= 0)
         _tiData[ColumnSize] = values.size;
 
     _tiData[ColumnStatus] = QVariant::fromValue(values.status);
