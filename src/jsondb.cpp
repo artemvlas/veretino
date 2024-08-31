@@ -140,8 +140,8 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
         return QString();
     }
 
-    QString pathToSave = rootFolder.isValid() ? data->getBranchFilePath(rootFolder) // branching
-                                              : data->metaData.databaseFilePath; // main database
+    const QString &pathToSave = rootFolder.isValid() ? data->getBranchFilePath(rootFolder) // branching
+                                                     : data->metaData.databaseFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText("Saved");
@@ -194,8 +194,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     DataContainer *parsedData = new DataContainer(getMetaData(filePath, mainArray.at(0).toObject(), filelistData));
     const QString &workDir = parsedData->metaData.workDir;
 
-    // Filling in the Main Data
-    // with very big Data, it is faster to add new files first, and then the main ones
+    // adding new files
     emit setStatusbarText("Looking for new files...");
 
     QDir dir(workDir);
@@ -220,14 +219,14 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); !isCanceled() && i != filelistData.constEnd(); ++i) {
         const QString &_fullPath = paths::joinPath(workDir, i.key());
-        bool _exist = QFileInfo::exists(_fullPath);
+        const bool _exist = QFileInfo::exists(_fullPath);
         qint64 _size = _exist ? QFileInfo(_fullPath).size() : -1;
         FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
 
-        FileValues curFileValues(_status, _size);
-        curFileValues.checksum = i.value().toString();
+        FileValues _values(_status, _size);
+        _values.checksum = i.value().toString();
 
-        parsedData->model_->add_file(i.key(), curFileValues);
+        parsedData->model_->add_file(i.key(), _values);
     }
 
     // additional data
@@ -267,15 +266,15 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     metaData.dbFileState = MetaData::Saved;
 
     // [checking for files in the intended WorkDir]
-    QString strWorkDir = findValueStr(header, strHeaderWorkDir);
-    bool isSpecWorkDir = strWorkDir.contains('/') && (isPresentInWorkDir(strWorkDir, fileList)
-                                                      || !isPresentInWorkDir(paths::parentFolder(filePath), fileList));
+    const QString strWorkDir = findValueStr(header, strHeaderWorkDir);
+    const bool isSpecWorkDir = strWorkDir.contains('/') && (isPresentInWorkDir(strWorkDir, fileList)
+                                                            || !isPresentInWorkDir(paths::parentFolder(filePath), fileList));
 
     metaData.workDir = isSpecWorkDir ? strWorkDir : paths::parentFolder(filePath);
 
     // [filter rule]
-    QString strIgnored = findValueStr(header, strHeaderIgnored);
-    QString strIncluded = findValueStr(header, strHeaderIncluded);
+    const QString strIgnored = findValueStr(header, strHeaderIgnored);
+    const QString strIncluded = findValueStr(header, strHeaderIncluded);
 
     if (!strIgnored.isEmpty()) {
         metaData.filter.setFilter(FilterRule::Ignore, strIgnored);
@@ -285,7 +284,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // [algorithm]
-    QString strAlgo = findValueStr(header, "Algo");
+    const QString strAlgo = findValueStr(header, "Algo");
     if (!strAlgo.isEmpty()) {
         metaData.algorithm = tools::strToAlgo(strAlgo);
         //qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;
@@ -304,7 +303,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // version 0.4.0+
-    QString strDT = findValueStr(header, "time");
+    const QString strDT = findValueStr(header, "time");
     if (!strDT.isEmpty()) {
         QStringList dtList = tools::strToList(strDT);
 
@@ -322,31 +321,26 @@ bool JsonDb::isPresentInWorkDir(const QString &workDir, const QJsonObject &fileL
     if (!QFileInfo::exists(workDir))
         return false;
 
-    bool isPresent = false;
     QJsonObject::const_iterator i;
 
     for (i = fileList.constBegin(); !isCanceled() && i != fileList.constEnd(); ++i) {
-        QString fullPath = paths::joinPath(workDir, i.key());
-        if (QFileInfo::exists(fullPath)) {
-            isPresent = true;
-            break;
+        if (QFileInfo::exists(paths::joinPath(workDir, i.key()))) {
+            return true;
         }
     }
 
-    return isPresent;
+    return false;
 }
 
 QString JsonDb::findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength)
 {
-    QString result;
     QJsonObject::const_iterator i;
 
     for (i = object.constBegin(); i != object.constEnd(); ++i) {
         if (i.key().contains(approxKey.left(sampleLength), Qt::CaseInsensitive)) {
-            result = i.value().toString();
-            break;
+            return i.value().toString();
         }
     }
 
-    return result;
+    return QString();
 }

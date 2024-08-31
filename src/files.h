@@ -99,12 +99,11 @@ using FileStatuses = Files::FileStatuses;
 Q_DECLARE_OPERATORS_FOR_FLAGS(Files::FileStatuses)
 
 struct FileValues {
-    FileValues() {}
-    FileValues(FileStatus fileStatus) : status(fileStatus) {}
-    FileValues(FileStatus fileStatus, qint64 fileSize) : status(fileStatus), size(fileSize) {}
+    FileValues(FileStatus fileStatus = FileStatus::NotSet, qint64 fileSize = -1)
+        : status(fileStatus), size(fileSize) {}
 
-    FileStatus status = FileStatus::NotSet;
-    qint64 size = -1; // file size in bytes
+    FileStatus status;
+    qint64 size; // file size in bytes
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues

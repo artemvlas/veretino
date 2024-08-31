@@ -30,8 +30,8 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     connect(ui->rbInclude, &QRadioButton::toggled, this, &DialogSettings::handleFilterMode);
 
     ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
-                                               "(if all files exist and match the saved checksums),\n"
-                                               "the current date/time will be saved in the database file");
+                                               "(if all files exist and match the stored checksums),\n"
+                                               "the current date/time will be written to the database.");
 
     loadSettings(*settings);
 
