@@ -171,20 +171,21 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
     actionUpdateDbWithReChecksums->setEnabled(dataNum.contains(FileStatus::Mismatched));
 
     // show number of items
-    static const QString strAddNew = actionDbAddNew->text();
-    static const QString strClearLost = actionDbClearLost->text();
-    static const QString strUpdateRe = actionUpdateDbWithReChecksums->text();
+    static const QString defstrAddNew = actionDbAddNew->text();
+    static const QString defstrClearLost = actionDbClearLost->text();
+    static const QString defstrUpdateRe = actionUpdateDbWithReChecksums->text();
+    static const QString defstrNumFormat = " [%1]";
 
-    QString _strAddNew_ = QString("%1%2").arg(strAddNew, actionDbAddNew->isEnabled() ? QString(" [%1]")
-                                                              .arg(dataNum.numberOf(FileStatus::New)) : QString());
-    actionDbAddNew->setText(_strAddNew_);
+    QString _strAddNew = defstrAddNew + (actionDbAddNew->isEnabled() ? QString(defstrNumFormat)
+                                         .arg(dataNum.numberOf(FileStatus::New)) : QString());
+    actionDbAddNew->setText(_strAddNew);
 
-    QString _strClearLost_ = QString("%1%2").arg(strClearLost, actionDbClearLost->isEnabled() ? QString(" [%1]")
-                                                                .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
-    actionDbClearLost->setText(_strClearLost_);
+    QString _strClearLost = defstrClearLost + (actionDbClearLost->isEnabled() ? QString(defstrNumFormat)
+                                                .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
+    actionDbClearLost->setText(_strClearLost);
 
-    QString _strUpdateRe = QString("%1%2").arg(strUpdateRe, actionUpdateDbWithReChecksums->isEnabled() ? QString(" [%1]")
-                                                                .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
+    QString _strUpdateRe = defstrUpdateRe + (actionUpdateDbWithReChecksums->isEnabled() ? QString(defstrNumFormat)
+                                                        .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
     actionUpdateDbWithReChecksums->setText(_strUpdateRe);
 
     return menuUpdateDatabase;
