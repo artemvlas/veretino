@@ -93,9 +93,12 @@ immediately after any changes are made.</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QCheckBox" name="cbShowUpdNumInMenu">
+          <widget class="QCheckBox" name="cbExcludeUnpermitted">
+           <property name="toolTip">
+            <string>Exclude files without read permissions.</string>
+           </property>
            <property name="text">
-            <string>Menu: Show the number of updatable</string>
+            <string>Exclude Unpermitted</string>
            </property>
           </widget>
          </item>

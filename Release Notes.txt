@@ -1,10 +1,14 @@
 Veretino 0.5.0
 What's new:
+* Now files without read permissions can be immediately excluded from the list (customizable).
 * Added the ability to export individual checksums from the database to a digest file (*.sha1/256/512).
 
 Internal changes:
 * Redesigned task management system.
 * Significant optimization of the Data Model creation process (x10 faster for Large lists).
+
+Removed:
+* Setting the display of the number of updated items in the menu. Now always on.
 
 ---
 Veretino 0.4.5

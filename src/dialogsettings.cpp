@@ -61,7 +61,7 @@ void DialogSettings::loadSettings(const Settings &settings)
 
     ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
     ui->cbInstantSaving->setChecked(settings.instantSaving);
-    ui->cbShowUpdNumInMenu->setChecked(settings.showUpdNumInMenu);
+    ui->cbExcludeUnpermitted->setChecked(settings.excludeUnpermitted);
 
     // Tab Database
     if (settings.dbPrefix == defaults.dbPrefix)
@@ -96,7 +96,7 @@ void DialogSettings::updateSettings()
 
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
     settings_->instantSaving = ui->cbInstantSaving->isChecked();
-    settings_->showUpdNumInMenu = ui->cbShowUpdNumInMenu->isChecked();
+    settings_->excludeUnpermitted = ui->cbExcludeUnpermitted->isChecked();
 
     // database
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix

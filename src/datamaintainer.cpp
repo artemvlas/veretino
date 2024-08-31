@@ -95,7 +95,7 @@ void DataMaintainer::updateVerifDateTime()
     }
 }
 
-// add new files to data_->model_
+// adds the WorkDir contents to the data_->model_
 int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
 {
     if (!data_)
@@ -114,11 +114,11 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     QDirIterator it(data_->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        QString fullPath = it.next();
-        QString relPath = dir.relativeFilePath(fullPath);
+        const QString &_fullPath = it.next();
+        const QString &_relPath = dir.relativeFilePath(_fullPath);
 
-        if (data_->metaData.filter.isFileAllowed(relPath)) {
-            QFileInfo _fileInfo(fullPath);
+        if (data_->metaData.filter.isFileAllowed(_relPath)) {
+            QFileInfo _fileInfo(_fullPath);
             const bool _isReadable = _fileInfo.isReadable();
 
             if (!_isReadable && ignoreUnreadable)
@@ -127,7 +127,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
             const FileValues &_values = _isReadable ? FileValues(fileStatus, _fileInfo.size())
                                                     : FileValues(FileStatus::Unreadable);
 
-            data_->model_->add_file(relPath, _values);
+            data_->model_->add_file(_relPath, _values);
             ++numAdded;
         }
     }

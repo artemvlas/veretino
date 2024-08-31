@@ -72,7 +72,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     dataMaintainer->setDbFileState(MetaData::NoFile);
 
     // create the filelist
-    dataMaintainer->addActualFiles(FileStatus::Queued, false);
+    dataMaintainer->addActualFiles(FileStatus::Queued, settings_->excludeUnpermitted);
 
     // exception and cancelation handling
     if (procState->isCanceled() || !dataMaintainer->data_) {

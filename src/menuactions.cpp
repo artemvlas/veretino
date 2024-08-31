@@ -175,19 +175,17 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
     static const QString strClearLost = actionDbClearLost->text();
     static const QString strUpdateRe = actionUpdateDbWithReChecksums->text();
 
-    bool showNum = settings_ && settings_->showUpdNumInMenu;
-
-    QString _strAddNew_ = QString("%1%2").arg(strAddNew, showNum && actionDbAddNew->isEnabled() ? QString(" [%1]")
+    QString _strAddNew_ = QString("%1%2").arg(strAddNew, actionDbAddNew->isEnabled() ? QString(" [%1]")
                                                               .arg(dataNum.numberOf(FileStatus::New)) : QString());
     actionDbAddNew->setText(_strAddNew_);
 
-    QString _strClearLost_ = QString("%1%2").arg(strClearLost, showNum && actionDbClearLost->isEnabled() ? QString(" [%1]")
-                                                                   .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
+    QString _strClearLost_ = QString("%1%2").arg(strClearLost, actionDbClearLost->isEnabled() ? QString(" [%1]")
+                                                                .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
     actionDbClearLost->setText(_strClearLost_);
 
-    QString _strUpdateRe_ = QString("%1%2").arg(strUpdateRe, showNum && actionUpdateDbWithReChecksums->isEnabled() ? QString(" [%1]")
-                                                                          .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
-    actionUpdateDbWithReChecksums->setText(_strUpdateRe_);
+    QString _strUpdateRe = QString("%1%2").arg(strUpdateRe, actionUpdateDbWithReChecksums->isEnabled() ? QString(" [%1]")
+                                                                .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
+    actionUpdateDbWithReChecksums->setText(_strUpdateRe);
 
     return menuUpdateDatabase;
 }
