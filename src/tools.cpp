@@ -131,24 +131,17 @@ QString basicName(const QString &path)
 
     return components.isEmpty() ? QString() : components.last();
     */
-
-    // #2 impl. (for single '/' only)
-    /*
-    QString result = path.mid(path.lastIndexOf(QRegExp("[/\\\\]"), -2) + 1);
-    if (result.endsWith('/') || result.endsWith("\\"))
-        result.chop(1);
-    return result;
-    */
 }
 
+// the function is not finished yet, exceptions need to be worked out!!!
 QString relativePath(const QString &rootFolder, const QString &fullPath)
 {
     if (!fullPath.startsWith(rootFolder))
         return QString();
 
     const int _cut = rootFolder.endsWith('/') ? rootFolder.size() : rootFolder.size() + 1;
-    return fullPath.right(fullPath.size() - _cut);
-}
+    return fullPath.mid(_cut);
+} // unfinished
 
 QString shortenPath(const QString &path)
 {
@@ -310,10 +303,15 @@ QString simplifiedChars(QString str)
     return str;
 }
 
-QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension)
+QString composeDbFileName(const QString &prefix, const QString &folder, const QString &extension)
 {
-    return folderName.isEmpty() ? tools::joinStrings(prefix, extension, '.')
-                                : tools::joinStrings(tools::joinStrings(prefix, simplifiedChars(paths::basicName(folderName)), '_'), extension, '.');
+    if (folder.isEmpty())
+        return tools::joinStrings(prefix, extension, '.');
+
+    const QString _folderStr = simplifiedChars(paths::basicName(folder));
+    const QString _dbFileName = tools::joinStrings(prefix, _folderStr, '_');
+
+    return tools::joinStrings(_dbFileName, extension, '.');
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
@@ -375,8 +373,8 @@ QString fileItemStatus(FileStatus status)
 
 QString coloredText(bool ignore)
 {
-    QString color = ignore ? "red" : "green";
-    return QString("color : %1").arg(color);
+    QString _color = ignore ? "red" : "green";
+    return QString("color : %1").arg(_color);
 }
 
 QString coloredText(const QString &className, bool ignore)

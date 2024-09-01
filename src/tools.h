@@ -44,7 +44,7 @@ QString dataSizeReadable(const qint64 sizeBytes); // converts size in bytes to h
 QString dataSizeReadableExt(const qint64 sizeBytes); // returning style example: "6.08 GiB (6,532,974,324 bytes)"
 QString shortenString(const QString &string, int length = 64, bool cutEnd = true);
 QString simplifiedChars(QString str);
-QString composeDbFileName(const QString &prefix, const QString &folderName, const QString &extension);
+QString composeDbFileName(const QString &prefix, const QString &folder, const QString &extension);
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true);
 QString algoToStr(int sumStrLength, bool capitalLetters = true);
 
