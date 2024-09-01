@@ -28,6 +28,7 @@ QStringList strToList(const QString &str); // splits the str
 namespace paths {
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
+QString relativePath(const QString &rootFolder, const QString &fullPath);
 QString shortenPath(const QString &path); // if not a root (or child of root) path, returns "../path"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 bool isRoot(const QString &path); // true: "/" or "X:'/'"; else false

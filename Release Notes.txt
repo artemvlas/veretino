@@ -5,7 +5,7 @@ What's new:
 
 Fixes and Minor Enhancements:
 * Fixed display of item's zero-byte size.
-* Folder Contents dialog: fixed adding file sizes without read permissions.
+* Folder Contents dialog: fixed adding the sizes of files without read permissions.
 
 Internal changes:
 * Redesigned task management system.

@@ -141,6 +141,15 @@ QString basicName(const QString &path)
     */
 }
 
+QString relativePath(const QString &rootFolder, const QString &fullPath)
+{
+    if (!fullPath.startsWith(rootFolder))
+        return QString();
+
+    const int _cut = rootFolder.endsWith('/') ? rootFolder.size() : rootFolder.size() + 1;
+    return fullPath.right(fullPath.size() - _cut);
+}
+
 QString shortenPath(const QString &path)
 {
     return paths::isRoot(paths::parentFolder(path)) ? path
