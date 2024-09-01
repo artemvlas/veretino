@@ -64,18 +64,14 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        QString fullPath = it.next();
-        QString relPath = dir.relativeFilePath(fullPath);
+        const QString &_fullPath = it.next();
+        const QString &_relPath = dir.relativeFilePath(_fullPath);
 
-        if (filter.isFileAllowed(relPath)) {
-            FileValues curFileValues;
-            QFileInfo fileInfo(fullPath);
-            if (fileInfo.isReadable())
-                curFileValues.size = fileInfo.size(); // If the file is unreadable, then its size is not needed
-            else
-                curFileValues.status = Files::Unreadable;
+        if (filter.isFileAllowed(_relPath)) {
+            QFileInfo fileInfo(_fullPath);
+            FileStatus _status = fileInfo.isReadable() ? FileStatus::NotSet : FileStatus::Unreadable;
 
-            resultList.insert(relPath, curFileValues);
+            resultList.insert(_relPath, FileValues(_status, fileInfo.size()));
         }
     }
 
@@ -149,11 +145,11 @@ QString Files::getFolderSize(const QString &path)
 
         // result processing
         if (!isCanceled()) {
-            QString folderName = paths::basicName(path);
-            QString folderSize = (filesNumber > 0) ? format::filesNumberAndSize(filesNumber, totalSize) : "no files";
+            const QString _folderName = paths::basicName(path);
+            const QString _folderSize = (filesNumber > 0) ? format::filesNumberAndSize(filesNumber, totalSize) : "no files";
 
             result = QString("%1: %2")
-                         .arg(folderName, folderSize);
+                         .arg(_folderName, _folderSize);
         }
         else
             qDebug() << "Files::getFolderSize | Canceled" << path;
@@ -169,11 +165,11 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
     TreeModelIterator it(model, rootIndex);
 
     while (it.hasNext()) {
-        QVariant itData = it.nextFile().data(Column::ColumnStatus);
+        const QVariant itData = it.nextFile().data(Column::ColumnStatus);
 
         if (itData.isValid()
-            && (flags & itData.value<FileStatus>())) {
-
+            && (flags & itData.value<FileStatus>()))
+        {
             dataSize += it.size();
             ++filesNumber;
         }
@@ -206,19 +202,19 @@ QList<ExtNumSize> Files::getFileTypes(const FileList &fileList)
 
     FileList::const_iterator filesIter;
     for (filesIter = fileList.constBegin(); filesIter != fileList.constEnd(); ++filesIter) {
-        QString ext;
+        QString _ext;
 
         if (tools::isDatabaseFile(filesIter.key()))
-            ext = ExtNumSize::strVeretinoDb;
+            _ext = ExtNumSize::strVeretinoDb;
         else if (tools::isSummaryFile(filesIter.key()))
-            ext = ExtNumSize::strShaFiles;
+            _ext = ExtNumSize::strShaFiles;
         else
-            ext = QFileInfo(filesIter.key()).suffix().toLower();
+            _ext = QFileInfo(filesIter.key()).suffix().toLower();
 
-        if (ext.isEmpty())
-            ext = ExtNumSize::strNoType;
+        if (_ext.isEmpty())
+            _ext = ExtNumSize::strNoType;
 
-        listsByType[ext].insert(filesIter.key(), filesIter.value());
+        listsByType[_ext].insert(filesIter.key(), filesIter.value());
     }
 
     QList<ExtNumSize> combList;
@@ -252,7 +248,9 @@ qint64 Files::dataSize(const FileList &filelist)
     if (!filelist.isEmpty()) {
         FileList::const_iterator iter;
         for (iter = filelist.constBegin(); iter != filelist.constEnd(); ++iter) {
-            totalSize += iter.value().size;
+            const qint64 _size = iter.value().size;
+            if (_size > 0)
+                totalSize += _size;
         }
     }
 
