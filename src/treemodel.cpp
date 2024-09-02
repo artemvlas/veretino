@@ -119,7 +119,7 @@ TreeItem *TreeModel::add_folder(const QString &path)
     }
 
     TreeItem *parentItem = rootItem;
-    const QStringList &pathParts = path.split('/');
+    const QStringList &pathParts = path.split('/', Qt::SkipEmptyParts);
 
     for (const QString &_subFolder : pathParts) {
         TreeItem *_ti = parentItem->findChild(_subFolder);
