@@ -12,7 +12,8 @@ Internal changes:
 * Significant optimization of the Data Model creation process (x10 faster for Large lists).
 
 Removed:
-* Menu Setting for display the number of updatable items. Now always on.
+* "Colored Items" setting. Now is always on.
+* Menu Setting for display the number of updatable items.
 
 ---
 Veretino 0.4.5

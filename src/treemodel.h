@@ -42,7 +42,6 @@ public:
     void add_file(const QString &filePath, const FileValues &values); // new func., with cache
     bool add_file_unforced(const QString &filePath, const FileValues &values); // checks for presence first; much slower for large lists
     void populate(const FileList &filesData);
-    void setColoredItems(const bool colored);
 
     static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex()); // build path by current index data
     static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
@@ -66,10 +65,10 @@ public slots:
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *add_folder(const QString &path);
+
     TreeItem *rootItem;
     IconProvider icons_;
     QHash<QString, TreeItem*> cacheFolderItems_;
-    bool isColored = false;
 }; // class TreeModel
 
 using Column = TreeModel::Column;

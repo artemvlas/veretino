@@ -204,12 +204,13 @@ immediately after any changes are made.</string>
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QCheckBox" name="cbColoredItems">
+        <widget class="QCheckBox" name="cbDbFlagConst">
          <property name="toolTip">
-          <string>Applies the next time the database is opened</string>
+          <string>New databases will contain a flag
+to prevent changes from being made.</string>
          </property>
          <property name="text">
-          <string>Colored Items</string>
+          <string>Mark as Const</string>
          </property>
         </widget>
        </item>

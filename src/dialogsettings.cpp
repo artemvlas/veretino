@@ -71,7 +71,7 @@ void DialogSettings::loadSettings(const Settings &settings)
 
     ui->cbAddFolderName->setChecked(settings.addWorkDirToFilename);
     ui->cbSaveVerificationDateTime->setChecked(settings.saveVerificationDateTime);
-    ui->cbColoredItems->setChecked(settings.coloredDbItems);
+    ui->cbDbFlagConst->setChecked(settings.dbFlagConst);
     settings.isLongExtension ? ui->rbExtVerJson->setChecked(true) : ui->rbExtVer->setChecked(true);
 
     updateLabelDatabaseFilename();
@@ -105,7 +105,7 @@ void DialogSettings::updateSettings()
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
     settings_->saveVerificationDateTime = ui->cbSaveVerificationDateTime->isChecked();
-    settings_->coloredDbItems = ui->cbColoredItems->isChecked();
+    settings_->dbFlagConst = ui->cbDbFlagConst->isChecked();
 
     // filters
     settings_->filter = getCurrentFilter();

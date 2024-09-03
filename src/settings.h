@@ -35,9 +35,9 @@ public:
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
-    bool coloredDbItems = true;
     bool instantSaving = true;
     bool excludeUnpermitted = false;
+    bool dbFlagConst = false;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;
