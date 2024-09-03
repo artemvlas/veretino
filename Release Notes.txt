@@ -1,6 +1,6 @@
 Veretino 0.5.0
 What's new:
-* Now a newly creating database can be marked as immutable (const), which will prevent changes to it in the future.
+* A newly creating database can be marked as immutable ("Deny Changes"), which will prevent changes to it in the future.
 * Now files without read permissions can be excluded when creating the list (customizable).
 * Added the ability to export individual checksums from the database to a digest file (*.sha1/256/512).
 

@@ -210,7 +210,7 @@ immediately after any changes are made.</string>
 to prevent changes from being made.</string>
          </property>
          <property name="text">
-          <string>Mark as Const</string>
+          <string>Deny Changes</string>
          </property>
         </widget>
        </item>
