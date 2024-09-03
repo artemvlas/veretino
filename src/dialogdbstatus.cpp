@@ -22,6 +22,9 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     if (data_->isDbFileState(DbFileState::NotSaved))
         setWindowTitle(windowTitle() + " [unsaved]");
 
+    if (data_->isImmutable())
+        setWindowTitle(windowTitle() + " [const]");
+
     setLabelsInfo();
     setTabsInfo();
     setVisibleTabs();
@@ -149,9 +152,9 @@ QStringList DialogDbStatus::infoContent()
     else
         contentNumbers.append("No Missing files found");
 
-    if (data_->contains(FileStatus::FlagNewLost)) {
+    if (data_->isImmutable()) {
         contentNumbers.append(QString());
-        contentNumbers.append("Use a context menu for more options");
+        contentNumbers.append("No changes are allowed");
     }
 
     return contentNumbers;

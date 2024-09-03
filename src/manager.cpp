@@ -172,7 +172,7 @@ void Manager::prepareSwitchToFs()
 
 void Manager::updateDatabase(const DestDbUpdate dest)
 {
-    if (!dataMaintainer->data_)
+    if (!dataMaintainer->data_ || dataMaintainer->data_->isImmutable())
         return;
 
     if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable)) {
@@ -214,11 +214,11 @@ void Manager::updateDatabase(const DestDbUpdate dest)
 
 void Manager::updateItemFile(const QModelIndex &fileIndex)
 {
-    if (!dataMaintainer->data_ || !fileIndex.isValid()) {
+    if (!dataMaintainer->data_ || !fileIndex.isValid() || dataMaintainer->data_->isImmutable()) {
         return;
     }
 
-    FileStatus fileStatusBefore = TreeModel::itemFileStatus(fileIndex);
+    const FileStatus fileStatusBefore = TreeModel::itemFileStatus(fileIndex);
 
     if (fileStatusBefore == FileStatus::New) {
         dataMaintainer->data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Calculating);

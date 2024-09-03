@@ -216,12 +216,14 @@ Mode ModeSelector::mode() const
                 return DbProcessing;
         }
 
-        if (view_->data_->numbers.contains(FileStatus::Mismatched))
-            return UpdateMismatch;
-        else if (view_->data_->numbers.contains(FileStatus::FlagNewLost))
-            return ModelNewLost;
-        else
-            return Model;
+        if (!isDbConst()) {
+            if (view_->data_->numbers.contains(FileStatus::Mismatched))
+                return UpdateMismatch;
+            else if (view_->data_->numbers.contains(FileStatus::FlagNewLost))
+                return ModelNewLost;
+        }
+
+        return Model;
     }
 
     if (view_->isViewFileSystem()) {
@@ -529,6 +531,8 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.algorithm = settings_->algorithm();
     metaData.filter = filter;
     metaData.databaseFilePath = composeDbFilePath();
+    if (settings_->dbFlagConst)
+        metaData.flags = MetaData::FlagConst;
 
     manager_->addTask(&Manager::processFolderSha, metaData);
 }
@@ -641,7 +645,7 @@ void ModeSelector::quickAction()
         case ModelNewLost:
         case UpdateMismatch:
             if (TreeModel::isFileRow(view_->curIndexSource)) {
-                if (TreeModel::hasStatus(FileStatus::FlagUpdatable, view_->curIndexSource))
+                if (!isDbConst() && TreeModel::hasStatus(FileStatus::FlagUpdatable, view_->curIndexSource))
                     promptItemFileUpd();
                 else
                     verifyItem();
@@ -715,7 +719,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     if (!view_->isViewDatabase())
         return;
 
-    QModelIndex index = view_->indexAt(point);
+    const QModelIndex index = view_->indexAt(point);
     QMenu *viewContextMenu = menuAct_->disposableMenu();
 
     if (proc_->isStarted()) {
@@ -739,6 +743,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
             viewContextMenu->addAction(menuAct_->actionShowAll);
         viewContextMenu->addSeparator();
 
+        // filter view
         if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
             if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
                 menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
@@ -762,7 +767,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
         if (index.isValid()) {
             if (TreeModel::isFileRow(index)) {
                 // Updatable file item
-                if (TreeModel::hasStatus(FileStatus::FlagUpdatable, index)) {
+                if (!isDbConst() && TreeModel::hasStatus(FileStatus::FlagUpdatable, index)) {
                     switch (TreeModel::itemFileStatus(index)) {
                         case FileStatus::New:
                             viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
@@ -808,7 +813,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
         viewContextMenu->addAction(menuAct_->actionCheckAll);
 
-        if (view_->data_->contains(FileStatus::FlagUpdatable))
+        if (!isDbConst() && view_->data_->contains(FileStatus::FlagUpdatable))
             viewContextMenu->addMenu(menuAct_->menuUpdateDb(view_->data_->numbers));
     }
 
@@ -817,6 +822,11 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     viewContextMenu->addAction(menuAct_->actionExpandAll);
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+}
+
+bool ModeSelector::isDbConst() const
+{
+    return (view_->data_ && view_->data_->isImmutable());
 }
 
 bool ModeSelector::promptProcessStop()
@@ -839,8 +849,8 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     if (!proc_->isState(State::StartVerbose))
         return true;
 
-    QString strAct = abort ? "Abort" : "Stop";
-    QIcon icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
+    const QString strAct = abort ? "Abort" : "Stop";
+    const QIcon &icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
     static const QPixmap icoMsgBox = iconProvider.icon(FileStatus::Calculating).pixmap(64, 64);
 
     QMessageBox msgBox(view_);

@@ -111,6 +111,11 @@ bool DataContainer::isInCreation() const
     return (metaData.dbFileState == MetaData::NoFile);
 }
 
+bool DataContainer::isImmutable() const
+{
+    return (metaData.flags & MetaData::FlagConst);
+}
+
 bool DataContainer::isBackupExists() const
 {
     return QFile::exists(backupFilePath());

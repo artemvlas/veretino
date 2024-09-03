@@ -274,11 +274,17 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
                                                            : modeSelect->iconProvider.icon(FileStatus::Matched);
 
     if (result.contains(FileStatus::Mismatched)) {
-        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Cancel);
-        msgBox.button(QMessageBox::Ok)->setText("Update");
+        if (modeSelect->isDbConst()) {
+            msgBox.setStandardButtons(QMessageBox::Cancel);
+        }
+        else {
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+            msgBox.button(QMessageBox::Ok)->setText("Update");
+            msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->iconProvider.icon(FileStatus::Updated));
+            msgBox.setDefaultButton(QMessageBox::Cancel);
+        }
+
         msgBox.button(QMessageBox::Cancel)->setText("Continue");
-        msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->iconProvider.icon(FileStatus::Updated));
         msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
 
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
@@ -296,7 +302,11 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     msgBox.setIconPixmap(icon.pixmap(64, 64));
 
     int ret = msgBox.exec();
-    if (result.contains(FileStatus::Mismatched) && ret == QMessageBox::Ok) {
+
+    if (!modeSelect->isDbConst()
+        && result.contains(FileStatus::Mismatched)
+        && ret == QMessageBox::Ok)
+    {
         modeSelect->updateDatabase(DestDbUpdate::DestUpdateMismatches);
     }
 }

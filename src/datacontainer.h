@@ -20,11 +20,15 @@ struct MetaData {
     QString workDir; // current working folder
     QString databaseFilePath;
 
+    // DateVerified == (all files exist and match the checksums)
+    enum DateTimeStr { DateCreated, DateUpdated, DateVerified };
     QString datetime[3];
-    enum DateTimeStr { DateCreated, DateUpdated, DateVerified }; // DateVerified == (all files exist and match the checksums)
 
     enum DbFileState { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
+
+    enum DbFlag { NotSet, FlagConst };
+    DbFlag flags = NotSet;
 }; // struct MetaData
 
 using DbFileState = MetaData::DbFileState;
@@ -51,6 +55,7 @@ public:
     bool isAllChecked() const;
     bool isAllMatched() const;
     bool isInCreation() const;
+    bool isImmutable() const; // has FlagConst
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;

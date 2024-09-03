@@ -70,7 +70,7 @@ void Settings::saveSettings()
     storedSettings.setValue("addWorkDirToFilename", addWorkDirToFilename);
     storedSettings.setValue("isLongExtension", isLongExtension);
     storedSettings.setValue("saveVerificationDateTime", saveVerificationDateTime);
-    //storedSettings.setValue("dbFlagConst", dbFlagConst);
+    storedSettings.setValue("dbFlagConst", dbFlagConst);
     storedSettings.setValue("instantSaving", instantSaving);
     storedSettings.setValue("excludeUnpermitted", excludeUnpermitted);
 
@@ -107,7 +107,7 @@ void Settings::loadSettings()
     addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", defaults.addWorkDirToFilename).toBool();
     isLongExtension = storedSettings.value("isLongExtension", defaults.isLongExtension).toBool();
     saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", defaults.saveVerificationDateTime).toBool();
-    //dbFlagConst = storedSettings.value("dbFlagConst", defaults.dbFlagConst).toBool();
+    dbFlagConst = storedSettings.value("dbFlagConst", defaults.dbFlagConst).toBool();
     instantSaving = storedSettings.value("instantSaving", defaults.instantSaving).toBool();
     excludeUnpermitted = storedSettings.value("excludeUnpermitted", defaults.excludeUnpermitted).toBool();
 

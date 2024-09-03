@@ -41,6 +41,7 @@ public:
 
     Mode mode() const;
     bool isMode(const Modes expected);
+    bool isDbConst() const;
 
     QString getButtonText();
     QString getButtonToolTip();

@@ -92,6 +92,10 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
         header[_strFilterKey] = meta.filter.extensionString();
     }
 
+    // Flags (needs to be redone after expanding the flags list)
+    if (meta.flags)
+        header["Flags"] = "const";
+
     return header;
 }
 
@@ -302,7 +306,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
             metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + header.value("Verified").toString();
     }
 
-    // version 0.4.0+
+    // [datetime] version 0.4.0+
     const QString strDT = findValueStr(header, "time");
     if (!strDT.isEmpty()) {
         QStringList dtList = tools::strToList(strDT);
@@ -311,6 +315,10 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
             metaData.datetime[i] = dtList.at(i);
         }
     }
+
+    // [Flags]
+    if (header.value("Flags").toString() == "const")
+        metaData.flags = MetaData::FlagConst;
 
     return metaData;
 }

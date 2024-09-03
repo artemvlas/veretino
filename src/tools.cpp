@@ -97,8 +97,20 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
 
 QStringList strToList(const QString &str)
 {
-    static const QRegularExpression re("[, ]");
-    return str.split(re, Qt::SkipEmptyParts);
+    if (str.isEmpty())
+        return QStringList();
+
+    QString sep = " ";
+    static const QStringList sepVariants { ", ", ",", "  " };
+
+    for (int i = 0; i < sepVariants.size(); ++i) {
+        if (str.contains(sepVariants.at(i))) {
+            sep = sepVariants.at(i);
+            break;
+        }
+    }
+
+    return str.split(sep);
 }
 } // namespace tools
 
