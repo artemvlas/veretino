@@ -115,16 +115,19 @@ void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
 {
     for (int i = 0; i < extList.size(); ++i) {
         QIcon icon;
+        const QString _ext = extList.at(i).extension;
 
-        if (extList.at(i).extension == ExtNumSize::strVeretinoDb)
+        if (_ext == ExtNumSize::strVeretinoDb)
             icon = icons_.icon(Icons::Database);
-        else if (extList.at(i).extension == ExtNumSize::strShaFiles)
+        else if (_ext == ExtNumSize::strShaFiles)
             icon = icons_.icon(Icons::HashFile);
+        else if (_ext == ExtNumSize::strNoPerm)
+            icon = icons_.icon(FileStatus::UnPermitted);
         else
-            icon = icons_.icon("file." + extList.at(i).extension);
+            icon = icons_.icon("file." + _ext);
 
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
-        item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, extList.at(i).extension);
+        item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, _ext);
         item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
         item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
@@ -185,7 +188,7 @@ void DialogContentsList::setTotalInfo()
 
 void DialogContentsList::setCheckboxesVisible(bool visible)
 {
-    static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
+    static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
 
     ui->treeWidget->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
@@ -230,7 +233,7 @@ bool DialogContentsList::isPassedChecked(const TreeWidgetItem *item) const
 
 bool DialogContentsList::isPassedUnChecked(const TreeWidgetItem *item) const
 {
-    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles };
+    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
 
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())

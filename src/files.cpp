@@ -14,6 +14,7 @@
 const QString ExtNumSize::strNoType = "No type";
 const QString ExtNumSize::strVeretinoDb = "Veretino DB";
 const QString ExtNumSize::strShaFiles = "sha1/256/512";
+const QString ExtNumSize::strNoPerm = "No Permissions";
 
 const QString Files::desktopFolderPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 
@@ -193,7 +194,7 @@ QList<ExtNumSize> Files::getFileTypes(const QAbstractItemModel *model, const QMo
     return getFileTypes(getFileList(model, FileStatus::FlagAvailable, rootIndex));
 }
 
-QList<ExtNumSize> Files::getFileTypes(const FileList &fileList)
+QList<ExtNumSize> Files::getFileTypes(const FileList &fileList, bool excludeUnreadable)
 {
     if (fileList.isEmpty())
         return QList<ExtNumSize>();
@@ -204,7 +205,9 @@ QList<ExtNumSize> Files::getFileTypes(const FileList &fileList)
     for (filesIter = fileList.constBegin(); filesIter != fileList.constEnd(); ++filesIter) {
         QString _ext;
 
-        if (tools::isDatabaseFile(filesIter.key()))
+        if (excludeUnreadable && (filesIter.value().status == FileStatus::Unreadable))
+            _ext = ExtNumSize::strNoPerm;
+        else if (tools::isDatabaseFile(filesIter.key()))
             _ext = ExtNumSize::strVeretinoDb;
         else if (tools::isSummaryFile(filesIter.key()))
             _ext = ExtNumSize::strShaFiles;

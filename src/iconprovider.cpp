@@ -82,6 +82,9 @@ QString IconProvider::svgFilePath(FileStatus status) const
     case FileStatus::Updated:
         iconFileName = "update";
         break;
+    case FileStatus::UnPermitted: // newly added status
+        iconFileName = "locked";
+        break;
     default:
         iconFileName = "unknown";
         break;

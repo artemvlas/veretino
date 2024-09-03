@@ -51,7 +51,10 @@ public:
 
         Computed = 1 << 12, // the checksum has been calculated and is ready for further processing (copy or save)
         ToClipboard = 1 << 13, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile = 1 << 14 // the calculated checksum is intended to be stored in the summary file
+        ToSumFile = 1 << 14, // the calculated checksum is intended to be stored in the summary file
+
+        // newly added status
+        UnPermitted = 1 << 15 // no read permissions
     };
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
@@ -73,7 +76,7 @@ public:
     QList<ExtNumSize> getFileTypes(); // returns a list of file types (extensions) with files number and their size
     QList<ExtNumSize> getFileTypes(const QString &folderPath);
     QList<ExtNumSize> getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
-    QList<ExtNumSize> getFileTypes(const FileList &fileList);
+    QList<ExtNumSize> getFileTypes(const FileList &fileList, bool excludeUnreadable = false);
 
     static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
                             const QModelIndex &rootIndex = QModelIndex());
@@ -112,6 +115,7 @@ struct ExtNumSize {
     static const QString strNoType;
     static const QString strVeretinoDb;
     static const QString strShaFiles;
+    static const QString strNoPerm;
 
     QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
     int filesNumber = 0; // number of files with this extension

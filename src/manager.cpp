@@ -579,13 +579,14 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        QList<ExtNumSize> typesList = files_->getFileTypes(folderPath);
+        const FileList &_flist = files_->getFileList(folderPath, FilterRule(false));
+        const QList<ExtNumSize> &_typesList = files_->getFileTypes(_flist, settings_->excludeUnpermitted);
 
-        if (!typesList.isEmpty()) {
+        if (!_typesList.isEmpty()) {
             if (filterCreation)
-                emit folderContentsFilterCreated(folderPath, typesList);
+                emit folderContentsFilterCreated(folderPath, _typesList);
             else
-                emit folderContentsListCreated(folderPath, typesList);
+                emit folderContentsListCreated(folderPath, _typesList);
         }
     }
 }
