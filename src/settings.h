@@ -35,8 +35,8 @@ public:
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
-    bool instantSaving = true;
-    bool excludeUnpermitted = false;
+    bool instantSaving = false;
+    bool excludeUnpermitted = true;
     bool dbFlagConst = false;
 
     QByteArray geometryMainWindow;
