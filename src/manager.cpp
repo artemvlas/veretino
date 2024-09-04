@@ -265,15 +265,11 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
-    QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
+    const FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
+    const QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
 
     if (!tools::canBeChecksum(storedSum) || !(storedStatus & FileStatus::FlagAvailable)) {
         switch (storedStatus) {
-        case FileStatus::New:
-            emit showMessage("The checksum is not yet in the database.\n"
-                             "Please Update New/Lost", "New File");
-            break;
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");
             break;
@@ -293,8 +289,8 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     }
 
     dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
-    QString filePath = dataMaintainer->data_->itemAbsolutePath(fileItemIndex);
-    QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
+    const QString filePath = dataMaintainer->data_->itemAbsolutePath(fileItemIndex);
+    const QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
 
     if (sum.isEmpty()) { // return previous status
         dataMaintainer->data_->model_->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
