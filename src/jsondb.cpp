@@ -305,19 +305,18 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
         if (header.contains("Verified"))
             metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + header.value("Verified").toString();
     }
-
     // [datetime] version 0.4.0+
-    const QString strDT = findValueStr(header, "time");
-    if (!strDT.isEmpty()) {
-        QStringList dtList = tools::strToList(strDT);
+    else {
+        const QStringList &_dtList = findValueStr(header, "time").split(", ", Qt::SkipEmptyParts);
 
-        for (int i = 0; i < dtList.size() && i < 3; ++i) {
-            metaData.datetime[i] = dtList.at(i);
+        for (int i = 0; i < _dtList.size() && i < 3; ++i) {
+            metaData.datetime[i] = _dtList.at(i);
         }
     }
 
     // [Flags]
-    if (header.value("Flags").toString() == "const")
+    const QString _strFlags = header.value("Flags").toString();
+    if (_strFlags.contains("const"))
         metaData.flags = MetaData::FlagConst;
 
     return metaData;
