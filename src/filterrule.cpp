@@ -5,6 +5,7 @@
 */
 #include "filterrule.h"
 #include "tools.h"
+#include <QRegularExpression>
 
 FilterRule::FilterRule(bool ignoreSummaries)
     : ignoreShaFiles(ignoreSummaries)
@@ -23,7 +24,8 @@ FilterMode FilterRule::mode() const
 
 void FilterRule::setFilter(const FilterMode filterMode, const QString &extensions)
 {
-    setFilter(filterMode, tools::strToList(extensions));
+    static const QRegularExpression re("[, ]");
+    setFilter(filterMode, extensions.split(re, Qt::SkipEmptyParts));
 }
 
 void FilterRule::setFilter(const FilterMode filterMode, const QStringList &extensions)

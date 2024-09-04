@@ -9,7 +9,6 @@
 #include <cmath>
 #include <QDesktopServices>
 #include <QUrl>
-#include <QRegularExpression>
 #include <QDebug>
 #include "files.h"
 
@@ -93,24 +92,6 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
         return str1 + str2;
 
     return QString("%1%2%3").arg(str1, sep, str2);
-}
-
-QStringList strToList(const QString &str)
-{
-    if (str.isEmpty())
-        return QStringList();
-
-    QString sep = " ";
-    static const QStringList sepVariants { ", ", ",", "  " };
-
-    for (int i = 0; i < sepVariants.size(); ++i) {
-        if (str.contains(sepVariants.at(i))) {
-            sep = sepVariants.at(i);
-            break;
-        }
-    }
-
-    return str.split(sep);
 }
 } // namespace tools
 
@@ -295,19 +276,19 @@ QString shortenString(const QString &string, int length, bool cutEnd)
 
 QString simplifiedChars(QString str)
 {
-    /* old impl.
-    str = str.simplified();
+    /*
+     * str = str.simplified();
+     * static const QRegularExpression re("[ /\\\\:;%*?|<>&#~^]");
+     * str.replace(re, "_");
+     */
 
-    QString forbSymb(" :/\\%*?|<>^&#");
+    static const QString forbSymb(" :/\\%*?|<>&#^");
 
     for (int i = 0; i < str.size(); ++i) {
         if (forbSymb.contains(str.at(i))) {
             str[i] = '_';
         }
-    }*/
-
-    static const QRegularExpression re("[ /\\\\:;%*?|<>&#~^]");
-    str.replace(re, "_");
+    }
 
     while (str.contains("__"))
         str.replace("__", "_");

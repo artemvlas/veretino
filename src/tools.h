@@ -22,7 +22,6 @@ bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &str);
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
-QStringList strToList(const QString &str); // splits the str
 } // namespace tools
 
 namespace paths {
