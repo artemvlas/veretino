@@ -74,7 +74,10 @@ void Manager::processFolderSha(const MetaData &metaData)
     dataMaintainer->addActualFiles(FileStatus::Queued, settings_->excludeUnpermitted);
 
     // exception and cancelation handling
-    if (procState->isCanceled() || !dataMaintainer->data_) {
+    if (procState->isCanceled()
+        || !dataMaintainer->data_
+        || dataMaintainer->data_->model_->isEmpty())
+    {
         emit setViewData();
         return;
     }
@@ -180,9 +183,9 @@ void Manager::updateDatabase(const DestDbUpdate dest)
         return;
     }
 
-    if (dest == DestUpdateMismatches)
+    if (dest == DestUpdateMismatches) {
         dataMaintainer->updateMismatchedChecksums();
-
+    }
     else {
         if ((dest & DestAddNew)
             && dataMaintainer->data_->contains(FileStatus::New))
@@ -339,7 +342,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         }
     }
     else { // if subfolder
-        Numbers num = dataMaintainer->data_->getNumbers(folderItemIndex);
+        const Numbers &num = dataMaintainer->data_->getNumbers(folderItemIndex);
         QString subfolderName = TreeModel::itemName(folderItemIndex);
 
         emit folderChecked(num, subfolderName);
@@ -592,10 +595,10 @@ void Manager::makeDbContentsList()
     if (!dataMaintainer->data_)
         return;
 
-    QList<ExtNumSize> typesList = files_->getFileTypes(dataMaintainer->data_->model_);
+    const QList<ExtNumSize> &_typesList = files_->getFileTypes(dataMaintainer->data_->model_);
 
-    if (!typesList.isEmpty())
-        emit dbContentsListCreated(dataMaintainer->data_->metaData.workDir, typesList);
+    if (!_typesList.isEmpty())
+        emit dbContentsListCreated(dataMaintainer->data_->metaData.workDir, _typesList);
 }
 
 void Manager::modelChanged(ModelView modelView)
