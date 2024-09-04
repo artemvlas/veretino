@@ -471,10 +471,11 @@ void ModeSelector::exportItemSum()
         return;
     }
 
-    QString filePath = view_->data_->itemAbsolutePath(_ind);
+    const QString filePath = view_->data_->itemAbsolutePath(_ind);
 
     FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
-    fileVal.checksum = TreeModel::itemFileChecksum(_ind);
+    fileVal.checksum = TreeModel::hasReChecksum(_ind) ? TreeModel::itemFileReChecksum(_ind)
+                                                      : TreeModel::itemFileChecksum(_ind);
 
     emit manager_->fileProcessed(filePath, fileVal);
 }
