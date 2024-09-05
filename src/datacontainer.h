@@ -24,11 +24,11 @@ struct MetaData {
     enum DateTimeStr { DateCreated, DateUpdated, DateVerified };
     QString datetime[3];
 
-    enum DbFileState { NoFile, Created, NotSaved, Saved };
+    enum DbFileState : quint8 { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
 
-    enum PropertyFlag : uint8_t { NotSet = 0, FlagConst = 1 };
-    uint8_t flags = NotSet;
+    enum PropertyFlag : quint8 { NotSet = 0, FlagConst = 1 };
+    quint8 flags = NotSet;
 }; // struct MetaData
 
 using DbFileState = MetaData::DbFileState;

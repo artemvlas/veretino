@@ -10,7 +10,7 @@
 class FilterRule
 {
 public:
-    enum FilterMode {
+    enum FilterMode : quint8 {
         NotSet,
         Include, // only files with extensions from [extensionsList] are allowed, others are ignored
         Ignore   // files with extensions from [extensionsList] are ignored (not included in the database)
