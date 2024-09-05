@@ -60,7 +60,6 @@ public:
 
 public slots:
     void clearCreationCache();
-    //bool addFile(const QString &filePath, const FileValues &values); // DEPRECATED; will be removed until the next release
 
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;

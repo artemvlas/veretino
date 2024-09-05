@@ -18,9 +18,9 @@ class Manager : public QObject
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
 
-    enum DestFileProc : quint8 { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
+    enum DestFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
 
-    enum DestDbUpdate : quint8 {
+    enum DestDbUpdate {
         DestUpdateMismatches = 1 << 0,
         DestAddNew = 1 << 1,
         DestClearLost = 1 << 2,

@@ -17,57 +17,12 @@ TreeModel::TreeModel(QObject *parent)
 TreeModel::~TreeModel()
 {
     delete rootItem;
-    // qDebug() << Q_FUNC_INFO << this;
 }
 
 bool TreeModel::isEmpty() const
 {
     return (rootItem->childCount() == 0);
 }
-
-/* // OLD, no cache; will be removed until the next release
-bool TreeModel::addFile(const QString &filePath, const FileValues &values)
-{
-    bool isAdded = false;
-    const QStringList &splitPath = filePath.split('/');
-    TreeItem *parentItem = rootItem;
-
-    for (int var = 0; var < splitPath.size(); ++var) {
-        bool not_exist = true;
-
-        for (int i = 0; i < parentItem->childCount(); ++i) {
-            if (parentItem->child(i)->data(0) == splitPath.at(var)) {
-                parentItem = parentItem->child(i);
-                not_exist = false;
-                break;
-            }
-        }
-
-        if (not_exist) {
-            QVector<QVariant> iData(rootItem->columnCount());
-            iData[ColumnName] = splitPath.at(var);
-
-            // the last item is considered a file
-            if (var + 1 == splitPath.size()) {
-                if (values.size > 0)
-                    iData[ColumnSize] = values.size;
-
-                iData[ColumnStatus] = QVariant::fromValue(values.status);
-
-                if (!values.checksum.isEmpty())
-                    iData[ColumnChecksum] = values.checksum;
-
-                isAdded = true;
-            }
-
-            TreeItem *ti = new TreeItem(iData, parentItem);
-            parentItem->appendChild(ti);
-            parentItem = ti;
-        }
-    }
-
-    return isAdded;
-} */ // DEPRECATED ^^^
 
 void TreeModel::populate(const FileList &filesData)
 {
@@ -243,8 +198,6 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
                                                                           : curIndex;
 
         emit dataChanged(curIndex, endIndex, { Qt::DisplayRole, Qt::EditRole, RawDataRole });
-        // It was before:
-        // emit dataChanged(curIndex, curIndex, {Qt::DisplayRole, Qt::EditRole, RawDataRole});
     }
 
     return result;
@@ -257,9 +210,9 @@ bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVa
         return false;
     }
 
-    const QModelIndex &idx = curIndex.siblingAtColumn(column);
+    const QModelIndex &_idx = curIndex.siblingAtColumn(column);
 
-    return idx.isValid() && setData(idx, itemData);
+    return _idx.isValid() && setData(_idx, itemData);
 }
 
 Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const
