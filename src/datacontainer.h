@@ -27,8 +27,8 @@ struct MetaData {
     enum DbFileState { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
 
-    enum DbFlag { NotSet, FlagConst };
-    DbFlag flags = NotSet;
+    enum PropertyFlag : uint8_t { NotSet = 0, FlagConst = 1 };
+    uint8_t flags = NotSet;
 }; // struct MetaData
 
 using DbFileState = MetaData::DbFileState;

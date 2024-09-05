@@ -317,7 +317,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     // [Flags]
     const QString _strFlags = header.value("Flags").toString();
     if (_strFlags.contains("const"))
-        metaData.flags = MetaData::FlagConst;
+        metaData.flags |= MetaData::FlagConst;
 
     return metaData;
 }

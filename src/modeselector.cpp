@@ -533,7 +533,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.filter = filter;
     metaData.databaseFilePath = composeDbFilePath();
     if (settings_->dbFlagConst)
-        metaData.flags = MetaData::FlagConst;
+        metaData.flags |= MetaData::FlagConst;
 
     manager_->addTask(&Manager::processFolderSha, metaData);
 }
