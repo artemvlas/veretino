@@ -446,6 +446,7 @@ void ModeSelector::checkFile(const QString &filePath, const QString &checkSum)
 void ModeSelector::verify(const QModelIndex& index)
 {
     if (TreeModel::isFileRow(index)) {
+        view_->disableFilter();
         manager_->addTask(&Manager::verifyFileItem, index);
     }
     else {

@@ -243,7 +243,9 @@ void View::editFilter(const FileStatuses flags, bool add)
 
 void View::disableFilter()
 {
-    setFilter();
+    if (data_ && data_->proxyModel_->isFilterEnabled()) {
+        setFilter();
+    }
 }
 
 void View::toHome()

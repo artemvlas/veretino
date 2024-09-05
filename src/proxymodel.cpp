@@ -52,19 +52,18 @@ bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) con
 
 void ProxyModel::setFilter(const FileStatuses flags)
 {
-    if (flags == FileStatus::NotSet) {
-        disableFilter();
-        return;
+    if (flags != filteredFlags) {
+        filteredFlags = flags;
+        invalidateFilter();
     }
-
-    filteredFlags = flags;
-    invalidateFilter();
 }
 
 void ProxyModel::disableFilter()
 {
-    filteredFlags = FileStatus::NotSet;
-    invalidateFilter();
+    if (isFilterEnabled()) {
+        filteredFlags = FileStatus::NotSet;
+        invalidateFilter();
+    }
 }
 
 FileStatuses ProxyModel::currentlyFiltered() const
@@ -74,5 +73,5 @@ FileStatuses ProxyModel::currentlyFiltered() const
 
 bool ProxyModel::isFilterEnabled() const
 {
-    return filteredFlags != FileStatus::NotSet;
+    return (filteredFlags != FileStatus::NotSet);
 }
