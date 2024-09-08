@@ -59,7 +59,7 @@ public:
     static QString itemFileReChecksum(const QModelIndex &fileIndex);
 
 public slots:
-    void clearCreationCache();
+    void clearCacheFolderItems();
 
 private:
     TreeItem *getItem(const QModelIndex &curIndex) const;

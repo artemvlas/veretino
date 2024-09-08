@@ -5,7 +5,6 @@
 */
 #include "datamaintainer.h"
 #include <QFileInfo>
-#include <QDir>
 #include <QDebug>
 #include <QDirIterator>
 #include "treemodeliterator.h"
@@ -101,8 +100,10 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     if (!data_)
         return 0;
 
-    if (!QFileInfo(data_->metaData.workDir).isDir()) {
-        qDebug() << "DataMaintainer::addActualFiles | Not a folder path: " << data_->metaData.workDir;
+    const QString &_workDir = data_->metaData.workDir;
+
+    if (!QFileInfo(_workDir).isDir()) {
+        qDebug() << "DataMaintainer::addActualFiles | Not a folder path: " << _workDir;
         return 0;
     }
 
@@ -110,12 +111,11 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
 
     int numAdded = 0;
 
-    QDir dir(data_->metaData.workDir);
-    QDirIterator it(data_->metaData.workDir, QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(_workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
         const QString &_fullPath = it.next();
-        const QString &_relPath = dir.relativeFilePath(_fullPath);
+        const QString &_relPath = paths::relativePath(_workDir, _fullPath);
 
         if (data_->metaData.filter.isFileAllowed(_relPath)) {
             QFileInfo _fileInfo(_fullPath);
@@ -133,7 +133,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     }
 
     if (isCanceled()) {
-        qDebug() << "DataMaintainer::addActualFiles | Canceled:" << data_->metaData.workDir;
+        qDebug() << "DataMaintainer::addActualFiles | Canceled:" << _workDir;
         clearData();
         emit setStatusbarText();
         return 0;
@@ -142,7 +142,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     if (numAdded > 0)
         updateNumbers();
 
-    data_->model_->clearCreationCache();
+    data_->model_->clearCacheFolderItems();
     return numAdded;
 }
 

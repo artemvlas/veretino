@@ -201,12 +201,11 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     // adding new files
     emit setStatusbarText("Looking for new files...");
 
-    QDir dir(workDir);
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
         const QString &_fullPath = it.next();
-        const QString &_relPath = dir.relativeFilePath(_fullPath);
+        const QString &_relPath = paths::relativePath(workDir, _fullPath);
 
         if (parsedData->metaData.filter.isFileAllowed(_relPath)
             && !filelistData.contains(_relPath))
@@ -257,7 +256,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
-    parsedData->model_->clearCreationCache();
+    parsedData->model_->clearCacheFolderItems();
     qDebug() << "Parsing time:" << timer.elapsed();
 
     return parsedData;

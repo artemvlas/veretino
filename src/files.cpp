@@ -60,13 +60,11 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
     emit setStatusbarText("Creating a list of files...");
 
     FileList resultList; // result list
-
-    QDir dir(rootFolder);
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
         const QString &_fullPath = it.next();
-        const QString &_relPath = dir.relativeFilePath(_fullPath);
+        const QString &_relPath = paths::relativePath(rootFolder, _fullPath);
 
         if (filter.isFileAllowed(_relPath)) {
             QFileInfo fileInfo(_fullPath);
