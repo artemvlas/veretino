@@ -126,15 +126,23 @@ QString basicName(const QString &path)
     */
 }
 
-// the function is not finished yet, exceptions need to be worked out!!!
 QString relativePath(const QString &rootFolder, const QString &fullPath)
 {
+    if (rootFolder.isEmpty())
+        return fullPath;
+
     if (!fullPath.startsWith(rootFolder))
         return QString();
 
-    const int _cut = rootFolder.endsWith('/') ? rootFolder.size() : rootFolder.size() + 1;
-    return fullPath.mid(_cut);
-} // unfinished
+    static const QChar _sep = '/';
+    const int _cut = rootFolder.endsWith(_sep) ? rootFolder.size() - 1 : rootFolder.size();
+
+    return ((_cut < fullPath.size()) && (fullPath.at(_cut) == _sep)) ? fullPath.mid(_cut + 1) : QString();
+
+    // #2 impl. --> x2 slower due to (rootFolder + '/')
+    // const QString &_root = rootFolder.endsWith('/') ? rootFolder : rootFolder + '/';
+    // return fullPath.startsWith(_root) ? fullPath.mid(_root.size()) : QString();
+}
 
 QString shortenPath(const QString &path)
 {
