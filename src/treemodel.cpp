@@ -187,7 +187,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
 
 bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int role)
 {
-    if (role != Qt::EditRole)
+    if (role != Qt::EditRole || !curIndex.isValid())
         return false;
 
     TreeItem *item = getItem(curIndex);
@@ -203,16 +203,9 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     return result;
 }
 
-bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
+bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVariant &value)
 {
-    if (!curIndex.isValid()) {
-        qDebug() << "TreeModel::setRowData | Invalid index";
-        return false;
-    }
-
-    const QModelIndex &_idx = curIndex.siblingAtColumn(column);
-
-    return _idx.isValid() && setData(_idx, itemData);
+    return setData(curIndex.siblingAtColumn(column), value);
 }
 
 Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const

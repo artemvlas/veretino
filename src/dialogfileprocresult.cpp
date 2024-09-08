@@ -179,6 +179,7 @@ void DialogFileProcResult::makeSumFile()
     {
         setModeStored();
     }
-    else
+    else {
         setModeUnstored();
+    }
 }

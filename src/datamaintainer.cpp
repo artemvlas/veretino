@@ -73,9 +73,9 @@ void DataMaintainer::clearOldData()
     }
 }
 
-bool DataMaintainer::setRowData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
+bool DataMaintainer::setRowData(const QModelIndex &curIndex, Column column, const QVariant &value)
 {
-    return (data_ && data_->model_->setRowData(curIndex, column, itemData));
+    return (data_ && data_->model_->setData(curIndex.siblingAtColumn(column), value));
 }
 
 void DataMaintainer::updateDateTime()
@@ -213,24 +213,22 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
         return false;
     }
 
-    bool result = false;
     QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
         setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
         setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
-        result = true;
+        return true;
     }
     else if (storedChecksum == computedChecksum) {
         setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
-        result = true;
+        return true;
     }
     else {
         setRowData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
         setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
+        return false;
     }
-
-    return result;
 }
 
 int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
@@ -421,7 +419,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        const Numbers num = data_->getNumbers(curIndex);
+        const Numbers &num = data_->getNumbers(curIndex);
         const bool containsAvailable = num.contains(FileStatus::FlagAvailable);
 
         if (containsAvailable) {
@@ -450,7 +448,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 
 bool DataMaintainer::isCanceled() const
 {
-    return proc_ && proc_->isCanceled();
+    return (proc_ && proc_->isCanceled());
 }
 
 bool DataMaintainer::isDataNotSaved() const
@@ -460,8 +458,9 @@ bool DataMaintainer::isDataNotSaved() const
 
 void DataMaintainer::saveData()
 {
-    if (isDataNotSaved())
+    if (isDataNotSaved()) {
         exportToJson();
+    }
 }
 
 DataMaintainer::~DataMaintainer()

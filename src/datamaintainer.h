@@ -24,7 +24,7 @@ public:
     void setSourceData();
     bool setSourceData(DataContainer *sourceData);
     bool setRowData(const QModelIndex &curIndex, Column column,
-                    const QVariant &itemData = QVariant());
+                    const QVariant &value = QVariant());
     void updateDateTime();
     void updateVerifDateTime();
     void updateNumbers();

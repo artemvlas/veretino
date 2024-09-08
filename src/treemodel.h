@@ -36,7 +36,7 @@ public:
     bool setData(const QModelIndex &curIndex, const QVariant &value,
                         int role = Qt::EditRole) override;
     bool setRowData(const QModelIndex &curIndex, Column column,
-                    const QVariant &itemData = QVariant());
+                    const QVariant &value = QVariant());
 
     bool isEmpty() const;
     void add_file(const QString &filePath, const FileValues &values); // new func., with cache
