@@ -174,8 +174,9 @@ void DialogFileProcResult::makeSumFile()
     QFile file(sumFile);
 
     if (file.open(QFile::WriteOnly)
-        && (file.write(QString("%1 *%2").arg(values_.checksum, paths::basicName(filePath_)).toUtf8()) > 0)) {
-
+        && (file.write(QString("%1 *%2")
+                           .arg(values_.checksum, paths::basicName(filePath_)).toUtf8())))
+    {
         setModeStored();
     }
     else

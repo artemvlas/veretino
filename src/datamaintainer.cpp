@@ -73,6 +73,11 @@ void DataMaintainer::clearOldData()
     }
 }
 
+bool DataMaintainer::setRowData(const QModelIndex &curIndex, Column column, const QVariant &itemData)
+{
+    return (data_ && data_->model_->setRowData(curIndex, column, itemData));
+}
+
 void DataMaintainer::updateDateTime()
 {
     if (data_) {
@@ -114,8 +119,8 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     QDirIterator it(_workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString &_fullPath = it.next();
-        const QString &_relPath = paths::relativePath(_workDir, _fullPath);
+        const QString _fullPath = it.next();
+        const QString _relPath = paths::relativePath(_workDir, _fullPath);
 
         if (data_->metaData.filter.isFileAllowed(_relPath)) {
             QFileInfo _fileInfo(_fullPath);
@@ -212,17 +217,17 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
     QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
-        data_->model_->setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
-        data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+        setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
+        setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
         result = true;
     }
     else if (storedChecksum == computedChecksum) {
-        data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
+        setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
         result = true;
     }
     else {
-        data_->model_->setRowData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
-        data_->model_->setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
+        setRowData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
+        setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
     }
 
     return result;
@@ -240,7 +245,7 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
-            data_->model_->setRowData(iter.index(), Column::ColumnStatus, newStatus);
+            setRowData(iter.index(), Column::ColumnStatus, newStatus);
             ++number;
         }
     }
@@ -268,7 +273,7 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
-            data_->model_->setRowData(iter.index(), Column::ColumnChecksum);
+            setRowData(iter.index(), Column::ColumnChecksum);
             ++number;
         }
     }
@@ -302,8 +307,8 @@ int DataMaintainer::clearLostFiles()
 bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
 {
     if (data_ && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
-        data_->model_->setRowData(fileIndex, Column::ColumnChecksum);
-        data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Removed);
+        setRowData(fileIndex, Column::ColumnChecksum);
+        setRowData(fileIndex, Column::ColumnStatus, FileStatus::Removed);
         return true;
     }
 
@@ -339,9 +344,9 @@ bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
         QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
         if (!reChecksum.isEmpty()) {
-            data_->model_->setRowData(fileIndex, Column::ColumnChecksum, reChecksum);
-            data_->model_->setRowData(fileIndex, Column::ColumnReChecksum);
-            data_->model_->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Updated);
+            setRowData(fileIndex, Column::ColumnChecksum, reChecksum);
+            setRowData(fileIndex, Column::ColumnReChecksum);
+            setRowData(fileIndex, Column::ColumnStatus, FileStatus::Updated);
             return true;
         }
     }
