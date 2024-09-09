@@ -12,7 +12,6 @@ class TreeModelIterator
 {
 public:
     TreeModelIterator(const QAbstractItemModel *model, const QModelIndex &root = QModelIndex());
-    void setup(const QModelIndex &root);
     TreeModelIterator& next();
     TreeModelIterator& nextFile();
     bool hasNext() const;
@@ -24,10 +23,11 @@ public:
     QString checksum() const;
 
 private:
+    void setup(const QModelIndex &root);
     QModelIndex nextRow(const QModelIndex &curIndex) const;
     QModelIndex stepForward(const QModelIndex &curIndex);
 
-    const QAbstractItemModel *model_;
+    const QAbstractItemModel *modelConst_;
     QModelIndex index_;
     QModelIndex rootIndex_;
     QModelIndex nextIndex_; // the next index is found in advance and used as a cache to avoid calling the function twice when hasNext()

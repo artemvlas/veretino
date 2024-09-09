@@ -6,14 +6,14 @@
 #include "treemodeliterator.h"
 
 TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, const QModelIndex &root)
-    : model_(model)
+    : modelConst_(model)
 {
     setup(root);
 }
 
 void TreeModelIterator::setup(const QModelIndex &root)
 {
-    if (root.isValid() && root.model() == model_) {
+    if (root.isValid() && root.model() == modelConst_) {
         QModelIndex _ind = root.siblingAtColumn(Column::ColumnName);
 
         if (TreeModel::isFileRow(_ind))
@@ -45,7 +45,7 @@ TreeModelIterator& TreeModelIterator::nextFile()
     if (endReached)
         return next();
 
-    return model_->hasChildren(next().index_) ? nextFile() : *this;
+    return modelConst_->hasChildren(next().index_) ? nextFile() : *this;
 }
 
 QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
@@ -53,8 +53,8 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
     if (endReached)
         return QModelIndex();
 
-    if (model_->hasChildren(curIndex))
-        return model_->index(0, 0, curIndex);
+    if (modelConst_->hasChildren(curIndex))
+        return modelConst_->index(0, 0, curIndex);
 
     QModelIndex&& _nextRow = nextRow(curIndex);
     if (_nextRow.isValid())
