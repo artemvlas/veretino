@@ -73,9 +73,9 @@ void DataMaintainer::clearOldData()
     }
 }
 
-bool DataMaintainer::setRowData(const QModelIndex &curIndex, Column column, const QVariant &value)
+bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value)
 {
-    return (data_ && data_->model_->setData(curIndex.siblingAtColumn(column), value));
+    return (data_ && data_->model_->setData(fileIndex.siblingAtColumn(column), value));
 }
 
 void DataMaintainer::updateDateTime()
@@ -216,17 +216,17 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
     QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
-        setRowData(fileRowIndex, Column::ColumnChecksum, computedChecksum);
-        setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+        setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
+        setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
         return true;
     }
     else if (storedChecksum == computedChecksum) {
-        setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
+        setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
         return true;
     }
     else {
-        setRowData(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
-        setRowData(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
+        setItemValue(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
+        setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
         return false;
     }
 }
@@ -243,7 +243,7 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
-            setRowData(iter.index(), Column::ColumnStatus, newStatus);
+            setItemValue(iter.index(), Column::ColumnStatus, newStatus);
             ++number;
         }
     }
@@ -271,7 +271,7 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
-            setRowData(iter.index(), Column::ColumnChecksum);
+            setItemValue(iter.index(), Column::ColumnChecksum);
             ++number;
         }
     }
@@ -305,8 +305,8 @@ int DataMaintainer::clearLostFiles()
 bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
 {
     if (data_ && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
-        setRowData(fileIndex, Column::ColumnChecksum);
-        setRowData(fileIndex, Column::ColumnStatus, FileStatus::Removed);
+        setItemValue(fileIndex, Column::ColumnChecksum);
+        setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Removed);
         return true;
     }
 
@@ -342,9 +342,9 @@ bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
         QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
         if (!reChecksum.isEmpty()) {
-            setRowData(fileIndex, Column::ColumnChecksum, reChecksum);
-            setRowData(fileIndex, Column::ColumnReChecksum);
-            setRowData(fileIndex, Column::ColumnStatus, FileStatus::Updated);
+            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum);
+            setItemValue(fileIndex, Column::ColumnReChecksum);
+            setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Updated);
             return true;
         }
     }

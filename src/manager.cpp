@@ -224,12 +224,12 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
     const FileStatus fileStatusBefore = TreeModel::itemFileStatus(fileIndex);
 
     if (fileStatusBefore == FileStatus::New) {
-        dataMaintainer->setRowData(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
+        dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
         QString filePath = dataMaintainer->data_->itemAbsolutePath(fileIndex);
         QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm);
 
         if (sum.isEmpty()) { // return previous status
-            dataMaintainer->setRowData(fileIndex, Column::ColumnStatus, FileStatus::New);
+            dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::New);
         }
         else {
             dataMaintainer->updateChecksum(fileIndex, sum);
@@ -291,12 +291,12 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    dataMaintainer->setRowData(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
+    dataMaintainer->setItemValue(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
     const QString filePath = dataMaintainer->data_->itemAbsolutePath(fileItemIndex);
     const QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
 
     if (sum.isEmpty()) { // return previous status
-        dataMaintainer->setRowData(fileItemIndex, Column::ColumnStatus, storedStatus);
+        dataMaintainer->setItemValue(fileItemIndex, Column::ColumnStatus, storedStatus);
     }
     else {
         showFileCheckResultMessage(filePath, storedSum, sum);
@@ -478,7 +478,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
     while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
-            dataMaintainer->setRowData(iter.index(), Column::ColumnStatus, procStatus);
+            dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus, procStatus);
 
             QString doneData = (procState->doneSize() == 0) ? QString("(%1)").arg(totalSizeReadable)
                                                             : QString("(%1 / %2)").arg(format::dataSizeReadable(procState->doneSize()), totalSizeReadable);
@@ -499,7 +499,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
                         _unread = TreeModel::hasChecksum(iter.index()) ? FileStatus::Missing : FileStatus::Removed;
                     }
 
-                    dataMaintainer->setRowData(iter.index(), Column::ColumnStatus,  _unread);
+                    dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _unread);
 
                     totalSize -= iter.size();
                     totalSizeReadable = format::dataSizeReadable(totalSize);

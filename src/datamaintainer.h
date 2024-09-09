@@ -23,8 +23,7 @@ public:
     void setProcState(const ProcState *procState);
     void setSourceData();
     bool setSourceData(DataContainer *sourceData);
-    bool setRowData(const QModelIndex &curIndex, Column column,
-                    const QVariant &value = QVariant());
+    bool setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value = QVariant());
     void updateDateTime();
     void updateVerifDateTime();
     void updateNumbers();

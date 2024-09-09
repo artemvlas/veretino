@@ -202,11 +202,11 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
 
     return result;
 }
-
+/*
 bool TreeModel::setRowData(const QModelIndex &curIndex, Column column, const QVariant &value)
 {
     return setData(curIndex.siblingAtColumn(column), value);
-}
+}*/
 
 Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const
 {
