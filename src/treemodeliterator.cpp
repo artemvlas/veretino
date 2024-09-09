@@ -5,18 +5,24 @@
 */
 #include "treemodeliterator.h"
 
-TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex)
+TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, const QModelIndex &root)
     : model_(model)
 {
-    rootIndex = (rootIndex.isValid() && rootIndex.model() == model) ? rootIndex.siblingAtColumn(Column::ColumnName)
-                                                                    : QModelIndex();
+    setup(root);
+}
 
-    if (TreeModel::isFileRow(rootIndex))
-        rootIndex = rootIndex.parent();
+void TreeModelIterator::setup(const QModelIndex &root)
+{
+    if (root.isValid() && root.model() == model_) {
+        QModelIndex _ind = root.siblingAtColumn(Column::ColumnName);
 
-    if (rootIndex.isValid()) {
-        rootIndex_ = rootIndex;
-        index_ = rootIndex;
+        if (TreeModel::isFileRow(_ind))
+            _ind = _ind.parent();
+
+        if (_ind.isValid()) { // subfolder
+            rootIndex_ = _ind;
+            index_ = _ind;
+        }
     }
 
     nextIndex_ = stepForward(index_);

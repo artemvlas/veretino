@@ -11,7 +11,8 @@
 class TreeModelIterator
 {
 public:
-    TreeModelIterator(const QAbstractItemModel *model, QModelIndex rootIndex = QModelIndex());
+    TreeModelIterator(const QAbstractItemModel *model, const QModelIndex &root = QModelIndex());
+    void setup(const QModelIndex &root);
     TreeModelIterator& next();
     TreeModelIterator& nextFile();
     bool hasNext() const;
