@@ -14,10 +14,8 @@ TreeModelIterator::TreeModelIterator(const QAbstractItemModel *model, const QMod
 void TreeModelIterator::setup(const QModelIndex &root)
 {
     if (root.isValid() && root.model() == modelConst_) {
-        QModelIndex _ind = root.siblingAtColumn(Column::ColumnName);
-
-        if (TreeModel::isFileRow(_ind))
-            _ind = _ind.parent();
+        const QModelIndex &_ind = TreeModel::isFileRow(root) ? root.parent()
+                                                             : root.siblingAtColumn(Column::ColumnName);
 
         if (_ind.isValid()) { // subfolder
             rootIndex_ = _ind;
