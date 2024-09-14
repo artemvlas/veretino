@@ -51,13 +51,7 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
             digits.append(_ch.digitValue());
     }
 
-    int number = 0;
-
-    for (int digit : digits) {
-        number = number * 10 + digit;
-    }
-
-    switch (number) {
+    switch (digitsToNum(digits)) {
         case 1:
             return QCryptographicHash::Sha1;
         case 512:
@@ -65,6 +59,18 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
         default:
             return QCryptographicHash::Sha256;
     }
+}
+
+int digitsToNum(const QList<int> &digits)
+{
+    int number = 0;
+
+    for (int digit : digits) {
+        number = number * 10 + digit;
+    }
+
+    qDebug() << "digitsToNum |" << digits << "-->" << number;
+    return number;
 }
 
 bool isDatabaseFile(const QString &filePath) {

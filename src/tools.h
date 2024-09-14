@@ -16,6 +16,7 @@ namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo); // returns the length of checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
 QCryptographicHash::Algorithm algorithmByStrLen(int strLen); // ^vice versa
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
+int digitsToNum(const QList<int> &digits); // {0,1,2,3} --> 123
 
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
