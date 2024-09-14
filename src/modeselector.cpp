@@ -132,24 +132,24 @@ QString ModeSelector::getButtonText()
     switch (mode()) {
         case FileProcessing:
         case DbProcessing:
-            return "Stop";
+            return QStringLiteral(u"Stop");
         case DbCreating:
-            return "Abort";
+            return QStringLiteral(u"Abort");
         case Folder:
         case File:
             return format::algoToStr(settings_->algorithm());
         case DbFile:
-            return "Open";
+            return QStringLiteral(u"Open");
         case SumFile:
-            return "Check";
+            return QStringLiteral(u"Check");
         case Model:
-            return "Verify";
+            return QStringLiteral(u"Verify");
         case ModelNewLost:
-            return "New/Lost";
+            return QStringLiteral(u"New/Lost");
         case UpdateMismatch:
-            return "Update";
+            return QStringLiteral(u"Update");
         case NoMode:
-            return "Browse";
+            return QStringLiteral(u"Browse");
         default:
             break;
     }
@@ -190,15 +190,15 @@ QString ModeSelector::getButtonToolTip()
 {
     switch (mode()) {
         case Folder:
-            return "Calculate checksums of contained files\nand save the result to the local database";
+            return QStringLiteral(u"Calculate checksums of contained files\nand save the result to the local database");
         case File:
             return QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm()));
         case Model:
-            return "Check ALL files against stored checksums";
+            return QStringLiteral(u"Check ALL files against stored checksums");
         case ModelNewLost:
-            return "Update the Database:\nadd new files, delete missing ones";
+            return QStringLiteral(u"Update the Database:\nadd new files, delete missing ones");
         case UpdateMismatch:
-            return "Update mismatched checksums with newly calculated ones";
+            return QStringLiteral(u"Update mismatched checksums with newly calculated ones");
         default:
             break;
     }
@@ -851,7 +851,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     if (!proc_->isState(State::StartVerbose))
         return true;
 
-    const QString strAct = abort ? "Abort" : "Stop";
+    const QString strAct = abort ? QStringLiteral(u"Abort") : QStringLiteral(u"Stop");
     const QIcon &icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
     static const QPixmap icoMsgBox = iconProvider.icon(FileStatus::Calculating).pixmap(64, 64);
 
@@ -859,12 +859,12 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     connect(proc_, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
 
     msgBox.setIconPixmap(icoMsgBox);
-    msgBox.setWindowTitle("Processing...");
+    msgBox.setWindowTitle(QStringLiteral(u"Processing..."));
     msgBox.setText(QString("%1 current process?").arg(strAct));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
     msgBox.button(QMessageBox::Yes)->setText(strAct);
-    msgBox.button(QMessageBox::No)->setText("Continue...");
+    msgBox.button(QMessageBox::No)->setText(QStringLiteral(u"Continue..."));
     msgBox.button(QMessageBox::Yes)->setIcon(icoAct);
     msgBox.button(QMessageBox::No)->setIcon(iconProvider.icon(Icons::DoubleGear));
 
