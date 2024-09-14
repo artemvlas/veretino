@@ -44,7 +44,7 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 {
     const QString _str = strAlgo.right(3);
-    QList<quint8> digits;
+    QList<int> digits;
 
     for (QChar _ch : _str) {
         if (_ch.isDigit())
@@ -81,17 +81,19 @@ bool isSummaryFile(const QString &filePath)
 
 bool canBeChecksum(const QString &str)
 {
-    bool isOK = false;
-
-    if (str.length() == 40 || str.length() == 64 || str.length() == 128) {
-        isOK = true;
-        for (int i = 0; isOK && i < str.length(); ++i) {
-            if (!str.at(i).isLetterOrNumber())
-                isOK = false;
-        }
+    if (str.length() != 40
+        && str.length() != 64
+        && str.length() != 128)
+    {
+        return false;
     }
 
-    return isOK;
+    for (int i = 0; i < str.length(); ++i) {
+        if (!str.at(i).isLetterOrNumber())
+            return false;
+    }
+
+    return true;
 }
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep)
