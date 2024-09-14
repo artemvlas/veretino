@@ -25,6 +25,7 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep);
 } // namespace tools
 
 namespace paths {
+static const QChar _sep = u'/';
 QString parentFolder(const QString &path); // returns the parent folder of the 'path'
 QString basicName(const QString &path); // returns file or folder name: "/home/user/folder/fname" --> "fname"
 QString relativePath(const QString &rootFolder, const QString &fullPath);

@@ -124,7 +124,7 @@ QString basicName(const QString &path)
 
     for (int i = lastIndex; i >= 0; --i) {
         const QChar _ch = path.at(i);
-        if (_ch != u'/') {
+        if (_ch != _sep) { // _sep == '/'
             result.prepend(_ch);
         }
         else if (i != lastIndex) {
@@ -150,7 +150,7 @@ QString relativePath(const QString &rootFolder, const QString &fullPath)
     if (!fullPath.startsWith(rootFolder))
         return QString();
 
-    static const QChar _sep = '/';
+    //static const QChar _sep = u'/';
     const int _cut = rootFolder.endsWith(_sep) ? rootFolder.size() - 1 : rootFolder.size();
 
     return ((_cut < fullPath.size()) && (fullPath.at(_cut) == _sep)) ? fullPath.mid(_cut + 1) : QString();
@@ -168,7 +168,7 @@ QString shortenPath(const QString &path)
 
 QString parentFolder(const QString &path)
 {
-    const int ind = path.lastIndexOf('/', -2);
+    const int ind = path.lastIndexOf(_sep, -2);
 
     switch (ind) {
     case -1: // root --> root; string'/' --> ""
@@ -186,10 +186,10 @@ bool isRoot(const QString &path)
 {
     switch (path.length()) {
     case 1:
-        return (path.at(0) == '/'); // Linux FS root
+        return (path.at(0) == _sep); // Linux FS root
     case 2:
     case 3:
-        return (path.at(0).isLetter() && path.at(1) == ':'); // Windows drive root
+        return (path.at(0).isLetter() && path.at(1) == u':'); // Windows drive root
     default:
         return false;
     }
@@ -197,7 +197,7 @@ bool isRoot(const QString &path)
 
 QString joinPath(const QString &absolutePath, const QString &addPath)
 {
-    return tools::joinStrings(absolutePath, addPath, '/');
+    return tools::joinStrings(absolutePath, addPath, _sep);
 }
 
 void browsePath(const QString &path)
@@ -264,19 +264,19 @@ QString dataSizeReadable(const qint64 sizeBytes)
     QChar _ch;
     switch (it) {
     case 1:
-        _ch = 'K';
+        _ch = u'K';
         break;
     case 2:
-        _ch = 'M';
+        _ch = u'M';
         break;
     case 3:
-        _ch = 'G';
+        _ch = u'G';
         break;
     case 4:
-        _ch = 'T';
+        _ch = u'T';
         break;
     default:
-        _ch = '?';
+        _ch = u'?';
         break;
     }
 
@@ -310,7 +310,7 @@ QString simplifiedChars(QString str)
 
     for (int i = 0; i < str.size(); ++i) {
         if (forbSymb.contains(str.at(i))) {
-            str[i] = '_';
+            str[i] = u'_';
         }
     }
 
@@ -323,12 +323,12 @@ QString simplifiedChars(QString str)
 QString composeDbFileName(const QString &prefix, const QString &folder, const QString &extension)
 {
     if (folder.isEmpty())
-        return tools::joinStrings(prefix, extension, '.');
+        return tools::joinStrings(prefix, extension, u'.');
 
     const QString _folderStr = simplifiedChars(paths::basicName(folder));
-    const QString _dbFileName = tools::joinStrings(prefix, _folderStr, '_');
+    const QString _dbFileName = tools::joinStrings(prefix, _folderStr, u'_');
 
-    return tools::joinStrings(_dbFileName, extension, '.');
+    return tools::joinStrings(_dbFileName, extension, u'.');
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
