@@ -43,7 +43,21 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
 
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 {
-    switch (QString(strAlgo.toLower().remove("sha").remove('-')).toInt()) {
+    const QString _str = strAlgo.right(3);
+    QList<quint8> digits;
+
+    for (QChar _ch : _str) {
+        if (_ch.isDigit())
+            digits.append(_ch.digitValue());
+    }
+
+    int number = 0;
+
+    for (int digit : digits) {
+        number = number * 10 + digit;
+    }
+
+    switch (number) {
         case 1:
             return QCryptographicHash::Sha1;
         case 512:
@@ -108,7 +122,7 @@ QString basicName(const QString &path)
 
     for (int i = lastIndex; i >= 0; --i) {
         const QChar _ch = path.at(i);
-        if (_ch != '/') {
+        if (_ch != u'/') {
             result.prepend(_ch);
         }
         else if (i != lastIndex) {
