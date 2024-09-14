@@ -537,11 +537,12 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
 void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)
 {
-    FileStatus status = (checksumEstimated.toLower() == checksumCalculated.toLower()) ? FileStatus::Matched : FileStatus::Mismatched;
+    const int _compare = checksumEstimated.compare(checksumCalculated, Qt::CaseInsensitive);
+    FileStatus status = (_compare == 0) ? FileStatus::Matched : FileStatus::Mismatched;
     FileValues fileVal(status, QFileInfo(filePath).size());
     fileVal.checksum = checksumEstimated.toLower();
 
-    if (fileVal.status == FileStatus::Mismatched) {
+    if (_compare) { // Mismatched
         fileVal.reChecksum = checksumCalculated;
     }
 
@@ -558,7 +559,7 @@ void Manager::getPathInfo(const QString &path)
             emit setStatusbarText(format::fileNameAndSize(path));
         }
         else if (fileInfo.isDir()) {
-            emit setStatusbarText("counting...");
+            emit setStatusbarText(QStringLiteral(u"counting..."));
             emit setStatusbarText(files_->getFolderSize(path));
         }
     }

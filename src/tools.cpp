@@ -43,7 +43,7 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
 
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 {
-    switch (QString(strAlgo.toLower().remove("sha").remove("-")).toInt()) {
+    switch (QString(strAlgo.toLower().remove("sha").remove('-')).toInt()) {
         case 1:
             return QCryptographicHash::Sha1;
         case 512:
@@ -54,15 +54,15 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 }
 
 bool isDatabaseFile(const QString &filePath) {
-    return filePath.endsWith(".ver", Qt::CaseInsensitive)
-           || filePath.endsWith(".ver.json", Qt::CaseInsensitive);
+    return filePath.endsWith(QStringLiteral(u".ver"), Qt::CaseInsensitive)
+           || filePath.endsWith(QStringLiteral(u".ver.json"), Qt::CaseInsensitive);
 }
 
 bool isSummaryFile(const QString &filePath)
 {
-    return (filePath.endsWith(".sha1", Qt::CaseInsensitive)
-            || filePath.endsWith(".sha256", Qt::CaseInsensitive)
-            || filePath.endsWith(".sha512", Qt::CaseInsensitive));
+    return (filePath.endsWith(QStringLiteral(u".sha1"), Qt::CaseInsensitive)
+            || filePath.endsWith(QStringLiteral(u".sha256"), Qt::CaseInsensitive)
+            || filePath.endsWith(QStringLiteral(u".sha512"), Qt::CaseInsensitive));
 }
 
 bool canBeChecksum(const QString &str)
@@ -337,12 +337,12 @@ QString algoToStr(int sumStrLength, bool capitalLetters)
 QString filesNumberAndSize(int filesNumber, qint64 filesSize)
 {
     if (filesNumber == 0)
-        return "no files";
+        return QStringLiteral(u"no files");
 
     // if only 1 file the text is "file", if more the text is "files"
-    const QString s = (filesNumber == 1) ? "file" : "files";
+    const QString s = (filesNumber != 1) ? "s" : QString(); // null QChar is \u0000, so QString is used
 
-    return QString("%1 %2 (%3)")
+    return QString("%1 file%2 (%3)")
                     .arg(filesNumber)
                     .arg(s, dataSizeReadable(filesSize));
 }
@@ -356,18 +356,18 @@ QString fileNameAndSize(const QString &filePath)
 QString fileItemStatus(FileStatus status)
 {
     switch (status) {
-    case FileStatus::Queued: return "queued";
-    case FileStatus::Calculating: return "calculating...";
-    case FileStatus::Verifying: return "verifying...";
-    case FileStatus::NotChecked: return "ready...";
-    case FileStatus::Matched: return "match";
-    case FileStatus::Mismatched: return "not match";
-    case FileStatus::New: return "new file";
-    case FileStatus::Missing: return "missing";
-    case FileStatus::Unreadable: return "unreadable";
-    case FileStatus::Added: return "added";
-    case Files::Removed: return "removed";
-    case FileStatus::Updated: return "updated";
+    case FileStatus::Queued: return QStringLiteral(u"queued");
+    case FileStatus::Calculating: return QStringLiteral(u"calculating...");
+    case FileStatus::Verifying: return QStringLiteral(u"verifying...");
+    case FileStatus::NotChecked: return QStringLiteral(u"ready...");
+    case FileStatus::Matched: return QStringLiteral(u"match");
+    case FileStatus::Mismatched: return QStringLiteral(u"not match");
+    case FileStatus::New: return QStringLiteral(u"new file");
+    case FileStatus::Missing: return QStringLiteral(u"missing");
+    case FileStatus::Unreadable: return QStringLiteral(u"unreadable");
+    case FileStatus::Added: return QStringLiteral(u"added");
+    case Files::Removed: return QStringLiteral(u"removed");
+    case FileStatus::Updated: return QStringLiteral(u"updated");
     default: return "unknown";
     }
 }
