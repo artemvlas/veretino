@@ -122,6 +122,14 @@ void View::setData(DataContainer *data)
     QTimer::singleShot(100, this, &View::dataSetted);
 }
 
+void View::clear()
+{
+    setModel(nullptr);
+    data_ = nullptr;
+
+    emit modelChanged(NotSetted);
+}
+
 // when the process is completed, return to the Proxy Model view
 void View::setViewProxy()
 {

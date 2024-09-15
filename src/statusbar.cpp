@@ -136,3 +136,10 @@ void StatusBar::clearButtons()
         list.at(i)->hide();
     }
 }
+
+void StatusBar::clear()
+{
+    clearButtons();
+    statusIconLabel->clear();
+    statusTextLabel->clear();
+}

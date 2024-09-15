@@ -52,6 +52,7 @@ public:
 
     void clearButtons();
     void setButtonsEnabled(bool enable);
+    void clear();
 
 private:
     StatusBarButton* addPermanentButton();

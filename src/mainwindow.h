@@ -32,6 +32,7 @@ public slots:
     void handlePathEdit();
     void setWinTitleMismatchFound();
     void updateWindowTitle();
+    void clearView();
 
     // dialogs
     void showDbStatus();
