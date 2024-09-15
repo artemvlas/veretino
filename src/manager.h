@@ -88,7 +88,6 @@ private:
 signals:
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setViewData(DataContainer *data = nullptr);
-    void setTreeModel(ModelView modelSel = ModelView::ModelProxy);
     void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void folderContentsFilterCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
     void dbContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);

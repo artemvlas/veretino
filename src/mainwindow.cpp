@@ -150,7 +150,6 @@ void MainWindow::connectManager()
     connect(manager, &Manager::mismatchFound, this, &MainWindow::setWinTitleMismatchFound);
 
     // results processing
-    connect(manager, &Manager::setTreeModel, ui->treeView, &View::setTreeModel);
     connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
