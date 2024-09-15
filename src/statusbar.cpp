@@ -105,7 +105,7 @@ void StatusBar::setModeDbCreating()
         buttonDbCreating = addPermanentButton();
         if (icons_)
             buttonDbCreating->setIcon(icons_->icon(Icons::Database));
-        buttonDbCreating->setText("Creating...");
+        buttonDbCreating->setText(QStringLiteral(u"Creating..."));
         connect(buttonDbCreating, &StatusBarButton::clicked, this, &StatusBar::buttonDbListedClicked);
     }
 
@@ -122,18 +122,20 @@ StatusBarButton* StatusBar::addPermanentButton()
 
 void StatusBar::setButtonsEnabled(bool enable)
 {
-    QList<StatusBarButton*> list = findChildren<StatusBarButton*>();
-    for (int i = 0; i < list.size(); ++i) {
-        if (list.at(i)->isVisible())
-            list.at(i)->setEnabled(enable);
+    const QList<StatusBarButton*> buttons = findChildren<StatusBarButton*>();
+
+    for (StatusBarButton *_button : buttons) {
+        if (_button->isVisible())
+            _button->setEnabled(enable);
     }
 }
 
 void StatusBar::clearButtons()
 {
-    QList<StatusBarButton*> list = findChildren<StatusBarButton*>();
-    for (int i = 0; i < list.size(); ++i) {
-        list.at(i)->hide();
+    const QList<StatusBarButton*> buttons = findChildren<StatusBarButton*>();
+
+    for (StatusBarButton *_button : buttons) {
+        _button->hide();
     }
 }
 

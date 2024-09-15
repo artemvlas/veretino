@@ -256,7 +256,7 @@ void View::editFilter(const FileStatuses flags, bool add)
 
 void View::disableFilter()
 {
-    if (data_ && data_->proxyModel_->isFilterEnabled()) {
+    if (isViewFiltered()) {
         setFilter();
     }
 }
@@ -283,7 +283,7 @@ ModelView View::currentViewModel()
 
 bool View::isCurrentViewModel(const ModelView modelView)
 {
-    return modelView == currentViewModel();
+    return (modelView == currentViewModel());
 }
 
 bool View::isViewFileSystem()
@@ -293,7 +293,7 @@ bool View::isViewFileSystem()
 
 bool View::isViewDatabase()
 {
-    return ModelDb & currentViewModel();
+    return (ModelDb & currentViewModel());
 }
 
 bool View::isViewFiltered()
@@ -385,7 +385,7 @@ void View::headerContextMenuRequested(const QPoint &point)
         QAction *curAct = new QAction(headerText(i), headerContextMenu);
         curAct->setCheckable(true);
         curAct->setChecked(!isColumnHidden(i));
-        connect(curAct, &QAction::toggled, this, [=]{toggleColumnVisibility(i);});
+        connect(curAct, &QAction::toggled, this, [=]{ toggleColumnVisibility(i); });
         headerContextMenu->addAction(curAct);
     }
 
@@ -396,7 +396,8 @@ void View::headerContextMenuRequested(const QPoint &point)
 
 void View::setBackgroundColor()
 {
-    QString style = isViewFiltered() ? "QTreeView { background-color : grey; color : black }" : QString();
+    QString style = isViewFiltered() ? QStringLiteral(u"QTreeView { background-color : grey; color : black }")
+                                     : QString();
 
     setStyleSheet(style);
 }

@@ -85,7 +85,7 @@ QString ProgressBar::progSpeed()
                      .arg(format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000));
     }
     else {
-        result = "idle";
+        result = QStringLiteral(u"idle");
     }
 
     return result;
