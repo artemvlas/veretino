@@ -68,7 +68,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         saveSettings();
 
         if (ui->treeView->isViewDatabase())
-            clearView();
+            ui->treeView->clear();
 
         event->accept();
     }
@@ -444,12 +444,6 @@ void MainWindow::updateWindowTitle()
     else {
         setWindowTitle(APP_NAME);
     }
-}
-
-void MainWindow::clearView()
-{
-    ui->treeView->clear();
-    statusBar->clear();
 }
 
 void MainWindow::handlePathEdit()
