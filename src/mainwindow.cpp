@@ -224,7 +224,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
-        dialog.setWindowTitle("File types to work with...");
+        dialog.setWindowTitle(QStringLiteral(u"File types to work with..."));
         dialog.setFilterCreation(DialogContentsList::FC_Enabled);
         FilterRule filter;
 
@@ -351,10 +351,11 @@ void MainWindow::dialogOpenJson()
 void MainWindow::showMessage(const QString &message, const QString &title)
 {
     QMessageBox messageBox;
+    QString titleLower = title.toLower();
 
-    if (title.toLower() == "error" || title.toLower() == "failed")
+    if (titleLower == "error" || titleLower == "failed")
         messageBox.critical(this, title, message);
-    else if (title.toLower() == "warning")
+    else if (titleLower == "warning")
         messageBox.warning(this, title, message);
     else
         messageBox.information(this, title, message);
@@ -451,7 +452,7 @@ void MainWindow::handlePathEdit()
     if (ui->pathEdit->text() == ui->treeView->curPathFileSystem)
         modeSelect->quickAction();
     else
-        ui->treeView->setIndexByPath(ui->pathEdit->text().replace("\\", "/"));
+        ui->treeView->setIndexByPath(ui->pathEdit->text().replace('\\', '/'));
 }
 
 void MainWindow::handleChangedModel()
@@ -490,7 +491,7 @@ bool MainWindow::argumentInput()
 {
     if (QApplication::arguments().size() > 1) {
         QString argPath = QApplication::arguments().at(1);
-        argPath.replace("\\", "/"); // win-->posix
+        argPath.replace('\\', '/'); // win-->posix
         if (QFileInfo::exists(argPath)) {
             if (QFileInfo(argPath).isFile() && tools::isDatabaseFile(argPath)) {
                 modeSelect->openJsonDatabase(argPath);
