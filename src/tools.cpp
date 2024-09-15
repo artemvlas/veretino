@@ -43,10 +43,9 @@ QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
 
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 {
-    const QString _str = strAlgo.right(3);
     QList<int> digits;
 
-    for (QChar _ch : _str) {
+    for (QChar _ch : strAlgo) {
         if (_ch.isDigit())
             digits.append(_ch.digitValue());
     }
@@ -65,8 +64,8 @@ int digitsToNum(const QList<int> &digits)
 {
     int number = 0;
 
-    for (int digit : digits) {
-        number = number * 10 + digit;
+    for (int _digit : digits) {
+        number = (number * 10) + _digit;
     }
 
     qDebug() << "digitsToNum |" << digits << "-->" << number;
@@ -156,7 +155,7 @@ QString relativePath(const QString &rootFolder, const QString &fullPath)
     if (!fullPath.startsWith(rootFolder))
         return QString();
 
-    //static const QChar _sep = u'/';
+    // _sep == u'/';
     const int _cut = rootFolder.endsWith(_sep) ? rootFolder.size() - 1 : rootFolder.size();
 
     return ((_cut < fullPath.size()) && (fullPath.at(_cut) == _sep)) ? fullPath.mid(_cut + 1) : QString();
