@@ -93,6 +93,11 @@ void View::setData(DataContainer *data)
         return;
     }
 
+    if (data == data_) {
+        qDebug() << "View::setData >> SKIP: this data is already setted";
+        return;
+    }
+
     data_ = data;
     curPathFileSystem = data->metaData.databaseFilePath;
 

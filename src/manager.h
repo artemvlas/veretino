@@ -50,7 +50,7 @@ public slots:
     void checkFile(const QString &filePath, const QString &checkSum);
     void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
 
-    void createDataModel(const QString &databaseFilePath);
+    void createDataModel(const QString &dbFilePath);
     void restoreDatabase();
     void saveData();
     void prepareSwitchToFs();

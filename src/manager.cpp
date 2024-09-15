@@ -135,23 +135,27 @@ void Manager::restoreDatabase()
     }
 }
 
-void Manager::createDataModel(const QString &databaseFilePath)
+void Manager::createDataModel(const QString &dbFilePath)
 {
-    if (!tools::isDatabaseFile(databaseFilePath)) {
+    if (!tools::isDatabaseFile(dbFilePath)) {
         QString str = QString("Wrong file: %1\n"
-                              "Expected file extension '*.ver' or '*.ver.json'").arg(databaseFilePath);
+                              "Expected file extension '*.ver' or '*.ver.json'").arg(dbFilePath);
 
         emit showMessage(str, "Wrong DB file!");
         emit setViewData();
         return;
     }
 
+    /*
     if (dataMaintainer->importJson(databaseFilePath)) {
         emit setViewData(dataMaintainer->data_);
     }
     else {
         emit setViewData();
-    }
+    }*/
+
+    dataMaintainer->importJson(dbFilePath);
+    emit setViewData(dataMaintainer->data_);
 }
 
 void Manager::saveData()
