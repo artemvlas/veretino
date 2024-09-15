@@ -26,6 +26,7 @@ public:
         Canceled = Stop | Abort
     };
     Q_ENUM(State)
+    //Q_DECLARE_FLAGS(States, State)
 
     void setState(State state);
     State state() const; // returns current state_
@@ -59,5 +60,6 @@ signals:
 }; // class ProcState
 
 using State = ProcState::State;
+//Q_DECLARE_OPERATORS_FOR_FLAGS(ProcState::States)
 
 #endif // PROCSTATE_H

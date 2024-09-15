@@ -403,6 +403,10 @@ void ModeSelector::restoreDatabase()
 void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (promptProcessAbort()) {
+        // aborted process
+        if (view_->isViewDatabase() && view_->data_->contains(FileStatus::FlagProcessing))
+            view_->clear();
+
         manager_->addTask(&Manager::saveData);
         manager_->addTask(&Manager::createDataModel, filePath);
     }
@@ -620,7 +624,8 @@ void ModeSelector::doWork()
                 updateDatabase(DestDbUpdate::DestUpdateMismatches);
             break;
         case NoMode:
-            showFileSystem();
+            if (!proc_->isStarted())
+                showFileSystem();
             break;
         default:
             qDebug() << "MainWindow::doWork() | Wrong MODE:" << mode();

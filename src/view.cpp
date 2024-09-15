@@ -77,12 +77,15 @@ void View::setTreeModel(ModelView modelSel)
     oldSelectionModel_ = selectionModel();
     saveHeaderState();
 
-    modelSel == ModelSource ? setModel(data_->model_) : setModel(data_->proxyModel_);
+    if (modelSel == ModelSource) {
+        setModel(data_->model_);
+    } else {
+        setModel(data_->proxyModel_);
+    }
 
     emit modelChanged(modelSel);
 
     restoreHeaderState();
-
     setIndexByPath(curPathModel);
 }
 
@@ -124,6 +127,9 @@ void View::setData(DataContainer *data)
 
 void View::clear()
 {
+    oldSelectionModel_ = selectionModel();
+    // ? saveHeaderState();
+
     setModel(nullptr);
     data_ = nullptr;
 

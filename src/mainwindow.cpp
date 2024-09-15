@@ -68,7 +68,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         saveSettings();
 
         if (ui->treeView->isViewDatabase())
-            ui->treeView->clear();
+            ui->treeView->setModel(nullptr);
 
         event->accept();
     }
@@ -224,7 +224,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
-        dialog.setWindowTitle(QStringLiteral(u"File types to work with..."));
+        dialog.setWindowTitle("File types to work with...");
         dialog.setFilterCreation(DialogContentsList::FC_Enabled);
         FilterRule filter;
 
