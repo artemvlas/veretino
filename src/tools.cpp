@@ -142,13 +142,6 @@ QString basicName(const QString &path)
     }
 
     return result;
-
-    /* prev. impl.
-    static const QRegularExpression pathSep("[/\\\\]");
-    const QStringList &components = path.split(pathSep, Qt::SkipEmptyParts);
-
-    return components.isEmpty() ? QString() : components.last();
-    */
 }
 
 QString relativePath(const QString &rootFolder, const QString &fullPath)
@@ -172,7 +165,7 @@ QString relativePath(const QString &rootFolder, const QString &fullPath)
 QString shortenPath(const QString &path)
 {
     return paths::isRoot(paths::parentFolder(path)) ? path
-                                                    : "../" + paths::basicName(path);
+                                                    : QStringLiteral(u"../") + paths::basicName(path);
 }
 
 QString parentFolder(const QString &path)
@@ -322,8 +315,10 @@ QString shortenString(const QString &string, int length, bool cutEnd)
     if (string.length() <= length)
         return string;
 
-    return cutEnd ? string.left(length).append("...")
-                  : string.right(length).prepend("...");
+    QString _dots = QStringLiteral(u"...");
+
+    return cutEnd ? string.left(length).append(_dots)
+                  : string.right(length).prepend(_dots);
 }
 
 QString simplifiedChars(QString str)
@@ -394,14 +389,6 @@ QString filesNumberAndSize(int number, qint64 filesSize)
         return filesNumber(number);
 
     return filesNumber(number) + QString(" (%1)").arg(dataSizeReadable(filesSize));
-
-    /*
-    // if only 1 file the text is "file", if more the text is "files"
-    const QString s = (filesNumber != 1) ? "s" : QString(); // null QChar is \u0000, so QString is used
-
-    return QString("%1 file%2 (%3)")
-                    .arg(filesNumber)
-                    .arg(s, dataSizeReadable(filesSize));*/
 }
 
 QString fileNameAndSize(const QString &filePath)
@@ -432,7 +419,7 @@ QString fileItemStatus(FileStatus status)
 QString coloredText(bool ignore)
 {
     QString _color = ignore ? QStringLiteral(u"red") : QStringLiteral(u"green");
-    return "color : " + _color;
+    return QStringLiteral(u"color : ") + _color;
 }
 
 QString coloredText(const QString &className, bool ignore)

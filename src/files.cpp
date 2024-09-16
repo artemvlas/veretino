@@ -156,26 +156,6 @@ QString Files::getFolderSize(const QString &path)
 
     return result;
 }
-/* Replaced by Numbers
-QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flags, const QModelIndex &rootIndex)
-{
-    int filesNumber = 0;
-    qint64 dataSize = 0;
-    TreeModelIterator it(model, rootIndex);
-
-    while (it.hasNext()) {
-        const QVariant itData = it.nextFile().data(Column::ColumnStatus);
-
-        if (itData.isValid()
-            && (flags & itData.value<FileStatus>()))
-        {
-            dataSize += it.size();
-            ++filesNumber;
-        }
-    }
-
-    return format::filesNumberAndSize(filesNumber, dataSize);
-} DEPRECATED */
 
 QList<ExtNumSize> Files::getFileTypes()
 {
