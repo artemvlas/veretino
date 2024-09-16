@@ -140,7 +140,7 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
 
     QIcon dbIcon = iconProvider.icon(Icons::Database);
 
-    foreach (const QString &recentFilePath, recentFiles) {
+    for (const QString &recentFilePath : recentFiles) {
         if (QFileInfo::exists(recentFilePath)) {
             QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
             act->setToolTip(recentFilePath);

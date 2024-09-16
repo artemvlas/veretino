@@ -57,14 +57,14 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
         return FileList();
     }
 
-    emit setStatusbarText("Creating a list of files...");
+    emit setStatusbarText(QStringLiteral(u"Creating a list of files..."));
 
     FileList resultList; // result list
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString &_fullPath = it.next();
-        const QString &_relPath = paths::relativePath(rootFolder, _fullPath);
+        const QString _fullPath = it.next();
+        const QString _relPath = paths::relativePath(rootFolder, _fullPath);
 
         if (filter.isFileAllowed(_relPath)) {
             QFileInfo fileInfo(_fullPath);
@@ -80,7 +80,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
         return FileList();
     }
 
-    emit setStatusbarText(QString("%1 files found").arg(resultList.size()));
+    emit setStatusbarText(format::filesNumber(resultList.size()) + QStringLiteral(u" found"));
     return resultList;
 }
 
@@ -145,7 +145,7 @@ QString Files::getFolderSize(const QString &path)
         // result processing
         if (!isCanceled()) {
             const QString _folderName = paths::basicName(path);
-            const QString _folderSize = (filesNumber > 0) ? format::filesNumberAndSize(filesNumber, totalSize) : "no files";
+            const QString _folderSize = format::filesNumberAndSize(filesNumber, totalSize);
 
             result = QString("%1: %2")
                          .arg(_folderName, _folderSize);
@@ -156,7 +156,7 @@ QString Files::getFolderSize(const QString &path)
 
     return result;
 }
-
+/* Replaced by Numbers
 QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flags, const QModelIndex &rootIndex)
 {
     int filesNumber = 0;
@@ -175,7 +175,7 @@ QString Files::itemInfo(const QAbstractItemModel* model, const FileStatuses flag
     }
 
     return format::filesNumberAndSize(filesNumber, dataSize);
-}
+} DEPRECATED */
 
 QList<ExtNumSize> Files::getFileTypes()
 {

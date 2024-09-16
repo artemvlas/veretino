@@ -78,8 +78,8 @@ public:
     QList<ExtNumSize> getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
     QList<ExtNumSize> getFileTypes(const FileList &fileList, bool excludeUnreadable = false);
 
-    static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
-                            const QModelIndex &rootIndex = QModelIndex());
+    //static QString itemInfo(const QAbstractItemModel *model, const FileStatuses flags,
+    //                        const QModelIndex &rootIndex = QModelIndex()); // DEPRECATED
 
     // checks whether there are any (or filtered) files the folder/subfolders
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false));

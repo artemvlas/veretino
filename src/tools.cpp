@@ -279,7 +279,7 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
 QString dataSizeReadable(const qint64 sizeBytes)
 {
     if (sizeBytes <= 1000)
-        return QString("%1 bytes").arg(sizeBytes);
+        return QString::number(sizeBytes) + QStringLiteral(u" bytes");
 
     long double converted = sizeBytes;
     int it = 0; // number of divisions
@@ -309,7 +309,7 @@ QString dataSizeReadable(const qint64 sizeBytes)
     }
 
     const float x = std::round(converted * 100) / 100;
-    return QString::number(x, 'f', 2) % _ch % "iB";
+    return QString::number(x, 'f', 2) % _ch % QStringLiteral(u"iB");
 }
 
 QString dataSizeReadableExt(const qint64 sizeBytes)
@@ -378,17 +378,30 @@ QString algoToStr(int sumStrLength, bool capitalLetters)
     return algoToStr(tools::algorithmByStrLen(sumStrLength), capitalLetters);
 }
 
-QString filesNumberAndSize(int filesNumber, qint64 filesSize)
+QString filesNumber(int number)
 {
-    if (filesNumber == 0)
+    if (number == 0)
         return QStringLiteral(u"no files");
 
+    const QString files = (number == 1) ? QStringLiteral(u" file") : QStringLiteral(u" files");
+
+    return QString::number(number) + files;
+}
+
+QString filesNumberAndSize(int number, qint64 filesSize)
+{
+    if (number == 0)
+        return filesNumber(number);
+
+    return filesNumber(number) + QString(" (%1)").arg(dataSizeReadable(filesSize));
+
+    /*
     // if only 1 file the text is "file", if more the text is "files"
     const QString s = (filesNumber != 1) ? "s" : QString(); // null QChar is \u0000, so QString is used
 
     return QString("%1 file%2 (%3)")
                     .arg(filesNumber)
-                    .arg(s, dataSizeReadable(filesSize));
+                    .arg(s, dataSizeReadable(filesSize));*/
 }
 
 QString fileNameAndSize(const QString &filePath)
@@ -418,8 +431,8 @@ QString fileItemStatus(FileStatus status)
 
 QString coloredText(bool ignore)
 {
-    QString _color = ignore ? "red" : "green";
-    return QString("color : %1").arg(_color);
+    QString _color = ignore ? QStringLiteral(u"red") : QStringLiteral(u"green");
+    return "color : " + _color;
 }
 
 QString coloredText(const QString &className, bool ignore)

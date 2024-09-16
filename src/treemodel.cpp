@@ -216,8 +216,7 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const
     return Qt::ItemIsEditable | QAbstractItemModel::flags(curIndex);
 }
 
-QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
-                               int role) const
+QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return rootItem->data(section);
@@ -310,24 +309,21 @@ bool TreeModel::hasReChecksum(const QModelIndex &fileIndex)
 
 bool TreeModel::hasStatus(const FileStatuses flag, const QModelIndex &fileIndex)
 {
-    return flag & itemFileStatus(fileIndex);
+    return (flag & itemFileStatus(fileIndex));
 }
 
 bool TreeModel::contains(const FileStatuses flag, const QModelIndex &folderIndex)
 {
-    bool isAny = false;
-
     if (isFolderRow(folderIndex)) {
         TreeModelIterator it(folderIndex.model(), folderIndex);
         while (it.hasNext()) {
             if (flag & itemFileStatus(it.nextFile().index())) {
-                isAny = true;
-                break;
+                return true;
             }
         }
     }
 
-    return isAny;
+    return false;
 }
 
 QString TreeModel::itemName(const QModelIndex &curIndex)

@@ -52,7 +52,8 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true
 QString algoToStr(int sumStrLength, bool capitalLetters = true);
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
-QString filesNumberAndSize(int filesNumber, qint64 filesSize); // returns "number file's' (readable size)"
+QString filesNumber(int number);
+QString filesNumberAndSize(int number, qint64 filesSize); // returns "number file's' (readable size)"
 QString fileItemStatus(FileStatus status);
 
 QString coloredText(bool ignore); // 'ignore' (true = red, false = green)
