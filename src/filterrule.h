@@ -12,8 +12,8 @@ class FilterRule
 public:
     enum FilterMode : quint8 {
         NotSet,
-        Include, // only files with extensions from [extensionsList] are allowed, others are ignored
-        Ignore   // files with extensions from [extensionsList] are ignored (not included in the database)
+        Include, // only files with extensions from [extensions_] are allowed, others are ignored
+        Ignore   // files with extensions from [extensions_] are ignored (not included in the database)
     };
 
     FilterRule(bool ignoreSummaries = true);
@@ -28,7 +28,7 @@ public:
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
     QString extensionString(const QString &sep = ", ") const;
 
-    QStringList extensionsList;
+    QStringList extensions_;
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
 

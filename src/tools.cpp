@@ -73,15 +73,16 @@ int digitsToNum(const QList<int> &digits)
 }
 
 bool isDatabaseFile(const QString &filePath) {
-    return filePath.endsWith(QStringLiteral(u".ver"), Qt::CaseInsensitive)
-           || filePath.endsWith(QStringLiteral(u".ver.json"), Qt::CaseInsensitive);
+    static const QStringList _exts = { "ver", "ver.json" };
+
+    return paths::hasExtension(filePath, _exts);
 }
 
 bool isSummaryFile(const QString &filePath)
 {
-    return (filePath.endsWith(QStringLiteral(u".sha1"), Qt::CaseInsensitive)
-            || filePath.endsWith(QStringLiteral(u".sha256"), Qt::CaseInsensitive)
-            || filePath.endsWith(QStringLiteral(u".sha512"), Qt::CaseInsensitive));
+    static const QStringList _exts = { "sha1", "sha256", "sha512" };
+
+    return paths::hasExtension(filePath, _exts);
 }
 
 bool canBeChecksum(const QString &str)
@@ -187,6 +188,11 @@ QString parentFolder(const QString &path)
     }
 }
 
+QString joinPath(const QString &absolutePath, const QString &addPath)
+{
+    return tools::joinStrings(absolutePath, addPath, _sep);
+}
+
 bool isRoot(const QString &path)
 {
     switch (path.length()) {
@@ -200,9 +206,23 @@ bool isRoot(const QString &path)
     }
 }
 
-QString joinPath(const QString &absolutePath, const QString &addPath)
+bool hasExtension(const QString &file, const QString &ext)
 {
-    return tools::joinStrings(absolutePath, addPath, _sep);
+    static const QChar _dot = u'.';
+    const int _dotInd = file.size() - ext.size() - 1;
+
+    return ((_dotInd >= 0 && file.at(_dotInd) == _dot)
+            && file.endsWith(ext, Qt::CaseInsensitive));
+}
+
+bool hasExtension(const QString &file, const QStringList &extensions)
+{
+    for (const QString &_ext : extensions) {
+        if (hasExtension(file, _ext))
+            return true;
+    }
+
+    return false;
 }
 
 void browsePath(const QString &path)

@@ -160,17 +160,17 @@ void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
     FilterPreset preset = PresetCustom;
 
     if (filter.isFilter(FilterRule::Include)) {
-        if (filter.extensionsList == listPresetDocuments)
+        if (filter.extensions_ == listPresetDocuments)
             preset = PresetDocuments;
-        else if (filter.extensionsList == listPresetPictures)
+        else if (filter.extensions_ == listPresetPictures)
             preset = PresetPictures;
-        else if (filter.extensionsList == listPresetMusic)
+        else if (filter.extensions_ == listPresetMusic)
             preset = PresetMusic;
-        else if (filter.extensionsList == listPresetVideos)
+        else if (filter.extensions_ == listPresetVideos)
             preset = PresetVideos;
     }
     else if (filter.isFilter(FilterRule::Ignore)) {
-        if (filter.extensionsList == listPresetIgnoreTriflings)
+        if (filter.extensions_ == listPresetIgnoreTriflings)
             preset = PresetIgnoreTriflings;
     }
 
@@ -240,7 +240,7 @@ void DialogSettings::handleFilterMode()
 
 void DialogSettings::cleanUpExtList()
 {
-    if (!settings_->filter.extensionsList.isEmpty()) {
+    if (!settings_->filter.extensions_.isEmpty()) {
         QStringList list;
         if (!settings_->filter.isFilter(FilterRule::Include)) {
             if (settings_->filter.ignoreShaFiles)
@@ -251,7 +251,7 @@ void DialogSettings::cleanUpExtList()
 
         if (!list.isEmpty()) {
             foreach (const QString &str, list) {
-                settings_->filter.extensionsList.removeOne(str);
+                settings_->filter.extensions_.removeOne(str);
             }
         }
     }
