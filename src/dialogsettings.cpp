@@ -108,8 +108,8 @@ void DialogSettings::updateSettings()
     settings_->dbFlagConst = ui->cbDbFlagConst->isChecked();
 
     // filters
-    settings_->filter = getCurrentFilter();
     cleanUpExtList();
+    settings_->filter = getCurrentFilter();
 }
 
 QStringList DialogSettings::extensionsList() const
@@ -125,9 +125,9 @@ QStringList DialogSettings::extensionsList() const
     if (_inputed.startsWith('.'))
         _inputed.remove(0, 1);
 
-    QStringList ext = _inputed.split(',');
+    QStringList ext = _inputed.split(',', Qt::SkipEmptyParts);
     ext.removeDuplicates();
-    ext.removeOne("");
+    //ext.removeOne("");
     return ext;
 }
 
@@ -158,19 +158,20 @@ void DialogSettings::setComboBoxFpIndex()
 void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
 {
     FilterPreset preset = PresetCustom;
+    const QStringList &_ext = filter.extensionList();
 
     if (filter.isFilter(FilterRule::Include)) {
-        if (filter.extensions_ == listPresetDocuments)
+        if (_ext == listPresetDocuments)
             preset = PresetDocuments;
-        else if (filter.extensions_ == listPresetPictures)
+        else if (_ext == listPresetPictures)
             preset = PresetPictures;
-        else if (filter.extensions_ == listPresetMusic)
+        else if (_ext == listPresetMusic)
             preset = PresetMusic;
-        else if (filter.extensions_ == listPresetVideos)
+        else if (_ext == listPresetVideos)
             preset = PresetVideos;
     }
     else if (filter.isFilter(FilterRule::Ignore)) {
-        if (filter.extensions_ == listPresetIgnoreTriflings)
+        if (_ext == listPresetIgnoreTriflings)
             preset = PresetIgnoreTriflings;
     }
 
@@ -240,19 +241,21 @@ void DialogSettings::handleFilterMode()
 
 void DialogSettings::cleanUpExtList()
 {
-    if (!settings_->filter.extensions_.isEmpty()) {
+    QStringList _exts = extensionsList();
+    if (!_exts.isEmpty()) {
         QStringList list;
-        if (!settings_->filter.isFilter(FilterRule::Include)) {
-            if (settings_->filter.ignoreShaFiles)
+        if (!ui->rbInclude->isChecked()) {
+            if (ui->ignoreShaFiles->isChecked())
                 list.append({ "sha1", "sha256", "sha512" });
-            if (settings_->filter.ignoreDbFiles)
+            if (ui->ignoreDbFiles->isChecked())
                 list.append({ "ver", "ver.json" });
         }
 
         if (!list.isEmpty()) {
             foreach (const QString &str, list) {
-                settings_->filter.extensions_.removeOne(str);
+                _exts.removeOne(str);
             }
+            ui->inputExtensions->setText(_exts.join(','));
         }
     }
 }

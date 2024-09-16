@@ -74,3 +74,8 @@ QString FilterRule::extensionString(const QString &sep) const
 {
     return extensions_.join(sep);
 }
+
+QStringList FilterRule::extensionList() const
+{
+    return extensions_;
+}

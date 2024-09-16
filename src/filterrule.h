@@ -27,13 +27,14 @@ public:
     bool isFilterEnabled() const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
     QString extensionString(const QString &sep = ", ") const;
+    QStringList extensionList() const;
 
-    QStringList extensions_;
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;
 
 private:
     FilterMode mode_ = NotSet;
+    QStringList extensions_;
 }; // class FilterRule
 
 using FilterMode = FilterRule::FilterMode;
