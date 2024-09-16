@@ -4,6 +4,7 @@
  * https://github.com/artemvlas/veretino
 */
 #include "tools.h"
+#include <QStringBuilder>
 #include <QDateTime>
 #include <QFileInfo>
 #include <cmath>
@@ -107,13 +108,15 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
     const bool s1Ends = str1.endsWith(sep);
     const bool s2Starts = str2.startsWith(sep);
 
-    if (s1Ends && s2Starts)
-        return str1.left(str1.length() - 1) + str2;
+    if (s1Ends && s2Starts) {
+        QStringView _chopped = QStringView(str1).left(str1.size() - 1);
+        return _chopped % str2;
+    }
 
     if (s1Ends || s2Starts)
         return str1 + str2;
 
-    return QString("%1%2%3").arg(str1, sep, str2);
+    return str1 % sep % str2;
 }
 } // namespace tools
 
@@ -306,7 +309,7 @@ QString dataSizeReadable(const qint64 sizeBytes)
     }
 
     const float x = std::round(converted * 100) / 100;
-    return QString("%1 %2iB").arg(QString::number(x, 'f', 2), _ch);
+    return QString::number(x, 'f', 2) % _ch % "iB";
 }
 
 QString dataSizeReadableExt(const qint64 sizeBytes)
