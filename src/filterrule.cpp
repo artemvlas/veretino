@@ -67,10 +67,15 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
     // if 'isFilter(FilterRule::Include)': a file ('filePath') with any extension from 'extensionsList' is allowed
     // if 'isFilter(FilterRule::Ignore)': than all files except these types are allowed
 
+    static const QChar _dot = u'.';
     bool allowed = isFilter(Ignore);
 
-    foreach (const QString &ext, extensionsList) {
-        if (filePath.endsWith('.' + ext, Qt::CaseInsensitive)) {
+    for (const QString &ext : extensionsList) {
+        const int _dotInd = filePath.size() - ext.size() - 1;
+
+        if ((_dotInd >= 0 && filePath.at(_dotInd) == _dot)
+            && filePath.endsWith(ext, Qt::CaseInsensitive))
+        {
             allowed = isFilter(Include);
             break;
         }
