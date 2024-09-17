@@ -71,11 +71,11 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     const Numbers &numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
-    header["App/Origin"] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
-    header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(meta.workDir);
+    header[QStringLiteral(u"App/Origin")] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
+    header[QStringLiteral(u"Folder")] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(meta.workDir);
     header[strHeaderAlgo] = format::algoToStr(meta.algorithm);
-    header["Total Checksums"] = numbers.numberOf(FileStatus::CombHasChecksum);
-    header["Total Size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::CombAvailable));
+    header[QStringLiteral(u"Total Checksums")] = numbers.numberOf(FileStatus::CombHasChecksum);
+    header[QStringLiteral(u"Total Size")] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::CombAvailable));
 
     // DateTime
     header[strHeaderDateTime] = QString("%1, %2, %3").arg(meta.datetime[DateTimeStr::DateCreated],
@@ -287,7 +287,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // [algorithm]
-    const QString strAlgo = findValueStr(header, "Algo");
+    const QString strAlgo = findValueStr(header, QStringLiteral(u"Algo"));
     if (!strAlgo.isEmpty()) {
         metaData.algorithm = tools::strToAlgo(strAlgo);
         //qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;
@@ -299,14 +299,17 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
 
     // [date]
     // compatibility with previous versions
-    if (header.contains("Updated")) {
-        metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + header.value("Updated").toString();
-        if (header.contains("Verified"))
-            metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + header.value("Verified").toString();
+    static const QString _strUpdated = "Updated";
+    if (header.contains(_strUpdated)) {
+        metaData.datetime[DateTimeStr::DateUpdated] = QString("%1 %2").arg(_strUpdated, header.value(_strUpdated).toString());
+
+        static const QString _strVerified = "Verified";
+        if (header.contains(_strVerified))
+            metaData.datetime[DateTimeStr::DateVerified] = QString("%1 %2").arg(_strVerified, header.value(_strVerified).toString());
     }
-    // [datetime] version 0.4.0+
-    else {
-        const QStringList &_dtList = findValueStr(header, "time").split(", ", Qt::SkipEmptyParts);
+    else { // [datetime] version 0.4.0+
+        const QString _strDateTime = findValueStr(header, QStringLiteral(u"time"));
+        const QStringList &_dtList = _strDateTime.split(", ");
 
         for (int i = 0; i < _dtList.size() && i < 3; ++i) {
             metaData.datetime[i] = _dtList.at(i);
@@ -314,8 +317,8 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
 
     // [Flags]
-    const QString _strFlags = header.value("Flags").toString();
-    if (_strFlags.contains("const"))
+    const QString _strFlags = header.value(QStringLiteral(u"Flags")).toString();
+    if (_strFlags.contains(QStringLiteral(u"const")))
         metaData.flags |= MetaData::FlagConst;
 
     return metaData;

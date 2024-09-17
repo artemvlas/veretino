@@ -69,7 +69,6 @@ int digitsToNum(const QList<int> &digits)
         number = (number * 10) + _digit;
     }
 
-    qDebug() << "digitsToNum |" << digits << "-->" << number;
     return number;
 }
 

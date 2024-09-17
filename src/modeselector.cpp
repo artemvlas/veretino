@@ -865,7 +865,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
 
     msgBox.setIconPixmap(icoMsgBox);
     msgBox.setWindowTitle(QStringLiteral(u"Processing..."));
-    msgBox.setText(QString("%1 current process?").arg(strAct));
+    msgBox.setText(strAct + QStringLiteral(u" current process?"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
     msgBox.button(QMessageBox::Yes)->setText(strAct);

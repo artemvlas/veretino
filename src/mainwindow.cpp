@@ -63,7 +63,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     // if a computing process is running, show a prompt when user wants to close the app
     if (modeSelect->promptProcessAbort()) {
-        proc_->setState(State::Abort); // just in case
         modeSelect->saveData();
         saveSettings();
 
