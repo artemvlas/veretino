@@ -74,8 +74,8 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header["App/Origin"] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
     header["Folder"] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(meta.workDir);
     header[strHeaderAlgo] = format::algoToStr(meta.algorithm);
-    header["Total Checksums"] = numbers.numberOf(FileStatus::FlagHasChecksum);
-    header["Total Size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::FlagAvailable));
+    header["Total Checksums"] = numbers.numberOf(FileStatus::CombHasChecksum);
+    header["Total Size"] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::CombAvailable));
 
     // DateTime
     header[strHeaderDateTime] = QString("%1, %2, %3").arg(meta.datetime[DateTimeStr::DateCreated],

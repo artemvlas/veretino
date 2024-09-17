@@ -288,12 +288,12 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
                             .arg(result.numberOf(FileStatus::Mismatched))
-                            .arg(result.numberOf(FileStatus::FlagAvailable))
+                            .arg(result.numberOf(FileStatus::CombAvailable))
                             .arg(result.numberOf(FileStatus::Mismatched) == 1 ? "is" : "are"));
     }
     else {
         messageText.append(QString("ALL %1 files passed verification.")
-                            .arg(result.numberOf(FileStatus::FlagMatched)));
+                            .arg(result.numberOf(FileStatus::CombMatched)));
     }
 
     msgBox.setWindowTitle(titleText);
@@ -471,9 +471,9 @@ void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->treeView->isViewDatabase()) {
         Numbers &numbers = ui->treeView->data_->numbers;
-        if (numbers.contains(FileStatus::FlagChecked))
+        if (numbers.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
-        else if (numbers.contains(FileStatus::FlagDbChanged))
+        else if (numbers.contains(FileStatus::CombDbChanged))
             showDbStatusTab(DialogDbStatus::TabChanges);
         else
             showMessage("There are no checked items yet.", "Unchecked DB");

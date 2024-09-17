@@ -80,15 +80,15 @@ void StatusBar::setModeDb(const DataContainer *data)
 
     QString checkResult = QString("☒ %1\n✓ %2")
                               .arg(numbers.numberOf(FileStatus::Mismatched))
-                              .arg(numbers.numberOf(FileStatus::FlagMatched));
+                              .arg(numbers.numberOf(FileStatus::CombMatched));
 
     buttonDbHash->setToolTip(checkResult);
     buttonDbHash->setText(format::algoToStr(data->metaData.algorithm));
-    buttonDbSize->setText(format::dataSizeReadable(numbers.totalSize(FileStatus::FlagAvailable)));
+    buttonDbSize->setText(format::dataSizeReadable(numbers.totalSize(FileStatus::CombAvailable)));
 
-    QString strDbMain = QString::number(numbers.numberOf(FileStatus::FlagAvailable));
+    QString strDbMain = QString::number(numbers.numberOf(FileStatus::CombAvailable));
     if (numbers.contains(FileStatus::Missing)) // if not all files are available, display "available/total"
-        strDbMain.append(QString("/%1").arg(numbers.numberOf(FileStatus::FlagHasChecksum)));
+        strDbMain.append(QString("/%1").arg(numbers.numberOf(FileStatus::CombHasChecksum)));
 
     buttonDbMain->setText(strDbMain);
 

@@ -56,7 +56,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DestDbUpdate::DestAddNew); });
     connect(menuAct_->actionDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DestDbUpdate::DestClearLost); });
     connect(menuAct_->actionFilterNewLost, &QAction::triggered, this,
-            [=](bool isChecked){ view_->editFilter(FileStatus::FlagNewLost, isChecked); });
+            [=](bool isChecked){ view_->editFilter(FileStatus::CombNewLost, isChecked); });
     connect(menuAct_->actionFilterMismatches, &QAction::triggered, this,
             [=](bool isChecked){ view_->editFilter(FileStatus::Mismatched, isChecked); });
     connect(menuAct_->actionFilterUnreadable, &QAction::triggered, this,
@@ -219,7 +219,7 @@ Mode ModeSelector::mode() const
         if (!isDbConst()) {
             if (view_->data_->numbers.contains(FileStatus::Mismatched))
                 return UpdateMismatch;
-            else if (view_->data_->numbers.contains(FileStatus::FlagNewLost))
+            else if (view_->data_->numbers.contains(FileStatus::CombNewLost))
                 return ModelNewLost;
         }
 
@@ -261,7 +261,7 @@ void ModeSelector::promptItemFileUpd()
 {
     FileStatus storedStatus = TreeModel::itemFileStatus(view_->curIndexSource);
 
-    if (!(storedStatus & FileStatus::FlagUpdatable))
+    if (!(storedStatus & FileStatus::CombUpdatable))
         return;
 
     QMessageBox msgBox(view_);
@@ -404,7 +404,7 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (promptProcessAbort()) {
         // aborted process
-        if (view_->isViewDatabase() && view_->data_->contains(FileStatus::FlagProcessing))
+        if (view_->isViewDatabase() && view_->data_->contains(FileStatus::CombProcessing))
             view_->clear();
 
         manager_->addTask(&Manager::saveData);
@@ -471,7 +471,7 @@ void ModeSelector::exportItemSum()
     const QModelIndex &_ind = view_->curIndexSource;
 
     if (!view_->data_ ||
-        !TreeModel::hasStatus(FileStatus::FlagAvailable, _ind))
+        !TreeModel::hasStatus(FileStatus::CombAvailable, _ind))
     {
         return;
     }
@@ -652,7 +652,7 @@ void ModeSelector::quickAction()
         case ModelNewLost:
         case UpdateMismatch:
             if (TreeModel::isFileRow(view_->curIndexSource)) {
-                if (!isDbConst() && TreeModel::hasStatus(FileStatus::FlagUpdatable, view_->curIndexSource))
+                if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, view_->curIndexSource))
                     promptItemFileUpd();
                 else
                     verifyItem();
@@ -762,19 +762,19 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 viewContextMenu->addAction(menuAct_->actionFilterUnreadable);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::FlagNewLost)) {
+            if (view_->data_->numbers.contains(FileStatus::CombNewLost)) {
                 menuAct_->actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
                 viewContextMenu->addAction(menuAct_->actionFilterNewLost);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::FlagUpdatable))
+            if (view_->data_->numbers.contains(FileStatus::CombUpdatable))
                 viewContextMenu->addSeparator();
         }
 
         if (index.isValid()) {
             if (TreeModel::isFileRow(index)) {
                 // Updatable file item
-                if (!isDbConst() && TreeModel::hasStatus(FileStatus::FlagUpdatable, index)) {
+                if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, index)) {
                     switch (TreeModel::itemFileStatus(index)) {
                         case FileStatus::New:
                             viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
@@ -795,7 +795,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     viewContextMenu->addAction(menuAct_->actionCopyStoredChecksum);
 
                 // Available file item
-                if (TreeModel::hasStatus(FileStatus::FlagAvailable, index)) {
+                if (TreeModel::hasStatus(FileStatus::CombAvailable, index)) {
                     viewContextMenu->addAction(menuAct_->actionExportSum);
 
                     menuAct_->actionCopyItem->setText("Copy File");
@@ -805,7 +805,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 }
             }
             // Folder item
-            else if (TreeModel::contains(FileStatus::FlagAvailable, index)) {
+            else if (TreeModel::contains(FileStatus::CombAvailable, index)) {
                 menuAct_->actionCopyItem->setText("Copy Folder");
                 viewContextMenu->addAction(menuAct_->actionCopyItem);
 
@@ -820,7 +820,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
         viewContextMenu->addAction(menuAct_->actionCheckAll);
 
-        if (!isDbConst() && view_->data_->contains(FileStatus::FlagUpdatable))
+        if (!isDbConst() && view_->data_->contains(FileStatus::CombUpdatable))
             viewContextMenu->addMenu(menuAct_->menuUpdateDb(view_->data_->numbers));
     }
 

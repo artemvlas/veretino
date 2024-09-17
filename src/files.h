@@ -29,7 +29,7 @@ public:
         Queued = 1 << 0, // added to the processing queue
         Calculating = 1 << 1, // checksum is being calculated
         Verifying = 1 << 2, // // checksum is being verified
-        FlagProcessing = Queued | Calculating | Verifying,
+        CombProcessing = Queued | Calculating | Verifying,
 
         NotChecked = 1 << 3, // available for verification
         Matched = 1 << 4, // checked, checksum matched
@@ -41,13 +41,13 @@ public:
         Removed = 1 << 10, // item^ removed from the database
         Updated = 1 << 11, // the checksum has been updated
 
-        FlagAvailable = NotChecked | Matched | Mismatched | Added | Updated,
-        FlagHasChecksum = FlagAvailable | Missing,
-        FlagUpdatable = New | Missing | Mismatched,
-        FlagDbChanged = Added | Removed | Updated,
-        FlagChecked = Matched | Mismatched,
-        FlagMatched = Matched | Added | Updated,
-        FlagNewLost = New | Missing,
+        CombAvailable = NotChecked | Matched | Mismatched | Added | Updated,
+        CombHasChecksum = CombAvailable | Missing,
+        CombUpdatable = New | Missing | Mismatched,
+        CombDbChanged = Added | Removed | Updated,
+        CombChecked = Matched | Mismatched,
+        CombMatched = Matched | Added | Updated,
+        CombNewLost = New | Missing,
 
         Computed = 1 << 12, // the checksum has been calculated and is ready for further processing (copy or save)
         ToClipboard = 1 << 13, // the calculated checksum is intended to be copied to the clipboard

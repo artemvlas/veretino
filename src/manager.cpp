@@ -182,7 +182,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
     if (!dataMaintainer->data_ || dataMaintainer->data_->isImmutable())
         return;
 
-    if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable)) {
+    if (!dataMaintainer->data_->contains(FileStatus::CombAvailable)) {
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
         return;
     }
@@ -246,7 +246,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
         dataMaintainer->itemFileUpdateChecksum(fileIndex);
     }
 
-    if (TreeModel::hasStatus(FileStatus::FlagDbChanged, fileIndex)) {
+    if (TreeModel::hasStatus(FileStatus::CombDbChanged, fileIndex)) {
         dataMaintainer->setDbFileState(DbFileState::NotSaved);
         dataMaintainer->updateNumbers(fileIndex, fileStatusBefore);
         dataMaintainer->updateDateTime();
@@ -275,7 +275,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     const FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
     const QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
 
-    if (!tools::canBeChecksum(storedSum) || !(storedStatus & FileStatus::FlagAvailable)) {
+    if (!tools::canBeChecksum(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
         switch (storedStatus) {
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");
@@ -315,7 +315,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
         return;
     }
 
-    if (!dataMaintainer->data_->contains(FileStatus::FlagAvailable, folderItemIndex)) {
+    if (!dataMaintainer->data_->contains(FileStatus::CombAvailable, folderItemIndex)) {
         QString warningText = "There are no files available for verification.";
         if (!folderItemIndex.isValid())
             warningText.append("\n\n" + movedDbWarning);
@@ -474,7 +474,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
     // checking whether this is a Calculation or Verification process
-    const FileStatus procStatus = (status & FileStatus::FlagAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
+    const FileStatus procStatus = (status & FileStatus::CombAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
     const QString procStatusText = (procStatus == FileStatus::Verifying) ? "Verifying" : "Calculating";
 
     // process

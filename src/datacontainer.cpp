@@ -91,14 +91,14 @@ bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfol
 
 bool DataContainer::isAllChecked() const
 {
-    return (contains(FileStatus::FlagChecked)
-            && !contains(FileStatus::NotChecked | FileStatus::FlagProcessing));
+    return (contains(FileStatus::CombChecked)
+            && !contains(FileStatus::NotChecked | FileStatus::CombProcessing));
 }
 
 bool DataContainer::isAllMatched() const
 {
-    return (!contains(FileStatus::FlagProcessing)
-            && numbers.numberOf(FileStatus::Matched) == numbers.numberOf(FileStatus::FlagHasChecksum));
+    return (!contains(FileStatus::CombProcessing)
+            && numbers.numberOf(FileStatus::Matched) == numbers.numberOf(FileStatus::CombHasChecksum));
 }
 
 bool DataContainer::isDbFileState(DbFileState state) const

@@ -84,7 +84,7 @@ void DataMaintainer::updateDateTime()
         if (data_->isDbFileState(DbFileState::NoFile)) {
             data_->metaData.datetime[DateTimeStr::DateCreated] = "Created: " + format::currentDateTime();
         }
-        else if (data_->contains(FileStatus::FlagDbChanged)) {
+        else if (data_->contains(FileStatus::CombDbChanged)) {
             data_->metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + format::currentDateTime();
             data_->metaData.datetime[DateTimeStr::DateVerified].clear();
         }
@@ -358,7 +358,7 @@ void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatu
         if (status == FileStatus::New)
             clearChecksums(FileStatus::Added, rootIndex);
 
-        changeFilesStatus((FileStatus::FlagProcessing | FileStatus::Added), status, rootIndex);
+        changeFilesStatus((FileStatus::CombProcessing | FileStatus::Added), status, rootIndex);
     }
 }
 
@@ -420,11 +420,11 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
         const Numbers &num = data_->getNumbers(curIndex);
-        const bool containsAvailable = num.contains(FileStatus::FlagAvailable);
+        const bool containsAvailable = num.contains(FileStatus::CombAvailable);
 
         if (containsAvailable) {
             text = QString("Avail.: %1")
-                       .arg(format::filesNumberAndSize(num.numberOf(FileStatus::FlagAvailable), num.totalSize(FileStatus::FlagAvailable)));
+                       .arg(format::filesNumberAndSize(num.numberOf(FileStatus::CombAvailable), num.totalSize(FileStatus::CombAvailable)));
         }
 
         if (num.contains(FileStatus::Missing)) {

@@ -91,14 +91,14 @@ void DialogDbStatus::setTabsInfo()
     }
 
     // tab Verification
-    ui->tabWidget->setTabEnabled(TabVerification, data_->contains(FileStatus::FlagChecked));
-    if (data_->contains(FileStatus::FlagChecked)) {
+    ui->tabWidget->setTabEnabled(TabVerification, data_->contains(FileStatus::CombChecked));
+    if (data_->contains(FileStatus::CombChecked)) {
         ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         ui->labelVerification->setText(infoVerification().join('\n'));
     }
 
     // tab Result
-    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data_->contains(FileStatus::FlagDbChanged));
+    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data_->contains(FileStatus::CombDbChanged));
     if (ui->tabWidget->isTabEnabled(TabChanges)) {
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join('\n'));
@@ -114,9 +114,9 @@ QStringList DialogDbStatus::infoContent()
 
     QStringList contentNumbers;
     QString createdDataSize;
-    const int numChecksums = _num.numberOf(FileStatus::FlagHasChecksum);
-    const int available = _num.numberOf(FileStatus::FlagAvailable);
-    const qint64 totalSize = _num.totalSize(FileStatus::FlagAvailable);
+    const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
+    const int available = _num.numberOf(FileStatus::CombAvailable);
+    const qint64 totalSize = _num.totalSize(FileStatus::CombAvailable);
 
     if (isJustCreated())
         createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
@@ -159,8 +159,8 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const int available = data_->numbers.numberOf(FileStatus::FlagAvailable);
-    const int numChecksums = data_->numbers.numberOf(FileStatus::FlagHasChecksum);
+    const int available = data_->numbers.numberOf(FileStatus::CombAvailable);
+    const int numChecksums = data_->numbers.numberOf(FileStatus::CombHasChecksum);
 
     if (data_->isAllChecked()) {
         if (data_->contains(FileStatus::Mismatched)) {
@@ -173,12 +173,12 @@ QStringList DialogDbStatus::infoVerification()
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
     }
-    else if (data_->contains(FileStatus::FlagChecked)) {
+    else if (data_->contains(FileStatus::CombChecked)) {
         // to account for added and updated files, the total number in parentheses is used
         const int numAddedUpdated = data_->numbers.numberOf(FileStatus::Added | FileStatus::Updated);
 
         // info str
-        const int numChecked = data_->numbers.numberOf(FileStatus::FlagChecked);
+        const int numChecked = data_->numbers.numberOf(FileStatus::CombChecked);
         result.append(QString("%1%2 out of %3 files were checked")
                           .arg(numChecked)
                           .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numChecked + numAddedUpdated) : QString())
