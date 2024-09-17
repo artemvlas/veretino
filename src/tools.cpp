@@ -388,13 +388,13 @@ QString filesNumberAndSize(int number, qint64 filesSize)
     if (number == 0)
         return filesNumber(number);
 
-    return filesNumber(number) + QString(" (%1)").arg(dataSizeReadable(filesSize));
+    return filesNumber(number) % QLatin1Literal(" (") % dataSizeReadable(filesSize) % ')';
 }
 
 QString fileNameAndSize(const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
-    return QString("%1 (%2)").arg(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
+    return fileInfo.fileName() % QLatin1Literal(" (") % dataSizeReadable(fileInfo.size()) % ')';
 }
 
 QString fileItemStatus(FileStatus status)
