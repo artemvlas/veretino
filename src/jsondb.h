@@ -34,11 +34,15 @@ private:
     QString findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength = 4);
     bool isCanceled() const;
 
-    const QString strHeaderDateTime = "DateTime";
-    const QString strHeaderIgnored = "Ignored";
-    const QString strHeaderIncluded = "Included";
-    const QString strHeaderAlgo = "Hash Algorithm";
-    const QString strHeaderWorkDir = "WorkDir";
+    static const QString h_key_DateTime;
+    static const QString h_key_Ignored;
+    static const QString h_key_Included;
+    static const QString h_key_Algo;
+    static const QString h_key_WorkDir;
+    static const QString h_key_Flags;
+
+    static const QString h_key_Updated;
+    static const QString h_key_Verified;
 
     QString jsonFilePath;
     const ProcState *proc_ = nullptr;

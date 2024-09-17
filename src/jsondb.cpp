@@ -12,6 +12,16 @@
 #include <QDirIterator>
 #include <QElapsedTimer>
 
+const QString JsonDb::h_key_DateTime = "DateTime";
+const QString JsonDb::h_key_Ignored = "Ignored";
+const QString JsonDb::h_key_Included = "Included";
+const QString JsonDb::h_key_Algo = "Hash Algorithm";
+const QString JsonDb::h_key_WorkDir = "WorkDir";
+const QString JsonDb::h_key_Flags = "Flags";
+
+const QString JsonDb::h_key_Updated = "Updated";
+const QString JsonDb::h_key_Verified = "Verified";
+
 JsonDb::JsonDb(QObject *parent)
     : QObject(parent)
 {}
@@ -27,7 +37,7 @@ void JsonDb::setProcState(const ProcState *procState)
 
 bool JsonDb::isCanceled() const
 {
-    return proc_ && proc_->isCanceled();
+    return (proc_ && proc_->isCanceled());
 }
 
 QJsonDocument JsonDb::readJsonFile(const QString &filePath)
@@ -67,34 +77,34 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
-    const MetaData &meta = data->metaData;
-    const Numbers &numbers = DataContainer::getNumbers(data->model_, rootFolder);
+    const MetaData &_meta = data->metaData;
+    const Numbers &_numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
-    header[QStringLiteral(u"App/Origin")] = QString("%1 >> https://github.com/artemvlas/veretino").arg(APP_NAME_VERSION);
-    header[QStringLiteral(u"Folder")] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(meta.workDir);
-    header[strHeaderAlgo] = format::algoToStr(meta.algorithm);
-    header[QStringLiteral(u"Total Checksums")] = numbers.numberOf(FileStatus::CombHasChecksum);
-    header[QStringLiteral(u"Total Size")] = format::dataSizeReadableExt(numbers.totalSize(FileStatus::CombAvailable));
+    header[QStringLiteral(u"App/Origin")] = APP_NAME_VERSION + QStringLiteral(u" >> https://github.com/artemvlas/veretino");
+    header[QStringLiteral(u"Folder")] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(_meta.workDir);
+    header[QStringLiteral(u"Total Checksums")] = _numbers.numberOf(FileStatus::CombHasChecksum);
+    header[QStringLiteral(u"Total Size")] = format::dataSizeReadableExt(_numbers.totalSize(FileStatus::CombAvailable));
+    header[h_key_Algo] = format::algoToStr(_meta.algorithm);
 
     // DateTime
-    header[strHeaderDateTime] = QString("%1, %2, %3").arg(meta.datetime[DateTimeStr::DateCreated],
-                                                          meta.datetime[DateTimeStr::DateUpdated],
-                                                          meta.datetime[DateTimeStr::DateVerified]);
+    header[h_key_DateTime] = QString("%1, %2, %3").arg(_meta.datetime[DateTimeStr::DateCreated],
+                                                       _meta.datetime[DateTimeStr::DateUpdated],
+                                                       _meta.datetime[DateTimeStr::DateVerified]);
 
     // WorkDir
     if (!data->isWorkDirRelative() && !rootFolder.isValid())
-        header[strHeaderWorkDir] = meta.workDir;
+        header[h_key_WorkDir] = _meta.workDir;
 
     // Filter
     if (data->isFilterApplied()) {
-        QString _strFilterKey = meta.filter.isFilter(FilterRule::Include) ? strHeaderIncluded : strHeaderIgnored;
-        header[_strFilterKey] = meta.filter.extensionString();
+        const bool _inc = _meta.filter.isFilter(FilterRule::Include);
+        header[_inc ? h_key_Included : h_key_Ignored] = _meta.filter.extensionString();
     }
 
     // Flags (needs to be redone after expanding the flags list)
-    if (meta.flags)
-        header["Flags"] = "const";
+    if (_meta.flags)
+        header[h_key_Flags] = QStringLiteral(u"const");
 
     return header;
 }
@@ -109,7 +119,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     QJsonObject header = dbHeader(data, rootFolder);
 
-    emit setStatusbarText("Exporting data to json...");
+    emit setStatusbarText(QStringLiteral(u"Exporting data to json..."));
 
     QJsonObject storedData;
     QJsonArray unreadableFiles;
@@ -118,7 +128,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     while (iter.hasNext() && !isCanceled()) {
         iter.nextFile();
-        const QString &checksum = iter.checksum();
+        const QString checksum = iter.checksum();
         if (!checksum.isEmpty()) {
             storedData.insert(iter.path(rootFolder), checksum);
         }
@@ -129,7 +139,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     QJsonObject excludedFiles;
     if (unreadableFiles.size() > 0)
-        excludedFiles["Unreadable files"] = unreadableFiles;
+        excludedFiles[QStringLiteral(u"Unreadable files")] = unreadableFiles;
 
     QJsonArray mainArray;
     mainArray.append(header);
@@ -148,11 +158,11 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
                                                      : data->metaData.databaseFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
-        emit setStatusbarText("Saved");
+        emit setStatusbarText(QStringLiteral(u"Saved"));
         return pathToSave;
     }
     else {
-        header[strHeaderWorkDir] = rootFolder.isValid() ? paths::parentFolder(pathToSave) : data->metaData.workDir;
+        header[h_key_WorkDir] = rootFolder.isValid() ? paths::parentFolder(pathToSave) : data->metaData.workDir;
         mainArray[0] = header;
         doc.setArray(mainArray);
 
@@ -182,7 +192,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
-    emit setStatusbarText("Importing Json database...");
+    emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
 
     const QJsonObject &filelistData = mainArray.at(1).toObject();
 
@@ -199,13 +209,13 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     const QString &workDir = parsedData->metaData.workDir;
 
     // adding new files
-    emit setStatusbarText("Looking for new files...");
+    emit setStatusbarText(QStringLiteral(u"Looking for new files..."));
 
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString &_fullPath = it.next();
-        const QString &_relPath = paths::relativePath(workDir, _fullPath);
+        const QString _fullPath = it.next();
+        const QString _relPath = paths::relativePath(workDir, _fullPath);
 
         if (parsedData->metaData.filter.isFileAllowed(_relPath)
             && !filelistData.contains(_relPath))
@@ -218,10 +228,10 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     }
 
     // populating the main data
-    emit setStatusbarText("Parsing Json database...");
+    emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); !isCanceled() && i != filelistData.constEnd(); ++i) {
-        const QString &_fullPath = paths::joinPath(workDir, i.key());
+        const QString _fullPath = paths::joinPath(workDir, i.key());
         const bool _exist = QFileInfo::exists(_fullPath);
         qint64 _size = _exist ? QFileInfo(_fullPath).size() : -1;
         FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
@@ -235,11 +245,11 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     // additional data
     const QJsonObject &excludedFiles = (mainArray.size() > 2) ? mainArray.at(2).toObject() : QJsonObject();
     if (!excludedFiles.isEmpty()) {
-        if (excludedFiles.contains("Unreadable files")) {
-            const QJsonArray &unreadableFiles = excludedFiles.value("Unreadable files").toArray();
+        if (excludedFiles.contains(QStringLiteral(u"Unreadable files"))) {
+            const QJsonArray &unreadableFiles = excludedFiles.value(QStringLiteral(u"Unreadable files")).toArray();
 
             for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
-                const QString &_unrFile = unreadableFiles.at(var).toString();
+                const QString _unrFile = unreadableFiles.at(var).toString();
                 if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
                     parsedData->model_->add_file(_unrFile, FileValues(FileStatus::Unreadable));
                 }
@@ -264,64 +274,72 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
 MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header, const QJsonObject &fileList)
 {
-    MetaData metaData;
-    metaData.databaseFilePath = filePath;
-    metaData.dbFileState = MetaData::Saved;
+    MetaData _meta;
+    _meta.databaseFilePath = filePath;
+    _meta.dbFileState = MetaData::Saved;
 
     // [checking for files in the intended WorkDir]
-    const QString strWorkDir = findValueStr(header, strHeaderWorkDir);
+    const QString strWorkDir = findValueStr(header, h_key_WorkDir);
     const bool isSpecWorkDir = strWorkDir.contains('/') && (isPresentInWorkDir(strWorkDir, fileList)
                                                             || !isPresentInWorkDir(paths::parentFolder(filePath), fileList));
 
-    metaData.workDir = isSpecWorkDir ? strWorkDir : paths::parentFolder(filePath);
+    _meta.workDir = isSpecWorkDir ? strWorkDir : paths::parentFolder(filePath);
 
     // [filter rule]
-    const QString strIgnored = findValueStr(header, strHeaderIgnored);
-    const QString strIncluded = findValueStr(header, strHeaderIncluded);
+    const QString strIgnored = findValueStr(header, h_key_Ignored);
+    const QString strIncluded = findValueStr(header, h_key_Included);
 
     if (!strIgnored.isEmpty()) {
-        metaData.filter.setFilter(FilterRule::Ignore, strIgnored);
+        _meta.filter.setFilter(FilterRule::Ignore, strIgnored);
     }
     else if (!strIncluded.isEmpty()) {
-        metaData.filter.setFilter(FilterRule::Include, strIncluded);
+        _meta.filter.setFilter(FilterRule::Include, strIncluded);
     }
 
     // [algorithm]
     const QString strAlgo = findValueStr(header, QStringLiteral(u"Algo"));
     if (!strAlgo.isEmpty()) {
-        metaData.algorithm = tools::strToAlgo(strAlgo);
+        _meta.algorithm = tools::strToAlgo(strAlgo);
         //qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;
     }
     else {
-        metaData.algorithm = tools::algorithmByStrLen(fileList.begin().value().toString().length());
+        _meta.algorithm = tools::algorithmByStrLen(fileList.begin().value().toString().length());
         //qDebug() << "JsonDb::getMetaData | The algorithm is determined by the length of the checksum string:" << metaData.algorithm;
     }
 
     // [date]
     // compatibility with previous versions
-    static const QString _strUpdated = "Updated";
-    if (header.contains(_strUpdated)) {
-        metaData.datetime[DateTimeStr::DateUpdated] = QString("%1 %2").arg(_strUpdated, header.value(_strUpdated).toString());
-
-        static const QString _strVerified = "Verified";
-        if (header.contains(_strVerified))
-            metaData.datetime[DateTimeStr::DateVerified] = QString("%1 %2").arg(_strVerified, header.value(_strVerified).toString());
+    if (header.contains(h_key_Updated)) {
+        _meta.datetime[DateTimeStr::DateUpdated] = QString("%1: %2").arg(h_key_Updated, header.value(h_key_Updated).toString());
+        if (header.contains(h_key_Verified))
+            _meta.datetime[DateTimeStr::DateVerified] = QString("%1: %2").arg(h_key_Verified, header.value(h_key_Verified).toString());
     }
     else { // [datetime] version 0.4.0+
         const QString _strDateTime = findValueStr(header, QStringLiteral(u"time"));
         const QStringList &_dtList = _strDateTime.split(", ");
 
-        for (int i = 0; i < _dtList.size() && i < 3; ++i) {
-            metaData.datetime[i] = _dtList.at(i);
+        if (_dtList.size() == 3) {
+            for (int i = 0; i < _dtList.size(); ++i) { // && i < 3
+                _meta.datetime[i] = _dtList.at(i);
+            }
+        } else {
+            for (const QString &_dt : _dtList) {
+                if (_dt.startsWith('C'))
+                    _meta.datetime[DateTimeStr::DateCreated] = _dt;
+                else if (_dt.startsWith('U'))
+                    _meta.datetime[DateTimeStr::DateUpdated] = _dt;
+                else if (_dt.startsWith('V'))
+                    _meta.datetime[DateTimeStr::DateVerified] = _dt;
+            }
         }
     }
 
-    // [Flags]
-    const QString _strFlags = header.value(QStringLiteral(u"Flags")).toString();
+    // [flags]
+    const QString _strFlags = header.value(h_key_Flags).toString();
     if (_strFlags.contains(QStringLiteral(u"const")))
-        metaData.flags |= MetaData::FlagConst;
+        _meta.flags |= MetaData::FlagConst;
 
-    return metaData;
+    return _meta;
 }
 
 // checks if there is at least one file from the list (keys) in the folder (workDir)
