@@ -265,8 +265,10 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
         return approx ? QString("%1 min").arg(minutes)
                       : QString("%1 min %2 sec").arg(minutes).arg(seconds);
 
-    return (approx && seconds < 5) ? QString("few sec")
-                                   : QString("%1 sec").arg(seconds);
+    QString _few = (approx && seconds < 5) ? QStringLiteral(u"few")
+                                           : QString::number(seconds);
+
+    return _few + QStringLiteral(u" sec");
 }
 
 QString dataSizeReadable(const qint64 sizeBytes)
@@ -388,13 +390,13 @@ QString filesNumberAndSize(int number, qint64 filesSize)
     if (number == 0)
         return filesNumber(number);
 
-    return filesNumber(number) % QLatin1Literal(" (") % dataSizeReadable(filesSize) % ')';
+    return filesNumber(number) % QStringLiteral(u" (") % dataSizeReadable(filesSize) % ')';
 }
 
 QString fileNameAndSize(const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
-    return fileInfo.fileName() % QLatin1Literal(" (") % dataSizeReadable(fileInfo.size()) % ')';
+    return fileInfo.fileName() % QStringLiteral(u" (") % dataSizeReadable(fileInfo.size()) % ')';
 }
 
 QString fileItemStatus(FileStatus status)
