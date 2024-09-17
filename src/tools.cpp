@@ -254,21 +254,22 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
     int hours = minutes / 60;
     minutes = minutes % 60;
 
-    if (hours > 0)
+    if (hours > 0) {
         return approx ? QString("%1 h %2 min").arg(hours).arg(minutes)
                       : QString("%1 h %2 min %3 sec").arg(hours).arg(minutes).arg(seconds);
+    }
 
-    if (approx && minutes > 0 && seconds > 15)
-        return QString("%1 min").arg(minutes + 1);
+    if (approx && minutes > 0 && seconds > 15) {
+        return QString::number(minutes + 1) + QStringLiteral(u" min");
+    }
 
-    if (minutes > 0)
-        return approx ? QString("%1 min").arg(minutes)
+    if (minutes > 0) {
+        return approx ? QString::number(minutes) + QStringLiteral(u" min")
                       : QString("%1 min %2 sec").arg(minutes).arg(seconds);
+    }
 
-    QString _few = (approx && seconds < 5) ? QStringLiteral(u"few")
-                                           : QString::number(seconds);
-
-    return _few + QStringLiteral(u" sec");
+    return (approx && seconds < 5) ? QStringLiteral(u"few sec")
+                                   : QString::number(seconds) + QStringLiteral(u" sec");
 }
 
 QString dataSizeReadable(const qint64 sizeBytes)
