@@ -346,6 +346,11 @@ QString simplifiedChars(QString str)
     return str;
 }
 
+QString addStrInParentheses(const QString &str1, const QString &str2)
+{
+    return str1 % QStringLiteral(u" (") % str2 % ')';
+}
+
 QString composeDbFileName(const QString &prefix, const QString &folder, const QString &extension)
 {
     if (folder.isEmpty())
@@ -391,13 +396,13 @@ QString filesNumberAndSize(int number, qint64 filesSize)
     if (number == 0)
         return filesNumber(number);
 
-    return filesNumber(number) % QStringLiteral(u" (") % dataSizeReadable(filesSize) % ')';
+    return addStrInParentheses(filesNumber(number), dataSizeReadable(filesSize));
 }
 
 QString fileNameAndSize(const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
-    return fileInfo.fileName() % QStringLiteral(u" (") % dataSizeReadable(fileInfo.size()) % ')';
+    return addStrInParentheses(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
 }
 
 QString fileItemStatus(FileStatus status)
