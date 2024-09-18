@@ -55,7 +55,7 @@ void DialogDbStatus::setLabelsInfo()
     ui->labelWorkDir->setToolTip(data_->metaData.workDir);
 
     if (!data_->isWorkDirRelative())
-        ui->labelWorkDir->setText("WorkDir: Specified");
+        ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
     const QString (&dt)[3] = data_->metaData.datetime;
@@ -75,7 +75,7 @@ void DialogDbStatus::setTabsInfo()
     IconProvider icons(palette()); // to set tabs icons
 
     // tab Content
-    ui->labelContentNumbers->setStyleSheet("QLabel { font-family: monospace; }");
+    ui->labelContentNumbers->setStyleSheet(QStringLiteral(u"QLabel { font-family: monospace; }"));
     ui->labelContentNumbers->setText(infoContent().join('\n'));
     ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
@@ -110,7 +110,7 @@ void DialogDbStatus::setTabsInfo()
 QStringList DialogDbStatus::infoContent()
 {
     if (isCreating())
-        return { "The checksum list is being calculated..." };
+        return { QStringLiteral(u"The checksum list is being calculated...") };
 
     const Numbers &_num = data_->numbers;
 
@@ -127,7 +127,7 @@ QStringList DialogDbStatus::infoContent()
         contentNumbers.append(QString("Stored checksums: %1%2").arg(numChecksums).arg(createdDataSize));
 
     if (data_->contains(FileStatus::Unreadable))
-        contentNumbers.append("Unreadable files: " + _num.numberOf(FileStatus::Unreadable));
+        contentNumbers.append(QStringLiteral(u"Unreadable files: ") + QString::number(_num.numberOf(FileStatus::Unreadable)));
 
     if (isSavedToDesktop()) {
         contentNumbers.append(QString());
@@ -144,7 +144,7 @@ QStringList DialogDbStatus::infoContent()
         contentNumbers.append("NO FILES available to check");
 
     contentNumbers.append(QString());
-    contentNumbers.append("***");
+    contentNumbers.append(QStringLiteral(u"***"));
 
     //OLD: Files::itemInfo(data_->model_, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumberAndSize(_num.numberOf(FileStatus::New), _num.totalSize(FileStatus::New)));
@@ -152,7 +152,7 @@ QStringList DialogDbStatus::infoContent()
 
     if (data_->isImmutable()) {
         contentNumbers.append(QString());
-        contentNumbers.append("No changes are allowed");
+        contentNumbers.append(QStringLiteral(u"No changes are allowed"));
     }
 
     return contentNumbers;
@@ -190,7 +190,7 @@ QStringList DialogDbStatus::infoVerification()
         if (data_->contains(FileStatus::Mismatched))
             result.append(QString("%1 files MISMATCHED").arg(data_->numbers.numberOf(FileStatus::Mismatched)));
         else
-            result.append("No Mismatches found");
+            result.append(QStringLiteral(u"No Mismatches found"));
 
         if (data_->contains(FileStatus::Matched)) {
             const int numMatched = data_->numbers.numberOf(FileStatus::Matched);
@@ -208,14 +208,14 @@ QStringList DialogDbStatus::infoChanges()
     const Numbers &_num = data_->numbers;
     QStringList result;
 
-    if (data_->contains(FileStatus::Added)) // OLD: Files::itemInfo(data_->model_, FileStatus::Added)
+    if (data_->contains(FileStatus::Added))
         result.append(QStringLiteral(u"Added: ") + format::filesNumberAndSize(_num.numberOf(FileStatus::Added), _num.totalSize(FileStatus::Added)));
 
     if (data_->contains(FileStatus::Removed))
-        result.append(QString("Removed: %1").arg(_num.numberOf(FileStatus::Removed)));
+        result.append(QStringLiteral(u"Removed: ") + QString::number(_num.numberOf(FileStatus::Removed)));
 
     if (data_->contains(FileStatus::Updated))
-        result.append(QString("Updated: %1").arg(_num.numberOf(FileStatus::Updated)));
+        result.append(QStringLiteral(u"Updated: ") + QString::number(_num.numberOf(FileStatus::Updated)));
 
     return result;
 }
