@@ -396,7 +396,7 @@ void View::headerContextMenuRequested(const QPoint &point)
     }
 
     headerContextMenu->addSeparator();
-    headerContextMenu->addAction("Show all", this, &View::showAllColumns);
+    headerContextMenu->addAction(QStringLiteral(u"Show all"), this, &View::showAllColumns);
     headerContextMenu->exec(header()->mapToGlobal(point));
 }
 

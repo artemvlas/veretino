@@ -158,7 +158,7 @@ void DialogSettings::setComboBoxFpIndex()
 void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
 {
     FilterPreset preset = PresetCustom;
-    const QStringList &_ext = filter.extensionList();
+    const QStringList _ext = filter.extensionList();
 
     if (filter.isFilter(FilterRule::Include)) {
         if (_ext == listPresetDocuments)

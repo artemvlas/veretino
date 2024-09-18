@@ -47,6 +47,7 @@ public:
 
 private:
     QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;
+    static const QString _str_veretino;
 
 signals:
     void algorithmChanged();

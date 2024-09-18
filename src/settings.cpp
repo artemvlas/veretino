@@ -8,6 +8,8 @@
 #include <QSettings>
 #include <QDebug>
 
+const QString Settings::_str_veretino = "veretino";
+
 Settings::Settings(QObject *parent)
     : QObject{parent}
 {}
@@ -32,7 +34,7 @@ QString Settings::dbFileExtension() const
 
 QString Settings::dbFileExtension(bool isLong)
 {
-    return isLong ? ".ver.json" : ".ver";
+    return isLong ? QStringLiteral(u".ver.json") : QStringLiteral(u".ver");
 }
 
 void Settings::addRecentFile(const QString &filePath)
@@ -57,7 +59,7 @@ void Settings::clearRecentFiles()
 
 void Settings::saveSettings()
 {
-    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
+    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, _str_veretino, _str_veretino);
     qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
     if (lastFsPath) {
@@ -93,7 +95,7 @@ void Settings::saveSettings()
 
 void Settings::loadSettings()
 {
-    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, "veretino", "veretino");
+    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, _str_veretino, _str_veretino);
     qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
     if (lastFsPath) {

@@ -146,7 +146,7 @@ void Manager::createDataModel(const QString &dbFilePath)
         return;
     }
 
-    /*
+    /* OLD
     if (dataMaintainer->importJson(databaseFilePath)) {
         emit setViewData(dataMaintainer->data_);
     }
@@ -416,7 +416,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
-    emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? "Verifying" : "Calculating",
+    emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating"),
                                                     format::algoToStr(algo),
                                                     format::fileNameAndSize(filePath)));
 
@@ -475,7 +475,7 @@ int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
 
     // checking whether this is a Calculation or Verification process
     const FileStatus procStatus = (status & FileStatus::CombAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
-    const QString procStatusText = (procStatus == FileStatus::Verifying) ? "Verifying" : "Calculating";
+    const QString procStatusText = (procStatus == FileStatus::Verifying) ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
 
     // process
     TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
@@ -583,8 +583,8 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        const FileList &_flist = files_->getFileList(folderPath, FilterRule(false));
-        const QList<ExtNumSize> &_typesList = files_->getFileTypes(_flist, settings_->excludeUnpermitted);
+        const FileList _flist = files_->getFileList(folderPath, FilterRule(false));
+        const QList<ExtNumSize> _typesList = files_->getFileTypes(_flist, settings_->excludeUnpermitted);
 
         if (!_typesList.isEmpty()) {
             if (filterCreation)
@@ -600,7 +600,7 @@ void Manager::makeDbContentsList()
     if (!dataMaintainer->data_)
         return;
 
-    const QList<ExtNumSize> &_typesList = files_->getFileTypes(dataMaintainer->data_->model_);
+    const QList<ExtNumSize> _typesList = files_->getFileTypes(dataMaintainer->data_->model_);
 
     if (!_typesList.isEmpty())
         emit dbContentsListCreated(dataMaintainer->data_->metaData.workDir, _typesList);

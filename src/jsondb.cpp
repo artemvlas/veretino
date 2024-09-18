@@ -316,7 +316,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
     else { // [datetime] version 0.4.0+
         const QString _strDateTime = findValueStr(header, QStringLiteral(u"time"));
-        const QStringList &_dtList = _strDateTime.split(", ");
+        const QStringList _dtList = _strDateTime.split(", ");
 
         if (_dtList.size() == 3) {
             for (int i = 0; i < _dtList.size(); ++i) { // && i < 3
@@ -324,6 +324,9 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
             }
         } else {
             for (const QString &_dt : _dtList) {
+                if (_dt.isEmpty())
+                    continue;
+
                 if (_dt.startsWith('C'))
                     _meta.datetime[DateTimeStr::DateCreated] = _dt;
                 else if (_dt.startsWith('U'))

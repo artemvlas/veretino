@@ -74,7 +74,7 @@ TreeItem *TreeModel::add_folder(const QString &path)
     }
 
     TreeItem *parentItem = rootItem;
-    const QStringList &pathParts = path.split('/', Qt::SkipEmptyParts);
+    const QStringList pathParts = path.split('/', Qt::SkipEmptyParts);
 
     for (const QString &_subFolder : pathParts) {
         TreeItem *_ti = parentItem->findChild(_subFolder);
@@ -173,7 +173,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
         return QVariant();
 
-    const QVariant &_tiData = getItem(curIndex)->data(curIndex.column());
+    const QVariant _tiData = getItem(curIndex)->data(curIndex.column());
 
     if (_tiData.isValid() && role != RawDataRole) {
         if (curIndex.column() == ColumnSize)
