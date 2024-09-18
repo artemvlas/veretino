@@ -10,6 +10,25 @@
 
 const QString Settings::_str_veretino = "veretino";
 
+const QString Settings::s_key_algo = "algorithm";
+const QString Settings::s_key_dbPrefix = "dbPrefix";
+const QString Settings::s_key_restoreLastPath = "restoreLastPathOnStartup";
+const QString Settings::s_key_addWorkDir = "addWorkDirToFilename";
+const QString Settings::s_key_isLongExt = "isLongExtension";
+const QString Settings::s_key_saveVerifDate = "saveVerifDate";
+const QString Settings::s_key_dbFlagConst = "dbFlagConst";
+const QString Settings::s_key_instantSaving = "instantSaving";
+const QString Settings::s_key_excludeUnPerm = "excludeUnPerm";
+const QString Settings::s_key_filter_ignoreDbFiles = "filter/ignoreDbFiles";
+const QString Settings::s_key_filter_ignoreShaFiles = "filter/ignoreShaFiles";
+const QString Settings::s_key_filter_Mode = "filter/filterMode";
+const QString Settings::s_key_filter_ExtList = "filter/filterExtList";
+const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
+const QString Settings::s_key_history_recentDbFiles = "history/recentDbFiles";
+const QString Settings::s_key_view_geometry = "view/geometry";
+const QString Settings::s_key_view_columnStateFs = "view/columnStateFs";
+const QString Settings::s_key_view_columnStateDb = "view/columnStateDb";
+
 Settings::Settings(QObject *parent)
     : QObject{parent}
 {}
@@ -60,72 +79,72 @@ void Settings::clearRecentFiles()
 void Settings::saveSettings()
 {
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, _str_veretino, _str_veretino);
-    qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
+    // qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
     if (lastFsPath) {
-        storedSettings.setValue("history/lastFsPath", restoreLastPathOnStartup ? *lastFsPath : QString());
+        storedSettings.setValue(s_key_history_lastFsPath, restoreLastPathOnStartup ? *lastFsPath : QString());
     }
 
-    storedSettings.setValue("algorithm", algorithm_);
-    storedSettings.setValue("dbPrefix", dbPrefix);
-    storedSettings.setValue("restoreLastPathOnStartup", restoreLastPathOnStartup);
-    storedSettings.setValue("addWorkDirToFilename", addWorkDirToFilename);
-    storedSettings.setValue("isLongExtension", isLongExtension);
-    storedSettings.setValue("saveVerificationDateTime", saveVerificationDateTime);
-    storedSettings.setValue("dbFlagConst", dbFlagConst);
-    storedSettings.setValue("instantSaving", instantSaving);
-    storedSettings.setValue("excludeUnpermitted", excludeUnpermitted);
+    storedSettings.setValue(s_key_algo, algorithm_);
+    storedSettings.setValue(s_key_dbPrefix, dbPrefix);
+    storedSettings.setValue(s_key_restoreLastPath, restoreLastPathOnStartup);
+    storedSettings.setValue(s_key_addWorkDir, addWorkDirToFilename);
+    storedSettings.setValue(s_key_isLongExt, isLongExtension);
+    storedSettings.setValue(s_key_saveVerifDate, saveVerificationDateTime);
+    storedSettings.setValue(s_key_dbFlagConst, dbFlagConst);
+    storedSettings.setValue(s_key_instantSaving, instantSaving);
+    storedSettings.setValue(s_key_excludeUnPerm, excludeUnpermitted);
 
     // FilterRule
-    storedSettings.setValue("filter/ignoreDbFiles", filter.ignoreDbFiles);
-    storedSettings.setValue("filter/ignoreShaFiles", filter.ignoreShaFiles);
-    storedSettings.setValue("filter/filterMode", filter.mode());
-    storedSettings.setValue("filter/filterExtensionsList", filter.extensionList());
+    storedSettings.setValue(s_key_filter_ignoreDbFiles, filter.ignoreDbFiles);
+    storedSettings.setValue(s_key_filter_ignoreShaFiles, filter.ignoreShaFiles);
+    storedSettings.setValue(s_key_filter_Mode, filter.mode());
+    storedSettings.setValue(s_key_filter_ExtList, filter.extensionList());
 
     // recent files
-    storedSettings.setValue("history/recentDbFiles", recentFiles);
+    storedSettings.setValue(s_key_history_recentDbFiles, recentFiles);
 
     // geometry
-    storedSettings.setValue("view/geometry", geometryMainWindow);
+    storedSettings.setValue(s_key_view_geometry, geometryMainWindow);
 
     // TreeView header(columns) state
-    storedSettings.setValue("view/columnStateFs", headerStateFs);
-    storedSettings.setValue("view/columnStateDb", headerStateDb);
+    storedSettings.setValue(s_key_view_columnStateFs, headerStateFs);
+    storedSettings.setValue(s_key_view_columnStateDb, headerStateDb);
 }
 
 void Settings::loadSettings()
 {
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, _str_veretino, _str_veretino);
-    qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
+    // qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
     if (lastFsPath) {
-        *lastFsPath = storedSettings.value("history/lastFsPath").toString();
+        *lastFsPath = storedSettings.value(s_key_history_lastFsPath).toString();
     }
 
     Settings defaults;
-    algorithm_ = static_cast<QCryptographicHash::Algorithm>(storedSettings.value("algorithm", defaults.algorithm()).toInt());
-    dbPrefix = storedSettings.value("dbPrefix", defaults.dbPrefix).toString();
-    restoreLastPathOnStartup = storedSettings.value("restoreLastPathOnStartup", defaults.restoreLastPathOnStartup).toBool();
-    addWorkDirToFilename = storedSettings.value("addWorkDirToFilename", defaults.addWorkDirToFilename).toBool();
-    isLongExtension = storedSettings.value("isLongExtension", defaults.isLongExtension).toBool();
-    saveVerificationDateTime = storedSettings.value("saveVerificationDateTime", defaults.saveVerificationDateTime).toBool();
-    dbFlagConst = storedSettings.value("dbFlagConst", defaults.dbFlagConst).toBool();
-    instantSaving = storedSettings.value("instantSaving", defaults.instantSaving).toBool();
-    excludeUnpermitted = storedSettings.value("excludeUnpermitted", defaults.excludeUnpermitted).toBool();
+    algorithm_ = static_cast<QCryptographicHash::Algorithm>(storedSettings.value(s_key_algo, defaults.algorithm()).toInt());
+    dbPrefix = storedSettings.value(s_key_dbPrefix, defaults.dbPrefix).toString();
+    restoreLastPathOnStartup = storedSettings.value(s_key_restoreLastPath, defaults.restoreLastPathOnStartup).toBool();
+    addWorkDirToFilename = storedSettings.value(s_key_addWorkDir, defaults.addWorkDirToFilename).toBool();
+    isLongExtension = storedSettings.value(s_key_isLongExt, defaults.isLongExtension).toBool();
+    saveVerificationDateTime = storedSettings.value(s_key_saveVerifDate, defaults.saveVerificationDateTime).toBool();
+    dbFlagConst = storedSettings.value(s_key_dbFlagConst, defaults.dbFlagConst).toBool();
+    instantSaving = storedSettings.value(s_key_instantSaving, defaults.instantSaving).toBool();
+    excludeUnpermitted = storedSettings.value(s_key_excludeUnPerm, defaults.excludeUnpermitted).toBool();
 
     // FilterRule
-    filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value("filter/filterMode", FilterRule::NotSet).toInt()),
-                                storedSettings.value("filter/filterExtensionsList").toStringList());
-    filter.ignoreDbFiles = storedSettings.value("filter/ignoreDbFiles", defaults.filter.ignoreDbFiles).toBool();
-    filter.ignoreShaFiles = storedSettings.value("filter/ignoreShaFiles", defaults.filter.ignoreShaFiles).toBool();
+    filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value(s_key_filter_Mode, FilterRule::NotSet).toInt()),
+                                                            storedSettings.value(s_key_filter_ExtList).toStringList());
+    filter.ignoreDbFiles = storedSettings.value(s_key_filter_ignoreDbFiles, defaults.filter.ignoreDbFiles).toBool();
+    filter.ignoreShaFiles = storedSettings.value(s_key_filter_ignoreShaFiles, defaults.filter.ignoreShaFiles).toBool();
 
     // recent files
-    recentFiles = storedSettings.value("history/recentDbFiles").toStringList();
+    recentFiles = storedSettings.value(s_key_history_recentDbFiles).toStringList();
 
     // geometry
-    geometryMainWindow = storedSettings.value("view/geometry").toByteArray();
+    geometryMainWindow = storedSettings.value(s_key_view_geometry).toByteArray();
 
     // TreeView header(columns) state
-    headerStateFs = storedSettings.value("view/columnStateFs").toByteArray();
-    headerStateDb = storedSettings.value("view/columnStateDb").toByteArray();
+    headerStateFs = storedSettings.value(s_key_view_columnStateFs).toByteArray();
+    headerStateDb = storedSettings.value(s_key_view_columnStateDb).toByteArray();
 }
