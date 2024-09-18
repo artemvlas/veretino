@@ -75,6 +75,7 @@ void DialogDbStatus::setTabsInfo()
     IconProvider icons(palette()); // to set tabs icons
 
     // tab Content
+    ui->labelContentNumbers->setStyleSheet("QLabel { font-family: monospace; }");
     ui->labelContentNumbers->setText(infoContent().join('\n'));
     ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
@@ -83,11 +84,12 @@ void DialogDbStatus::setTabsInfo()
     if (data_->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
-        ui->labelFiltersInfo->setStyleSheet(format::coloredText(data_->metaData.filter.isFilter(FilterRule::Ignore)));
+        const FilterRule &_filter = data_->metaData.filter;
+        ui->labelFiltersInfo->setStyleSheet(format::coloredText(_filter.isFilter(FilterRule::Ignore)));
 
-        QString extensions = data_->metaData.filter.extensionString();
-        data_->metaData.filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText("Included:\n" + extensions)
-                                                             : ui->labelFiltersInfo->setText("Ignored:\n" + extensions);
+        const QString _ext = _filter.extensionString();
+        _filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText("Included:\n" + _ext)
+                                              : ui->labelFiltersInfo->setText("Ignored:\n" + _ext);
     }
 
     // tab Verification
