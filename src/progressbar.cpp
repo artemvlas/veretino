@@ -5,6 +5,7 @@
 */
 #include "progressbar.h"
 #include "tools.h"
+#include <QStringBuilder>
 
 ProgressBar::ProgressBar(QWidget *parent)
     : QProgressBar(parent)
@@ -32,7 +33,7 @@ void ProgressBar::setProgEnabled(bool enabled)
 {
     if (enabled) {
         resetFormat();
-        timer->start(1000);
+        timer->start(1000); // 1 sec
         elapsedTimer.start();
     }
     else {
@@ -47,10 +48,16 @@ void ProgressBar::updateProgressInfo()
 {
     if (procState_ && procState_->isStarted()) {
         updateDonePiece();
-        setFormat(QString("%p% | %1 | %2")
-                      .arg(progSpeed(), progTimeLeft()));
+
+        static const QString _perc("%p%");
+        static const QString _sep(" | ");
+        QString _format = _perc % _sep % progSpeed() % _sep % progTimeLeft();
+        setFormat(_format);
+
+        // setFormat(QString("%p% | %1 | %2").arg(progSpeed(), progTimeLeft()));
     }
     else {
+        finish();
         resetFormat();
     }
 }
@@ -74,7 +81,8 @@ QString ProgressBar::progTimeLeft()
 QString ProgressBar::progSpeed()
 {
     if (pieceTime_ > 0 && pieceSize_ > 0) {
-        return format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000) + QStringLiteral(u"/s");
+        QString _s = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);
+        return _s + QStringLiteral(u"/s");
     }
 
     return QStringLiteral(u"idle");
