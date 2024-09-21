@@ -8,10 +8,18 @@
 #include "tools.h"
 #include <QDebug>
 
+const QVector<QVariant> TreeModel::s_rootItemData = {
+    QStringLiteral(u"Name"),
+    QStringLiteral(u"Size"),
+    QStringLiteral(u"Status"),
+    QStringLiteral(u"Checksum"),
+    QStringLiteral(u"ReChecksum")
+};
+
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem({ "Name", "Size", "Status", "Checksum", "ReChecksum" });
+    rootItem = new TreeItem(s_rootItemData);
 }
 
 TreeModel::~TreeModel()

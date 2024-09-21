@@ -64,6 +64,7 @@ private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *add_folder(const QString &path);
 
+    static const QVector<QVariant> s_rootItemData;
     TreeItem *rootItem;
     IconProvider icons_;
     QHash<QString, TreeItem*> cacheFolderItems_;
