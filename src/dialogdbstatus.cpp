@@ -183,7 +183,7 @@ QStringList DialogDbStatus::infoVerification()
         const int numChecked = data_->numbers.numberOf(FileStatus::CombChecked);
         result.append(QString("%1%2 out of %3 files were checked")
                           .arg(numChecked)
-                          .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numChecked + numAddedUpdated) : QString())
+                          .arg(numAddedUpdated > 0 ? format::inParentheses(numChecked + numAddedUpdated) : QString())
                           .arg(available));
 
         result.append(QString());
@@ -196,7 +196,7 @@ QStringList DialogDbStatus::infoVerification()
             const int numMatched = data_->numbers.numberOf(FileStatus::Matched);
             result.append(QString("%1%2 files matched")
                               .arg(numMatched)
-                              .arg(numAddedUpdated > 0 ? QString("(%1)").arg(numMatched + numAddedUpdated) : QString()));
+                              .arg(numAddedUpdated > 0 ? format::inParentheses(numMatched + numAddedUpdated) : QString()));
         }
     }
 

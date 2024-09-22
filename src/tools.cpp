@@ -345,6 +345,16 @@ QString simplifiedChars(QString str)
     return str;
 }
 
+QString inParentheses(const int number)
+{
+    return inParentheses(QString::number(number));
+}
+
+QString inParentheses(const QString &str)
+{
+    return '(' % str % ')';
+}
+
 QString addStrInParentheses(const QString &str1, const QString &str2)
 {
     return str1 % QStringLiteral(u" (") % str2 % ')';
