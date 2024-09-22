@@ -13,6 +13,16 @@
 #include <QDebug>
 #include "files.h"
 
+const QStringList Lit::sl_db_exts = {
+    QStringLiteral(u"ver"),
+    QStringLiteral(u"ver.json")
+};
+const QStringList Lit::sl_digest_exts = {
+    QStringLiteral(u"sha1"),
+    QStringLiteral(u"sha256"),
+    QStringLiteral(u"sha512")
+};
+
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
 {
@@ -73,16 +83,16 @@ int digitsToNum(const QList<int> &digits)
 }
 
 bool isDatabaseFile(const QString &filePath) {
-    static const QStringList _exts = { "ver", "ver.json" };
+    //static const QStringList _exts = { "ver", "ver.json" };
 
-    return paths::hasExtension(filePath, _exts);
+    return paths::hasExtension(filePath, Lit::sl_db_exts);
 }
 
 bool isSummaryFile(const QString &filePath)
 {
-    static const QStringList _exts = { "sha1", "sha256", "sha512" };
+    //static const QStringList _exts = { "sha1", "sha256", "sha512" };
 
-    return paths::hasExtension(filePath, _exts);
+    return paths::hasExtension(filePath, Lit::sl_digest_exts);
 }
 
 bool canBeChecksum(const QString &str)

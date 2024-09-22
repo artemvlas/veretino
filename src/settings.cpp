@@ -7,6 +7,7 @@
 #include "settings.h"
 #include <QSettings>
 #include <QDebug>
+#include "tools.h"
 
 const QString Settings::_str_veretino = "veretino";
 
@@ -53,7 +54,7 @@ QString Settings::dbFileExtension() const
 
 QString Settings::dbFileExtension(bool isLong)
 {
-    return isLong ? QStringLiteral(u".ver.json") : QStringLiteral(u".ver");
+    return Lit::sl_db_exts.at(isLong ? 1 : 0); // "ver.json" : "ver";
 }
 
 void Settings::addRecentFile(const QString &filePath)

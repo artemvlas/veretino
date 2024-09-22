@@ -12,6 +12,11 @@
 #include <QPalette>
 #include "files.h"
 
+struct Lit { // Literals
+static const QStringList sl_db_exts;
+static const QStringList sl_digest_exts;
+}; // struct Lit
+
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo); // returns the length of checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
 QCryptographicHash::Algorithm algorithmByStrLen(int strLen); // ^vice versa

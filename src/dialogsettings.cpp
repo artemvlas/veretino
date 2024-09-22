@@ -134,7 +134,7 @@ QStringList DialogSettings::extensionsList() const
 void DialogSettings::updateLabelDatabaseFilename()
 {
     QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
-    QString folderName = ui->cbAddFolderName->isChecked() ? "@FolderName" : QString();
+    QString folderName = ui->cbAddFolderName->isChecked() ? QStringLiteral(u"@FolderName") : QString();
     QString extension = defaults.dbFileExtension(ui->rbExtVerJson->isChecked());
 
     ui->labelDatabaseFilename->setText(format::composeDbFileName(prefix, folderName, extension));
@@ -147,7 +147,7 @@ void DialogSettings::restoreDefaults()
 
 void DialogSettings::setExtensionsColor()
 {
-    ui->inputExtensions->setStyleSheet(format::coloredText("QLineEdit", ui->radioButtonIgnore->isChecked()));
+    ui->inputExtensions->setStyleSheet(format::coloredText(QStringLiteral(u"QLineEdit"), ui->radioButtonIgnore->isChecked()));
 }
 
 void DialogSettings::setComboBoxFpIndex()
@@ -246,9 +246,9 @@ void DialogSettings::cleanUpExtList()
         QStringList list;
         if (!ui->rbInclude->isChecked()) {
             if (ui->ignoreShaFiles->isChecked())
-                list.append({ "sha1", "sha256", "sha512" });
+                list.append(Lit::sl_digest_exts); // { "sha1", "sha256", "sha512" }
             if (ui->ignoreDbFiles->isChecked())
-                list.append({ "ver", "ver.json" });
+                list.append(Lit::sl_db_exts); // { "ver", "ver.json" }
         }
 
         if (!list.isEmpty()) {
