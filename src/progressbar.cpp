@@ -6,6 +6,7 @@
 #include "progressbar.h"
 #include "tools.h"
 #include <QStringBuilder>
+#include <QDebug>
 
 ProgressBar::ProgressBar(QWidget *parent)
     : QProgressBar(parent)
@@ -46,7 +47,7 @@ void ProgressBar::setProgEnabled(bool enabled)
 
 void ProgressBar::updateProgressInfo()
 {
-    if (procState_ && procState_->isStarted()) {
+    if (procState_ && procState_->isState(State::StartVerbose)) {
         updateDonePiece();
 
         static const QString _perc("%p%");
@@ -54,11 +55,15 @@ void ProgressBar::updateProgressInfo()
         QString _format = _perc % _sep % progSpeed() % _sep % progTimeLeft();
         setFormat(_format);
 
+        // OLD
         // setFormat(QString("%p% | %1 | %2").arg(progSpeed(), progTimeLeft()));
     }
     else {
         finish();
         resetFormat();
+
+        if (procState_)
+            qDebug() << "<!> ProgressBar >> wrong state:" << procState_->state();
     }
 }
 
@@ -68,7 +73,7 @@ void ProgressBar::updateDonePiece()
     pieceSize_ = procState_->donePieceSize();
 }
 
-QString ProgressBar::progTimeLeft()
+QString ProgressBar::progTimeLeft() const
 {
     if (pieceSize_ > 0) {
         qint64 timeleft = (procState_->remainingSize() / pieceSize_) * pieceTime_;
@@ -78,7 +83,7 @@ QString ProgressBar::progTimeLeft()
     return QStringLiteral(u"∞");
 }
 
-QString ProgressBar::progSpeed()
+QString ProgressBar::progSpeed() const
 {
     if (pieceTime_ > 0 && pieceSize_ > 0) {
         QString _s = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);

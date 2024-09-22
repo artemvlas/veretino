@@ -26,8 +26,8 @@ private:
     void setProgEnabled(bool enabled);
     void updateProgressInfo();
     void updateDonePiece();
-    QString progTimeLeft();
-    QString progSpeed();
+    QString progTimeLeft() const;
+    QString progSpeed() const;
 
     const ProcState *procState_ = nullptr;
     QTimer *timer = new QTimer(this);
