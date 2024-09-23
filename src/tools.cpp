@@ -275,7 +275,7 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
     }
 
     if (approx && minutes > 0 && seconds > 15) {
-        return tools::joinStrings(minutes + 1, QStringLiteral(u"min"));
+        return tools::joinStrings(++minutes, QStringLiteral(u"min"));
     }
 
     if (minutes > 0) {
@@ -290,7 +290,7 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
 QString dataSizeReadable(const qint64 sizeBytes)
 {
     if (sizeBytes <= 1000)
-        return QString::number(sizeBytes) + QStringLiteral(u" bytes");
+        return tools::joinStrings((int)sizeBytes, QStringLiteral(u"bytes"));
 
     long double converted = sizeBytes;
     int it = 0; // number of divisions
@@ -355,8 +355,8 @@ QString simplifiedChars(QString str)
         }
     }
 
-    while (str.contains("__"))
-        str.replace("__", "_");
+    while (str.contains(QStringLiteral(u"__")))
+        str.replace(QStringLiteral(u"__"), QStringLiteral(u"_"));
 
     return str;
 }
@@ -391,11 +391,11 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 {
     switch (algo) {
         case QCryptographicHash::Sha1:
-            return capitalLetters ? "SHA-1" : "sha1";
+            return capitalLetters ? "SHA-1" : Lit::sl_digest_exts.at(0);
         case QCryptographicHash::Sha256:
-            return capitalLetters ? "SHA-256" : "sha256";
+            return capitalLetters ? "SHA-256" : Lit::sl_digest_exts.at(1);
         case QCryptographicHash::Sha512:
-            return capitalLetters ? "SHA-512" : "sha512";
+            return capitalLetters ? "SHA-512" : Lit::sl_digest_exts.at(2);
         default:
             return "Unknown";
     }
