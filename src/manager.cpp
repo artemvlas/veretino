@@ -325,7 +325,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     }
 
     // main job
-    calculateChecksums(folderItemIndex, FileStatus::NotChecked);
+    calculateChecksums(FileStatus::NotChecked, folderItemIndex);
 
     if (procState->isCanceled())
         return;
@@ -436,12 +436,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return checkSum;
 }
 
-int Manager::calculateChecksums(FileStatus status)
-{
-    return calculateChecksums(QModelIndex(), status);
-}
-
-int Manager::calculateChecksums(const QModelIndex &rootIndex, FileStatus status)
+int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 {
     if (!dataMaintainer->data_
         || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_))

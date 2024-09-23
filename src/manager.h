@@ -74,8 +74,7 @@ private:
     QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
 
-    int calculateChecksums(FileStatus status);
-    int calculateChecksums(const QModelIndex &rootIndex, FileStatus status);
+    int calculateChecksums(FileStatus status, const QModelIndex &rootIndex = QModelIndex());
 
     // variables
     bool isViewFileSysytem;
