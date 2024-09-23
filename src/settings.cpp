@@ -54,7 +54,7 @@ QString Settings::dbFileExtension() const
 
 QString Settings::dbFileExtension(bool isLong)
 {
-    return Lit::sl_db_exts.at(isLong ? 1 : 0); // "ver.json" : "ver";
+    return Lit::sl_db_exts.at(isLong ? 0 : 1); // "ver.json" : "ver";
 }
 
 void Settings::addRecentFile(const QString &filePath)

@@ -15,6 +15,10 @@
 struct Lit { // Literals
 static const QStringList sl_db_exts;
 static const QStringList sl_digest_exts;
+static const QString s_webpage;
+static const QString s_appName;
+static const QString s_appNameVersion;
+static const QString s_sepStick;
 }; // struct Lit
 
 namespace tools {
@@ -28,6 +32,7 @@ bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &str);
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
+QString joinStrings(int num, const QString &str); // --> "X str"
 } // namespace tools
 
 namespace paths {

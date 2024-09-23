@@ -14,14 +14,18 @@
 #include "files.h"
 
 const QStringList Lit::sl_db_exts = {
-    QStringLiteral(u"ver"),
-    QStringLiteral(u"ver.json")
+    QStringLiteral(u"ver.json"),
+    QStringLiteral(u"ver")
 };
 const QStringList Lit::sl_digest_exts = {
     QStringLiteral(u"sha1"),
     QStringLiteral(u"sha256"),
     QStringLiteral(u"sha512")
 };
+const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
+const QString Lit::s_appName = QStringLiteral(APP_NAME);
+const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
+const QString Lit::s_sepStick = QStringLiteral(u" | ");
 
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
@@ -82,16 +86,13 @@ int digitsToNum(const QList<int> &digits)
     return number;
 }
 
-bool isDatabaseFile(const QString &filePath) {
-    //static const QStringList _exts = { "ver", "ver.json" };
-
+bool isDatabaseFile(const QString &filePath)
+{
     return paths::hasExtension(filePath, Lit::sl_db_exts);
 }
 
 bool isSummaryFile(const QString &filePath)
 {
-    //static const QStringList _exts = { "sha1", "sha256", "sha512" };
-
     return paths::hasExtension(filePath, Lit::sl_digest_exts);
 }
 
@@ -126,6 +127,11 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
         return str1 + str2;
 
     return str1 % sep % str2;
+}
+
+QString joinStrings(int num, const QString &str)
+{
+    return QString::number(num) % ' ' % str;
 }
 } // namespace tools
 
@@ -269,16 +275,16 @@ QString millisecToReadable(qint64 milliseconds, bool approx)
     }
 
     if (approx && minutes > 0 && seconds > 15) {
-        return QString::number(minutes + 1) + QStringLiteral(u" min");
+        return tools::joinStrings(minutes + 1, QStringLiteral(u"min"));
     }
 
     if (minutes > 0) {
-        return approx ? QString::number(minutes) + QStringLiteral(u" min")
+        return approx ? tools::joinStrings(minutes, QStringLiteral(u"min"))
                       : QString("%1 min %2 sec").arg(minutes).arg(seconds);
     }
 
     return (approx && seconds < 5) ? QStringLiteral(u"few sec")
-                                   : QString::number(seconds) + QStringLiteral(u" sec");
+                                   : tools::joinStrings(seconds, QStringLiteral(u"sec"));
 }
 
 QString dataSizeReadable(const qint64 sizeBytes)
@@ -405,9 +411,9 @@ QString filesNumber(int number)
     if (number == 0)
         return QStringLiteral(u"no files");
 
-    const QString files = (number == 1) ? QStringLiteral(u" file") : QStringLiteral(u" files");
+    const QString _files = (number == 1) ? QStringLiteral(u"file") : QStringLiteral(u"files");
 
-    return QString::number(number) + files;
+    return tools::joinStrings(number, _files);
 }
 
 QString filesNumberAndSize(int number, qint64 filesSize)

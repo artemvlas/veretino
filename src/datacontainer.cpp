@@ -53,7 +53,7 @@ QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool exis
     const Settings defaults;
     QString folderName = subfolder.data().toString();
     QString folderPath = itemAbsolutePath(subfolder);
-    const bool isLongExtension = !paths::hasExtension(metaData.databaseFilePath, Lit::sl_db_exts.first()); // !metaData.databaseFilePath.endsWith(".ver");
+    const bool isLongExtension = paths::hasExtension(metaData.databaseFilePath, Lit::sl_db_exts.first());
 
     QString extension = defaults.dbFileExtension(isLongExtension);
     QString fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);

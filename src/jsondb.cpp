@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include "treemodeliterator.h"
 #include <QDirIterator>
+#include <QStringBuilder>
 #include <QElapsedTimer>
 
 const QString JsonDb::h_key_DateTime = "DateTime";
@@ -81,7 +82,8 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     const Numbers &_numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
-    header[QStringLiteral(u"App/Origin")] = APP_NAME_VERSION + QStringLiteral(u" >> https://github.com/artemvlas/veretino");
+    static const QString _app_origin = Lit::s_appNameVersion % QStringLiteral(u" >> ") % Lit::s_webpage;
+    header[QStringLiteral(u"App/Origin")] = _app_origin;
     header[QStringLiteral(u"Folder")] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(_meta.workDir);
     header[QStringLiteral(u"Total Checksums")] = _numbers.numberOf(FileStatus::CombHasChecksum);
     header[QStringLiteral(u"Total Size")] = format::dataSizeReadableExt(_numbers.totalSize(FileStatus::CombAvailable));

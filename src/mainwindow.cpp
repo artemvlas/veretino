@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QStringBuilder>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -223,7 +224,7 @@ void MainWindow::showFilterCreationDialog(const QString &folderName, const QList
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
-        dialog.setWindowTitle("File types to work with...");
+        dialog.setWindowTitle(QStringLiteral(u"File types to work with..."));
         dialog.setFilterCreation(DialogContentsList::FC_Enabled);
         FilterRule filter;
 
@@ -423,7 +424,9 @@ void MainWindow::updatePermanentStatus()
 
 void MainWindow::setWinTitleMismatchFound()
 {
-    setWindowTitle(QString("%1 | <!> mismatches found").arg(APP_NAME));
+    setWindowTitle(Lit::s_appName
+                   % Lit::s_sepStick
+                   % QStringLiteral(u"<!> mismatches found"));
 }
 
 void MainWindow::updateWindowTitle()
@@ -436,13 +439,15 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        QString str = data->isAllMatched() ? "✓ verified"
-                                           : "DB > " + paths::shortenPath(data->metaData.workDir);
+        QString str = data->isAllMatched() ? QStringLiteral(u"✓ verified")
+                                           : QStringLiteral(u"DB > ") + paths::shortenPath(data->metaData.workDir);
 
-        setWindowTitle(QString("%1 | %2").arg(APP_NAME, str));
+        setWindowTitle(Lit::s_appName
+                       % Lit::s_sepStick
+                       % str);
     }
     else {
-        setWindowTitle(APP_NAME);
+        setWindowTitle(Lit::s_appName);
     }
 }
 

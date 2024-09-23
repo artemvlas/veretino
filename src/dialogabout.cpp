@@ -6,6 +6,7 @@
 #include "dialogabout.h"
 #include "ui_dialogabout.h"
 #include "iconprovider.h"
+#include "tools.h"
 
 DialogAbout::DialogAbout(QWidget *parent) :
     QDialog(parent),
@@ -24,8 +25,8 @@ DialogAbout::DialogAbout(QWidget *parent) :
                                     "<br>Free and open-source software"
                                     "<br>GNU General Public License v3"
                                     "<br>"
-                                    "<br>Home Page: <a href='https://github.com/artemvlas/veretino'>GitHub</a>")
-                                .arg(APP_NAME_VERSION, __DATE__, qVersion()));
+                                    "<br>Home Page: <a href='%4'>GitHub</a>")
+                                .arg(Lit::s_appNameVersion, __DATE__, qVersion(), Lit::s_webpage));
 
     ui->labelAuthor->setAlignment(Qt::AlignCenter);
     ui->labelAuthor->setTextFormat(Qt::RichText);

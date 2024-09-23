@@ -248,7 +248,7 @@ void DialogSettings::cleanUpExtList()
             if (ui->ignoreShaFiles->isChecked())
                 list.append(Lit::sl_digest_exts); // { "sha1", "sha256", "sha512" }
             if (ui->ignoreDbFiles->isChecked())
-                list.append(Lit::sl_db_exts); // { "ver", "ver.json" }
+                list.append(Lit::sl_db_exts); // { "ver.json", "ver" }
         }
 
         if (!list.isEmpty()) {

@@ -10,7 +10,7 @@
 StatusBar::StatusBar(QWidget *parent)
     : QStatusBar(parent)
 {
-    setStyleSheet("QWidget { margin: 0; }");
+    setStyleSheet(QStringLiteral(u"QWidget { margin: 0; }"));
     statusTextLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
     statusIconLabel->setContentsMargins(5, 0, 0, 0);
     statusTextLabel->setContentsMargins(0, 0, 30, 0);
