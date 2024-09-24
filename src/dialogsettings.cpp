@@ -119,7 +119,7 @@ QStringList DialogSettings::extensionsList() const
 
     QString _inputed = ui->inputExtensions->text().toLower();
     _inputed.remove('*');
-    _inputed.replace(" .", " ");
+    _inputed.replace(" ."," ");
     _inputed.replace(' ',',');
 
     if (_inputed.startsWith('.'))
@@ -179,7 +179,8 @@ void DialogSettings::setComboBoxFpIndex(const FilterRule &filter)
 
 void DialogSettings::setFilterRule(const FilterRule &filter)
 {
-    ui->inputExtensions->setText(filter.extensionString(" "));
+    const QString _exts = filter.extensionString(QStringLiteral(u" "));
+    ui->inputExtensions->setText(_exts);
     filter.isFilter(FilterRule::Include) ? ui->rbInclude->setChecked(true) : ui->radioButtonIgnore->setChecked(true);
 
     ui->ignoreDbFiles->setChecked(filter.ignoreDbFiles);
@@ -220,8 +221,9 @@ FilterRule DialogSettings::getCurrentFilter() const
     curFilter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
 
     if (!ui->inputExtensions->text().isEmpty()) {
-        ui->radioButtonIgnore->isChecked() ? curFilter.setFilter(FilterRule::Ignore, extensionsList())
-                                           : curFilter.setFilter(FilterRule::Include, extensionsList());
+        FilterMode _mode = ui->radioButtonIgnore->isChecked() ? FilterMode::Ignore
+                                                              : FilterMode::Include;
+        curFilter.setFilter(_mode, extensionsList());
     }
 
     return curFilter;
