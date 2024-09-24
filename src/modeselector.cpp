@@ -78,8 +78,8 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
 
     // both
-    connect(menuAct_->actionCopyFile, &QAction::triggered, this, &ModeSelector::copyItemPath);
-    connect(menuAct_->actionCopyFolder, &QAction::triggered, this, &ModeSelector::copyItemPath);
+    connect(menuAct_->actionCopyFile, &QAction::triggered, this, &ModeSelector::copyFsItem);
+    connect(menuAct_->actionCopyFolder, &QAction::triggered, this, &ModeSelector::copyFsItem);
 
     // Algorithm selection
     connect(menuAct_->actionSetAlgoSha1, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha1); });
@@ -340,7 +340,7 @@ void ModeSelector::checkFileByClipboardChecksum()
     checkFile(view_->curPathFileSystem, QGuiApplication::clipboard()->text());
 }
 
-void ModeSelector::copyItemPath()
+void ModeSelector::copyFsItem()
 {
     QString itemPath = view_->curAbsPath();
 
