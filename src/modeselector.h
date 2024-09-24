@@ -86,7 +86,7 @@ public:
     void promptItemFileUpd();
     void showFolderContentTypes();
     void checkFileByClipboardChecksum();
-    void copyItem();
+    void copyItemPath();
 
     IconProvider iconProvider;
     MenuActions *menuAct_ = new MenuActions(this);

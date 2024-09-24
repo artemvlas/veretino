@@ -171,6 +171,17 @@ void View::setMismatchFiltering(const Numbers &num)
     }
 }
 
+QString View::curAbsPath()
+{
+    if (isViewFileSystem())
+        return fileSystem->filePath(curIndexFileSystem);
+
+    if (isViewDatabase())
+        return data_->itemAbsolutePath(curIndexSource);
+
+    return QString();
+}
+
 void View::changeCurIndexAndPath(const QModelIndex &curIndex)
 {
     if (isViewFileSystem()) {

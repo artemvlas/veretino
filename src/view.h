@@ -34,6 +34,7 @@ public:
     bool isViewDatabase();
     bool isViewFiltered();
     bool isViewFiltered(const FileStatus status);
+    QString curAbsPath();
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;

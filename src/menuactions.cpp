@@ -77,6 +77,9 @@ void MenuActions::setActionsIcons()
     menuAlgo->menuAction()->setIcon(iconProvider.icon(Icons::DoubleGear));
     menuCreateDigest->menuAction()->setIcon(iconProvider.icon(Icons::Save));
 
+    actionCopyFile->setIcon(iconProvider.icon(Icons::Copy));
+    actionCopyFolder->setIcon(iconProvider.icon(Icons::Copy));
+
     // DB Model View
     actionCancelBackToFS->setIcon(iconProvider.icon(Icons::ProcessAbort));
     actionShowDbStatus->setIcon(iconProvider.icon(Icons::Database));
@@ -94,7 +97,6 @@ void MenuActions::setActionsIcons()
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
     actionCopyStoredChecksum->setIcon(iconProvider.icon(Icons::Copy));
     actionCopyReChecksum->setIcon(iconProvider.icon(Icons::Copy));
-    actionCopyItem->setIcon(iconProvider.icon(Icons::Copy));
     actionBranchMake->setIcon(iconProvider.icon(Icons::AddFork));
     actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
     actionUpdFileAdd->setIcon(iconProvider.icon(FileStatus::Added));

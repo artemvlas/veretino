@@ -81,7 +81,6 @@ public:
     QAction *actionCheckAll = new QAction("Check ALL available files", this);
     QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
     QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
-    QAction *actionCopyItem = new QAction("Copy", this);
     QAction *actionExportSum = new QAction("Export to *.sha", this);
 
     QAction *actionUpdFileAdd = new QAction("Add to DB", this);
@@ -90,6 +89,9 @@ public:
 
     QAction *actionCollapseAll = new QAction("Collapse all", this);
     QAction *actionExpandAll = new QAction("Expand all", this);
+
+    QAction *actionCopyFile = new QAction("Copy File", this);
+    QAction *actionCopyFolder = new QAction("Copy Folder", this);
 
     // Algorithm selection
     QAction *actionSetAlgoSha1 = new QAction("SHA-1", this);

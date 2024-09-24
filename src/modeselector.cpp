@@ -67,7 +67,6 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
     connect(menuAct_->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
     connect(menuAct_->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
-    connect(menuAct_->actionCopyItem, &QAction::triggered, this, &ModeSelector::copyItem);
     connect(menuAct_->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
     connect(menuAct_->actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
     connect(menuAct_->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
@@ -77,6 +76,10 @@ void ModeSelector::connectActions()
 
     connect(menuAct_->actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
+
+    // both
+    connect(menuAct_->actionCopyFile, &QAction::triggered, this, &ModeSelector::copyItemPath);
+    connect(menuAct_->actionCopyFolder, &QAction::triggered, this, &ModeSelector::copyItemPath);
 
     // Algorithm selection
     connect(menuAct_->actionSetAlgoSha1, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha1); });
@@ -337,15 +340,15 @@ void ModeSelector::checkFileByClipboardChecksum()
     checkFile(view_->curPathFileSystem, QGuiApplication::clipboard()->text());
 }
 
-void ModeSelector::copyItem()
+void ModeSelector::copyItemPath()
 {
-    if (!view_->isViewDatabase() || !view_->curIndexSource.isValid())
-        return;
+    QString itemPath = view_->curAbsPath();
 
-    QString itemPath = view_->data_->itemAbsolutePath(view_->curIndexSource);
-    QMimeData* mimeData = new QMimeData();
-    mimeData->setUrls({ QUrl::fromLocalFile(itemPath) });
-    QGuiApplication::clipboard()->setMimeData(mimeData);
+    if (!itemPath.isEmpty()) {
+        QMimeData* mimeData = new QMimeData();
+        mimeData->setUrls({ QUrl::fromLocalFile(itemPath) });
+        QGuiApplication::clipboard()->setMimeData(mimeData);
+    }
 }
 
 void ModeSelector::showFileSystem(const QString &path)
@@ -691,6 +694,7 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
     else if (index.isValid()) {
         if (isMode(Folder)) {
             viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
+            viewContextMenu->addAction(menuAct_->actionCopyFolder);
             viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
             viewContextMenu->addSeparator();
 
@@ -700,13 +704,15 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
             viewContextMenu->addAction(menuAct_->actionProcessChecksumsCustomFilter);
         }
         else if (isMode(File)) {
-            viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
+            viewContextMenu->addAction(menuAct_->actionCopyFile);
             viewContextMenu->addAction(menuAct_->actionProcessSha_toClipboard);
+            viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
             viewContextMenu->addMenu(menuAct_->menuCreateDigest);
 
             QString clipboardText = QGuiApplication::clipboard()->text();
             if (tools::canBeChecksum(clipboardText)) {
-                menuAct_->actionCheckFileByClipboardChecksum->setText("Check the file by checksum: " + format::shortenString(clipboardText, 20));
+                QString _s = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(clipboardText, 20);
+                menuAct_->actionCheckFileByClipboardChecksum->setText(_s);
                 viewContextMenu->addSeparator();
                 viewContextMenu->addAction(menuAct_->actionCheckFileByClipboardChecksum);
             }
@@ -797,17 +803,14 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 // Available file item
                 if (TreeModel::hasStatus(FileStatus::CombAvailable, index)) {
                     viewContextMenu->addAction(menuAct_->actionExportSum);
-
-                    menuAct_->actionCopyItem->setText("Copy File");
-                    viewContextMenu->addAction(menuAct_->actionCopyItem);
+                    viewContextMenu->addAction(menuAct_->actionCopyFile);
 
                     viewContextMenu->addAction(menuAct_->actionCheckCurFileFromModel);
                 }
             }
             // Folder item
             else if (TreeModel::contains(FileStatus::CombAvailable, index)) {
-                menuAct_->actionCopyItem->setText("Copy Folder");
-                viewContextMenu->addAction(menuAct_->actionCopyItem);
+                viewContextMenu->addAction(menuAct_->actionCopyFolder);
 
                 if (!view_->data_->getBranchFilePath(index, true).isEmpty())
                     viewContextMenu->addAction(menuAct_->actionBranchOpen);
