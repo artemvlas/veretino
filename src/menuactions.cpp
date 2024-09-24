@@ -91,7 +91,7 @@ void MenuActions::setActionsIcons()
     actionDbClearLost->setIcon(iconProvider.icon(FileStatus::Removed));
     actionFilterNewLost->setIcon(iconProvider.icon(Icons::NewFile));
     actionFilterMismatches->setIcon(iconProvider.icon(Icons::DocClose));
-    actionFilterUnreadable->setIcon(iconProvider.icon(FileStatus::Unreadable));
+    actionFilterUnreadable->setIcon(iconProvider.icon(FileStatus::ReadError));
     actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
     actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));

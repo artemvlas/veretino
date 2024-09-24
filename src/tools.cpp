@@ -441,10 +441,11 @@ QString fileItemStatus(FileStatus status)
     case FileStatus::Mismatched: return QStringLiteral(u"not match");
     case FileStatus::New: return QStringLiteral(u"new file");
     case FileStatus::Missing: return QStringLiteral(u"missing");
-    case FileStatus::Unreadable: return QStringLiteral(u"unreadable");
     case FileStatus::Added: return QStringLiteral(u"added");
     case Files::Removed: return QStringLiteral(u"removed");
     case FileStatus::Updated: return QStringLiteral(u"updated");
+    case FileStatus::UnPermitted: return QStringLiteral(u"no permissions");
+    case FileStatus::ReadError: return QStringLiteral(u"read error");
     default: return "unknown";
     }
 }

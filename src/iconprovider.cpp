@@ -38,7 +38,7 @@ IconProvider::Theme IconProvider::theme() const
 
 QString IconProvider::themeFolder() const
 {
-    return (theme_ == Dark) ? "dark" : "light";
+    return (theme_ == Dark) ? QStringLiteral(u"dark") : QStringLiteral(u"light");
 }
 
 QString IconProvider::svgFilePath(FileStatus status) const
@@ -47,46 +47,46 @@ QString IconProvider::svgFilePath(FileStatus status) const
 
     switch (status) {
     case FileStatus::Queued:
-        iconFileName = "queued";
+        iconFileName = QStringLiteral(u"queued");
         break;
     case FileStatus::Calculating:
-        iconFileName = "processing";
+        iconFileName = QStringLiteral(u"processing");
         break;
     case FileStatus::Verifying:
-        iconFileName = "processing";
+        iconFileName = QStringLiteral(u"processing");
         break;
     case FileStatus::NotChecked:
-        iconFileName = "notchecked";
+        iconFileName = QStringLiteral(u"notchecked");
         break;
     case FileStatus::Matched:
-        iconFileName = "matched";
+        iconFileName = QStringLiteral(u"matched");
         break;
     case FileStatus::Mismatched:
-        iconFileName = "mismatched";
+        iconFileName = QStringLiteral(u"mismatched");
         break;
     case FileStatus::New:
-        iconFileName = "new";
+        iconFileName = QStringLiteral(u"new");
         break;
     case FileStatus::Missing:
-        iconFileName = "missing";
-        break;
-    case FileStatus::Unreadable:
-        iconFileName = "unreadable";
+        iconFileName = QStringLiteral(u"missing");
         break;
     case FileStatus::Added:
-        iconFileName = "added";
+        iconFileName = QStringLiteral(u"added");
         break;
     case Files::Removed:
-        iconFileName = "removed";
+        iconFileName = QStringLiteral(u"removed");
         break;
     case FileStatus::Updated:
-        iconFileName = "update";
+        iconFileName = QStringLiteral(u"update");
         break;
-    case FileStatus::UnPermitted: // newly added status
-        iconFileName = "locked";
+    case FileStatus::UnPermitted:
+        iconFileName = QStringLiteral(u"locked");
+        break;
+    case FileStatus::ReadError:
+        iconFileName = QStringLiteral(u"unreadable");
         break;
     default:
-        iconFileName = "unknown";
+        iconFileName = QStringLiteral(u"unknown");
         break;
     }
 
@@ -99,91 +99,91 @@ QString IconProvider::svgFilePath(Icons icon) const
 
     switch (icon) {
     case AddFork:
-        iconFileName = "add-fork";
+        iconFileName = QStringLiteral(u"add-fork");
         break;
     case Backup:
-        iconFileName = "backup";
+        iconFileName = QStringLiteral(u"backup");
         break;
     case Branch:
-        iconFileName = "branch";
+        iconFileName = QStringLiteral(u"branch");
         break;
     case Cancel:
-        iconFileName = "cancel";
+        iconFileName = QStringLiteral(u"cancel");
         break;
     case ChartPie:
-        iconFileName = "chart-pie";
+        iconFileName = QStringLiteral(u"chart-pie");
         break;
     case ClearHistory:
-        iconFileName = "clear-history";
+        iconFileName = QStringLiteral(u"clear-history");
         break;
     case Clock:
-        iconFileName = "clock";
+        iconFileName = QStringLiteral(u"clock");
         break;
     case Configure:
-        iconFileName = "configure";
+        iconFileName = QStringLiteral(u"configure");
         break;
     case Copy:
-        iconFileName = "copy";
+        iconFileName = QStringLiteral(u"copy");
         break;
     case Database:
-        iconFileName = "database";
+        iconFileName = QStringLiteral(u"database");
         break;
     case DocClose:
-        iconFileName = "document-close";
+        iconFileName = QStringLiteral(u"document-close");
         break;
     case DoubleGear:
-        iconFileName = "double-gear";
+        iconFileName = QStringLiteral(u"double-gear");
         break;
     case FileSystem:
-        iconFileName = "filesystem";
+        iconFileName = QStringLiteral(u"filesystem");
         break;
     case Filter:
-        iconFileName = "filter";
+        iconFileName = QStringLiteral(u"filter");
         break;
     case Folder:
-        iconFileName = "folder";
+        iconFileName = QStringLiteral(u"folder");
         break;
     case FolderSync:
-        iconFileName = "folder-sync";
+        iconFileName = QStringLiteral(u"folder-sync");
         break;
     case Gear:
-        iconFileName = "gear";
+        iconFileName = QStringLiteral(u"gear");
         break;
     case GoHome:
-        iconFileName = "go-home";
+        iconFileName = QStringLiteral(u"go-home");
         break;
     case HashFile:
-        iconFileName = "hash-file";
+        iconFileName = QStringLiteral(u"hash-file");
         break;
     case Info:
-        iconFileName = "help-about";
+        iconFileName = QStringLiteral(u"help-about");
         break;
     case NewFile:
-        iconFileName = "newfile";
+        iconFileName = QStringLiteral(u"newfile");
         break;
     case Paste:
-        iconFileName = "paste";
+        iconFileName = QStringLiteral(u"paste");
         break;
     case ProcessAbort:
-        iconFileName = "process-abort";
+        iconFileName = QStringLiteral(u"process-abort");
         break;
     case ProcessStop:
-        iconFileName = "process-stop";
+        iconFileName = QStringLiteral(u"process-stop");
         break;
     case Save:
-        iconFileName = "save";
+        iconFileName = QStringLiteral(u"save");
         break;
     case Scan:
-        iconFileName = "scan";
+        iconFileName = QStringLiteral(u"scan");
         break;
     case Start:
-        iconFileName = "start";
+        iconFileName = QStringLiteral(u"start");
         break;
     case Undo:
-        iconFileName = "undo";
+        iconFileName = QStringLiteral(u"undo");
         break;
     case Update:
-        iconFileName = "update";
+        iconFileName = QStringLiteral(u"update");
         break;
     default:
         return QString();
@@ -228,6 +228,6 @@ QIcon IconProvider::iconFolder() const
 
 QIcon IconProvider::appIcon()
 {
-    static const QIcon iconVeretino = QIcon(":/icons/generic/veretino.svg");
+    static const QIcon iconVeretino = QIcon(QStringLiteral(u":/icons/generic/veretino.svg"));
     return iconVeretino;
 }

@@ -134,7 +134,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
         if (!checksum.isEmpty()) {
             storedData.insert(iter.path(rootFolder), checksum);
         }
-        else if (iter.status() == FileStatus::Unreadable) {
+        else if (iter.status() & FileStatus::CombUnreadable) {
             unreadableFiles.append(iter.path(rootFolder));
         }
     }
@@ -253,7 +253,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
             for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
                 const QString _unrFile = unreadableFiles.at(var).toString();
                 if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
-                    parsedData->model_->add_file(_unrFile, FileValues(FileStatus::Unreadable));
+                    parsedData->model_->add_file(_unrFile, FileValues(FileStatus::UnPermitted));
                 }
             }
         }

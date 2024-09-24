@@ -36,10 +36,11 @@ public:
         Mismatched = 1 << 5, // checked, checksum did not match
         New = 1 << 6, // a file that is present on disk but not in the database
         Missing = 1 << 7, // not on disk, but present in the database
-        Unreadable = 1 << 8, // present on the disk, but unreadable (no read permission or read error)
-        Added = 1 << 9, // item (file path and its checksum) has been added to the database
-        Removed = 1 << 10, // item^ removed from the database
-        Updated = 1 << 11, // the checksum has been updated
+        Added = 1 << 8, // item (file path and its checksum) has been added to the database
+        Removed = 1 << 9, // item^ removed from the database
+        Updated = 1 << 10, // the checksum has been updated
+        UnPermitted = 1 << 11, // no read permissions
+        ReadError = 1 << 12, // an error occurred during reading
 
         CombAvailable = NotChecked | Matched | Mismatched | Added | Updated,
         CombHasChecksum = CombAvailable | Missing,
@@ -48,13 +49,11 @@ public:
         CombChecked = Matched | Mismatched,
         CombMatched = Matched | Added | Updated,
         CombNewLost = New | Missing,
+        CombUnreadable = UnPermitted | ReadError, // present on the disk, but unreadable (no read permission or read error)
 
-        Computed = 1 << 12, // the checksum has been calculated and is ready for further processing (copy or save)
-        ToClipboard = 1 << 13, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile = 1 << 14, // the calculated checksum is intended to be stored in the summary file
-
-        // newly added status
-        UnPermitted = 1 << 15 // no read permissions
+        Computed = 1 << 13, // the checksum has been calculated and is ready for further processing (copy or save)
+        ToClipboard = 1 << 14, // the calculated checksum is intended to be copied to the clipboard
+        ToSumFile = 1 << 15, // the calculated checksum is intended to be stored in the summary file
     };
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)

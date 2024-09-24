@@ -283,7 +283,8 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         case FileStatus::Removed:
             emit showMessage("The checksum has been removed from the database.", "No Checksum");
             break;
-        case FileStatus::Unreadable:
+        case FileStatus::UnPermitted:
+        case FileStatus::ReadError:
             emit showMessage("The integrity of this file is not verifiable.\n"
                              "Failed to read: no access or disk error.", "Unreadable File");
             break;
@@ -493,8 +494,10 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 
             if (!procState->isCanceled()) {
                 if (checksum.isEmpty()) {
-                    FileStatus _unread = FileStatus::Unreadable;
-                    if (!QFileInfo::exists(curFilePath)) {
+                    FileStatus _unread = FileStatus::NotSet;
+                    if (QFileInfo::exists(curFilePath)) {
+                        _unread = QFileInfo(curFilePath).isReadable() ? FileStatus::ReadError : FileStatus::UnPermitted;
+                    } else {
                         _unread = TreeModel::hasChecksum(iter.index()) ? FileStatus::Missing : FileStatus::Removed;
                     }
 

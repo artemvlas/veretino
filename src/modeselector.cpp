@@ -60,7 +60,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionFilterMismatches, &QAction::triggered, this,
             [=](bool isChecked){ view_->editFilter(FileStatus::Mismatched, isChecked); });
     connect(menuAct_->actionFilterUnreadable, &QAction::triggered, this,
-            [=](bool isChecked){ view_->editFilter(FileStatus::Unreadable, isChecked); });
+            [=](bool isChecked){ view_->editFilter(FileStatus::CombUnreadable, isChecked); });
     connect(menuAct_->actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(menuAct_->actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(menuAct_->actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
@@ -763,8 +763,8 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 viewContextMenu->addAction(menuAct_->actionFilterMismatches);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::Unreadable)) {
-                menuAct_->actionFilterUnreadable->setChecked(view_->isViewFiltered(FileStatus::Unreadable));
+            if (view_->data_->numbers.contains(FileStatus::CombUnreadable)) {
+                menuAct_->actionFilterUnreadable->setChecked(view_->isViewFiltered(FileStatus::CombUnreadable));
                 viewContextMenu->addAction(menuAct_->actionFilterUnreadable);
             }
 

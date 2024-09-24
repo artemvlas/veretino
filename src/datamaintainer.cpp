@@ -130,7 +130,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
                 continue;
 
             const FileValues &_values = _isReadable ? FileValues(fileStatus, _fileInfo.size())
-                                                    : FileValues(FileStatus::Unreadable);
+                                                    : FileValues(FileStatus::UnPermitted);
 
             data_->model_->add_file(_relPath, _values);
             ++numAdded;

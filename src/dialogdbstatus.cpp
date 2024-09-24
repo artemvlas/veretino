@@ -126,8 +126,8 @@ QStringList DialogDbStatus::infoContent()
     if (isJustCreated() || (numChecksums != available))
         contentNumbers.append(QString("Stored checksums: %1%2").arg(numChecksums).arg(createdDataSize));
 
-    if (data_->contains(FileStatus::Unreadable))
-        contentNumbers.append(QStringLiteral(u"Unreadable files: ") + QString::number(_num.numberOf(FileStatus::Unreadable)));
+    if (data_->contains(FileStatus::CombUnreadable))
+        contentNumbers.append(QStringLiteral(u"Unreadable files: ") + QString::number(_num.numberOf(FileStatus::CombUnreadable)));
 
     if (isSavedToDesktop()) {
         contentNumbers.append(QString());

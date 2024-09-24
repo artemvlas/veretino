@@ -68,7 +68,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 
         if (filter.isFileAllowed(_relPath)) {
             QFileInfo fileInfo(_fullPath);
-            FileStatus _status = fileInfo.isReadable() ? FileStatus::NotSet : FileStatus::Unreadable;
+            FileStatus _status = fileInfo.isReadable() ? FileStatus::NotSet : FileStatus::UnPermitted;
 
             resultList.insert(_relPath, FileValues(_status, fileInfo.size()));
         }
@@ -183,7 +183,7 @@ QList<ExtNumSize> Files::getFileTypes(const FileList &fileList, bool excludeUnre
     for (filesIter = fileList.constBegin(); filesIter != fileList.constEnd(); ++filesIter) {
         QString _ext;
 
-        if (excludeUnreadable && (filesIter.value().status == FileStatus::Unreadable))
+        if (excludeUnreadable && (filesIter.value().status == FileStatus::UnPermitted))
             _ext = ExtNumSize::strNoPerm;
         else if (tools::isDatabaseFile(filesIter.key()))
             _ext = ExtNumSize::strVeretinoDb;

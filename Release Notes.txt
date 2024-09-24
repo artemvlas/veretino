@@ -4,6 +4,7 @@ What's new:
 * Now files without read permissions can be excluded when creating the list (customizable).
 * Added the ability to export individual checksums from the database to a digest file (*.ver(.json) --> *.sha1/256/512).
 * Copying files and folders is now also available when browsing the file system.
+* The Unreadable Status is divided into two separate ones: UnPermitted ("no permissions") and ReadError ("read error").
 
 Fixes and Minor Enhancements:
 * Fixed display of item's zero-byte size.

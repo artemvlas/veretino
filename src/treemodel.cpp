@@ -168,7 +168,8 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
                 return QColor(Qt::darkGreen);
             case FileStatus::Mismatched:
                 return QColor(Qt::red);
-            case FileStatus::Unreadable:
+            case FileStatus::UnPermitted:
+            case FileStatus::ReadError:
                 return QColor(Qt::darkRed);
             default: break;
             }
