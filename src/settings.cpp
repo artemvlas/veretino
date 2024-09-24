@@ -9,8 +9,6 @@
 #include <QDebug>
 #include "tools.h"
 
-const QString Settings::_str_veretino = "veretino";
-
 const QString Settings::s_key_algo = "algorithm";
 const QString Settings::s_key_dbPrefix = "dbPrefix";
 const QString Settings::s_key_restoreLastPath = "restoreLastPathOnStartup";
@@ -79,7 +77,7 @@ void Settings::clearRecentFiles()
 
 void Settings::saveSettings()
 {
-    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, _str_veretino, _str_veretino);
+    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, Lit::s_app_name, Lit::s_app_name);
     // qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
     if (lastFsPath) {
@@ -115,7 +113,7 @@ void Settings::saveSettings()
 
 void Settings::loadSettings()
 {
-    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, _str_veretino, _str_veretino);
+    QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, Lit::s_app_name, Lit::s_app_name);
     // qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
     if (lastFsPath) {

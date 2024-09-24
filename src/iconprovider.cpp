@@ -4,9 +4,14 @@
  * https://github.com/artemvlas/veretino
 */
 #include "iconprovider.h"
+#include "tools.h"
 
 QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
 QHash<Icons, QIcon> IconProvider::cacheThemeIcons = QHash<Icons, QIcon>();
+const QString IconProvider::s_folderGeneric = QStringLiteral(u":/icons/generic");
+const QString IconProvider::s_folderDark = QStringLiteral(u":/icons/dark");
+const QString IconProvider::s_folderLight = QStringLiteral(u":/icons/light");
+const QString IconProvider::s_svg = QStringLiteral(u"svg");
 
 IconProvider::IconProvider() {}
 
@@ -38,7 +43,7 @@ IconProvider::Theme IconProvider::theme() const
 
 QString IconProvider::themeFolder() const
 {
-    return (theme_ == Dark) ? QStringLiteral(u"dark") : QStringLiteral(u"light");
+    return (theme_ == Dark) ? s_folderDark : s_folderLight;
 }
 
 QString IconProvider::svgFilePath(FileStatus status) const
@@ -90,7 +95,8 @@ QString IconProvider::svgFilePath(FileStatus status) const
         break;
     }
 
-    return QString(":/icons/generic/%1.svg").arg(iconFileName);
+    //QString(":/icons/generic/%1.svg").arg(iconFileName);
+    return paths::composeFilePath(s_folderGeneric, iconFileName, s_svg);
 }
 
 QString IconProvider::svgFilePath(Icons icon) const
@@ -189,7 +195,8 @@ QString IconProvider::svgFilePath(Icons icon) const
         return QString();
     }
 
-    return QString(":/icons/%1/%2.svg").arg(themeFolder(), iconFileName);
+    //return QString(":/icons/%1/%2.svg").arg(themeFolder(), iconFileName);
+    return paths::composeFilePath(themeFolder(), iconFileName, s_svg);
 }
 
 QIcon IconProvider::icon(FileStatus status) const
@@ -228,6 +235,6 @@ QIcon IconProvider::iconFolder() const
 
 QIcon IconProvider::appIcon()
 {
-    static const QIcon iconVeretino = QIcon(QStringLiteral(u":/icons/generic/veretino.svg"));
-    return iconVeretino;
+    static const QIcon _icon = QIcon(paths::composeFilePath(s_folderGeneric, Lit::s_app_name, s_svg));
+    return _icon; // ":/icons/generic/veretino.svg"
 }

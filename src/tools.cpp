@@ -25,6 +25,7 @@ const QStringList Lit::sl_digest_exts = {
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
 const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
+const QString Lit::s_app_name = QStringLiteral(u"veretino");
 const QString Lit::s_sepStick = QStringLiteral(u" | ");
 
 namespace tools {

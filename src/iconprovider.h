@@ -66,10 +66,15 @@ private:
     QString svgFilePath(FileStatus status) const;
     QString svgFilePath(Icons icon) const;
 
-    static QHash<FileStatus, QIcon> cacheFileStatus;
-    static QHash<Icons, QIcon> cacheThemeIcons;
     Theme theme_ = Light;
     QFileIconProvider fsIcons;
+
+    static QHash<FileStatus, QIcon> cacheFileStatus;
+    static QHash<Icons, QIcon> cacheThemeIcons;
+    static const QString s_folderGeneric;
+    static const QString s_folderDark;
+    static const QString s_folderLight;
+    static const QString s_svg;
 
 }; // class IconProvider
 

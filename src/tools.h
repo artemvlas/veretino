@@ -18,6 +18,7 @@ static const QStringList sl_digest_exts;
 static const QString s_webpage;
 static const QString s_appName;
 static const QString s_appNameVersion;
+static const QString s_app_name;
 static const QString s_sepStick;
 }; // struct Lit
 

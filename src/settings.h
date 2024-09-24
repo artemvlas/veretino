@@ -47,7 +47,6 @@ public:
 
 private:
     QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;
-    static const QString _str_veretino;
 
     static const QString s_key_algo;
     static const QString s_key_dbPrefix;
