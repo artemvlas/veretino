@@ -50,7 +50,6 @@ void ProgressBar::updateProgressInfo()
     if (procState_ && procState_->isState(State::StartVerbose)) {
         updateDonePiece();
 
-        // static const QString _perc = QStringLiteral(u"%p%");
         QString _format = QStringLiteral(u"%p%")
                           % Lit::s_sepStick // " | "
                           % progSpeed()
@@ -58,9 +57,6 @@ void ProgressBar::updateProgressInfo()
                           % progTimeLeft();
 
         setFormat(_format);
-
-        // OLD
-        // setFormat(QString("%p% | %1 | %2").arg(progSpeed(), progTimeLeft()));
     }
     else {
         finish();

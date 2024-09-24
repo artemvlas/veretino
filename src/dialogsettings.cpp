@@ -18,7 +18,7 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     ui->setupUi(this);
     setWindowIcon(IconProvider::appIcon());
 
-    ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText("Defaults");
+    ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(QStringLiteral(u"Defaults"));
     ui->comboBoxPresets->addItems(filterPresetsList);
 
     connect(ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &DialogSettings::restoreDefaults);
@@ -119,7 +119,7 @@ QStringList DialogSettings::extensionsList() const
 
     QString _inputed = ui->inputExtensions->text().toLower();
     _inputed.remove('*');
-    _inputed.replace(" ."," ");
+    _inputed.replace(" .", " ");
     _inputed.replace(' ',',');
 
     if (_inputed.startsWith('.'))
@@ -127,7 +127,6 @@ QStringList DialogSettings::extensionsList() const
 
     QStringList ext = _inputed.split(',', Qt::SkipEmptyParts);
     ext.removeDuplicates();
-    //ext.removeOne("");
     return ext;
 }
 

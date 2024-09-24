@@ -146,14 +146,6 @@ void Manager::createDataModel(const QString &dbFilePath)
         return;
     }
 
-    /* OLD
-    if (dataMaintainer->importJson(databaseFilePath)) {
-        emit setViewData(dataMaintainer->data_);
-    }
-    else {
-        emit setViewData();
-    }*/
-
     dataMaintainer->importJson(dbFilePath);
     emit setViewData(dataMaintainer->data_);
 }

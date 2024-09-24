@@ -51,7 +51,7 @@ DialogFileProcResult::~DialogFileProcResult()
 
 void DialogFileProcResult::setModeMatched()
 {
-    setWindowTitle("Checksums Match");
+    setWindowTitle(QStringLiteral(u"Checksums Match"));
     setIcon(icons_.icon(FileStatus::Matched));
 
     ui->textChecksum->setTextColor(QColor("green"));
@@ -60,7 +60,7 @@ void DialogFileProcResult::setModeMatched()
 
 void DialogFileProcResult::setModeMismatched()
 {
-    setWindowTitle("Checksums do not match");
+    setWindowTitle(QStringLiteral(u"Checksums do not match"));
     setIcon(icons_.icon(FileStatus::Mismatched));
 
     ui->textChecksum->setTextColor(QColor("red"));
@@ -76,7 +76,7 @@ void DialogFileProcResult::setModeMismatched()
 
 void DialogFileProcResult::setModeComputed()
 {
-    setWindowTitle("Checksum calculated");
+    setWindowTitle(QStringLiteral(u"Checksum calculated"));
     setIcon(icons_.icon(Icons::HashFile));
 
     ui->textChecksum->setText(values_.checksum);
@@ -90,7 +90,7 @@ void DialogFileProcResult::setModeComputed()
 
 void DialogFileProcResult::setModeCopied()
 {
-    setWindowTitle("Copied to clipboard");
+    setWindowTitle(QStringLiteral(u"Copied to clipboard"));
     setIcon(icons_.icon(Icons::Paste));
 
     ui->textChecksum->setText(values_.checksum);
@@ -100,7 +100,7 @@ void DialogFileProcResult::setModeCopied()
 
 void DialogFileProcResult::setModeStored()
 {
-    setWindowTitle("The checksum is saved");
+    setWindowTitle(QStringLiteral(u"The checksum is saved"));
     setIcon(icons_.icon(Icons::Save));
     setExtLineVisible(false);
 
@@ -112,7 +112,7 @@ void DialogFileProcResult::setModeStored()
 
 void DialogFileProcResult::setModeUnstored()
 {
-    setWindowTitle("Unable to create a summary file");
+    setWindowTitle(QStringLiteral(u"Unable to create a summary file"));
     setIcon(icons_.icon(Icons::DocClose));
     setExtLineVisible(false);
 
@@ -130,7 +130,7 @@ void DialogFileProcResult::setIcon(const QIcon &icon)
 
 void DialogFileProcResult::setFileName(const QString &filePath)
 {
-    ui->labelFileName->setText("File: " + paths::basicName(filePath));
+    ui->labelFileName->setText(QStringLiteral(u"File: ") + paths::basicName(filePath));
 }
 
 void DialogFileProcResult::setExtLineVisible(bool visible)
@@ -139,14 +139,14 @@ void DialogFileProcResult::setExtLineVisible(bool visible)
     ui->labelAlgo->setVisible(visible);
 
     if (visible) {
-        ui->labelFileSize->setText("Size: " + format::dataSizeReadable(values_.size));
-        ui->labelAlgo->setText("Algorithm: " + format::algoToStr(values_.checksum.length()));
+        ui->labelFileSize->setText(QStringLiteral(u"Size: ") + format::dataSizeReadable(values_.size));
+        ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(values_.checksum.length()));
     }
 }
 
 void DialogFileProcResult::addButtonCopy()
 {
-    QPushButton *buttonCopy = ui->buttonBox->addButton("Copy", QDialogButtonBox::AcceptRole);
+    QPushButton *buttonCopy = ui->buttonBox->addButton(QStringLiteral(u"Copy"), QDialogButtonBox::AcceptRole);
     buttonCopy->setIcon(icons_.icon(Icons::Copy));
 
     connect(buttonCopy, &QPushButton::clicked, this, [=]{QGuiApplication::clipboard()->setText(values_.checksum);});
@@ -154,7 +154,7 @@ void DialogFileProcResult::addButtonCopy()
 
 void DialogFileProcResult::addButtonSave()
 {
-    QPushButton *buttonSave = ui->buttonBox->addButton("Save", QDialogButtonBox::ActionRole);
+    QPushButton *buttonSave = ui->buttonBox->addButton(QStringLiteral(u"Save"), QDialogButtonBox::ActionRole);
     buttonSave->setIcon(icons_.icon(Icons::Save));
 
     connect(buttonSave, &QPushButton::clicked, this, &DialogFileProcResult::makeSumFile);

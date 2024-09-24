@@ -124,7 +124,7 @@ void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
         else if (_ext == ExtNumSize::strNoPerm)
             icon = icons_.icon(FileStatus::UnPermitted);
         else
-            icon = icons_.icon("file." + _ext);
+            icon = icons_.icon(QStringLiteral(u"file.") + _ext);
 
         TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
         item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, _ext);
@@ -139,7 +139,7 @@ void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
 void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 {
     if (!isTop10Checked) {
-        ui->chbTop10->setText("Top10");
+        ui->chbTop10->setText(QStringLiteral(u"Top10"));
 
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
             ui->treeWidget->topLevelItem(i)->setHidden(false);

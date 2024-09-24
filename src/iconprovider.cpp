@@ -95,7 +95,6 @@ QString IconProvider::svgFilePath(FileStatus status) const
         break;
     }
 
-    //QString(":/icons/generic/%1.svg").arg(iconFileName);
     return paths::composeFilePath(s_folderGeneric, iconFileName, s_svg);
 }
 
@@ -195,7 +194,6 @@ QString IconProvider::svgFilePath(Icons icon) const
         return QString();
     }
 
-    //return QString(":/icons/%1/%2.svg").arg(themeFolder(), iconFileName);
     return paths::composeFilePath(themeFolder(), iconFileName, s_svg);
 }
 

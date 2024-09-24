@@ -146,7 +146,6 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
         if (QFileInfo::exists(recentFilePath)) {
             QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
             act->setToolTip(recentFilePath);
-            // connect(act, &QAction::triggered, this, [=]{ openJsonDatabase(recentFilePath); });
         }
     }
 
@@ -176,7 +175,7 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
     static const QString defstrAddNew = actionDbAddNew->text();
     static const QString defstrClearLost = actionDbClearLost->text();
     static const QString defstrUpdateRe = actionUpdateDbWithReChecksums->text();
-    static const QString defstrNumFormat = " [%1]";
+    static const QString defstrNumFormat = QStringLiteral(u" [%1]");
 
     QString _strAddNew = defstrAddNew + (actionDbAddNew->isEnabled() ? QString(defstrNumFormat)
                                          .arg(dataNum.numberOf(FileStatus::New)) : QString());

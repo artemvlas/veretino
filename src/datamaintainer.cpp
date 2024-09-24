@@ -82,10 +82,10 @@ void DataMaintainer::updateDateTime()
 {
     if (data_) {
         if (data_->isDbFileState(DbFileState::NoFile)) {
-            data_->metaData.datetime[DateTimeStr::DateCreated] = "Created: " + format::currentDateTime();
+            data_->metaData.datetime[DateTimeStr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
         }
         else if (data_->contains(FileStatus::CombDbChanged)) {
-            data_->metaData.datetime[DateTimeStr::DateUpdated] = "Updated: " + format::currentDateTime();
+            data_->metaData.datetime[DateTimeStr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
             data_->metaData.datetime[DateTimeStr::DateVerified].clear();
         }
     }
@@ -94,7 +94,7 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateVerifDateTime()
 {
     if (data_ && data_->isAllMatched()) {
-        data_->metaData.datetime[DateTimeStr::DateVerified] = "Verified: " + format::currentDateTime();
+        data_->metaData.datetime[DateTimeStr::DateVerified] = QStringLiteral(u"Verified: ") + format::currentDateTime();
         setDbFileState(DbFileState::NotSaved);
     }
 }
@@ -112,7 +112,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         return 0;
     }
 
-    emit setStatusbarText("Creating a list of files...");
+    emit setStatusbarText(QStringLiteral(u"Creating a list of files..."));
 
     int numAdded = 0;
 
@@ -415,7 +415,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
         QString itemFileSizeStr = itemFileSize.isValid() ? QString(" (%1)").arg(format::dataSizeReadable(itemFileSize.toLongLong()))
                                                          : QString();
 
-        return QString("%1%2").arg(itemFileNameStr, itemFileSizeStr);
+        return itemFileNameStr + itemFileSizeStr;
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
@@ -423,8 +423,8 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
         const bool containsAvailable = num.contains(FileStatus::CombAvailable);
 
         if (containsAvailable) {
-            text = QString("Avail.: %1")
-                       .arg(format::filesNumberAndSize(num.numberOf(FileStatus::CombAvailable), num.totalSize(FileStatus::CombAvailable)));
+            text = QStringLiteral(u"Avail.: ")
+                   + format::filesNumberAndSize(num.numberOf(FileStatus::CombAvailable), num.totalSize(FileStatus::CombAvailable));
         }
 
         if (num.contains(FileStatus::Missing)) {
