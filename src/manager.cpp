@@ -494,14 +494,8 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 
             if (!procState->isCanceled()) {
                 if (checksum.isEmpty()) {
-                    FileStatus _unread = FileStatus::NotSet;
-                    if (QFileInfo::exists(curFilePath)) {
-                        _unread = QFileInfo(curFilePath).isReadable() ? FileStatus::ReadError : FileStatus::UnPermitted;
-                    } else {
-                        _unread = TreeModel::hasChecksum(iter.index()) ? FileStatus::Missing : FileStatus::Removed;
-                    }
-
-                    dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _unread);
+                    FileStatus _failStatus = tools::failedCalcStatus(curFilePath, TreeModel::hasChecksum(iter.index()));
+                    dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _failStatus);
 
                     totalSize -= iter.size();
                     totalSizeReadable = format::dataSizeReadable(totalSize);

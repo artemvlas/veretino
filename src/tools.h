@@ -34,6 +34,8 @@ bool canBeChecksum(const QString &str);
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
 QString joinStrings(int num, const QString &str); // --> "X str"
+
+FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
 } // namespace tools
 
 namespace paths {

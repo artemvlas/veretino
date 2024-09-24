@@ -134,6 +134,14 @@ QString joinStrings(int num, const QString &str)
 {
     return QString::number(num) % ' ' % str;
 }
+
+FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
+{
+    if (QFileInfo::exists(path))
+        return QFileInfo(path).isReadable() ? FileStatus::ReadError : FileStatus::UnPermitted;
+
+    return isChecksumStored ? FileStatus::Missing : FileStatus::Removed;
+}
 } // namespace tools
 
 namespace paths {
