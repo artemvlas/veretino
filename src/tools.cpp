@@ -140,7 +140,7 @@ QString basicName(const QString &path)
 {
     if (isRoot(path)) {
         const QChar _ch = path.at(0);
-        return _ch.isLetter() ? QString("Drive_").append(_ch.toUpper()) : "Root";
+        return _ch.isLetter() ? QStringLiteral(u"Drive_") + _ch.toUpper() : "Root";
     }
 
     QString result;
@@ -391,11 +391,11 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 {
     switch (algo) {
         case QCryptographicHash::Sha1:
-            return capitalLetters ? "SHA-1" : Lit::sl_digest_exts.at(0);
+            return capitalLetters ? QStringLiteral(u"SHA-1") : Lit::sl_digest_exts.at(0);
         case QCryptographicHash::Sha256:
-            return capitalLetters ? "SHA-256" : Lit::sl_digest_exts.at(1);
+            return capitalLetters ? QStringLiteral(u"SHA-256") : Lit::sl_digest_exts.at(1);
         case QCryptographicHash::Sha512:
-            return capitalLetters ? "SHA-512" : Lit::sl_digest_exts.at(2);
+            return capitalLetters ? QStringLiteral(u"SHA-512") : Lit::sl_digest_exts.at(2);
         default:
             return "Unknown";
     }
@@ -457,7 +457,8 @@ QString coloredText(bool ignore)
 
 QString coloredText(const QString &className, bool ignore)
 {
-    return QString("%1 { %2 }").arg(className, coloredText(ignore));
+    // "%1 { %2 }"
+    return className % QStringLiteral(u" { ") % coloredText(ignore) % QStringLiteral(u" }");
 }
 
 } // namespace format

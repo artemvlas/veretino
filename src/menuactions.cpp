@@ -157,7 +157,7 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
 QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
 {
     if (!menuUpdateDatabase) {
-        menuUpdateDatabase = new QMenu("Update the Database");
+        menuUpdateDatabase = new QMenu(QStringLiteral(u"Update the Database"));
         menuUpdateDatabase->menuAction()->setIcon(iconProvider.icon(Icons::Update));
 
         menuUpdateDatabase->addAction(actionDbAddNew);
@@ -212,7 +212,7 @@ QMenu* MenuActions::menuAlgorithm(QCryptographicHash::Algorithm curAlgo)
         break;
     }
 
-    menuAlgo->menuAction()->setText("Algorithm " + format::algoToStr(curAlgo));
+    menuAlgo->menuAction()->setText(QStringLiteral(u"Algorithm ") + format::algoToStr(curAlgo));
 
     return menuAlgo;
 }
