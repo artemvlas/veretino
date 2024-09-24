@@ -274,7 +274,7 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
 
     QModelIndex parentIndex;
     QModelIndex curIndex = model->index(0, 0);
-    const QStringList &parts = path.split('/');
+    const QStringList parts = path.split('/');
 
     foreach (const QString &str, parts) {
         for (int i = 0; curIndex.isValid(); ++i) {
@@ -333,7 +333,7 @@ bool TreeModel::contains(const FileStatuses flag, const QModelIndex &folderIndex
     if (isFolderRow(folderIndex)) {
         TreeModelIterator it(folderIndex.model(), folderIndex);
         while (it.hasNext()) {
-            if (flag & itemFileStatus(it.nextFile().index())) {
+            if (flag & it.nextFile().status()) {
                 return true;
             }
         }
