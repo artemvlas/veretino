@@ -5,7 +5,7 @@ What's new:
 * Added the ability to export individual checksums from the database to a digest file (*.ver(.json) --> *.sha1/256/512).
 * Copying files and folders is now also available when browsing the file system.
 * The Unreadable Status is divided into two separate ones: UnPermitted ("no permissions") and ReadError ("read error").
-    The first means no read permissions. Second, an error occurred during reading (probably a damaged file).
+    The first means no read permissions. Second, an error occurred during reading (damaged file: bad block, disk or file system error).
 
 Fixes and Minor Enhancements:
 * Fixed display of item's zero-byte size.
