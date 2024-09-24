@@ -246,14 +246,14 @@ TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
 QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
 {
     QString path;
-    QModelIndex newIndex = curIndex.siblingAtColumn(ColumnName);
+    QModelIndex _ind = curIndex.siblingAtColumn(ColumnName);
 
-    if (newIndex.isValid()) {
-        path = newIndex.data().toString();
+    if (_ind.isValid()) {
+        path = _ind.data().toString();
 
-        while (newIndex.parent().isValid() && newIndex.parent() != root) {
-            path = paths::joinPath(newIndex.parent().data().toString(), path);
-            newIndex = newIndex.parent();
+        while (_ind.parent().isValid() && _ind.parent() != root) {
+            _ind = _ind.parent();
+            path = paths::joinPath(_ind.data().toString(), path);
         }
     }
 
