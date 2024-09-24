@@ -41,7 +41,7 @@ IconProvider::Theme IconProvider::theme() const
     return theme_;
 }
 
-QString IconProvider::themeFolder() const
+const QString &IconProvider::themeFolder() const
 {
     return (theme_ == Dark) ? s_folderDark : s_folderLight;
 }
@@ -205,9 +205,9 @@ QIcon IconProvider::icon(FileStatus status) const
         return cacheFileStatus.value(status);
     }
     else {
-        QIcon ico = QIcon(svgFilePath(status));
-        cacheFileStatus.insert(status, ico);
-        return ico;
+        QIcon _ico = QIcon(svgFilePath(status));
+        cacheFileStatus.insert(status, _ico);
+        return _ico;
     }
 }
 
@@ -217,9 +217,9 @@ QIcon IconProvider::icon(Icons themeIcon) const
         return cacheThemeIcons.value(themeIcon);
     }
     else {
-        QIcon ico = QIcon(svgFilePath(themeIcon));
-        cacheThemeIcons.insert(themeIcon, ico);
-        return ico;
+        QIcon _ico = QIcon(svgFilePath(themeIcon));
+        cacheThemeIcons.insert(themeIcon, _ico);
+        return _ico;
     }
 }
 

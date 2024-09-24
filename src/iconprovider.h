@@ -62,7 +62,7 @@ public:
 
 private:
     bool isDarkTheme(const QPalette &palette) const;
-    QString themeFolder() const;
+    const QString &themeFolder() const;
     QString svgFilePath(FileStatus status) const;
     QString svgFilePath(Icons icon) const;
 
