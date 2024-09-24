@@ -251,10 +251,17 @@ QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
     if (_ind.isValid()) {
         path = _ind.data().toString();
 
+        while (_ind = _ind.parent(),
+               _ind.isValid() && _ind != root)
+        {
+            path = paths::joinPath(_ind.data().toString(), path);
+        }
+
+        /*
         while (_ind.parent().isValid() && _ind.parent() != root) {
             _ind = _ind.parent();
             path = paths::joinPath(_ind.data().toString(), path);
-        }
+        }*/
     }
 
     return path;
