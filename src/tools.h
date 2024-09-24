@@ -42,6 +42,7 @@ QString basicName(const QString &path); // returns file or folder name: "/home/u
 QString relativePath(const QString &rootFolder, const QString &fullPath);
 QString shortenPath(const QString &path); // if not a root (or child of root) path, returns "../path"
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
+QString composeFilePath(const QString &parentFolder, const QString &fileName, const QString &ext);
 bool isRoot(const QString &path); // true: "/" or "X:'/'"; else false
 bool hasExtension(const QString &file, const QString &ext); // true if the "file" (name or path) have the "ext" suffix
 bool hasExtension(const QString &file, const QStringList &extensions); // true if the file have any extension from the list

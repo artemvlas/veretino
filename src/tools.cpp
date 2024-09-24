@@ -204,6 +204,16 @@ QString joinPath(const QString &absolutePath, const QString &addPath)
     return tools::joinStrings(absolutePath, addPath, _sep);
 }
 
+QString composeFilePath(const QString &parentFolder, const QString &fileName, const QString &ext)
+{
+    // with sep check
+    // const QString _file = tools::joinStrings(fileName, ext, u'.');
+    // return joinPath(parentFolder, _file);
+
+    // no sep check
+    return parentFolder % _sep % fileName % '.' % ext;
+}
+
 bool isRoot(const QString &path)
 {
     switch (path.length()) {
