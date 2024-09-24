@@ -34,75 +34,75 @@ public:
     QMenu* contextMenuViewNot();
 
     // MainWindow menu
-    QAction *actionChooseFolder = new QAction("Choose Folder...", this);
-    QAction *actionOpenDatabaseFile = new QAction("Open Database...", this);
-    QAction *actionOpenDialogSettings = new QAction("Settings...", this);
-    QAction *actionSave = new QAction("Save", this);
-    QAction *actionShowFilesystem = new QAction("Show file system", this);
-    QAction *actionClearRecent = new QAction("Clear History", this);
-    QAction *actionAbout = new QAction("About", this);
+    QAction *actionChooseFolder = new QAction(QStringLiteral(u"Choose Folder..."), this);
+    QAction *actionOpenDatabaseFile = new QAction(QStringLiteral(u"Open Database..."), this);
+    QAction *actionOpenDialogSettings = new QAction(QStringLiteral(u"Settings..."), this);
+    QAction *actionSave = new QAction(QStringLiteral(u"Save"), this);
+    QAction *actionShowFilesystem = new QAction(QStringLiteral(u"Show file system"), this);
+    QAction *actionClearRecent = new QAction(QStringLiteral(u"Clear History"), this);
+    QAction *actionAbout = new QAction(QStringLiteral(u"About"), this);
 
     QList<QAction*> menuFileActions { actionChooseFolder, actionOpenDatabaseFile, actionSave, actionShowFilesystem, actionOpenDialogSettings };
 
     // File system View
-    QAction *actionToHome = new QAction("to Home", this);
-    QAction *actionStop = new QAction("Stop", this);
-    QAction *actionShowFolderContentsTypes = new QAction("Folder Contents", this);
-    QAction *actionProcessChecksumsNoFilter = new QAction("Calculate checksums [All Files]", this);
-    QAction *actionProcessChecksumsPermFilter = new QAction("Calculate checksums [Permanent Filter]", this);
-    QAction *actionProcessChecksumsCustomFilter = new QAction("Calculate checksums", this);
-    QAction *actionCheckFileByClipboardChecksum = new QAction("Check the file by checksum: ", this);
-    QAction *actionProcessSha_toClipboard = new QAction("Copy Checksum", this);
-    QAction *actionProcessSha1File = new QAction("SHA-1 → *.sha1", this);
-    QAction *actionProcessSha256File = new QAction("SHA-256 → *.sha256", this);
-    QAction *actionProcessSha512File = new QAction("SHA-512 → *.sha512", this);
-    QAction *actionOpenDatabase = new QAction("Open Database", this);
-    QAction *actionCheckSumFile = new QAction("Check the Checksum", this);
+    QAction *actionToHome = new QAction(QStringLiteral(u"to Home"), this);
+    QAction *actionStop = new QAction(QStringLiteral(u"Stop"), this);
+    QAction *actionShowFolderContentsTypes = new QAction(QStringLiteral(u"Folder Contents"), this);
+    QAction *actionProcessChecksumsNoFilter = new QAction(QStringLiteral(u"Calculate checksums [All Files]"), this);
+    QAction *actionProcessChecksumsPermFilter = new QAction(QStringLiteral(u"Calculate checksums [Permanent Filter]"), this);
+    QAction *actionProcessChecksumsCustomFilter = new QAction(QStringLiteral(u"Calculate checksums"), this);
+    QAction *actionCheckFileByClipboardChecksum = new QAction(QStringLiteral(u"Check the file by checksum: "), this);
+    QAction *actionProcessSha_toClipboard = new QAction(QStringLiteral(u"Copy Checksum"), this);
+    QAction *actionProcessSha1File = new QAction(QStringLiteral(u"SHA-1 → *.sha1"), this);
+    QAction *actionProcessSha256File = new QAction(QStringLiteral(u"SHA-256 → *.sha256"), this);
+    QAction *actionProcessSha512File = new QAction(QStringLiteral(u"SHA-512 → *.sha512"), this);
+    QAction *actionOpenDatabase = new QAction(QStringLiteral(u"Open Database"), this);
+    QAction *actionCheckSumFile = new QAction(QStringLiteral(u"Check the Checksum"), this);
 
     QList<QAction*> actionsMakeDigest { actionProcessSha1File, actionProcessSha256File, actionProcessSha512File };
 
     // DB Model View
-    QAction *actionCancelBackToFS = new QAction("Close the Database", this);
-    QAction *actionShowDbStatus = new QAction("Status", this);
-    QAction *actionResetDb = new QAction("Reset", this);
-    QAction *actionForgetChanges = new QAction("Forget all changes", this);
-    QAction *actionUpdateDbWithReChecksums = new QAction("Update Mismatched checksums", this);
-    QAction *actionUpdateDbWithNewLost = new QAction("Add New && Clear Lost", this);
-    QAction *actionDbAddNew = new QAction("Add New files", this);
-    QAction *actionDbClearLost = new QAction("Clear Lost files", this);
-    QAction *actionFilterNewLost = new QAction("Filter New/Lost", this);
-    QAction *actionFilterMismatches = new QAction("Filter Mismatches", this);
-    QAction *actionFilterUnreadable = new QAction("Filter Unreadable", this);
-    QAction *actionShowAll = new QAction("Show All", this);
-    QAction *actionCheckCurFileFromModel = new QAction("Check File", this);
-    QAction *actionCheckCurSubfolderFromModel = new QAction("Check Folder", this);
-    QAction *actionBranchMake = new QAction("Branch Folder", this);
-    QAction *actionBranchOpen = new QAction("Open Branch", this);
-    QAction *actionCheckAll = new QAction("Check ALL available files", this);
-    QAction *actionCopyStoredChecksum = new QAction("Copy stored Checksum", this);
-    QAction *actionCopyReChecksum = new QAction("Copy ReChecksum", this);
-    QAction *actionExportSum = new QAction("Export to *.sha", this);
+    QAction *actionCancelBackToFS = new QAction(QStringLiteral(u"Close the Database"), this);
+    QAction *actionShowDbStatus = new QAction(QStringLiteral(u"Status"), this);
+    QAction *actionResetDb = new QAction(QStringLiteral(u"Reset"), this);
+    QAction *actionForgetChanges = new QAction(QStringLiteral(u"Forget all changes"), this);
+    QAction *actionUpdateDbWithReChecksums = new QAction(QStringLiteral(u"Update Mismatched checksums"), this);
+    QAction *actionUpdateDbWithNewLost = new QAction(QStringLiteral(u"Add New && Clear Lost"), this);
+    QAction *actionDbAddNew = new QAction(QStringLiteral(u"Add New files"), this);
+    QAction *actionDbClearLost = new QAction(QStringLiteral(u"Clear Lost files"), this);
+    QAction *actionFilterNewLost = new QAction(QStringLiteral(u"Filter New/Lost"), this);
+    QAction *actionFilterMismatches = new QAction(QStringLiteral(u"Filter Mismatches"), this);
+    QAction *actionFilterUnreadable = new QAction(QStringLiteral(u"Filter Unreadable"), this);
+    QAction *actionShowAll = new QAction(QStringLiteral(u"Show All"), this);
+    QAction *actionCheckCurFileFromModel = new QAction(QStringLiteral(u"Check File"), this);
+    QAction *actionCheckCurSubfolderFromModel = new QAction(QStringLiteral(u"Check Folder"), this);
+    QAction *actionBranchMake = new QAction(QStringLiteral(u"Branch Folder"), this);
+    QAction *actionBranchOpen = new QAction(QStringLiteral(u"Open Branch"), this);
+    QAction *actionCheckAll = new QAction(QStringLiteral(u"Check ALL available files"), this);
+    QAction *actionCopyStoredChecksum = new QAction(QStringLiteral(u"Copy stored Checksum"), this);
+    QAction *actionCopyReChecksum = new QAction(QStringLiteral(u"Copy ReChecksum"), this);
+    QAction *actionExportSum = new QAction(QStringLiteral(u"Export to *.sha"), this);
 
-    QAction *actionUpdFileAdd = new QAction("Add to DB", this);
-    QAction *actionUpdFileRemove = new QAction("Remove from DB", this);
-    QAction *actionUpdFileReChecksum = new QAction("Update Checksum", this);
+    QAction *actionUpdFileAdd = new QAction(QStringLiteral(u"Add to DB"), this);
+    QAction *actionUpdFileRemove = new QAction(QStringLiteral(u"Remove from DB"), this);
+    QAction *actionUpdFileReChecksum = new QAction(QStringLiteral(u"Update Checksum"), this);
 
-    QAction *actionCollapseAll = new QAction("Collapse all", this);
-    QAction *actionExpandAll = new QAction("Expand all", this);
+    QAction *actionCollapseAll = new QAction(QStringLiteral(u"Collapse all"), this);
+    QAction *actionExpandAll = new QAction(QStringLiteral(u"Expand all"), this);
 
-    QAction *actionCopyFile = new QAction("Copy File", this);
-    QAction *actionCopyFolder = new QAction("Copy Folder", this);
+    QAction *actionCopyFile = new QAction(QStringLiteral(u"Copy File"), this);
+    QAction *actionCopyFolder = new QAction(QStringLiteral(u"Copy Folder"), this);
 
     // Algorithm selection
-    QAction *actionSetAlgoSha1 = new QAction("SHA-1", this);
-    QAction *actionSetAlgoSha256 = new QAction("SHA-256", this);
-    QAction *actionSetAlgoSha512 = new QAction("SHA-512", this);
+    QAction *actionSetAlgoSha1 = new QAction(QStringLiteral(u"SHA-1"), this);
+    QAction *actionSetAlgoSha256 = new QAction(QStringLiteral(u"SHA-256"), this);
+    QAction *actionSetAlgoSha512 = new QAction(QStringLiteral(u"SHA-512"), this);
     QActionGroup *actionGroupSelectAlgo = new QActionGroup(this);
 
     // Menu
     QMenu *menuAlgo = new QMenu;
-    QMenu *menuCreateDigest = new QMenu("Create Digest file");
-    QMenu *menuOpenRecent = new QMenu("Open Recent");
+    QMenu *menuCreateDigest = new QMenu(QStringLiteral(u"Create Digest file"));
+    QMenu *menuOpenRecent = new QMenu(QStringLiteral(u"Open Recent"));
     QMenu *menuUpdateDatabase = nullptr;
     QList<QMenu*> listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase };
 
