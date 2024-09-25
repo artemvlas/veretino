@@ -298,17 +298,18 @@ void TreeModel::clearCacheFolderItems()
     cacheFolderItems_.clear();
 }
 
-// the TreeModel implies that if an item has children, then it is a folder (or invalid-root); if not, then it is a file
+// the TreeModel implies that if an item has children,
+// then it is a folder (or invalid-root); if not, then it is a file
 bool TreeModel::isFileRow(const QModelIndex &curIndex)
 {
-    const QModelIndex &ind = curIndex.siblingAtColumn(ColumnName);
+    const QModelIndex ind = curIndex.siblingAtColumn(ColumnName);
 
     return (ind.isValid() && !ind.model()->hasChildren(ind));
 }
 
 bool TreeModel::isFolderRow(const QModelIndex &curIndex)
 {
-    const QModelIndex &ind = curIndex.siblingAtColumn(ColumnName);
+    const QModelIndex ind = curIndex.siblingAtColumn(ColumnName);
 
     return (ind.isValid() && ind.model()->hasChildren(ind));
 }

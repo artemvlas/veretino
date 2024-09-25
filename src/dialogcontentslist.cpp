@@ -331,8 +331,8 @@ void DialogContentsList::updateLabelTotalFiltered()
     }
 
     if (itemsContain(Checked)) {
-        ui->labelTotalFiltered->setText(QString("Filtered: %1")
-                                        .arg(format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize)));
+        ui->labelTotalFiltered->setText(QStringLiteral(u"Filtered: ")
+                                        + format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize));
     }
     else
         ui->labelTotalFiltered->clear();

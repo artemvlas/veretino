@@ -11,6 +11,7 @@
 #include <QAbstractItemModel>
 #include <QPalette>
 #include "files.h"
+#include "numbers.h"
 
 struct Lit { // Literals
 static const QStringList sl_db_exts;
@@ -34,6 +35,7 @@ bool canBeChecksum(const QString &str);
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
 QString joinStrings(int num, const QString &str); // --> "X str"
+QString joinStrings(const QString &str, int num); // --> "str X"
 
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
 } // namespace tools
@@ -71,6 +73,7 @@ QString algoToStr(int sumStrLength, bool capitalLetters = true);
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumber(int number);
 QString filesNumberAndSize(int number, qint64 filesSize); // returns "number file's' (readable size)"
+QString filesNumberAndSize(const Numbers &num, FileStatus status);
 QString fileItemStatus(FileStatus status);
 
 QString coloredText(bool ignore); // 'ignore' (true = red, false = green)

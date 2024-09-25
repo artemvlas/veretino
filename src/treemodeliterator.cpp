@@ -28,7 +28,8 @@ void TreeModelIterator::setup(const QModelIndex &root)
 
 bool TreeModelIterator::hasNext() const
 {
-    return nextIndex_.isValid();
+    // return nextIndex_.isValid();
+    return !endReached;
 }
 
 TreeModelIterator& TreeModelIterator::next()
@@ -70,7 +71,7 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
 
     endReached = !estimatedIndex.isValid();
 
-    return estimatedIndex.isValid() ? estimatedIndex : QModelIndex();
+    return endReached ? QModelIndex() : estimatedIndex;
 }
 
 QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex) const

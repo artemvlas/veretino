@@ -135,6 +135,11 @@ QString joinStrings(int num, const QString &str)
     return QString::number(num) % ' ' % str;
 }
 
+QString joinStrings(const QString &str, int num)
+{
+    return str % ' ' % QString::number(num);
+}
+
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
 {
     if (QFileInfo::exists(path))
@@ -441,6 +446,11 @@ QString filesNumberAndSize(int number, qint64 filesSize)
         return filesNumber(number);
 
     return addStrInParentheses(filesNumber(number), dataSizeReadable(filesSize));
+}
+
+QString filesNumberAndSize(const Numbers &num, FileStatus status)
+{
+    return filesNumberAndSize(num.numberOf(status), num.totalSize(status));
 }
 
 QString fileNameAndSize(const QString &filePath)

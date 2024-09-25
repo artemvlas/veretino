@@ -127,7 +127,7 @@ QStringList DialogDbStatus::infoContent()
         contentNumbers.append(QString("Stored checksums: %1%2").arg(numChecksums).arg(createdDataSize));
 
     if (data_->contains(FileStatus::CombUnreadable))
-        contentNumbers.append(QStringLiteral(u"Unreadable files: ") + QString::number(_num.numberOf(FileStatus::CombUnreadable)));
+        contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _num.numberOf(FileStatus::CombUnreadable)));
 
     if (isSavedToDesktop()) {
         contentNumbers.append(QString());
@@ -147,7 +147,7 @@ QStringList DialogDbStatus::infoContent()
     contentNumbers.append(QStringLiteral(u"***"));
 
     //OLD: Files::itemInfo(data_->model_, FileStatus::New));
-    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumberAndSize(_num.numberOf(FileStatus::New), _num.totalSize(FileStatus::New)));
+    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumberAndSize(_num, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(_num.numberOf(FileStatus::Missing)));
 
     if (data_->isImmutable()) {
@@ -209,13 +209,13 @@ QStringList DialogDbStatus::infoChanges()
     QStringList result;
 
     if (data_->contains(FileStatus::Added))
-        result.append(QStringLiteral(u"Added: ") + format::filesNumberAndSize(_num.numberOf(FileStatus::Added), _num.totalSize(FileStatus::Added)));
+        result.append(QStringLiteral(u"Added: ") + format::filesNumberAndSize(_num, FileStatus::Added));
 
     if (data_->contains(FileStatus::Removed))
-        result.append(QStringLiteral(u"Removed: ") + QString::number(_num.numberOf(FileStatus::Removed)));
+        result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _num.numberOf(FileStatus::Removed)));
 
     if (data_->contains(FileStatus::Updated))
-        result.append(QStringLiteral(u"Updated: ") + QString::number(_num.numberOf(FileStatus::Updated)));
+        result.append(tools::joinStrings(QStringLiteral(u"Updated:"), _num.numberOf(FileStatus::Updated)));
 
     return result;
 }

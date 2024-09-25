@@ -11,10 +11,10 @@
 #include "treemodeliterator.h"
 #include "treemodel.h"
 
-const QString ExtNumSize::strNoType = "No type";
-const QString ExtNumSize::strVeretinoDb = "Veretino DB";
-const QString ExtNumSize::strShaFiles = "sha1/256/512";
-const QString ExtNumSize::strNoPerm = "No Permissions";
+const QString ExtNumSize::strNoType = QStringLiteral(u"No type");
+const QString ExtNumSize::strVeretinoDb = QStringLiteral(u"Veretino DB");
+const QString ExtNumSize::strShaFiles = QStringLiteral(u"sha1/256/512");
+const QString ExtNumSize::strNoPerm = QStringLiteral(u"No Permissions");
 
 const QString Files::desktopFolderPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 

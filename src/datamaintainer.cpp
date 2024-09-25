@@ -407,43 +407,40 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     if (!data_ || !curIndex.isValid() || (curIndex.model() != data_->model_))
         return QString();
 
-    QString text;
-
     if (TreeModel::isFileRow(curIndex)) {
-        QString itemFileNameStr = TreeModel::itemName(curIndex);
-        QVariant itemFileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
-        QString itemFileSizeStr = itemFileSize.isValid() ? QString(" (%1)").arg(format::dataSizeReadable(itemFileSize.toLongLong()))
-                                                         : QString();
+        const QString _fileName = TreeModel::itemName(curIndex);
+        const QVariant _fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
 
-        return itemFileNameStr + itemFileSizeStr;
+        if (_fileSize.isValid()) {
+            return format::addStrInParentheses(_fileName,
+                                               format::dataSizeReadable(_fileSize.toLongLong()));
+        }
+
+        return _fileName;
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
         const Numbers &num = data_->getNumbers(curIndex);
-        const bool containsAvailable = num.contains(FileStatus::CombAvailable);
+        QStringList _sl;
 
-        if (containsAvailable) {
-            text = QStringLiteral(u"Avail.: ")
-                   + format::filesNumberAndSize(num.numberOf(FileStatus::CombAvailable), num.totalSize(FileStatus::CombAvailable));
-        }
-
-        if (num.contains(FileStatus::Missing)) {
-            QString pre;
-            if (containsAvailable)
-                pre = "; ";
-            text.append(QString("%1Missing: %2").arg(pre).arg(num.numberOf(FileStatus::Missing)));
+        if (num.contains(FileStatus::CombAvailable)) {
+            QString __s = format::filesNumberAndSize(num, FileStatus::CombAvailable);
+            _sl << QStringLiteral(u"Avail.: ") + __s;
         }
 
         if (num.contains(FileStatus::New)) {
-            QString pre;
-            if (containsAvailable || num.contains(FileStatus::Missing))
-                pre = "; ";
-            text.append(QString("%1New: %2")
-                        .arg(pre, format::filesNumberAndSize(num.numberOf(FileStatus::New), num.totalSize(FileStatus::New))));
+            QString __s = format::filesNumberAndSize(num, FileStatus::New);
+            _sl << QStringLiteral(u"New: ") + __s;
         }
+
+        if (num.contains(FileStatus::Missing)) {
+            _sl << tools::joinStrings(QStringLiteral(u"Missing:"), num.numberOf(FileStatus::Missing));
+        }
+
+        return _sl.join(QStringLiteral(u"; "));
     }
 
-    return text;
+    return QString();
 }
 
 bool DataMaintainer::isCanceled() const
