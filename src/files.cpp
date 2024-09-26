@@ -145,7 +145,7 @@ QString Files::getFolderSize(const QString &path)
         // result processing
         if (!isCanceled()) {
             const QString _folderName = paths::basicName(path);
-            const QString _folderSize = format::filesNumberAndSize(filesNumber, totalSize);
+            const QString _folderSize = format::filesNumSize(filesNumber, totalSize);
 
             result = QString("%1: %2")
                          .arg(_folderName, _folderSize);

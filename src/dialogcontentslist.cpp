@@ -332,7 +332,7 @@ void DialogContentsList::updateLabelTotalFiltered()
 
     if (itemsContain(Checked)) {
         ui->labelTotalFiltered->setText(QStringLiteral(u"Filtered: ")
-                                        + format::filesNumberAndSize(filteredFilesNumber, filteredFilesSize));
+                                        + format::filesNumSize(filteredFilesNumber, filteredFilesSize));
     }
     else
         ui->labelTotalFiltered->clear();

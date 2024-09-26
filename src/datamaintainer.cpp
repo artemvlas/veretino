@@ -424,12 +424,12 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
         QStringList _sl;
 
         if (num.contains(FileStatus::CombAvailable)) {
-            QString __s = format::filesNumberAndSize(num, FileStatus::CombAvailable);
+            QString __s = format::filesNumSize(num, FileStatus::CombAvailable);
             _sl << QStringLiteral(u"Avail.: ") + __s;
         }
 
         if (num.contains(FileStatus::New)) {
-            QString __s = format::filesNumberAndSize(num, FileStatus::New);
+            QString __s = format::filesNumSize(num, FileStatus::New);
             _sl << QStringLiteral(u"New: ") + __s;
         }
 

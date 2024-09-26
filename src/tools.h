@@ -72,8 +72,8 @@ QString algoToStr(int sumStrLength, bool capitalLetters = true);
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
 QString filesNumber(int number);
-QString filesNumberAndSize(int number, qint64 filesSize); // returns "number file's' (readable size)"
-QString filesNumberAndSize(const Numbers &num, FileStatus status);
+QString filesNumSize(int number, qint64 filesSize); // returns "number file's' (readable size)"
+QString filesNumSize(const Numbers &num, FileStatus status);
 QString fileItemStatus(FileStatus status);
 
 QString coloredText(bool ignore); // 'ignore' (true = red, false = green)

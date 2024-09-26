@@ -139,7 +139,7 @@ QStringList DialogDbStatus::infoContent()
         return contentNumbers;
 
     if (available > 0)
-        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumberAndSize(available, totalSize));
+        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(available, totalSize));
     else
         contentNumbers.append("NO FILES available to check");
 
@@ -147,7 +147,7 @@ QStringList DialogDbStatus::infoContent()
     contentNumbers.append(QStringLiteral(u"***"));
 
     //OLD: Files::itemInfo(data_->model_, FileStatus::New));
-    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumberAndSize(_num, FileStatus::New));
+    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(_num, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(_num.numberOf(FileStatus::Missing)));
 
     if (data_->isImmutable()) {
@@ -209,7 +209,7 @@ QStringList DialogDbStatus::infoChanges()
     QStringList result;
 
     if (data_->contains(FileStatus::Added))
-        result.append(QStringLiteral(u"Added: ") + format::filesNumberAndSize(_num, FileStatus::Added));
+        result.append(QStringLiteral(u"Added: ") + format::filesNumSize(_num, FileStatus::Added));
 
     if (data_->contains(FileStatus::Removed))
         result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _num.numberOf(FileStatus::Removed)));

@@ -440,7 +440,7 @@ QString filesNumber(int number)
     return tools::joinStrings(number, _files);
 }
 
-QString filesNumberAndSize(int number, qint64 filesSize)
+QString filesNumSize(int number, qint64 filesSize)
 {
     if (number == 0)
         return filesNumber(number);
@@ -448,9 +448,9 @@ QString filesNumberAndSize(int number, qint64 filesSize)
     return addStrInParentheses(filesNumber(number), dataSizeReadable(filesSize));
 }
 
-QString filesNumberAndSize(const Numbers &num, FileStatus status)
+QString filesNumSize(const Numbers &num, FileStatus status)
 {
-    return filesNumberAndSize(num.numberOf(status), num.totalSize(status));
+    return filesNumSize(num.numberOf(status), num.totalSize(status));
 }
 
 QString fileNameAndSize(const QString &filePath)
