@@ -437,6 +437,10 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
             _sl << tools::joinStrings(QStringLiteral(u"Missing:"), num.numberOf(FileStatus::Missing));
         }
 
+        if (num.contains(FileStatus::CombUnreadable)) {
+            _sl << tools::joinStrings(QStringLiteral(u"Unread.:"), num.numberOf(FileStatus::CombUnreadable));
+        }
+
         return _sl.join(QStringLiteral(u"; "));
     }
 
