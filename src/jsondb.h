@@ -44,6 +44,8 @@ private:
     static const QString h_key_Updated;
     static const QString h_key_Verified;
 
+    static const QString a_key_Unreadable;
+
     QString jsonFilePath;
     const ProcState *proc_ = nullptr;
 

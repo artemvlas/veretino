@@ -11,6 +11,7 @@ Fixes and Minor Enhancements:
 * Fixed display of item's zero-byte size.
 * Folder Contents dialog: fixed adding the sizes of files without read permissions.
 * Fixed crash when opening a database while another parsing is ongoing.
+* Improved parsing of items that were marked unreadable during database creation.
 
 Internal changes:
 * Redesigned task management system.

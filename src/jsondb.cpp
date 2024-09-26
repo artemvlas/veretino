@@ -13,15 +13,17 @@
 #include <QStringBuilder>
 #include <QElapsedTimer>
 
-const QString JsonDb::h_key_DateTime = "DateTime";
-const QString JsonDb::h_key_Ignored = "Ignored";
-const QString JsonDb::h_key_Included = "Included";
-const QString JsonDb::h_key_Algo = "Hash Algorithm";
-const QString JsonDb::h_key_WorkDir = "WorkDir";
-const QString JsonDb::h_key_Flags = "Flags";
+const QString JsonDb::h_key_DateTime = QStringLiteral(u"DateTime");
+const QString JsonDb::h_key_Ignored = QStringLiteral(u"Ignored");
+const QString JsonDb::h_key_Included = QStringLiteral(u"Included");
+const QString JsonDb::h_key_Algo = QStringLiteral(u"Hash Algorithm");
+const QString JsonDb::h_key_WorkDir = QStringLiteral(u"WorkDir");
+const QString JsonDb::h_key_Flags = QStringLiteral(u"Flags");
 
-const QString JsonDb::h_key_Updated = "Updated";
-const QString JsonDb::h_key_Verified = "Verified";
+const QString JsonDb::h_key_Updated = QStringLiteral(u"Updated");
+const QString JsonDb::h_key_Verified = QStringLiteral(u"Verified");
+
+const QString JsonDb::a_key_Unreadable = QStringLiteral(u"Unreadable files");
 
 JsonDb::JsonDb(QObject *parent)
     : QObject(parent)
@@ -141,7 +143,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
 
     QJsonObject excludedFiles;
     if (unreadableFiles.size() > 0)
-        excludedFiles[QStringLiteral(u"Unreadable files")] = unreadableFiles;
+        excludedFiles[a_key_Unreadable] = unreadableFiles;
 
     QJsonArray mainArray;
     mainArray.append(header);
@@ -207,27 +209,9 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         return nullptr;
     }
 
-    DataContainer *parsedData = new DataContainer(getMetaData(filePath, mainArray.at(0).toObject(), filelistData));
+    const QJsonObject _header = mainArray.at(0).toObject();
+    DataContainer *parsedData = new DataContainer(getMetaData(filePath, _header, filelistData));
     const QString &workDir = parsedData->metaData.workDir;
-
-    // adding new files
-    emit setStatusbarText(QStringLiteral(u"Looking for new files..."));
-
-    QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
-
-    while (it.hasNext() && !isCanceled()) {
-        const QString _fullPath = it.next();
-        const QString _relPath = paths::relativePath(workDir, _fullPath);
-
-        if (parsedData->metaData.filter.isFileAllowed(_relPath)
-            && !filelistData.contains(_relPath))
-        {
-            QFileInfo fileInfo(_fullPath);
-            if (fileInfo.isReadable()) {
-                parsedData->model_->add_file(_relPath, FileValues(FileStatus::New, fileInfo.size()));
-            }
-        }
-    }
 
     // populating the main data
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
@@ -245,16 +229,38 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     }
 
     // additional data
-    const QJsonObject &excludedFiles = (mainArray.size() > 2) ? mainArray.at(2).toObject() : QJsonObject();
-    if (!excludedFiles.isEmpty()) {
-        if (excludedFiles.contains(QStringLiteral(u"Unreadable files"))) {
-            const QJsonArray &unreadableFiles = excludedFiles.value(QStringLiteral(u"Unreadable files")).toArray();
+    QSet<QString> _unrCache;
+    const QJsonObject excludedFiles = (mainArray.size() > 2) ? mainArray.at(2).toObject() : QJsonObject();
+    if (excludedFiles.contains(a_key_Unreadable)) {
+        const QJsonArray unreadableFiles = excludedFiles.value(a_key_Unreadable).toArray();
 
-            for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
-                const QString _unrFile = unreadableFiles.at(var).toString();
-                if (QFileInfo::exists(paths::joinPath(workDir, _unrFile))) {
-                    parsedData->model_->add_file(_unrFile, FileValues(FileStatus::UnPermitted));
-                }
+        for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
+            const QString _relPath = unreadableFiles.at(var).toString();
+            const QString _fullPath = paths::joinPath(workDir, _relPath);
+            const FileStatus _status = tools::failedCalcStatus(_fullPath);
+
+            if (_status & FileStatus::CombUnreadable) {
+                parsedData->model_->add_file(_relPath, FileValues(_status));
+                _unrCache << _relPath;
+            }
+        }
+    }
+
+    // adding new files
+    emit setStatusbarText(QStringLiteral(u"Looking for new files..."));
+    QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
+
+    while (it.hasNext() && !isCanceled()) {
+        const QString _fullPath = it.next();
+        const QString _relPath = paths::relativePath(workDir, _fullPath);
+
+        if (parsedData->metaData.filter.isFileAllowed(_relPath)
+            && !filelistData.contains(_relPath)
+            && !_unrCache.contains(_relPath))
+        {
+            QFileInfo fileInfo(_fullPath);
+            if (fileInfo.isReadable()) {
+                parsedData->model_->add_file(_relPath, FileValues(FileStatus::New, fileInfo.size()));
             }
         }
     }
