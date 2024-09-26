@@ -114,6 +114,30 @@ bool canBeChecksum(const QString &str)
     return true;
 }
 
+bool isLater(const QString &dt_before, const QString &dt_later)
+{
+    // format "yyyy/MM/dd HH:mm"
+    const int dt_str_len = 16;
+
+    if (dt_before.size() != dt_str_len
+        || dt_later.size() != dt_str_len)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < dt_before.size(); ++i) {
+        const int _ch1v = dt_before.at(i).digitValue();
+        const int _ch2v = dt_later.at(i).digitValue();
+
+        if (_ch1v < _ch2v)
+            return true;
+        if (_ch1v > _ch2v)
+            return false;
+    }
+
+    return false;
+}
+
 QString joinStrings(const QString &str1, const QString &str2, QChar sep)
 {
     const bool s1Ends = str1.endsWith(sep);

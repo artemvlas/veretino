@@ -32,6 +32,7 @@ int digitsToNum(const QList<int> &digits); // {0,1,2,3} --> 123
 bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &str);
+bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
 QString joinStrings(int num, const QString &str); // --> "X str"
