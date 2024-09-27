@@ -114,18 +114,19 @@ QStringList DialogDbStatus::infoContent()
         return { QStringLiteral(u"The checksum list is being calculated...") };
 
     const Numbers &_num = data_->numbers;
-
     QStringList contentNumbers;
-    QString createdDataSize;
-    const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
-    const int available = _num.numberOf(FileStatus::CombAvailable);
     const qint64 totalSize = _num.totalSize(FileStatus::CombAvailable);
+    const int available = _num.numberOf(FileStatus::CombAvailable);
+    const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
 
-    if (isJustCreated())
-        createdDataSize = QString(" (%1)").arg(format::dataSizeReadable(totalSize));
+    if (isJustCreated() || (numChecksums != available)) {
+        QString _storedChecksums = tools::joinStrings(QStringLiteral(u"Stored checksums:"), numChecksums);
 
-    if (isJustCreated() || (numChecksums != available))
-        contentNumbers.append(QString("Stored checksums: %1%2").arg(numChecksums).arg(createdDataSize));
+        if (isJustCreated())
+            contentNumbers << format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(totalSize));
+        else
+            contentNumbers << _storedChecksums;
+    }
 
     if (data_->contains(FileStatus::CombUnreadable))
         contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _num.numberOf(FileStatus::CombUnreadable)));
@@ -147,7 +148,6 @@ QStringList DialogDbStatus::infoContent()
     contentNumbers.append(QString());
     contentNumbers.append(QStringLiteral(u"***"));
 
-    //OLD: Files::itemInfo(data_->model_, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(_num, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(_num.numberOf(FileStatus::Missing)));
 
