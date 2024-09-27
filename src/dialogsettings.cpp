@@ -33,7 +33,7 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
                                                  "(if all files exist and match the stored checksums),\n"
                                                  "the current date/time will be written to the database."));
 
-    ui->cbConsiderDateModified->setToolTip(QStringLiteral(u"During parsing, check the modified date of the files.\n"
+    ui->cbConsiderDateModified->setToolTip(QStringLiteral(u"During parsing, check the files modified date.\n"
                                                            "Items changed after creating the DB will be marked."));
 
     loadSettings(*settings);

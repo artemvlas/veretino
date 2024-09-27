@@ -96,6 +96,7 @@ void MenuActions::setActionsIcons()
     actionFilterModified->setIcon(iconProvider.icon(FileStatus::NotCheckedMod));
     actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
     actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
+    //actionCheckAllMod->setIcon(iconProvider.icon(FileStatus::NotCheckedMod));
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
     actionCopyStoredChecksum->setIcon(iconProvider.icon(Icons::Copy));
     actionCopyReChecksum->setIcon(iconProvider.icon(Icons::Copy));

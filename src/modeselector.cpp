@@ -742,6 +742,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     if (!view_->isViewDatabase())
         return;
 
+    const Numbers &_num = view_->data_->numbers;
     const QModelIndex index = view_->indexAt(point);
     QMenu *viewContextMenu = menuAct_->disposableMenu();
 
@@ -768,27 +769,27 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
         // filter view
         if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
-            if (view_->data_->numbers.contains(FileStatus::Mismatched)) {
+            if (_num.contains(FileStatus::Mismatched)) {
                 menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
                 viewContextMenu->addAction(menuAct_->actionFilterMismatches);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::CombUnreadable)) {
+            if (_num.contains(FileStatus::CombUnreadable)) {
                 menuAct_->actionFilterUnreadable->setChecked(view_->isViewFiltered(FileStatus::CombUnreadable));
                 viewContextMenu->addAction(menuAct_->actionFilterUnreadable);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::NotCheckedMod)) {
+            if (_num.contains(FileStatus::NotCheckedMod)) {
                 menuAct_->actionFilterModified->setChecked(view_->isViewFiltered(FileStatus::NotCheckedMod));
                 viewContextMenu->addAction(menuAct_->actionFilterModified);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::CombNewLost)) {
+            if (_num.contains(FileStatus::CombNewLost)) {
                 menuAct_->actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
                 viewContextMenu->addAction(menuAct_->actionFilterNewLost);
             }
 
-            if (view_->data_->numbers.contains(FileStatus::CombUpdatable))
+            if (_num.contains(FileStatus::CombUpdatable))
                 viewContextMenu->addSeparator();
         }
 
@@ -836,13 +837,13 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
             }
         }
 
-        if (view_->data_->numbers.contains(FileStatus::NotCheckedMod))
+        if (_num.contains(FileStatus::NotCheckedMod))
             viewContextMenu->addAction(menuAct_->actionCheckAllMod);
 
         viewContextMenu->addAction(menuAct_->actionCheckAll);
 
-        if (!isDbConst() && view_->data_->contains(FileStatus::CombUpdatable))
-            viewContextMenu->addMenu(menuAct_->menuUpdateDb(view_->data_->numbers));
+        if (!isDbConst() && _num.contains(FileStatus::CombUpdatable))
+            viewContextMenu->addMenu(menuAct_->menuUpdateDb(_num));
     }
 
     viewContextMenu->addSeparator();
