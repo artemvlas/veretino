@@ -39,6 +39,9 @@ public:
     bool excludeUnpermitted = true;
     bool dbFlagConst = false;
 
+    // experimental
+    bool considerFileModDate = true;
+
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;
     QByteArray headerStateDb;

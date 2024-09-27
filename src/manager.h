@@ -60,7 +60,10 @@ public slots:
     void modelChanged(ModelView modelView); // recive the signal when Model has been changed
     void makeDbContentsList();
 
-    void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex()); // checking the list of files against the checksums stored in the database
+    // checking the list of files against the checksums stored in the database
+    void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex());
+    void verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus);
+
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
 
     void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size

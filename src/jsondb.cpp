@@ -221,6 +221,13 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         qint64 _size = _exist ? QFileInfo(_fullPath).size() : -1;
         FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
 
+        // modif. date [experimental]
+        if (_exist && considerFileModDate && parsedData->hasNeverUpdated()) {
+            QString _db_creat = parsedData->metaData.datetime[DateTimeStr::DateCreated].right(16);
+            if (tools::isLater(_db_creat, QFileInfo(_fullPath).lastModified()))
+                _status = FileStatus::NotCheckedMod;
+        }
+
         FileValues _values(_status, _size);
         _values.checksum = i.value().toString();
 

@@ -139,6 +139,11 @@ bool isLater(const QString &dt_before, const QString &dt_later)
     return false;
 }
 
+bool isLater(const QString &dt_str, const QDateTime &other)
+{
+    return isLater(dt_str, other.toString(Lit::s_dt_format));
+}
+
 QString joinStrings(const QString &str1, const QString &str2, QChar sep)
 {
     const bool s1Ends = str1.endsWith(sep);
@@ -490,6 +495,7 @@ QString fileItemStatus(FileStatus status)
     case FileStatus::Calculating: return QStringLiteral(u"calculating...");
     case FileStatus::Verifying: return QStringLiteral(u"verifying...");
     case FileStatus::NotChecked: return QStringLiteral(u"ready...");
+    case FileStatus::NotCheckedMod: return QStringLiteral(u"(mod)ready...");
     case FileStatus::Matched: return QStringLiteral(u"match");
     case FileStatus::Mismatched: return QStringLiteral(u"not match");
     case FileStatus::New: return QStringLiteral(u"new file");

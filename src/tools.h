@@ -34,6 +34,7 @@ bool isDatabaseFile(const QString &filePath);
 bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &str);
 bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
+bool isLater(const QString &dt_str, const QDateTime &other);
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
 QString joinStrings(int num, const QString &str); // --> "X str"

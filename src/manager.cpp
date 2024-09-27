@@ -146,6 +146,10 @@ void Manager::createDataModel(const QString &dbFilePath)
         return;
     }
 
+    // [experimental, file mod. date]
+    dataMaintainer->json_->considerFileModDate = settings_->considerFileModDate;
+    // [exp.]
+
     dataMaintainer->importJson(dbFilePath);
     emit setViewData(dataMaintainer->data_);
 }
@@ -304,6 +308,11 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
 void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
 {
+    verifyFolderItem(folderItemIndex, FileStatus::CombNotChecked);
+}
+
+void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus)
+{
     if (!dataMaintainer->data_) {
         return;
     }
@@ -318,7 +327,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
     }
 
     // main job
-    calculateChecksums(FileStatus::NotChecked, folderItemIndex);
+    calculateChecksums(checkstatus, folderItemIndex);
 
     if (procState->isCanceled())
         return;

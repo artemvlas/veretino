@@ -145,6 +145,11 @@ QStringList DialogDbStatus::infoContent()
     else
         contentNumbers.append("NO FILES available to check");
 
+    // [experimental]
+    if (_num.contains(FileStatus::NotCheckedMod))
+        contentNumbers << tools::joinStrings(QStringLiteral(u"Modified: "), _num.numberOf(FileStatus::NotCheckedMod));
+    // [exp.]
+
     contentNumbers.append(QString());
     contentNumbers.append(QStringLiteral(u"***"));
 

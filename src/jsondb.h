@@ -24,6 +24,9 @@ public:
     DataContainer* parseJson(const QString &filePath);
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
 
+    // [experimental]
+    bool considerFileModDate = false;
+
 private:   
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);

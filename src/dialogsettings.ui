@@ -102,6 +102,13 @@ immediately after any changes are made.</string>
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="cbConsiderFileModDate">
+           <property name="text">
+            <string>Consider file modif. date</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

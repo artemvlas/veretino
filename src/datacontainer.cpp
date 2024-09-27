@@ -92,7 +92,7 @@ bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfol
 bool DataContainer::isAllChecked() const
 {
     return (contains(FileStatus::CombChecked)
-            && !contains(FileStatus::NotChecked | FileStatus::CombProcessing));
+            && !contains(FileStatus::CombNotChecked | FileStatus::CombProcessing));
 }
 
 bool DataContainer::isAllMatched() const

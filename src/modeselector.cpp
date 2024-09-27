@@ -65,6 +65,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(menuAct_->actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(menuAct_->actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
+    connect(menuAct_->actionCheckAllMod, &QAction::triggered, this, &ModeSelector::verifyModified);
     connect(menuAct_->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
     connect(menuAct_->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
     connect(menuAct_->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
@@ -450,7 +451,7 @@ void ModeSelector::checkFile(const QString &filePath, const QString &checkSum)
     manager_->addTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
 }
 
-void ModeSelector::verify(const QModelIndex& index)
+void ModeSelector::verify(const QModelIndex &index)
 {
     if (TreeModel::isFileRow(index)) {
         view_->disableFilter();
@@ -458,8 +459,15 @@ void ModeSelector::verify(const QModelIndex& index)
     }
     else {
         view_->setViewSource();
-        manager_->addTask(&Manager::verifyFolderItem, index);
+        manager_->addTask(qOverload<const QModelIndex&>(&Manager::verifyFolderItem), index);
     }
+}
+
+void ModeSelector::verifyModified()
+{
+    view_->setViewSource();
+    manager_->addTask(qOverload<const QModelIndex&, FileStatus>(&Manager::verifyFolderItem),
+                      QModelIndex(), FileStatus::NotCheckedMod);
 }
 
 void ModeSelector::branchSubfolder()
@@ -820,6 +828,9 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 viewContextMenu->addAction(menuAct_->actionCheckCurSubfolderFromModel);
             }
         }
+
+        if (view_->data_->numbers.contains(FileStatus::NotCheckedMod))
+            viewContextMenu->addAction(menuAct_->actionCheckAllMod);
 
         viewContextMenu->addAction(menuAct_->actionCheckAll);
 

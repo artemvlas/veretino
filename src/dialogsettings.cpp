@@ -63,6 +63,9 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbInstantSaving->setChecked(settings.instantSaving);
     ui->cbExcludeUnpermitted->setChecked(settings.excludeUnpermitted);
 
+    // experimental
+    ui->cbConsiderFileModDate->setChecked(settings.considerFileModDate);
+
     // Tab Database
     if (settings.dbPrefix == defaults.dbPrefix)
         ui->inputJsonFileNamePrefix->clear();
@@ -97,6 +100,9 @@ void DialogSettings::updateSettings()
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
     settings_->instantSaving = ui->cbInstantSaving->isChecked();
     settings_->excludeUnpermitted = ui->cbExcludeUnpermitted->isChecked();
+
+    // experimental
+    settings_->considerFileModDate = ui->cbConsiderFileModDate->isChecked();
 
     // database
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix

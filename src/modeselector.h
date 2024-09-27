@@ -65,7 +65,8 @@ public:
     void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result = DestFileProc::Generic);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
-    void verify(const QModelIndex& index = QModelIndex());
+    void verify(const QModelIndex &index = QModelIndex());
+    void verifyModified();
     void branchSubfolder();
     void exportItemSum();
 
@@ -112,8 +113,6 @@ private:
     Settings *settings_;
     ProcState *proc_ = nullptr;
     Manager *manager_ = nullptr;
-
-signals:
 
 }; // class ModeSelector
 
