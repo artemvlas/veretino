@@ -116,6 +116,11 @@ bool DataContainer::isImmutable() const
     return (metaData.flags & MetaData::FlagConst);
 }
 
+bool DataContainer::hasNeverUpdated() const
+{
+    return metaData.datetime[DateTimeStr::DateUpdated].isEmpty();
+}
+
 bool DataContainer::isBackupExists() const
 {
     return QFile::exists(backupFilePath());
