@@ -63,6 +63,9 @@ QString IconProvider::svgFilePath(FileStatus status) const
     case FileStatus::NotChecked:
         iconFileName = QStringLiteral(u"notchecked");
         break;
+    case FileStatus::NotCheckedMod:
+        iconFileName = QStringLiteral(u"outdated");
+        break;
     case FileStatus::Matched:
         iconFileName = QStringLiteral(u"matched");
         break;

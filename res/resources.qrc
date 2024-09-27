@@ -72,5 +72,6 @@
         <file>icons/light/process-stop.svg</file>
         <file>icons/generic/unreadable.svg</file>
         <file>icons/generic/locked.svg</file>
+        <file>icons/generic/outdated.svg</file>
     </qresource>
 </RCC>
