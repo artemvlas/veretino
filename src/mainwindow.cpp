@@ -269,8 +269,8 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     QString titleText = result.contains(FileStatus::Mismatched) ? "FAILED" : "Success";
     QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
 
-    QIcon icon = (result.contains(FileStatus::Mismatched)) ? modeSelect->iconProvider.icon(FileStatus::Mismatched)
-                                                           : modeSelect->iconProvider.icon(FileStatus::Matched);
+    QIcon icon = result.contains(FileStatus::Mismatched) ? modeSelect->iconProvider.icon(FileStatus::Mismatched)
+                                                         : modeSelect->iconProvider.icon(FileStatus::Matched);
 
     if (result.contains(FileStatus::Mismatched)) {
         if (modeSelect->isDbConst()) {
@@ -288,8 +288,14 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
                             .arg(result.numberOf(FileStatus::Mismatched))
-                            .arg(result.numberOf(FileStatus::CombAvailable))
+                            .arg(result.numberOf(FileStatus::CombMatched | FileStatus::Mismatched)) // was before: FileStatus::CombAvailable
                             .arg(result.numberOf(FileStatus::Mismatched) == 1 ? "is" : "are"));
+
+        if (result.contains(FileStatus::CombNotChecked)) {
+            messageText.append("\n\n");
+            messageText.append(format::filesNumber(result.numberOf(FileStatus::CombNotChecked))
+                               + " remain unchecked.");
+        }
     }
     else {
         messageText.append(QString("ALL %1 files passed verification.")
