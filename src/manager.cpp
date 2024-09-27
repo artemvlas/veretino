@@ -147,7 +147,7 @@ void Manager::createDataModel(const QString &dbFilePath)
     }
 
     // [experimental, file mod. date]
-    dataMaintainer->json_->considerFileModDate = settings_->considerFileModDate;
+    dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
     // [exp.]
 
     dataMaintainer->importJson(dbFilePath);

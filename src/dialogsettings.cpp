@@ -29,9 +29,12 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     connect(ui->inputExtensions, &QLineEdit::textEdited, this, qOverload<>(&DialogSettings::setComboBoxFpIndex));
     connect(ui->rbInclude, &QRadioButton::toggled, this, &DialogSettings::handleFilterMode);
 
-    ui->cbSaveVerificationDateTime->setToolTip("Checked: after successful verification\n"
-                                               "(if all files exist and match the stored checksums),\n"
-                                               "the current date/time will be written to the database.");
+    ui->cbSaveVerificationDateTime->setToolTip(QStringLiteral(u"Checked: after successful verification\n"
+                                                 "(if all files exist and match the stored checksums),\n"
+                                                 "the current date/time will be written to the database."));
+
+    ui->cbConsiderDateModified->setToolTip(QStringLiteral(u"During parsing, check the modified date of the files.\n"
+                                                           "Items changed after creating the DB will be marked."));
 
     loadSettings(*settings);
 
@@ -62,9 +65,7 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
     ui->cbInstantSaving->setChecked(settings.instantSaving);
     ui->cbExcludeUnpermitted->setChecked(settings.excludeUnpermitted);
-
-    // experimental
-    ui->cbConsiderFileModDate->setChecked(settings.considerFileModDate);
+    ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
 
     // Tab Database
     if (settings.dbPrefix == defaults.dbPrefix)
@@ -100,9 +101,7 @@ void DialogSettings::updateSettings()
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
     settings_->instantSaving = ui->cbInstantSaving->isChecked();
     settings_->excludeUnpermitted = ui->cbExcludeUnpermitted->isChecked();
-
-    // experimental
-    settings_->considerFileModDate = ui->cbConsiderFileModDate->isChecked();
+    settings_->considerDateModified = ui->cbConsiderDateModified->isChecked();
 
     // database
     settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix

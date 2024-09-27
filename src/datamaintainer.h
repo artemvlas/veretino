@@ -24,6 +24,7 @@ public:
     void setSourceData();
     bool setSourceData(DataContainer *sourceData);
     bool setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value = QVariant());
+    void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
     void updateNumbers();

@@ -38,9 +38,7 @@ public:
     bool instantSaving = false;
     bool excludeUnpermitted = true;
     bool dbFlagConst = false;
-
-    // experimental
-    bool considerFileModDate = true;
+    bool considerDateModified = true;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;
@@ -60,6 +58,7 @@ private:
     static const QString s_key_dbFlagConst;
     static const QString s_key_instantSaving;
     static const QString s_key_excludeUnPerm;
+    static const QString s_key_considerDateModified;
     static const QString s_key_filter_ignoreDbFiles;
     static const QString s_key_filter_ignoreShaFiles;
     static const QString s_key_filter_Mode;

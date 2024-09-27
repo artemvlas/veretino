@@ -18,6 +18,7 @@ const QString Settings::s_key_saveVerifDate = "saveVerifDate";
 const QString Settings::s_key_dbFlagConst = "dbFlagConst";
 const QString Settings::s_key_instantSaving = "instantSaving";
 const QString Settings::s_key_excludeUnPerm = "excludeUnPerm";
+const QString Settings::s_key_considerDateModified = "considerDateModified";
 const QString Settings::s_key_filter_ignoreDbFiles = "filter/ignoreDbFiles";
 const QString Settings::s_key_filter_ignoreShaFiles = "filter/ignoreShaFiles";
 const QString Settings::s_key_filter_Mode = "filter/filterMode";

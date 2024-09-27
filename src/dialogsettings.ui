@@ -103,9 +103,9 @@ immediately after any changes are made.</string>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="cbConsiderFileModDate">
+          <widget class="QCheckBox" name="cbConsiderDateModified">
            <property name="text">
-            <string>Consider file modif. date</string>
+            <string>Consider Date Modified</string>
            </property>
           </widget>
          </item>

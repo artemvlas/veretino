@@ -78,6 +78,11 @@ bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, c
     return (data_ && data_->model_->setData(fileIndex.siblingAtColumn(column), value));
 }
 
+void DataMaintainer::setConsiderDateModified(bool consider)
+{
+    json_->considerFileModDate = consider;
+}
+
 void DataMaintainer::updateDateTime()
 {
     if (data_) {
