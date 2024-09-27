@@ -27,6 +27,7 @@ const QString Lit::s_appName = QStringLiteral(APP_NAME);
 const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
 const QString Lit::s_app_name = QStringLiteral(u"veretino");
 const QString Lit::s_sepStick = QStringLiteral(u" | ");
+const QString Lit::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
 
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
@@ -295,7 +296,7 @@ void browsePath(const QString &path)
 namespace format {
 QString currentDateTime()
 {
-    return QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm");
+    return QDateTime::currentDateTime().toString(Lit::s_dt_format);
 }
 
 QString numString(qint64 num)

@@ -66,10 +66,10 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
         return QJsonArray();
     }
 
-    const QJsonDocument &readedDoc = readJsonFile(filePath);
+    const QJsonDocument readedDoc = readJsonFile(filePath);
 
     if (readedDoc.isArray()) {
-        const QJsonArray &dataArray = readedDoc.array();
+        const QJsonArray dataArray = readedDoc.array();
         if (dataArray.size() > 1 && dataArray.at(0).isObject() && dataArray.at(1).isObject())
             return dataArray;
     }
@@ -178,7 +178,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
         }
         else {
             emit setStatusbarText("NOT Saved");
-            emit showMessage(QString("Unable to save json file: %1").arg(pathToSave), "Error");
+            emit showMessage("Unable to save json file: " + pathToSave, "Error");
             return QString();
         }
     }
@@ -190,7 +190,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     timer.start();
 
     // the database is QJsonArray of QJsonObjects [{}, {}, ...]
-    const QJsonArray &mainArray = loadJsonDB(filePath);
+    const QJsonArray mainArray = loadJsonDB(filePath);
 
     if (mainArray.isEmpty()) {
         return nullptr;
@@ -198,13 +198,12 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
 
-    const QJsonObject &filelistData = mainArray.at(1).toObject();
+    const QJsonObject filelistData = mainArray.at(1).toObject();
 
     if (filelistData.isEmpty()) {
-        emit showMessage(QString("%1\n\n"
-                                 "The database doesn't contain checksums.\n"
-                                 "Probably all files have been ignored.")
-                                .arg(paths::basicName(filePath)), "Empty Database!");
+        emit showMessage(paths::basicName(filePath) + "\n\n"
+                            "The database doesn't contain checksums.\n"
+                            "Probably all files have been ignored.", "Empty Database!");
         emit setStatusbarText();
         return nullptr;
     }
@@ -324,7 +323,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     }
     else { // [datetime] version 0.4.0+
         const QString _strDateTime = findValueStr(header, QStringLiteral(u"time"));
-        const QStringList _dtList = _strDateTime.split(", ");
+        const QStringList _dtList = _strDateTime.split(QStringLiteral(u", "));
 
         if (_dtList.size() == 3) {
             for (int i = 0; i < _dtList.size(); ++i) { // && i < 3

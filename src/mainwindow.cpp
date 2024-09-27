@@ -254,9 +254,9 @@ void MainWindow::showDialogDbContents(const QString &folderName, const QList<Ext
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
-        QString strWindowTitle = "Database Contents";
+        QString strWindowTitle = QStringLiteral(u"Database Contents");
         if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))
-            strWindowTitle.append(" [available ones]");
+            strWindowTitle.append(QStringLiteral(u" [available ones]"));
         dialog.setWindowTitle(strWindowTitle);
         dialog.exec();
     }
@@ -266,7 +266,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 {
     QMessageBox msgBox(this);
 
-    QString titleText = (result.contains(FileStatus::Mismatched)) ? "FAILED" : "Success";
+    QString titleText = result.contains(FileStatus::Mismatched) ? "FAILED" : "Success";
     QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
 
     QIcon icon = (result.contains(FileStatus::Mismatched)) ? modeSelect->iconProvider.icon(FileStatus::Mismatched)
@@ -368,7 +368,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
 
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("A new Branch has been created");
-    msgBox.setText(QString("The subfolder data is forked:\n%1").arg(paths::shortenPath(dbFilePath)));
+    msgBox.setText("The subfolder data is forked:\n" + paths::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
