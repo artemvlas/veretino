@@ -6,7 +6,7 @@
 
 #include "settings.h"
 #include <QSettings>
-#include <QDebug>
+// #include <QDebug>
 #include "tools.h"
 
 const QString Settings::s_key_algo = "algorithm";
@@ -94,6 +94,7 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_dbFlagConst, dbFlagConst);
     storedSettings.setValue(s_key_instantSaving, instantSaving);
     storedSettings.setValue(s_key_excludeUnPerm, excludeUnpermitted);
+    storedSettings.setValue(s_key_considerDateModified, considerDateModified);
 
     // FilterRule
     storedSettings.setValue(s_key_filter_ignoreDbFiles, filter.ignoreDbFiles);
@@ -131,6 +132,7 @@ void Settings::loadSettings()
     dbFlagConst = storedSettings.value(s_key_dbFlagConst, defaults.dbFlagConst).toBool();
     instantSaving = storedSettings.value(s_key_instantSaving, defaults.instantSaving).toBool();
     excludeUnpermitted = storedSettings.value(s_key_excludeUnPerm, defaults.excludeUnpermitted).toBool();
+    considerDateModified = storedSettings.value(s_key_considerDateModified, defaults.considerDateModified).toBool();
 
     // FilterRule
     filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value(s_key_filter_Mode, FilterRule::NotSet).toInt()),
