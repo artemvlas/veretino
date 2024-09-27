@@ -14,6 +14,7 @@ MenuActions::MenuActions(QObject *parent)
     actionFilterNewLost->setCheckable(true);
     actionFilterMismatches->setCheckable(true);
     actionFilterUnreadable->setCheckable(true);
+    actionFilterModified->setCheckable(true);
 
     actionSetAlgoSha1->setCheckable(true);
     actionSetAlgoSha256->setCheckable(true);
@@ -92,6 +93,7 @@ void MenuActions::setActionsIcons()
     actionFilterNewLost->setIcon(iconProvider.icon(Icons::NewFile));
     actionFilterMismatches->setIcon(iconProvider.icon(Icons::DocClose));
     actionFilterUnreadable->setIcon(iconProvider.icon(FileStatus::ReadError));
+    actionFilterModified->setIcon(iconProvider.icon(FileStatus::NotCheckedMod));
     actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
     actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckAll->setIcon(iconProvider.icon(Icons::Start));

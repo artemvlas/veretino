@@ -1,7 +1,8 @@
 Veretino 0.5.0
 What's new:
 * A newly creating database can be marked as immutable ("Deny Changes"), which will prevent changes to it in the future.
-* It is now possible to check the modification date of files during database parsing. If the file has been modified (according to the file system) since the creation of the current database, it will be assigned a special status. In many cases, this will save time, for example by checking only files that have obviously changed.
+* It is now possible to check the modification date of listed files during database parsing.
+    Makes it easier to work with obviously changed items.
 * Now files without read permissions can be excluded when creating the list (customizable).
 * Added the ability to export individual checksums from the database to a digest file (*.ver(.json) --> *.sha1/256/512).
 * Copying files and folders is now also available when browsing the file system.

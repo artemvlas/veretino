@@ -73,6 +73,7 @@ public:
     QAction *actionFilterNewLost = new QAction(QStringLiteral(u"Filter New/Lost"), this);
     QAction *actionFilterMismatches = new QAction(QStringLiteral(u"Filter Mismatches"), this);
     QAction *actionFilterUnreadable = new QAction(QStringLiteral(u"Filter Unreadable"), this);
+    QAction *actionFilterModified = new QAction(QStringLiteral(u"Filter Modified"), this);
     QAction *actionShowAll = new QAction(QStringLiteral(u"Show All"), this);
     QAction *actionCheckCurFileFromModel = new QAction(QStringLiteral(u"Check File"), this);
     QAction *actionCheckCurSubfolderFromModel = new QAction(QStringLiteral(u"Check Folder"), this);
