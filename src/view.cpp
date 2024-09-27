@@ -232,8 +232,9 @@ void View::setIndexByPath(const QString &path)
             // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
             // 'index' (wich is =fileSystem->index(path)) is NOT working good
         }
-        else if (!path.isEmpty())
-            emit showMessage(QString("Wrong path: %1").arg(path), "Error");
+        else if (!path.isEmpty()) {
+            emit showMessage("Wrong path: " + path, "Error");
+        }
     }
     else if (isViewDatabase()) {
         QModelIndex index = TreeModel::getIndex(path, model());

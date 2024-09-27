@@ -87,9 +87,10 @@ void DialogDbStatus::setTabsInfo()
         const FilterRule &_filter = data_->metaData.filter;
         ui->labelFiltersInfo->setStyleSheet(format::coloredText(_filter.isFilter(FilterRule::Ignore)));
 
-        const QString _ext = _filter.extensionString();
-        _filter.isFilter(FilterRule::Include) ? ui->labelFiltersInfo->setText("Included:\n" + _ext)
-                                              : ui->labelFiltersInfo->setText("Ignored:\n" + _ext);
+        const QString _exts = _filter.extensionString();
+        const QString _str_mode = _filter.isFilter(FilterRule::Include) ? QStringLiteral(u"Included:\n")
+                                                                        : QStringLiteral(u"Ignored:\n");
+        ui->labelFiltersInfo->setText(_str_mode + _exts);
     }
 
     // tab Verification
@@ -161,13 +162,14 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const int available = data_->numbers.numberOf(FileStatus::CombAvailable);
-    const int numChecksums = data_->numbers.numberOf(FileStatus::CombHasChecksum);
+    const Numbers &num = data_->numbers;
+    const int available = num.numberOf(FileStatus::CombAvailable);
+    const int numChecksums = num.numberOf(FileStatus::CombHasChecksum);
 
     if (data_->isAllChecked()) {
         if (data_->contains(FileStatus::Mismatched)) {
             result.append(QString("☒ %1 mismatches out of %2 available files")
-                              .arg(data_->numbers.numberOf(FileStatus::Mismatched))
+                              .arg(num.numberOf(FileStatus::Mismatched))
                               .arg(available));
         }
         else if (numChecksums == available)
@@ -177,10 +179,10 @@ QStringList DialogDbStatus::infoVerification()
     }
     else if (data_->contains(FileStatus::CombChecked)) {
         // to account for added and updated files, the total number in parentheses is used
-        const int numAddedUpdated = data_->numbers.numberOf(FileStatus::Added | FileStatus::Updated);
+        const int numAddedUpdated = num.numberOf(FileStatus::Added | FileStatus::Updated);
 
         // info str
-        const int numChecked = data_->numbers.numberOf(FileStatus::CombChecked);
+        const int numChecked = num.numberOf(FileStatus::CombChecked);
         result.append(QString("%1%2 out of %3 files were checked")
                           .arg(numChecked)
                           .arg(numAddedUpdated > 0 ? format::inParentheses(numChecked + numAddedUpdated) : QString())
@@ -188,12 +190,12 @@ QStringList DialogDbStatus::infoVerification()
 
         result.append(QString());
         if (data_->contains(FileStatus::Mismatched))
-            result.append(QString("%1 files MISMATCHED").arg(data_->numbers.numberOf(FileStatus::Mismatched)));
+            result.append(format::filesNumber(num.numberOf(FileStatus::Mismatched)) + QStringLiteral(u" MISMATCHED"));
         else
             result.append(QStringLiteral(u"No Mismatches found"));
 
         if (data_->contains(FileStatus::Matched)) {
-            const int numMatched = data_->numbers.numberOf(FileStatus::Matched);
+            const int numMatched = num.numberOf(FileStatus::Matched);
             result.append(QString("%1%2 files matched")
                               .arg(numMatched)
                               .arg(numAddedUpdated > 0 ? format::inParentheses(numMatched + numAddedUpdated) : QString()));

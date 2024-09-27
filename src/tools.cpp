@@ -250,7 +250,7 @@ QString composeFilePath(const QString &parentFolder, const QString &fileName, co
     // return joinPath(parentFolder, _file);
 
     // no sep check
-    return parentFolder % _sep % fileName % '.' % ext;
+    return parentFolder % _sep % fileName % _dot % ext;
 }
 
 bool isRoot(const QString &path)
@@ -268,7 +268,6 @@ bool isRoot(const QString &path)
 
 bool hasExtension(const QString &file, const QString &ext)
 {
-    static const QChar _dot = u'.';
     const int _dotInd = file.size() - ext.size() - 1;
 
     return ((_dotInd >= 0 && file.at(_dotInd) == _dot)

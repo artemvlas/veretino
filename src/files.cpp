@@ -38,7 +38,7 @@ void Files::setPath(const QString &path)
 
 bool Files::isCanceled() const
 {
-    return proc_ && proc_->isCanceled();
+    return (proc_ && proc_->isCanceled());
 }
 
 FileList Files::getFileList()
