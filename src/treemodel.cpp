@@ -268,39 +268,19 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
 
     QModelIndex parentIndex;
     QModelIndex curIndex = model->index(0, 0);
-    const QStringList parts = path.split('/');
+    const QStringList subfolders = path.split('/', Qt::SkipEmptyParts);
 
-    foreach (const QString &str, parts) {
+    for (const QString &_subfolder : subfolders) {
         for (int i = 0; curIndex.isValid(); ++i) {
             curIndex = model->index(i, 0, parentIndex);
-            if (curIndex.data().toString() == str) {
-                //qDebug() << "***" << str << "finded on" << i << "row";
-                parentIndex = model->index(i, 0, parentIndex);
+            if (curIndex.data().toString() == _subfolder) {
+                parentIndex = curIndex;
                 break;
             }
-            //qDebug() << "*** Looking for:" << str << curIndex.data();
         }
     }
-    //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
 
     return curIndex;
-
-    /* NO STATIC impl.
-    TreeItem *_item = rootItem;
-    const QStringList pathParts = path.split('/', Qt::SkipEmptyParts);
-
-    for (const QString &_subFolder : pathParts) {
-        TreeItem *_ti = _item->findChild(_subFolder);
-        if (_ti) {
-            _item = _ti;
-        }
-        else {
-            return QModelIndex();
-        }
-    }
-
-    return createIndex(_item->childNumber(), 0, _item);
-    */
 }
 
 void TreeModel::clearCacheFolderItems()
