@@ -32,6 +32,7 @@ private:
     QJsonArray loadJsonDB(const QString &filePath);
     QJsonObject dbHeader(const DataContainer *data, const QModelIndex &rootFolder);
     MetaData getMetaData(const QString &filePath, const QJsonObject &header, const QJsonObject &fileList);
+    FileValues makeFileValues(const QString &filePath, const QString &basicDate);
     bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList);
     QString findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength = 4);
     bool isCanceled() const;

@@ -184,6 +184,20 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
     }
 }
 
+FileValues JsonDb::makeFileValues(const QString &filePath, const QString &basicDate)
+{
+    if (QFileInfo::exists(filePath)) {
+        QFileInfo _fi(filePath);
+        FileStatus _status = (considerFileModDate
+                              && tools::isLater(basicDate, _fi.lastModified()))
+                                 ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
+
+        return FileValues(_status, _fi.size());
+    }
+
+    return FileValues(FileStatus::Missing);
+}
+
 DataContainer* JsonDb::parseJson(const QString &filePath)
 {
     QElapsedTimer timer;
@@ -216,46 +230,14 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
     const QString _basicDT = considerFileModDate ? parsedData->basicDate() : QString();
 
-    QJsonObject::const_iterator i;
-    for (i = filelistData.constBegin(); !isCanceled() && i != filelistData.constEnd(); ++i) {
-        const QString _fullPath = paths::joinPath(workDir, i.key());
+    for (QJsonObject::const_iterator it = filelistData.constBegin();
+         !isCanceled() && it != filelistData.constEnd(); ++it)
+    {
+        const QString _fullPath = paths::joinPath(workDir, it.key());
+        FileValues _values = makeFileValues(_fullPath, _basicDT);
+        _values.checksum = it.value().toString();
 
-        if (QFileInfo::exists(_fullPath)) {
-            QFileInfo _fi(_fullPath);
-            FileStatus _status = (considerFileModDate
-                                  && tools::isLater(_basicDT, _fi.lastModified()))
-                                     ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
-
-            FileValues _values(_status, _fi.size());
-            _values.checksum = i.value().toString();
-
-            parsedData->model_->add_file(i.key(), _values);
-        }
-        else {
-            FileValues _values(FileStatus::Missing);
-            _values.checksum = i.value().toString();
-
-            parsedData->model_->add_file(i.key(), _values);
-        }
-
-        // ^^^ OPTIMIZE!!! ^^^
-
-        /* double QFileInfo and DT string
-        const bool _exist = QFileInfo::exists(_fullPath);
-        qint64 _size = _exist ? QFileInfo(_fullPath).size() : -1;
-        FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
-
-        // modif. date [experimental]
-        if (_exist && considerFileModDate && parsedData->hasNeverUpdated()) {
-            QString _db_creat = parsedData->metaData.datetime[DTstr::DateCreated].right(16);
-            if (tools::isLater(_db_creat, QFileInfo(_fullPath).lastModified()))
-                _status = FileStatus::NotCheckedMod;
-        }
-
-        FileValues _values(_status, _size);
-        _values.checksum = i.value().toString();
-
-        parsedData->model_->add_file(i.key(), _values);*/
+        parsedData->model_->add_file(it.key(), _values);
     }
 
     // additional data
