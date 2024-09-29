@@ -256,12 +256,6 @@ QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
         {
             path = paths::joinPath(_ind.data().toString(), path);
         }
-
-        /*
-        while (_ind.parent().isValid() && _ind.parent() != root) {
-            _ind = _ind.parent();
-            path = paths::joinPath(_ind.data().toString(), path);
-        }*/
     }
 
     return path;
@@ -290,6 +284,23 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
     //qDebug() << "View::pathToIndex" << path << "-->" << curIndex << curIndex.data();
 
     return curIndex;
+
+    /* NO STATIC impl.
+    TreeItem *_item = rootItem;
+    const QStringList pathParts = path.split('/', Qt::SkipEmptyParts);
+
+    for (const QString &_subFolder : pathParts) {
+        TreeItem *_ti = _item->findChild(_subFolder);
+        if (_ti) {
+            _item = _ti;
+        }
+        else {
+            return QModelIndex();
+        }
+    }
+
+    return createIndex(_item->childNumber(), 0, _item);
+    */
 }
 
 void TreeModel::clearCacheFolderItems()
