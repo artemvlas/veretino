@@ -306,11 +306,6 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     }
 }
 
-void Manager::verifyFolderItem(const QModelIndex &folderItemIndex)
-{
-    verifyFolderItem(folderItemIndex, FileStatus::CombNotChecked);
-}
-
 void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus)
 {
     if (!dataMaintainer->data_) {

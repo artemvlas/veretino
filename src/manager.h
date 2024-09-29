@@ -61,7 +61,6 @@ public slots:
     void makeDbContentsList();
 
     // checking the list of files against the checksums stored in the database
-    void verifyFolderItem(const QModelIndex &folderItemIndex = QModelIndex());
     void verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus);
 
     void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
