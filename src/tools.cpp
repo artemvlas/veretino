@@ -141,6 +141,9 @@ bool isLater(const QString &dt_before, const QString &dt_later)
 
 bool isLater(const QString &dt_str, const QDateTime &other)
 {
+    if (dt_str.isEmpty())
+        return false;
+
     return isLater(dt_str, other.toString(Lit::s_dt_format));
 }
 

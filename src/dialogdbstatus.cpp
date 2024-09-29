@@ -60,14 +60,14 @@ void DialogDbStatus::setLabelsInfo()
     // datetime
     const QString (&dt)[3] = data_->metaData.datetime;
 
-    if (dt[DateTimeStr::DateUpdated].isEmpty())
-        ui->labelDateTime_Update->setText(dt[DateTimeStr::DateCreated]);
+    if (dt[DTstr::DateUpdated].isEmpty())
+        ui->labelDateTime_Update->setText(dt[DTstr::DateCreated]);
     else {
-        ui->labelDateTime_Update->setText(dt[DateTimeStr::DateUpdated]);
-        ui->labelDateTime_Update->setToolTip(dt[DateTimeStr::DateCreated]);
+        ui->labelDateTime_Update->setText(dt[DTstr::DateUpdated]);
+        ui->labelDateTime_Update->setToolTip(dt[DTstr::DateCreated]);
     }
 
-    ui->labelDateTime_Check->setText(dt[DateTimeStr::DateVerified]);
+    ui->labelDateTime_Check->setText(dt[DTstr::DateVerified]);
 }
 
 void DialogDbStatus::setTabsInfo()

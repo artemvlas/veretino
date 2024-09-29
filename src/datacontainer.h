@@ -21,7 +21,7 @@ struct MetaData {
     QString databaseFilePath;
 
     // DateVerified == (all files exist and match the checksums)
-    enum DateTimeStr { DateCreated, DateUpdated, DateVerified };
+    enum DTstr { DateCreated, DateUpdated, DateVerified };
     QString datetime[3];
 
     enum DbFileState : quint8 { NoFile, Created, NotSaved, Saved };
@@ -32,7 +32,7 @@ struct MetaData {
 }; // struct MetaData
 
 using DbFileState = MetaData::DbFileState;
-using DateTimeStr = MetaData::DateTimeStr;
+using DTstr = MetaData::DTstr;
 
 class DataContainer : public QObject
 {
@@ -47,6 +47,7 @@ public:
     QString backupFilePath() const;
     QString itemAbsolutePath(const QModelIndex &curIndex) const; // returns the absolute path to the database item (file or subfolder)
     QString getBranchFilePath(const QModelIndex &subfolder, bool existing = false) const;
+    QString basicDate() const; // the date until which files are considered unmodified
 
     bool isDbFileState(DbFileState state) const;
     bool isWorkDirRelative() const;
@@ -56,7 +57,7 @@ public:
     bool isAllMatched() const;
     bool isInCreation() const;
     bool isImmutable() const; // has FlagConst
-    bool hasNeverUpdated() const;
+    //bool hasNeverUpdated() const;
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;

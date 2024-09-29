@@ -30,7 +30,7 @@ void DataMaintainer::connections()
     connect(json_, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
     connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
-                                                                  data_->metaData.datetime[DateTimeStr::DateVerified].clear(); });
+                                                                  data_->metaData.datetime[DTstr::DateVerified].clear(); });
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
@@ -87,11 +87,11 @@ void DataMaintainer::updateDateTime()
 {
     if (data_) {
         if (data_->isDbFileState(DbFileState::NoFile)) {
-            data_->metaData.datetime[DateTimeStr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
+            data_->metaData.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
         }
         else if (data_->contains(FileStatus::CombDbChanged)) {
-            data_->metaData.datetime[DateTimeStr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
-            data_->metaData.datetime[DateTimeStr::DateVerified].clear();
+            data_->metaData.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
+            data_->metaData.datetime[DTstr::DateVerified].clear();
         }
     }
 }
@@ -99,7 +99,7 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateVerifDateTime()
 {
     if (data_ && data_->isAllMatched()) {
-        data_->metaData.datetime[DateTimeStr::DateVerified] = QStringLiteral(u"Verified: ") + format::currentDateTime();
+        data_->metaData.datetime[DTstr::DateVerified] = QStringLiteral(u"Verified: ") + format::currentDateTime();
         setDbFileState(DbFileState::NotSaved);
     }
 }

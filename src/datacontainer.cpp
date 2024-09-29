@@ -72,6 +72,17 @@ QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool exis
     return QString();
 }
 
+QString DataContainer::basicDate() const
+{
+    const QString (&dt)[3] = metaData.datetime;
+
+    const QString _d = !dt[DTstr::DateVerified].isEmpty() ? dt[DTstr::DateVerified]
+                                                          : dt[DTstr::DateCreated];
+
+    // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
+    return _d.right(Lit::s_dt_format.size()); // 16
+}
+
 bool DataContainer::isWorkDirRelative() const
 {
     return (paths::parentFolder(metaData.databaseFilePath) == metaData.workDir);
@@ -116,10 +127,10 @@ bool DataContainer::isImmutable() const
     return (metaData.flags & MetaData::FlagConst);
 }
 
-bool DataContainer::hasNeverUpdated() const
+/*bool DataContainer::hasNeverUpdated() const
 {
-    return metaData.datetime[DateTimeStr::DateUpdated].isEmpty();
-}
+    return metaData.datetime[DTstr::DateUpdated].isEmpty();
+}*/
 
 bool DataContainer::isBackupExists() const
 {

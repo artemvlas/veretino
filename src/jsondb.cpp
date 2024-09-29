@@ -92,9 +92,9 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header[h_key_Algo] = format::algoToStr(_meta.algorithm);
 
     // DateTime
-    header[h_key_DateTime] = QString("%1, %2, %3").arg(_meta.datetime[DateTimeStr::DateCreated],
-                                                       _meta.datetime[DateTimeStr::DateUpdated],
-                                                       _meta.datetime[DateTimeStr::DateVerified]);
+    header[h_key_DateTime] = QString("%1, %2, %3").arg(_meta.datetime[DTstr::DateCreated],
+                                                       _meta.datetime[DTstr::DateUpdated],
+                                                       _meta.datetime[DTstr::DateVerified]);
 
     // WorkDir
     if (!data->isWorkDirRelative() && !rootFolder.isValid())
@@ -214,16 +214,40 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     // populating the main data
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
+    const QString _basicDT = considerFileModDate ? parsedData->basicDate() : QString();
+
     QJsonObject::const_iterator i;
     for (i = filelistData.constBegin(); !isCanceled() && i != filelistData.constEnd(); ++i) {
         const QString _fullPath = paths::joinPath(workDir, i.key());
+
+        if (QFileInfo::exists(_fullPath)) {
+            QFileInfo _fi(_fullPath);
+            FileStatus _status = (considerFileModDate
+                                  && tools::isLater(_basicDT, _fi.lastModified()))
+                                     ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
+
+            FileValues _values(_status, _fi.size());
+            _values.checksum = i.value().toString();
+
+            parsedData->model_->add_file(i.key(), _values);
+        }
+        else {
+            FileValues _values(FileStatus::Missing);
+            _values.checksum = i.value().toString();
+
+            parsedData->model_->add_file(i.key(), _values);
+        }
+
+        // ^^^ OPTIMIZE!!! ^^^
+
+        /* double QFileInfo and DT string
         const bool _exist = QFileInfo::exists(_fullPath);
         qint64 _size = _exist ? QFileInfo(_fullPath).size() : -1;
         FileStatus _status = _exist ? FileStatus::NotChecked : FileStatus::Missing;
 
         // modif. date [experimental]
         if (_exist && considerFileModDate && parsedData->hasNeverUpdated()) {
-            QString _db_creat = parsedData->metaData.datetime[DateTimeStr::DateCreated].right(16);
+            QString _db_creat = parsedData->metaData.datetime[DTstr::DateCreated].right(16);
             if (tools::isLater(_db_creat, QFileInfo(_fullPath).lastModified()))
                 _status = FileStatus::NotCheckedMod;
         }
@@ -231,7 +255,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         FileValues _values(_status, _size);
         _values.checksum = i.value().toString();
 
-        parsedData->model_->add_file(i.key(), _values);
+        parsedData->model_->add_file(i.key(), _values);*/
     }
 
     // additional data
@@ -324,9 +348,9 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
     // [date]
     // compatibility with previous versions
     if (header.contains(h_key_Updated)) {
-        _meta.datetime[DateTimeStr::DateUpdated] = QString("%1: %2").arg(h_key_Updated, header.value(h_key_Updated).toString());
+        _meta.datetime[DTstr::DateUpdated] = QString("%1: %2").arg(h_key_Updated, header.value(h_key_Updated).toString());
         if (header.contains(h_key_Verified))
-            _meta.datetime[DateTimeStr::DateVerified] = QString("%1: %2").arg(h_key_Verified, header.value(h_key_Verified).toString());
+            _meta.datetime[DTstr::DateVerified] = QString("%1: %2").arg(h_key_Verified, header.value(h_key_Verified).toString());
     }
     else { // [datetime] version 0.4.0+
         const QString _strDateTime = findValueStr(header, QStringLiteral(u"time"));
@@ -342,11 +366,11 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
                     continue;
 
                 if (_dt.startsWith('C'))
-                    _meta.datetime[DateTimeStr::DateCreated] = _dt;
+                    _meta.datetime[DTstr::DateCreated] = _dt;
                 else if (_dt.startsWith('U'))
-                    _meta.datetime[DateTimeStr::DateUpdated] = _dt;
+                    _meta.datetime[DTstr::DateUpdated] = _dt;
                 else if (_dt.startsWith('V'))
-                    _meta.datetime[DateTimeStr::DateVerified] = _dt;
+                    _meta.datetime[DTstr::DateVerified] = _dt;
             }
         }
     }

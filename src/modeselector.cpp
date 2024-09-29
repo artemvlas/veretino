@@ -461,14 +461,16 @@ void ModeSelector::verify(const QModelIndex &index)
     }
     else {
         view_->setViewSource();
-        manager_->addTask(&Manager::verifyFolderItem, index, FileStatus::CombNotChecked);
+        manager_->addTask(&Manager::verifyFolderItem,
+                          index, FileStatus::CombNotChecked);
     }
 }
 
 void ModeSelector::verifyModified()
 {
     view_->setViewSource();
-    manager_->addTask(&Manager::verifyFolderItem, QModelIndex(), FileStatus::NotCheckedMod);
+    manager_->addTask(&Manager::verifyFolderItem,
+                      QModelIndex(), FileStatus::NotCheckedMod);
 }
 
 void ModeSelector::branchSubfolder()
