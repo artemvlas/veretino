@@ -60,6 +60,11 @@ void Manager::clearTasks()
     taskQueue_.clear();
 }
 
+void Manager::sendDbUpdated()
+{
+    QTimer::singleShot(0, dataMaintainer, &DataMaintainer::databaseUpdated);
+}
+
 void Manager::processFolderSha(const MetaData &metaData)
 {
     if (Files::isEmptyFolder(metaData.workDir, metaData.filter)) {
@@ -94,7 +99,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     if (!procState->isCanceled()) { // saving to json
         dataMaintainer->updateDateTime();
         dataMaintainer->exportToJson();
-        QTimer::singleShot(0, dataMaintainer, &DataMaintainer::databaseUpdated);
+        sendDbUpdated();
     }
 }
 
@@ -215,7 +220,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
         if (settings_->instantSaving)
             dataMaintainer->saveData();            
 
-        QTimer::singleShot(0, dataMaintainer, &DataMaintainer::databaseUpdated);
+        sendDbUpdated();
     }
 }
 

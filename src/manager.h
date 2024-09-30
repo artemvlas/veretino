@@ -71,9 +71,14 @@ public slots:
 
 private:
     void queueTask(std::function<void()> task);
+    void sendDbUpdated();
 
-    void showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated);
-    QString calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo,
+    void showFileCheckResultMessage(const QString &filePath,
+                                    const QString &checksumEstimated,
+                                    const QString &checksumCalculated);
+
+    QString calculateChecksum(const QString &filePath,
+                              QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
 
     int calculateChecksums(FileStatus status, const QModelIndex &rootIndex = QModelIndex());
