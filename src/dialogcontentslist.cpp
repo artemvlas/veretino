@@ -162,9 +162,8 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
             }
         }
 
-        ui->chbTop10->setText(QString("Top10: %1 files (%2)")
-                                    .arg(top10FilesNumber)
-                                    .arg(format::dataSizeReadable(top10FilesSize)));
+        ui->chbTop10->setText(QStringLiteral(u"Top10: ")
+                              + format::filesNumSize(top10FilesNumber, top10FilesSize));
     }
 
     updateFilterDisplay();
@@ -180,10 +179,9 @@ void DialogContentsList::setTotalInfo()
         totalFilesNumber += extList_.at(i).filesNumber;
     }
 
-    ui->labelTotal->setText(QString("Total: %1 types, %2 files (%3) ")
+    ui->labelTotal->setText(QString("Total: %1 types, %2 ")
                                 .arg(extList_.size())
-                                .arg(totalFilesNumber)
-                                .arg(format::dataSizeReadable(totalSize)));
+                                .arg(format::filesNumSize(totalFilesNumber, totalSize)));
 }
 
 void DialogContentsList::setCheckboxesVisible(bool visible)
@@ -251,16 +249,13 @@ bool DialogContentsList::itemsContain(CheckState state) const
     if (mode_ != FC_Enabled)
         return false;
 
-    bool contains = false;
-
     for (const TreeWidgetItem *item : std::as_const(items_)) {
         if (isPassed(state, item)) {
-            contains = true;
-            break;
+            return true;
         }
     }
 
-    return contains;
+    return false;
 }
 
 QList<TreeWidgetItem *> DialogContentsList::items(CheckState state) const

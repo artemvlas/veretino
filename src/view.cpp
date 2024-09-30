@@ -202,8 +202,9 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
         curPathModel = TreeModel::getPath(curIndexSource);
         emit pathChanged(curPathModel);
     }
-    else
+    else {
         qDebug() << "View::changeCurIndexAndPath | FAILURE";
+    }
 }
 
 void View::setIndexByPath()

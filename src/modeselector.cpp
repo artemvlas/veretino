@@ -198,7 +198,7 @@ QString ModeSelector::getButtonToolTip()
         case Folder:
             return QStringLiteral(u"Calculate checksums of contained files\nand save the result to the local database");
         case File:
-            return QString("Calculate %1 checksum of the file").arg(format::algoToStr(settings_->algorithm()));
+            return QStringLiteral(u"Calculate file Digest");
         case Model:
             return QStringLiteral(u"Check ALL files against stored checksums");
         case ModelNewLost:
@@ -578,7 +578,7 @@ bool ModeSelector::overwriteDbPrompt()
 
     QMessageBox msgBox(view_);
     msgBox.setWindowTitle("Existing database detected");
-    msgBox.setText(QString("The folder already contains the database file:\n%1").arg(paths::basicName(dbFilePath)));
+    msgBox.setText("The folder already contains the database file:\n" + paths::basicName(dbFilePath));
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Open);

@@ -96,7 +96,7 @@ void Manager::processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
-    qDebug() << thread()->objectName() << Q_FUNC_INFO;
+    // qDebug() << thread()->objectName() << Q_FUNC_INFO;
 
     QString sum = calculateChecksum(filePath, algo);
 
@@ -413,9 +413,10 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
-    emit setStatusbarText(QString("%1 %2: %3").arg(isVerification ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating"),
-                                                    format::algoToStr(algo),
-                                                    format::fileNameAndSize(filePath)));
+    const QString _calcPurp = isVerification ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
+    emit setStatusbarText(QString("%1 %2: %3").arg(_calcPurp,
+                                                   format::algoToStr(algo),
+                                                   format::fileNameAndSize(filePath)));
 
     QString checkSum = shaCalc.calculate(filePath, algo);
 
@@ -447,10 +448,9 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);
 
-    qDebug() << QString("Manager::calculateChecksums: %1 files in queue").arg(numQueued);
+    qDebug() << "Manager::calculateChecksums | Queued:" << numQueued;
 
     if (numQueued == 0) {
-        //qDebug() << "Manager::calculateChecksums | No files in queue";
         return 0;
     }
 

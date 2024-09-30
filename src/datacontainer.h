@@ -57,7 +57,6 @@ public:
     bool isAllMatched() const;
     bool isInCreation() const;
     bool isImmutable() const; // has FlagConst
-    //bool hasNeverUpdated() const;
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;

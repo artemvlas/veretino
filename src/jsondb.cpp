@@ -188,7 +188,7 @@ FileValues JsonDb::makeFileValues(const QString &filePath, const QString &basicD
 {
     if (QFileInfo::exists(filePath)) {
         QFileInfo _fi(filePath);
-        FileStatus _status = (considerFileModDate
+        FileStatus _status = (!basicDate.isEmpty()
                               && tools::isLater(basicDate, _fi.lastModified()))
                                  ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
 

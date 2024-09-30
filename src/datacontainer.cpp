@@ -36,7 +36,7 @@ QString DataContainer::backupFilePath() const
                            QStringLiteral(u".tmp-backup_") + paths::basicName(metaData.databaseFilePath));
 }
 
-// returns the absolute path to the database item (file or subfolder)
+// returns the absolute path to the db item (file or subfolder)
 // (working folder path in filesystem + relative path in the database)
 QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
 {
@@ -59,14 +59,14 @@ QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool exis
     QString fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);
     QString filePath = paths::joinPath(folderPath, fileName);
 
-    if (QFile::exists(filePath) || !existing)
+    if (QFileInfo::exists(filePath) || !existing)
         return filePath;
 
     extension = defaults.dbFileExtension(!isLongExtension);
     fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);
     filePath = paths::joinPath(folderPath, fileName);
 
-    if (QFile::exists(filePath))
+    if (QFileInfo::exists(filePath))
         return filePath;
 
     return QString();
@@ -134,19 +134,14 @@ bool DataContainer::isImmutable() const
     return (metaData.flags & MetaData::FlagConst);
 }
 
-/*bool DataContainer::hasNeverUpdated() const
-{
-    return metaData.datetime[DTstr::DateUpdated].isEmpty();
-}*/
-
 bool DataContainer::isBackupExists() const
 {
-    return QFile::exists(backupFilePath());
+    return QFileInfo::exists(backupFilePath());
 }
 
 bool DataContainer::makeBackup(bool forceOverwrite) const
 {
-    if (!QFile::exists(metaData.databaseFilePath))
+    if (!QFileInfo::exists(metaData.databaseFilePath))
         return false;
 
     if (forceOverwrite)

@@ -104,21 +104,19 @@ FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses 
 
 bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 {
-    bool result = true;
-
     if (QFileInfo(folderPath).isDir()) {
         QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()) {
             if (filter.isFileAllowed(it.next())) {
-                result = false;
-                break;
+                return false;
             }
         }
     }
-    else
-        qDebug() << "Files::containsFiles | Not a folder path: " << folderPath;
+    else {
+        qDebug() << "Files::isEmptyFolder | Not a folder path: " << folderPath;
+    }
 
-    return result;
+    return true;
 }
 
 QString Files::getFolderSize()
@@ -127,11 +125,10 @@ QString Files::getFolderSize()
 }
 
 QString Files::getFolderSize(const QString &path)
-{   
-    QFileInfo fileInfo(path);
+{
     QString result;
 
-    if (fileInfo.isDir()) {
+    if (QFileInfo(path).isDir()) {
         int filesNumber = 0;
         qint64 totalSize = 0;
 
@@ -150,8 +147,9 @@ QString Files::getFolderSize(const QString &path)
             result = QString("%1: %2")
                          .arg(_folderName, _folderSize);
         }
-        else
+        else {
             qDebug() << "Files::getFolderSize | Canceled" << path;
+        }
     }
 
     return result;

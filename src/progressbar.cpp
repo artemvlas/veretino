@@ -62,8 +62,7 @@ void ProgressBar::updateProgressInfo()
         finish();
         resetFormat();
 
-        if (procState_)
-            qDebug() << "<!> ProgressBar >> wrong state:" << procState_->state();
+        qDebug() << "<!> ProgressBar >> wrong state:" << procState_->state();
     }
 }
 

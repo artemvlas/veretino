@@ -6,8 +6,8 @@
 
 #include "settings.h"
 #include <QSettings>
-// #include <QDebug>
 #include "tools.h"
+// #include <QDebug>
 
 const QString Settings::s_key_algo = "algorithm";
 const QString Settings::s_key_dbPrefix = "dbPrefix";
