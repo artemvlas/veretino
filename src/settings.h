@@ -38,7 +38,7 @@ public:
     bool instantSaving = false;
     bool excludeUnpermitted = true;
     bool dbFlagConst = false;
-    bool considerDateModified = false;
+    bool considerDateModified = true;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;

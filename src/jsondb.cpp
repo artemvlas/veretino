@@ -10,7 +10,6 @@
 #include <QFileInfo>
 #include "treemodeliterator.h"
 #include <QDirIterator>
-#include <QStringBuilder>
 #include <QElapsedTimer>
 
 const QString JsonDb::h_key_DateTime = QStringLiteral(u"DateTime");
@@ -84,7 +83,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     const Numbers &_numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
-    static const QString _app_origin = Lit::s_appNameVersion % QStringLiteral(u" >> ") % Lit::s_webpage;
+    static const QString _app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
     header[QStringLiteral(u"App/Origin")] = _app_origin;
     header[QStringLiteral(u"Folder")] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(_meta.workDir);
     header[QStringLiteral(u"Total Checksums")] = _numbers.numberOf(FileStatus::CombHasChecksum);
@@ -323,7 +322,7 @@ MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header,
         //qDebug() << "JsonDb::getMetaData | Used algorithm from header data:" << metaData.algorithm;
     }
     else {
-        _meta.algorithm = tools::algorithmByStrLen(fileList.begin().value().toString().length());
+        _meta.algorithm = tools::algoByStrLen(fileList.begin().value().toString().length());
         //qDebug() << "JsonDb::getMetaData | The algorithm is determined by the length of the checksum string:" << metaData.algorithm;
     }
 

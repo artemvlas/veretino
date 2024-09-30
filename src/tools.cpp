@@ -44,7 +44,7 @@ int algoStrLen(QCryptographicHash::Algorithm algo)
     }
 }
 
-QCryptographicHash::Algorithm algorithmByStrLen(int strLen)
+QCryptographicHash::Algorithm algoByStrLen(int strLen)
 {
     switch (strLen) {
         case 40:
@@ -464,7 +464,7 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 
 QString algoToStr(int sumStrLength, bool capitalLetters)
 {
-    return algoToStr(tools::algorithmByStrLen(sumStrLength), capitalLetters);
+    return algoToStr(tools::algoByStrLen(sumStrLength), capitalLetters);
 }
 
 QString filesNumber(int number)

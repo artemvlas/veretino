@@ -162,20 +162,22 @@ void DialogFileProcResult::addButtonSave()
 
 void DialogFileProcResult::makeSumFile()
 {
-    if (filePath_.isEmpty() || !tools::canBeChecksum(values_.checksum))
+    using namespace tools;
+    const QString &_chsum = values_.checksum;
+
+    if (filePath_.isEmpty() || !canBeChecksum(_chsum))
         return;
 
-    QCryptographicHash::Algorithm algo = tools::algorithmByStrLen(values_.checksum.length());
-    QString ext = format::algoToStr(algo, false);
-    QString sumFile = QString("%1.%2").arg(filePath_, ext);
+    const QString ext = format::algoToStr(_chsum.size(), false);
+    const QString sumFile = joinStrings(filePath_, ext, u'.');
+    const QString strToWrite = joinStrings(_chsum, paths::basicName(filePath_), QStringLiteral(u" *"));
 
     setFileName(sumFile);
 
     QFile file(sumFile);
 
     if (file.open(QFile::WriteOnly)
-        && (file.write(QString("%1 *%2")
-                           .arg(values_.checksum, paths::basicName(filePath_)).toUtf8())))
+        && file.write(strToWrite.toUtf8()))
     {
         setModeStored();
     }

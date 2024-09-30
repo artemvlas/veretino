@@ -392,7 +392,7 @@ void Manager::checkSummaryFile(const QString &path)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)
 {
-    checkFile(filePath, checkSum, tools::algorithmByStrLen(checkSum.length()));
+    checkFile(filePath, checkSum, tools::algoByStrLen(checkSum.length()));
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
