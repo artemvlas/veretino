@@ -170,7 +170,7 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
     connect(ui->treeView, &View::dataSetted, this,
-            [=]{ if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.databaseFilePath); });
+            [=]{ if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.dbFilePath); });
 
     thread->start();
 }

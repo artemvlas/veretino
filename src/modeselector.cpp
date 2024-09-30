@@ -196,7 +196,8 @@ QString ModeSelector::getButtonToolTip()
 {
     switch (mode()) {
         case Folder:
-            return QStringLiteral(u"Calculate checksums of contained files\nand save the result to the local database");
+            return QStringLiteral(u"Calculate checksums of contained files\n"
+                                  "and save the result to the local database");
         case File:
             return QStringLiteral(u"Calculate file Digest");
         case Model:
@@ -397,7 +398,7 @@ void ModeSelector::resetDatabase()
 {
     if (view_->data_) {
         view_->saveHeaderState();
-        openJsonDatabase(view_->data_->metaData.databaseFilePath);
+        openJsonDatabase(view_->data_->metaData.dbFilePath);
     }
 }
 
@@ -550,7 +551,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.workDir = view_->curPathFileSystem;
     metaData.algorithm = settings_->algorithm();
     metaData.filter = filter;
-    metaData.databaseFilePath = composeDbFilePath();
+    metaData.dbFilePath = composeDbFilePath();
     if (settings_->dbFlagConst)
         metaData.flags |= MetaData::FlagConst;
 

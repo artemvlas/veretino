@@ -28,13 +28,14 @@ public:
 
     enum ColumnFileSystem { ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified };
 
+    void setSettings(Settings *settings);
+    QString curAbsPath();
     ModelView currentViewModel();
     bool isCurrentViewModel(const ModelView modelView);
     bool isViewFileSystem(); // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
     bool isViewDatabase();
     bool isViewFiltered();
     bool isViewFiltered(const FileStatus status);
-    QString curAbsPath();
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
@@ -46,8 +47,6 @@ public:
     QModelIndex curIndexSource;
     QModelIndex curIndexProxy;
 
-    void setSettings(Settings *settings);
-
 public slots:
     void setFileSystemModel();
     void setData(DataContainer *data);
@@ -55,12 +54,12 @@ public slots:
     void clear();
     void setIndexByPath();
     void setIndexByPath(const QString &path);
+    void setMismatchFiltering(const Numbers &num);
     void setFilter(const FileStatuses flags = FileStatus::NotSet);
     void editFilter(const FileStatuses flags, bool add);
     void disableFilter();
     void saveHeaderState();
     void toHome();
-    void setMismatchFiltering(const Numbers &num);
 
     void setViewSource();
     void setViewProxy();
@@ -75,8 +74,8 @@ private:
     void toggleColumnVisibility(int column);
     void showAllColumns();
     void setDefaultColumnsWidth();
-    QString headerText(int column);
     void restoreHeaderState();
+    QString headerText(int column);
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
     Settings *settings_ = nullptr;

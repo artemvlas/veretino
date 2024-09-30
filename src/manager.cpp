@@ -38,9 +38,12 @@ void Manager::queueTask(std::function<void()> task)
 
 void Manager::runTasks()
 {
-    // qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
+    qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
+    int i = 0;
 
     while (!taskQueue_.isEmpty()) {
+        qDebug() << "...task #" << ++i;
+
         if (!procState->isStarted())
             procState->setState(State::StartSilently);
 
@@ -48,6 +51,7 @@ void Manager::runTasks()
         func();
     }
 
+    qDebug() << "...all done";
     procState->setState(State::Idle);
 }
 
@@ -128,7 +132,7 @@ void Manager::restoreDatabase()
     if (dataMaintainer->data_
         && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved()))
     {
-        createDataModel(dataMaintainer->data_->metaData.databaseFilePath);
+        createDataModel(dataMaintainer->data_->metaData.dbFilePath);
     }
     else {
         emit setStatusbarText("No saved changes");

@@ -149,7 +149,7 @@ void DialogFileProcResult::addButtonCopy()
     QPushButton *buttonCopy = ui->buttonBox->addButton(QStringLiteral(u"Copy"), QDialogButtonBox::AcceptRole);
     buttonCopy->setIcon(icons_.icon(Icons::Copy));
 
-    connect(buttonCopy, &QPushButton::clicked, this, [=]{QGuiApplication::clipboard()->setText(values_.checksum);});
+    connect(buttonCopy, &QPushButton::clicked, this, [=]{ QGuiApplication::clipboard()->setText(values_.checksum); });
 }
 
 void DialogFileProcResult::addButtonSave()

@@ -32,9 +32,10 @@ bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent
     if (!isFilterEnabled())
         return true;
 
-    QModelIndex curIndex = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
+    QModelIndex _ind = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
+    FileStatus _status = _ind.data(TreeModel::RawDataRole).value<FileStatus>();
 
-    return filteredFlags & curIndex.data(TreeModel::RawDataRole).value<FileStatus>();
+    return (_status & filteredFlags);
 }
 
 bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const

@@ -27,13 +27,13 @@ ProxyModel* DataContainer::setProxyModel()
 
 QString DataContainer::databaseFileName() const
 {
-    return paths::basicName(metaData.databaseFilePath);
+    return paths::basicName(metaData.dbFilePath);
 }
 
 QString DataContainer::backupFilePath() const
 {
-    return paths::joinPath(paths::parentFolder(metaData.databaseFilePath),
-                           QStringLiteral(u".tmp-backup_") + paths::basicName(metaData.databaseFilePath));
+    return paths::joinPath(paths::parentFolder(metaData.dbFilePath),
+                           QStringLiteral(u".tmp-backup_") + paths::basicName(metaData.dbFilePath));
 }
 
 // returns the absolute path to the db item (file or subfolder)
@@ -53,7 +53,7 @@ QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool exis
     const Settings defaults;
     QString folderName = subfolder.data().toString();
     QString folderPath = itemAbsolutePath(subfolder);
-    const bool isLongExtension = paths::hasExtension(metaData.databaseFilePath, Lit::sl_db_exts.first());
+    const bool isLongExtension = paths::hasExtension(metaData.dbFilePath, Lit::sl_db_exts.first());
 
     QString extension = defaults.dbFileExtension(isLongExtension);
     QString fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);
@@ -92,7 +92,7 @@ QString DataContainer::basicDate() const
 
 bool DataContainer::isWorkDirRelative() const
 {
-    return (paths::parentFolder(metaData.databaseFilePath) == metaData.workDir);
+    return (paths::parentFolder(metaData.dbFilePath) == metaData.workDir);
 }
 
 bool DataContainer::isFilterApplied() const
@@ -141,24 +141,24 @@ bool DataContainer::isBackupExists() const
 
 bool DataContainer::makeBackup(bool forceOverwrite) const
 {
-    if (!QFileInfo::exists(metaData.databaseFilePath))
+    if (!QFileInfo::exists(metaData.dbFilePath))
         return false;
 
     if (forceOverwrite)
         removeBackupFile();
 
-    return QFile::copy(metaData.databaseFilePath,
+    return QFile::copy(metaData.dbFilePath,
                        backupFilePath());
 }
 
 bool DataContainer::restoreBackupFile() const
 {
     if (isBackupExists()) {
-        if (QFile::exists(metaData.databaseFilePath)) {
-            if (!QFile::remove(metaData.databaseFilePath))
+        if (QFile::exists(metaData.dbFilePath)) {
+            if (!QFile::remove(metaData.dbFilePath))
                 return false;
         }
-        return QFile::rename(backupFilePath(), metaData.databaseFilePath);
+        return QFile::rename(backupFilePath(), metaData.dbFilePath);
     }
     return false;
 }

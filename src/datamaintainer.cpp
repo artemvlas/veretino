@@ -379,11 +379,11 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
-    QString dbFilePath = json_->makeJson(data_);
+    QString _dbFilePath = json_->makeJson(data_);
 
-    if (!dbFilePath.isEmpty()) {
+    if (!_dbFilePath.isEmpty()) {
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
-        data_->metaData.databaseFilePath = dbFilePath;
+        data_->metaData.dbFilePath = _dbFilePath;
     }
     else {
         setDbFileState(DbFileState::NotSaved);

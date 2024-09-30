@@ -18,7 +18,7 @@ struct MetaData {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
     FilterRule filter;
     QString workDir; // current working folder
-    QString databaseFilePath;
+    QString dbFilePath;
 
     // DateVerified == (all files exist and match the checksums)
     enum DTstr { DateCreated, DateUpdated, DateVerified };

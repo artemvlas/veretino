@@ -38,7 +38,7 @@ DialogDbStatus::~DialogDbStatus()
 
 void DialogDbStatus::connections()
 {
-    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData.databaseFilePath)); });
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData.dbFilePath)); });
     connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData.workDir); });
 }
 
@@ -50,7 +50,7 @@ void DialogDbStatus::setLabelsInfo()
         dbFileName.prepend("../DESKTOP/");
 
     ui->labelDbFileName->setText(dbFileName);
-    ui->labelDbFileName->setToolTip(data_->metaData.databaseFilePath);
+    ui->labelDbFileName->setToolTip(data_->metaData.dbFilePath);
     ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(data_->metaData.algorithm));
     ui->labelWorkDir->setToolTip(data_->metaData.workDir);
 
@@ -267,7 +267,7 @@ bool DialogDbStatus::isJustCreated()
 bool DialogDbStatus::isSavedToDesktop()
 {
     return (isJustCreated() && !data_->isWorkDirRelative()
-            && (paths::parentFolder(data_->metaData.databaseFilePath) == Files::desktopFolderPath));
+            && (paths::parentFolder(data_->metaData.dbFilePath) == Files::desktopFolderPath));
 }
 
 void DialogDbStatus::showEvent(QShowEvent *event)

@@ -158,7 +158,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
     }
 
     const QString &pathToSave = rootFolder.isValid() ? data->getBranchFilePath(rootFolder) // branching
-                                                     : data->metaData.databaseFilePath; // main database
+                                                     : data->metaData.dbFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText(QStringLiteral(u"Saved"));
@@ -294,7 +294,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 MetaData JsonDb::getMetaData(const QString &filePath, const QJsonObject &header, const QJsonObject &fileList)
 {
     MetaData _meta;
-    _meta.databaseFilePath = filePath;
+    _meta.dbFilePath = filePath;
     _meta.dbFileState = MetaData::Saved;
 
     // [checking for files in the intended WorkDir]
