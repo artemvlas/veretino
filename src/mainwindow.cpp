@@ -189,8 +189,10 @@ void MainWindow::showDbStatus()
 
 void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
 {
-    if (proc_->isState(State::StartSilently))
+    if (proc_->isState(State::StartSilently)) {
+        qDebug() << "MainWindow::showDbStatusTab | Rejected >> State::StartSilently";
         return;
+    }
 
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
         DialogDbStatus statusDialog(ui->treeView->data_, this);

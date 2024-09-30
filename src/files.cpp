@@ -113,7 +113,7 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
         }
     }
     else {
-        qDebug() << "Files::isEmptyFolder | Not a folder path: " << folderPath;
+        qDebug() << "Files::isEmptyFolder | Not a folder:" << folderPath;
     }
 
     return true;

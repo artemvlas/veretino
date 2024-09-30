@@ -117,6 +117,8 @@ void View::setData(DataContainer *data)
 
         if (data->isDbFileState(DbFileState::Saved))
             emit showDbStatus();
+        else
+            qDebug() << "View::setData | DbFileState:" << data->metaData.dbFileState;
     }
 
     // the newly setted data has not yet been verified and does not contain ReChecksums
