@@ -357,14 +357,18 @@ void MainWindow::dialogOpenJson()
 void MainWindow::showMessage(const QString &message, const QString &title)
 {
     QMessageBox messageBox;
-    QString titleLower = title.toLower();
 
-    if (titleLower == "error" || titleLower == "failed")
+    if (!title.compare(QStringLiteral(u"error"), Qt::CaseInsensitive)
+        || !title.compare(QStringLiteral(u"failed"), Qt::CaseInsensitive))
+    {
         messageBox.critical(this, title, message);
-    else if (titleLower == "warning")
+    }
+    else if (!title.compare(QStringLiteral(u"warning"), Qt::CaseInsensitive)) {
         messageBox.warning(this, title, message);
-    else
+    }
+    else {
         messageBox.information(this, title, message);
+    }
 }
 
 void MainWindow::promptOpenBranch(const QString &dbFilePath)
@@ -430,9 +434,11 @@ void MainWindow::updatePermanentStatus()
 
 void MainWindow::setWinTitleMismatchFound()
 {
-    setWindowTitle(Lit::s_appName
-                   % Lit::s_sepStick
-                   % QStringLiteral(u"<!> mismatches found"));
+    static const QString _s = Lit::s_appName
+                              % Lit::s_sepStick
+                              % QStringLiteral(u"<!> mismatches found");
+
+    setWindowTitle(_s);
 }
 
 void MainWindow::updateWindowTitle()
