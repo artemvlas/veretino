@@ -163,6 +163,11 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
     return str1 % sep % str2;
 }
 
+QString joinStrings(const QString &str1, const QString &str2, const QString &sep)
+{
+    return str1 % sep % str2;
+}
+
 QString joinStrings(int num, const QString &str)
 {
     return QString::number(num) % ' ' % str;

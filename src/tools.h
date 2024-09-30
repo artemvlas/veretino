@@ -36,7 +36,8 @@ bool canBeChecksum(const QString &str);
 bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
 bool isLater(const QString &dt_str, const QDateTime &other);
 
-QString joinStrings(const QString &str1, const QString &str2, QChar sep);
+QString joinStrings(const QString &str1, const QString &str2, QChar sep); // checks for the absence of sep duplication
+QString joinStrings(const QString &str1, const QString &str2, const QString &sep); // no such check
 QString joinStrings(int num, const QString &str); // --> "X str"
 QString joinStrings(const QString &str, int num); // --> "str X"
 
