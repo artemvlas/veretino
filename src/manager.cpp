@@ -38,11 +38,11 @@ void Manager::queueTask(std::function<void()> task)
 
 void Manager::runTasks()
 {
-    qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
-    int i = 0;
+    //qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
+    //int i = 0;
 
     while (!taskQueue_.isEmpty()) {
-        qDebug() << "...task #" << ++i;
+        //qDebug() << "...task #" << ++i;
 
         if (!procState->isStarted())
             procState->setState(State::StartSilently);
@@ -51,7 +51,7 @@ void Manager::runTasks()
         func();
     }
 
-    qDebug() << "...all done";
+    //qDebug() << "...all done";
     procState->setState(State::Idle);
 }
 
@@ -452,8 +452,6 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
     }
-
-    //qDebug() << "adding to queue...";
 
     int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);

@@ -7,7 +7,6 @@
 #include <QDebug>
 #include <QFile>
 #include "treemodeliterator.h"
-#include "settings.h"
 #include "tools.h"
 
 DataContainer::DataContainer(QObject *parent)
@@ -50,27 +49,14 @@ QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool exis
     if (!TreeModel::isFolderRow(subfolder))
         return QString();
 
-    //const Settings defaults;
-    //QString folderName = subfolder.data().toString();
+    const bool _isLongExt = paths::hasExtension(metaData.dbFilePath, Lit::sl_db_exts.first());
+    QString extension = Lit::sl_db_exts.at(_isLongExt ? 0 : 1);
     QString folderPath = itemAbsolutePath(subfolder);
-    //const bool isLongExtension = paths::hasExtension(metaData.dbFilePath, Lit::sl_db_exts.first());
-
-    QString extension = paths::hasExtension(metaData.dbFilePath, Lit::sl_db_exts.at(0)) ? Lit::sl_db_exts.at(0) : Lit::sl_db_exts.at(1);
     QString fileName = format::composeDbFileName(QStringLiteral(u"checksums"), folderPath, extension);
     QString filePath = paths::joinPath(folderPath, fileName);
 
     if (QFileInfo::exists(filePath) || !existing)
         return filePath;
-
-    /*
-    extension = defaults.dbFileExtension(!isLongExtension);
-    fileName = format::composeDbFileName(defaults.dbPrefix, folderName, extension);
-    filePath = paths::joinPath(folderPath, fileName);
-
-    if (QFileInfo::exists(filePath))
-        return filePath;
-
-    return QString();*/
 
     return Files::firstDbFile(folderPath);
 }

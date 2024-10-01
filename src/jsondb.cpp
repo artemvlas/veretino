@@ -10,7 +10,7 @@
 #include <QFileInfo>
 #include "treemodeliterator.h"
 #include <QDirIterator>
-#include <QElapsedTimer>
+//#include <QElapsedTimer>
 
 const QString JsonDb::h_key_DateTime = QStringLiteral(u"DateTime");
 const QString JsonDb::h_key_Ignored = QStringLiteral(u"Ignored");
@@ -199,8 +199,8 @@ FileValues JsonDb::makeFileValues(const QString &filePath, const QString &basicD
 
 DataContainer* JsonDb::parseJson(const QString &filePath)
 {
-    QElapsedTimer timer;
-    timer.start();
+    //QElapsedTimer timer;
+    //timer.start();
 
     // the database is QJsonArray of QJsonObjects [{}, {}, ...]
     const QJsonArray mainArray = loadJsonDB(filePath);
@@ -284,7 +284,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
     }
 
     parsedData->model_->clearCacheFolderItems();
-    qDebug() << "Parsing time:" << timer.elapsed();
+    //qDebug() << "Parsing time:" << timer.elapsed();
 
     return parsedData;
 }

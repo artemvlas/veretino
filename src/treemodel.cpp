@@ -280,7 +280,7 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
 
 void TreeModel::clearCacheFolderItems()
 {
-    qDebug() << "TreeModel::clearCacheFolderItems >>" << cacheFolderItems_.size();
+    //qDebug() << "TreeModel::clearCacheFolderItems >>" << cacheFolderItems_.size();
     cacheFolderItems_.clear();
 }
 
