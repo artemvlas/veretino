@@ -39,7 +39,7 @@ class DataContainer : public QObject
     Q_OBJECT
 public:
     explicit DataContainer(QObject *parent = nullptr);
-    explicit DataContainer(const MetaData &metadata, QObject *parent = nullptr);
+    explicit DataContainer(const MetaData &meta, QObject *parent = nullptr);
     ~DataContainer();
 
     ProxyModel* setProxyModel();

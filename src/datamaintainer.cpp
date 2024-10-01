@@ -44,6 +44,11 @@ void DataMaintainer::setSourceData()
     setSourceData(new DataContainer(this));
 }
 
+void DataMaintainer::setSourceData(const MetaData &meta)
+{
+    setSourceData(new DataContainer(meta, this));
+}
+
 bool DataMaintainer::setSourceData(DataContainer *sourceData)
 {
     if (sourceData) {

@@ -22,6 +22,7 @@ public:
     // functions() --->>
     void setProcState(const ProcState *procState);
     void setSourceData();
+    void setSourceData(const MetaData &meta);
     bool setSourceData(DataContainer *sourceData);
     bool setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value = QVariant());
     void setConsiderDateModified(bool consider);

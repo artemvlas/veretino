@@ -75,9 +75,8 @@ void Manager::processFolderSha(const MetaData &metaData)
 
     qDebug() << thread()->objectName() << Q_FUNC_INFO;
 
-    dataMaintainer->setSourceData();
-    dataMaintainer->data_->metaData = metaData;
-    dataMaintainer->setDbFileState(MetaData::NoFile);
+    dataMaintainer->setSourceData(metaData);
+    // dataMaintainer->setDbFileState(MetaData::NoFile);
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, settings_->excludeUnpermitted);
@@ -188,7 +187,9 @@ void Manager::updateDatabase(const DestDbUpdate dest)
     if (!dataMaintainer->data_ || dataMaintainer->data_->isImmutable())
         return;
 
-    if (!dataMaintainer->data_->contains(FileStatus::CombAvailable)) {
+    const Numbers &_num = dataMaintainer->data_->numbers;
+
+    if (!_num.contains(FileStatus::CombAvailable)) {
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
         return;
     }
@@ -198,7 +199,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
     }
     else {
         if ((dest & DestAddNew)
-            && dataMaintainer->data_->contains(FileStatus::New))
+            && _num.contains(FileStatus::New))
         {
             int numAdded = calculateChecksums(FileStatus::New);
 
@@ -209,7 +210,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
         }
 
         if ((dest & DestClearLost)
-            && dataMaintainer->data_->contains(FileStatus::Missing))
+            && _num.contains(FileStatus::Missing))
         {
             dataMaintainer->clearLostFiles();
         }

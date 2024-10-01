@@ -13,8 +13,8 @@
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}
 
-DataContainer::DataContainer(const MetaData &metadata, QObject *parent)
-    : QObject(parent), metaData(metadata) {}
+DataContainer::DataContainer(const MetaData &meta, QObject *parent)
+    : QObject(parent), metaData(meta) {}
 
 ProxyModel* DataContainer::setProxyModel()
 {

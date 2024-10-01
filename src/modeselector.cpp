@@ -552,6 +552,7 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.algorithm = settings_->algorithm();
     metaData.filter = filter;
     metaData.dbFilePath = composeDbFilePath();
+    metaData.dbFileState = DbFileState::NoFile;
     if (settings_->dbFlagConst)
         metaData.flags |= MetaData::FlagConst;
 
