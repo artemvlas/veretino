@@ -155,12 +155,13 @@ void Manager::createDataModel(const QString &dbFilePath)
         return;
     }
 
-    // [experimental, file mod. date]
     dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
-    // [exp.]
 
-    dataMaintainer->importJson(dbFilePath);
+    const bool _success = dataMaintainer->importJson(dbFilePath);
     emit setViewData(dataMaintainer->data_);
+
+    if (_success)
+        sendDbUpdated();
 }
 
 void Manager::saveData()

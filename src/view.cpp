@@ -115,10 +115,11 @@ void View::setData(DataContainer *data)
          * So, to avoid duplicating the "Database Status" window, an additional condition is needed.
          */
 
+        /* moved; used generic signal from Manager thread
         if (data->isDbFileState(DbFileState::Saved))
             emit showDbStatus();
         else
-            qDebug() << "View::setData | DbFileState:" << data->metaData.dbFileState;
+            qDebug() << "View::setData | DbFileState:" << data->metaData.dbFileState;*/
     }
 
     // the newly setted data has not yet been verified and does not contain ReChecksums
