@@ -241,9 +241,9 @@ Mode ModeSelector::mode() const
         if (pathInfo.isDir())
             return Folder;
         else if (pathInfo.isFile()) {
-            if (tools::isDatabaseFile(view_->curPathFileSystem))
+            if (paths::isDbFile(view_->curPathFileSystem))
                 return DbFile;
-            else if (tools::isSummaryFile(view_->curPathFileSystem))
+            else if (paths::isDigestFile(view_->curPathFileSystem))
                 return SumFile;
             else
                 return File;

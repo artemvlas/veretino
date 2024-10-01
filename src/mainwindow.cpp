@@ -375,7 +375,7 @@ void MainWindow::showMessage(const QString &message, const QString &title)
 
 void MainWindow::promptOpenBranch(const QString &dbFilePath)
 {
-    if (!tools::isDatabaseFile(dbFilePath))
+    if (!paths::isDbFile(dbFilePath))
         return;
 
     QMessageBox msgBox(this);
@@ -511,7 +511,7 @@ bool MainWindow::argumentInput()
         QString argPath = QApplication::arguments().at(1);
         argPath.replace('\\', '/'); // win-->posix
         if (QFileInfo::exists(argPath)) {
-            if (QFileInfo(argPath).isFile() && tools::isDatabaseFile(argPath)) {
+            if (QFileInfo(argPath).isFile() && paths::isDbFile(argPath)) {
                 modeSelect->openJsonDatabase(argPath);
             }
             else {
@@ -537,7 +537,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     QString path = event->mimeData()->urls().first().toLocalFile();
 
     if (QFileInfo::exists(path)) {
-        if (tools::isDatabaseFile(path)) {
+        if (paths::isDbFile(path)) {
             modeSelect->openJsonDatabase(path);
         }
         else {

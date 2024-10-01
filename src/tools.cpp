@@ -88,16 +88,6 @@ int digitsToNum(const QList<int> &digits)
     return number;
 }
 
-bool isDatabaseFile(const QString &filePath)
-{
-    return paths::hasExtension(filePath, Lit::sl_db_exts);
-}
-
-bool isSummaryFile(const QString &filePath)
-{
-    return paths::hasExtension(filePath, Lit::sl_digest_exts);
-}
-
 bool canBeChecksum(const QString &str)
 {
     if (str.length() != 40
@@ -295,6 +285,16 @@ bool hasExtension(const QString &file, const QStringList &extensions)
     }
 
     return false;
+}
+
+bool isDbFile(const QString &filePath)
+{
+    return hasExtension(filePath, Lit::sl_db_exts);
+}
+
+bool isDigestFile(const QString &filePath)
+{
+    return hasExtension(filePath, Lit::sl_digest_exts);
 }
 
 void browsePath(const QString &path)

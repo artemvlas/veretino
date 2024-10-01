@@ -30,8 +30,6 @@ QCryptographicHash::Algorithm algoByStrLen(int strLen); // ^vice versa
 QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
 int digitsToNum(const QList<int> &digits); // {0,1,2,3} --> 123
 
-bool isDatabaseFile(const QString &filePath);
-bool isSummaryFile(const QString &filePath);
 bool canBeChecksum(const QString &str);
 bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
 bool isLater(const QString &dt_str, const QDateTime &other);
@@ -56,6 +54,8 @@ QString composeFilePath(const QString &parentFolder, const QString &fileName, co
 bool isRoot(const QString &path); // true: "/" or "X:'/'"; else false
 bool hasExtension(const QString &file, const QString &ext); // true if the "file" (name or path) have the "ext" suffix
 bool hasExtension(const QString &file, const QStringList &extensions); // true if the file have any extension from the list
+bool isDbFile(const QString &filePath);
+bool isDigestFile(const QString &filePath);
 void browsePath(const QString &path);
 } // namespace paths
 

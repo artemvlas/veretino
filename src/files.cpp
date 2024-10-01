@@ -118,6 +118,17 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
     return true;
 }
 
+QString Files::firstDbFile(const QString &folderPath)
+{
+    QDirIterator it(folderPath, QDir::Files);
+    while (it.hasNext()) {
+        if (paths::isDbFile(it.next()))
+            return it.filePath();
+    }
+
+    return QString();
+}
+
 QString Files::getFolderSize()
 {
     return getFolderSize(fsPath_);
@@ -180,9 +191,9 @@ QList<ExtNumSize> Files::getFileTypes(const FileList &fileList, bool excludeUnre
 
         if (excludeUnreadable && (filesIter.value().status == FileStatus::UnPermitted))
             _ext = ExtNumSize::strNoPerm;
-        else if (tools::isDatabaseFile(filesIter.key()))
+        else if (paths::isDbFile(filesIter.key()))
             _ext = ExtNumSize::strVeretinoDb;
-        else if (tools::isSummaryFile(filesIter.key()))
+        else if (paths::isDigestFile(filesIter.key()))
             _ext = ExtNumSize::strShaFiles;
         else
             _ext = QFileInfo(filesIter.key()).suffix().toLower();

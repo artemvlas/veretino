@@ -55,9 +55,9 @@ bool FilterRule::isFilterEnabled() const
 bool FilterRule::isFileAllowed(const QString &filePath) const
 {
     if (!isFilter(Include)) {
-        if (tools::isDatabaseFile(filePath))
+        if (paths::isDbFile(filePath))
             return !ignoreDbFiles;
-        if (tools::isSummaryFile(filePath))
+        if (paths::isDigestFile(filePath))
             return !ignoreShaFiles;
     }
 

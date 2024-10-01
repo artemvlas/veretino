@@ -145,7 +145,7 @@ void Manager::restoreDatabase()
 
 void Manager::createDataModel(const QString &dbFilePath)
 {
-    if (!tools::isDatabaseFile(dbFilePath)) {
+    if (!paths::isDbFile(dbFilePath)) {
         QString str = QString("Wrong file: %1\n"
                               "Expected file extension '*.ver' or '*.ver.json'").arg(dbFilePath);
 
