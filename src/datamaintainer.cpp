@@ -133,13 +133,12 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         const QString _relPath = paths::relativePath(_workDir, _fullPath);
 
         if (data_->metaData.filter.isFileAllowed(_relPath)) {
-            QFileInfo _fileInfo(_fullPath);
-            const bool _isReadable = _fileInfo.isReadable();
+            const bool _isReadable = it.fileInfo().isReadable();
 
             if (!_isReadable && ignoreUnreadable)
                 continue;
 
-            const FileValues &_values = _isReadable ? FileValues(fileStatus, _fileInfo.size())
+            const FileValues &_values = _isReadable ? FileValues(fileStatus, it.fileInfo().size())
                                                     : FileValues(FileStatus::UnPermitted);
 
             data_->model_->add_file(_relPath, _values);

@@ -59,7 +59,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 
     emit setStatusbarText(QStringLiteral(u"Creating a list of files..."));
 
-    FileList resultList; // result list
+    FileList resultList;
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
@@ -67,10 +67,10 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
         const QString _relPath = paths::relativePath(rootFolder, _fullPath);
 
         if (filter.isFileAllowed(_relPath)) {
-            QFileInfo fileInfo(_fullPath);
-            FileStatus _status = fileInfo.isReadable() ? FileStatus::NotSet : FileStatus::UnPermitted;
+            FileStatus _status = it.fileInfo().isReadable() ? FileStatus::NotSet
+                                                            : FileStatus::UnPermitted;
 
-            resultList.insert(_relPath, FileValues(_status, fileInfo.size()));
+            resultList.insert(_relPath, FileValues(_status, it.fileInfo().size()));
         }
     }
 
@@ -132,7 +132,8 @@ QString Files::getFolderSize(const QString &path)
         // iterating
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext() && !isCanceled()) {
-            totalSize += QFileInfo(it.next()).size();
+            it.next();
+            totalSize += it.fileInfo().size();
             ++filesNumber;
         }
 

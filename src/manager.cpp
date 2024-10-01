@@ -156,11 +156,10 @@ void Manager::createDataModel(const QString &dbFilePath)
 
     dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
 
-    const bool _success = dataMaintainer->importJson(dbFilePath);
-    emit setViewData(dataMaintainer->data_);
+    if (dataMaintainer->importJson(dbFilePath))
+        sendDbUpdated(); // using timer 0
 
-    if (_success)
-        sendDbUpdated();
+    emit setViewData(dataMaintainer->data_);
 }
 
 void Manager::saveData()

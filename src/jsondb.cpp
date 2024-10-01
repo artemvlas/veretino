@@ -267,12 +267,10 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
         if (parsedData->metaData.filter.isFileAllowed(_relPath)
             && !filelistData.contains(_relPath)
-            && !_unrCache.contains(_relPath))
+            && !_unrCache.contains(_relPath)
+            && it.fileInfo().isReadable())
         {
-            QFileInfo fileInfo(_fullPath);
-            if (fileInfo.isReadable()) {
-                parsedData->model_->add_file(_relPath, FileValues(FileStatus::New, fileInfo.size()));
-            }
+            parsedData->model_->add_file(_relPath, FileValues(FileStatus::New, it.fileInfo().size()));
         }
     }
 
