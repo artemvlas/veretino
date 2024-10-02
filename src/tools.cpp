@@ -193,24 +193,8 @@ QString basicName(const QString &path)
         return _endsWithSep ? path.chopped(1) : path;
     }
 
-    const int _len = _endsWithSep ? path.size() - _lastSepInd - 2 : -1;
+    const int _len = _endsWithSep ? (path.size() - _lastSepInd - 2) : -1;
     return path.mid(_lastSepInd + 1, _len);
-
-    /* slower due malloc
-    QString result;
-    const int lastIndex = path.size() - 1;
-
-    for (int i = lastIndex; i >= 0; --i) {
-        const QChar _ch = path.at(i);
-        if (_ch != _sep) { // _sep == '/'
-            result.prepend(_ch);
-        }
-        else if (i != lastIndex) {
-            break;
-        }
-    }
-
-    return result;*/
 }
 
 QString relativePath(const QString &rootFolder, const QString &fullPath)
