@@ -7,7 +7,6 @@
 #include "settings.h"
 #include <QSettings>
 #include "tools.h"
-// #include <QDebug>
 
 const QString Settings::s_key_algo = "algorithm";
 const QString Settings::s_key_dbPrefix = "dbPrefix";
@@ -116,7 +115,6 @@ void Settings::saveSettings()
 void Settings::loadSettings()
 {
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, Lit::s_app_name, Lit::s_app_name);
-    // qDebug() << "Load settings:" << storedSettings.fileName() << storedSettings.format();
 
     if (lastFsPath) {
         *lastFsPath = storedSettings.value(s_key_history_lastFsPath).toString();

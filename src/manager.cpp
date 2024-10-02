@@ -39,11 +39,8 @@ void Manager::queueTask(std::function<void()> task)
 void Manager::runTasks()
 {
     //qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
-    //int i = 0;
 
     while (!taskQueue_.isEmpty()) {
-        //qDebug() << "...task #" << ++i;
-
         if (!procState->isStarted())
             procState->setState(State::StartSilently);
 
@@ -51,7 +48,6 @@ void Manager::runTasks()
         func();
     }
 
-    //qDebug() << "...all done";
     procState->setState(State::Idle);
 }
 
@@ -73,10 +69,7 @@ void Manager::processFolderSha(const MetaData &metaData)
         return;
     }
 
-    qDebug() << thread()->objectName() << Q_FUNC_INFO;
-
     dataMaintainer->setSourceData(metaData);
-    // dataMaintainer->setDbFileState(MetaData::NoFile);
 
     // create the filelist
     dataMaintainer->addActualFiles(FileStatus::Queued, settings_->excludeUnpermitted);
@@ -104,8 +97,6 @@ void Manager::processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
-    // qDebug() << thread()->objectName() << Q_FUNC_INFO;
-
     QString sum = calculateChecksum(filePath, algo);
 
     if (sum.isEmpty())

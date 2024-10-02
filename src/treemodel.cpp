@@ -77,7 +77,6 @@ TreeItem *TreeModel::add_folder(const QString &path)
         return rootItem;
 
     if (cacheFolderItems_.contains(path)) {
-        //qDebug() << "add_folder >> returned cached value:" << path;
         return cacheFolderItems_.value(path);
     }
 
@@ -97,7 +96,6 @@ TreeItem *TreeModel::add_folder(const QString &path)
     }
 
     cacheFolderItems_.insert(path, parentItem);
-    //qDebug() << "add_folder >> value cached:" << path;
     return parentItem;
 }
 
@@ -280,7 +278,6 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
 
 void TreeModel::clearCacheFolderItems()
 {
-    //qDebug() << "TreeModel::clearCacheFolderItems >>" << cacheFolderItems_.size();
     cacheFolderItems_.clear();
 }
 
