@@ -38,8 +38,8 @@ DialogDbStatus::~DialogDbStatus()
 
 void DialogDbStatus::connections()
 {
-    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData.dbFilePath)); });
-    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData.workDir); });
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(paths::parentFolder(data_->metaData_.dbFilePath)); });
+    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData_.workDir); });
 }
 
 void DialogDbStatus::setLabelsInfo()
@@ -50,15 +50,15 @@ void DialogDbStatus::setLabelsInfo()
         dbFileName.prepend("../DESKTOP/");
 
     ui->labelDbFileName->setText(dbFileName);
-    ui->labelDbFileName->setToolTip(data_->metaData.dbFilePath);
-    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(data_->metaData.algorithm));
-    ui->labelWorkDir->setToolTip(data_->metaData.workDir);
+    ui->labelDbFileName->setToolTip(data_->metaData_.dbFilePath);
+    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(data_->metaData_.algorithm));
+    ui->labelWorkDir->setToolTip(data_->metaData_.workDir);
 
     if (!data_->isWorkDirRelative())
         ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
-    const QString (&dt)[3] = data_->metaData.datetime;
+    const QString (&dt)[3] = data_->metaData_.datetime;
 
     if (dt[DTstr::DateUpdated].isEmpty())
         ui->labelDateTime_Update->setText(dt[DTstr::DateCreated]);
@@ -84,7 +84,7 @@ void DialogDbStatus::setTabsInfo()
     if (data_->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
-        const FilterRule &_filter = data_->metaData.filter;
+        const FilterRule &_filter = data_->metaData_.filter;
         ui->labelFiltersInfo->setStyleSheet(format::coloredText(_filter.isFilter(FilterRule::Ignore)));
 
         const QString _exts = _filter.extensionString();
@@ -113,7 +113,7 @@ QStringList DialogDbStatus::infoContent()
     if (isCreating())
         return { QStringLiteral(u"The checksum list is being calculated...") };
 
-    const Numbers &_num = data_->numbers;
+    const Numbers &_num = data_->numbers_;
     QStringList contentNumbers;
     const qint64 totalSize = _num.totalSize(FileStatus::CombAvailable);
     const int available = _num.numberOf(FileStatus::CombAvailable);
@@ -167,7 +167,7 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const Numbers &num = data_->numbers;
+    const Numbers &num = data_->numbers_;
     const int available = num.numberOf(FileStatus::CombAvailable);
     const int numChecksums = num.numberOf(FileStatus::CombHasChecksum);
 
@@ -212,7 +212,7 @@ QStringList DialogDbStatus::infoVerification()
 
 QStringList DialogDbStatus::infoChanges()
 {
-    const Numbers &_num = data_->numbers;
+    const Numbers &_num = data_->numbers_;
     QStringList result;
 
     if (data_->contains(FileStatus::Added))
@@ -267,7 +267,7 @@ bool DialogDbStatus::isJustCreated()
 bool DialogDbStatus::isSavedToDesktop()
 {
     return (isJustCreated() && !data_->isWorkDirRelative()
-            && (paths::parentFolder(data_->metaData.dbFilePath) == Files::desktopFolderPath));
+            && (paths::parentFolder(data_->metaData_.dbFilePath) == Files::desktopFolderPath));
 }
 
 void DialogDbStatus::showEvent(QShowEvent *event)

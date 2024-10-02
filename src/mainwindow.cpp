@@ -170,7 +170,7 @@ void MainWindow::connectManager()
     connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
     connect(ui->treeView, &View::dataSetted, this,
-            [=]{ if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData.dbFilePath); });
+            [=]{ if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData_.dbFilePath); });
 
     thread->start();
 }
@@ -257,7 +257,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const QList<Ext
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
         QString strWindowTitle = QStringLiteral(u"Database Contents");
-        if (ui->treeView->data_ && ui->treeView->data_->numbers.contains(FileStatus::Missing))
+        if (ui->treeView->data_ && ui->treeView->data_->numbers_.contains(FileStatus::Missing))
             strWindowTitle.append(QStringLiteral(u" [available ones]"));
         dialog.setWindowTitle(strWindowTitle);
         dialog.exec();
@@ -448,13 +448,13 @@ void MainWindow::updateWindowTitle()
     if (ui->treeView->isViewDatabase()) {
         const DataContainer *data = ui->treeView->data_;
 
-        if (data->numbers.contains(FileStatus::Mismatched)) {
+        if (data->numbers_.contains(FileStatus::Mismatched)) {
             setWinTitleMismatchFound();
             return;
         }
 
         QString str = data->isAllMatched() ? QStringLiteral(u"✓ verified")
-                                           : QStringLiteral(u"DB > ") + paths::shortenPath(data->metaData.workDir);
+                                           : QStringLiteral(u"DB > ") + paths::shortenPath(data->metaData_.workDir);
 
         setWindowTitle(Lit::s_appName
                        % Lit::s_sepStick
@@ -488,7 +488,7 @@ void MainWindow::handleChangedModel()
 void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->treeView->isViewDatabase()) {
-        Numbers &numbers = ui->treeView->data_->numbers;
+        Numbers &numbers = ui->treeView->data_->numbers_;
         if (numbers.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
         else if (numbers.contains(FileStatus::CombDbChanged))

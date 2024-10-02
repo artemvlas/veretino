@@ -136,7 +136,7 @@ void Manager::restoreDatabase()
     if (dataMaintainer->data_
         && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved()))
     {
-        createDataModel(dataMaintainer->data_->metaData.dbFilePath);
+        createDataModel(dataMaintainer->data_->metaData_.dbFilePath);
     }
     else {
         emit setStatusbarText("No saved changes");
@@ -186,7 +186,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
     if (!dataMaintainer->data_ || dataMaintainer->data_->isImmutable())
         return;
 
-    const Numbers &_num = dataMaintainer->data_->numbers;
+    const Numbers &_num = dataMaintainer->data_->numbers_;
 
     if (!_num.contains(FileStatus::CombAvailable)) {
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
@@ -236,7 +236,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
     if (fileStatusBefore == FileStatus::New) {
         dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
         QString filePath = dataMaintainer->data_->itemAbsolutePath(fileIndex);
-        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm);
+        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData_.algorithm);
 
         if (sum.isEmpty()) { // return previous status
             dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::New);
@@ -304,7 +304,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
 
     dataMaintainer->setItemValue(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
     const QString filePath = dataMaintainer->data_->itemAbsolutePath(fileItemIndex);
-    const QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData.algorithm, true);
+    const QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData_.algorithm, true);
 
     if (sum.isEmpty()) { // return previous status
         dataMaintainer->setItemValue(fileItemIndex, Column::ColumnStatus, storedStatus);
@@ -339,13 +339,13 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
 
     // changing accompanying statuses to "Matched"
     FileStatuses flagAddedUpdated = (FileStatus::Added | FileStatus::Updated);
-    if (dataMaintainer->data_->numbers.contains(flagAddedUpdated)) {
+    if (dataMaintainer->data_->numbers_.contains(flagAddedUpdated)) {
         dataMaintainer->changeFilesStatus(flagAddedUpdated, FileStatus::Matched, folderItemIndex);
     }
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        emit folderChecked(dataMaintainer->data_->numbers);
+        emit folderChecked(dataMaintainer->data_->numbers_);
 
         // Save the verification datetime, if needed
         if (settings_->saveVerificationDateTime) {
@@ -453,7 +453,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
         return 0;
     }
 
-    int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers.numberOf(FileStatus::Queued)
+    int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers_.numberOf(FileStatus::Queued)
                                                    : dataMaintainer->addToQueue(status, rootIndex);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << numQueued;
@@ -466,7 +466,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     QString totalSizeReadable = format::dataSizeReadable(totalSize);
     procState->setTotalSize(totalSize);
 
-    ShaCalculator shaCalc(dataMaintainer->data_->metaData.algorithm);
+    ShaCalculator shaCalc(dataMaintainer->data_->metaData_.algorithm);
     shaCalc.setProcState(procState);
     int doneNum = 0;
     bool isMismatchFound = false;
@@ -599,7 +599,7 @@ void Manager::makeDbContentsList()
     const QList<ExtNumSize> _typesList = files_->getFileTypes(dataMaintainer->data_->model_);
 
     if (!_typesList.isEmpty())
-        emit dbContentsListCreated(dataMaintainer->data_->metaData.workDir, _typesList);
+        emit dbContentsListCreated(dataMaintainer->data_->metaData_.workDir, _typesList);
 }
 
 void Manager::modelChanged(ModelView modelView)

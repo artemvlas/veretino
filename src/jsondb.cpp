@@ -79,7 +79,7 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
-    const MetaData &_meta = data->metaData;
+    const MetaData &_meta = data->metaData_;
     const Numbers &_numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
@@ -158,14 +158,14 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
     }
 
     const QString &pathToSave = rootFolder.isValid() ? data->getBranchFilePath(rootFolder) // branching
-                                                     : data->metaData.dbFilePath; // main database
+                                                     : data->metaData_.dbFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
         emit setStatusbarText(QStringLiteral(u"Saved"));
         return pathToSave;
     }
     else {
-        header[h_key_WorkDir] = rootFolder.isValid() ? paths::parentFolder(pathToSave) : data->metaData.workDir;
+        header[h_key_WorkDir] = rootFolder.isValid() ? paths::parentFolder(pathToSave) : data->metaData_.workDir;
         mainArray[0] = header;
         doc.setArray(mainArray);
 
@@ -223,7 +223,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
 
     const QJsonObject _header = mainArray.at(0).toObject();
     DataContainer *parsedData = new DataContainer(getMetaData(filePath, _header, filelistData));
-    const QString &workDir = parsedData->metaData.workDir;
+    const QString &workDir = parsedData->metaData_.workDir;
 
     // populating the main data
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
@@ -265,7 +265,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         const QString _fullPath = it.next();
         const QString _relPath = paths::relativePath(workDir, _fullPath);
 
-        if (parsedData->metaData.filter.isFileAllowed(_relPath)
+        if (parsedData->metaData_.filter.isFileAllowed(_relPath)
             && !filelistData.contains(_relPath)
             && !_unrCache.contains(_relPath)
             && it.fileInfo().isReadable())

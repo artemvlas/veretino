@@ -76,19 +76,19 @@ void StatusBar::setModeDb(const DataContainer *data)
     }
 
     // update info
-    const Numbers &numbers = data->numbers;
+    const Numbers &_num = data->numbers_;
 
     QString checkResult = QString("☒ %1\n✓ %2")
-                              .arg(numbers.numberOf(FileStatus::Mismatched))
-                              .arg(numbers.numberOf(FileStatus::CombMatched));
+                              .arg(_num.numberOf(FileStatus::Mismatched))
+                              .arg(_num.numberOf(FileStatus::CombMatched));
 
     buttonDbHash->setToolTip(checkResult);
-    buttonDbHash->setText(format::algoToStr(data->metaData.algorithm));
-    buttonDbSize->setText(format::dataSizeReadable(numbers.totalSize(FileStatus::CombAvailable)));
+    buttonDbHash->setText(format::algoToStr(data->metaData_.algorithm));
+    buttonDbSize->setText(format::dataSizeReadable(_num.totalSize(FileStatus::CombAvailable)));
 
-    QString strDbMain = QString::number(numbers.numberOf(FileStatus::CombAvailable));
-    if (numbers.contains(FileStatus::Missing)) // if not all files are available, display "available/total"
-        strDbMain.append(QString("/%1").arg(numbers.numberOf(FileStatus::CombHasChecksum)));
+    QString strDbMain = QString::number(_num.numberOf(FileStatus::CombAvailable));
+    if (_num.contains(FileStatus::Missing)) // if not all files are available, display "available/total"
+        strDbMain.append(QString("/%1").arg(_num.numberOf(FileStatus::CombHasChecksum)));
 
     buttonDbMain->setText(strDbMain);
 

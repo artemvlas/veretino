@@ -224,9 +224,9 @@ Mode ModeSelector::mode() const
         }
 
         if (!isDbConst()) {
-            if (view_->data_->numbers.contains(FileStatus::Mismatched))
+            if (view_->data_->numbers_.contains(FileStatus::Mismatched))
                 return UpdateMismatch;
-            else if (view_->data_->numbers.contains(FileStatus::CombNewLost))
+            else if (view_->data_->numbers_.contains(FileStatus::CombNewLost))
                 return ModelNewLost;
         }
 
@@ -398,7 +398,7 @@ void ModeSelector::resetDatabase()
 {
     if (view_->data_) {
         view_->saveHeaderState();
-        openJsonDatabase(view_->data_->metaData.dbFilePath);
+        openJsonDatabase(view_->data_->metaData_.dbFilePath);
     }
 }
 
@@ -745,7 +745,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     if (!view_->isViewDatabase())
         return;
 
-    const Numbers &_num = view_->data_->numbers;
+    const Numbers &_num = view_->data_->numbers_;
     const QModelIndex index = view_->indexAt(point);
     QMenu *viewContextMenu = menuAct_->disposableMenu();
 

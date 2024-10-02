@@ -102,7 +102,7 @@ void View::setData(DataContainer *data)
     }
 
     data_ = data;
-    curPathFileSystem = data->metaData.dbFilePath;
+    curPathFileSystem = data->metaData_.dbFilePath;
 
     if (data->isInCreation()) {
         setTreeModel(ModelView::ModelSource);

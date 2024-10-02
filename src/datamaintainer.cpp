@@ -30,7 +30,7 @@ void DataMaintainer::connections()
     connect(json_, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
 
     connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
-                                                                  data_->metaData.datetime[DTstr::DateVerified].clear(); });
+                                                                  data_->metaData_.datetime[DTstr::DateVerified].clear(); });
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
@@ -92,11 +92,11 @@ void DataMaintainer::updateDateTime()
 {
     if (data_) {
         if (data_->isDbFileState(DbFileState::NoFile)) {
-            data_->metaData.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
+            data_->metaData_.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
         }
         else if (data_->contains(FileStatus::CombDbChanged)) {
-            data_->metaData.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
-            data_->metaData.datetime[DTstr::DateVerified].clear();
+            data_->metaData_.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
+            data_->metaData_.datetime[DTstr::DateVerified].clear();
         }
     }
 }
@@ -104,7 +104,7 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateVerifDateTime()
 {
     if (data_ && data_->isAllMatched()) {
-        data_->metaData.datetime[DTstr::DateVerified] = QStringLiteral(u"Verified: ") + format::currentDateTime();
+        data_->metaData_.datetime[DTstr::DateVerified] = QStringLiteral(u"Verified: ") + format::currentDateTime();
         setDbFileState(DbFileState::NotSaved);
     }
 }
@@ -115,7 +115,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     if (!data_)
         return 0;
 
-    const QString &_workDir = data_->metaData.workDir;
+    const QString &_workDir = data_->metaData_.workDir;
 
     if (!QFileInfo(_workDir).isDir()) {
         qDebug() << "DataMaintainer::addActualFiles | Not a folder path: " << _workDir;
@@ -132,7 +132,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         const QString _fullPath = it.next();
         const QString _relPath = paths::relativePath(_workDir, _fullPath);
 
-        if (data_->metaData.filter.isFileAllowed(_relPath)) {
+        if (data_->metaData_.filter.isFileAllowed(_relPath)) {
             const bool _isReadable = it.fileInfo().isReadable();
 
             if (!_isReadable && ignoreUnreadable)
@@ -175,9 +175,9 @@ void DataMaintainer::updateNumbers()
 void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore)
 {
     if (data_
-        && data_->numbers.moveFile(statusBefore,
-                                   TreeModel::itemFileStatus(fileIndex),
-                                   TreeModel::itemFileSize(fileIndex)))
+        && data_->numbers_.moveFile(statusBefore,
+                                    TreeModel::itemFileStatus(fileIndex),
+                                    TreeModel::itemFileSize(fileIndex)))
     {
         emit numbersUpdated();
     }
@@ -186,7 +186,7 @@ void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatu
 void DataMaintainer::setDbFileState(DbFileState state)
 {
     if (data_ && !data_->isDbFileState(state)) {
-        data_->metaData.dbFileState = state;
+        data_->metaData_.dbFileState = state;
         emit dbFileStateChanged(state == DbFileState::NotSaved);
     }
 }
@@ -387,7 +387,7 @@ void DataMaintainer::exportToJson()
 
     if (!_dbFilePath.isEmpty()) {
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
-        data_->metaData.dbFilePath = _dbFilePath;
+        data_->metaData_.dbFilePath = _dbFilePath;
     }
     else {
         setDbFileState(DbFileState::NotSaved);

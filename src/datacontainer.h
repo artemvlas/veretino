@@ -71,8 +71,8 @@ public:
     // DATA
     TreeModel *model_ = new TreeModel(this);  // main data
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
-    MetaData metaData;
-    Numbers numbers;
+    MetaData metaData_;
+    Numbers numbers_;
 }; // class DataContainer
 
 #endif // DATACONTAINER_H
