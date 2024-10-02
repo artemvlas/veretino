@@ -79,15 +79,16 @@ QJsonArray JsonDb::loadJsonDB(const QString &filePath)
 
 QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootFolder)
 {
+    const bool isBranching = TreeModel::isFolderRow(rootFolder);
+    const Numbers &_num = isBranching ? data->getNumbers(rootFolder) : data->numbers_;
     const MetaData &_meta = data->metaData_;
-    const Numbers &_numbers = DataContainer::getNumbers(data->model_, rootFolder);
     QJsonObject header;
 
     static const QString _app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
     header[QStringLiteral(u"App/Origin")] = _app_origin;
-    header[QStringLiteral(u"Folder")] = rootFolder.isValid() ? rootFolder.data().toString() : paths::basicName(_meta.workDir);
-    header[QStringLiteral(u"Total Checksums")] = _numbers.numberOf(FileStatus::CombHasChecksum);
-    header[QStringLiteral(u"Total Size")] = format::dataSizeReadableExt(_numbers.totalSize(FileStatus::CombAvailable));
+    header[QStringLiteral(u"Folder")] = isBranching ? rootFolder.data().toString() : paths::basicName(_meta.workDir);
+    header[QStringLiteral(u"Total Checksums")] = _num.numberOf(FileStatus::CombHasChecksum);
+    header[QStringLiteral(u"Total Size")] = format::dataSizeReadableExt(_num.totalSize(FileStatus::CombAvailable));
     header[h_key_Algo] = format::algoToStr(_meta.algorithm);
 
     // DateTime
@@ -96,7 +97,7 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
                                                        _meta.datetime[DTstr::DateVerified]);
 
     // WorkDir
-    if (!data->isWorkDirRelative() && !rootFolder.isValid())
+    if (!isBranching && !data->isWorkDirRelative())
         header[h_key_WorkDir] = _meta.workDir;
 
     // Filter
