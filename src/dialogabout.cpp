@@ -39,8 +39,9 @@ DialogAbout::DialogAbout(QWidget *parent) :
                              "<a href='https://github.com/artemvlas'>GitHub</a>"
                              "<br>"
                              "<br>"
+                             "Thanks to the Breeze Theme creators for the icons."
                              "<br>"
-                             "Thanks to the Breeze Theme creators for the icons.");
+                             "...and to the Qt dev team for making these things possible.");
 }
 
 DialogAbout::~DialogAbout()
