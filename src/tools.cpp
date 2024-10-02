@@ -185,6 +185,18 @@ QString basicName(const QString &path)
         return _ch.isLetter() ? QStringLiteral(u"Drive_") + _ch.toUpper() : "Root";
     }
 
+    // _sep == '/'
+    const bool _endsWithSep = path.endsWith(_sep);
+    const int _lastSepInd = path.lastIndexOf(_sep, -2);
+
+    if (_lastSepInd == -1) {
+        return _endsWithSep ? path.chopped(1) : path;
+    }
+
+    const int _len = _endsWithSep ? path.size() - _lastSepInd - 2 : -1;
+    return path.mid(_lastSepInd + 1, _len);
+
+    /* slower due malloc
     QString result;
     const int lastIndex = path.size() - 1;
 
@@ -198,7 +210,7 @@ QString basicName(const QString &path)
         }
     }
 
-    return result;
+    return result;*/
 }
 
 QString relativePath(const QString &rootFolder, const QString &fullPath)
