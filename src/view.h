@@ -75,7 +75,7 @@ private:
     void showAllColumns();
     void setDefaultColumnsWidth();
     void restoreHeaderState();
-    QString headerText(int column);
+    QString headerText(int column) const;
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
     Settings *settings_ = nullptr;

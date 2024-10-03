@@ -328,7 +328,7 @@ void View::deleteOldSelModel()
     }
 }
 
-QString View::headerText(int column)
+QString View::headerText(int column) const
 {
     return model()->headerData(column, Qt::Horizontal).toString();
 }
