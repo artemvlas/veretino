@@ -29,13 +29,13 @@ public:
     enum ColumnFileSystem { ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified };
 
     void setSettings(Settings *settings);
-    QString curAbsPath();
-    ModelView currentViewModel();
-    bool isCurrentViewModel(const ModelView modelView);
-    bool isViewFileSystem(); // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
-    bool isViewDatabase();
-    bool isViewFiltered();
-    bool isViewFiltered(const FileStatus status);
+    QString curAbsPath() const;
+    ModelView currentViewModel() const;
+    bool isCurrentViewModel(const ModelView modelView) const;
+    bool isViewFileSystem() const; // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
+    bool isViewDatabase() const;
+    bool isViewFiltered() const;
+    bool isViewFiltered(const FileStatus status) const;
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;

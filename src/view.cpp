@@ -163,7 +163,7 @@ void View::setMismatchFiltering(const Numbers &num)
     }
 }
 
-QString View::curAbsPath()
+QString View::curAbsPath() const
 {
     if (isViewFileSystem())
         return fileSystem->filePath(curIndexFileSystem);
@@ -280,7 +280,7 @@ void View::toHome()
     }
 }
 
-ModelView View::currentViewModel()
+ModelView View::currentViewModel() const
 {
     if (model() == fileSystem)
         return FileSystem;
@@ -292,28 +292,28 @@ ModelView View::currentViewModel()
         return NotSetted;
 }
 
-bool View::isCurrentViewModel(const ModelView modelView)
+bool View::isCurrentViewModel(const ModelView modelView) const
 {
     return (modelView == currentViewModel());
 }
 
-bool View::isViewFileSystem()
+bool View::isViewFileSystem() const
 {
     return (model() == fileSystem);
 }
 
-bool View::isViewDatabase()
+bool View::isViewDatabase() const
 {
     return (ModelDb & currentViewModel());
 }
 
-bool View::isViewFiltered()
+bool View::isViewFiltered() const
 {
     return isCurrentViewModel(ModelView::ModelProxy)
            && data_->proxyModel_->isFilterEnabled();
 }
 
-bool View::isViewFiltered(const FileStatus status)
+bool View::isViewFiltered(const FileStatus status) const
 {
     return isCurrentViewModel(ModelView::ModelProxy)
            && (data_->proxyModel_->currentlyFiltered() & status);
