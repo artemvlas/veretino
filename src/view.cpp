@@ -33,6 +33,7 @@ View::View(QWidget *parent)
 // called every time the model is changed
 void View::connectModel()
 {
+    clearCurIndexes(); // TMP, due to changeCurIndexAndPath
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
 }
 
@@ -40,6 +41,12 @@ void View::setSettings(Settings *settings)
 {
     settings_ = settings;
     settings_->lastFsPath = &curPathFileSystem;
+}
+
+void View::clearCurIndexes()
+{
+    curIndexSource = QModelIndex();
+    curIndexProxy = QModelIndex();
 }
 
 void View::setFileSystemModel()
@@ -86,7 +93,8 @@ void View::setTreeModel(ModelView modelSel)
     emit modelChanged(modelSel);
 
     restoreHeaderState();
-    setIndexByPath(curPathModel);
+    // setIndexByPath(curPathModel);
+    QTimer::singleShot(0, this, qOverload<>(&View::setIndexByPath));
 }
 
 void View::setData(DataContainer *data)

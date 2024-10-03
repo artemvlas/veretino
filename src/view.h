@@ -67,6 +67,8 @@ public slots:
     void headerContextMenuRequested(const QPoint &point);
 
 private:
+    QString headerText(int column) const;
+    void clearCurIndexes();
     void changeCurIndexAndPath(const QModelIndex &curIndex);
     void deleteOldSelModel();
     void connectModel();
@@ -75,7 +77,6 @@ private:
     void showAllColumns();
     void setDefaultColumnsWidth();
     void restoreHeaderState();
-    QString headerText(int column) const;
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
     Settings *settings_ = nullptr;
