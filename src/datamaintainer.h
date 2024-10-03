@@ -33,7 +33,7 @@ public:
     void setDbFileState(DbFileState state);
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_
-    int addActualFiles(FileStatus fileStatus = FileStatus::New,
+    int folderBasedData(FileStatus fileStatus = FileStatus::New,
                        bool ignoreUnreadable = true);
 
     qint64 totalSizeOfListedFiles(const FileStatuses flags,
@@ -93,6 +93,7 @@ signals:
     void showMessage(const QString &text, const QString &title = "Info");
     void subDbForked(const QString &forkedDbFilePath);
     void dbFileStateChanged(bool isNotSaved);
+    void failedDataCreation();
 }; // class DataMaintainer
 
 #endif // DATAMAINTAINER_H

@@ -110,7 +110,7 @@ void DataMaintainer::updateVerifDateTime()
 }
 
 // adds the WorkDir contents to the data_->model_
-int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
+int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable)
 {
     if (!data_)
         return 0;
@@ -118,7 +118,7 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
     const QString &_workDir = data_->metaData_.workDir;
 
     if (!QFileInfo(_workDir).isDir()) {
-        qDebug() << "DataMaintainer::addActualFiles | Not a folder path: " << _workDir;
+        qDebug() << "DataMaintainer::folderBasedData | Wrong path:" << _workDir;
         return 0;
     }
 
@@ -146,15 +146,16 @@ int DataMaintainer::addActualFiles(FileStatus fileStatus, bool ignoreUnreadable)
         }
     }
 
-    if (isCanceled()) {
-        qDebug() << "DataMaintainer::addActualFiles | Canceled:" << _workDir;
-        clearData();
+    if (isCanceled() || numAdded == 0) {
+        qDebug() << "DataMaintainer::folderBasedData | Canceled/No items:" << _workDir;
         emit setStatusbarText();
+        emit failedDataCreation();
+        clearData();
         return 0;
     }
 
-    if (numAdded > 0)
-        updateNumbers();
+    //if (numAdded > 0)
+    updateNumbers();
 
     data_->model_->clearCacheFolderItems();
     return numAdded;
@@ -373,7 +374,11 @@ void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatu
 
 bool DataMaintainer::importJson(const QString &jsonFilePath)
 {
-    return setSourceData(json_->parseJson(jsonFilePath));
+    const bool _success = setSourceData(json_->parseJson(jsonFilePath));
+    if (!_success)
+        emit failedDataCreation();
+
+    return _success;
 }
 
 void DataMaintainer::exportToJson()
