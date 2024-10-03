@@ -33,7 +33,7 @@ View::View(QWidget *parent)
 // called every time the model is changed
 void View::connectModel()
 {
-    clearCurIndexes(); // TMP, due to changeCurIndexAndPath
+    curIndexSource = QModelIndex(); // TMP, due to changeCurIndexAndPath
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
 }
 
@@ -41,12 +41,6 @@ void View::setSettings(Settings *settings)
 {
     settings_ = settings;
     settings_->lastFsPath = &curPathFileSystem;
-}
-
-void View::clearCurIndexes()
-{
-    curIndexSource = QModelIndex();
-    curIndexProxy = QModelIndex();
 }
 
 void View::setFileSystemModel()
@@ -78,7 +72,7 @@ void View::setTreeModel(ModelView modelSel)
         return;
     }
 
-    if (isCurrentViewModel(modelSel))
+    if (isViewModel(modelSel))
         return; // if the current model remains the same
 
     oldSelectionModel_ = selectionModel();
@@ -139,14 +133,14 @@ void View::clear()
 // when the process is completed, return to the Proxy Model view
 void View::setViewProxy()
 {
-    if (isCurrentViewModel(ModelView::ModelSource)) {
+    if (isViewModel(ModelView::ModelSource)) {
         setTreeModel(ModelView::ModelProxy);
     }
 }
 
 void View::setViewSource()
 {
-    if (isCurrentViewModel(ModelView::ModelProxy)) {
+    if (isViewModel(ModelView::ModelProxy)) {
         // if proxy model filtering is enabled, starting a Big Data queuing/verification may be very slow,
         // even if switching to Source Model, so disable filtering first
         disableFilter();
@@ -190,14 +184,8 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
         emit pathChanged(curPathFileSystem);
     }
     else if (isViewDatabase()) {
-        if (isCurrentViewModel(ModelSource)) {
-            curIndexSource = curIndex;
-            curIndexProxy = data_->proxyModel_->mapFromSource(curIndexSource);
-        }
-        else if (isCurrentViewModel(ModelProxy)) {
-            curIndexProxy = curIndex;
-            curIndexSource = data_->proxyModel_->mapToSource(curIndexProxy);
-        }
+        curIndexSource = isViewModel(ModelSource) ? curIndex
+                                                  : data_->proxyModel_->mapToSource(curIndex); // ModelProxy
 
         curPathModel = TreeModel::getPath(curIndexSource);
         emit pathChanged(curPathModel);
@@ -253,20 +241,20 @@ void View::setIndexByPath(const QString &path)
 
 void View::setFilter(const FileStatuses flags)
 {
-    if (isCurrentViewModel(ModelProxy)) {
+    if (isViewModel(ModelProxy)) {
         QString prePathModel = curPathModel;
         data_->proxyModel_->setFilter(flags);
         setIndexByPath(prePathModel);
         setBackgroundColor();
     }
-    else if (isCurrentViewModel(ModelSource)) {
+    else if (isViewModel(ModelSource)) {
         data_->proxyModel_->setFilter(flags);
     }
 }
 
 void View::editFilter(const FileStatuses flags, bool add)
 {
-    if (isCurrentViewModel(ModelProxy)) {
+    if (isViewModel(ModelProxy)) {
         FileStatuses curFilter = data_->proxyModel_->currentlyFiltered();
 
         setFilter(add ? (curFilter | flags) : (curFilter & ~flags));
@@ -288,7 +276,7 @@ void View::toHome()
     }
 }
 
-ModelView View::currentViewModel() const
+ModelView View::curViewModel() const
 {
     if (model() == fileSystem)
         return FileSystem;
@@ -300,9 +288,9 @@ ModelView View::currentViewModel() const
         return NotSetted;
 }
 
-bool View::isCurrentViewModel(const ModelView modelView) const
+bool View::isViewModel(const ModelView modelView) const
 {
-    return (modelView == currentViewModel());
+    return (modelView == curViewModel());
 }
 
 bool View::isViewFileSystem() const
@@ -312,18 +300,18 @@ bool View::isViewFileSystem() const
 
 bool View::isViewDatabase() const
 {
-    return (ModelDb & currentViewModel());
+    return (ModelDb & curViewModel());
 }
 
 bool View::isViewFiltered() const
 {
-    return isCurrentViewModel(ModelView::ModelProxy)
+    return isViewModel(ModelView::ModelProxy)
            && data_->proxyModel_->isFilterEnabled();
 }
 
 bool View::isViewFiltered(const FileStatus status) const
 {
-    return isCurrentViewModel(ModelView::ModelProxy)
+    return isViewModel(ModelView::ModelProxy)
            && (data_->proxyModel_->currentlyFiltered() & status);
 }
 
@@ -394,7 +382,7 @@ void View::restoreHeaderState()
 
 void View::headerContextMenuRequested(const QPoint &point)
 {
-    if (isCurrentViewModel(NotSetted))
+    if (isViewModel(NotSetted))
         return;
 
     QMenu *headerContextMenu = new QMenu(this);

@@ -685,7 +685,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         createContextMenu_ViewFs(point);
     else if (view_->isViewDatabase())
         createContextMenu_ViewDb(point);
-    else if (view_->isCurrentViewModel(ModelView::NotSetted))
+    else if (view_->isViewModel(ModelView::NotSetted))
         menuAct_->contextMenuViewNot()->exec(view_->viewport()->mapToGlobal(point));
 }
 
@@ -771,7 +771,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
         viewContextMenu->addSeparator();
 
         // filter view
-        if (view_->isCurrentViewModel(ModelView::ModelProxy)) {
+        if (view_->isViewModel(ModelView::ModelProxy)) {
             if (_num.contains(FileStatus::Mismatched)) {
                 menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
                 viewContextMenu->addAction(menuAct_->actionFilterMismatches);

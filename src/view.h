@@ -30,8 +30,8 @@ public:
 
     void setSettings(Settings *settings);
     QString curAbsPath() const;
-    ModelView currentViewModel() const;
-    bool isCurrentViewModel(const ModelView modelView) const;
+    ModelView curViewModel() const;
+    bool isViewModel(const ModelView modelView) const;
     bool isViewFileSystem() const; // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
     bool isViewDatabase() const;
     bool isViewFiltered() const;
@@ -45,7 +45,6 @@ public:
 
     QModelIndex curIndexFileSystem;
     QModelIndex curIndexSource;
-    QModelIndex curIndexProxy;
 
 public slots:
     void setFileSystemModel();
@@ -68,7 +67,6 @@ public slots:
 
 private:
     QString headerText(int column) const;
-    void clearCurIndexes();
     void changeCurIndexAndPath(const QModelIndex &curIndex);
     void deleteOldSelModel();
     void connectModel();

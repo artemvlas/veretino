@@ -156,7 +156,7 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updateWindowTitle);
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
     connect(manager->dataMaintainer, &DataMaintainer::failedDataCreation, this,
-            [=]{ if (ui->treeView->isCurrentViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
+            [=]{ if (ui->treeView->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
 
     // process status
     connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->treeView->setViewProxy(); });
