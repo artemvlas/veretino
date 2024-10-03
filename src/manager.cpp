@@ -78,16 +78,6 @@ void Manager::processFolderSha(const MetaData &metaData)
         return;
     }
 
-    /*
-    // exception and cancelation handling
-    if (procState->isCanceled()
-        || !dataMaintainer->data_
-        || dataMaintainer->data_->model_->isEmpty())
-    {
-        //emit setViewData();
-        return;
-    }*/
-
     emit setViewData(dataMaintainer->data_);
 
     // calculating checksums
@@ -142,13 +132,6 @@ void Manager::restoreDatabase()
 void Manager::createDataModel(const QString &dbFilePath)
 {
     if (!paths::isDbFile(dbFilePath)) {
-        /*
-        QString str = QString("Wrong file: %1\n"
-                              "Expected file extension '*.ver' or '*.ver.json'").arg(dbFilePath);
-
-        emit showMessage(str, "Wrong DB file!");
-        emit setViewData();*/
-
         qDebug() << "Manager::createDataModel | Wrong DB file:" << dbFilePath;
         return;
     }
