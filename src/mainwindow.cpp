@@ -8,6 +8,7 @@
 #include "tools.h"
 #include "dialogcontentslist.h"
 #include "dialogdbcreation.h"
+#include "dialogexistingdbs.h"
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"
 #include "dialogabout.h"
@@ -145,7 +146,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
     connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogContentsList);
-    connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showDialogDbCreation);
+    connect(manager, &Manager::dbCreationDataCollected, this, &MainWindow::showDialogDbCreation);
     connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
     connect(manager, &Manager::dbContentsListCreated, this, &MainWindow::showDialogDbContents);
     connect(manager, &Manager::mismatchFound, this, &MainWindow::setWinTitleMismatchFound);
@@ -225,34 +226,49 @@ void MainWindow::showDialogContentsList(const QString &folderName, const QList<E
     }
 }
 
-void MainWindow::showDialogDbCreation(const QString &folderName, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &dbFiles, const QList<ExtNumSize> &extList)
 {
-    if (!extList.isEmpty()) {
-        DialogDbCreation dialog(folderName, extList, this);
-        dialog.setSettings(settings_);
-        dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
-        dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
-        //dialog.setFilterCreation(DialogDbCreation::FC_Enabled);
-        FilterRule filter;
+    if (extList.isEmpty()) {
+        qDebug() << "MainWindow::showDialogDbCreation >> Empty extList";
+        return;
+    }
 
-        if (dialog.exec())
-            filter = dialog.resultFilter();
-
-        if (filter.isFilterEnabled())
-            modeSelect->processFolderChecksums(filter);
-        else {
-            QMessageBox msgBox(this);
-            msgBox.setWindowTitle("No filter specified");
-            msgBox.setText("File filtering is not set.");
-            msgBox.setInformativeText("Continue for all files?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
-            msgBox.setDefaultButton(QMessageBox::Yes);
-            msgBox.setIcon(QMessageBox::Question);
-            msgBox.button(QMessageBox::Yes)->setText("Continue");
-
-            if (msgBox.exec() == QMessageBox::Yes)
-                modeSelect->processFolderChecksums(filter);
+    if (!dbFiles.isEmpty()) {
+        DialogExistingDbs _dialog(dbFiles, this);
+        if (_dialog.exec() && !_dialog.curFile().isEmpty()) {
+            modeSelect->openJsonDatabase(paths::joinPath(folder, _dialog.curFile()));
+            return;
         }
+    }
+
+    DialogDbCreation dialog(folder, extList, this);
+    dialog.setSettings(settings_);
+    dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
+    dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
+    //dialog.setFilterCreation(DialogDbCreation::FC_Enabled);
+    //FilterRule filter;
+
+    if (!dialog.exec()) {
+        qDebug() << "MainWindow::showDialogDbCreation >> Rejected";
+        return;
+    }
+
+    FilterRule filter = dialog.resultFilter();
+    if (filter.isFilterEnabled()) {
+        modeSelect->processFolderChecksums(filter);
+    }
+    else {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("No filter specified");
+        msgBox.setText("File filtering is not set.");
+        msgBox.setInformativeText("Continue for all files?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.button(QMessageBox::Yes)->setText("Continue");
+
+        if (msgBox.exec() == QMessageBox::Yes)
+            modeSelect->processFolderChecksums(filter);
     }
 }
 

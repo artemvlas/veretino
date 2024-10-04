@@ -529,7 +529,10 @@ QString ModeSelector::composeDbFilePath()
 
 void ModeSelector::processChecksumsFiltered()
 {
-    if (isSelectedCreateDb())
+    //if (isSelectedCreateDb())
+    abortProcess();
+
+    if (emptyFolderPrompt())
         makeFolderContentsFilter(view_->curPathFileSystem);
 }
 

@@ -566,7 +566,7 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 
         if (!_typesList.isEmpty()) {
             if (filterCreation)
-                emit folderContentsFilterCreated(folderPath, _typesList);
+                emit dbCreationDataCollected(folderPath, Files::dbFiles(folderPath), _typesList);
             else
                 emit folderContentsListCreated(folderPath, _typesList);
         }

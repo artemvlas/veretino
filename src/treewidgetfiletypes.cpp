@@ -142,8 +142,8 @@ NumSize TreeWidgetFileTypes::numSize(CheckState chk_state)
     NumSize _res;
 
     for (const TreeWidgetItem *_item : itemList) {
-        _res.num += _item->filesNumber();
-        _res.size += _item->filesSize();
+        _res.add(_item->filesNumber(),
+                 _item->filesSize());
     }
 
     return _res;

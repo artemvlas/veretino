@@ -121,19 +121,17 @@ void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
     updateFilterDisplay();
 }
 
-void DialogDbCreation::setTotalInfo(QList<ExtNumSize> exts)
+void DialogDbCreation::setTotalInfo(const QList<ExtNumSize> &exts)
 {
-    qint64 totalSize = 0;
-    int totalFilesNumber = 0;
+    NumSize _nums;
 
-    for (int i = 0; i < exts.size(); ++i) {
-        totalSize += exts.at(i).filesSize;
-        totalFilesNumber += exts.at(i).filesNumber;
+    for (const ExtNumSize &_ext : exts) {
+        _nums.add(_ext.filesNumber, _ext.filesSize);
     }
 
     ui->l_total_files->setText(QString("Total: %1 types, %2 ")
                                 .arg(exts.size())
-                                .arg(format::filesNumSize(totalFilesNumber, totalSize)));
+                                .arg(format::filesNumSize(_nums)));
 }
 
 void DialogDbCreation::setCheckboxesVisible(bool visible)

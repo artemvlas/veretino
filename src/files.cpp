@@ -136,7 +136,7 @@ QStringList Files::dbFiles(const QString &folderPath)
 
     while (it.hasNext()) {
         if (paths::isDbFile(it.next()))
-            _res << it.filePath();
+            _res << it.fileName();
     }
 
     return _res;

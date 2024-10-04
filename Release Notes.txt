@@ -16,6 +16,7 @@ Fixes and Minor Enhancements:
 * Fixed crash when opening a database while another parsing is ongoing.
 * Improved parsing of items that were marked unreadable during database creation.
 * Menu action "Open Branch": added finding renamed branch files.
+* Added finding of all existing databases in the working folder.
 
 Internal changes:
 * Redesigned task management system.

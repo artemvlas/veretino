@@ -26,6 +26,9 @@ static const QString s_db_prefix;
 }; // struct Lit
 
 struct NumSize { // number and total size (of files)
+    void add(int _num, qint64 _size) { num += _num; size += _size; }
+    void add(NumSize _nums) { add(_nums.num, _nums.size); }
+
     int num = 0;
     qint64 size = 0;
 }; // struct NumSize

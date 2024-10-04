@@ -37,7 +37,7 @@ private:
     void connections();
     void updateLabelDbFilename();
 
-    void setTotalInfo(QList<ExtNumSize> exts);
+    void setTotalInfo(const QList<ExtNumSize> &exts);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
     void clearChecked();

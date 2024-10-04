@@ -37,7 +37,7 @@ public slots:
     void showDbStatus();
     void showDbStatusTab(DialogDbStatus::Tabs tab);
     void showDialogContentsList(const QString &folderName, const QList<ExtNumSize> &extList); // view folder contents
-    void showDialogDbCreation(const QString &folderName, const QList<ExtNumSize> &extList);
+    void showDialogDbCreation(const QString &folder, const QStringList &dbFiles, const QList<ExtNumSize> &extList);
     void showDialogDbContents(const QString &folderName, const QList<ExtNumSize> &extList); // view DB contents
     void dialogSettings();
     void dialogChooseFolder();
