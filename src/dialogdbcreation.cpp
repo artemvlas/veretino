@@ -29,6 +29,8 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const QList<ExtNum
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(icons_.icon(FileStatus::Calculating));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Continue");
+
+    updateViewMode();
 }
 
 DialogDbCreation::~DialogDbCreation()
@@ -38,9 +40,6 @@ DialogDbCreation::~DialogDbCreation()
 
 void DialogDbCreation::connections()
 {
-    //connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogDbCreation::accept);
-    //connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogDbCreation::reject);
-
     connect(ui->cb_top10, &QCheckBox::toggled, this, &DialogDbCreation::setItemsVisibility);
 
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogDbCreation::updateFilterDisplay);
@@ -152,10 +151,6 @@ void DialogDbCreation::clearChecked()
 
 void DialogDbCreation::activateItem(QTreeWidgetItem *t_item)
 {
-    //qDebug() << "MODE" << mode_;
-    //if (mode_ == FC_Hidden)
-    //    return;
-
     if (mode_ == FC_Disabled) {
         setFilterCreation(FC_Enabled);
         return;
@@ -244,14 +239,6 @@ void DialogDbCreation::updateViewMode()
         ui->rb_ignore->setChecked(true);
 
     // updateFilterDisplay();
-}
-
-void DialogDbCreation::showEvent(QShowEvent *event)
-{
-    //if (mode_ == FC_Hidden) // if the mode_ was set specifically by ::setFilterCreation(mode_ != FC_Hidden),
-        updateViewMode(); // this function was already executed
-
-    QDialog::showEvent(event);
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)

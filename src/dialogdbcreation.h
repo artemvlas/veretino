@@ -48,7 +48,6 @@ private:
     void updateLabelTotalFiltered();
     bool itemsContain(int state) const;
 
-    //QList<ExtNumSize> extList_;
     FilterCreation mode_ = FC_Disabled;
 
     TreeWidgetFileTypes *types_ = nullptr;
@@ -58,7 +57,6 @@ private:
 
 
 protected:
-    void showEvent(QShowEvent *event) override;
     void keyPressEvent(QKeyEvent* event) override;
 };
 

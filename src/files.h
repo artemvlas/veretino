@@ -13,6 +13,7 @@
 #include "procstate.h"
 
 struct FileValues;
+struct NumSize;
 struct ExtNumSize;
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
 
@@ -110,6 +111,19 @@ struct FileValues {
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues
+
+struct NumSize { // number and total size (of files)
+    NumSize() {}
+    NumSize(int _num, qint64 _size) : num(_num), size(_size) {}
+    void add(int _num, qint64 _size) { num += _num; size += _size; }
+    void add(NumSize _nums) { add(_nums.num, _nums.size); }
+    void addOne(qint64 _size = 0) { ++num; size += _size; }
+    void operator<<(qint64 _size) { addOne(_size); }
+
+    // values
+    int num = 0;
+    qint64 size = 0;
+}; // struct NumSize
 
 struct ExtNumSize {
     static const QString strNoType;

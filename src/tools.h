@@ -25,14 +25,6 @@ static const QString s_dt_format;
 static const QString s_db_prefix;
 }; // struct Lit
 
-struct NumSize { // number and total size (of files)
-    void add(int _num, qint64 _size) { num += _num; size += _size; }
-    void add(NumSize _nums) { add(_nums.num, _nums.size); }
-
-    int num = 0;
-    qint64 size = 0;
-}; // struct NumSize
-
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo); // returns the length of checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
 QCryptographicHash::Algorithm algoByStrLen(int strLen); // ^vice versa

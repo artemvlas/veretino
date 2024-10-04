@@ -150,21 +150,19 @@ QString Files::getFolderSize()
 QString Files::getFolderSize(const QString &path)
 {
     if (QFileInfo(path).isDir()) {
-        int filesNumber = 0;
-        qint64 totalSize = 0;
+        NumSize __n;
 
         // iterating
         QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext() && !isCanceled()) {
             it.next();
-            totalSize += it.fileInfo().size();
-            ++filesNumber;
+            __n << it.fileInfo().size();
         }
 
         // result processing
         if (!isCanceled()) {
             const QString _folderName = paths::basicName(path);
-            const QString _folderSize = format::filesNumSize(filesNumber, totalSize);
+            const QString _folderSize = format::filesNumSize(__n);
 
             return tools::joinStrings(_folderName, _folderSize, QStringLiteral(u": "));
         }

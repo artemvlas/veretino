@@ -19,6 +19,7 @@ public:
     bool contains(const FileStatuses flags) const;
     int numberOf(const FileStatuses flag) const;
     qint64 totalSize(const FileStatuses flag) const;
+    NumSize values(const FileStatuses flag) const;
 
 private:
     QHash<FileStatus, int> amounts_; // { FileStatus : number of corresponding files }

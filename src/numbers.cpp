@@ -72,3 +72,8 @@ qint64 Numbers::totalSize(const FileStatuses flag) const
 
     return result;
 }
+
+NumSize Numbers::values(const FileStatuses flag) const
+{
+    return NumSize(numberOf(flag), totalSize(flag));
+}
