@@ -3,6 +3,7 @@
 
 #include <QTreeWidget>
 #include "files.h"
+#include "tools.h"
 #include "iconprovider.h"
 #include "treewidgetitem.h"
 
@@ -21,6 +22,9 @@ public:
     bool isPassed(CheckState state, const TreeWidgetItem *item) const;
     bool itemsContain(CheckState state) const;
     void showAllItems();
+    void hideExtra(int nomore = 10); // leave only this number of items visible
+    NumSize numSizeVisible();
+    NumSize numSize(CheckState chk_state);
 
     QList<TreeWidgetItem *> items_;
 

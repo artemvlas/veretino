@@ -30,6 +30,7 @@ set(PROJECT_SOURCES
     src/dialogdbcreation.h
     src/dialogcontentslist.h
     src/dialogdbstatus.h
+    src/dialogexistingdbs.h
     src/dialogfileprocresult.h
     src/dialogsettings.h
     src/files.h
@@ -63,6 +64,7 @@ set(PROJECT_SOURCES
     src/dialogdbcreation.cpp
     src/dialogcontentslist.cpp
     src/dialogdbstatus.cpp
+    src/dialogexistingdbs.cpp
     src/dialogfileprocresult.cpp
     src/dialogsettings.cpp
     src/files.cpp
@@ -94,6 +96,7 @@ set(PROJECT_SOURCES
     src/dialogdbcreation.ui
     src/dialogcontentslist.ui
     src/dialogdbstatus.ui
+    src/dialogexistingdbs.ui
     src/dialogfileprocresult.ui
     src/dialogsettings.ui
     src/mainwindow.ui

@@ -28,6 +28,7 @@ const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
 const QString Lit::s_app_name = QStringLiteral(u"veretino");
 const QString Lit::s_sepStick = QStringLiteral(u" | ");
 const QString Lit::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
+const QString Lit::s_db_prefix = QStringLiteral(u"checksums");
 
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
@@ -484,6 +485,11 @@ QString filesNumSize(int number, qint64 filesSize)
 QString filesNumSize(const Numbers &num, FileStatus status)
 {
     return filesNumSize(num.numberOf(status), num.totalSize(status));
+}
+
+QString filesNumSize(const NumSize &nums)
+{
+    return filesNumSize(nums.num, nums.size);
 }
 
 QString fileNameAndSize(const QString &filePath)

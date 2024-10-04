@@ -213,14 +213,15 @@ void MainWindow::showDialogContentsList(const QString &folderName, const QList<E
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
-        dialog.setFilterCreation(DialogContentsList::FC_Disabled);
-        if (dialog.exec()) {
+        dialog.setFilterCreation(DialogContentsList::FC_Hidden);
+        dialog.exec();
+        /*if (dialog.exec()) {
             FilterRule filter = dialog.resultFilter();
             if (filter.isFilterEnabled()) {
                 settings_->filter = filter;
                 updatePermanentStatus();
             }
-        }
+        }*/
     }
 }
 

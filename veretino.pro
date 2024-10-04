@@ -17,6 +17,7 @@ SOURCES += \
     src/dialogcontentslist.cpp \
     src/dialogdbcreation.cpp \
     src/dialogdbstatus.cpp \
+    src/dialogexistingdbs.cpp \
     src/dialogfileprocresult.cpp \
     src/dialogsettings.cpp \
     src/files.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     src/dialogcontentslist.h \
     src/dialogdbcreation.h \
     src/dialogdbstatus.h \
+    src/dialogexistingdbs.h \
     src/dialogfileprocresult.h \
     src/dialogsettings.h \
     src/files.h \
@@ -81,6 +83,7 @@ FORMS += \
     src/dialogcontentslist.ui \
     src/dialogdbcreation.ui \
     src/dialogdbstatus.ui \
+    src/dialogexistingdbs.ui \
     src/dialogfileprocresult.ui \
     src/dialogsettings.ui \
     src/mainwindow.ui

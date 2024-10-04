@@ -7,6 +7,7 @@
 #include "treewidgetitem.h"
 #include "files.h"
 #include "settings.h"
+#include "treewidgetfiletypes.h"
 
 namespace Ui {
 class DialogDbCreation;
@@ -36,7 +37,7 @@ private:
     void connections();
     void updateLabelDbFilename();
 
-    void setTotalInfo();
+    void setTotalInfo(QList<ExtNumSize> exts);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
     void clearChecked();
@@ -47,9 +48,10 @@ private:
     void updateLabelTotalFiltered();
     bool itemsContain(int state) const;
 
-    QList<ExtNumSize> extList_;
+    //QList<ExtNumSize> extList_;
     FilterCreation mode_ = FC_Disabled;
 
+    TreeWidgetFileTypes *types_ = nullptr;
     Settings *settings_ = nullptr;
     IconProvider icons_;
     QString workDir_;

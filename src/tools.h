@@ -22,7 +22,13 @@ static const QString s_appNameVersion;
 static const QString s_app_name;
 static const QString s_sepStick;
 static const QString s_dt_format;
+static const QString s_db_prefix;
 }; // struct Lit
+
+struct NumSize { // number and total size (of files)
+    int num = 0;
+    qint64 size = 0;
+}; // struct NumSize
 
 namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo); // returns the length of checksum string depending on the sha-type: sha(1) = 40, sha(256) = 64, sha(512) = 128
@@ -79,6 +85,7 @@ QString fileNameAndSize(const QString &filePath); // returns "filename (readable
 QString filesNumber(int number);
 QString filesNumSize(int number, qint64 filesSize); // returns "number file's' (readable size)"
 QString filesNumSize(const Numbers &num, FileStatus status);
+QString filesNumSize(const NumSize &nums);
 QString fileItemStatus(FileStatus status);
 
 QString coloredText(bool ignore); // 'ignore' (true = red, false = green)

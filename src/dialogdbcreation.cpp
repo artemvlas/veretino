@@ -2,31 +2,30 @@
 #include "ui_dialogdbcreation.h"
 #include "tools.h"
 #include <QPushButton>
-#include "treewidgetfiletypes.h"
 #include <QDebug>
 
 DialogDbCreation::DialogDbCreation(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDbCreation)
-    , extList_(extList)
     , workDir_(folderPath)
 {
     ui->setupUi(this);
 
     icons_.setTheme(palette());
     setWindowIcon(icons_.iconFolder());
-    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnType, 130);
-    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
-    ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
+    types_ = ui->treeWidget;
+    types_->setColumnWidth(TreeWidgetItem::ColumnType, 130);
+    types_->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
+    types_->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
 
     //QString folderName = paths::shortenPath(folderPath);
     //ui->labelFolderName->setText(folderName);
     //ui->labelFolderName->setToolTip(folderPath);
     ui->cb_top10->setVisible(extList.size() > 15);
 
-    setTotalInfo();
+    setTotalInfo(extList);
     connections();
-    ui->treeWidget->setItems(extList);
+    types_->setItems(extList);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(icons_.icon(FileStatus::Calculating));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Continue");
@@ -79,7 +78,7 @@ void DialogDbCreation::updateSettings()
     settings_->isLongExtension = ui->rb_ext_long->isChecked();
     settings_->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
     settings_->dbFlagConst = ui->cb_flag_const->isChecked();
-    settings_->dbPrefix = ui->inp_db_filename->text().isEmpty() ? QStringLiteral(u"checksums")
+    settings_->dbPrefix = ui->inp_db_filename->text().isEmpty() ? Lit::s_db_prefix
                                                                 : format::simplifiedChars(ui->inp_db_filename->text());
 }
 
@@ -92,13 +91,15 @@ void DialogDbCreation::setDbConfig()
     ui->cb_add_folder_name->setChecked(settings_->addWorkDirToFilename);
     ui->cb_flag_const->setChecked(settings_->dbFlagConst);
 
-    if (settings_->dbPrefix != QStringLiteral(u"checksums"))
+    if (settings_->dbPrefix != Lit::s_db_prefix)
         ui->inp_db_filename->setText(settings_->dbPrefix);
+
+    updateLabelDbFilename();
 }
 
 void DialogDbCreation::updateLabelDbFilename()
 {
-    QString prefix = ui->inp_db_filename->text().isEmpty() ? QStringLiteral(u"checksums") : format::simplifiedChars(ui->inp_db_filename->text());
+    QString prefix = ui->inp_db_filename->text().isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(ui->inp_db_filename->text());
     QString folderName = ui->cb_add_folder_name->isChecked() ? QStringLiteral(u"@FolderName") : QString();
     QString extension = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
 
@@ -108,52 +109,36 @@ void DialogDbCreation::updateLabelDbFilename()
 void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
 {
     if (!isTop10Checked) {
+        types_->showAllItems();
         ui->cb_top10->setText(QStringLiteral(u"Top10"));
-        ui->treeWidget->showAllItems();
     }
     else {
-        if (ui->treeWidget->sortColumn() == TreeWidgetItem::ColumnFilesNumber)
-            ui->treeWidget->sortItems(TreeWidgetItem::ColumnFilesNumber, Qt::DescendingOrder);
-        else
-            ui->treeWidget->sortItems(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
-
-        int top10FilesNumber = 0; // total number of files in the Top10 list
-        qint64 top10FilesSize = 0; // total size of these files
-
-        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i) {
-            QTreeWidgetItem *item = ui->treeWidget->topLevelItem(i);
-            item->setHidden(i > 9);
-            if (!item->isHidden()) {
-                top10FilesNumber += item->data(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole).toInt();
-                top10FilesSize += item->data(TreeWidgetItem::ColumnTotalSize, Qt::UserRole).toLongLong();
-            }
-        }
-
+        types_->hideExtra();
         ui->cb_top10->setText(QStringLiteral(u"Top10: ")
-                              + format::filesNumSize(top10FilesNumber, top10FilesSize));
+                              + format::filesNumSize(types_->numSizeVisible()));
     }
 
     updateFilterDisplay();
 }
 
-void DialogDbCreation::setTotalInfo()
+void DialogDbCreation::setTotalInfo(QList<ExtNumSize> exts)
 {
     qint64 totalSize = 0;
     int totalFilesNumber = 0;
 
-    for (int i = 0; i < extList_.size(); ++i) {
-        totalSize += extList_.at(i).filesSize;
-        totalFilesNumber += extList_.at(i).filesNumber;
+    for (int i = 0; i < exts.size(); ++i) {
+        totalSize += exts.at(i).filesSize;
+        totalFilesNumber += exts.at(i).filesNumber;
     }
 
     ui->l_total_files->setText(QString("Total: %1 types, %2 ")
-                                .arg(extList_.size())
+                                .arg(exts.size())
                                 .arg(format::filesNumSize(totalFilesNumber, totalSize)));
 }
 
 void DialogDbCreation::setCheckboxesVisible(bool visible)
 {
-    ui->treeWidget->setCheckboxesVisible(visible);
+    types_->setCheckboxesVisible(visible);
     updateFilterDisplay();
 
     // qDebug() << Q_FUNC_INFO;
@@ -188,18 +173,13 @@ bool DialogDbCreation::itemsContain(int state) const
     if (mode_ != FC_Enabled)
         return false;
 
-    return ui->treeWidget->itemsContain((TreeWidgetFileTypes::CheckState)state);
+    return types_->itemsContain((TreeWidgetFileTypes::CheckState)state);
 }
 
 void DialogDbCreation::updateFilterDisplay()
 {
     updateLabelFilterExtensions();
     updateLabelTotalFiltered();
-
-    //bool isFiltered = ui->rb_include->isChecked() ? itemsContain(TreeWidgetFileTypes::Checked)
-    //                                              : itemsContain(TreeWidgetFileTypes::Checked) && itemsContain(TreeWidgetFileTypes::UnChecked);
-
-    //ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isFiltered);
 }
 
 void DialogDbCreation::updateLabelFilterExtensions()
@@ -223,19 +203,10 @@ void DialogDbCreation::updateLabelTotalFiltered()
     // ? Include only visible_checked : Include all except visible_checked and Db-Sha
     TreeWidgetFileTypes::CheckState _checkState = ui->rb_include->isChecked() ? TreeWidgetFileTypes::Checked
                                                                               : TreeWidgetFileTypes::UnChecked;
-    const QList<TreeWidgetItem *> itemList = ui->treeWidget->items(_checkState);
-
-    int filteredFilesNumber = 0;
-    qint64 filteredFilesSize = 0;
-
-    for (const TreeWidgetItem *item : itemList) {
-        filteredFilesNumber += item->filesNumber();
-        filteredFilesSize += item->filesSize();
-    }
 
     if (itemsContain(TreeWidgetFileTypes::Checked)) {
         ui->l_total_filtered->setText(QStringLiteral(u"Filtered: ")
-                                        + format::filesNumSize(filteredFilesNumber, filteredFilesSize));
+                                        + format::filesNumSize(types_->numSize(_checkState)));
     }
     else {
         ui->l_total_filtered->clear();
@@ -246,7 +217,7 @@ void DialogDbCreation::updateLabelTotalFiltered()
 FilterRule DialogDbCreation::resultFilter()
 {
     FilterRule::FilterMode filterType = ui->rb_ignore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-    return FilterRule(filterType, ui->treeWidget->checkedExtensions());
+    return FilterRule(filterType, types_->checkedExtensions());
 }
 
 void DialogDbCreation::setFilterCreation(FilterCreation mode)
@@ -288,7 +259,7 @@ void DialogDbCreation::showEvent(QShowEvent *event)
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-        activateItem(ui->treeWidget->currentItem());
+        activateItem(types_->currentItem());
         return;
     }
 

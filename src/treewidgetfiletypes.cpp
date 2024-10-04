@@ -1,5 +1,4 @@
 #include "treewidgetfiletypes.h"
-#include "tools.h"
 
 TreeWidgetFileTypes::TreeWidgetFileTypes(QWidget *parent)
     : QTreeWidget(parent)
@@ -106,4 +105,46 @@ void TreeWidgetFileTypes::showAllItems()
 {
     for (int i = 0; i < topLevelItemCount(); ++i)
         topLevelItem(i)->setHidden(false);
+}
+
+void TreeWidgetFileTypes::hideExtra(int nomore)
+{
+    TreeWidgetItem::Column _sortColumn = (sortColumn() == TreeWidgetItem::ColumnFilesNumber)
+                                             ? TreeWidgetItem::ColumnFilesNumber
+                                             : TreeWidgetItem::ColumnTotalSize;
+
+    sortItems(_sortColumn, Qt::DescendingOrder);
+
+    for (int i = 0; i < topLevelItemCount(); ++i) {
+        QTreeWidgetItem *_item = topLevelItem(i);
+        _item->setHidden(i >= nomore);
+    }
+}
+
+NumSize TreeWidgetFileTypes::numSizeVisible()
+{
+    NumSize _nums;
+
+    for (int i = 0; i < topLevelItemCount(); ++i) {
+        QTreeWidgetItem *_item = topLevelItem(i);
+        if (!_item->isHidden()) {
+            _nums.num += _item->data(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole).toInt();
+            _nums.size += _item->data(TreeWidgetItem::ColumnTotalSize, Qt::UserRole).toLongLong();
+        }
+    }
+
+    return _nums;
+}
+
+NumSize TreeWidgetFileTypes::numSize(CheckState chk_state)
+{
+    const QList<TreeWidgetItem *> itemList = items(chk_state);
+    NumSize _res;
+
+    for (const TreeWidgetItem *_item : itemList) {
+        _res.num += _item->filesNumber();
+        _res.size += _item->filesSize();
+    }
+
+    return _res;
 }
