@@ -121,24 +121,23 @@ void TreeWidgetFileTypes::hideExtra(int nomore)
     }
 }
 
-NumSize TreeWidgetFileTypes::numSizeVisible()
+NumSize TreeWidgetFileTypes::numSizeVisible() const
 {
     NumSize _nums;
 
     for (int i = 0; i < topLevelItemCount(); ++i) {
-        QTreeWidgetItem *_item = topLevelItem(i);
+        const TreeWidgetItem *_item = static_cast<TreeWidgetItem*>(topLevelItem(i));
         if (!_item->isHidden()) {
-            _nums.num += _item->data(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole).toInt();
-            _nums.size += _item->data(TreeWidgetItem::ColumnTotalSize, Qt::UserRole).toLongLong();
+            _nums.add(_item->filesNumber(), _item->filesSize());
         }
     }
 
     return _nums;
 }
 
-NumSize TreeWidgetFileTypes::numSize(CheckState chk_state)
+NumSize TreeWidgetFileTypes::numSize(CheckState chk_state) const
 {
-    const QList<TreeWidgetItem *> itemList = items(chk_state);
+    const QList<TreeWidgetItem*> itemList = items(chk_state);
     NumSize _res;
 
     for (const TreeWidgetItem *_item : itemList) {

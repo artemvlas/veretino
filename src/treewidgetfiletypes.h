@@ -23,8 +23,8 @@ public:
     bool itemsContain(CheckState state) const;
     void showAllItems();
     void hideExtra(int nomore = 10); // leave only this number of items visible
-    NumSize numSizeVisible();
-    NumSize numSize(CheckState chk_state);
+    NumSize numSizeVisible() const;
+    NumSize numSize(CheckState chk_state) const;
 
     QList<TreeWidgetItem *> items_;
 
