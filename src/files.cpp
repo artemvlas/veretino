@@ -129,6 +129,19 @@ QString Files::firstDbFile(const QString &folderPath)
     return QString();
 }
 
+QStringList Files::dbFiles(const QString &folderPath)
+{
+    QStringList _res;
+    QDirIterator it(folderPath, QDir::Files);
+
+    while (it.hasNext()) {
+        if (paths::isDbFile(it.next()))
+            _res << it.filePath();
+    }
+
+    return _res;
+}
+
 QString Files::getFolderSize()
 {
     return getFolderSize(fsPath_);

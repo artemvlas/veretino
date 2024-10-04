@@ -7,6 +7,7 @@
 #include "ui_mainwindow.h"
 #include "tools.h"
 #include "dialogcontentslist.h"
+#include "dialogdbcreation.h"
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"
 #include "dialogabout.h"
@@ -144,7 +145,7 @@ void MainWindow::connectManager()
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
     connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogContentsList);
-    connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showFilterCreationDialog);
+    connect(manager, &Manager::folderContentsFilterCreated, this, &MainWindow::showDialogDbCreation);
     connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
     connect(manager, &Manager::dbContentsListCreated, this, &MainWindow::showDialogDbContents);
     connect(manager, &Manager::mismatchFound, this, &MainWindow::setWinTitleMismatchFound);
@@ -223,13 +224,14 @@ void MainWindow::showDialogContentsList(const QString &folderName, const QList<E
     }
 }
 
-void MainWindow::showFilterCreationDialog(const QString &folderName, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogDbCreation(const QString &folderName, const QList<ExtNumSize> &extList)
 {
     if (!extList.isEmpty()) {
-        DialogContentsList dialog(folderName, extList, this);
-        dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Filter));
-        dialog.setWindowTitle(QStringLiteral(u"File types to work with..."));
-        dialog.setFilterCreation(DialogContentsList::FC_Enabled);
+        DialogDbCreation dialog(folderName, extList, this);
+        dialog.setSettings(settings_);
+        dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
+        dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
+        //dialog.setFilterCreation(DialogDbCreation::FC_Enabled);
         FilterRule filter;
 
         if (dialog.exec())

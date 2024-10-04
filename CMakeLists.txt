@@ -27,6 +27,7 @@ set(PROJECT_SOURCES
     src/datacontainer.h
     src/datamaintainer.h
     src/dialogabout.h
+    src/dialogdbcreation.h
     src/dialogcontentslist.h
     src/dialogdbstatus.h
     src/dialogfileprocresult.h
@@ -50,6 +51,8 @@ set(PROJECT_SOURCES
     src/treeitem.h
     src/treemodel.h
     src/treemodeliterator.h
+    src/treewidgetfiletypes.h
+    src/treewidgetitem.h
     src/view.h
 
     # SOURCES
@@ -57,6 +60,7 @@ set(PROJECT_SOURCES
     src/datacontainer.cpp
     src/datamaintainer.cpp
     src/dialogabout.cpp
+    src/dialogdbcreation.cpp
     src/dialogcontentslist.cpp
     src/dialogdbstatus.cpp
     src/dialogfileprocresult.cpp
@@ -81,10 +85,13 @@ set(PROJECT_SOURCES
     src/treeitem.cpp
     src/treemodel.cpp
     src/treemodeliterator.cpp
+    src/treewidgetfiletypes.cpp
+    src/treewidgetitem.cpp
     src/view.cpp
 
     # FORMS
     src/dialogabout.ui
+    src/dialogdbcreation.ui
     src/dialogcontentslist.ui
     src/dialogdbstatus.ui
     src/dialogfileprocresult.ui

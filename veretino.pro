@@ -15,6 +15,7 @@ SOURCES += \
     src/datamaintainer.cpp \
     src/dialogabout.cpp \
     src/dialogcontentslist.cpp \
+    src/dialogdbcreation.cpp \
     src/dialogdbstatus.cpp \
     src/dialogfileprocresult.cpp \
     src/dialogsettings.cpp \
@@ -38,6 +39,8 @@ SOURCES += \
     src/treeitem.cpp \
     src/treemodel.cpp \
     src/treemodeliterator.cpp \
+    src/treewidgetfiletypes.cpp \
+    src/treewidgetitem.cpp \
     src/view.cpp
 
 HEADERS += \
@@ -46,6 +49,7 @@ HEADERS += \
     src/datamaintainer.h \
     src/dialogabout.h \
     src/dialogcontentslist.h \
+    src/dialogdbcreation.h \
     src/dialogdbstatus.h \
     src/dialogfileprocresult.h \
     src/dialogsettings.h \
@@ -68,11 +72,14 @@ HEADERS += \
     src/treeitem.h \
     src/treemodel.h \
     src/treemodeliterator.h \
+    src/treewidgetfiletypes.h \
+    src/treewidgetitem.h \
     src/view.h
 
 FORMS += \
     src/dialogabout.ui \
     src/dialogcontentslist.ui \
+    src/dialogdbcreation.ui \
     src/dialogdbstatus.ui \
     src/dialogfileprocresult.ui \
     src/dialogsettings.ui \
