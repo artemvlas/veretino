@@ -116,12 +116,14 @@ struct NumSize { // number and total size (of files)
     NumSize() {}
     NumSize(int _num, qint64 _size) : num(_num), size(_size) {}
     void add(int _num, qint64 _size) { num += _num; size += _size; }
-    void add(NumSize _nums) { add(_nums.num, _nums.size); }
+    void add(const NumSize &other) { add(other.num, other.size); }
     void addOne(qint64 _size = 0) { ++num; size += _size; }
-    void remove(int _num, qint64 _size) { num -= _num; size -= _size; }
-    void remove(NumSize _nums) { remove(_nums.num, _nums.size); }
-    void removeOne(qint64 _size = 0) { --num; size -= _size; }
-    void operator<<(qint64 _size) { addOne(_size); }
+    void subtract(int _num, qint64 _size) { num -= _num; size -= _size; }
+    void subtract(const NumSize &other) { subtract(other.num, other.size); }
+    void subtractOne(qint64 _size = 0) { --num; size -= _size; }
+    NumSize& operator<<(qint64 _size) { addOne(_size); return *this; }
+    NumSize& operator<<(const NumSize &other) { add(other); return *this; }
+    NumSize& operator+=(const NumSize &other) { add(other); return *this; }
 
     // values
     int num = 0;

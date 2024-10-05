@@ -22,8 +22,9 @@ public:
     NumSize values(const FileStatuses flag) const;
 
 private:
-    QHash<FileStatus, int> amounts_; // { FileStatus : number of corresponding files }
-    QHash<FileStatus, qint64> sizes_; // { FileStatus : total size }
+    QHash<FileStatus, NumSize> val_;
+    //QHash<FileStatus, int> amounts_; // { FileStatus : number of corresponding files }
+    //QHash<FileStatus, qint64> sizes_; // { FileStatus : total size }
 }; // class Numbers
 
 #endif // NUMBERS_H
