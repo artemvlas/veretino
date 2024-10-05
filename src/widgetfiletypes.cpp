@@ -3,6 +3,7 @@
 WidgetFileTypes::WidgetFileTypes(QWidget *parent)
     : QTreeWidget(parent)
 {
+    setContextMenuPolicy(Qt::CustomContextMenu);
     icons_.setTheme(palette());
 }
 
@@ -45,16 +46,16 @@ void WidgetFileTypes::setCheckboxesVisible(bool visible)
     this->blockSignals(false);
 }
 
-QList<ItemFileType *> WidgetFileTypes::items(CheckState state) const
+QList<ItemFileType*> WidgetFileTypes::items(CheckState state) const
 {
-    QList<ItemFileType *> resultList;
+    QList<ItemFileType*> _res;
 
-    for (ItemFileType *item : std::as_const(items_)) {
-        if (isPassed(state, item))
-            resultList.append(item);
+    for (ItemFileType *_item : std::as_const(items_)) {
+        if (isPassed(state, _item))
+            _res.append(_item);
     }
 
-    return resultList;
+    return _res;
 }
 
 QStringList WidgetFileTypes::checkedExtensions() const
@@ -146,4 +147,12 @@ NumSize WidgetFileTypes::numSize(CheckState chk_state) const
     }
 
     return _res;
+}
+
+void WidgetFileTypes::setChecked(const QStringList &exts)
+{
+    for (ItemFileType *_item : std::as_const(items_)) {
+        if (exts.contains(_item->extension()))
+            _item->setChecked(true);
+    }
 }

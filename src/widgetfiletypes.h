@@ -15,6 +15,7 @@ public:
 
     void setItems(const QList<ExtNumSize> &extList);
     void setCheckboxesVisible(bool visible);
+    void setChecked(const QStringList &exts);
     QList<ItemFileType*> items(CheckState state) const;
     QStringList checkedExtensions() const;
     bool isPassedChecked(const ItemFileType *item) const;

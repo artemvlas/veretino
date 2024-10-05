@@ -3,6 +3,7 @@
 #include "tools.h"
 #include <QPushButton>
 #include <QDebug>
+#include <QMenu>
 
 DialogDbCreation::DialogDbCreation(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
     : QDialog(parent)
@@ -40,6 +41,8 @@ DialogDbCreation::~DialogDbCreation()
 
 void DialogDbCreation::connections()
 {
+    connect(types_, &WidgetFileTypes::customContextMenuRequested, this, &DialogDbCreation::createMenuWidgetTypes);
+
     connect(ui->cb_top10, &QCheckBox::toggled, this, &DialogDbCreation::setItemsVisibility);
 
     connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogDbCreation::updateFilterDisplay);
@@ -173,17 +176,26 @@ void DialogDbCreation::updateFilterDisplay()
 {
     updateLabelFilterExtensions();
     updateLabelTotalFiltered();
+
+    // TMP
+    bool isFiltered = ui->rb_include->isChecked() ? types_->itemsContain(WidgetFileTypes::Checked)
+                                                  : types_->itemsContain(WidgetFileTypes::Checked) && types_->itemsContain(WidgetFileTypes::UnChecked);
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((mode_ != FC_Enabled) || !types_->itemsContain(WidgetFileTypes::Checked) || isFiltered);
+
+    // !!! TMP !!!
 }
 
 void DialogDbCreation::updateLabelFilterExtensions()
 {
     if (mode_ != FC_Enabled) {
-        ui->l_exts_list->clear();
+        ui->le_exts_list->clear();
         return;
     }
 
-    ui->l_exts_list->setStyleSheet(format::coloredText(ui->rb_ignore->isChecked()));
-    ui->l_exts_list->setText(ui->treeWidget->checkedExtensions().join(QStringLiteral(u", ")));
+    const QString  _color = format::coloredText(QStringLiteral(u"QLineEdit"), ui->rb_ignore->isChecked());
+    ui->le_exts_list->setStyleSheet(_color);
+    ui->le_exts_list->setText(types_->checkedExtensions().join(QStringLiteral(u", ")));
 }
 
 void DialogDbCreation::updateLabelTotalFiltered()
@@ -202,8 +214,8 @@ void DialogDbCreation::updateLabelTotalFiltered()
                                         + format::filesNumSize(types_->numSize(_checkState)));
     }
     else {
-        ui->l_total_filtered->clear();
-        //ui->l_total_filtered->setText("No filter");
+        //ui->l_total_filtered->clear();
+        ui->l_total_filtered->setText("No filter");
     }
 }
 
@@ -239,6 +251,58 @@ void DialogDbCreation::updateViewMode()
         ui->rb_ignore->setChecked(true);
 
     // updateFilterDisplay();
+}
+
+void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
+{
+    QMenu *dispMenu = new QMenu(this);
+    connect(dispMenu, &QMenu::aboutToHide, dispMenu, &QMenu::deleteLater);
+    connect(dispMenu, &QMenu::triggered, this, &DialogDbCreation::handlePresetClicked);
+
+    for (int i = 0; i < filterPresetsList.size(); ++i) {
+        QAction *action = new QAction(filterPresetsList.at(i), dispMenu);
+        dispMenu->addAction(action);
+    }
+
+    dispMenu->exec(types_->mapToGlobal(point));
+}
+
+void DialogDbCreation::handlePresetClicked(const QAction *_act)
+{
+    // TMP !!!
+    if (mode_ != FC_Enabled) {
+        setFilterCreation(FC_Enabled);
+    }
+
+    clearChecked();
+
+    const int _ind = filterPresetsList.indexOf(_act->text());
+
+    switch (_ind) {
+    case 0:
+        types_->setChecked(listPresetDocuments);
+        break;
+    case 1:
+        types_->setChecked(listPresetPictures);
+        break;
+    case 2:
+        types_->setChecked(listPresetMusic);
+        break;
+    case 3:
+        types_->setChecked(listPresetVideos);
+        break;
+    case 4:
+        types_->setChecked(listPresetIgnoreTriflings);
+        break;
+    default: break;
+    }
+
+    if (_ind == 4)
+        ui->rb_ignore->setChecked(true);
+    else if (_ind >= 0 && _ind < 4)
+        ui->rb_include->setChecked(true);
+
+    // TMP !!!
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)

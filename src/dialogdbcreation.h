@@ -47,6 +47,8 @@ private:
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
     bool itemsContain(int state) const;
+    void createMenuWidgetTypes(const QPoint &point);
+    void handlePresetClicked(const QAction *_act);
 
     FilterCreation mode_ = FC_Disabled;
 
@@ -55,6 +57,12 @@ private:
     IconProvider icons_;
     QString workDir_;
 
+    const QStringList filterPresetsList = { "Documents", "Pictures", "Music", "Videos", "Ignore Triflings" };
+    const QStringList listPresetDocuments = { "odt", "ods", "pdf", "docx", "xlsx", "doc", "rtf", "txt" };
+    const QStringList listPresetPictures = { "jpg", "jpeg", "png", "svg", "webp" };
+    const QStringList listPresetMusic = { "flac", "wv", "ape", "oga", "ogg", "opus", "m4a", "mp3" };
+    const QStringList listPresetVideos = { "mkv", "webm", "mp4", "m4v", "avi" };
+    const QStringList listPresetIgnoreTriflings = { "log", "cue", "txt" };
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

@@ -104,32 +104,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QFrame" name="frame_3">
-       <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Shadow::Raised</enum>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QRadioButton" name="rb_ignore">
-          <property name="text">
-           <string>Ignore</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rb_include">
-          <property name="text">
-           <string>Include</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="1" column="1">
       <widget class="QCheckBox" name="cb_top10">
        <property name="text">
@@ -144,9 +118,9 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tabSelect">
+     <widget class="QWidget" name="tabFilter">
       <attribute name="title">
-       <string>Select</string>
+       <string>Filter</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -174,46 +148,48 @@
          </column>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabEdit">
-      <attribute name="title">
-       <string>Edit</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QLineEdit" name="inp_exts">
-         <property name="placeholderText">
-          <string>log jpg docx mkv</string>
+        <widget class="QFrame" name="frameFilterExtensions">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QRadioButton" name="rb_ignore">
+            <property name="text">
+             <string>Ignore</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rb_include">
+            <property name="text">
+             <string>Include</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="le_exts_list">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabExtra">
+      <attribute name="title">
+       <string>Extra</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3"/>
+     </widget>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QFrame" name="frameFilterExtensions">
-       <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Shadow::Raised</enum>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="l_exts_list">
-          <property name="text">
-           <string>Extensions</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
