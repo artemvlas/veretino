@@ -118,6 +118,9 @@ struct NumSize { // number and total size (of files)
     void add(int _num, qint64 _size) { num += _num; size += _size; }
     void add(NumSize _nums) { add(_nums.num, _nums.size); }
     void addOne(qint64 _size = 0) { ++num; size += _size; }
+    void remove(int _num, qint64 _size) { num -= _num; size -= _size; }
+    void remove(NumSize _nums) { remove(_nums.num, _nums.size); }
+    void removeOne(qint64 _size = 0) { --num; size -= _size; }
     void operator<<(qint64 _size) { addOne(_size); }
 
     // values

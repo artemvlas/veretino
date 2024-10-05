@@ -24,6 +24,8 @@ Internal changes:
 * Multiple optimizations of basic functions.
 
 Removed:
+* Permanent Filter.
+    And the Presets have been moved to the Db Creation Dialog (context menu in the Filter section).
 * "Colored Items" setting. Now is always on.
 * Menu Setting for display the number of updatable items.
 

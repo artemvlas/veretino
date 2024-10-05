@@ -179,9 +179,12 @@ void DialogDbCreation::updateFilterDisplay()
 
     // TMP
     bool isFiltered = ui->rb_include->isChecked() ? types_->itemsContain(WidgetFileTypes::Checked)
-                                                  : types_->itemsContain(WidgetFileTypes::Checked) && types_->itemsContain(WidgetFileTypes::UnChecked);
+                                                  : types_->itemsContain(WidgetFileTypes::Checked)
+                                                        && types_->itemsContain(WidgetFileTypes::UnChecked);
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((mode_ != FC_Enabled) || !types_->itemsContain(WidgetFileTypes::Checked) || isFiltered);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((mode_ != FC_Enabled)
+                                                            || !types_->itemsContain(WidgetFileTypes::Checked)
+                                                            || isFiltered);
 
     // !!! TMP !!!
 }
@@ -207,7 +210,7 @@ void DialogDbCreation::updateLabelTotalFiltered()
 
     // ? Include only visible_checked : Include all except visible_checked and Db-Sha
     WidgetFileTypes::CheckState _checkState = ui->rb_include->isChecked() ? WidgetFileTypes::Checked
-                                                                              : WidgetFileTypes::UnChecked;
+                                                                          : WidgetFileTypes::UnChecked;
 
     if (itemsContain(WidgetFileTypes::Checked)) {
         ui->l_total_filtered->setText(QStringLiteral(u"Filtered: ")
@@ -221,8 +224,8 @@ void DialogDbCreation::updateLabelTotalFiltered()
 
 FilterRule DialogDbCreation::resultFilter()
 {
-    FilterRule::FilterMode filterType = ui->rb_ignore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-    return FilterRule(filterType, types_->checkedExtensions());
+    FilterRule::FilterMode __f = ui->rb_ignore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
+    return FilterRule(__f, types_->checkedExtensions());
 }
 
 void DialogDbCreation::setFilterCreation(FilterCreation mode)
@@ -322,3 +325,48 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
 
     QDialog::keyPressEvent(event);
 }
+
+// moved from Settings
+/*
+enum FilterPreset { PresetCustom, PresetDocuments, PresetPictures, PresetMusic, PresetVideos, PresetIgnoreTriflings };
+
+QStringList DialogSettings::extensionsList() const
+{
+    if (ui->inputExtensions->text().isEmpty())
+        return QStringList();
+
+    QString _inputed = ui->inputExtensions->text().toLower();
+    _inputed.remove('*');
+    _inputed.replace(" ."," ");
+    _inputed.replace(' ',',');
+
+    if (_inputed.startsWith('.'))
+        _inputed.remove(0, 1);
+
+    QStringList ext = _inputed.split(',', Qt::SkipEmptyParts);
+    ext.removeDuplicates();
+    return ext;
+}
+
+void DialogSettings::cleanUpExtList()
+{
+    QStringList _exts = extensionsList();
+    if (!_exts.isEmpty()) {
+        QStringList list;
+        if (!ui->rbInclude->isChecked()) {
+            if (ui->ignoreShaFiles->isChecked())
+                list.append(Lit::sl_digest_exts); // { "sha1", "sha256", "sha512" }
+            if (ui->ignoreDbFiles->isChecked())
+                list.append(Lit::sl_db_exts); // { "ver.json", "ver" }
+        }
+
+        if (!list.isEmpty()) {
+            foreach (const QString &str, list) {
+                _exts.removeOne(str);
+            }
+            ui->inputExtensions->setText(_exts.join(','));
+        }
+    }
+}
+
+*/

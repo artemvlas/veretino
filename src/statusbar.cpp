@@ -32,7 +32,7 @@ void StatusBar::setStatusIcon(const QIcon &icon)
 {
     statusIconLabel->setPixmap(icon.pixmap(16, 16));
 }
-
+/*
 void StatusBar::setModeFs(bool addButtonFilter)
 {
     clearButtons();
@@ -47,7 +47,7 @@ void StatusBar::setModeFs(bool addButtonFilter)
 
         buttonFsFilter->show();
     }
-}
+}*/
 
 void StatusBar::setModeDb(const DataContainer *data)
 {

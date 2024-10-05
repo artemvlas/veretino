@@ -46,7 +46,7 @@ public:
     void setStatusText(const QString &text);
     void setStatusIcon(const QIcon &icon);
 
-    void setModeFs(bool addButtonFilter);
+    //void setModeFs(bool addButtonFilter);
     void setModeDb(const DataContainer *data);
     void setModeDbCreating();
 

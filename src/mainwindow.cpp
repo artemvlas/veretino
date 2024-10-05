@@ -355,7 +355,7 @@ void MainWindow::dialogSettings()
 
     if (dialog.exec()) {
         dialog.updateSettings();
-        updatePermanentStatus();
+        //updatePermanentStatus();
     }
 }
 
@@ -447,9 +447,9 @@ void MainWindow::updatePermanentStatus()
         else if (!proc_->isStarted())
             statusBar->setModeDb(ui->treeView->data_);
     }
-    else if (ui->treeView->isViewFileSystem()) {
-        statusBar->setModeFs(settings_->filter.isFilterEnabled());
-    }
+    //else if (ui->treeView->isViewFileSystem()) {
+    //    statusBar->setModeFs(settings_->filter.isFilterEnabled());
+    //}
     else {
         statusBar->clearButtons();
     }
