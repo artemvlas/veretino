@@ -10,7 +10,7 @@
 #include <QKeyEvent>
 #include "files.h"
 #include "iconprovider.h"
-#include "treewidgetitem.h"
+#include "itemfiletype.h"
 
 namespace Ui {
 class DialogContentsList;
@@ -41,15 +41,15 @@ private:
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
-    bool isPassedChecked(const TreeWidgetItem *item) const;
-    bool isPassedUnChecked(const TreeWidgetItem *item) const;
-    bool isPassed(CheckState state, const TreeWidgetItem *item) const;
+    bool isPassedChecked(const ItemFileType *item) const;
+    bool isPassedUnChecked(const ItemFileType *item) const;
+    bool isPassed(CheckState state, const ItemFileType *item) const;
     bool itemsContain(CheckState state) const;
-    QList<TreeWidgetItem *> items(CheckState state) const;
+    QList<ItemFileType *> items(CheckState state) const;
     QStringList checkedExtensions() const;
 
     QList<ExtNumSize> extList_;
-    QList<TreeWidgetItem *> items_;
+    QList<ItemFileType *> items_;
 
     IconProvider icons_;
     FilterCreation mode_ = FC_Hidden;

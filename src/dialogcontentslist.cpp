@@ -17,9 +17,9 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const QList<Ex
     ui->setupUi(this);
     icons_.setTheme(palette());
     setWindowIcon(icons_.iconFolder());
-    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnType, 130);
-    ui->treeWidget->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
-    ui->treeWidget->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
+    ui->treeWidget->setColumnWidth(ItemFileType::ColumnType, 130);
+    ui->treeWidget->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
+    ui->treeWidget->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
     QString folderName = paths::shortenPath(folderPath);
     ui->labelFolderName->setText(folderName);
@@ -71,12 +71,12 @@ void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
         else
             icon = icons_.icon(QStringLiteral(u"file.") + _ext);
 
-        TreeWidgetItem *item = new TreeWidgetItem(ui->treeWidget);
-        item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, _ext);
-        item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
-        item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
-        item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
-        item->setIcon(TreeWidgetItem::ColumnType, icon);
+        ItemFileType *item = new ItemFileType(ui->treeWidget);
+        item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
+        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
+        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
+        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
+        item->setIcon(ItemFileType::ColumnType, icon);
         items_.append(item);
     }
 }
@@ -90,10 +90,10 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
             ui->treeWidget->topLevelItem(i)->setHidden(false);
     }
     else {
-        if (ui->treeWidget->sortColumn() == TreeWidgetItem::ColumnFilesNumber)
-            ui->treeWidget->sortItems(TreeWidgetItem::ColumnFilesNumber, Qt::DescendingOrder);
+        if (ui->treeWidget->sortColumn() == ItemFileType::ColumnFilesNumber)
+            ui->treeWidget->sortItems(ItemFileType::ColumnFilesNumber, Qt::DescendingOrder);
         else
-            ui->treeWidget->sortItems(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
+            ui->treeWidget->sortItems(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
         int top10FilesNumber = 0; // total number of files in the Top10 list
         qint64 top10FilesSize = 0; // total size of these files
@@ -102,8 +102,8 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
             QTreeWidgetItem *item = ui->treeWidget->topLevelItem(i);
             item->setHidden(i > 9);
             if (!item->isHidden()) {
-                top10FilesNumber += item->data(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole).toInt();
-                top10FilesSize += item->data(TreeWidgetItem::ColumnTotalSize, Qt::UserRole).toLongLong();
+                top10FilesNumber += item->data(ItemFileType::ColumnFilesNumber, Qt::DisplayRole).toInt();
+                top10FilesSize += item->data(ItemFileType::ColumnTotalSize, Qt::UserRole).toLongLong();
             }
         }
 
@@ -135,7 +135,7 @@ void DialogContentsList::setCheckboxesVisible(bool visible)
 
     ui->treeWidget->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
-    for (TreeWidgetItem *item : std::as_const(items_)) {
+    for (ItemFileType *item : std::as_const(items_)) {
         item->setCheckBoxVisible(visible
                                  && !excluded.contains(item->extension()));
     }
@@ -164,17 +164,17 @@ void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
         return;
     }
 
-    TreeWidgetItem *item = static_cast<TreeWidgetItem*>(t_item);
+    ItemFileType *item = static_cast<ItemFileType*>(t_item);
     item->toggle();
 }
 
-bool DialogContentsList::isPassedChecked(const TreeWidgetItem *item) const
+bool DialogContentsList::isPassedChecked(const ItemFileType *item) const
 {
     // allow only visible_checked
     return !item->isHidden() && item->isChecked();
 }
 
-bool DialogContentsList::isPassedUnChecked(const TreeWidgetItem *item) const
+bool DialogContentsList::isPassedUnChecked(const ItemFileType *item) const
 {
     static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
 
@@ -183,7 +183,7 @@ bool DialogContentsList::isPassedUnChecked(const TreeWidgetItem *item) const
            && !unfilterable.contains(item->extension());
 }
 
-bool DialogContentsList::isPassed(CheckState state, const TreeWidgetItem *item) const
+bool DialogContentsList::isPassed(CheckState state, const ItemFileType *item) const
 {
     return (state == Checked && isPassedChecked(item))
            || (state == UnChecked && isPassedUnChecked(item));
@@ -194,7 +194,7 @@ bool DialogContentsList::itemsContain(CheckState state) const
     if (mode_ != FC_Enabled)
         return false;
 
-    for (const TreeWidgetItem *item : std::as_const(items_)) {
+    for (const ItemFileType *item : std::as_const(items_)) {
         if (isPassed(state, item)) {
             return true;
         }
@@ -203,14 +203,14 @@ bool DialogContentsList::itemsContain(CheckState state) const
     return false;
 }
 
-QList<TreeWidgetItem *> DialogContentsList::items(CheckState state) const
+QList<ItemFileType *> DialogContentsList::items(CheckState state) const
 {
-    QList<TreeWidgetItem *> resultList;
+    QList<ItemFileType *> resultList;
 
     if (mode_ != FC_Enabled)
         return resultList;
 
-    for (TreeWidgetItem *item : std::as_const(items_)) {
+    for (ItemFileType *item : std::as_const(items_)) {
         if (isPassed(state, item))
             resultList.append(item);
     }
@@ -221,9 +221,9 @@ QList<TreeWidgetItem *> DialogContentsList::items(CheckState state) const
 QStringList DialogContentsList::checkedExtensions() const
 {
     QStringList extensions;
-    const QList<TreeWidgetItem *> checked_items = items(Checked);
+    const QList<ItemFileType *> checked_items = items(Checked);
 
-    for (const TreeWidgetItem *item : checked_items) {
+    for (const ItemFileType *item : checked_items) {
         extensions.append(item->extension());
     }
 
@@ -260,12 +260,12 @@ void DialogContentsList::updateLabelTotalFiltered()
     }
 
     // ? Include only visible_checked : Include all except visible_checked and Db-Sha
-    const QList<TreeWidgetItem *> itemList = items(ui->rbInclude->isChecked() ? Checked : UnChecked);
+    const QList<ItemFileType *> itemList = items(ui->rbInclude->isChecked() ? Checked : UnChecked);
 
     int filteredFilesNumber = 0;
     qint64 filteredFilesSize = 0;
 
-    for (const TreeWidgetItem *item : itemList) {
+    for (const ItemFileType *item : itemList) {
         filteredFilesNumber += item->filesNumber();
         filteredFilesSize += item->filesSize();
     }

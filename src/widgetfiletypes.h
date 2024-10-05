@@ -1,36 +1,36 @@
-#ifndef TREEWIDGETFILETYPES_H
-#define TREEWIDGETFILETYPES_H
+#ifndef WIDGETFILETYPES_H
+#define WIDGETFILETYPES_H
 
 #include <QTreeWidget>
 #include "files.h"
 #include "tools.h"
 #include "iconprovider.h"
-#include "treewidgetitem.h"
+#include "itemfiletype.h"
 
-class TreeWidgetFileTypes : public QTreeWidget
+class WidgetFileTypes : public QTreeWidget
 {
 public:
-    TreeWidgetFileTypes(QWidget *parent = nullptr);
+    WidgetFileTypes(QWidget *parent = nullptr);
     enum CheckState { UnChecked, Checked };
 
     void setItems(const QList<ExtNumSize> &extList);
     void setCheckboxesVisible(bool visible);
-    QList<TreeWidgetItem *> items(CheckState state) const;
+    QList<ItemFileType*> items(CheckState state) const;
     QStringList checkedExtensions() const;
-    bool isPassedChecked(const TreeWidgetItem *item) const;
-    bool isPassedUnChecked(const TreeWidgetItem *item) const;
-    bool isPassed(CheckState state, const TreeWidgetItem *item) const;
+    bool isPassedChecked(const ItemFileType *item) const;
+    bool isPassedUnChecked(const ItemFileType *item) const;
+    bool isPassed(CheckState state, const ItemFileType *item) const;
     bool itemsContain(CheckState state) const;
     void showAllItems();
     void hideExtra(int nomore = 10); // leave only this number of items visible
     NumSize numSizeVisible() const;
     NumSize numSize(CheckState chk_state) const;
 
-    QList<TreeWidgetItem *> items_;
+    QList<ItemFileType*> items_;
 
 private:
     IconProvider icons_;
 
-}; // class TreeWidgetFileTypes
+}; // class WidgetFileTypes
 
-#endif // TREEWIDGETFILETYPES_H
+#endif // WIDGETFILETYPES_H

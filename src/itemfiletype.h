@@ -1,12 +1,12 @@
-#ifndef TREEWIDGETITEM_H
-#define TREEWIDGETITEM_H
+#ifndef ITEMFILETYPE_H
+#define ITEMFILETYPE_H
 
 #include <QTreeWidgetItem>
 
-class TreeWidgetItem : public QTreeWidgetItem
+class ItemFileType : public QTreeWidgetItem
 {
 public:
-    TreeWidgetItem(QTreeWidget* parent);
+    ItemFileType(QTreeWidget* parent);
     enum Column { ColumnType, ColumnFilesNumber, ColumnTotalSize };
 
     void toggle();
@@ -20,6 +20,6 @@ public:
 
 private:
     bool operator <(const QTreeWidgetItem &other) const override;
-}; // class TreeWidgetItem
+}; // class ItemFileType
 
-#endif // TREEWIDGETITEM_H
+#endif // ITEMFILETYPE_H

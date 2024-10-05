@@ -36,6 +36,7 @@ set(PROJECT_SOURCES
     src/files.h
     src/filterrule.h
     src/iconprovider.h
+    src/itemfiletype.h
     src/jsondb.h
     src/mainwindow.h
     src/manager.h
@@ -52,9 +53,8 @@ set(PROJECT_SOURCES
     src/treeitem.h
     src/treemodel.h
     src/treemodeliterator.h
-    src/treewidgetfiletypes.h
-    src/treewidgetitem.h
     src/view.h
+    src/widgetfiletypes.h
 
     # SOURCES
     src/clickablelabel.cpp
@@ -70,6 +70,7 @@ set(PROJECT_SOURCES
     src/files.cpp
     src/filterrule.cpp
     src/iconprovider.cpp
+    src/itemfiletype.cpp
     src/jsondb.cpp
     src/main.cpp
     src/mainwindow.cpp
@@ -87,9 +88,8 @@ set(PROJECT_SOURCES
     src/treeitem.cpp
     src/treemodel.cpp
     src/treemodeliterator.cpp
-    src/treewidgetfiletypes.cpp
-    src/treewidgetitem.cpp
     src/view.cpp
+    src/widgetfiletypes.cpp
 
     # FORMS
     src/dialogabout.ui

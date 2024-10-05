@@ -150,7 +150,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="TreeWidgetFileTypes" name="treeWidget">
+        <widget class="WidgetFileTypes" name="treeWidget">
          <property name="rootIsDecorated">
           <bool>false</bool>
          </property>
@@ -258,9 +258,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TreeWidgetFileTypes</class>
+   <class>WidgetFileTypes</class>
    <extends>QTreeWidget</extends>
-   <header>src/treewidgetfiletypes.h</header>
+   <header>src/widgetfiletypes.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

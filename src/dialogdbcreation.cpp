@@ -14,9 +14,9 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const QList<ExtNum
     icons_.setTheme(palette());
     setWindowIcon(icons_.iconFolder());
     types_ = ui->treeWidget;
-    types_->setColumnWidth(TreeWidgetItem::ColumnType, 130);
-    types_->setColumnWidth(TreeWidgetItem::ColumnFilesNumber, 130);
-    types_->sortByColumn(TreeWidgetItem::ColumnTotalSize, Qt::DescendingOrder);
+    types_->setColumnWidth(ItemFileType::ColumnType, 130);
+    types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
+    types_->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
     //QString folderName = paths::shortenPath(folderPath);
     //ui->labelFolderName->setText(folderName);
@@ -156,7 +156,7 @@ void DialogDbCreation::activateItem(QTreeWidgetItem *t_item)
         return;
     }
 
-    TreeWidgetItem *item = static_cast<TreeWidgetItem*>(t_item);
+    ItemFileType *item = static_cast<ItemFileType*>(t_item);
     item->toggle();
 }
 
@@ -166,7 +166,7 @@ bool DialogDbCreation::itemsContain(int state) const
     if (mode_ != FC_Enabled)
         return false;
 
-    return types_->itemsContain((TreeWidgetFileTypes::CheckState)state);
+    return types_->itemsContain((WidgetFileTypes::CheckState)state);
 }
 
 void DialogDbCreation::updateFilterDisplay()
@@ -194,10 +194,10 @@ void DialogDbCreation::updateLabelTotalFiltered()
     }
 
     // ? Include only visible_checked : Include all except visible_checked and Db-Sha
-    TreeWidgetFileTypes::CheckState _checkState = ui->rb_include->isChecked() ? TreeWidgetFileTypes::Checked
-                                                                              : TreeWidgetFileTypes::UnChecked;
+    WidgetFileTypes::CheckState _checkState = ui->rb_include->isChecked() ? WidgetFileTypes::Checked
+                                                                              : WidgetFileTypes::UnChecked;
 
-    if (itemsContain(TreeWidgetFileTypes::Checked)) {
+    if (itemsContain(WidgetFileTypes::Checked)) {
         ui->l_total_filtered->setText(QStringLiteral(u"Filtered: ")
                                         + format::filesNumSize(types_->numSize(_checkState)));
     }
@@ -249,7 +249,7 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
     }
 
     if (event->key() == Qt::Key_Escape && mode_ == FC_Enabled) {
-        if (itemsContain(TreeWidgetFileTypes::Checked))
+        if (itemsContain(WidgetFileTypes::Checked))
             clearChecked();
         else
             setFilterCreation(FC_Disabled);

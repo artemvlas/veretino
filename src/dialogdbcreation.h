@@ -4,10 +4,10 @@
 #include <QDialog>
 #include <QKeyEvent>
 #include "iconprovider.h"
-#include "treewidgetitem.h"
+#include "itemfiletype.h"
 #include "files.h"
 #include "settings.h"
-#include "treewidgetfiletypes.h"
+#include "widgetfiletypes.h"
 
 namespace Ui {
 class DialogDbCreation;
@@ -50,7 +50,7 @@ private:
 
     FilterCreation mode_ = FC_Disabled;
 
-    TreeWidgetFileTypes *types_ = nullptr;
+    WidgetFileTypes *types_ = nullptr;
     Settings *settings_ = nullptr;
     IconProvider icons_;
     QString workDir_;

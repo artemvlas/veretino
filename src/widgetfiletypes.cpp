@@ -1,12 +1,12 @@
-#include "treewidgetfiletypes.h"
+#include "widgetfiletypes.h"
 
-TreeWidgetFileTypes::TreeWidgetFileTypes(QWidget *parent)
+WidgetFileTypes::WidgetFileTypes(QWidget *parent)
     : QTreeWidget(parent)
 {
     icons_.setTheme(palette());
 }
 
-void TreeWidgetFileTypes::setItems(const QList<ExtNumSize> &extList)
+void WidgetFileTypes::setItems(const QList<ExtNumSize> &extList)
 {
     for (int i = 0; i < extList.size(); ++i) {
         QIcon icon;
@@ -21,23 +21,23 @@ void TreeWidgetFileTypes::setItems(const QList<ExtNumSize> &extList)
         else
             icon = icons_.icon(QStringLiteral(u"file.") + _ext);
 
-        TreeWidgetItem *item = new TreeWidgetItem(this);
-        item->setData(TreeWidgetItem::ColumnType, Qt::DisplayRole, _ext);
-        item->setData(TreeWidgetItem::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
-        item->setData(TreeWidgetItem::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
-        item->setData(TreeWidgetItem::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
-        item->setIcon(TreeWidgetItem::ColumnType, icon);
+        ItemFileType *item = new ItemFileType(this);
+        item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
+        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
+        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
+        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
+        item->setIcon(ItemFileType::ColumnType, icon);
         items_.append(item);
     }
 }
 
-void TreeWidgetFileTypes::setCheckboxesVisible(bool visible)
+void WidgetFileTypes::setCheckboxesVisible(bool visible)
 {
     static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
 
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
-    for (TreeWidgetItem *item : std::as_const(items_)) {
+    for (ItemFileType *item : std::as_const(items_)) {
         item->setCheckBoxVisible(visible
                                  && !excluded.contains(item->extension()));
     }
@@ -45,11 +45,11 @@ void TreeWidgetFileTypes::setCheckboxesVisible(bool visible)
     this->blockSignals(false);
 }
 
-QList<TreeWidgetItem *> TreeWidgetFileTypes::items(CheckState state) const
+QList<ItemFileType *> WidgetFileTypes::items(CheckState state) const
 {
-    QList<TreeWidgetItem *> resultList;
+    QList<ItemFileType *> resultList;
 
-    for (TreeWidgetItem *item : std::as_const(items_)) {
+    for (ItemFileType *item : std::as_const(items_)) {
         if (isPassed(state, item))
             resultList.append(item);
     }
@@ -57,25 +57,25 @@ QList<TreeWidgetItem *> TreeWidgetFileTypes::items(CheckState state) const
     return resultList;
 }
 
-QStringList TreeWidgetFileTypes::checkedExtensions() const
+QStringList WidgetFileTypes::checkedExtensions() const
 {
     QStringList extensions;
-    const QList<TreeWidgetItem *> checked_items = items(Checked);
+    const QList<ItemFileType *> checked_items = items(Checked);
 
-    for (const TreeWidgetItem *item : checked_items) {
+    for (const ItemFileType *item : checked_items) {
         extensions.append(item->extension());
     }
 
     return extensions;
 }
 
-bool TreeWidgetFileTypes::isPassedChecked(const TreeWidgetItem *item) const
+bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
 {
     // allow only visible_checked
     return !item->isHidden() && item->isChecked();
 }
 
-bool TreeWidgetFileTypes::isPassedUnChecked(const TreeWidgetItem *item) const
+bool WidgetFileTypes::isPassedUnChecked(const ItemFileType *item) const
 {
     static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
 
@@ -84,15 +84,15 @@ bool TreeWidgetFileTypes::isPassedUnChecked(const TreeWidgetItem *item) const
            && !unfilterable.contains(item->extension());
 }
 
-bool TreeWidgetFileTypes::isPassed(CheckState state, const TreeWidgetItem *item) const
+bool WidgetFileTypes::isPassed(CheckState state, const ItemFileType *item) const
 {
     return (state == Checked && isPassedChecked(item))
            || (state == UnChecked && isPassedUnChecked(item));
 }
 
-bool TreeWidgetFileTypes::itemsContain(CheckState state) const
+bool WidgetFileTypes::itemsContain(CheckState state) const
 {
-    for (const TreeWidgetItem *item : std::as_const(items_)) {
+    for (const ItemFileType *item : std::as_const(items_)) {
         if (isPassed(state, item)) {
             return true;
         }
@@ -101,17 +101,17 @@ bool TreeWidgetFileTypes::itemsContain(CheckState state) const
     return false;
 }
 
-void TreeWidgetFileTypes::showAllItems()
+void WidgetFileTypes::showAllItems()
 {
     for (int i = 0; i < topLevelItemCount(); ++i)
         topLevelItem(i)->setHidden(false);
 }
 
-void TreeWidgetFileTypes::hideExtra(int nomore)
+void WidgetFileTypes::hideExtra(int nomore)
 {
-    TreeWidgetItem::Column _sortColumn = (sortColumn() == TreeWidgetItem::ColumnFilesNumber)
-                                             ? TreeWidgetItem::ColumnFilesNumber
-                                             : TreeWidgetItem::ColumnTotalSize;
+    ItemFileType::Column _sortColumn = (sortColumn() == ItemFileType::ColumnFilesNumber)
+                                             ? ItemFileType::ColumnFilesNumber
+                                             : ItemFileType::ColumnTotalSize;
 
     sortItems(_sortColumn, Qt::DescendingOrder);
 
@@ -121,12 +121,12 @@ void TreeWidgetFileTypes::hideExtra(int nomore)
     }
 }
 
-NumSize TreeWidgetFileTypes::numSizeVisible() const
+NumSize WidgetFileTypes::numSizeVisible() const
 {
     NumSize _nums;
 
     for (int i = 0; i < topLevelItemCount(); ++i) {
-        const TreeWidgetItem *_item = static_cast<TreeWidgetItem*>(topLevelItem(i));
+        const ItemFileType *_item = static_cast<ItemFileType*>(topLevelItem(i));
         if (!_item->isHidden()) {
             _nums.add(_item->filesNumber(), _item->filesSize());
         }
@@ -135,12 +135,12 @@ NumSize TreeWidgetFileTypes::numSizeVisible() const
     return _nums;
 }
 
-NumSize TreeWidgetFileTypes::numSize(CheckState chk_state) const
+NumSize WidgetFileTypes::numSize(CheckState chk_state) const
 {
-    const QList<TreeWidgetItem*> itemList = items(chk_state);
+    const QList<ItemFileType*> itemList = items(chk_state);
     NumSize _res;
 
-    for (const TreeWidgetItem *_item : itemList) {
+    for (const ItemFileType *_item : itemList) {
         _res.add(_item->filesNumber(),
                  _item->filesSize());
     }
