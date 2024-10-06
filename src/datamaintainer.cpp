@@ -192,30 +192,6 @@ void DataMaintainer::setDbFileState(DbFileState state)
     }
 }
 
-qint64 DataMaintainer::totalSizeOfListedFiles(const FileStatuses flags, const QModelIndex &rootIndex)
-{
-    if (!data_) {
-        qDebug() << "DataMaintainer::totalSizeOfListedFiles | NO data_";
-        return 0;
-    }
-
-    if (rootIndex.isValid() && rootIndex.model() != data_->model_) {
-        qDebug() << "DataMaintainer::totalSizeOfListedFiles | Wrong model index";
-        return 0;
-    }
-
-    qint64 result = 0;
-    TreeModelIterator it(data_->model_, rootIndex);
-
-    while (it.hasNext()) {
-        if (flags & it.nextFile().status()) {
-            result += it.size();
-        }
-    }
-
-    return result;
-}
-
 bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
 {
     if (!data_ || !fileRowIndex.isValid() || fileRowIndex.model() != data_->model_) {

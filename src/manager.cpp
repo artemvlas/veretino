@@ -428,27 +428,30 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
 int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 {
-    if (!dataMaintainer->data_
-        || (rootIndex.isValid() && rootIndex.model() != dataMaintainer->data_->model_))
+    DataContainer *_data = dataMaintainer->data_;
+
+    if (!_data
+        || (rootIndex.isValid() && rootIndex.model() != _data->model_))
     {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
     }
 
-    int numQueued = (status == FileStatus::Queued) ? dataMaintainer->data_->numbers_.numberOf(FileStatus::Queued)
-                                                   : dataMaintainer->addToQueue(status, rootIndex);
+    if (status != FileStatus::Queued)
+        dataMaintainer->addToQueue(status, rootIndex);
 
-    qDebug() << "Manager::calculateChecksums | Queued:" << numQueued;
+    NumSize _queued = _data->getNumbers(rootIndex).values(FileStatus::Queued);
 
-    if (numQueued == 0) {
+    qDebug() << "Manager::calculateChecksums | Queued:" << _queued.num;
+
+    if (_queued.num == 0) {
         return 0;
     }
 
-    qint64 totalSize = dataMaintainer->totalSizeOfListedFiles(FileStatus::Queued, rootIndex);
-    QString totalSizeReadable = format::dataSizeReadable(totalSize);
-    procState->setTotalSize(totalSize);
+    QString totalSizeReadable = format::dataSizeReadable(_queued.size);
+    procState->setTotalSize(_queued.size);
 
-    ShaCalculator shaCalc(dataMaintainer->data_->metaData_.algorithm);
+    ShaCalculator shaCalc(_data->metaData_.algorithm);
     shaCalc.setProcState(procState);
     int doneNum = 0;
     bool isMismatchFound = false;
@@ -460,7 +463,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     const QString procStatusText = (procStatus == FileStatus::Verifying) ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
 
     // process
-    TreeModelIterator iter(dataMaintainer->data_->model_, rootIndex);
+    TreeModelIterator iter(_data->model_, rootIndex);
 
     while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
@@ -472,10 +475,10 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
             emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
                                       .arg(procStatusText)
                                       .arg(doneNum + 1)
-                                      .arg(numQueued)
+                                      .arg(_queued.num)
                                       .arg(doneData));
 
-            QString curFilePath = dataMaintainer->data_->itemAbsolutePath(iter.index());
+            QString curFilePath = _data->itemAbsolutePath(iter.index());
             QString checksum = shaCalc.calculate(curFilePath);
 
             if (!procState->isCanceled()) {
@@ -483,10 +486,9 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
                     FileStatus _failStatus = tools::failedCalcStatus(curFilePath, TreeModel::hasChecksum(iter.index()));
                     dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _failStatus);
 
-                    totalSize -= iter.size();
-                    totalSizeReadable = format::dataSizeReadable(totalSize);
-                    procState->changeTotalSize(totalSize);
-                    --numQueued;
+                    _queued.subtractOne(iter.size());
+                    totalSizeReadable = format::dataSizeReadable(_queued.size);
+                    procState->changeTotalSize(_queued.size);
                 }
                 else {
                     if (!dataMaintainer->updateChecksum(iter.index(), checksum)) {
@@ -561,7 +563,6 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        //const FileList _flist = files_->getFileList(folderPath, FilterRule(false));
         const FileTypeList _typesList = files_->getFileTypes(folderPath, settings_->excludeUnpermitted);
 
         if (!_typesList.isEmpty()) {

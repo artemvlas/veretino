@@ -36,9 +36,6 @@ public:
     int folderBasedData(FileStatus fileStatus = FileStatus::New,
                        bool ignoreUnreadable = true);
 
-    qint64 totalSizeOfListedFiles(const FileStatuses flags,
-                                  const QModelIndex &rootIndex = QModelIndex());
-
     // returns 'true' if Added or Matched. returns false if Mismatched
     bool updateChecksum(const QModelIndex &fileRowIndex,
                         const QString &computedChecksum);
