@@ -19,7 +19,7 @@ class DialogDbCreation : public QDialog
 
 public:
     explicit DialogDbCreation(const QString &folderPath,
-                              const QList<ExtNumSize> &extList,
+                              const FileTypeList &extList,
                               QWidget *parent = nullptr);
     ~DialogDbCreation();
 
@@ -37,7 +37,7 @@ private:
     void connections();
     void updateLabelDbFilename();
 
-    void setTotalInfo(const QList<ExtNumSize> &exts);
+    void setTotalInfo(const FileTypeList &exts);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
     void clearChecked();

@@ -253,6 +253,12 @@ QString composeFilePath(const QString &parentFolder, const QString &fileName, co
     return parentFolder % _sep % fileName % _dot % ext;
 }
 
+QString suffix(const QString &_file)
+{
+    const int _dotInd = _file.lastIndexOf(_dot);
+    return (_dotInd > 0) ? _file.right(_file.size() - _dotInd - 1).toLower() : QString();
+}
+
 bool isRoot(const QString &path)
 {
     switch (path.length()) {

@@ -7,26 +7,28 @@ WidgetFileTypes::WidgetFileTypes(QWidget *parent)
     icons_.setTheme(palette());
 }
 
-void WidgetFileTypes::setItems(const QList<ExtNumSize> &extList)
+void WidgetFileTypes::setItems(const FileTypeList &extList)
 {
-    for (int i = 0; i < extList.size(); ++i) {
+    FileTypeList::const_iterator it;
+    for (it = extList.constBegin(); it != extList.constEnd(); ++it) {
         QIcon icon;
-        const QString _ext = extList.at(i).extension;
+        const QString _ext = it.key();
+        const NumSize _nums = it.value();
 
-        if (_ext == ExtNumSize::strVeretinoDb)
+        if (_ext == Files::strVeretinoDb)
             icon = icons_.icon(Icons::Database);
-        else if (_ext == ExtNumSize::strShaFiles)
+        else if (_ext == Files::strShaFiles)
             icon = icons_.icon(Icons::HashFile);
-        else if (_ext == ExtNumSize::strNoPerm)
+        else if (_ext == Files::strNoPerm)
             icon = icons_.icon(FileStatus::UnPermitted);
         else
             icon = icons_.icon(QStringLiteral(u"file.") + _ext);
 
         ItemFileType *item = new ItemFileType(this);
         item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
-        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
-        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
-        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
+        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, _nums.num);
+        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(_nums.size));
+        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, _nums.size);
         item->setIcon(ItemFileType::ColumnType, icon);
         items_.append(item);
     }
@@ -34,7 +36,7 @@ void WidgetFileTypes::setItems(const QList<ExtNumSize> &extList)
 
 void WidgetFileTypes::setCheckboxesVisible(bool visible)
 {
-    static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
+    static const QStringList excluded { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
 
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
@@ -78,7 +80,7 @@ bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
 
 bool WidgetFileTypes::isPassedUnChecked(const ItemFileType *item) const
 {
-    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
+    static const QStringList unfilterable { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
 
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())

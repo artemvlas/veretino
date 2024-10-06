@@ -9,7 +9,7 @@
 #include <QPushButton>
 #include <QDebug>
 
-DialogContentsList::DialogContentsList(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
+DialogContentsList::DialogContentsList(const QString &folderPath, const FileTypeList &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogContentsList)
     , extList_(extList)
@@ -56,26 +56,28 @@ void DialogContentsList::connections()
     connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(ui->labelFolderName->toolTip()); });
 }
 
-void DialogContentsList::makeItemsList(const QList<ExtNumSize> &extList)
-{
-    for (int i = 0; i < extList.size(); ++i) {
+void DialogContentsList::makeItemsList(const FileTypeList &extList)
+{   
+    FileTypeList::const_iterator it;
+    for (it = extList.constBegin(); it != extList.constEnd(); ++it) {
         QIcon icon;
-        const QString _ext = extList.at(i).extension;
+        const QString _ext = it.key();
+        const NumSize _nums = it.value();
 
-        if (_ext == ExtNumSize::strVeretinoDb)
+        if (_ext == Files::strVeretinoDb)
             icon = icons_.icon(Icons::Database);
-        else if (_ext == ExtNumSize::strShaFiles)
+        else if (_ext == Files::strShaFiles)
             icon = icons_.icon(Icons::HashFile);
-        else if (_ext == ExtNumSize::strNoPerm)
+        else if (_ext == Files::strNoPerm)
             icon = icons_.icon(FileStatus::UnPermitted);
         else
             icon = icons_.icon(QStringLiteral(u"file.") + _ext);
 
         ItemFileType *item = new ItemFileType(ui->treeWidget);
         item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
-        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, extList.at(i).filesNumber);
-        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(extList.at(i).filesSize));
-        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, extList.at(i).filesSize);
+        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, _nums.num);
+        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(_nums.size));
+        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, _nums.size);
         item->setIcon(ItemFileType::ColumnType, icon);
         items_.append(item);
     }
@@ -116,22 +118,22 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 
 void DialogContentsList::setTotalInfo()
 {
-    qint64 totalSize = 0;
+   /* qint64 totalSize = 0;
     int totalFilesNumber = 0;
 
     for (int i = 0; i < extList_.size(); ++i) {
         totalSize += extList_.at(i).filesSize;
         totalFilesNumber += extList_.at(i).filesNumber;
-    }
+    }*/
 
     ui->labelTotal->setText(QString("Total: %1 types, %2 ")
                                 .arg(extList_.size())
-                                .arg(format::filesNumSize(totalFilesNumber, totalSize)));
+                                .arg(format::filesNumSize(Files::totalListed(extList_))));
 }
 
 void DialogContentsList::setCheckboxesVisible(bool visible)
 {
-    static const QStringList excluded { ExtNumSize::strNoType, ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
+    static const QStringList excluded { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
 
     ui->treeWidget->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
@@ -176,7 +178,7 @@ bool DialogContentsList::isPassedChecked(const ItemFileType *item) const
 
 bool DialogContentsList::isPassedUnChecked(const ItemFileType *item) const
 {
-    static const QStringList unfilterable { ExtNumSize::strVeretinoDb, ExtNumSize::strShaFiles, ExtNumSize::strNoPerm };
+    static const QStringList unfilterable { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
 
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())

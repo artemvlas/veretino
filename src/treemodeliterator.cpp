@@ -23,7 +23,10 @@ void TreeModelIterator::setup(const QModelIndex &root)
         }
     }
 
-    nextIndex_ = stepForward(index_);
+    if (modelConst_)
+        nextIndex_ = stepForward(index_);
+    else
+        endReached = true;
 }
 
 bool TreeModelIterator::hasNext() const

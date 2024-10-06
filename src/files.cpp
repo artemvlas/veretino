@@ -11,10 +11,10 @@
 #include "treemodeliterator.h"
 #include "treemodel.h"
 
-const QString ExtNumSize::strNoType = QStringLiteral(u"No type");
-const QString ExtNumSize::strVeretinoDb = QStringLiteral(u"Veretino DB");
-const QString ExtNumSize::strShaFiles = QStringLiteral(u"sha1/256/512");
-const QString ExtNumSize::strNoPerm = QStringLiteral(u"No Permissions");
+const QString Files::strNoType = QStringLiteral(u"No type");
+const QString Files::strVeretinoDb = QStringLiteral(u"Veretino DB");
+const QString Files::strShaFiles = QStringLiteral(u"sha1/256/512");
+const QString Files::strNoPerm = QStringLiteral(u"No Permissions");
 
 const QString Files::desktopFolderPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 
@@ -174,59 +174,72 @@ QString Files::getFolderSize(const QString &path)
     return QString();
 }
 
-QList<ExtNumSize> Files::getFileTypes()
+FileTypeList Files::getFileTypes(const QString &folderPath, bool excludeUnPerm)
 {
-    return getFileTypes(fsPath_);
-}
+    emit setStatusbarText(QStringLiteral(u"Parsing folder contents..."));
 
-QList<ExtNumSize> Files::getFileTypes(const QString &folderPath)
-{
-    return getFileTypes(getFileList(folderPath, FilterRule(false)));
-}
+    FileTypeList _res;
+    QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
 
-QList<ExtNumSize> Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)
-{
-    return getFileTypes(getFileList(model, FileStatus::CombAvailable, rootIndex));
-}
-
-QList<ExtNumSize> Files::getFileTypes(const FileList &fileList, bool excludeUnreadable)
-{
-    if (fileList.isEmpty())
-        return QList<ExtNumSize>();
-
-    QHash<QString, FileList> listsByType; // key = extension, value = list of files with that extension
-
-    FileList::const_iterator filesIter;
-    for (filesIter = fileList.constBegin(); filesIter != fileList.constEnd(); ++filesIter) {
-        QString _ext;
-
-        if (excludeUnreadable && (filesIter.value().status == FileStatus::UnPermitted))
-            _ext = ExtNumSize::strNoPerm;
-        else if (paths::isDbFile(filesIter.key()))
-            _ext = ExtNumSize::strVeretinoDb;
-        else if (paths::isDigestFile(filesIter.key()))
-            _ext = ExtNumSize::strShaFiles;
-        else
-            _ext = QFileInfo(filesIter.key()).suffix().toLower();
-
-        if (_ext.isEmpty())
-            _ext = ExtNumSize::strNoType;
-
-        listsByType[_ext].insert(filesIter.key(), filesIter.value());
+    while (it.hasNext() && !isCanceled()) {
+        it.next();
+        QString _ext = (excludeUnPerm && !it.fileInfo().isReadable()) ? strNoPerm
+                                                                      : suffixName(it.fileName());
+        _res[_ext] << it.fileInfo().size();
     }
 
-    QList<ExtNumSize> combList;
-
-    QHash<QString, FileList>::const_iterator iter;
-    for (iter = listsByType.constBegin(); iter != listsByType.constEnd(); ++iter) {
-        ExtNumSize t;
-        t.extension = iter.key();
-        t.filesNumber = iter.value().size();
-        t.filesSize = dataSize(iter.value());
-        combList.append(t);
+    if (isCanceled()) {
+        qDebug() << "Files::getFileTypes | Canceled:" << folderPath;
+        emit setStatusbarText();
+        return FileTypeList();
     }
 
-    return combList;
+    emit setStatusbarText(tools::joinStrings(_res.size(), QStringLiteral(u"types found")));
+    return _res;
+}
+
+FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)
+{
+    FileTypeList _res;
+    TreeModelIterator it(model, rootIndex);
+
+    while (it.hasNext() && !isCanceled()) {
+        it.nextFile();
+        if (it.status() & FileStatus::CombAvailable) {
+            const QString _ext = suffixName(it.path());
+            _res[_ext] << it.size();
+        }
+    }
+
+    return _res;
+}
+
+NumSize Files::totalListed(const FileTypeList &_typeList)
+{
+    NumSize _res;
+    FileTypeList::const_iterator it;
+    for (it = _typeList.constBegin(); it != _typeList.constEnd(); ++it) {
+        _res.add(it.value());
+    }
+
+    return _res;
+}
+
+QString Files::suffixName(const QString &_file)
+{
+    QString _ext;
+
+    if (paths::isDbFile(_file))
+        _ext = strVeretinoDb;
+    else if (paths::isDigestFile(_file))
+        _ext = strShaFiles;
+    else
+        _ext = paths::suffix(_file);
+
+    if (_ext.isEmpty())
+        _ext = strNoType;
+
+    return _ext;
 }
 
 qint64 Files::dataSize()

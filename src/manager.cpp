@@ -561,8 +561,8 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        const FileList _flist = files_->getFileList(folderPath, FilterRule(false));
-        const QList<ExtNumSize> _typesList = files_->getFileTypes(_flist, settings_->excludeUnpermitted);
+        //const FileList _flist = files_->getFileList(folderPath, FilterRule(false));
+        const FileTypeList _typesList = files_->getFileTypes(folderPath, settings_->excludeUnpermitted);
 
         if (!_typesList.isEmpty()) {
             if (filterCreation)
@@ -578,7 +578,7 @@ void Manager::makeDbContentsList()
     if (!dataMaintainer->data_)
         return;
 
-    const QList<ExtNumSize> _typesList = files_->getFileTypes(dataMaintainer->data_->model_);
+    const FileTypeList _typesList = files_->getFileTypes(dataMaintainer->data_->model_);
 
     if (!_typesList.isEmpty())
         emit dbContentsListCreated(dataMaintainer->data_->metaData_.workDir, _typesList);

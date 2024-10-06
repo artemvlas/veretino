@@ -13,7 +13,7 @@ public:
     WidgetFileTypes(QWidget *parent = nullptr);
     enum CheckState { UnChecked, Checked };
 
-    void setItems(const QList<ExtNumSize> &extList);
+    void setItems(const FileTypeList &extList);
     void setCheckboxesVisible(bool visible);
     void setChecked(const QStringList &exts);
     QList<ItemFileType*> items(CheckState state) const;

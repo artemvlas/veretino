@@ -183,9 +183,9 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabExtra">
+     <widget class="QWidget" name="tabAdvanced">
       <attribute name="title">
-       <string>Extra</string>
+       <string>Advanced</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3"/>
      </widget>

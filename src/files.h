@@ -14,8 +14,8 @@
 
 struct FileValues;
 struct NumSize;
-struct ExtNumSize;
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
+using FileTypeList = QHash<QString, NumSize>;
 
 class Files : public QObject
 {
@@ -75,10 +75,13 @@ public:
 
     QString getFolderSize(); // returns "folder name: number of files (redable size)"
     QString getFolderSize(const QString &path);
-    QList<ExtNumSize> getFileTypes(); // returns a list of file types (extensions) with files number and their size
-    QList<ExtNumSize> getFileTypes(const QString &folderPath);
-    QList<ExtNumSize> getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
-    QList<ExtNumSize> getFileTypes(const FileList &fileList, bool excludeUnreadable = false);
+
+    // returns a list of file types (extensions) with files number and their size
+    FileTypeList getFileTypes(const QString &folderPath, bool excludeUnPerm = false);
+    FileTypeList getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
+
+    static NumSize totalListed(const FileTypeList &_typeList);
+    static QString suffixName(const QString &_file);
 
     // checks whether there are any (or filtered) files the folder/subfolders
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false));
@@ -86,6 +89,11 @@ public:
     static QStringList dbFiles(const QString &folderPath); // file names only
 
     static const QString desktopFolderPath; // path to the user's Desktop folder
+
+    static const QString strNoType;
+    static const QString strVeretinoDb;
+    static const QString strShaFiles;
+    static const QString strNoPerm;
 
 private:
     bool isCanceled() const;
@@ -129,16 +137,5 @@ struct NumSize { // number and total size (of files)
     int num = 0;
     qint64 size = 0;
 }; // struct NumSize
-
-struct ExtNumSize {
-    static const QString strNoType;
-    static const QString strVeretinoDb;
-    static const QString strShaFiles;
-    static const QString strNoPerm;
-
-    QString extension; // file extension/type, for example: txt (pdf, mkv, 7z, flac...)
-    int filesNumber = 0; // number of files with this extension
-    qint64 filesSize = 0; // total size of these files
-}; // struct ExtNumSize
 
 #endif // FILES_H

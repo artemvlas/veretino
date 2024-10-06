@@ -94,9 +94,9 @@ private:
 signals:
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setViewData(DataContainer *data = nullptr);
-    void folderContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
-    void dbCreationDataCollected(const QString &folderPath, const QStringList &dbFiles, const QList<ExtNumSize> &extList);
-    void dbContentsListCreated(const QString &folderPath, const QList<ExtNumSize> &extList);
+    void folderContentsListCreated(const QString &folderPath, const FileTypeList &extList);
+    void dbCreationDataCollected(const QString &folderPath, const QStringList &dbFiles, const FileTypeList &extList);
+    void dbContentsListCreated(const QString &folderPath, const FileTypeList &extList);
     void folderChecked(const Numbers &result, const QString &subFolder = QString());
     void fileProcessed(const QString &fileName, const FileValues &result);
     void showMessage(const QString &text, const QString &title = "Info");

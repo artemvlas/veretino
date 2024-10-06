@@ -20,7 +20,7 @@ class DialogContentsList : public QDialog
 {
     Q_OBJECT
 public:
-    explicit DialogContentsList(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent = nullptr);
+    explicit DialogContentsList(const QString &folderPath, const FileTypeList &extList, QWidget *parent = nullptr);
     ~DialogContentsList();
 
     enum FilterCreation { FC_Hidden, FC_Disabled, FC_Enabled };
@@ -32,7 +32,7 @@ private:
     enum CheckState { Checked, UnChecked };
     void connections();
     void setTotalInfo();
-    void makeItemsList(const QList<ExtNumSize> &extList);
+    void makeItemsList(const FileTypeList &extList);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
     void clearChecked();
@@ -48,7 +48,7 @@ private:
     QList<ItemFileType *> items(CheckState state) const;
     QStringList checkedExtensions() const;
 
-    QList<ExtNumSize> extList_;
+    FileTypeList extList_;
     QList<ItemFileType *> items_;
 
     IconProvider icons_;

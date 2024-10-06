@@ -129,7 +129,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<QVector<int>>("QVector<int>"); // for building on Windows (qt 5.15.2)
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
     qRegisterMetaType<ModelView>("ModelView");
-    qRegisterMetaType<QList<ExtNumSize>>("QList<ExtNumSize>");
+    qRegisterMetaType<FileTypeList>("FileTypeList");
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
 
@@ -210,7 +210,7 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
     }
 }
 
-void MainWindow::showDialogContentsList(const QString &folderName, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogContentsList(const QString &folderName, const FileTypeList &extList)
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
@@ -226,7 +226,7 @@ void MainWindow::showDialogContentsList(const QString &folderName, const QList<E
     }
 }
 
-void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &dbFiles, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &dbFiles, const FileTypeList &extList)
 {
     if (extList.isEmpty()) {
         qDebug() << "MainWindow::showDialogDbCreation >> Empty extList";
@@ -272,7 +272,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     }
 }
 
-void MainWindow::showDialogDbContents(const QString &folderName, const QList<ExtNumSize> &extList)
+void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeList &extList)
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);

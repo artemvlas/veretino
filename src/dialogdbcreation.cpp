@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QMenu>
 
-DialogDbCreation::DialogDbCreation(const QString &folderPath, const QList<ExtNumSize> &extList, QWidget *parent)
+DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDbCreation)
     , workDir_(folderPath)
@@ -123,17 +123,11 @@ void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
     updateFilterDisplay();
 }
 
-void DialogDbCreation::setTotalInfo(const QList<ExtNumSize> &exts)
+void DialogDbCreation::setTotalInfo(const FileTypeList &exts)
 {
-    NumSize _nums;
-
-    for (const ExtNumSize &_ext : exts) {
-        _nums.add(_ext.filesNumber, _ext.filesSize);
-    }
-
     ui->l_total_files->setText(QString("Total: %1 types, %2 ")
                                 .arg(exts.size())
-                                .arg(format::filesNumSize(_nums)));
+                                .arg(format::filesNumSize(Files::totalListed(exts))));
 }
 
 void DialogDbCreation::setCheckboxesVisible(bool visible)
