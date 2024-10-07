@@ -45,7 +45,7 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
 
     ui->tabWidget->setTabIcon(0, _icons.icon(Icons::Filter));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(_icons.icon(FileStatus::Calculating));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(QStringLiteral(u"Continue"));
+    //ui->buttonBox->button(QDialogButtonBox::Ok)->setText(QStringLiteral(u"Continue"));
 
     updateViewMode();
 }
@@ -75,9 +75,9 @@ void DialogDbCreation::connections()
     connect(ui->le_exts_list, &QLineEdit::textEdited, this, &DialogDbCreation::parseInputedExts);
 
     // filename
-    connect(ui->rb_ext_short, &QRadioButton::toggled, this, &DialogDbCreation::updateLabelDbFilename);
-    connect(ui->cb_add_folder_name, &QCheckBox::toggled, this, &DialogDbCreation::updateLabelDbFilename);
-    connect(ui->inp_db_filename, &QLineEdit::textEdited, this, &DialogDbCreation::updateLabelDbFilename);
+    connect(ui->rb_ext_short, &QRadioButton::toggled, this, &DialogDbCreation::updateDbFilename);
+    connect(ui->cb_add_folder_name, &QCheckBox::toggled, this, &DialogDbCreation::updateDbFilename);
+    connect(ui->inp_db_filename, &QLineEdit::textEdited, this, &DialogDbCreation::updateDbFilename);
 
     // settings
     connect(this, &DialogDbCreation::accepted, this, &DialogDbCreation::updateSettings);
@@ -118,6 +118,11 @@ void DialogDbCreation::updateSettings()
     }
 }
 
+void DialogDbCreation::setExistingDbs(const QStringList &existing)
+{
+    existingDbs_ = existing;
+}
+
 void DialogDbCreation::setDbConfig()
 {
     if (!settings_)
@@ -130,7 +135,7 @@ void DialogDbCreation::setDbConfig()
     if (!settings_->dbPrefix.isEmpty() && (settings_->dbPrefix != Lit::s_db_prefix))
         ui->inp_db_filename->setText(settings_->dbPrefix);
 
-    updateLabelDbFilename();
+    updateDbFilename();
 }
 
 void DialogDbCreation::setFilterConfig()
@@ -190,13 +195,23 @@ QStringList DialogDbCreation::extensionsList() const
     return _exts;
 }
 
-void DialogDbCreation::updateLabelDbFilename()
+void DialogDbCreation::updateDbFilename()
 {
-    QString prefix = ui->inp_db_filename->text().isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(ui->inp_db_filename->text());
-    QString folderName = ui->cb_add_folder_name->isChecked() ? QStringLiteral(u"@FolderName") : QString();
-    QString extension = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
+    const QString _inpText = ui->inp_db_filename->text();
+    const QString _prefix = _inpText.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(_inpText);
+    const QString _folderName = ui->cb_add_folder_name->isChecked() ? workDir_ : QString(); // QStringLiteral(u"@FolderName")
+    const QString _ext = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
+    const QString _dbFileName = format::composeDbFileName(_prefix, _folderName, _ext);
+    const QString _dbFilePath = paths::joinPath(workDir_, _dbFileName);
+    const bool _exists = QFileInfo::exists(_dbFilePath);
+    const QString _color = _exists ? format::coloredText(true) : QString();
+    const QString _toolTip = _exists ? QStringLiteral(u"The file already exists") : QStringLiteral(u"Available");
+    const QString _acceptBtnText = _exists ? QStringLiteral(u"Overwrite") : QStringLiteral(u"Create");
 
-    ui->l_db_filename->setText(format::composeDbFileName(prefix, folderName, extension));
+    ui->l_db_filename->setStyleSheet(_color);
+    ui->l_db_filename->setText(_dbFileName);
+    ui->l_db_filename->setToolTip(_toolTip);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(_acceptBtnText);
 }
 
 void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
@@ -370,6 +385,7 @@ void DialogDbCreation::resetView()
     ui->rb_ext_long->setChecked(true);
     ui->cb_add_folder_name->setChecked(true);
     ui->cb_flag_const->setChecked(false);
+    updateDbFilename();
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)

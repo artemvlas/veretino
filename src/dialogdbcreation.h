@@ -27,6 +27,7 @@ public:
 
     void setSettings(Settings *settings);
     void updateSettings();
+    void setExistingDbs(const QStringList &existing);
     void setFilterCreation(FilterCreation mode);
     FilterRule resultFilter();
 
@@ -39,7 +40,7 @@ private:
     void restoreLastExts();
     void parseInputedExts();
     void resetView();
-    void updateLabelDbFilename();
+    void updateDbFilename();
     void setTotalInfo(const FileTypeList &exts);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
@@ -58,6 +59,7 @@ private:
     WidgetFileTypes *types_ = nullptr;
     Settings *settings_ = nullptr;
     QString workDir_;
+    QStringList existingDbs_;
 
     static const QMap<QString, QStringList> _presets;
 
