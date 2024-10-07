@@ -22,6 +22,7 @@ public:
     bool isPassedUnChecked(const ItemFileType *item) const;
     bool isPassed(CheckState state, const ItemFileType *item) const;
     bool itemsContain(CheckState state) const;
+    bool hasChecked() const;
     void showAllItems();
     void hideExtra(int nomore = 10); // leave only this number of items visible
     NumSize numSizeVisible() const;

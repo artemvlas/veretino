@@ -59,20 +59,16 @@ DialogDbCreation::~DialogDbCreation()
 
 void DialogDbCreation::connections()
 {
+    // type list
     connect(types_, &WidgetFileTypes::customContextMenuRequested, this, &DialogDbCreation::createMenuWidgetTypes);
-
+    connect(types_, &QTreeWidget::itemChanged, this, &DialogDbCreation::updateFilterDisplay);
+    connect(types_, &QTreeWidget::itemDoubleClicked, this, &DialogDbCreation::activateItem);
     connect(ui->cb_top10, &QCheckBox::toggled, this, &DialogDbCreation::setItemsVisibility);
 
-    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogDbCreation::updateFilterDisplay);
-    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogDbCreation::activateItem);
-
+    // filter
     connect(ui->cb_enable_filter, &QCheckBox::toggled, this,
             [=](bool isChecked){ setFilterCreation(isChecked ? FC_Enabled : FC_Disabled); });
-
     connect(ui->rb_ignore, &QRadioButton::toggled, this, &DialogDbCreation::updateFilterDisplay);
-
-    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogDbCreation::resetView);
-
     connect(ui->cb_editable_exts, &QCheckBox::toggled, this, [=](bool _chk) { ui->le_exts_list->setReadOnly(!_chk); });
     connect(ui->le_exts_list, &QLineEdit::textEdited, this, &DialogDbCreation::parseInputedExts);
 
@@ -83,6 +79,9 @@ void DialogDbCreation::connections()
 
     // settings
     connect(this, &DialogDbCreation::accepted, this, &DialogDbCreation::updateSettings);
+
+    // buttons
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogDbCreation::resetView);
 }
 
 void DialogDbCreation::setSettings(Settings *settings)
@@ -100,11 +99,13 @@ void DialogDbCreation::updateSettings()
     if (!settings_)
         return;
 
+    const QString _inpFileName = ui->inp_db_filename->text();
+    if (!_inpFileName.isEmpty())
+        settings_->dbPrefix = format::simplifiedChars(_inpFileName);
+
     settings_->isLongExtension = ui->rb_ext_long->isChecked();
     settings_->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
     settings_->dbFlagConst = ui->cb_flag_const->isChecked();
-    if (!ui->inp_db_filename->text().isEmpty())
-        settings_->dbPrefix = format::simplifiedChars(ui->inp_db_filename->text());
 
     // filter
     settings_->filter_editable_exts = ui->cb_editable_exts->isChecked();
@@ -196,7 +197,7 @@ void DialogDbCreation::updateDbFilename()
 {
     const QString _inpText = ui->inp_db_filename->text();
     const QString _prefix = _inpText.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(_inpText);
-    const QString _folderName = ui->cb_add_folder_name->isChecked() ? workDir_ : QString(); // QStringLiteral(u"@FolderName")
+    const QString &_folderName = ui->cb_add_folder_name->isChecked() ? workDir_ : QString(); // QStringLiteral(u"@FolderName")
     const QString _ext = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
     const QString _dbFileName = format::composeDbFileName(_prefix, _folderName, _ext);
     const QString _dbFilePath = paths::joinPath(workDir_, _dbFileName);

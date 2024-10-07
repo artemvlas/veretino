@@ -104,6 +104,16 @@ bool WidgetFileTypes::itemsContain(CheckState state) const
     return false;
 }
 
+bool WidgetFileTypes::hasChecked() const
+{
+    for (ItemFileType *_item : std::as_const(items_)) {
+        if ( _item->isChecked())
+            return true;
+    }
+
+    return false;
+}
+
 void WidgetFileTypes::showAllItems()
 {
     for (int i = 0; i < topLevelItemCount(); ++i) {
