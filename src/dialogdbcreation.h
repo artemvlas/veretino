@@ -38,7 +38,7 @@ private:
     void setFilterConfig();
     void restoreLastExts();
     void parseInputedExts();
-
+    void resetView();
     void updateLabelDbFilename();
     void setTotalInfo(const FileTypeList &exts);
     void setItemsVisibility(bool isTop10Checked);
@@ -61,7 +61,7 @@ private:
     IconProvider icons_;
     QString workDir_;
 
-    const QStringList filterPresetsList = { "Documents", "Pictures", "Music", "Videos", "Ignore Triflings" };
+    const QStringList sl_presets = { "Documents", "Pictures", "Music", "Videos", "Ignore Triflings" };
     const QStringList listPresetDocuments = { "odt", "ods", "pdf", "docx", "xlsx", "doc", "rtf", "txt" };
     const QStringList listPresetPictures = { "jpg", "jpeg", "png", "svg", "webp" };
     const QStringList listPresetMusic = { "flac", "wv", "ape", "oga", "ogg", "opus", "m4a", "mp3" };

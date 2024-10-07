@@ -53,7 +53,7 @@ void DialogDbCreation::connections()
 
     connect(ui->rb_ignore, &QRadioButton::toggled, this, &DialogDbCreation::updateFilterDisplay);
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogDbCreation::clearChecked);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogDbCreation::resetView);
 
     connect(ui->cb_editable_exts, &QCheckBox::toggled, this, [=](bool _chk) { ui->le_exts_list->setReadOnly(!_chk); });
     connect(ui->le_exts_list, &QLineEdit::textEdited, this, &DialogDbCreation::parseInputedExts);
@@ -314,8 +314,6 @@ void DialogDbCreation::updateViewMode()
     ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
     ui->cb_enable_filter->setChecked(mode_ == FC_Enabled);
 
-    // the isVisible() condition is used to prevent an unnecessary call when opening the Dialog with FC_Disabled mode
-    //if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
     setCheckboxesVisible(mode_ == FC_Enabled);
 
     if (mode_ == FC_Enabled)
@@ -330,8 +328,8 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
     connect(dispMenu, &QMenu::aboutToHide, dispMenu, &QMenu::deleteLater);
     connect(dispMenu, &QMenu::triggered, this, &DialogDbCreation::handlePresetClicked);
 
-    for (int i = 0; i < filterPresetsList.size(); ++i) {
-        QAction *action = new QAction(filterPresetsList.at(i), dispMenu);
+    for (int i = 0; i < sl_presets.size(); ++i) {
+        QAction *action = new QAction(sl_presets.at(i), dispMenu);
         dispMenu->addAction(action);
     }
 
@@ -345,9 +343,7 @@ void DialogDbCreation::handlePresetClicked(const QAction *_act)
         setFilterCreation(FC_Enabled);
     }
 
-    clearChecked();
-
-    const int _ind = filterPresetsList.indexOf(_act->text());
+    const int _ind = sl_presets.indexOf(_act->text());
 
     switch (_ind) {
     case 0:
@@ -374,6 +370,15 @@ void DialogDbCreation::handlePresetClicked(const QAction *_act)
         ui->rb_include->setChecked(true);
 
     // TMP !!!
+}
+
+void DialogDbCreation::resetView()
+{
+    clearChecked();
+    ui->inp_db_filename->clear();
+    ui->rb_ext_long->setChecked(true);
+    ui->cb_add_folder_name->setChecked(true);
+    ui->cb_flag_const->setChecked(false);
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)

@@ -43,7 +43,7 @@ public:
     FilterMode filter_mode = FilterMode::NotSet;
     QStringList filter_last_exts;
     bool filter_editable_exts = false;
-    bool filter_remember_exts = false;
+    bool filter_remember_exts = true;
     bool filter_ignore_sha = true;
     bool filter_ignore_db = true;
 
