@@ -51,7 +51,6 @@ public:
     void quickAction();
     void doWork();
     void processChecksumsNoFilter();
-    void processChecksumsPermFilter();
     void processChecksumsFiltered();
     void processFolderChecksums(const FilterRule &filter);
     void openJsonDatabase(const QString &filePath);

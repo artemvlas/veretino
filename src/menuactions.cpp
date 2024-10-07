@@ -68,7 +68,6 @@ void MenuActions::setActionsIcons()
     actionStop->setIcon(iconProvider.icon(Icons::ProcessStop));
     actionShowFolderContentsTypes->setIcon(iconProvider.icon(Icons::ChartPie));
     actionProcessChecksumsNoFilter->setIcon(iconProvider.icon(Icons::Folder));
-    actionProcessChecksumsPermFilter->setIcon(iconProvider.icon(Icons::Filter));
     actionProcessChecksumsCustomFilter->setIcon(iconProvider.icon(Icons::FolderSync));
     actionCheckFileByClipboardChecksum->setIcon(iconProvider.icon(Icons::Paste));
     actionProcessSha_toClipboard->setIcon(iconProvider.icon(Icons::Copy));

@@ -35,7 +35,6 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionStop, &QAction::triggered, this, &ModeSelector::stopProcess);
     connect(menuAct_->actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
     connect(menuAct_->actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
-    connect(menuAct_->actionProcessChecksumsPermFilter, &QAction::triggered, this, &ModeSelector::processChecksumsPermFilter);
     connect(menuAct_->actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processChecksumsFiltered);
     connect(menuAct_->actionCheckFileByClipboardChecksum, &QAction::triggered, this, &ModeSelector::checkFileByClipboardChecksum);
     connect(menuAct_->actionProcessSha1File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha1); });
@@ -539,14 +538,12 @@ void ModeSelector::processChecksumsFiltered()
 
 void ModeSelector::processChecksumsNoFilter()
 {
-    if (isSelectedCreateDb())
-        processFolderChecksums(FilterRule());
-}
-
-void ModeSelector::processChecksumsPermFilter()
-{
-    if (isSelectedCreateDb())
-        processFolderChecksums(settings_->filter);
+    if (isSelectedCreateDb()) {
+        FilterRule _filter;
+        _filter.ignoreDbFiles = settings_->filter_ignore_db;
+        _filter.ignoreShaFiles = settings_->filter_ignore_sha;
+        processFolderChecksums(_filter);
+    }
 }
 
 void ModeSelector::processFolderChecksums(const FilterRule &filter)
@@ -716,8 +713,6 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
             viewContextMenu->addSeparator();
 
             viewContextMenu->addAction(menuAct_->actionProcessChecksumsNoFilter);
-            if (settings_->filter.isFilterEnabled())
-                viewContextMenu->addAction(menuAct_->actionProcessChecksumsPermFilter);
             viewContextMenu->addAction(menuAct_->actionProcessChecksumsCustomFilter);
         }
         else if (isMode(File)) {

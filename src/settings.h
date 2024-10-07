@@ -28,7 +28,7 @@ public:
     void loadSettings();
 
     // variables
-    FilterRule filter;
+    //FilterRule filter;
     QStringList recentFiles;
     QString dbPrefix;
     bool restoreLastPathOnStartup = true;
@@ -39,6 +39,13 @@ public:
     bool excludeUnpermitted = true;
     bool dbFlagConst = false;
     bool considerDateModified = false;
+
+    FilterMode filter_mode = FilterMode::NotSet;
+    QStringList filter_last_exts;
+    bool filter_editable_exts = false;
+    bool filter_remember_exts = false;
+    bool filter_ignore_sha = true;
+    bool filter_ignore_db = true;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;
@@ -59,15 +66,17 @@ private:
     static const QString s_key_instantSaving;
     static const QString s_key_excludeUnPerm;
     static const QString s_key_considerDateModified;
-    static const QString s_key_filter_ignoreDbFiles;
-    static const QString s_key_filter_ignoreShaFiles;
-    static const QString s_key_filter_Mode;
-    static const QString s_key_filter_ExtList;
     static const QString s_key_history_lastFsPath;
     static const QString s_key_history_recentDbFiles;
     static const QString s_key_view_geometry;
     static const QString s_key_view_columnStateFs;
     static const QString s_key_view_columnStateDb;
+    static const QString s_key_filter_mode;
+    static const QString s_key_filter_last_exts;
+    static const QString s_key_filter_remember_exts;
+    static const QString s_key_filter_editable_exts;
+    static const QString s_key_filter_ignore_sha;
+    static const QString s_key_filter_ignore_db;
 
 signals:
     void algorithmChanged();

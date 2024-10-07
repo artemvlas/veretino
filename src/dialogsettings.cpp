@@ -74,10 +74,9 @@ void DialogSettings::loadSettings(const Settings &settings)
 
     updateLabelDatabaseFilename();
 
-    // Tab Filter
-    //setFilterRule(settings.filter);
-    ui->ignoreDbFiles->setChecked(settings.filter.ignoreDbFiles);
-    ui->ignoreShaFiles->setChecked(settings.filter.ignoreShaFiles);
+    // Tab Extra
+    ui->ignoreDbFiles->setChecked(settings.filter_ignore_db);
+    ui->ignoreShaFiles->setChecked(settings.filter_ignore_sha);
 }
 
 void DialogSettings::updateSettings()
@@ -106,13 +105,15 @@ void DialogSettings::updateSettings()
     settings_->dbFlagConst = ui->cbDbFlagConst->isChecked();
 
     // filters
-    settings_->filter.ignoreDbFiles = ui->ignoreDbFiles->isChecked();
-    settings_->filter.ignoreShaFiles = ui->ignoreShaFiles->isChecked();
+    settings_->filter_ignore_db = ui->ignoreDbFiles->isChecked();
+    settings_->filter_ignore_sha = ui->ignoreShaFiles->isChecked();
 }
 
 void DialogSettings::updateLabelDatabaseFilename()
 {
-    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
+    const QString _inpPrefix = ui->inputJsonFileNamePrefix->text();
+
+    QString prefix = _inpPrefix.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(_inpPrefix);
     QString folderName = ui->cbAddFolderName->isChecked() ? QStringLiteral(u"@FolderName") : QString();
     QString extension = defaults.dbFileExtension(ui->rbExtVerJson->isChecked());
 

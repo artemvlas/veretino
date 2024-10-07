@@ -68,6 +68,10 @@ void DialogDbCreation::setSettings(Settings *settings)
 {
     settings_ = settings;
     setDbConfig();
+    setFilterConfig();
+
+    if (settings_->filter_remember_exts)
+        restoreLastExts();
 }
 
 void DialogDbCreation::updateSettings()
@@ -82,6 +86,19 @@ void DialogDbCreation::updateSettings()
     settings_->dbFlagConst = ui->cb_flag_const->isChecked();
     if (!ui->inp_db_filename->text().isEmpty())
         settings_->dbPrefix = format::simplifiedChars(ui->inp_db_filename->text());
+
+    // filter
+    settings_->filter_editable_exts = ui->cb_editable_exts->isChecked();
+    settings_->filter_remember_exts = ui->cb_remember_exts->isChecked();
+
+    if (mode_ == FC_Enabled) {
+        settings_->filter_last_exts = types_->checkedExtensions();
+        settings_->filter_mode = ui->rb_include->isChecked() ? FilterMode::Include : FilterMode::Ignore;
+    }
+    else {
+        settings_->filter_last_exts = QStringList();
+        settings_->filter_mode = FilterMode::NotSet;
+    }
 }
 
 void DialogDbCreation::setDbConfig()
@@ -97,6 +114,37 @@ void DialogDbCreation::setDbConfig()
         ui->inp_db_filename->setText(settings_->dbPrefix);
 
     updateLabelDbFilename();
+}
+
+void DialogDbCreation::setFilterConfig()
+{
+    if (!settings_)
+        return;
+
+    ui->cb_editable_exts->setChecked(settings_->filter_editable_exts);
+    ui->cb_remember_exts->setChecked(settings_->filter_remember_exts);
+}
+
+void DialogDbCreation::restoreLastExts()
+{
+    if (!settings_
+        || settings_->filter_last_exts.isEmpty()
+        || settings_->filter_mode == FilterMode::NotSet)
+    {
+        return;
+    }
+
+    if (mode_ != FC_Enabled) {
+        setFilterCreation(FC_Enabled);
+    }
+
+    types_->setChecked(settings_->filter_last_exts);
+
+    if (settings_->filter_mode == FilterMode::Ignore)
+        ui->rb_ignore->setChecked(true);
+    else if (settings_->filter_mode == FilterMode::Include)
+        ui->rb_include->setChecked(true);
+
 }
 
 void DialogDbCreation::updateLabelDbFilename()

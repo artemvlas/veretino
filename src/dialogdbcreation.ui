@@ -208,9 +208,10 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QCheckBox" name="cb_remember_types">
+         <widget class="QCheckBox" name="cb_remember_exts">
           <property name="toolTip">
-           <string>The selected list of extensions will be checked next time, if there are any in the folder.</string>
+           <string>The selected list of extensions will be checked next time,
+if there are any in the folder.</string>
           </property>
           <property name="text">
            <string>Remember selected types</string>

@@ -49,7 +49,6 @@ public:
     QAction *actionStop = new QAction(QStringLiteral(u"Stop"), this);
     QAction *actionShowFolderContentsTypes = new QAction(QStringLiteral(u"Folder Contents"), this);
     QAction *actionProcessChecksumsNoFilter = new QAction(QStringLiteral(u"Calculate checksums [All Files]"), this);
-    QAction *actionProcessChecksumsPermFilter = new QAction(QStringLiteral(u"Calculate checksums [Permanent Filter]"), this);
     QAction *actionProcessChecksumsCustomFilter = new QAction(QStringLiteral(u"Calculate checksums"), this);
     QAction *actionCheckFileByClipboardChecksum = new QAction(QStringLiteral(u"Check the file by checksum: "), this);
     QAction *actionProcessSha_toClipboard = new QAction(QStringLiteral(u"Copy Checksum"), this);

@@ -18,15 +18,21 @@ const QString Settings::s_key_dbFlagConst = "dbFlagConst";
 const QString Settings::s_key_instantSaving = "instantSaving";
 const QString Settings::s_key_excludeUnPerm = "excludeUnPerm";
 const QString Settings::s_key_considerDateModified = "considerDateModified";
-const QString Settings::s_key_filter_ignoreDbFiles = "filter/ignoreDbFiles";
-const QString Settings::s_key_filter_ignoreShaFiles = "filter/ignoreShaFiles";
-const QString Settings::s_key_filter_Mode = "filter/filterMode";
-const QString Settings::s_key_filter_ExtList = "filter/filterExtList";
 const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
 const QString Settings::s_key_history_recentDbFiles = "history/recentDbFiles";
+
+// view
 const QString Settings::s_key_view_geometry = "view/geometry";
 const QString Settings::s_key_view_columnStateFs = "view/columnStateFs";
 const QString Settings::s_key_view_columnStateDb = "view/columnStateDb";
+
+// filter
+const QString Settings::s_key_filter_mode = "filter/mode";
+const QString Settings::s_key_filter_last_exts = "filter/last_exts";
+const QString Settings::s_key_filter_ignore_db = "filter/ignore_db";
+const QString Settings::s_key_filter_ignore_sha = "filter/ignore_sha";
+const QString Settings::s_key_filter_remember_exts = "filter/remember_exts";
+const QString Settings::s_key_filter_editable_exts = "filter/editable_exts";
 
 Settings::Settings(QObject *parent)
     : QObject{parent}
@@ -95,11 +101,13 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_excludeUnPerm, excludeUnpermitted);
     storedSettings.setValue(s_key_considerDateModified, considerDateModified);
 
-    // FilterRule
-    storedSettings.setValue(s_key_filter_ignoreDbFiles, filter.ignoreDbFiles);
-    storedSettings.setValue(s_key_filter_ignoreShaFiles, filter.ignoreShaFiles);
-    storedSettings.setValue(s_key_filter_Mode, filter.mode());
-    storedSettings.setValue(s_key_filter_ExtList, filter.extensionList());
+    // filter
+    storedSettings.setValue(s_key_filter_ignore_db, filter_ignore_db);
+    storedSettings.setValue(s_key_filter_ignore_sha, filter_ignore_sha);
+    storedSettings.setValue(s_key_filter_mode, filter_mode);
+    storedSettings.setValue(s_key_filter_last_exts, filter_last_exts);
+    storedSettings.setValue(s_key_filter_editable_exts, filter_editable_exts);
+    storedSettings.setValue(s_key_filter_remember_exts, filter_remember_exts);
 
     // recent files
     storedSettings.setValue(s_key_history_recentDbFiles, recentFiles);
@@ -132,11 +140,13 @@ void Settings::loadSettings()
     excludeUnpermitted = storedSettings.value(s_key_excludeUnPerm, defaults.excludeUnpermitted).toBool();
     considerDateModified = storedSettings.value(s_key_considerDateModified, defaults.considerDateModified).toBool();
 
-    // FilterRule
-    filter.setFilter(static_cast<FilterRule::FilterMode>(storedSettings.value(s_key_filter_Mode, FilterRule::NotSet).toInt()),
-                                                            storedSettings.value(s_key_filter_ExtList).toStringList());
-    filter.ignoreDbFiles = storedSettings.value(s_key_filter_ignoreDbFiles, defaults.filter.ignoreDbFiles).toBool();
-    filter.ignoreShaFiles = storedSettings.value(s_key_filter_ignoreShaFiles, defaults.filter.ignoreShaFiles).toBool();
+    // filter
+    filter_mode = static_cast<FilterRule::FilterMode>(storedSettings.value(s_key_filter_mode, FilterRule::NotSet).toInt());
+    filter_last_exts = storedSettings.value(s_key_filter_last_exts).toStringList();
+    filter_editable_exts = storedSettings.value(s_key_filter_editable_exts, defaults.filter_editable_exts).toBool();
+    filter_remember_exts = storedSettings.value(s_key_filter_remember_exts, defaults.filter_remember_exts).toBool();
+    filter_ignore_db = storedSettings.value(s_key_filter_ignore_db, defaults.filter_ignore_db).toBool();
+    filter_ignore_sha = storedSettings.value(s_key_filter_ignore_sha, defaults.filter_ignore_db).toBool();
 
     // recent files
     recentFiles = storedSettings.value(s_key_history_recentDbFiles).toStringList();

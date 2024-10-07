@@ -33,10 +33,11 @@ public:
 private:
     Ui::DialogDbCreation *ui;
 
-    void setDbConfig();
     void connections();
+    void setDbConfig();
+    void setFilterConfig();
+    void restoreLastExts();
     void updateLabelDbFilename();
-
     void setTotalInfo(const FileTypeList &exts);
     void setItemsVisibility(bool isTop10Checked);
     void setCheckboxesVisible(bool visible);
