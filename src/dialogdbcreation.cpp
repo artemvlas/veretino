@@ -5,6 +5,24 @@
 #include <QDebug>
 #include <QMenu>
 
+const QMap<QString, QStringList> DialogDbCreation::_presets = {
+    { QStringLiteral(u"Documents"), { QStringLiteral(u"odt"), QStringLiteral(u"ods"), QStringLiteral(u"pdf"), QStringLiteral(u"docx"),
+                                      QStringLiteral(u"xlsx"), QStringLiteral(u"doc"), QStringLiteral(u"rtf"), QStringLiteral(u"txt"),
+                                      QStringLiteral(u"epub"), QStringLiteral(u"fb2"), QStringLiteral(u"djvu") }},
+
+    { QStringLiteral(u"Pictures"), { QStringLiteral(u"jpg"), QStringLiteral(u"jpeg"), QStringLiteral(u"png"), QStringLiteral(u"gif"),
+                                     QStringLiteral(u"svg"), QStringLiteral(u"webp"), QStringLiteral(u"raw"), QStringLiteral(u"psd") }},
+
+    { QStringLiteral(u"Music"), { QStringLiteral(u"flac"), QStringLiteral(u"wv"), QStringLiteral(u"ape"), QStringLiteral(u"oga"),
+                                  QStringLiteral(u"ogg"), QStringLiteral(u"opus"), QStringLiteral(u"m4a"), QStringLiteral(u"mp3"),
+                                  QStringLiteral(u"wav") }},
+
+    { QStringLiteral(u"Videos"), { QStringLiteral(u"mkv"), QStringLiteral(u"webm"), QStringLiteral(u"mp4"),
+                                   QStringLiteral(u"m4v"), QStringLiteral(u"avi") }},
+
+    { QStringLiteral(u"! Triflings"), { QStringLiteral(u"log"), QStringLiteral(u"cue"), QStringLiteral(u"info"), QStringLiteral(u"txt") }}
+};
+
 DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDbCreation)
@@ -19,9 +37,6 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
     types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
     types_->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
-    //QString folderName = paths::shortenPath(folderPath);
-    //ui->labelFolderName->setText(folderName);
-    //ui->labelFolderName->setToolTip(folderPath);
     ui->cb_top10->setVisible(extList.size() > 15);
 
     setTotalInfo(extList);
@@ -29,7 +44,7 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
     types_->setItems(extList);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(icons_.icon(FileStatus::Calculating));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Continue");
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(QStringLiteral(u"Continue"));
 
     updateViewMode();
 }
@@ -81,8 +96,6 @@ void DialogDbCreation::updateSettings()
 {
     if (!settings_)
         return;
-
-    qDebug() << "DialogDbCreation::updateSettings()";
 
     settings_->isLongExtension = ui->rb_ext_long->isChecked();
     settings_->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
@@ -328,9 +341,10 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
     connect(dispMenu, &QMenu::aboutToHide, dispMenu, &QMenu::deleteLater);
     connect(dispMenu, &QMenu::triggered, this, &DialogDbCreation::handlePresetClicked);
 
-    for (int i = 0; i < sl_presets.size(); ++i) {
-        QAction *action = new QAction(sl_presets.at(i), dispMenu);
-        dispMenu->addAction(action);
+    QMap<QString, QStringList>::const_iterator it;
+    for (it = _presets.constBegin(); it != _presets.constEnd(); ++it) {
+        QAction *_act = new QAction(it.key(), dispMenu);
+        dispMenu->addAction(_act);
     }
 
     dispMenu->exec(types_->mapToGlobal(point));
@@ -338,38 +352,15 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
 
 void DialogDbCreation::handlePresetClicked(const QAction *_act)
 {
-    // TMP !!!
     if (mode_ != FC_Enabled) {
         setFilterCreation(FC_Enabled);
     }
 
-    const int _ind = sl_presets.indexOf(_act->text());
+    types_->setChecked(_presets.value(_act->text()));
 
-    switch (_ind) {
-    case 0:
-        types_->setChecked(listPresetDocuments);
-        break;
-    case 1:
-        types_->setChecked(listPresetPictures);
-        break;
-    case 2:
-        types_->setChecked(listPresetMusic);
-        break;
-    case 3:
-        types_->setChecked(listPresetVideos);
-        break;
-    case 4:
-        types_->setChecked(listPresetIgnoreTriflings);
-        break;
-    default: break;
-    }
-
-    if (_ind == 4)
-        ui->rb_ignore->setChecked(true);
-    else if (_ind >= 0 && _ind < 4)
-        ui->rb_include->setChecked(true);
-
-    // TMP !!!
+    QRadioButton *_rb = _act->text().startsWith('!') ? ui->rb_ignore
+                                                     : ui->rb_include;
+    _rb->setChecked(true);
 }
 
 void DialogDbCreation::resetView()
@@ -403,30 +394,3 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
 
     QDialog::keyPressEvent(event);
 }
-
-// moved from Settings
-/*
-enum FilterPreset { PresetCustom, PresetDocuments, PresetPictures, PresetMusic, PresetVideos, PresetIgnoreTriflings };
-
-void DialogSettings::cleanUpExtList()
-{
-    QStringList _exts = extensionsList();
-    if (!_exts.isEmpty()) {
-        QStringList list;
-        if (!ui->rbInclude->isChecked()) {
-            if (ui->ignoreShaFiles->isChecked())
-                list.append(Lit::sl_digest_exts); // { "sha1", "sha256", "sha512" }
-            if (ui->ignoreDbFiles->isChecked())
-                list.append(Lit::sl_db_exts); // { "ver.json", "ver" }
-        }
-
-        if (!list.isEmpty()) {
-            foreach (const QString &str, list) {
-                _exts.removeOne(str);
-            }
-            ui->inputExtensions->setText(_exts.join(','));
-        }
-    }
-}
-
-*/
