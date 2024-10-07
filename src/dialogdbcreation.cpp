@@ -45,7 +45,9 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
 
     ui->tabWidget->setTabIcon(0, _icons.icon(Icons::Filter));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(_icons.icon(FileStatus::Calculating));
-    //ui->buttonBox->button(QDialogButtonBox::Ok)->setText(QStringLiteral(u"Continue"));
+
+    ui->cb_flag_const->setToolTip(QStringLiteral(u"The database will contain a flag\n"
+                                                 "to prevent changes from being made."));
 
     updateViewMode();
 }
@@ -116,11 +118,6 @@ void DialogDbCreation::updateSettings()
         settings_->filter_last_exts = QStringList();
         settings_->filter_mode = FilterMode::NotSet;
     }
-}
-
-void DialogDbCreation::setExistingDbs(const QStringList &existing)
-{
-    existingDbs_ = existing;
 }
 
 void DialogDbCreation::setDbConfig()
