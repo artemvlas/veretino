@@ -187,7 +187,38 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3"/>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>218</width>
+         <height>93</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Filtering</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="cb_editable_exts">
+          <property name="text">
+           <string>Editable input of types (suffixes)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="cb_remember_types">
+          <property name="toolTip">
+           <string>The selected list of extensions will be checked next time, if there are any in the folder.</string>
+          </property>
+          <property name="text">
+           <string>Remember selected types</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </item>

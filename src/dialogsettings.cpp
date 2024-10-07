@@ -64,9 +64,7 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
 
     // Tab Database
-    if (settings.dbPrefix == defaults.dbPrefix)
-        ui->inputJsonFileNamePrefix->clear();
-    else
+    if (!settings.dbPrefix.isEmpty() && settings.dbPrefix != Lit::s_db_prefix)
         ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
 
     ui->cbAddFolderName->setChecked(settings.addWorkDirToFilename);
@@ -98,8 +96,9 @@ void DialogSettings::updateSettings()
     settings_->considerDateModified = ui->cbConsiderDateModified->isChecked();
 
     // database
-    settings_->dbPrefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix
-                                                                        : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
+    const QString _inpPrefix = ui->inputJsonFileNamePrefix->text();
+    if (!_inpPrefix.isEmpty())
+        settings_->dbPrefix = format::simplifiedChars(_inpPrefix);
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
@@ -113,7 +112,7 @@ void DialogSettings::updateSettings()
 
 void DialogSettings::updateLabelDatabaseFilename()
 {
-    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? defaults.dbPrefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
+    QString prefix = ui->inputJsonFileNamePrefix->text().isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(ui->inputJsonFileNamePrefix->text());
     QString folderName = ui->cbAddFolderName->isChecked() ? QStringLiteral(u"@FolderName") : QString();
     QString extension = defaults.dbFileExtension(ui->rbExtVerJson->isChecked());
 

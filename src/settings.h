@@ -19,9 +19,9 @@ public:
 
     void setAlgorithm(QCryptographicHash::Algorithm algo);
     QCryptographicHash::Algorithm algorithm() const;
-    QString dbFileExtension() const;
     void addRecentFile(const QString &filePath);
     void clearRecentFiles();
+    QString dbFileExtension() const;
     static QString dbFileExtension(bool isLong);
 
     void saveSettings();
@@ -30,7 +30,7 @@ public:
     // variables
     FilterRule filter;
     QStringList recentFiles;
-    QString dbPrefix = "checksums";
+    QString dbPrefix;
     bool restoreLastPathOnStartup = true;
     bool addWorkDirToFilename = true;
     bool isLongExtension = true;

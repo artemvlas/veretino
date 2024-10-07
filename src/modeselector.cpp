@@ -522,7 +522,8 @@ void ModeSelector::_makeDbContentsList()
 QString ModeSelector::composeDbFilePath()
 {
     QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem) : QString();
-    QString databaseFileName = format::composeDbFileName(settings_->dbPrefix, folderName, settings_->dbFileExtension());
+    QString _prefix = settings_->dbPrefix.isEmpty() ? Lit::s_db_prefix : settings_->dbPrefix;
+    QString databaseFileName = format::composeDbFileName(_prefix, folderName, settings_->dbFileExtension());
 
     return paths::joinPath(view_->curPathFileSystem, databaseFileName);
 }

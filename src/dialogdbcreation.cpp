@@ -80,8 +80,8 @@ void DialogDbCreation::updateSettings()
     settings_->isLongExtension = ui->rb_ext_long->isChecked();
     settings_->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
     settings_->dbFlagConst = ui->cb_flag_const->isChecked();
-    settings_->dbPrefix = ui->inp_db_filename->text().isEmpty() ? Lit::s_db_prefix
-                                                                : format::simplifiedChars(ui->inp_db_filename->text());
+    if (!ui->inp_db_filename->text().isEmpty())
+        settings_->dbPrefix = format::simplifiedChars(ui->inp_db_filename->text());
 }
 
 void DialogDbCreation::setDbConfig()
@@ -93,7 +93,7 @@ void DialogDbCreation::setDbConfig()
     ui->cb_add_folder_name->setChecked(settings_->addWorkDirToFilename);
     ui->cb_flag_const->setChecked(settings_->dbFlagConst);
 
-    if (settings_->dbPrefix != Lit::s_db_prefix)
+    if (!settings_->dbPrefix.isEmpty() && (settings_->dbPrefix != Lit::s_db_prefix))
         ui->inp_db_filename->setText(settings_->dbPrefix);
 
     updateLabelDbFilename();
@@ -212,7 +212,7 @@ void DialogDbCreation::updateLabelTotalFiltered()
     }
     else {
         //ui->l_total_filtered->clear();
-        ui->l_total_filtered->setText("No filter");
+        ui->l_total_filtered->setText(QStringLiteral(u"No filter"));
     }
 }
 

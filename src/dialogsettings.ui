@@ -223,29 +223,38 @@ to prevent changes from being made.</string>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabFilter">
+     <widget class="QWidget" name="tabExtra">
       <attribute name="title">
-       <string>Filter</string>
+       <string>Extra</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="ignoreDbFiles">
-         <property name="toolTip">
-          <string>Exclude *.ver and *.ver.json files from the filelist</string>
+       <item row="0" column="0" colspan="2">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>With no filter</string>
          </property>
-         <property name="text">
-          <string>Ignore Veretino DB files</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2" colspan="2">
-        <widget class="QCheckBox" name="ignoreShaFiles">
-         <property name="toolTip">
-          <string>Exclude digest files from the list</string>
-         </property>
-         <property name="text">
-          <string>Ignore *.sha1/256/512 files</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="ignoreDbFiles">
+            <property name="toolTip">
+             <string>Exclude *.ver and *.ver.json files from the filelist</string>
+            </property>
+            <property name="text">
+             <string>Ignore Veretino DB files</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="ignoreShaFiles">
+            <property name="toolTip">
+             <string>Exclude digest files from the list</string>
+            </property>
+            <property name="text">
+             <string>Ignore *.sha1/256/512 files</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
