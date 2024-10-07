@@ -214,15 +214,8 @@ void MainWindow::showDialogContentsList(const QString &folderName, const FileTyp
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
-        dialog.setFilterCreation(DialogContentsList::FC_Hidden);
+        dialog.setWindowIcon(modeSelect->iconProvider.iconFolder());
         dialog.exec();
-        /*if (dialog.exec()) {
-            FilterRule filter = dialog.resultFilter();
-            if (filter.isFilterEnabled()) {
-                settings_->filter = filter;
-                updatePermanentStatus();
-            }
-        }*/
     }
 }
 
@@ -245,8 +238,6 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     dialog.setSettings(settings_);
     dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
     dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
-    //dialog.setFilterCreation(DialogDbCreation::FC_Enabled);
-    //FilterRule filter;
 
     if (!dialog.exec()) {
         qDebug() << "MainWindow::showDialogDbCreation >> Rejected";

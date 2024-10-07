@@ -106,8 +106,9 @@ bool WidgetFileTypes::itemsContain(CheckState state) const
 
 void WidgetFileTypes::showAllItems()
 {
-    for (int i = 0; i < topLevelItemCount(); ++i)
+    for (int i = 0; i < topLevelItemCount(); ++i) {
         topLevelItem(i)->setHidden(false);
+    }
 }
 
 void WidgetFileTypes::hideExtra(int nomore)
@@ -126,16 +127,17 @@ void WidgetFileTypes::hideExtra(int nomore)
 
 NumSize WidgetFileTypes::numSizeVisible() const
 {
-    NumSize _nums;
+    NumSize _res;
 
     for (int i = 0; i < topLevelItemCount(); ++i) {
         const ItemFileType *_item = static_cast<ItemFileType*>(topLevelItem(i));
         if (!_item->isHidden()) {
-            _nums.add(_item->filesNumber(), _item->filesSize());
+            _res.add(_item->filesNumber(),
+                     _item->filesSize());
         }
     }
 
-    return _nums;
+    return _res;
 }
 
 NumSize WidgetFileTypes::numSize(CheckState chk_state) const

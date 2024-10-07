@@ -12,22 +12,18 @@
 DialogContentsList::DialogContentsList(const QString &folderPath, const FileTypeList &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogContentsList)
-    , extList_(extList)
 {
     ui->setupUi(this);
-    icons_.setTheme(palette());
-    setWindowIcon(icons_.iconFolder());
-    ui->treeWidget->setColumnWidth(ItemFileType::ColumnType, 130);
-    ui->treeWidget->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
-    ui->treeWidget->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
+    ui->types_->setColumnWidth(ItemFileType::ColumnType, 130);
+    ui->types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
+    ui->types_->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
-    QString folderName = paths::shortenPath(folderPath);
-    ui->labelFolderName->setText(folderName);
+    ui->labelFolderName->setText(paths::shortenPath(folderPath));
     ui->labelFolderName->setToolTip(folderPath);
     ui->chbTop10->setVisible(extList.size() > 15);
 
-    setTotalInfo();
-    makeItemsList(extList);
+    setTotalInfo(extList);
+    ui->types_->setItems(extList);
     connections();
 }
 
@@ -38,305 +34,27 @@ DialogContentsList::~DialogContentsList()
 
 void DialogContentsList::connections()
 {
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DialogContentsList::accept);
-    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &DialogContentsList::reject);
-
     connect(ui->chbTop10, &QCheckBox::toggled, this, &DialogContentsList::setItemsVisibility);
-
-    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &DialogContentsList::updateFilterDisplay);
-    connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &DialogContentsList::activateItem);
-
-    connect(ui->chbCreateFilter, &QCheckBox::toggled, this,
-            [=](bool isChecked){ setFilterCreation(isChecked ? FC_Enabled : FC_Disabled); });
-
-    connect(ui->rbIgnore, &QRadioButton::toggled, this, &DialogContentsList::updateFilterDisplay);
-
-    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogContentsList::clearChecked);
-
-    connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(ui->labelFolderName->toolTip()); });
+    connect(ui->labelFolderName, &ClickableLabel::doubleClicked, this,
+            [=]{ paths::browsePath(ui->labelFolderName->toolTip()); });
 }
 
-void DialogContentsList::makeItemsList(const FileTypeList &extList)
-{   
-    FileTypeList::const_iterator it;
-    for (it = extList.constBegin(); it != extList.constEnd(); ++it) {
-        QIcon icon;
-        const QString _ext = it.key();
-        const NumSize _nums = it.value();
-
-        if (_ext == Files::strVeretinoDb)
-            icon = icons_.icon(Icons::Database);
-        else if (_ext == Files::strShaFiles)
-            icon = icons_.icon(Icons::HashFile);
-        else if (_ext == Files::strNoPerm)
-            icon = icons_.icon(FileStatus::UnPermitted);
-        else
-            icon = icons_.icon(QStringLiteral(u"file.") + _ext);
-
-        ItemFileType *item = new ItemFileType(ui->treeWidget);
-        item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
-        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, _nums.num);
-        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(_nums.size));
-        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, _nums.size);
-        item->setIcon(ItemFileType::ColumnType, icon);
-        items_.append(item);
-    }
+void DialogContentsList::setTotalInfo(const FileTypeList &extList)
+{
+    ui->labelTotal->setText(QString("Total: %1 types, %2 ")
+                                .arg(extList.size())
+                                .arg(format::filesNumSize(Files::totalListed(extList))));
 }
 
 void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 {
     if (!isTop10Checked) {
+        ui->types_->showAllItems();
         ui->chbTop10->setText(QStringLiteral(u"Top10"));
-
-        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
-            ui->treeWidget->topLevelItem(i)->setHidden(false);
     }
     else {
-        if (ui->treeWidget->sortColumn() == ItemFileType::ColumnFilesNumber)
-            ui->treeWidget->sortItems(ItemFileType::ColumnFilesNumber, Qt::DescendingOrder);
-        else
-            ui->treeWidget->sortItems(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
-
-        int top10FilesNumber = 0; // total number of files in the Top10 list
-        qint64 top10FilesSize = 0; // total size of these files
-
-        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i) {
-            QTreeWidgetItem *item = ui->treeWidget->topLevelItem(i);
-            item->setHidden(i > 9);
-            if (!item->isHidden()) {
-                top10FilesNumber += item->data(ItemFileType::ColumnFilesNumber, Qt::DisplayRole).toInt();
-                top10FilesSize += item->data(ItemFileType::ColumnTotalSize, Qt::UserRole).toLongLong();
-            }
-        }
-
+        ui->types_->hideExtra();
         ui->chbTop10->setText(QStringLiteral(u"Top10: ")
-                              + format::filesNumSize(top10FilesNumber, top10FilesSize));
+                              + format::filesNumSize(ui->types_->numSizeVisible()));
     }
-
-    updateFilterDisplay();
-}
-
-void DialogContentsList::setTotalInfo()
-{
-   /* qint64 totalSize = 0;
-    int totalFilesNumber = 0;
-
-    for (int i = 0; i < extList_.size(); ++i) {
-        totalSize += extList_.at(i).filesSize;
-        totalFilesNumber += extList_.at(i).filesNumber;
-    }*/
-
-    ui->labelTotal->setText(QString("Total: %1 types, %2 ")
-                                .arg(extList_.size())
-                                .arg(format::filesNumSize(Files::totalListed(extList_))));
-}
-
-void DialogContentsList::setCheckboxesVisible(bool visible)
-{
-    static const QStringList excluded { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
-
-    ui->treeWidget->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
-
-    for (ItemFileType *item : std::as_const(items_)) {
-        item->setCheckBoxVisible(visible
-                                 && !excluded.contains(item->extension()));
-    }
-
-    ui->treeWidget->blockSignals(false);
-    updateFilterDisplay();
-
-    // qDebug() << Q_FUNC_INFO;
-}
-
-void DialogContentsList::clearChecked()
-{
-    if (mode_ == FC_Enabled) {
-        ui->rbIgnore->setChecked(true);
-        setCheckboxesVisible(true);
-    }
-}
-
-void DialogContentsList::activateItem(QTreeWidgetItem *t_item)
-{
-    if (mode_ == FC_Hidden)
-        return;
-
-    if (mode_ == FC_Disabled) {
-        setFilterCreation(FC_Enabled);
-        return;
-    }
-
-    ItemFileType *item = static_cast<ItemFileType*>(t_item);
-    item->toggle();
-}
-
-bool DialogContentsList::isPassedChecked(const ItemFileType *item) const
-{
-    // allow only visible_checked
-    return !item->isHidden() && item->isChecked();
-}
-
-bool DialogContentsList::isPassedUnChecked(const ItemFileType *item) const
-{
-    static const QStringList unfilterable { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
-
-    // allow all except visible_checked and Db-Sha
-    return (!item->isChecked() || item->isHidden())
-           && !unfilterable.contains(item->extension());
-}
-
-bool DialogContentsList::isPassed(CheckState state, const ItemFileType *item) const
-{
-    return (state == Checked && isPassedChecked(item))
-           || (state == UnChecked && isPassedUnChecked(item));
-}
-
-bool DialogContentsList::itemsContain(CheckState state) const
-{
-    if (mode_ != FC_Enabled)
-        return false;
-
-    for (const ItemFileType *item : std::as_const(items_)) {
-        if (isPassed(state, item)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-QList<ItemFileType *> DialogContentsList::items(CheckState state) const
-{
-    QList<ItemFileType *> resultList;
-
-    if (mode_ != FC_Enabled)
-        return resultList;
-
-    for (ItemFileType *item : std::as_const(items_)) {
-        if (isPassed(state, item))
-            resultList.append(item);
-    }
-
-    return resultList;
-}
-
-QStringList DialogContentsList::checkedExtensions() const
-{
-    QStringList extensions;
-    const QList<ItemFileType *> checked_items = items(Checked);
-
-    for (const ItemFileType *item : checked_items) {
-        extensions.append(item->extension());
-    }
-
-    return extensions;
-}
-
-void DialogContentsList::updateFilterDisplay()
-{
-    updateLabelFilterExtensions();
-    updateLabelTotalFiltered();
-
-    bool isFiltered = ui->rbInclude->isChecked() ? itemsContain(Checked)
-                                                 : itemsContain(Checked) && itemsContain(UnChecked);
-
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isFiltered);
-}
-
-void DialogContentsList::updateLabelFilterExtensions()
-{
-    if (mode_ != FC_Enabled) {
-        ui->labelFilterExtensions->clear();
-        return;
-    }
-
-    ui->labelFilterExtensions->setStyleSheet(format::coloredText(ui->rbIgnore->isChecked()));
-    ui->labelFilterExtensions->setText(checkedExtensions().join(", "));
-}
-
-void DialogContentsList::updateLabelTotalFiltered()
-{
-    if (mode_ != FC_Enabled) {
-        ui->labelTotalFiltered->clear();
-        return;
-    }
-
-    // ? Include only visible_checked : Include all except visible_checked and Db-Sha
-    const QList<ItemFileType *> itemList = items(ui->rbInclude->isChecked() ? Checked : UnChecked);
-
-    int filteredFilesNumber = 0;
-    qint64 filteredFilesSize = 0;
-
-    for (const ItemFileType *item : itemList) {
-        filteredFilesNumber += item->filesNumber();
-        filteredFilesSize += item->filesSize();
-    }
-
-    if (itemsContain(Checked)) {
-        ui->labelTotalFiltered->setText(QStringLiteral(u"Filtered: ")
-                                        + format::filesNumSize(filteredFilesNumber, filteredFilesSize));
-    }
-    else
-        ui->labelTotalFiltered->clear();
-}
-
-FilterRule DialogContentsList::resultFilter()
-{
-    FilterRule::FilterMode filterType = ui->rbIgnore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-    return FilterRule(filterType, checkedExtensions());
-}
-
-void DialogContentsList::setFilterCreation(FilterCreation mode)
-{
-    if (mode_ != mode) {
-        mode_ = mode;
-        updateViewMode();
-    }
-}
-
-void DialogContentsList::updateViewMode()
-{
-    ui->rbIgnore->setVisible(mode_ == FC_Enabled);
-    ui->rbInclude->setVisible(mode_ == FC_Enabled);
-    ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
-    ui->labelTotalFiltered->setVisible(mode_ == FC_Enabled);
-    ui->buttonBox->setVisible(mode_ == FC_Enabled);
-
-    ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
-    ui->chbCreateFilter->setChecked(mode_ == FC_Enabled);
-
-    // the isVisible() condition is used to prevent an unnecessary call when opening the Dialog with FC_Disabled mode
-    if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
-        setCheckboxesVisible(mode_ == FC_Enabled);
-
-    if (mode_ == FC_Enabled)
-        ui->rbIgnore->setChecked(true);
-
-    // updateFilterDisplay();
-}
-
-void DialogContentsList::showEvent(QShowEvent *event)
-{
-    if (mode_ == FC_Hidden) // if the mode_ was set specifically by ::setFilterCreation(mode_ != FC_Hidden),
-        updateViewMode(); // this function was already executed
-
-    QDialog::showEvent(event);
-}
-
-void DialogContentsList::keyPressEvent(QKeyEvent* event)
-{
-    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-        activateItem(ui->treeWidget->currentItem());
-        return;
-    }
-
-    if (event->key() == Qt::Key_Escape && mode_ == FC_Enabled) {
-        if (itemsContain(Checked))
-            clearChecked();
-        else
-            setFilterCreation(FC_Disabled);
-        return;
-    }
-
-    QDialog::keyPressEvent(event);
 }

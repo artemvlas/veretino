@@ -30,8 +30,8 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
 {
     ui->setupUi(this);
 
-    icons_.setTheme(palette());
-    setWindowIcon(icons_.iconFolder());
+    IconProvider _icons(palette());
+    setWindowIcon(_icons.iconFolder());
     types_ = ui->treeWidget;
     types_->setColumnWidth(ItemFileType::ColumnType, 130);
     types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
@@ -43,7 +43,8 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
     connections();
     types_->setItems(extList);
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(icons_.icon(FileStatus::Calculating));
+    ui->tabWidget->setTabIcon(0, _icons.icon(Icons::Filter));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(_icons.icon(FileStatus::Calculating));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(QStringLiteral(u"Continue"));
 
     updateViewMode();
@@ -301,7 +302,6 @@ void DialogDbCreation::updateLabelTotalFiltered()
                                         + format::filesNumSize(types_->numSize(_checkState)));
     }
     else {
-        //ui->l_total_filtered->clear();
         ui->l_total_filtered->setText(QStringLiteral(u"No filter"));
     }
 }

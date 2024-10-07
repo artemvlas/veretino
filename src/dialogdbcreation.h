@@ -55,22 +55,14 @@ private:
     QStringList extensionsList() const;
 
     FilterCreation mode_ = FC_Disabled;
-
     WidgetFileTypes *types_ = nullptr;
     Settings *settings_ = nullptr;
-    IconProvider icons_;
     QString workDir_;
 
-    /*const QStringList sl_presets = { "Documents", "Pictures", "Music", "Videos", "Ignore Triflings" };
-    const QStringList listPresetDocuments = { "odt", "ods", "pdf", "docx", "xlsx", "doc", "rtf", "txt" };
-    const QStringList listPresetPictures = { "jpg", "jpeg", "png", "svg", "webp" };
-    const QStringList listPresetMusic = { "flac", "wv", "ape", "oga", "ogg", "opus", "m4a", "mp3" };
-    const QStringList listPresetVideos = { "mkv", "webm", "mp4", "m4v", "avi" };
-    const QStringList listPresetIgnoreTriflings = { "log", "cue", "txt" };*/
     static const QMap<QString, QStringList> _presets;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
-};
+}; // class DialogDbCreation
 
 #endif // DIALOGDBCREATION_H
