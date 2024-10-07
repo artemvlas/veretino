@@ -55,6 +55,9 @@ void DialogDbCreation::connections()
 
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &DialogDbCreation::clearChecked);
 
+    connect(ui->cb_editable_exts, &QCheckBox::toggled, this, [=](bool _chk) { ui->le_exts_list->setReadOnly(!_chk); });
+    connect(ui->le_exts_list, &QLineEdit::textEdited, this, &DialogDbCreation::parseInputedExts);
+
     // filename
     connect(ui->rb_ext_short, &QRadioButton::toggled, this, &DialogDbCreation::updateLabelDbFilename);
     connect(ui->cb_add_folder_name, &QCheckBox::toggled, this, &DialogDbCreation::updateLabelDbFilename);
@@ -144,7 +147,33 @@ void DialogDbCreation::restoreLastExts()
         ui->rb_ignore->setChecked(true);
     else if (settings_->filter_mode == FilterMode::Include)
         ui->rb_include->setChecked(true);
+}
 
+void DialogDbCreation::parseInputedExts()
+{
+    if (ui->le_exts_list->isReadOnly())
+        return;
+
+    const QStringList _exts = extensionsList();
+    types_->setChecked(_exts);
+}
+
+QStringList DialogDbCreation::extensionsList() const
+{
+    if (ui->le_exts_list->text().isEmpty())
+        return QStringList();
+
+    QString _inputed = ui->le_exts_list->text().toLower();
+    _inputed.remove('*');
+    _inputed.replace(" ."," ");
+    _inputed.replace(' ',',');
+
+    if (_inputed.startsWith('.'))
+        _inputed.remove(0, 1);
+
+    QStringList _exts = _inputed.split(',', Qt::SkipEmptyParts);
+    _exts.removeDuplicates();
+    return _exts;
 }
 
 void DialogDbCreation::updateLabelDbFilename()
@@ -352,12 +381,17 @@ void DialogDbCreation::handlePresetClicked(const QAction *_act)
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+    if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+        && types_->hasFocus())
+    {
         activateItem(types_->currentItem());
         return;
     }
 
-    if (event->key() == Qt::Key_Escape && mode_ == FC_Enabled) {
+    if (event->key() == Qt::Key_Escape
+        && mode_ == FC_Enabled
+        && ui->tabWidget->currentIndex() == 0)
+    {
         if (itemsContain(WidgetFileTypes::Checked))
             clearChecked();
         else

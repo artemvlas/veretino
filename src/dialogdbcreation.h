@@ -37,6 +37,8 @@ private:
     void setDbConfig();
     void setFilterConfig();
     void restoreLastExts();
+    void parseInputedExts();
+
     void updateLabelDbFilename();
     void setTotalInfo(const FileTypeList &exts);
     void setItemsVisibility(bool isTop10Checked);
@@ -50,6 +52,7 @@ private:
     bool itemsContain(int state) const;
     void createMenuWidgetTypes(const QPoint &point);
     void handlePresetClicked(const QAction *_act);
+    QStringList extensionsList() const;
 
     FilterCreation mode_ = FC_Disabled;
 
