@@ -154,6 +154,7 @@ NumSize WidgetFileTypes::numSize(CheckState chk_state) const
 void WidgetFileTypes::setChecked(const QStringList &exts)
 {
     for (ItemFileType *_item : std::as_const(items_)) {
-        _item->setChecked(exts.contains(_item->extension()));
+        if (_item->isCheckBoxVisible())
+            _item->setChecked(exts.contains(_item->extension()));
     }
 }

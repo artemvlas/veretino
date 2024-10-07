@@ -312,14 +312,11 @@ void DialogDbCreation::updateViewMode()
     ui->rb_ignore->setVisible(mode_ == FC_Enabled);
     ui->rb_include->setVisible(mode_ == FC_Enabled);
     ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
-    //ui->l_total_filtered->setVisible(mode_ == FC_Enabled);
-
-    //ui->frameCreateFilter->setVisible(mode_ != FC_Hidden);
     ui->cb_enable_filter->setChecked(mode_ == FC_Enabled);
 
     // the isVisible() condition is used to prevent an unnecessary call when opening the Dialog with FC_Disabled mode
-    if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
-        setCheckboxesVisible(mode_ == FC_Enabled);
+    //if (mode_ == FC_Enabled || (isVisible() && mode_ == FC_Disabled))
+    setCheckboxesVisible(mode_ == FC_Enabled);
 
     if (mode_ == FC_Enabled)
         ui->rb_ignore->setChecked(true);
@@ -405,24 +402,6 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
 // moved from Settings
 /*
 enum FilterPreset { PresetCustom, PresetDocuments, PresetPictures, PresetMusic, PresetVideos, PresetIgnoreTriflings };
-
-QStringList DialogSettings::extensionsList() const
-{
-    if (ui->inputExtensions->text().isEmpty())
-        return QStringList();
-
-    QString _inputed = ui->inputExtensions->text().toLower();
-    _inputed.remove('*');
-    _inputed.replace(" ."," ");
-    _inputed.replace(' ',',');
-
-    if (_inputed.startsWith('.'))
-        _inputed.remove(0, 1);
-
-    QStringList ext = _inputed.split(',', Qt::SkipEmptyParts);
-    ext.removeDuplicates();
-    return ext;
-}
 
 void DialogSettings::cleanUpExtList()
 {
