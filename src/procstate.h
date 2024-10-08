@@ -8,6 +8,24 @@
 
 #include <QObject>
 
+template <typename T = int> // (int, qint64...)
+struct Pieces {
+    Pieces() {}
+    Pieces(T total) : _total(total) {}
+    T remain() const { return _total - _done; }
+    void setTotal(T total) { _total = total; _done = 0; }
+    bool decreaseTotal(T by_size) { if (remain() < by_size) return false; _total -= by_size; return true; }
+    void addDone(T number) { _done += number; } // same as P <<
+    void addOneDone() { ++_done; } // same as ++P
+    Pieces& operator<<(T done_num) { _done += done_num; return *this; }
+    Pieces& operator++() { ++_done; return *this; } // prefix
+    Pieces  operator++(int) { Pieces _res(*this); ++(*this); return _res; } // postfix
+
+    // values
+    T _total = 0;
+    T _done = 0;
+}; // struct Pieces
+
 class ProcState : public QObject
 {
     Q_OBJECT
