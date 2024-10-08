@@ -13,10 +13,13 @@ struct Pieces {
     Pieces() {}
     Pieces(T total) : _total(total) {}
     T remain() const { return _total - _done; }
+    T percent() const { return (_done * 100) / _total; }
+    bool hasSet() const { return (_total > 0); }
+    bool hasChunks() const { return (_done > 0); }
     void setTotal(T total) { _total = total; _done = 0; }
     bool decreaseTotal(T by_size) { if (remain() < by_size) return false; _total -= by_size; return true; }
-    void addDone(T number) { _done += number; } // same as P <<
-    void addOneDone() { ++_done; } // same as ++P
+    void addChunks(T number) { _done += number; } // same as P <<
+    void addChunk() { ++_done; } // same as ++P
     Pieces& operator<<(T done_num) { _done += done_num; return *this; }
     Pieces& operator++() { ++_done; return *this; } // prefix
     Pieces  operator++(int) { Pieces _res(*this); ++(*this); return _res; } // postfix
@@ -33,6 +36,7 @@ public:
     explicit ProcState(QObject *parent = nullptr);
     void setTotalSize(qint64 totalSize);
     void changeTotalSize(qint64 totalSize);
+    bool decreaseTotalSize(qint64 by_size);
 
     enum State {
         Idle = 1 << 0,
@@ -65,8 +69,9 @@ private:
 
     static qint64 prevDoneSize_;
     int lastPerc_ = 0; // percentage before current chunk added
-    qint64 totalSize_ = 0;
-    qint64 doneSize_ = 0;
+    //qint64 totalSize_ = 0;
+    //qint64 doneSize_ = 0;
+    Pieces<qint64> _p_size;
 
     State state_ = Idle;
 

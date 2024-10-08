@@ -42,15 +42,24 @@ bool ProcState::isCanceled() const
 
 void ProcState::setTotalSize(qint64 totalSize)
 {
-    totalSize_ = totalSize;
-    doneSize_ = 0;
+    //totalSize_ = totalSize;
+    //doneSize_ = 0;
+    _p_size.setTotal(totalSize);
 }
 
 void ProcState::changeTotalSize(qint64 totalSize)
 {
-    if (totalSize > doneSize_) {
+    /*if (totalSize > doneSize_) {
         totalSize_ = totalSize;
+    }*/
+    if (totalSize > _p_size._done) {
+        _p_size._total = totalSize;
     }
+}
+
+bool ProcState::decreaseTotalSize(qint64 by_size)
+{
+    return _p_size.decreaseTotal(by_size);
 }
 
 void ProcState::startProgress()
@@ -63,7 +72,7 @@ void ProcState::startProgress()
 
 void ProcState::isFinished()
 {
-    if (doneSize_ > 0 && totalSize_ > 0 && isState(Idle)) {
+    if (_p_size.hasChunks() && _p_size.hasSet() && isState(Idle)) {
         setTotalSize(0); // reset to 0
         emit progressFinished();
     }
@@ -72,14 +81,15 @@ void ProcState::isFinished()
 // add this processed piece(chunk), calculate total done size and emit ::percentageChanged
 void ProcState::addChunk(int chunk)
 {
-    if (totalSize_ == 0)
+    if (!_p_size.hasSet()) // _p_size._total == 0
         return;
 
-    if (doneSize_ == 0)
+    if (!_p_size.hasChunks()) // _p_size._done == 0
         startProgress();
 
-    doneSize_ += chunk;
-    int curPerc = (doneSize_ * 100) / totalSize_; // current percentage
+    //doneSize_ += chunk;
+    _p_size << chunk;
+    int curPerc = _p_size.percent(); //(doneSize_ * 100) / totalSize_; // current percentage
 
     if (curPerc > lastPerc_) {
         lastPerc_ = curPerc;
@@ -89,12 +99,13 @@ void ProcState::addChunk(int chunk)
 
 qint64 ProcState::doneSize() const
 {
-    return doneSize_;
+    //return doneSize_;
+    return _p_size._done;
 }
 
 qint64 ProcState::donePieceSize() const
 {
-    qint64 pieceSize = doneSize_ - prevDoneSize_;
+    qint64 pieceSize = _p_size._done - prevDoneSize_;
     prevDoneSize_ += pieceSize;
 
     return pieceSize;
@@ -102,5 +113,6 @@ qint64 ProcState::donePieceSize() const
 
 qint64 ProcState::remainingSize() const
 {
-    return totalSize_ - doneSize_;
+    //return totalSize_ - doneSize_;
+    return _p_size.remain();
 }
