@@ -11,25 +11,25 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
 {
     FileTypeList::const_iterator it;
     for (it = extList.constBegin(); it != extList.constEnd(); ++it) {
-        QIcon icon;
+        QIcon _icon;
         const QString _ext = it.key();
         const NumSize _nums = it.value();
 
         if (_ext == Files::strVeretinoDb)
-            icon = icons_.icon(Icons::Database);
+            _icon = icons_.icon(Icons::Database);
         else if (_ext == Files::strShaFiles)
-            icon = icons_.icon(Icons::HashFile);
+            _icon = icons_.icon(Icons::HashFile);
         else if (_ext == Files::strNoPerm)
-            icon = icons_.icon(FileStatus::UnPermitted);
+            _icon = icons_.icon(FileStatus::UnPermitted);
         else
-            icon = icons_.icon(QStringLiteral(u"file.") + _ext);
+            _icon = icons_.icon(QStringLiteral(u"file.") + _ext);
 
         ItemFileType *item = new ItemFileType(this);
         item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
-        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, _nums.num);
-        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(_nums.size));
-        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, _nums.size);
-        item->setIcon(ItemFileType::ColumnType, icon);
+        item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, _nums._num);
+        item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(_nums._size));
+        item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, _nums._size);
+        item->setIcon(ItemFileType::ColumnType, _icon);
         items_.append(item);
     }
 }

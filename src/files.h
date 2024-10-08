@@ -122,20 +122,24 @@ struct FileValues {
 
 struct NumSize { // number and total size (of files)
     NumSize() {}
-    NumSize(int _num, qint64 _size) : num(_num), size(_size) {}
-    void add(int _num, qint64 _size) { num += _num; size += _size; }
-    void add(const NumSize &other) { add(other.num, other.size); }
-    void addOne(qint64 _size = 0) { ++num; size += _size; }
-    void subtract(int _num, qint64 _size) { num -= _num; size -= _size; }
-    void subtract(const NumSize &other) { subtract(other.num, other.size); }
-    void subtractOne(qint64 _size = 0) { --num; size -= _size; }
-    NumSize& operator<<(qint64 _size) { addOne(_size); return *this; }
+    NumSize(int num, qint64 size) : _num(num), _size(size) {}
+    void add(int num, qint64 size) { _num += num; _size += size; }
+    void add(const NumSize &other) { add(other._num, other._size); }
+    void addOne(qint64 size = 0) { ++_num; _size += size; }
+    void subtract(int num, qint64 size) { _num -= num; _size -= size; }
+    void subtract(const NumSize &other) { subtract(other._num, other._size); }
+    void subtractOne(qint64 size = 0) { --_num; _size -= size; }
+    NumSize& operator<<(qint64 size) { addOne(size); return *this; }
     NumSize& operator<<(const NumSize &other) { add(other); return *this; }
     NumSize& operator+=(const NumSize &other) { add(other); return *this; }
+    NumSize& operator-=(const NumSize &other) { subtract(other); return *this; }
+    NumSize& operator-=(qint64 size) { subtractOne(size); return *this; }
+    NumSize& operator++() { ++_num; return *this; } // prefix
+    explicit operator bool() const { return _num > 0; }
 
     // values
-    int num = 0;
-    qint64 size = 0;
+    int _num = 0;
+    qint64 _size = 0;
 }; // struct NumSize
 
 #endif // FILES_H

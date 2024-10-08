@@ -83,7 +83,7 @@ void ProcState::addChunk(int chunk)
         startProgress();
 
     _p_size << chunk;
-    int curPerc = _p_size.percent(); // current percentage
+    const int curPerc = _p_size.percent(); // current percentage
 
     if (curPerc > lastPerc_) {
         lastPerc_ = curPerc;

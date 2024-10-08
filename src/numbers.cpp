@@ -16,7 +16,7 @@ void Numbers::removeFile(const FileStatus status, const qint64 size)
 {
     if (val_.contains(status)) {
         val_[status].subtractOne(size);
-        if (val_[status].num == 0)
+        if (val_[status]._num == 0)
             val_.remove(status);
     }
 }
@@ -34,17 +34,24 @@ bool Numbers::moveFile(const FileStatus statusBefore, const FileStatus statusAft
 
 bool Numbers::contains(const FileStatuses flag) const
 {
-    return (values(flag).num > 0);
+    QHash<FileStatus, NumSize>::const_iterator it;
+
+    for (it = val_.constBegin(); it != val_.constEnd(); ++it) {
+        if ((flag & it.key()) && it.value()._num)
+            return true;
+    }
+
+    return false;
 }
 
 int Numbers::numberOf(const FileStatuses flag) const
 {
-    return values(flag).num;
+    return values(flag)._num;
 }
 
 qint64 Numbers::totalSize(const FileStatuses flag) const
 {
-    return values(flag).size;
+    return values(flag)._size;
 }
 
 NumSize Numbers::values(const FileStatuses flag) const

@@ -115,21 +115,21 @@ QStringList DialogDbStatus::infoContent()
 
     const Numbers &_num = data_->numbers_;
     QStringList contentNumbers;
-    const qint64 totalSize = _num.totalSize(FileStatus::CombAvailable);
-    const int available = _num.numberOf(FileStatus::CombAvailable);
+    const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
     const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
 
-    if (isJustCreated() || (numChecksums != available)) {
+    if (isJustCreated() || (numChecksums != _n_avail._num)) {
         QString _storedChecksums = tools::joinStrings(QStringLiteral(u"Stored checksums:"), numChecksums);
 
         if (isJustCreated())
-            contentNumbers << format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(totalSize));
+            contentNumbers << format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(_n_avail._size));
         else
             contentNumbers << _storedChecksums;
     }
 
-    if (data_->contains(FileStatus::CombUnreadable))
-        contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _num.numberOf(FileStatus::CombUnreadable)));
+    const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
+    if (_n_unr)
+        contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _n_unr._num));
 
     if (isSavedToDesktop()) {
         contentNumbers.append(QString());
@@ -140,14 +140,16 @@ QStringList DialogDbStatus::infoContent()
     if (isJustCreated())
         return contentNumbers;
 
-    if (available > 0)
-        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(available, totalSize));
+    if (_n_avail)
+        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(_n_avail));
     else
         contentNumbers.append("NO FILES available to check");
 
     // [experimental]
-    if (_num.contains(FileStatus::NotCheckedMod))
-        contentNumbers << tools::joinStrings(QStringLiteral(u"Modified: "), _num.numberOf(FileStatus::NotCheckedMod));
+    const NumSize _n_mod = _num.values(FileStatus::NotCheckedMod);
+    if (_n_mod)
+        contentNumbers << tools::joinStrings(QStringLiteral(u"Modified: "), _n_mod._num);
+        // addit. space is needed for align. with "Available: " (monospace fonts)
     // [exp.]
 
     contentNumbers.append(QString());
@@ -215,14 +217,17 @@ QStringList DialogDbStatus::infoChanges()
     const Numbers &_num = data_->numbers_;
     QStringList result;
 
-    if (data_->contains(FileStatus::Added))
-        result.append(QStringLiteral(u"Added: ") + format::filesNumSize(_num, FileStatus::Added));
+    const NumSize _n_added = _num.values(FileStatus::Added);
+    if (_n_added)
+        result.append(QStringLiteral(u"Added: ") + format::filesNumSize(_n_added));
 
-    if (data_->contains(FileStatus::Removed))
-        result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _num.numberOf(FileStatus::Removed)));
+    const NumSize _n_removed = _num.values(FileStatus::Removed);
+    if (_n_removed)
+        result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _n_removed._num));
 
-    if (data_->contains(FileStatus::Updated))
-        result.append(tools::joinStrings(QStringLiteral(u"Updated:"), _num.numberOf(FileStatus::Updated)));
+    const NumSize _n_upd = _num.values(FileStatus::Updated);
+    if (_n_upd)
+        result.append(tools::joinStrings(QStringLiteral(u"Updated:"), _n_upd._num));
 
     return result;
 }

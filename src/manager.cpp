@@ -442,14 +442,14 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 
     NumSize _queued = _data->getNumbers(rootIndex).values(FileStatus::Queued);
 
-    qDebug() << "Manager::calculateChecksums | Queued:" << _queued.num;
+    qDebug() << "Manager::calculateChecksums | Queued:" << _queued._num;
 
-    if (_queued.num == 0) {
+    if (_queued._num == 0) {
         return 0;
     }
 
-    QString totalSizeReadable = format::dataSizeReadable(_queued.size);
-    procState->setTotalSize(_queued.size);
+    QString totalSizeReadable = format::dataSizeReadable(_queued._size);
+    procState->setTotalSize(_queued._size);
 
     ShaCalculator shaCalc(_data->metaData_.algorithm);
     shaCalc.setProcState(procState);
@@ -475,7 +475,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
             emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
                                       .arg(procStatusText)
                                       .arg(doneNum + 1)
-                                      .arg(_queued.num)
+                                      .arg(_queued._num)
                                       .arg(doneData));
 
             QString curFilePath = _data->itemAbsolutePath(iter.index());
@@ -487,8 +487,8 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
                     dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _failStatus);
 
                     _queued.subtractOne(iter.size());
-                    totalSizeReadable = format::dataSizeReadable(_queued.size);
-                    procState->changeTotalSize(_queued.size);
+                    totalSizeReadable = format::dataSizeReadable(_queued._size);
+                    procState->changeTotalSize(_queued._size);
                 }
                 else {
                     if (!dataMaintainer->updateChecksum(iter.index(), checksum)) {

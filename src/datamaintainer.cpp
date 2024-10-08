@@ -410,25 +410,27 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        const Numbers &num = data_->getNumbers(curIndex);
+        const Numbers &_num = data_->getNumbers(curIndex);
         QStringList _sl;
 
-        if (num.contains(FileStatus::CombAvailable)) {
-            QString __s = format::filesNumSize(num, FileStatus::CombAvailable);
-            _sl << QStringLiteral(u"Avail.: ") + __s;
+        const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
+        if (_n_avail) {
+            _sl << QStringLiteral(u"Avail.: ") + format::filesNumSize(_n_avail);
         }
 
-        if (num.contains(FileStatus::New)) {
-            QString __s = format::filesNumSize(num, FileStatus::New);
-            _sl << QStringLiteral(u"New: ") + __s;
+        const NumSize _n_new = _num.values(FileStatus::New);
+        if (_n_new) {
+            _sl << QStringLiteral(u"New: ") + format::filesNumSize(_n_new);
         }
 
-        if (num.contains(FileStatus::Missing)) {
-            _sl << tools::joinStrings(QStringLiteral(u"Missing:"), num.numberOf(FileStatus::Missing));
+        const NumSize _n_missing = _num.values(FileStatus::Missing);
+        if (_n_missing) {
+            _sl << tools::joinStrings(QStringLiteral(u"Missing:"), _n_missing._num);
         }
 
-        if (num.contains(FileStatus::CombUnreadable)) {
-            _sl << tools::joinStrings(QStringLiteral(u"Unread.:"), num.numberOf(FileStatus::CombUnreadable));
+        const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
+        if (_n_unr) {
+            _sl << tools::joinStrings(QStringLiteral(u"Unread.:"), _n_unr._num);
         }
 
         return _sl.join(QStringLiteral(u"; "));

@@ -490,12 +490,12 @@ QString filesNumSize(int number, qint64 filesSize)
 
 QString filesNumSize(const Numbers &num, FileStatus status)
 {
-    return filesNumSize(num.numberOf(status), num.totalSize(status));
+    return filesNumSize(num.values(status));
 }
 
 QString filesNumSize(const NumSize &nums)
 {
-    return filesNumSize(nums.num, nums.size);
+    return filesNumSize(nums._num, nums._size);
 }
 
 QString fileNameAndSize(const QString &filePath)
