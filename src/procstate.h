@@ -60,6 +60,7 @@ public:
     qint64 doneSize() const; // returns the total size of the processed data
     qint64 donePieceSize() const; // returns the size of the data processed since the previous function call
     qint64 remainingSize() const;
+    Pieces<qint64> piecesSize() const;
 
 public slots:
     void addChunk(int chunk);

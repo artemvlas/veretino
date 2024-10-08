@@ -10,6 +10,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QDebug>
+#include <QStringBuilder>
 #include "files.h"
 #include "shacalculator.h"
 #include "treemodeliterator.h"
@@ -426,6 +427,35 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return checkSum;
 }
 
+void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items) const
+{
+    const Pieces<qint64> _p_size = procState->piecesSize();
+
+    // to avoid calling the dataSizeReadable() func for each file
+    static qint64 _lastTotalSize;
+    static QString _lastTotalSizeR;
+
+    if (_p_size._done == 0 || (_lastTotalSize != _p_size._total)) {
+        _lastTotalSize = _p_size._total;
+        _lastTotalSizeR = format::dataSizeReadable(_lastTotalSize);
+    }
+
+    // UGLY, but most effective. Should be re-implemented!!!
+    const QString _res = _purp % ' ' % QString::number(_p_items._done + 1) % QStringLiteral(u" of ")
+                    % QString::number(_p_items._total) % QStringLiteral(u" checksums ")
+                    % ((_p_size._done == 0) ? format::inParentheses(_lastTotalSizeR) // (%1)
+                    : ('(' % format::dataSizeReadable(_p_size._done) % QStringLiteral(u" / ") % _lastTotalSizeR % ')')); // "(%1 / %2)"
+
+    emit setStatusbarText(_res);
+
+    // OLD
+    /*emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
+                              .arg(_purp)
+                              .arg(_p_items._done + 1)
+                              .arg(_p_items._total)
+                              .arg(doneData));*/
+}
+
 int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 {
     DataContainer *_data = dataMaintainer->data_;
@@ -440,20 +470,19 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     if (status != FileStatus::Queued)
         dataMaintainer->addToQueue(status, rootIndex);
 
-    NumSize _queued = _data->getNumbers(rootIndex).values(FileStatus::Queued);
+    const NumSize _queued = _data->getNumbers(rootIndex).values(FileStatus::Queued);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << _queued._num;
 
-    if (_queued._num == 0) {
+    if (!_queued)
         return 0;
-    }
 
-    QString totalSizeReadable = format::dataSizeReadable(_queued._size);
+    Pieces<int> _p_items(_queued._num);
     procState->setTotalSize(_queued._size);
 
     ShaCalculator shaCalc(_data->metaData_.algorithm);
     shaCalc.setProcState(procState);
-    int doneNum = 0;
+
     bool isMismatchFound = false;
 
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
@@ -468,36 +497,28 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() == FileStatus::Queued) {
             dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus, procStatus);
+            updateCalcStatus(procStatusText, _p_items);
 
-            QString doneData = (procState->doneSize() == 0) ? QString("(%1)").arg(totalSizeReadable)
-                                                            : QString("(%1 / %2)").arg(format::dataSizeReadable(procState->doneSize()), totalSizeReadable);
+            const QString _filePath = _data->itemAbsolutePath(iter.index());
+            const QString _checksum = shaCalc.calculate(_filePath);
 
-            emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
-                                      .arg(procStatusText)
-                                      .arg(doneNum + 1)
-                                      .arg(_queued._num)
-                                      .arg(doneData));
+            if (procState->isCanceled())
+                break;
 
-            QString curFilePath = _data->itemAbsolutePath(iter.index());
-            QString checksum = shaCalc.calculate(curFilePath);
+            if (_checksum.isEmpty()) {
+                FileStatus _failStatus = tools::failedCalcStatus(_filePath, TreeModel::hasChecksum(iter.index()));
+                dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _failStatus);
 
-            if (!procState->isCanceled()) {
-                if (checksum.isEmpty()) {
-                    FileStatus _failStatus = tools::failedCalcStatus(curFilePath, TreeModel::hasChecksum(iter.index()));
-                    dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _failStatus);
-
-                    _queued.subtractOne(iter.size());
-                    totalSizeReadable = format::dataSizeReadable(_queued._size);
-                    procState->changeTotalSize(_queued._size);
-                }
-                else {
-                    if (!dataMaintainer->updateChecksum(iter.index(), checksum)) {
-                        if (!isMismatchFound) { // the signal is only needed once
-                            emit mismatchFound();
-                            isMismatchFound = true;
-                        }
+                _p_items.decreaseTotal(1);
+                procState->decreaseTotalSize(iter.size());
+            }
+            else { // success
+                ++_p_items;
+                if (!dataMaintainer->updateChecksum(iter.index(), _checksum)) {
+                    if (!isMismatchFound) { // the signal is only needed once
+                        emit mismatchFound();
+                        isMismatchFound = true;
                     }
-                    ++doneNum;
                 }
             }
         }
@@ -511,12 +532,12 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
 
         // rolling back file statuses
         dataMaintainer->rollBackStoppedCalc(rootIndex, status);
-        qDebug() << "Manager::calculateChecksums >> Stopped | Done" << doneNum;
+        qDebug() << "Manager::calculateChecksums >> Stopped | Done" << _p_items._done;
     }
 
     // end
     dataMaintainer->updateNumbers();
-    return doneNum;
+    return _p_items._done;
 }
 
 void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)

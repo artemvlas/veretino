@@ -108,3 +108,8 @@ qint64 ProcState::remainingSize() const
 {
     return _p_size.remain();
 }
+
+Pieces<qint64> ProcState::piecesSize() const
+{
+    return _p_size;
+}

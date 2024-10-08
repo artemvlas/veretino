@@ -37,7 +37,7 @@ bool Numbers::contains(const FileStatuses flag) const
     QHash<FileStatus, NumSize>::const_iterator it;
 
     for (it = val_.constBegin(); it != val_.constEnd(); ++it) {
-        if ((flag & it.key()) && it.value()._num)
+        if ((flag & it.key()) && it.value())
             return true;
     }
 
