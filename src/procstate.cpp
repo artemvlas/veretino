@@ -42,16 +42,11 @@ bool ProcState::isCanceled() const
 
 void ProcState::setTotalSize(qint64 totalSize)
 {
-    //totalSize_ = totalSize;
-    //doneSize_ = 0;
     _p_size.setTotal(totalSize);
 }
 
 void ProcState::changeTotalSize(qint64 totalSize)
 {
-    /*if (totalSize > doneSize_) {
-        totalSize_ = totalSize;
-    }*/
     if (totalSize > _p_size._done) {
         _p_size._total = totalSize;
     }
@@ -87,9 +82,8 @@ void ProcState::addChunk(int chunk)
     if (!_p_size.hasChunks()) // _p_size._done == 0
         startProgress();
 
-    //doneSize_ += chunk;
     _p_size << chunk;
-    int curPerc = _p_size.percent(); //(doneSize_ * 100) / totalSize_; // current percentage
+    int curPerc = _p_size.percent(); // current percentage
 
     if (curPerc > lastPerc_) {
         lastPerc_ = curPerc;
@@ -99,7 +93,6 @@ void ProcState::addChunk(int chunk)
 
 qint64 ProcState::doneSize() const
 {
-    //return doneSize_;
     return _p_size._done;
 }
 
@@ -113,6 +106,5 @@ qint64 ProcState::donePieceSize() const
 
 qint64 ProcState::remainingSize() const
 {
-    //return totalSize_ - doneSize_;
     return _p_size.remain();
 }

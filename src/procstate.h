@@ -14,10 +14,10 @@ struct Pieces {
     Pieces(T total) : _total(total) {}
     T remain() const { return _total - _done; }
     T percent() const { return (_done * 100) / _total; }
-    bool hasSet() const { return (_total > 0); }
-    bool hasChunks() const { return (_done > 0); }
     void setTotal(T total) { _total = total; _done = 0; }
     bool decreaseTotal(T by_size) { if (remain() < by_size) return false; _total -= by_size; return true; }
+    bool hasSet() const { return (_total > 0); }
+    bool hasChunks() const { return (_done > 0); }
     void addChunks(T number) { _done += number; } // same as P <<
     void addChunk() { ++_done; } // same as ++P
     Pieces& operator<<(T done_num) { _done += done_num; return *this; }
@@ -58,7 +58,7 @@ public:
 
     qint64 doneSize() const; // returns the total size of the processed data
     qint64 donePieceSize() const; // returns the size of the data processed since the previous function call
-    qint64 remainingSize() const; // totalSize_ - doneSize_
+    qint64 remainingSize() const;
 
 public slots:
     void addChunk(int chunk);
@@ -69,8 +69,6 @@ private:
 
     static qint64 prevDoneSize_;
     int lastPerc_ = 0; // percentage before current chunk added
-    //qint64 totalSize_ = 0;
-    //qint64 doneSize_ = 0;
     Pieces<qint64> _p_size;
 
     State state_ = Idle;

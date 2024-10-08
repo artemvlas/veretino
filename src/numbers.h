@@ -16,15 +16,14 @@ public:
     void addFile(const FileStatus status, const qint64 size);
     void removeFile(const FileStatus status, const qint64 size);
     bool moveFile(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size);
-    bool contains(const FileStatuses flags) const;
+    bool contains(const FileStatuses flag) const;
     int numberOf(const FileStatuses flag) const;
     qint64 totalSize(const FileStatuses flag) const;
     NumSize values(const FileStatuses flag) const;
 
 private:
+    // { FileStatus : number of corresponding files, total size }
     QHash<FileStatus, NumSize> val_;
-    //QHash<FileStatus, int> amounts_; // { FileStatus : number of corresponding files }
-    //QHash<FileStatus, qint64> sizes_; // { FileStatus : total size }
 }; // class Numbers
 
 #endif // NUMBERS_H
