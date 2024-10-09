@@ -261,7 +261,8 @@ QString composeFilePath(const QString &parentFolder, const QString &fileName, co
 QString suffix(const QString &_file)
 {
     const int _dotInd = _file.lastIndexOf(_dot);
-    return (_dotInd > 0) ? _file.right(_file.size() - _dotInd - 1).toLower() : QString();
+    const int _len = _file.size() - _dotInd - 1;
+    return (_dotInd > 0 && _len > 0) ? _file.right(_len).toLower() : QString();
 }
 
 bool isRoot(const QString &path)

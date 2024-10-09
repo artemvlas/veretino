@@ -54,14 +54,14 @@ private:
     void handlePresetClicked(const QAction *_act);
     int selectCmbAlgo();
     QCryptographicHash::Algorithm selectAlgoCmb();
-    QStringList extensionsList() const;
+    QStringList inputedExts() const;
 
     FilterCreation mode_ = FC_Disabled;
     WidgetFileTypes *types_ = nullptr;
     Settings *settings_ = nullptr;
     QString workDir_;
 
-    static const QMap<QString, QStringList> _presets;
+    static const QMap<QString, QSet<QString>> _presets;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

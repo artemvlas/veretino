@@ -36,13 +36,13 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
 
 void WidgetFileTypes::setCheckboxesVisible(bool visible)
 {
-    static const QStringList excluded { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
+    static const QSet<QString> _s_excl { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
 
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
     for (ItemFileType *item : std::as_const(items_)) {
         item->setCheckBoxVisible(visible
-                                 && !excluded.contains(item->extension()));
+                                 && !_s_excl.contains(item->extension()));
     }
 
     this->blockSignals(false);
@@ -80,11 +80,11 @@ bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
 
 bool WidgetFileTypes::isPassedUnChecked(const ItemFileType *item) const
 {
-    static const QStringList unfilterable { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
+    static const QSet<QString> _s_unfilterable { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
 
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())
-           && !unfilterable.contains(item->extension());
+           && !_s_unfilterable.contains(item->extension());
 }
 
 bool WidgetFileTypes::isPassed(CheckState state, const ItemFileType *item) const
@@ -164,6 +164,11 @@ NumSize WidgetFileTypes::numSize(CheckState chk_state) const
 }
 
 void WidgetFileTypes::setChecked(const QStringList &exts)
+{
+    setChecked(QSet<QString>(exts.begin(), exts.end()));
+}
+
+void WidgetFileTypes::setChecked(const QSet<QString> &exts)
 {
     for (ItemFileType *_item : std::as_const(items_)) {
         if (_item->isCheckBoxVisible())

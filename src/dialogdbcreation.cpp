@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QMenu>
 
-const QMap<QString, QStringList> DialogDbCreation::_presets = {
+const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
     { QStringLiteral(u"Documents"), { QStringLiteral(u"odt"), QStringLiteral(u"ods"), QStringLiteral(u"pdf"), QStringLiteral(u"docx"),
                                       QStringLiteral(u"xlsx"), QStringLiteral(u"doc"), QStringLiteral(u"rtf"), QStringLiteral(u"txt"),
                                       QStringLiteral(u"epub"), QStringLiteral(u"fb2"), QStringLiteral(u"djvu") }},
@@ -212,11 +212,10 @@ void DialogDbCreation::parseInputedExts()
     if (ui->le_exts_list->isReadOnly())
         return;
 
-    const QStringList _exts = extensionsList();
-    types_->setChecked(_exts);
+    types_->setChecked(inputedExts());
 }
 
-QStringList DialogDbCreation::extensionsList() const
+QStringList DialogDbCreation::inputedExts() const
 {
     if (ui->le_exts_list->text().isEmpty())
         return QStringList();
@@ -229,8 +228,9 @@ QStringList DialogDbCreation::extensionsList() const
     if (_inputed.startsWith('.'))
         _inputed.remove(0, 1);
 
-    QStringList _exts = _inputed.split(',', Qt::SkipEmptyParts);
-    _exts.removeDuplicates();
+    const QStringList _exts = _inputed.split(',', Qt::SkipEmptyParts);
+    //_exts.removeDuplicates(); // converting to Set<> will do it itself
+
     return _exts;
 }
 
@@ -395,7 +395,7 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
     connect(dispMenu, &QMenu::aboutToHide, dispMenu, &QMenu::deleteLater);
     connect(dispMenu, &QMenu::triggered, this, &DialogDbCreation::handlePresetClicked);
 
-    QMap<QString, QStringList>::const_iterator it;
+    QMap<QString, QSet<QString>>::const_iterator it;
     for (it = _presets.constBegin(); it != _presets.constEnd(); ++it) {
         QAction *_act = new QAction(it.key(), dispMenu);
         dispMenu->addAction(_act);
