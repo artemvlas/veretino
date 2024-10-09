@@ -200,7 +200,7 @@ QStringList DialogDbCreation::inputedExts() const
         return QStringList();
 
     _inputed.remove('*');
-    _inputed.replace(" ."," ");
+    _inputed.replace(QStringLiteral(u" ."), QStringLiteral(u","));
     _inputed.replace(' ',',');
 
     if (_inputed.startsWith('.'))
@@ -238,16 +238,18 @@ void DialogDbCreation::updateDbFilename()
 
 void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
 {
-    if (!isTop10Checked) {
-        types_->showAllItems();
-        ui->cb_top10->setText(QStringLiteral(u"Top10"));
+    QString __s;
+
+    if (isTop10Checked) {
+        types_->hideExtra();
+        __s = QStringLiteral(u"Top10: ") + format::filesNumSize(types_->numSizeVisible());
     }
     else {
-        types_->hideExtra();
-        ui->cb_top10->setText(QStringLiteral(u"Top10: ")
-                              + format::filesNumSize(types_->numSizeVisible()));
+        types_->showAllItems();
+        __s = QStringLiteral(u"Top10");
     }
 
+    ui->cb_top10->setText(__s);
     updateFilterDisplay();
 }
 
@@ -281,8 +283,8 @@ void DialogDbCreation::activateItem(QTreeWidgetItem *t_item)
         return;
     }
 
-    ItemFileType *item = static_cast<ItemFileType*>(t_item);
-    item->toggle();
+    ItemFileType *_item = static_cast<ItemFileType*>(t_item);
+    _item->toggle();
 }
 
 void DialogDbCreation::updateFilterDisplay()
