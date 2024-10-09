@@ -111,17 +111,12 @@ void DialogDbCreation::updateSettings()
     settings_->filter_editable_exts = ui->cb_editable_exts->isChecked();
     settings_->filter_remember_exts = ui->cb_remember_exts->isChecked();
 
-    if (mode_ == FC_Enabled) {
-        settings_->filter_last_exts = types_->checkedExtensions();
-        settings_->filter_mode = ui->rb_include->isChecked() ? FilterMode::Include : FilterMode::Ignore;
-    }
-    else {
-        settings_->filter_last_exts = QStringList();
-        settings_->filter_mode = FilterMode::NotSet;
-    }
+    settings_->filter_mode = curFilterMode();
+    settings_->filter_last_exts = (mode_ == FC_Enabled) ? types_->checkedExtensions()
+                                                        : QStringList();
 
     // algo
-    settings_->setAlgorithm(selectAlgoCmb());
+    settings_->setAlgorithm(tools::strToAlgo(ui->cmb_algo->currentText()));
 }
 
 void DialogDbCreation::setDbConfig()
@@ -140,10 +135,10 @@ void DialogDbCreation::setDbConfig()
 
     // algo
     ui->cmb_algo->addItems(Lit::sl_digest_Exts);
-    ui->cmb_algo->setCurrentIndex(selectCmbAlgo());
+    ui->cmb_algo->setCurrentIndex(cmbAlgoIndex());
 }
 
-int DialogDbCreation::selectCmbAlgo()
+int DialogDbCreation::cmbAlgoIndex()
 {
     if (!settings_)
         return 0;
@@ -158,23 +153,6 @@ int DialogDbCreation::selectCmbAlgo()
     default:
         return 1;
     }
-}
-
-QCryptographicHash::Algorithm DialogDbCreation::selectAlgoCmb()
-{
-    switch (ui->cmb_algo->currentIndex()) {
-    case 0:
-        return QCryptographicHash::Sha1;
-    case 1:
-        return QCryptographicHash::Sha256;
-    case 2:
-        return QCryptographicHash::Sha512;
-    default:
-        return QCryptographicHash::Sha256;
-    }
-
-    // or just
-    // return tools::strToAlgo(ui->cmb_algo->currentText());
 }
 
 void DialogDbCreation::setFilterConfig()
@@ -201,10 +179,9 @@ void DialogDbCreation::restoreLastExts()
 
     types_->setChecked(settings_->filter_last_exts);
 
-    if (settings_->filter_mode == FilterMode::Ignore)
-        ui->rb_ignore->setChecked(true);
-    else if (settings_->filter_mode == FilterMode::Include)
-        ui->rb_include->setChecked(true);
+    QRadioButton *_rb = (settings_->filter_mode == FilterMode::Include) ? ui->rb_include
+                                                                        : ui->rb_ignore;
+    _rb->setChecked(true);
 }
 
 void DialogDbCreation::parseInputedExts()
@@ -217,10 +194,11 @@ void DialogDbCreation::parseInputedExts()
 
 QStringList DialogDbCreation::inputedExts() const
 {
-    if (ui->le_exts_list->text().isEmpty())
+    QString _inputed = ui->le_exts_list->text().toLower();
+
+    if (_inputed.isEmpty())
         return QStringList();
 
-    QString _inputed = ui->le_exts_list->text().toLower();
     _inputed.remove('*');
     _inputed.replace(" ."," ");
     _inputed.replace(' ',',');
@@ -228,10 +206,15 @@ QStringList DialogDbCreation::inputedExts() const
     if (_inputed.startsWith('.'))
         _inputed.remove(0, 1);
 
-    const QStringList _exts = _inputed.split(',', Qt::SkipEmptyParts);
-    //_exts.removeDuplicates(); // converting to Set<> will do it itself
+    return _inputed.split(',', Qt::SkipEmptyParts);
+}
 
-    return _exts;
+FilterMode DialogDbCreation::curFilterMode() const
+{
+    if (mode_ == FC_Disabled)
+        return FilterMode::NotSet;
+
+    return ui->rb_include->isChecked() ? FilterMode::Include : FilterMode::Ignore;
 }
 
 void DialogDbCreation::updateDbFilename()
@@ -302,27 +285,18 @@ void DialogDbCreation::activateItem(QTreeWidgetItem *t_item)
     item->toggle();
 }
 
-
-bool DialogDbCreation::itemsContain(int state) const
-{
-    if (mode_ != FC_Enabled)
-        return false;
-
-    return types_->itemsContain((WidgetFileTypes::CheckState)state);
-}
-
 void DialogDbCreation::updateFilterDisplay()
 {
     updateLabelFilterExtensions();
     updateLabelTotalFiltered();
 
     // TMP
-    bool isFiltered = ui->rb_include->isChecked() ? types_->itemsContain(WidgetFileTypes::Checked)
-                                                  : types_->itemsContain(WidgetFileTypes::Checked)
+    bool isFiltered = ui->rb_include->isChecked() ? types_->hasChecked()
+                                                  : types_->hasChecked()
                                                         && types_->itemsContain(WidgetFileTypes::UnChecked);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((mode_ != FC_Enabled)
-                                                            || !types_->itemsContain(WidgetFileTypes::Checked)
+                                                            || !types_->hasChecked()
                                                             || isFiltered);
 
     // !!! TMP !!!
@@ -351,19 +325,21 @@ void DialogDbCreation::updateLabelTotalFiltered()
     WidgetFileTypes::CheckState _checkState = ui->rb_include->isChecked() ? WidgetFileTypes::Checked
                                                                           : WidgetFileTypes::UnChecked;
 
-    if (itemsContain(WidgetFileTypes::Checked)) {
-        ui->l_total_filtered->setText(QStringLiteral(u"Filtered: ")
-                                        + format::filesNumSize(types_->numSize(_checkState)));
+    QString __s;
+    if (types_->hasChecked()) {
+        __s = QStringLiteral(u"Filtered: ") + format::filesNumSize(types_->numSize(_checkState));
     }
     else {
-        ui->l_total_filtered->setText(QStringLiteral(u"No filter"));
+        __s = QStringLiteral(u"No filter");
     }
+
+    ui->l_total_filtered->setText(__s);
 }
 
 FilterRule DialogDbCreation::resultFilter()
 {
-    FilterRule::FilterMode __f = ui->rb_ignore->isChecked() ? FilterRule::Ignore : FilterRule::Include;
-    return FilterRule(__f, types_->checkedExtensions());
+    return FilterRule(curFilterMode(),
+                      types_->checkedExtensions());
 }
 
 void DialogDbCreation::setFilterCreation(FilterCreation mode)
@@ -424,8 +400,8 @@ void DialogDbCreation::resetView()
     ui->rb_ext_long->setChecked(true);
     ui->cb_add_folder_name->setChecked(true);
     ui->cb_flag_const->setChecked(false);
+    ui->cmb_algo->setCurrentIndex(cmbAlgoIndex());
     updateDbFilename();
-    ui->cmb_algo->setCurrentIndex(selectCmbAlgo());
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)
@@ -441,7 +417,7 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
         && mode_ == FC_Enabled
         && ui->tabWidget->currentIndex() == 0)
     {
-        if (itemsContain(WidgetFileTypes::Checked))
+        if (types_->hasChecked())
             clearChecked();
         else
             setFilterCreation(FC_Disabled);

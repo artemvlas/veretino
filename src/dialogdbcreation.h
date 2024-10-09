@@ -49,12 +49,11 @@ private:
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
-    bool itemsContain(int state) const;
     void createMenuWidgetTypes(const QPoint &point);
     void handlePresetClicked(const QAction *_act);
-    int selectCmbAlgo();
-    QCryptographicHash::Algorithm selectAlgoCmb();
+    int cmbAlgoIndex();
     QStringList inputedExts() const;
+    FilterMode curFilterMode() const;
 
     FilterCreation mode_ = FC_Disabled;
     WidgetFileTypes *types_ = nullptr;
