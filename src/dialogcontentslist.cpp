@@ -48,13 +48,16 @@ void DialogContentsList::setTotalInfo(const FileTypeList &extList)
 
 void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 {
-    if (!isTop10Checked) {
-        ui->types_->showAllItems();
-        ui->chbTop10->setText(QStringLiteral(u"Top10"));
+    QString __s;
+
+    if (isTop10Checked) {
+        ui->types_->hideExtra();
+        __s = QStringLiteral(u"Top10: ") + format::filesNumSize(ui->types_->numSizeVisible());
     }
     else {
-        ui->types_->hideExtra();
-        ui->chbTop10->setText(QStringLiteral(u"Top10: ")
-                              + format::filesNumSize(ui->types_->numSizeVisible()));
+        ui->types_->showAllItems();
+        __s = QStringLiteral(u"Top10");
     }
+
+    ui->chbTop10->setText(__s);
 }

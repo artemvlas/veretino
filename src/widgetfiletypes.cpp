@@ -137,8 +137,7 @@ NumSize WidgetFileTypes::numSizeVisible() const
     for (int i = 0; i < topLevelItemCount(); ++i) {
         const ItemFileType *_item = static_cast<ItemFileType*>(topLevelItem(i));
         if (!_item->isHidden()) {
-            _res.add(_item->filesNumber(),
-                     _item->filesSize());
+            _res += _item->numSize();
         }
     }
 
@@ -151,8 +150,7 @@ NumSize WidgetFileTypes::numSize(CheckState chk_state) const
     NumSize _res;
 
     for (const ItemFileType *_item : itemList) {
-        _res.add(_item->filesNumber(),
-                 _item->filesSize());
+        _res += _item->numSize();
     }
 
     return _res;

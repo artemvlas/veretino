@@ -18,6 +18,11 @@ qint64 ItemFileType::filesSize() const
     return data(ColumnTotalSize, Qt::UserRole).toLongLong();
 }
 
+NumSize ItemFileType::numSize() const
+{
+    return NumSize(filesNumber(), filesSize());
+}
+
 void ItemFileType::setChecked(bool checked)
 {
     setCheckState(ColumnType, checked ? Qt::Checked : Qt::Unchecked);

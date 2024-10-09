@@ -2,6 +2,7 @@
 #define ITEMFILETYPE_H
 
 #include <QTreeWidgetItem>
+#include "files.h" // for NumSize
 
 class ItemFileType : public QTreeWidgetItem
 {
@@ -16,6 +17,7 @@ public:
     bool isCheckBoxVisible() const;
     int filesNumber() const;
     qint64 filesSize() const;
+    NumSize numSize() const;
     QString extension() const;
 
 private:
