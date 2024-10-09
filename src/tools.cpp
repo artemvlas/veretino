@@ -22,6 +22,11 @@ const QStringList Lit::sl_digest_exts = {
     QStringLiteral(u"sha256"),
     QStringLiteral(u"sha512")
 };
+const QStringList Lit::sl_digest_Exts = {
+    QStringLiteral(u"SHA-1"),
+    QStringLiteral(u"SHA-256"),
+    QStringLiteral(u"SHA-512")
+};
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
 const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
@@ -453,13 +458,15 @@ QString composeDbFileName(const QString &prefix, const QString &folder, const QS
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 {
+    const QStringList &_list = capitalLetters ? Lit::sl_digest_Exts : Lit::sl_digest_exts;
+
     switch (algo) {
         case QCryptographicHash::Sha1:
-            return capitalLetters ? QStringLiteral(u"SHA-1") : Lit::sl_digest_exts.at(0);
+            return _list.at(0);
         case QCryptographicHash::Sha256:
-            return capitalLetters ? QStringLiteral(u"SHA-256") : Lit::sl_digest_exts.at(1);
+            return _list.at(1);
         case QCryptographicHash::Sha512:
-            return capitalLetters ? QStringLiteral(u"SHA-512") : Lit::sl_digest_exts.at(2);
+            return _list.at(2);
         default:
             return "Unknown";
     }

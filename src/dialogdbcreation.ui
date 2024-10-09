@@ -16,48 +16,47 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="cb_add_folder_name">
-       <property name="text">
-        <string>Add Folder Name</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="1">
-      <widget class="QFrame" name="frame">
-       <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Shadow::Raised</enum>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QRadioButton" name="rb_ext_long">
-          <property name="text">
-           <string>*.ver.json</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rb_ext_short">
-          <property name="text">
-           <string>*.ver</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="2" column="2">
       <widget class="QCheckBox" name="cb_flag_const">
        <property name="text">
         <string>Deny Changes</string>
        </property>
       </widget>
+     </item>
+     <item row="1" column="3">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QCheckBox" name="cb_add_folder_name">
+         <property name="text">
+          <string>Folder Name</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="3">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QRadioButton" name="rb_ext_long">
+         <property name="text">
+          <string>*.ver.json</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="rb_ext_short">
+         <property name="text">
+          <string>*.ver</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <widget class="QComboBox" name="cmb_algo"/>
      </item>
      <item row="1" column="0" colspan="3">
       <widget class="QLineEdit" name="inp_db_filename">
@@ -69,7 +68,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0" colspan="3">
+     <item row="0" column="0" colspan="4">
       <widget class="QLabel" name="l_db_filename">
        <property name="text">
         <string>db file name</string>

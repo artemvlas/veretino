@@ -52,6 +52,8 @@ private:
     bool itemsContain(int state) const;
     void createMenuWidgetTypes(const QPoint &point);
     void handlePresetClicked(const QAction *_act);
+    int selectCmbAlgo();
+    QCryptographicHash::Algorithm selectAlgoCmb();
     QStringList extensionsList() const;
 
     FilterCreation mode_ = FC_Disabled;

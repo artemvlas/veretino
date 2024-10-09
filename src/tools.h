@@ -16,6 +16,7 @@
 struct Lit { // Literals
 static const QStringList sl_db_exts;
 static const QStringList sl_digest_exts;
+static const QStringList sl_digest_Exts;
 static const QString s_webpage;
 static const QString s_appName;
 static const QString s_appNameVersion;

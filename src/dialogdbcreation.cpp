@@ -119,6 +119,9 @@ void DialogDbCreation::updateSettings()
         settings_->filter_last_exts = QStringList();
         settings_->filter_mode = FilterMode::NotSet;
     }
+
+    // algo
+    settings_->setAlgorithm(selectAlgoCmb());
 }
 
 void DialogDbCreation::setDbConfig()
@@ -134,6 +137,44 @@ void DialogDbCreation::setDbConfig()
         ui->inp_db_filename->setText(settings_->dbPrefix);
 
     updateDbFilename();
+
+    // algo
+    ui->cmb_algo->addItems(Lit::sl_digest_Exts);
+    ui->cmb_algo->setCurrentIndex(selectCmbAlgo());
+}
+
+int DialogDbCreation::selectCmbAlgo()
+{
+    if (!settings_)
+        return 0;
+
+    switch (settings_->algorithm()) {
+    case QCryptographicHash::Sha1:
+        return 0;
+    case QCryptographicHash::Sha256:
+        return 1;
+    case QCryptographicHash::Sha512:
+        return 2;
+    default:
+        return 1;
+    }
+}
+
+QCryptographicHash::Algorithm DialogDbCreation::selectAlgoCmb()
+{
+    switch (ui->cmb_algo->currentIndex()) {
+    case 0:
+        return QCryptographicHash::Sha1;
+    case 1:
+        return QCryptographicHash::Sha256;
+    case 2:
+        return QCryptographicHash::Sha512;
+    default:
+        return QCryptographicHash::Sha256;
+    }
+
+    // or just
+    // return tools::strToAlgo(ui->cmb_algo->currentText());
 }
 
 void DialogDbCreation::setFilterConfig()
@@ -384,6 +425,7 @@ void DialogDbCreation::resetView()
     ui->cb_add_folder_name->setChecked(true);
     ui->cb_flag_const->setChecked(false);
     updateDbFilename();
+    ui->cmb_algo->setCurrentIndex(selectCmbAlgo());
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)

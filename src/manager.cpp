@@ -440,7 +440,7 @@ void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items) const
         _lastTotalSizeR = format::dataSizeReadable(_lastTotalSize);
     }
 
-    // UGLY, but most effective. Should be re-implemented!!!
+    // UGLY, but better performance (should be). And should be re-implemented.
     const QString _res = _purp % ' ' % QString::number(_p_items._done + 1) % QStringLiteral(u" of ")
                     % QString::number(_p_items._total) % QStringLiteral(u" checksums ")
                     % ((_p_size._done == 0) ? format::inParentheses(_lastTotalSizeR) // (%1)
