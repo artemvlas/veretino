@@ -352,7 +352,8 @@ void DialogDbCreation::setFilterCreation(FilterCreation mode)
 
 void DialogDbCreation::updateViewMode()
 {
-    ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
+    ui->fr_total_filtered->setVisible(mode_ == FC_Enabled);
+    ui->fr_filter_exts->setVisible(mode_ == FC_Enabled);
     ui->cb_enable_filter->setChecked(mode_ == FC_Enabled);
     setCheckboxesVisible(mode_ == FC_Enabled);
 

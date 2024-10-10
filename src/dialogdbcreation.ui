@@ -148,7 +148,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frameFilterExtensions">
+        <widget class="QFrame" name="fr_filter_exts">
          <property name="frameShape">
           <enum>QFrame::Shape::StyledPanel</enum>
          </property>
@@ -186,46 +186,55 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>9</y>
-         <width>218</width>
-         <height>93</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Filtering</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="cb_editable_exts">
-          <property name="text">
-           <string>Editable input of types (suffixes)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="cb_remember_exts">
-          <property name="toolTip">
-           <string>The selected list of extensions will be checked next time,
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Filtering</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="cb_editable_exts">
+            <property name="text">
+             <string>Editable input of types (suffixes)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="cb_remember_exts">
+            <property name="toolTip">
+             <string>The selected list of extensions will be checked next time,
 if there are any in the folder.</string>
-          </property>
-          <property name="text">
-           <string>Remember selected types</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+            </property>
+            <property name="text">
+             <string>Remember selected types</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>233</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QFrame" name="frame_2">
+      <widget class="QFrame" name="fr_total_filtered">
        <property name="frameShape">
         <enum>QFrame::Shape::StyledPanel</enum>
        </property>
@@ -244,10 +253,23 @@ if there are any in the folder.</string>
       </widget>
      </item>
      <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QDialogButtonBox" name="buttonBox">
        <property name="maximumSize">
         <size>
-         <width>250</width>
+         <width>16777215</width>
          <height>16777215</height>
         </size>
        </property>
