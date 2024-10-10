@@ -6,6 +6,7 @@ What's new:
     Instead of a Permanent filter, selected extensions can be flexibly remembered between sessions, adapting to the contents of working folders.
 * It is now possible to check the modification date of listed files during database parsing.
     Makes it easier to work with obviously changed items.
+* The Contents List (folder or db) now supports multiple selections and displays the corresponding amounts.
 * Now files without read permissions can be excluded when creating the list (customizable).
 * Added the ability to export individual checksums from the database to a digest file (*.ver(.json) --> *.sha1/256/512).
 * Copying files and folders is now also available when browsing the file system.

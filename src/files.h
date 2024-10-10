@@ -135,6 +135,8 @@ struct NumSize { // number and total size (of files)
     NumSize& operator-=(const NumSize &other) { subtract(other); return *this; }
     NumSize& operator-=(qint64 size) { subtractOne(size); return *this; }
     NumSize& operator++() { ++_num; return *this; } // prefix
+    friend NumSize operator+(NumSize lhs, const NumSize& rhs) { lhs += rhs; return lhs; }
+    friend NumSize operator-(NumSize lhs, const NumSize& rhs) { lhs -= rhs; return lhs; }
     explicit operator bool() const { return _num > 0; }
 
     // values

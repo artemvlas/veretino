@@ -31,6 +31,9 @@ private:
     void connections();
     void setTotalInfo(const FileTypeList &extList);
     void setItemsVisibility(bool isTop10Checked);
+    void updateSelectInfo();
+
+    NumSize _n_total;
 }; // class DialogContentsList
 
 #endif // DIALOGCONTENTSLIST_H
