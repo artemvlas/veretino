@@ -22,7 +22,7 @@ public:
     explicit DialogSettings(Settings *settings, QWidget *parent = nullptr);
     ~DialogSettings();
     void updateSettings();
-    enum Tabs { TabMain, TabDatabase, TabFilter };
+    enum Tabs { TabMain, TabDatabase, TabExtra };
 
 private:
     void loadSettings(const Settings &settings);

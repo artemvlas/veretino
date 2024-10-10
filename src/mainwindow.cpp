@@ -16,7 +16,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QClipboard>
-#include <QStringBuilder>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -222,7 +221,6 @@ void MainWindow::showDialogContentsList(const QString &folderName, const FileTyp
 void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &dbFiles, const FileTypeList &extList)
 {
     if (extList.isEmpty()) {
-        qDebug() << "MainWindow::showDialogDbCreation >> Empty extList";
         return;
     }
 
@@ -240,7 +238,6 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
 
     if (!dialog.exec()) {
-        qDebug() << "MainWindow::showDialogDbCreation >> Rejected";
         return;
     }
 
@@ -300,14 +297,16 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         msgBox.button(QMessageBox::Cancel)->setText("Continue");
         msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
 
+        const int _n_mismatch = result.numberOf(FileStatus::Mismatched);
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
-                            .arg(result.numberOf(FileStatus::Mismatched))
+                            .arg(_n_mismatch)
                             .arg(result.numberOf(FileStatus::CombMatched | FileStatus::Mismatched)) // was before: FileStatus::CombAvailable
-                            .arg(result.numberOf(FileStatus::Mismatched) == 1 ? "is" : "are"));
+                            .arg(_n_mismatch == 1 ? "is" : "are"));
 
-        if (result.contains(FileStatus::CombNotChecked)) {
+        const int _n_notchecked = result.numberOf(FileStatus::CombNotChecked);
+        if (_n_notchecked) {
             messageText.append("\n\n");
-            messageText.append(format::filesNumber(result.numberOf(FileStatus::CombNotChecked))
+            messageText.append(format::filesNumber(_n_notchecked)
                                + " remain unchecked.");
         }
     }
@@ -346,7 +345,6 @@ void MainWindow::dialogSettings()
 
     if (dialog.exec()) {
         dialog.updateSettings();
-        //updatePermanentStatus();
     }
 }
 
@@ -438,9 +436,6 @@ void MainWindow::updatePermanentStatus()
         else if (!proc_->isStarted())
             statusBar->setModeDb(ui->treeView->data_);
     }
-    //else if (ui->treeView->isViewFileSystem()) {
-    //    statusBar->setModeFs(settings_->filter.isFilterEnabled());
-    //}
     else {
         statusBar->clearButtons();
     }
@@ -448,10 +443,9 @@ void MainWindow::updatePermanentStatus()
 
 void MainWindow::setWinTitleMismatchFound()
 {
-    static const QString _s = Lit::s_appName
-                              % Lit::s_sepStick
-                              % QStringLiteral(u"<!> mismatches found");
-
+    static const QString _s = tools::joinStrings(Lit::s_appName,
+                                                 QStringLiteral(u"<!> mismatches found"),
+                                                 Lit::s_sepStick);
     setWindowTitle(_s);
 }
 
@@ -465,12 +459,11 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        QString str = data->isAllMatched() ? QStringLiteral(u"✓ verified")
-                                           : QStringLiteral(u"DB > ") + paths::shortenPath(data->metaData_.workDir);
+        QString _s_add = data->isAllMatched() ? QStringLiteral(u"✓ verified")
+                                              : QStringLiteral(u"DB > ") + paths::shortenPath(data->metaData_.workDir);
 
-        setWindowTitle(Lit::s_appName
-                       % Lit::s_sepStick
-                       % str);
+        const QString _s = tools::joinStrings(Lit::s_appName, _s_add, Lit::s_sepStick);
+        setWindowTitle(_s);
     }
     else {
         setWindowTitle(Lit::s_appName);

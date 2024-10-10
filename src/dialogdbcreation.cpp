@@ -264,8 +264,6 @@ void DialogDbCreation::setCheckboxesVisible(bool visible)
 {
     types_->setCheckboxesVisible(visible);
     updateFilterDisplay();
-
-    // qDebug() << Q_FUNC_INFO;
 }
 
 void DialogDbCreation::clearChecked()
@@ -354,11 +352,8 @@ void DialogDbCreation::setFilterCreation(FilterCreation mode)
 
 void DialogDbCreation::updateViewMode()
 {
-    ui->rb_ignore->setVisible(mode_ == FC_Enabled);
-    ui->rb_include->setVisible(mode_ == FC_Enabled);
     ui->frameFilterExtensions->setVisible(mode_ == FC_Enabled);
     ui->cb_enable_filter->setChecked(mode_ == FC_Enabled);
-
     setCheckboxesVisible(mode_ == FC_Enabled);
 
     if (mode_ == FC_Enabled)

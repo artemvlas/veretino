@@ -104,15 +104,16 @@ FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses 
 
 bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 {
-    if (QFileInfo(folderPath).isDir()) {
-        QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            if (filter.isFileAllowed(it.next())) {
-                return false;
-            }
-        }
-    } else {
+    if (!QFileInfo(folderPath).isDir()) {
         qDebug() << "Files::isEmptyFolder | Wrong path:" << folderPath;
+        return true;
+    }
+
+    QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        if (filter.isFileAllowed(it.next())) {
+            return false;
+        }
     }
 
     return true;
@@ -149,26 +150,27 @@ QString Files::getFolderSize()
 
 QString Files::getFolderSize(const QString &path)
 {
-    if (QFileInfo(path).isDir()) {
-        NumSize __n;
+    if (!QFileInfo(path).isDir())
+        return QString();
 
-        // iterating
-        QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext() && !isCanceled()) {
-            it.next();
-            __n << it.fileInfo().size();
-        }
+    NumSize __n;
 
-        // result processing
-        if (!isCanceled()) {
-            const QString _folderName = paths::basicName(path);
-            const QString _folderSize = format::filesNumSize(__n);
+    // iterating
+    QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext() && !isCanceled()) {
+        it.next();
+        __n << it.fileInfo().size();
+    }
 
-            return tools::joinStrings(_folderName, _folderSize, QStringLiteral(u": "));
-        }
-        else {
-            qDebug() << "Files::getFolderSize | Canceled" << path;
-        }
+    // result processing
+    if (!isCanceled()) {
+        const QString _folderName = paths::basicName(path);
+        const QString _folderSize = format::filesNumSize(__n);
+
+        return tools::joinStrings(_folderName, _folderSize, QStringLiteral(u": "));
+    }
+    else {
+        qDebug() << "Files::getFolderSize | Canceled" << path;
     }
 
     return QString();
@@ -254,16 +256,14 @@ qint64 Files::dataSize(const QString &folder)
 
 qint64 Files::dataSize(const FileList &filelist)
 {
-    qint64 totalSize = 0;
+    qint64 _total = 0;
 
-    if (!filelist.isEmpty()) {
-        FileList::const_iterator iter;
-        for (iter = filelist.constBegin(); iter != filelist.constEnd(); ++iter) {
-            const qint64 _size = iter.value().size;
-            if (_size > 0)
-                totalSize += _size;
-        }
+    FileList::const_iterator iter;
+    for (iter = filelist.constBegin(); iter != filelist.constEnd(); ++iter) {
+        const qint64 _size = iter.value().size;
+        if (_size > 0)
+            _total += _size;
     }
 
-    return totalSize;
+    return _total;
 }

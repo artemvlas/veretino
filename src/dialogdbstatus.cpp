@@ -169,43 +169,45 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const Numbers &num = data_->numbers_;
-    const int available = num.numberOf(FileStatus::CombAvailable);
-    const int numChecksums = num.numberOf(FileStatus::CombHasChecksum);
+    const Numbers &_num = data_->numbers_;
+    const int _n_available = _num.numberOf(FileStatus::CombAvailable);
+    const int _n_mismatch = _num.numberOf(FileStatus::Mismatched);
 
     if (data_->isAllChecked()) {
-        if (data_->contains(FileStatus::Mismatched)) {
+        const int _n_checksums = _num.numberOf(FileStatus::CombHasChecksum);
+
+        if (_n_mismatch) {
             result.append(QString("☒ %1 mismatches out of %2 available files")
-                              .arg(num.numberOf(FileStatus::Mismatched))
-                              .arg(available));
+                              .arg(_n_mismatch)
+                              .arg(_n_available));
         }
-        else if (numChecksums == available)
-            result.append(QString("✓ ALL %1 stored checksums matched").arg(numChecksums));
+        else if (_n_checksums == _n_available)
+            result.append(QString("✓ ALL %1 stored checksums matched").arg(_n_checksums));
         else
-            result.append(QString("✓ All %1 available files matched the stored checksums").arg(available));
+            result.append(QString("✓ All %1 available files matched the stored checksums").arg(_n_available));
     }
     else if (data_->contains(FileStatus::CombChecked)) {
         // to account for added and updated files, the total number in parentheses is used
-        const int numAddedUpdated = num.numberOf(FileStatus::Added | FileStatus::Updated);
+        const int _n_added_updated = _num.numberOf(FileStatus::Added | FileStatus::Updated);
 
         // info str
-        const int numChecked = num.numberOf(FileStatus::CombChecked);
+        const int _n_checked = _num.numberOf(FileStatus::CombChecked);
         result.append(QString("%1%2 out of %3 files were checked")
-                          .arg(numChecked)
-                          .arg(numAddedUpdated > 0 ? format::inParentheses(numChecked + numAddedUpdated) : QString())
-                          .arg(available));
+                          .arg(_n_checked)
+                          .arg(_n_added_updated > 0 ? format::inParentheses(_n_checked + _n_added_updated) : QString())
+                          .arg(_n_available));
 
         result.append(QString());
-        if (data_->contains(FileStatus::Mismatched))
-            result.append(format::filesNumber(num.numberOf(FileStatus::Mismatched)) + QStringLiteral(u" MISMATCHED"));
+        if (_n_mismatch)
+            result.append(format::filesNumber(_n_mismatch) + QStringLiteral(u" MISMATCHED"));
         else
             result.append(QStringLiteral(u"No Mismatches found"));
 
-        if (data_->contains(FileStatus::Matched)) {
-            const int numMatched = num.numberOf(FileStatus::Matched);
+        const int _n_matched = _num.numberOf(FileStatus::Matched);
+        if (_n_matched) {
             result.append(QString("%1%2 files matched")
-                              .arg(numMatched)
-                              .arg(numAddedUpdated > 0 ? format::inParentheses(numMatched + numAddedUpdated) : QString()));
+                              .arg(_n_matched)
+                              .arg(_n_added_updated > 0 ? format::inParentheses(_n_matched + _n_added_updated) : QString()));
         }
     }
 
@@ -221,13 +223,13 @@ QStringList DialogDbStatus::infoChanges()
     if (_n_added)
         result.append(QStringLiteral(u"Added: ") + format::filesNumSize(_n_added));
 
-    const NumSize _n_removed = _num.values(FileStatus::Removed);
+    const int _n_removed = _num.numberOf(FileStatus::Removed);
     if (_n_removed)
-        result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _n_removed._num));
+        result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _n_removed));
 
-    const NumSize _n_upd = _num.values(FileStatus::Updated);
+    const int _n_upd = _num.numberOf(FileStatus::Updated);
     if (_n_upd)
-        result.append(tools::joinStrings(QStringLiteral(u"Updated:"), _n_upd._num));
+        result.append(tools::joinStrings(QStringLiteral(u"Updated:"), _n_upd));
 
     return result;
 }

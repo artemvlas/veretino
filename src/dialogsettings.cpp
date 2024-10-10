@@ -38,7 +38,6 @@ DialogSettings::DialogSettings(Settings *settings, QWidget *parent) :
     const IconProvider icons(palette());
     ui->tabWidget->setTabIcon(TabMain, icons.icon(Icons::Configure));
     ui->tabWidget->setTabIcon(TabDatabase, icons.icon(Icons::Database));
-    //ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 }
 
 void DialogSettings::loadSettings(const Settings &settings)
