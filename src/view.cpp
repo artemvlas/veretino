@@ -33,7 +33,7 @@ View::View(QWidget *parent)
 // called every time the model is changed
 void View::connectModel()
 {
-    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
+    connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurPath);
 }
 
 void View::setSettings(Settings *settings)
@@ -188,22 +188,18 @@ QString View::curAbsPath() const
     return QString();
 }
 
-void View::changeCurIndexAndPath(const QModelIndex &curIndex)
+void View::changeCurPath(const QModelIndex &curIndex)
 {
     if (isViewFileSystem()) {
-        _curIndexFS = curIndex;
-        _lastPathFS = curAbsPath(); //fileSystem->filePath(curIndex);
+        _lastPathFS = curAbsPath();
         emit pathChanged(_lastPathFS);
     }
     else if (isViewDatabase()) {
-        //curIndexSource = isViewModel(ModelSource) ? curIndex
-        //                                          : data_->proxyModel_->mapToSource(curIndex); // ModelProxy
-
         _lastPathModel = TreeModel::getPath(curIndex);
         emit pathChanged(_lastPathModel);
     }
     else {
-        qDebug() << "View::changeCurIndexAndPath | FAILURE";
+        qDebug() << "View::changeCurPath | FAILURE";
     }
 }
 
@@ -224,14 +220,17 @@ void View::setIndexByPath(const QString &path)
 {
     if (isViewFileSystem()) {
         if (QFileInfo::exists(path)) {
-            QModelIndex index = fileSystem->index(path);
+            setCurIndex(fileSystem->index(path));
+
+            //OLD
+            /*QModelIndex index = fileSystem->index(path);
             expand(index);
             setCurrentIndex(index);
             QTimer::singleShot(500, this, [=]{ scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter); });
             // for better scrolling work, a timer^ is used
             // QFileSystemModel needs some time after setup to Scrolling be able
             // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
-            // 'index' (wich is =fileSystem->index(path)) is NOT working good
+            // 'index' (wich is ==fileSystem->index(path)) is NOT working good*/
         }
         else if (!path.isEmpty()) {
             emit showMessage("Wrong path: " + path, "Error");
@@ -243,11 +242,18 @@ void View::setIndexByPath(const QString &path)
         if (!_ind.isValid())
             _ind = TreeModelIterator(model()).nextFile().index(); // select the very first file
 
-        if (_ind.isValid()) {
-            expand(_ind);
-            setCurrentIndex(_ind);
-            scrollTo(_ind, QAbstractItemView::PositionAtCenter);
-        }
+        setCurIndex(_ind);
+    }
+}
+
+void View::setCurIndex(const QModelIndex &ind)
+{
+    if (ind.isValid()) {
+        expand(ind);
+        setCurrentIndex(ind);
+        const int _tmr = (ind.model() == fileSystem) ? 500 : 0;
+        QTimer::singleShot(_tmr, this, [=]{ scrollTo(ind, QAbstractItemView::PositionAtCenter); });
+        //scrollTo(ind, QAbstractItemView::PositionAtCenter);
     }
 }
 

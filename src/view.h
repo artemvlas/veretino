@@ -67,7 +67,7 @@ public slots:
 
 private:
     QString headerText(int column) const;
-    void changeCurIndexAndPath(const QModelIndex &curIndex);
+    void changeCurPath(const QModelIndex &curIndex);
     void deleteOldSelModel();
     void connectModel();
     void setBackgroundColor();
@@ -75,11 +75,10 @@ private:
     void showAllColumns();
     void setDefaultColumnsWidth();
     void restoreHeaderState();
+    void setCurIndex(const QModelIndex &ind);
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
     Settings *settings_ = nullptr;
-
-    QModelIndex _curIndexFS;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
