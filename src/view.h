@@ -36,15 +36,15 @@ public:
     bool isViewDatabase() const;
     bool isViewFiltered() const;
     bool isViewFiltered(const FileStatus status) const;
+    QModelIndex curIndex() const;
 
     DataContainer *data_ = nullptr;
     QItemSelectionModel *oldSelectionModel_ = nullptr;
 
-    QString curPathFileSystem;
-    QString curPathModel;
+    QString _lastPathFS;
+    QString _lastPathModel;
 
-    QModelIndex curIndexFileSystem;
-    QModelIndex curIndexSource;
+    //QModelIndex curIndexSource;
 
 public slots:
     void setFileSystemModel();
@@ -78,6 +78,8 @@ private:
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
     Settings *settings_ = nullptr;
+
+    QModelIndex _curIndexFS;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

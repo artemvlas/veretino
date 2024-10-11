@@ -41,7 +41,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
     connect(menuAct_->actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
     connect(menuAct_->actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{ processFileSha(view_->curPathFileSystem, settings_->algorithm(), DestFileProc::Clipboard); });
+            [=]{ processFileSha(view_->curAbsPath(), settings_->algorithm(), DestFileProc::Clipboard); });
     connect(menuAct_->actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(menuAct_->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -125,10 +125,10 @@ void ModeSelector::getInfoPathItem()
 
     if (view_->isViewFileSystem()) {
         abortProcess();
-        manager_->addTask(&Manager::getPathInfo, view_->curPathFileSystem);
+        manager_->addTask(&Manager::getPathInfo, view_->curAbsPath());
     }
     else if (view_->isViewDatabase()) {
-        manager_->addTask(&Manager::getIndexInfo, view_->curIndexSource); // info about db item (file or subfolder index)
+        manager_->addTask(&Manager::getIndexInfo, view_->curIndex()); // info about db item (file or subfolder index)
     }
 }
 
@@ -236,13 +236,13 @@ Mode ModeSelector::mode() const
         if (proc_ && proc_->isState(State::StartVerbose))
             return FileProcessing;
 
-        QFileInfo pathInfo(view_->curPathFileSystem);
+        QFileInfo pathInfo(view_->_lastPathFS);
         if (pathInfo.isDir())
             return Folder;
         else if (pathInfo.isFile()) {
-            if (paths::isDbFile(view_->curPathFileSystem))
+            if (paths::isDbFile(view_->_lastPathFS))
                 return DbFile;
-            else if (paths::isDigestFile(view_->curPathFileSystem))
+            else if (paths::isDigestFile(view_->_lastPathFS))
                 return SumFile;
             else
                 return File;
@@ -260,12 +260,12 @@ bool ModeSelector::isMode(const Modes expected)
 // tasks execution --->>>
 void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
 {
-    processFileSha(view_->curPathFileSystem, algo, DestFileProc::SumFile);
+    processFileSha(view_->curAbsPath(), algo, DestFileProc::SumFile);
 }
 
 void ModeSelector::promptItemFileUpd()
 {
-    FileStatus storedStatus = TreeModel::itemFileStatus(view_->curIndexSource);
+    FileStatus storedStatus = TreeModel::itemFileStatus(view_->curIndex());
 
     if (!(storedStatus & FileStatus::CombUpdatable))
         return;
@@ -313,7 +313,7 @@ void ModeSelector::promptItemFileUpd()
 
 void ModeSelector::verifyItem()
 {
-    verify(view_->curIndexSource);
+    verify(view_->curIndex());
 }
 
 void ModeSelector::verifyDb()
@@ -330,17 +330,17 @@ void ModeSelector::updateDbItem()
     if (view_->isViewFiltered())
         view_->disableFilter();
 
-    manager_->addTask(&Manager::updateItemFile, view_->curIndexSource);
+    manager_->addTask(&Manager::updateItemFile, view_->curIndex());
 }
 
 void ModeSelector::showFolderContentTypes()
 {
-    makeFolderContentsList(view_->curPathFileSystem);
+    makeFolderContentsList(view_->curAbsPath());
 }
 
 void ModeSelector::checkFileByClipboardChecksum()
 {
-    checkFile(view_->curPathFileSystem, QGuiApplication::clipboard()->text());
+    checkFile(view_->curAbsPath(), QGuiApplication::clipboard()->text());
 }
 
 void ModeSelector::copyFsItem()
@@ -358,7 +358,7 @@ void ModeSelector::showFileSystem(const QString &path)
 {
     if (promptProcessAbort()) {
         if (QFileInfo::exists(path))
-            view_->curPathFileSystem = path;
+            view_->_lastPathFS = path;
 
         if (view_->data_
             && view_->data_->isDbFileState(DbFileState::NotSaved))
@@ -379,11 +379,11 @@ void ModeSelector::saveData()
 void ModeSelector::copyDataToClipboard(Column column)
 {
     if (view_->isViewDatabase()
-        && view_->curIndexSource.isValid())
+        && view_->curIndex().isValid())
     {
-        QString strData = view_->curIndexSource.siblingAtColumn(column).data().toString();
-        if (!strData.isEmpty())
-            QGuiApplication::clipboard()->setText(strData);
+        const QString _strData = view_->curIndex().siblingAtColumn(column).data().toString();
+        if (!_strData.isEmpty())
+            QGuiApplication::clipboard()->setText(_strData);
     }
 }
 
@@ -432,7 +432,7 @@ void ModeSelector::openBranchDb()
     if (!view_->data_)
         return;
 
-    QString assumedPath = view_->data_->getBranchFilePath(view_->curIndexSource, true);
+    QString assumedPath = view_->data_->getBranchFilePath(view_->curIndex(), true);
 
     if (QFileInfo::exists(assumedPath))
         openJsonDatabase(assumedPath);
@@ -475,14 +475,14 @@ void ModeSelector::verifyModified()
 
 void ModeSelector::branchSubfolder()
 {
-    if (view_->curIndexSource.isValid()) {
-        manager_->addTask(&Manager::branchSubfolder, view_->curIndexSource);
+    if (view_->curIndex().isValid()) {
+        manager_->addTask(&Manager::branchSubfolder, view_->curIndex());
     }
 }
 
 void ModeSelector::exportItemSum()
 {
-    const QModelIndex &_ind = view_->curIndexSource;
+    const QModelIndex _ind = view_->curIndex();
 
     if (!view_->data_ ||
         !TreeModel::hasStatus(FileStatus::CombAvailable, _ind))
@@ -520,11 +520,11 @@ void ModeSelector::_makeDbContentsList()
 
 QString ModeSelector::composeDbFilePath()
 {
-    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->curPathFileSystem) : QString();
+    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->_lastPathFS) : QString();
     QString _prefix = settings_->dbPrefix.isEmpty() ? Lit::s_db_prefix : settings_->dbPrefix;
     QString databaseFileName = format::composeDbFileName(_prefix, folderName, settings_->dbFileExtension());
 
-    return paths::joinPath(view_->curPathFileSystem, databaseFileName);
+    return paths::joinPath(view_->_lastPathFS, databaseFileName);
 }
 
 void ModeSelector::processChecksumsFiltered()
@@ -533,7 +533,7 @@ void ModeSelector::processChecksumsFiltered()
     abortProcess();
 
     if (emptyFolderPrompt())
-        makeFolderContentsFilter(view_->curPathFileSystem);
+        makeFolderContentsFilter(view_->_lastPathFS);
 }
 
 void ModeSelector::processChecksumsNoFilter()
@@ -549,7 +549,7 @@ void ModeSelector::processChecksumsNoFilter()
 void ModeSelector::processFolderChecksums(const FilterRule &filter)
 {
     MetaData metaData;
-    metaData.workDir = view_->curPathFileSystem;
+    metaData.workDir = view_->_lastPathFS;
     metaData.algorithm = settings_->algorithm();
     metaData.filter = filter;
     metaData.dbFilePath = composeDbFilePath();
@@ -597,7 +597,7 @@ bool ModeSelector::overwriteDbPrompt()
 
 bool ModeSelector::emptyFolderPrompt()
 {
-    if (Files::isEmptyFolder(view_->curPathFileSystem)) {
+    if (Files::isEmptyFolder(view_->_lastPathFS)) {
         QMessageBox messageBox;
         messageBox.information(view_, "Empty folder", "Nothing to do.");
         return false;
@@ -620,13 +620,13 @@ void ModeSelector::doWork()
             processChecksumsFiltered();
             break;
         case File:
-            processFileSha(view_->curPathFileSystem, settings_->algorithm());
+            processFileSha(view_->_lastPathFS, settings_->algorithm());
             break;
         case DbFile:
-            openJsonDatabase(view_->curPathFileSystem);
+            openJsonDatabase(view_->_lastPathFS);
             break;
         case SumFile:
-            checkSummaryFile(view_->curPathFileSystem);
+            checkSummaryFile(view_->_lastPathFS);
             break;
         case Model:
             if (!proc_->isStarted())
@@ -660,16 +660,16 @@ void ModeSelector::quickAction()
             doWork();
             break;
         case DbFile:
-            openJsonDatabase(view_->curPathFileSystem);
+            openJsonDatabase(view_->_lastPathFS);
             break;
         case SumFile:
-            checkSummaryFile(view_->curPathFileSystem);
+            checkSummaryFile(view_->_lastPathFS);
             break;
         case Model:
         case ModelNewLost:
         case UpdateMismatch:
-            if (TreeModel::isFileRow(view_->curIndexSource)) {
-                if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, view_->curIndexSource))
+            if (TreeModel::isFileRow(view_->curIndex())) {
+                if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, view_->curIndex()))
                     promptItemFileUpd();
                 else
                     verifyItem();

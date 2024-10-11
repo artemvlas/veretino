@@ -33,14 +33,26 @@ View::View(QWidget *parent)
 // called every time the model is changed
 void View::connectModel()
 {
-    curIndexSource = QModelIndex(); // TMP, due to changeCurIndexAndPath
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &View::changeCurIndexAndPath);
 }
 
 void View::setSettings(Settings *settings)
 {
     settings_ = settings;
-    settings_->lastFsPath = &curPathFileSystem;
+    settings_->lastFsPath = &_lastPathFS;
+}
+
+QModelIndex View::curIndex() const
+{
+    if (!selectionModel()) {
+        qDebug() << "View::curIndex | No selection model";
+        return QModelIndex();
+    }
+
+    if (isViewModel(ModelProxy))
+        return data_->proxyModel_->mapToSource(selectionModel()->currentIndex());
+
+    return selectionModel()->currentIndex();
 }
 
 void View::setFileSystemModel()
@@ -104,7 +116,7 @@ void View::setData(DataContainer *data)
     }
 
     data_ = data;
-    curPathFileSystem = data->metaData_.dbFilePath;
+    _lastPathFS = data->metaData_.dbFilePath;
 
     if (data->isInCreation()) {
         setTreeModel(ModelView::ModelSource);
@@ -168,10 +180,10 @@ void View::setMismatchFiltering(const Numbers &num)
 QString View::curAbsPath() const
 {
     if (isViewFileSystem())
-        return fileSystem->filePath(curIndexFileSystem);
+        return fileSystem->filePath(curIndex());
 
     if (isViewDatabase())
-        return data_->itemAbsolutePath(curIndexSource);
+        return data_->itemAbsolutePath(curIndex());
 
     return QString();
 }
@@ -179,16 +191,16 @@ QString View::curAbsPath() const
 void View::changeCurIndexAndPath(const QModelIndex &curIndex)
 {
     if (isViewFileSystem()) {
-        curIndexFileSystem = curIndex;
-        curPathFileSystem = fileSystem->filePath(curIndex);
-        emit pathChanged(curPathFileSystem);
+        _curIndexFS = curIndex;
+        _lastPathFS = curAbsPath(); //fileSystem->filePath(curIndex);
+        emit pathChanged(_lastPathFS);
     }
     else if (isViewDatabase()) {
-        curIndexSource = isViewModel(ModelSource) ? curIndex
-                                                  : data_->proxyModel_->mapToSource(curIndex); // ModelProxy
+        //curIndexSource = isViewModel(ModelSource) ? curIndex
+        //                                          : data_->proxyModel_->mapToSource(curIndex); // ModelProxy
 
-        curPathModel = TreeModel::getPath(curIndexSource);
-        emit pathChanged(curPathModel);
+        _lastPathModel = TreeModel::getPath(curIndex);
+        emit pathChanged(_lastPathModel);
     }
     else {
         qDebug() << "View::changeCurIndexAndPath | FAILURE";
@@ -198,13 +210,13 @@ void View::changeCurIndexAndPath(const QModelIndex &curIndex)
 void View::setIndexByPath()
 {
     if (isViewFileSystem()) {
-        if (!curPathFileSystem.isEmpty() && !QFileInfo::exists(curPathFileSystem))
-            curPathFileSystem = paths::parentFolder(curPathFileSystem);
+        if (!_lastPathFS.isEmpty() && !QFileInfo::exists(_lastPathFS))
+            _lastPathFS = paths::parentFolder(_lastPathFS);
 
-        QFileInfo::exists(curPathFileSystem) ? setIndexByPath(curPathFileSystem) : toHome();
+        QFileInfo::exists(_lastPathFS) ? setIndexByPath(_lastPathFS) : toHome();
     }
     else if (isViewDatabase()) {
-        setIndexByPath(curPathModel);
+        setIndexByPath(_lastPathModel);
     }
 }
 
@@ -226,15 +238,15 @@ void View::setIndexByPath(const QString &path)
         }
     }
     else if (isViewDatabase()) {
-        QModelIndex index = TreeModel::getIndex(path, model());
+        QModelIndex _ind = TreeModel::getIndex(path, model());
 
-        if (!index.isValid())
-            index = TreeModelIterator(model()).nextFile().index(); // select the very first file
+        if (!_ind.isValid())
+            _ind = TreeModelIterator(model()).nextFile().index(); // select the very first file
 
-        if (index.isValid()) {
-            expand(index);
-            setCurrentIndex(index);
-            scrollTo(index, QAbstractItemView::PositionAtCenter);
+        if (_ind.isValid()) {
+            expand(_ind);
+            setCurrentIndex(_ind);
+            scrollTo(_ind, QAbstractItemView::PositionAtCenter);
         }
     }
 }
@@ -242,7 +254,7 @@ void View::setIndexByPath(const QString &path)
 void View::setFilter(const FileStatuses flags)
 {
     if (isViewModel(ModelProxy)) {
-        QString prePathModel = curPathModel;
+        QString prePathModel = _lastPathModel;
         data_->proxyModel_->setFilter(flags);
         setIndexByPath(prePathModel);
         setBackgroundColor();
@@ -271,8 +283,8 @@ void View::disableFilter()
 void View::toHome()
 {
     if (isViewFileSystem()) {
-        curPathFileSystem = QDir::homePath();
-        setIndexByPath(curPathFileSystem);
+        _lastPathFS = QDir::homePath();
+        setIndexByPath(_lastPathFS);
     }
 }
 

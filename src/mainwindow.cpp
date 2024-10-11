@@ -416,11 +416,11 @@ void MainWindow::updateStatusIcon()
         statusIcon = modeSelect->iconProvider.icon(FileStatus::Calculating);
     }
     else if (ui->treeView->isViewFileSystem()) {
-        statusIcon = modeSelect->iconProvider.icon(ui->treeView->curPathFileSystem);
+        statusIcon = modeSelect->iconProvider.icon(ui->treeView->curAbsPath());
     }
     else if (ui->treeView->isViewDatabase()) {
-        if (TreeModel::isFileRow(ui->treeView->curIndexSource))
-            statusIcon = modeSelect->iconProvider.icon(TreeModel::itemFileStatus(ui->treeView->curIndexSource));
+        if (TreeModel::isFileRow(ui->treeView->curIndex()))
+            statusIcon = modeSelect->iconProvider.icon(TreeModel::itemFileStatus(ui->treeView->curIndex()));
         else
             statusIcon = modeSelect->iconProvider.iconFolder();
     }
@@ -472,7 +472,7 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::handlePathEdit()
 {
-    if (ui->pathEdit->text() == ui->treeView->curPathFileSystem)
+    if (ui->pathEdit->text() == ui->treeView->curAbsPath())
         modeSelect->quickAction();
     else
         ui->treeView->setIndexByPath(ui->pathEdit->text().replace('\\', '/'));
