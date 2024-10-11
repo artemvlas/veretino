@@ -253,7 +253,9 @@ void View::setCurIndex(const QModelIndex &ind)
         setCurrentIndex(ind);
         const int _tmr = (ind.model() == fileSystem) ? 500 : 0;
         QTimer::singleShot(_tmr, this, [=]{ scrollTo(ind, QAbstractItemView::PositionAtCenter); });
-        //scrollTo(ind, QAbstractItemView::PositionAtCenter);
+
+        if (_tmr) // second control one :)
+            QTimer::singleShot((_tmr * 2), this, [=]{ scrollTo(ind, QAbstractItemView::PositionAtCenter); });
     }
 }
 
