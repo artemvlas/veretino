@@ -252,11 +252,16 @@ void View::setCurIndex(const QModelIndex &ind)
         expand(ind);
         setCurrentIndex(ind);
         const int _tmr = (ind.model() == fileSystem) ? 500 : 0;
-        QTimer::singleShot(_tmr, this, [=]{ scrollTo(ind, QAbstractItemView::PositionAtCenter); });
+        QTimer::singleShot(_tmr, this, &View::scrollToCurrent);
 
-        if (_tmr) // second control one :)
-            QTimer::singleShot((_tmr * 2), this, [=]{ scrollTo(ind, QAbstractItemView::PositionAtCenter); });
+        if (_tmr) // second, the control one :)
+            QTimer::singleShot((_tmr * 2), this, &View::scrollToCurrent);
     }
+}
+
+void View::scrollToCurrent()
+{
+    scrollTo(currentIndex(), QAbstractItemView::PositionAtCenter);
 }
 
 void View::setFilter(const FileStatuses flags)

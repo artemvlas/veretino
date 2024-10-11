@@ -76,6 +76,7 @@ private:
     void setDefaultColumnsWidth();
     void restoreHeaderState();
     void setCurIndex(const QModelIndex &ind);
+    void scrollToCurrent();
 
     QFileSystemModel *fileSystem = new QFileSystemModel(this);
     Settings *settings_ = nullptr;
