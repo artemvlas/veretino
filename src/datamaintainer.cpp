@@ -338,13 +338,15 @@ bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
     return false;
 }
 
-void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus status)
+void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus)
 {
-    if (status != FileStatus::Queued) { // data_ && !data_->isInCreation()
-        if (status == FileStatus::New)
+    if (prevStatus != FileStatus::Queued) { // data_ && !data_->isInCreation()
+        if (prevStatus == FileStatus::New)
             clearChecksums(FileStatus::Added, rootIndex);
+        else if (tools::isFlagCombined(prevStatus)) // CombNotChecked == NotChecked | NotCheckedMod
+            prevStatus = FileStatus::NotChecked;
 
-        changeFilesStatus((FileStatus::CombProcessing | FileStatus::Added), status, rootIndex);
+        changeFilesStatus((FileStatus::CombProcessing | FileStatus::Added), prevStatus, rootIndex);
     }
 }
 

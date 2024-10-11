@@ -453,16 +453,16 @@ void ModeSelector::checkFile(const QString &filePath, const QString &checkSum)
     manager_->addTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
 }
 
-void ModeSelector::verify(const QModelIndex &index)
+void ModeSelector::verify(const QModelIndex _index)
 {
-    if (TreeModel::isFileRow(index)) {
+    if (TreeModel::isFileRow(_index)) {
         view_->disableFilter();
-        manager_->addTask(&Manager::verifyFileItem, index);
+        manager_->addTask(&Manager::verifyFileItem, _index);
     }
     else {
         view_->setViewSource();
         manager_->addTask(&Manager::verifyFolderItem,
-                          index, FileStatus::CombNotChecked);
+                          _index, FileStatus::CombNotChecked);
     }
 }
 

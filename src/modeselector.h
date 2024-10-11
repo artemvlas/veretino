@@ -64,7 +64,7 @@ public:
     void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result = DestFileProc::Generic);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
-    void verify(const QModelIndex &index = QModelIndex());
+    void verify(const QModelIndex _index = QModelIndex());
     void verifyModified();
     void branchSubfolder();
     void exportItemSum();

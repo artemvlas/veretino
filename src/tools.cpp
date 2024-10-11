@@ -143,6 +143,19 @@ bool isLater(const QString &dt_str, const QDateTime &other)
     return isLater(dt_str, other.toString(Lit::s_dt_format));
 }
 
+bool isFlagCombined(const int flag)
+{
+    return (flag & (flag - 1));
+}
+
+bool isFlagNonCombined(const int flag)
+{
+    // > 0
+    // return flag && !(flag & (flag - 1));
+
+    return !(flag & (flag - 1));
+}
+
 QString joinStrings(const QString &str1, const QString &str2, QChar sep)
 {
     const bool s1Ends = str1.endsWith(sep);

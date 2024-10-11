@@ -34,6 +34,8 @@ int digitsToNum(const QList<int> &digits); // {0,1,2,3} --> 123
 
 bool canBeChecksum(const QString &str);
 bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
+bool isFlagCombined(const int flag);
+bool isFlagNonCombined(const int flag);
 bool isLater(const QString &dt_str, const QDateTime &other);
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep); // checks for the absence of sep duplication
