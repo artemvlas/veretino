@@ -427,7 +427,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return checkSum;
 }
 
-void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items) const
+void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items)
 {
     const Pieces<qint64> _p_size = procState->piecesSize();
 

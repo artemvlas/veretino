@@ -82,7 +82,7 @@ private:
                               bool isVerification = false);
 
     int calculateChecksums(FileStatus status, const QModelIndex &rootIndex = QModelIndex());
-    void updateCalcStatus(const QString &_purp, Pieces<int> _p_items) const;
+    void updateCalcStatus(const QString &_purp, Pieces<int> _p_items);
 
     // variables
     bool isViewFileSysytem;
@@ -93,7 +93,7 @@ private:
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
 
 signals:
-    void setStatusbarText(const QString &text = QString()) const; // send the 'text' to statusbar
+    void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
     void setViewData(DataContainer *data = nullptr);
     void folderContentsListCreated(const QString &folderPath, const FileTypeList &extList);
     void dbCreationDataCollected(const QString &folderPath, const QStringList &dbFiles, const FileTypeList &extList);
