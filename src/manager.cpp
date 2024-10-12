@@ -60,6 +60,9 @@ void Manager::runTasks()
 
 void Manager::clearTasks()
 {
+    if (taskQueue_.size() > 0)
+        qDebug() << "Manager::clearTasks:" << taskQueue_.size() << "State:" << procState->state();
+
     taskQueue_.clear();
 }
 
@@ -421,14 +424,6 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
     if (checkSum.isEmpty() && !procState->isCanceled())
         emit showMessage("Read error:\n" + filePath, "Warning");
-
-    // to update the statusbar text
-    if (isViewFileSysytem && settings_->lastFsPath) // to prevent unnecessary cancellation
-        getPathInfo(*settings_->lastFsPath);
-    else
-        emit finishedCalcFileChecksum();
-
-    procState->setState(State::Idle);
 
     return checkSum;
 }

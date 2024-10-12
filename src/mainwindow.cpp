@@ -146,7 +146,6 @@ void MainWindow::connectManager()
     connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogContentsList);
     connect(manager, &Manager::dbCreationDataCollected, this, &MainWindow::showDialogDbCreation);
-    connect(manager, &Manager::finishedCalcFileChecksum, modeSelect, &ModeSelector::getInfoPathItem);
     connect(manager, &Manager::dbContentsListCreated, this, &MainWindow::showDialogDbContents);
     connect(manager, &Manager::mismatchFound, this, &MainWindow::setWinTitleMismatchFound);
 
@@ -166,6 +165,9 @@ void MainWindow::connectManager()
     connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
     connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
     connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateStatusIcon);
+
+    // <!> experimental
+    connect(manager->procState, &ProcState::progressFinished, modeSelect, &ModeSelector::getInfoPathItem);
 
     // change view
     connect(manager, &Manager::switchToFsPrepared, ui->treeView, &View::setFileSystemModel);
