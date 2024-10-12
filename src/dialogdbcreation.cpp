@@ -357,15 +357,15 @@ void DialogDbCreation::setFilterCreation(FilterCreation mode)
 
 void DialogDbCreation::updateViewMode()
 {
-    ui->fr_total_filtered->setVisible(mode_ == FC_Enabled);
-    ui->fr_filter_exts->setVisible(mode_ == FC_Enabled);
-    ui->cb_enable_filter->setChecked(mode_ == FC_Enabled);
-    setCheckboxesVisible(mode_ == FC_Enabled);
+    const bool _is_f = isFilterCreating();
 
-    if (mode_ == FC_Enabled)
+    ui->fr_total_filtered->setVisible(_is_f);
+    ui->fr_filter_exts->setVisible(_is_f);
+    ui->cb_enable_filter->setChecked(_is_f);
+    setCheckboxesVisible(_is_f);
+
+    if (_is_f)
         ui->rb_ignore->setChecked(true);
-
-    // updateFilterDisplay();
 }
 
 void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
@@ -385,14 +385,16 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
 
 void DialogDbCreation::handlePresetClicked(const QAction *_act)
 {
-    if (mode_ != FC_Enabled) {
+    if (!isFilterCreating()) {
         setFilterCreation(FC_Enabled);
     }
 
-    types_->setChecked(_presets.value(_act->text()));
+    // _act->text() may contain an ampersand in some Qt versions (6.7.2 for example)
+    const QString __s = _act->toolTip();
+    types_->setChecked(_presets.value(__s));
 
-    QRadioButton *_rb = _act->text().startsWith('!') ? ui->rb_ignore
-                                                     : ui->rb_include;
+    QRadioButton *_rb = __s.startsWith('!') ? ui->rb_ignore
+                                            : ui->rb_include;
     _rb->setChecked(true);
 }
 
