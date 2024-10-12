@@ -29,7 +29,7 @@ Manager::Manager(Settings *settings, QObject *parent)
     connect(this, &Manager::taskAdded, this, &Manager::runTasks);
 }
 
-void Manager::queueTask(std::function<void()> task)
+void Manager::queueTask(Task task)
 {
     taskQueue_.append(task);
 
@@ -39,14 +39,20 @@ void Manager::queueTask(std::function<void()> task)
 
 void Manager::runTasks()
 {
-    //qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
+    // qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
 
     while (!taskQueue_.isEmpty()) {
-        if (!procState->isStarted())
-            procState->setState(State::StartSilently);
+        /* OLD
+         * if (!procState->isStarted())
+         *    procState->setState(State::StartSilently);
+         * std::function<void()> func = taskQueue_.takeFirst();
+         * func();
+         */
 
-        std::function<void()> func = taskQueue_.takeFirst();
-        func();
+        Task _task = taskQueue_.takeFirst();
+        procState->setState(_task._state);
+
+        _task._func();
     }
 
     procState->setState(State::Idle);

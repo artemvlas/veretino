@@ -128,7 +128,10 @@ void ModeSelector::getInfoPathItem()
         manager_->addTask(&Manager::getPathInfo, view_->curAbsPath());
     }
     else if (view_->isViewDatabase()) {
-        manager_->addTask(&Manager::getIndexInfo, view_->curIndex()); // info about db item (file or subfolder index)
+        // info about db item (file or subfolder index)
+        manager_->addTaskWithState(State::Idle,
+                                   &Manager::getIndexInfo,
+                                   view_->curIndex());
     }
 }
 

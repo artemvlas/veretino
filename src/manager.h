@@ -12,6 +12,14 @@
 #include "procstate.h"
 #include "settings.h"
 
+struct Task {
+    Task(std::function<void()> func, State state = State::StartSilently)
+        : _func(func), _state(state) {}
+
+    std::function<void()> _func;
+    State _state;
+}; // struct Task
+
 class Manager : public QObject
 {
     Q_OBJECT
@@ -33,7 +41,18 @@ public:
     template<typename Callable, typename... Args>
     void addTask(Callable&& _func, Args&&... _args)
     {
-        std::function<void()> _task = std::bind(std::forward<Callable>(_func), this, std::forward<Args>(_args)...);
+        Task _task(std::bind(std::forward<Callable>(_func),
+                             this, std::forward<Args>(_args)...));
+        queueTask(_task);
+    }
+
+    template<typename Callable, typename... Args>
+    void addTaskWithState(State p_state, Callable&& _func, Args&&... _args)
+    {
+        Task _task(std::bind(std::forward<Callable>(_func),
+                             this, std::forward<Args>(_args)...),
+                   p_state);
+
         queueTask(_task);
     }
 
@@ -70,7 +89,7 @@ public slots:
     void runTasks();
 
 private:
-    void queueTask(std::function<void()> task);
+    void queueTask(Task task);
     void sendDbUpdated();
 
     void showFileCheckResultMessage(const QString &filePath,
@@ -88,7 +107,7 @@ private:
     bool isViewFileSysytem;
     Settings *settings_;
     Files *files_ = new Files(this);
-    QList<std::function<void()>> taskQueue_;
+    QList<Task> taskQueue_;
 
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
 
