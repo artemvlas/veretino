@@ -13,12 +13,16 @@ DialogExistingDbs::DialogExistingDbs(const QStringList &fileList, QWidget *paren
     , ui(new Ui::DialogExistingDbs)
 {
     ui->setupUi(this);
+
+    IconProvider _icons(palette());
     setWindowIcon(IconProvider::appIcon());
 
     ui->listWidget->addItems(fileList);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(QStringLiteral(u"Open"));
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(QStringLiteral(u"Create New"));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(_icons.icon(Icons::Database));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setIcon(_icons.icon(Icons::DoubleGear));
 
     connect(ui->listWidget, &QListWidget::doubleClicked, this, &DialogExistingDbs::accept);
 }
