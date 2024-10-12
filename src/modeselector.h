@@ -66,6 +66,7 @@ public:
     void checkFile(const QString &filePath, const QString &checkSum);
     void verify(const QModelIndex _index = QModelIndex());
     void verifyModified();
+    void verifyItems(const QModelIndex &_root, FileStatus _status);
     void branchSubfolder();
     void exportItemSum();
 

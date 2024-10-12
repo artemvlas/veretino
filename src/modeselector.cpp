@@ -389,6 +389,7 @@ void ModeSelector::copyDataToClipboard(Column column)
 
 void ModeSelector::updateDatabase(const DestDbUpdate task)
 {
+    stopProcess();
     view_->setViewSource();
     manager_->addTask(&Manager::updateDatabase, task);
 }
@@ -460,17 +461,20 @@ void ModeSelector::verify(const QModelIndex _index)
         manager_->addTask(&Manager::verifyFileItem, _index);
     }
     else {
-        view_->setViewSource();
-        manager_->addTask(&Manager::verifyFolderItem,
-                          _index, FileStatus::CombNotChecked);
+        verifyItems(_index, FileStatus::CombNotChecked);
     }
 }
 
 void ModeSelector::verifyModified()
 {
+    verifyItems(QModelIndex(), FileStatus::NotCheckedMod);
+}
+
+void ModeSelector::verifyItems(const QModelIndex &_root, FileStatus _status)
+{
+    stopProcess();
     view_->setViewSource();
-    manager_->addTask(&Manager::verifyFolderItem,
-                      QModelIndex(), FileStatus::NotCheckedMod);
+    manager_->addTask(&Manager::verifyFolderItem, _root, _status);
 }
 
 void ModeSelector::branchSubfolder()
