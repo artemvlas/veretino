@@ -241,7 +241,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     }
 
     const FilterRule _filter = dialog.resultFilter();
-    if (_filter || !dialog.isFilterCreationEnabled()) {
+    if (_filter || !dialog.isFilterCreating()) {
         modeSelect->processFolderChecksums(_filter);
     }
     else { // filter creation is enabled, BUT no suffix(type) is ​​selected

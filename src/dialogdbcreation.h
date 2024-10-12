@@ -34,7 +34,7 @@ public:
     void updateSettings();
     void setFilterCreation(FilterCreation mode);
     FilterRule resultFilter();
-    bool isFilterCreationEnabled() const;
+    bool isFilterCreating() const;
 
 private:
     Ui::DialogDbCreation *ui;

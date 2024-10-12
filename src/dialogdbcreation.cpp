@@ -407,7 +407,7 @@ void DialogDbCreation::resetView()
     updateDbFilename();
 }
 
-bool DialogDbCreation::isFilterCreationEnabled() const
+bool DialogDbCreation::isFilterCreating() const
 {
     return (mode_ == FC_Enabled);
 }
