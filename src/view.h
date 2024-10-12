@@ -44,8 +44,6 @@ public:
     QString _lastPathFS;
     QString _lastPathModel;
 
-    //QModelIndex curIndexSource;
-
 public slots:
     void setFileSystemModel();
     void setData(DataContainer *data);

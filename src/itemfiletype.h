@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino,
+ * licensed under the GNU GPLv3.
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef ITEMFILETYPE_H
 #define ITEMFILETYPE_H
 

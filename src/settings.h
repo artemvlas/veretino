@@ -28,7 +28,6 @@ public:
     void loadSettings();
 
     // variables
-    //FilterRule filter;
     QStringList recentFiles;
     QString dbPrefix;
     bool restoreLastPathOnStartup = true;
@@ -38,7 +37,7 @@ public:
     bool instantSaving = false;
     bool excludeUnpermitted = true;
     bool dbFlagConst = false;
-    bool considerDateModified = false;
+    bool considerDateModified = true;
 
     FilterMode filter_mode = FilterMode::NotSet;
     QStringList filter_last_exts;

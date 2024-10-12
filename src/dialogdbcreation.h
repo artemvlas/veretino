@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino,
+ * licensed under the GNU GPLv3.
+ * https://github.com/artemvlas/veretino
+*/
 #ifndef DIALOGDBCREATION_H
 #define DIALOGDBCREATION_H
 
@@ -29,6 +34,7 @@ public:
     void updateSettings();
     void setFilterCreation(FilterCreation mode);
     FilterRule resultFilter();
+    bool isFilterCreationEnabled() const;
 
 private:
     Ui::DialogDbCreation *ui;

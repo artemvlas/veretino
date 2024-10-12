@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino,
+ * licensed under the GNU GPLv3.
+ * https://github.com/artemvlas/veretino
+*/
 #include "dialogdbcreation.h"
 #include "ui_dialogdbcreation.h"
 #include "tools.h"
@@ -31,7 +36,7 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
     ui->setupUi(this);
 
     IconProvider _icons(palette());
-    setWindowIcon(_icons.iconFolder());
+    setWindowIcon(_icons.icon(Icons::Database));
     types_ = ui->treeWidget;
     types_->setColumnWidth(ItemFileType::ColumnType, 130);
     types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
@@ -400,6 +405,11 @@ void DialogDbCreation::resetView()
     ui->cb_flag_const->setChecked(false);
     ui->cmb_algo->setCurrentIndex(cmbAlgoIndex());
     updateDbFilename();
+}
+
+bool DialogDbCreation::isFilterCreationEnabled() const
+{
+    return (mode_ == FC_Enabled);
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)

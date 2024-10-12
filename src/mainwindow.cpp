@@ -234,7 +234,6 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
 
     DialogDbCreation dialog(folder, extList, this);
     dialog.setSettings(settings_);
-    dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
     dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
 
     if (!dialog.exec()) {
@@ -242,18 +241,20 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     }
 
     FilterRule filter = dialog.resultFilter();
-    if (filter.isFilterEnabled()) {
+    if (filter.isFilterEnabled() || !dialog.isFilterCreationEnabled()) {
         modeSelect->processFolderChecksums(filter);
     }
-    else {
+    else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("No filter specified");
         msgBox.setText("File filtering is not set.");
-        msgBox.setInformativeText("Continue for all files?");
+        msgBox.setInformativeText("Continue with all files?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
         msgBox.setDefaultButton(QMessageBox::Yes);
-        msgBox.setIcon(QMessageBox::Question);
         msgBox.button(QMessageBox::Yes)->setText("Continue");
+
+        static const QPixmap _pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(64, 64);
+        msgBox.setIconPixmap(_pixFilter);
 
         if (msgBox.exec() == QMessageBox::Yes)
             modeSelect->processFolderChecksums(filter);
