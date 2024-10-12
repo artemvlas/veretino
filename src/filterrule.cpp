@@ -47,7 +47,7 @@ bool FilterRule::isFilter(const FilterMode filterMode) const
     return (filterMode == mode_);
 }
 
-bool FilterRule::isFilterEnabled() const
+bool FilterRule::isEnabled() const
 {
     return !isFilter(NotSet);
 }

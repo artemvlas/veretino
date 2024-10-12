@@ -35,7 +35,7 @@ public:
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
     bool instantSaving = false;
-    bool excludeUnpermitted = true;
+    bool excludeUnpermitted = false;
     bool dbFlagConst = false;
     bool considerDateModified = true;
 

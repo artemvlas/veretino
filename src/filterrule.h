@@ -24,10 +24,12 @@ public:
     void setFilter(const FilterMode filterMode, const QStringList &extensions);
     void clearFilter(); // set defaults
     bool isFilter(const FilterMode filterMode) const;
-    bool isFilterEnabled() const;
+    bool isEnabled() const;
     bool isFileAllowed(const QString &filePath) const; // whether the file extension matches the filter rules
     QString extensionString(const QString &sep = ", ") const;
     QStringList extensionList() const;
+
+    explicit operator bool() const { return isEnabled(); }
 
     bool ignoreShaFiles = true;
     bool ignoreDbFiles = true;

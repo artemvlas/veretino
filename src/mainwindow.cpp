@@ -240,9 +240,9 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         return;
     }
 
-    FilterRule filter = dialog.resultFilter();
-    if (filter.isFilterEnabled() || !dialog.isFilterCreationEnabled()) {
-        modeSelect->processFolderChecksums(filter);
+    const FilterRule _filter = dialog.resultFilter();
+    if (_filter || !dialog.isFilterCreationEnabled()) {
+        modeSelect->processFolderChecksums(_filter);
     }
     else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
@@ -257,7 +257,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         msgBox.setIconPixmap(_pixFilter);
 
         if (msgBox.exec() == QMessageBox::Yes)
-            modeSelect->processFolderChecksums(filter);
+            modeSelect->processFolderChecksums(_filter);
     }
 }
 
