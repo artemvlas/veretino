@@ -420,12 +420,16 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
                                                    format::algoToStr(algo),
                                                    format::fileNameAndSize(filePath)));
 
-    QString checkSum = shaCalc.calculate(filePath, algo);
+    const QString _digest = shaCalc.calculate(filePath, algo);
 
-    if (checkSum.isEmpty() && !procState->isCanceled())
-        emit showMessage("Read error:\n" + filePath, "Warning");
+    if (_digest.isEmpty() && !procState->isCanceled()) {
+        QString __s = tools::enumToString(tools::failedCalcStatus(filePath)) + ":\n";
 
-    return checkSum;
+        emit showMessage(__s + filePath, "Warning");
+        emit setStatusbarText("failed to read file");
+    }
+
+    return _digest;
 }
 
 void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items)

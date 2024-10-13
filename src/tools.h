@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include <QAbstractItemModel>
 #include <QPalette>
+#include <QMetaEnum>
 #include "files.h"
 #include "numbers.h"
 
@@ -44,6 +45,12 @@ QString joinStrings(int num, const QString &str); // --> "X str"
 QString joinStrings(const QString &str, int num); // --> "str X"
 
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
+
+template<typename QEnum>
+QString enumToString(const QEnum value)
+{
+    return QMetaEnum::fromType<QEnum>().valueToKey(value);
+}
 } // namespace tools
 
 namespace paths {
