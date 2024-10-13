@@ -1,3 +1,7 @@
+Veretino 0.5.1
+* Fixed saving the DB name prefix in Settings.
+
+---
 Veretino 0.5.0
 What's new:
 * New Database Creation Dialog, combining basic settings and filter creation.

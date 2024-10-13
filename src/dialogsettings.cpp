@@ -63,7 +63,9 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
 
     // Tab Database
-    if (!settings.dbPrefix.isEmpty() && settings.dbPrefix != Lit::s_db_prefix)
+    if (settings.dbPrefix.isEmpty() || (settings.dbPrefix == Lit::s_db_prefix))
+        ui->inputJsonFileNamePrefix->clear();
+    else
         ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
 
     ui->cbAddFolderName->setChecked(settings.addWorkDirToFilename);
@@ -95,8 +97,7 @@ void DialogSettings::updateSettings()
 
     // database
     const QString _inpPrefix = ui->inputJsonFileNamePrefix->text();
-    if (!_inpPrefix.isEmpty())
-        settings_->dbPrefix = format::simplifiedChars(_inpPrefix);
+    settings_->dbPrefix = format::simplifiedChars(_inpPrefix);
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
