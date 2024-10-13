@@ -42,16 +42,8 @@ void Manager::runTasks()
     // qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
 
     while (!taskQueue_.isEmpty()) {
-        /* OLD
-         * if (!procState->isStarted())
-         *    procState->setState(State::StartSilently);
-         * std::function<void()> func = taskQueue_.takeFirst();
-         * func();
-         */
-
         Task _task = taskQueue_.takeFirst();
         procState->setState(_task._state);
-
         _task._func();
     }
 
@@ -61,7 +53,7 @@ void Manager::runTasks()
 void Manager::clearTasks()
 {
     if (taskQueue_.size() > 0)
-        qDebug() << "Manager::clearTasks:" << taskQueue_.size() << "State:" << procState->state();
+        qDebug() << "Manager::clearTasks:" << taskQueue_.size();
 
     taskQueue_.clear();
 }
@@ -399,10 +391,10 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    QString sum = calculateChecksum(filePath, algo, true);
+    const QString _digest = calculateChecksum(filePath, algo, true);
 
-    if (!sum.isEmpty()) {
-        showFileCheckResultMessage(filePath, checkSum, sum);
+    if (!_digest.isEmpty()) {
+        showFileCheckResultMessage(filePath, checkSum, _digest);
     }
 }
 
@@ -425,7 +417,7 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     if (_digest.isEmpty() && !procState->isCanceled()) {
         QString __s = tools::enumToString(tools::failedCalcStatus(filePath)) + ":\n";
 
-        emit showMessage(__s + filePath, "Warning");
+        emit showMessage(__s += filePath, "Warning");
         emit setStatusbarText("failed to read file");
     }
 

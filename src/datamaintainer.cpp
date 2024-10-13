@@ -118,7 +118,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable
     const QString &_workDir = data_->metaData_.workDir;
 
     if (!QFileInfo(_workDir).isDir()) {
-        qDebug() << "DataMaintainer::folderBasedData | Wrong path:" << _workDir;
+        qDebug() << "DM::folderBasedData | Wrong path:" << _workDir;
         return 0;
     }
 
@@ -147,7 +147,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable
     }
 
     if (isCanceled() || numAdded == 0) {
-        qDebug() << "DataMaintainer::folderBasedData | Canceled/No items:" << _workDir;
+        qDebug() << "DM::folderBasedData | Canceled/No items:" << _workDir;
         emit setStatusbarText();
         emit failedDataCreation();
         clearData();
@@ -164,7 +164,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable
 void DataMaintainer::updateNumbers()
 {
     if (!data_) {
-        qDebug() << "DataMaintainer::updateNumbers | NO data_";
+        qDebug() << "DM::updateNumbers | NO data_";
         return;
     }
 
@@ -195,11 +195,11 @@ void DataMaintainer::setDbFileState(DbFileState state)
 bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
 {
     if (!data_ || !fileRowIndex.isValid() || fileRowIndex.model() != data_->model_) {
-        qDebug() << "DataMaintainer::updateChecksum | NO data_ or invalid index";
+        qDebug() << "DM::updateChecksum >> Error";
         return false;
     }
 
-    QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
+    const QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
         setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
@@ -219,8 +219,8 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
 
 int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
-    if (!data_) {
-        qDebug() << "DataMaintainer::changeFilesStatus | NO data_";
+    if (!data_ || tools::isFlagCombined(newStatus)) {
+        qDebug() << "DM::changeFilesStatus >> Error";
         return 0;
     }
 
@@ -248,7 +248,7 @@ int DataMaintainer::addToQueue(const FileStatuses flags, const QModelIndex &root
 int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &rootIndex)
 {
     if (!data_) {
-        qDebug() << "DataMaintainer::clearChecksums | NO data_";
+        qDebug() << "DM::clearChecksums | NO data_";
         return 0;
     }
 
@@ -268,7 +268,7 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
 int DataMaintainer::clearLostFiles()
 {
     if (!data_) {
-        qDebug() << "DataMaintainer::clearLostFiles | NO data_";
+        qDebug() << "DM::clearLostFiles | NO data_";
         return 0;
     }
 
@@ -302,7 +302,7 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
 int DataMaintainer::updateMismatchedChecksums()
 {
     if (!data_) {
-        qDebug() << "DataMaintainer::updateMismatchedChecksums | NO data_";
+        qDebug() << "DM::updateMismatchedChecksums | NO data_";
         return 0;
     }
 
@@ -325,10 +325,10 @@ int DataMaintainer::updateMismatchedChecksums()
 bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
 {
     if (data_ && TreeModel::hasReChecksum(fileIndex)) {
-        QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
+        const QString _reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
-        if (!reChecksum.isEmpty()) {
-            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum);
+        if (!_reChecksum.isEmpty()) {
+            setItemValue(fileIndex, Column::ColumnChecksum, _reChecksum);
             setItemValue(fileIndex, Column::ColumnReChecksum);
             setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Updated);
             return true;
@@ -366,7 +366,7 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
-    QString _dbFilePath = json_->makeJson(data_);
+    const QString _dbFilePath = json_->makeJson(data_);
 
     if (!_dbFilePath.isEmpty()) {
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
@@ -378,7 +378,7 @@ void DataMaintainer::exportToJson()
 
     // debug info
     if (data_->isDbFileState(DbFileState::Saved))
-        qDebug() << "DataMaintainer::exportToJson >> Saved";
+        qDebug() << "DM::exportToJson >> Saved";
 }
 
 void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
@@ -387,7 +387,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
 
     if (!TreeModel::isFolderRow(rootFolder)) {
-        qDebug() << "DataMaintainer::forkJsonDb | wrong folder index";
+        qDebug() << "DM::forkJsonDb | wrong folder index";
         return;
     }
 

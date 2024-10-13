@@ -46,7 +46,6 @@ public:
     void setStatusText(const QString &text);
     void setStatusIcon(const QIcon &icon);
 
-    //void setModeFs(bool addButtonFilter);
     void setModeDb(const DataContainer *data);
     void setModeDbCreating();
 
@@ -60,7 +59,6 @@ private:
     const IconProvider *icons_ = nullptr;
     QLabel *statusTextLabel = new QLabel(this);
     QLabel *statusIconLabel = new QLabel(this);
-    StatusBarButton *buttonFsFilter = nullptr;
     StatusBarButton *buttonDbHash = nullptr;
     StatusBarButton *buttonDbSize = nullptr;
     StatusBarButton *buttonDbMain = nullptr;

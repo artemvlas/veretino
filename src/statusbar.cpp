@@ -32,22 +32,6 @@ void StatusBar::setStatusIcon(const QIcon &icon)
 {
     statusIconLabel->setPixmap(icon.pixmap(16, 16));
 }
-/*
-void StatusBar::setModeFs(bool addButtonFilter)
-{
-    clearButtons();
-
-    if (addButtonFilter) {
-        if (!buttonFsFilter) {
-            buttonFsFilter = addPermanentButton();
-            buttonFsFilter->setIcon(icons_->icon(Icons::Filter));
-            buttonFsFilter->setToolTip("View/Change Permanent Filter");
-            connect(buttonFsFilter, &StatusBarButton::clicked, this, &StatusBar::buttonFsFilterClicked);
-        }
-
-        buttonFsFilter->show();
-    }
-}*/
 
 void StatusBar::setModeDb(const DataContainer *data)
 {

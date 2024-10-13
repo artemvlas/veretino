@@ -261,17 +261,17 @@ void DialogDbStatus::setCurrentTab(Tabs tab)
     }
 }
 
-bool DialogDbStatus::isCreating()
+bool DialogDbStatus::isCreating() const
 {
     return data_->isDbFileState(MetaData::NoFile);
 }
 
-bool DialogDbStatus::isJustCreated()
+bool DialogDbStatus::isJustCreated() const
 {
     return data_->isDbFileState(MetaData::Created);
 }
 
-bool DialogDbStatus::isSavedToDesktop()
+bool DialogDbStatus::isSavedToDesktop() const
 {
     return (isJustCreated() && !data_->isWorkDirRelative()
             && (paths::parentFolder(data_->metaData_.dbFilePath) == Files::desktopFolderPath));
