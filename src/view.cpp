@@ -49,10 +49,12 @@ QModelIndex View::curIndex() const
         return QModelIndex();
     }
 
-    if (isViewModel(ModelProxy))
-        return data_->proxyModel_->mapToSource(selectionModel()->currentIndex());
+    const QModelIndex _ind = selectionModel()->currentIndex();
 
-    return selectionModel()->currentIndex();
+    if (isViewModel(ModelProxy))
+        return data_->proxyModel_->mapToSource(_ind);
+
+    return _ind;
 }
 
 void View::setFileSystemModel()

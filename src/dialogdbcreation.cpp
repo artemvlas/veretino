@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QMenu>
+#include <QTimer>
 
 const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
     { QStringLiteral(u"Documents"), { QStringLiteral(u"odt"), QStringLiteral(u"ods"), QStringLiteral(u"pdf"), QStringLiteral(u"docx"),
@@ -194,7 +195,8 @@ void DialogDbCreation::parseInputedExts()
     if (ui->le_exts_list->isReadOnly())
         return;
 
-    types_->setChecked(inputedExts());
+    // types_->setChecked(inputedExts());
+    QTimer::singleShot(500, this, [=]{ types_->setChecked(inputedExts()); });
 }
 
 QStringList DialogDbCreation::inputedExts() const
