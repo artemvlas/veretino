@@ -61,7 +61,7 @@
      <item row="1" column="0" colspan="3">
       <widget class="QLineEdit" name="inp_db_prefix">
        <property name="placeholderText">
-        <string>DB file name prefix. Default: checksums</string>
+        <string>Name prefix. Default: checksums</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>
@@ -195,8 +195,11 @@
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="0">
            <widget class="QCheckBox" name="cb_editable_exts">
+            <property name="toolTip">
+             <string>Enable editing the list of file types (suffixes)</string>
+            </property>
             <property name="text">
-             <string>Editable input of types (suffixes)</string>
+             <string>Editable input</string>
             </property>
            </widget>
           </item>
@@ -207,7 +210,7 @@
 if there are any in the folder.</string>
             </property>
             <property name="text">
-             <string>Remember selected types</string>
+             <string>Remember selected</string>
             </property>
            </widget>
           </item>
