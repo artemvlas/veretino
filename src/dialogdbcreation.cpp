@@ -80,7 +80,7 @@ void DialogDbCreation::connections()
     // filename
     connect(ui->rb_ext_short, &QRadioButton::toggled, this, &DialogDbCreation::updateDbFilename);
     connect(ui->cb_add_folder_name, &QCheckBox::toggled, this, &DialogDbCreation::updateDbFilename);
-    connect(ui->inp_db_filename, &QLineEdit::textEdited, this, &DialogDbCreation::updateDbFilename);
+    connect(ui->inp_db_prefix, &QLineEdit::textEdited, this, &DialogDbCreation::updateDbFilename);
 
     // settings
     connect(this, &DialogDbCreation::accepted, this, &DialogDbCreation::updateSettings);
@@ -104,9 +104,9 @@ void DialogDbCreation::updateSettings()
     if (!settings_)
         return;
 
-    const QString _inpFileName = ui->inp_db_filename->text();
-    if (!_inpFileName.isEmpty())
-        settings_->dbPrefix = format::simplifiedChars(_inpFileName);
+    const QString _inpPrefix = ui->inp_db_prefix->text();
+    settings_->dbPrefix = (_inpPrefix != Lit::s_db_prefix) ? format::simplifiedChars(_inpPrefix)
+                                                           : QString();
 
     settings_->isLongExtension = ui->rb_ext_long->isChecked();
     settings_->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
@@ -134,7 +134,7 @@ void DialogDbCreation::setDbConfig()
     ui->cb_flag_const->setChecked(settings_->dbFlagConst);
 
     if (!settings_->dbPrefix.isEmpty() && (settings_->dbPrefix != Lit::s_db_prefix))
-        ui->inp_db_filename->setText(settings_->dbPrefix);
+        ui->inp_db_prefix->setText(settings_->dbPrefix);
 
     updateDbFilename();
 
@@ -224,7 +224,7 @@ FilterMode DialogDbCreation::curFilterMode() const
 
 void DialogDbCreation::updateDbFilename()
 {
-    const QString _inpText = ui->inp_db_filename->text();
+    const QString _inpText = ui->inp_db_prefix->text();
     const QString _prefix = _inpText.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(_inpText);
     const QString &_folderName = ui->cb_add_folder_name->isChecked() ? workDir_ : QString(); // QStringLiteral(u"@FolderName")
     const QString _ext = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
@@ -401,7 +401,7 @@ void DialogDbCreation::handlePresetClicked(const QAction *_act)
 void DialogDbCreation::resetView()
 {
     clearChecked();
-    ui->inp_db_filename->clear();
+    ui->inp_db_prefix->clear();
     ui->rb_ext_long->setChecked(true);
     ui->cb_add_folder_name->setChecked(true);
     ui->cb_flag_const->setChecked(false);

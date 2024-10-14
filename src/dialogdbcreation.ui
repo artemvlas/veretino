@@ -59,7 +59,7 @@
       <widget class="QComboBox" name="cmb_algo"/>
      </item>
      <item row="1" column="0" colspan="3">
-      <widget class="QLineEdit" name="inp_db_filename">
+      <widget class="QLineEdit" name="inp_db_prefix">
        <property name="placeholderText">
         <string>DB file name prefix. Default: checksums</string>
        </property>

@@ -430,6 +430,9 @@ QString simplifiedChars(QString str)
      * str.replace(re, "_");
      */
 
+    if (str.isEmpty())
+        return str;
+
     static const QString forbSymb(" :/\\%*?|<>&#^");
 
     for (int i = 0; i < str.size(); ++i) {
