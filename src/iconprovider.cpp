@@ -239,3 +239,13 @@ QIcon IconProvider::appIcon()
     static const QIcon _icon = QIcon(paths::composeFilePath(s_folderGeneric, Lit::s_app_name, s_svg));
     return _icon; // ":/icons/generic/veretino.svg"
 }
+
+QPixmap IconProvider::pixmap(FileStatus status, int size) const
+{
+    return icon(status).pixmap(size, size);
+}
+
+QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
+{
+    return icon(themeIcon).pixmap(size, size);
+}

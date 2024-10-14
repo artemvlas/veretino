@@ -255,7 +255,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         msgBox.setDefaultButton(QMessageBox::Yes);
         msgBox.button(QMessageBox::Yes)->setText("Continue");
 
-        static const QPixmap _pixFilter = modeSelect->iconProvider.icon(Icons::Filter).pixmap(64, 64);
+        static const QPixmap _pixFilter = modeSelect->iconProvider.pixmap(Icons::Filter);
         msgBox.setIconPixmap(_pixFilter);
 
         if (msgBox.exec() == QMessageBox::Yes)
@@ -282,9 +282,6 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
     QString titleText = result.contains(FileStatus::Mismatched) ? "FAILED" : "Success";
     QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
-
-    QIcon icon = result.contains(FileStatus::Mismatched) ? modeSelect->iconProvider.icon(FileStatus::Mismatched)
-                                                         : modeSelect->iconProvider.icon(FileStatus::Matched);
 
     if (result.contains(FileStatus::Mismatched)) {
         if (modeSelect->isDbConst()) {
@@ -318,9 +315,12 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
                             .arg(result.numberOf(FileStatus::CombMatched)));
     }
 
+    FileStatus _st_icon = result.contains(FileStatus::Mismatched) ? FileStatus::Mismatched
+                                                                  : FileStatus::Matched;
+
+    msgBox.setIconPixmap(modeSelect->iconProvider.pixmap(_st_icon));
     msgBox.setWindowTitle(titleText);
     msgBox.setText(messageText);
-    msgBox.setIconPixmap(icon.pixmap(64, 64));
 
     int ret = msgBox.exec();
 
@@ -391,7 +391,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     if (!paths::isDbFile(dbFilePath))
         return;
 
-    static const QPixmap _pixBranch = modeSelect->iconProvider.icon(Icons::AddFork).pixmap(64, 64);
+    static const QPixmap _pixBranch = modeSelect->iconProvider.pixmap(Icons::AddFork);
 
     QMessageBox msgBox(this);
     msgBox.setIconPixmap(_pixBranch);

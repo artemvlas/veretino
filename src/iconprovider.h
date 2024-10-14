@@ -54,10 +54,13 @@ public:
     void setTheme(const QPalette &palette);
     Theme theme() const;
 
+    QIcon iconFolder() const;
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons themeIcon) const;
     QIcon icon(const QString &file) const;
-    QIcon iconFolder() const;
+    QPixmap pixmap(FileStatus status, int size = 64) const;
+    QPixmap pixmap(Icons themeIcon, int size = 64) const;
+
     static QIcon appIcon();
 
 private:
