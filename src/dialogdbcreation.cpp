@@ -9,7 +9,6 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QMenu>
-#include <QTimer>
 
 const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
     { QStringLiteral(u"Documents"), { QStringLiteral(u"odt"), QStringLiteral(u"ods"), QStringLiteral(u"pdf"), QStringLiteral(u"docx"),
@@ -76,7 +75,7 @@ void DialogDbCreation::connections()
             [=](bool isChecked){ setFilterCreation(isChecked ? FC_Enabled : FC_Disabled); });
     connect(ui->rb_ignore, &QRadioButton::toggled, this, &DialogDbCreation::updateFilterDisplay);
     connect(ui->cb_editable_exts, &QCheckBox::toggled, this, [=](bool _chk) { ui->le_exts_list->setReadOnly(!_chk); });
-    connect(ui->le_exts_list, &QLineEdit::textEdited, this, &DialogDbCreation::parseInputedExts);
+    connect(ui->le_exts_list, &LineEdit::edited, this, &DialogDbCreation::parseInputedExts);
 
     // filename
     connect(ui->rb_ext_short, &QRadioButton::toggled, this, &DialogDbCreation::updateDbFilename);
@@ -195,8 +194,7 @@ void DialogDbCreation::parseInputedExts()
     if (ui->le_exts_list->isReadOnly())
         return;
 
-    // types_->setChecked(inputedExts());
-    QTimer::singleShot(500, this, [=]{ types_->setChecked(inputedExts()); });
+    types_->setChecked(inputedExts());
 }
 
 QStringList DialogDbCreation::inputedExts() const

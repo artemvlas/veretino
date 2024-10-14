@@ -1,5 +1,6 @@
 Veretino 0.5.1
-* Fixed saving the DB name prefix in Settings.
+* Fixed saving the DB file name prefix in Settings.
+* Optimization of manual input of the filtered types list.
 
 ---
 Veretino 0.5.0

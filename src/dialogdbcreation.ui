@@ -61,7 +61,7 @@
      <item row="1" column="0" colspan="3">
       <widget class="QLineEdit" name="inp_db_filename">
        <property name="placeholderText">
-        <string>Input a prefix for the DB filename. Default: checksums</string>
+        <string>DB file name prefix. Default: checksums</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>
@@ -171,7 +171,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="le_exts_list">
+           <widget class="LineEdit" name="le_exts_list">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -290,6 +290,11 @@ if there are any in the folder.</string>
    <class>WidgetFileTypes</class>
    <extends>QTreeWidget</extends>
    <header>src/widgetfiletypes.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>src/lineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

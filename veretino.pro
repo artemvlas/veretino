@@ -25,6 +25,7 @@ SOURCES += \
     src/iconprovider.cpp \
     src/itemfiletype.cpp \
     src/jsondb.cpp \
+    src/lineedit.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/manager.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     src/iconprovider.h \
     src/itemfiletype.h \
     src/jsondb.h \
+    src/lineedit.h \
     src/mainwindow.h \
     src/manager.h \
     src/menuactions.h \
