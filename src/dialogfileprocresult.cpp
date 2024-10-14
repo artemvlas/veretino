@@ -52,7 +52,7 @@ DialogFileProcResult::~DialogFileProcResult()
 void DialogFileProcResult::setModeMatched()
 {
     setWindowTitle(QStringLiteral(u"Checksums Match"));
-    setIcon(icons_.icon(FileStatus::Matched));
+    setIcon(FileStatus::Matched);
 
     ui->textChecksum->setTextColor(QColor("green"));
     ui->textChecksum->setText(values_.checksum);
@@ -61,7 +61,7 @@ void DialogFileProcResult::setModeMatched()
 void DialogFileProcResult::setModeMismatched()
 {
     setWindowTitle(QStringLiteral(u"Checksums do not match"));
-    setIcon(icons_.icon(FileStatus::Mismatched));
+    setIcon(FileStatus::Mismatched);
 
     ui->textChecksum->setTextColor(QColor("red"));
     ui->textChecksum->setText(values_.checksum);
@@ -77,7 +77,7 @@ void DialogFileProcResult::setModeMismatched()
 void DialogFileProcResult::setModeComputed()
 {
     setWindowTitle(QStringLiteral(u"Checksum calculated"));
-    setIcon(icons_.icon(Icons::HashFile));
+    setIcon(Icons::HashFile);
 
     ui->textChecksum->setText(values_.checksum);
 
@@ -91,7 +91,7 @@ void DialogFileProcResult::setModeComputed()
 void DialogFileProcResult::setModeCopied()
 {
     setWindowTitle(QStringLiteral(u"Copied to clipboard"));
-    setIcon(icons_.icon(Icons::Paste));
+    setIcon(Icons::Paste);
 
     ui->textChecksum->setText(values_.checksum);
 
@@ -101,7 +101,7 @@ void DialogFileProcResult::setModeCopied()
 void DialogFileProcResult::setModeStored()
 {
     setWindowTitle(QStringLiteral(u"The checksum is saved"));
-    setIcon(icons_.icon(Icons::Save));
+    setIcon(Icons::Save);
     setExtLineVisible(false);
 
     ui->textChecksum->setText(values_.checksum);
@@ -113,7 +113,7 @@ void DialogFileProcResult::setModeStored()
 void DialogFileProcResult::setModeUnstored()
 {
     setWindowTitle(QStringLiteral(u"Unable to create a summary file"));
-    setIcon(icons_.icon(Icons::DocClose));
+    setIcon(Icons::DocClose);
     setExtLineVisible(false);
 
     ui->textChecksum->setText(values_.checksum);
@@ -123,9 +123,14 @@ void DialogFileProcResult::setModeUnstored()
     addButtonCopy();
 }
 
-void DialogFileProcResult::setIcon(const QIcon &icon)
+void DialogFileProcResult::setIcon(Icons _icon)
 {
-    ui->labelIcon->setPixmap(icon.pixmap(64, 64));
+    ui->labelIcon->setPixmap(icons_.pixmap(_icon));
+}
+
+void DialogFileProcResult::setIcon(FileStatus _status)
+{
+    ui->labelIcon->setPixmap(icons_.pixmap(_status));
 }
 
 void DialogFileProcResult::setFileName(const QString &filePath)

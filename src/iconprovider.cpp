@@ -242,10 +242,10 @@ QIcon IconProvider::appIcon()
 
 QPixmap IconProvider::pixmap(FileStatus status, int size) const
 {
-    return icon(status).pixmap(size, size);
+    return icon(status).pixmap(size);
 }
 
 QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
 {
-    return icon(themeIcon).pixmap(size, size);
+    return icon(themeIcon).pixmap(size);
 }
