@@ -391,13 +391,15 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     if (!paths::isDbFile(dbFilePath))
         return;
 
+    static const QPixmap _pixBranch = modeSelect->iconProvider.icon(Icons::AddFork).pixmap(64, 64);
+
     QMessageBox msgBox(this);
+    msgBox.setIconPixmap(_pixBranch);
     msgBox.setWindowTitle("A new Branch has been created");
     msgBox.setText("The subfolder data is forked:\n" + paths::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
-    msgBox.setIcon(QMessageBox::Question);
     msgBox.button(QMessageBox::No)->setText("Stay");
 
     if (msgBox.exec() == QMessageBox::Open) {
