@@ -239,34 +239,3 @@ QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
 
     return cachedPix(themeIcon);
 }
-
-template<typename _Enum> // FileStatus or Icons
-QIcon IconProvider::cachedIco(const _Enum _value) const
-{
-    static QHash<_Enum, QIcon> _cont;
-
-    if (_cont.contains(_value)) {
-        return _cont.value(_value);
-    }
-    else {
-        QIcon _ico = QIcon(svgFilePath(_value));
-        _cont.insert(_value, _ico);
-        return _ico;
-    }
-}
-
-// the cache contains only 64pix sized items
-template<typename _Enum> // FileStatus or Icons
-QPixmap IconProvider::cachedPix(const _Enum _value) const
-{
-    static QHash<_Enum, QPixmap> _cont;
-
-    if (_cont.contains(_value)) {
-        return _cont.value(_value);
-    }
-    else {
-        QPixmap _pix = icon(_value).pixmap(_pix_size); // 64x64
-        _cont.insert(_value, _pix);
-        return _pix;
-    }
-}

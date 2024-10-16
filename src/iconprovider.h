@@ -61,12 +61,6 @@ public:
     QPixmap pixmap(FileStatus status, int size = 64) const;
     QPixmap pixmap(Icons themeIcon, int size = 64) const;
 
-    template<typename _Enum> // FileStatus or Icons
-    QIcon cachedIco(const _Enum _value) const;
-
-    template<typename _Enum>
-    QPixmap cachedPix(const _Enum _value) const;
-
     static QIcon appIcon();
 
 private:
@@ -83,6 +77,37 @@ private:
     static const QString s_folderDark;
     static const QString s_folderLight;
     static const QString s_svg;
+
+    template<typename _Enum> // FileStatus or enum Icons
+    QIcon cachedIco(const _Enum _value) const
+    {
+        static QHash<_Enum, QIcon> _cache;
+
+        if (_cache.contains(_value)) {
+            return _cache.value(_value);
+        }
+        else {
+            QIcon _ico = QIcon(svgFilePath(_value));
+            _cache.insert(_value, _ico);
+            return _ico;
+        }
+    }
+
+    // the cache contains only 64pix sized items
+    template<typename _Enum> // FileStatus or enum Icons
+    QPixmap cachedPix(const _Enum _value) const
+    {
+        static QHash<_Enum, QPixmap> _cache;
+
+        if (_cache.contains(_value)) {
+            return _cache.value(_value);
+        }
+        else {
+            QPixmap _pix = icon(_value).pixmap(_pix_size); // 64x64
+            _cache.insert(_value, _pix);
+            return _pix;
+        }
+    }
 
 }; // class IconProvider
 
