@@ -61,8 +61,11 @@ public:
     QPixmap pixmap(FileStatus status, int size = 64) const;
     QPixmap pixmap(Icons themeIcon, int size = 64) const;
 
-    template<typename EnumIcon> // FileStatus or Icons
-    QPixmap cache(const EnumIcon _value, QHash<EnumIcon, QPixmap> &_cont) const;
+    template<typename _Enum> // FileStatus or Icons
+    QIcon cached(const _Enum _value, QHash<_Enum, QIcon> &_cont) const;
+
+    template<typename _Enum>
+    QPixmap cached(const _Enum _value, QHash<_Enum, QPixmap> &_cont) const;
 
     static QIcon appIcon();
 
@@ -76,10 +79,10 @@ private:
     QFileIconProvider fsIcons;
 
     static const int _pix_size = 64; // default pixmap size
-    static QHash<FileStatus, QIcon> cacheFileStatus;
-    static QHash<Icons, QIcon> cacheThemeIcons;
-    static QHash<FileStatus, QPixmap> _pix_cache_fstatus;
-    static QHash<Icons, QPixmap> _pix_cache_themed;
+    static QHash<FileStatus, QIcon> _cache_ico_fstatus;
+    static QHash<Icons, QIcon> _cache_ico_themed;
+    static QHash<FileStatus, QPixmap> _cache_pix_fstatus;
+    static QHash<Icons, QPixmap> _cache_pix_themed;
     static const QString s_folderGeneric;
     static const QString s_folderDark;
     static const QString s_folderLight;

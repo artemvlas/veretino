@@ -6,10 +6,10 @@
 #include "iconprovider.h"
 #include "tools.h"
 
-QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
-QHash<Icons, QIcon> IconProvider::cacheThemeIcons = QHash<Icons, QIcon>();
-QHash<FileStatus, QPixmap> IconProvider::_pix_cache_fstatus = QHash<FileStatus, QPixmap>();
-QHash<Icons, QPixmap> IconProvider::_pix_cache_themed = QHash<Icons, QPixmap>();
+QHash<FileStatus, QIcon> IconProvider::_cache_ico_fstatus = QHash<FileStatus, QIcon>();
+QHash<Icons, QIcon> IconProvider::_cache_ico_themed = QHash<Icons, QIcon>();
+QHash<FileStatus, QPixmap> IconProvider::_cache_pix_fstatus = QHash<FileStatus, QPixmap>();
+QHash<Icons, QPixmap> IconProvider::_cache_pix_themed = QHash<Icons, QPixmap>();
 const QString IconProvider::s_folderGeneric = QStringLiteral(u":/icons/generic");
 const QString IconProvider::s_folderDark = QStringLiteral(u":/icons/dark");
 const QString IconProvider::s_folderLight = QStringLiteral(u":/icons/light");
@@ -204,26 +204,12 @@ QString IconProvider::svgFilePath(Icons icon) const
 
 QIcon IconProvider::icon(FileStatus status) const
 {
-    if (cacheFileStatus.contains(status)) {
-        return cacheFileStatus.value(status);
-    }
-    else {
-        QIcon _ico = QIcon(svgFilePath(status));
-        cacheFileStatus.insert(status, _ico);
-        return _ico;
-    }
+    return cached(status, _cache_ico_fstatus);
 }
 
 QIcon IconProvider::icon(Icons themeIcon) const
 {
-    if (cacheThemeIcons.contains(themeIcon)) {
-        return cacheThemeIcons.value(themeIcon);
-    }
-    else {
-        QIcon _ico = QIcon(svgFilePath(themeIcon));
-        cacheThemeIcons.insert(themeIcon, _ico);
-        return _ico;
-    }
+    return cached(themeIcon, _cache_ico_themed);
 }
 
 QIcon IconProvider::icon(const QString &file) const
@@ -247,7 +233,7 @@ QPixmap IconProvider::pixmap(FileStatus status, int size) const
     if (size != _pix_size)
         return icon(status).pixmap(size);
 
-    return cache(status, _pix_cache_fstatus);
+    return cached(status, _cache_pix_fstatus);
 }
 
 QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
@@ -255,12 +241,25 @@ QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
     if (size != _pix_size)
         return icon(themeIcon).pixmap(size);
 
-    return cache(themeIcon, _pix_cache_themed);
+    return cached(themeIcon, _cache_pix_themed);
+}
+
+template<typename _Enum> // FileStatus or Icons
+QIcon IconProvider::cached(const _Enum _value, QHash<_Enum, QIcon> &_cont) const
+{
+    if (_cont.contains(_value)) {
+        return _cont.value(_value);
+    }
+    else {
+        QIcon _ico = QIcon(svgFilePath(_value));
+        _cont.insert(_value, _ico);
+        return _ico;
+    }
 }
 
 // the cache contains only 64pix sized items
-template<typename EnumIcon> // FileStatus or Icons
-QPixmap IconProvider::cache(const EnumIcon _value, QHash<EnumIcon, QPixmap> &_cont) const
+template<typename _Enum> // FileStatus or Icons
+QPixmap IconProvider::cached(const _Enum _value, QHash<_Enum, QPixmap> &_cont) const
 {
     if (_cont.contains(_value)) {
         return _cont.value(_value);
