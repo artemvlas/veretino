@@ -78,34 +78,22 @@ private:
     static const QString s_folderLight;
     static const QString s_svg;
 
-    template<typename _Enum> // FileStatus or enum Icons
-    QIcon cachedIco(const _Enum _value) const
+    template<typename _Pic = QIcon, typename _Enum> // _Pic(QIcon or QPixmap); _Enum(FileStatus or enum Icons)
+    _Pic cached(const _Enum _value) const
     {
-        static QHash<_Enum, QIcon> _cache;
+        static QHash<_Enum, _Pic> _cache;
 
         if (_cache.contains(_value)) {
             return _cache.value(_value);
         }
         else {
-            QIcon _ico = QIcon(svgFilePath(_value));
-            _cache.insert(_value, _ico);
-            return _ico;
-        }
-    }
+            _Pic _pic;
+            if constexpr(std::is_same_v<_Pic, QIcon>)
+                _pic = QIcon(svgFilePath(_value));
+            else if constexpr(std::is_same_v<_Pic, QPixmap>)
+                _pic = icon(_value).pixmap(_pix_size); // 64x64
 
-    // the cache contains only 64pix sized items
-    template<typename _Enum> // FileStatus or enum Icons
-    QPixmap cachedPix(const _Enum _value) const
-    {
-        static QHash<_Enum, QPixmap> _cache;
-
-        if (_cache.contains(_value)) {
-            return _cache.value(_value);
-        }
-        else {
-            QPixmap _pix = icon(_value).pixmap(_pix_size); // 64x64
-            _cache.insert(_value, _pix);
-            return _pix;
+            return *_cache.insert(_value, _pic);
         }
     }
 

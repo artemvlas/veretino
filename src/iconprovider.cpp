@@ -200,12 +200,12 @@ QString IconProvider::svgFilePath(Icons icon) const
 
 QIcon IconProvider::icon(FileStatus status) const
 {
-    return cachedIco(status);
+    return cached(status);
 }
 
 QIcon IconProvider::icon(Icons themeIcon) const
 {
-    return cachedIco(themeIcon);
+    return cached(themeIcon);
 }
 
 QIcon IconProvider::icon(const QString &file) const
@@ -229,7 +229,7 @@ QPixmap IconProvider::pixmap(FileStatus status, int size) const
     if (size != _pix_size)
         return icon(status).pixmap(size);
 
-    return cachedPix(status);
+    return cached<QPixmap>(status);
 }
 
 QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
@@ -237,5 +237,5 @@ QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
     if (size != _pix_size)
         return icon(themeIcon).pixmap(size);
 
-    return cachedPix(themeIcon);
+    return cached<QPixmap>(themeIcon);
 }
