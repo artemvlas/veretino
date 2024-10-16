@@ -6,10 +6,6 @@
 #include "iconprovider.h"
 #include "tools.h"
 
-QHash<FileStatus, QIcon> IconProvider::_cache_ico_fstatus = QHash<FileStatus, QIcon>();
-QHash<Icons, QIcon> IconProvider::_cache_ico_themed = QHash<Icons, QIcon>();
-QHash<FileStatus, QPixmap> IconProvider::_cache_pix_fstatus = QHash<FileStatus, QPixmap>();
-QHash<Icons, QPixmap> IconProvider::_cache_pix_themed = QHash<Icons, QPixmap>();
 const QString IconProvider::s_folderGeneric = QStringLiteral(u":/icons/generic");
 const QString IconProvider::s_folderDark = QStringLiteral(u":/icons/dark");
 const QString IconProvider::s_folderLight = QStringLiteral(u":/icons/light");
@@ -204,12 +200,12 @@ QString IconProvider::svgFilePath(Icons icon) const
 
 QIcon IconProvider::icon(FileStatus status) const
 {
-    return cached(status, _cache_ico_fstatus);
+    return cachedIco(status);
 }
 
 QIcon IconProvider::icon(Icons themeIcon) const
 {
-    return cached(themeIcon, _cache_ico_themed);
+    return cachedIco(themeIcon);
 }
 
 QIcon IconProvider::icon(const QString &file) const
@@ -233,7 +229,7 @@ QPixmap IconProvider::pixmap(FileStatus status, int size) const
     if (size != _pix_size)
         return icon(status).pixmap(size);
 
-    return cached(status, _cache_pix_fstatus);
+    return cachedPix(status);
 }
 
 QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
@@ -241,12 +237,14 @@ QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
     if (size != _pix_size)
         return icon(themeIcon).pixmap(size);
 
-    return cached(themeIcon, _cache_pix_themed);
+    return cachedPix(themeIcon);
 }
 
 template<typename _Enum> // FileStatus or Icons
-QIcon IconProvider::cached(const _Enum _value, QHash<_Enum, QIcon> &_cont) const
+QIcon IconProvider::cachedIco(const _Enum _value) const
 {
+    static QHash<_Enum, QIcon> _cont;
+
     if (_cont.contains(_value)) {
         return _cont.value(_value);
     }
@@ -259,8 +257,10 @@ QIcon IconProvider::cached(const _Enum _value, QHash<_Enum, QIcon> &_cont) const
 
 // the cache contains only 64pix sized items
 template<typename _Enum> // FileStatus or Icons
-QPixmap IconProvider::cached(const _Enum _value, QHash<_Enum, QPixmap> &_cont) const
+QPixmap IconProvider::cachedPix(const _Enum _value) const
 {
+    static QHash<_Enum, QPixmap> _cont;
+
     if (_cont.contains(_value)) {
         return _cont.value(_value);
     }
