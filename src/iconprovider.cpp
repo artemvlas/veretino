@@ -8,6 +8,8 @@
 
 QHash<FileStatus, QIcon> IconProvider::cacheFileStatus = QHash<FileStatus, QIcon>();
 QHash<Icons, QIcon> IconProvider::cacheThemeIcons = QHash<Icons, QIcon>();
+QHash<FileStatus, QPixmap> IconProvider::_pix_cache_fstatus = QHash<FileStatus, QPixmap>();
+QHash<Icons, QPixmap> IconProvider::_pix_cache_themed = QHash<Icons, QPixmap>();
 const QString IconProvider::s_folderGeneric = QStringLiteral(u":/icons/generic");
 const QString IconProvider::s_folderDark = QStringLiteral(u":/icons/dark");
 const QString IconProvider::s_folderLight = QStringLiteral(u":/icons/light");
@@ -242,10 +244,30 @@ QIcon IconProvider::appIcon()
 
 QPixmap IconProvider::pixmap(FileStatus status, int size) const
 {
-    return icon(status).pixmap(size);
+    if (size != _pix_size)
+        return icon(status).pixmap(size);
+
+    return cache(status, _pix_cache_fstatus);
 }
 
 QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
 {
-    return icon(themeIcon).pixmap(size);
+    if (size != _pix_size)
+        return icon(themeIcon).pixmap(size);
+
+    return cache(themeIcon, _pix_cache_themed);
+}
+
+// the cache contains only 64pix sized items
+template<typename EnumIcon> // FileStatus or Icons
+QPixmap IconProvider::cache(const EnumIcon _value, QHash<EnumIcon, QPixmap> &_cont) const
+{
+    if (_cont.contains(_value)) {
+        return _cont.value(_value);
+    }
+    else {
+        QPixmap _pix = icon(_value).pixmap(_pix_size); // 64x64
+        _cont.insert(_value, _pix);
+        return _pix;
+    }
 }

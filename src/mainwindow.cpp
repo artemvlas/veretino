@@ -248,15 +248,13 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     }
     else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
+        msgBox.setIconPixmap(modeSelect->iconProvider.pixmap(Icons::Filter));
         msgBox.setWindowTitle("No filter specified");
         msgBox.setText("File filtering is not set.");
         msgBox.setInformativeText("Continue with all files?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
         msgBox.setDefaultButton(QMessageBox::Yes);
         msgBox.button(QMessageBox::Yes)->setText("Continue");
-
-        static const QPixmap _pixFilter = modeSelect->iconProvider.pixmap(Icons::Filter);
-        msgBox.setIconPixmap(_pixFilter);
 
         if (msgBox.exec() == QMessageBox::Yes)
             modeSelect->processFolderChecksums(_filter);
@@ -391,10 +389,8 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     if (!paths::isDbFile(dbFilePath))
         return;
 
-    static const QPixmap _pixBranch = modeSelect->iconProvider.pixmap(Icons::AddFork);
-
     QMessageBox msgBox(this);
-    msgBox.setIconPixmap(_pixBranch);
+    msgBox.setIconPixmap(modeSelect->iconProvider.pixmap(Icons::AddFork));
     msgBox.setWindowTitle("A new Branch has been created");
     msgBox.setText("The subfolder data is forked:\n" + paths::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");

@@ -279,8 +279,7 @@ void ModeSelector::promptItemFileUpd()
 
     switch (storedStatus) {
     case FileStatus::New:
-        static const QPixmap icoNew = iconProvider.pixmap(FileStatus::New);
-        msgBox.setIconPixmap(icoNew);
+        msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::New));
         msgBox.setWindowTitle("New File...");
         msgBox.setText("The database does not yet contain\n"
                        "a corresponding checksum.");
@@ -289,8 +288,7 @@ void ModeSelector::promptItemFileUpd()
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Added));
         break;
     case FileStatus::Missing:
-        static const QPixmap icoMissing = iconProvider.pixmap(FileStatus::Missing);
-        msgBox.setIconPixmap(icoMissing);
+        msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::Missing));
         msgBox.setWindowTitle("Missing File...");
         msgBox.setText("File does not exist.");
         msgBox.setInformativeText("Remove the Item from the database?");
@@ -298,8 +296,7 @@ void ModeSelector::promptItemFileUpd()
         msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Removed));
         break;
     case FileStatus::Mismatched:
-        static const QPixmap icoMismatch = iconProvider.pixmap(FileStatus::Mismatched);
-        msgBox.setIconPixmap(icoMismatch);
+        msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::Mismatched));
         msgBox.setWindowTitle("Mismatched Checksum...");
         msgBox.setText("The calculated and stored checksums do not match.");
         msgBox.setInformativeText("Do you want to update the stored one?");
@@ -889,12 +886,11 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
 
     const QString strAct = abort ? QStringLiteral(u"Abort") : QStringLiteral(u"Stop");
     const QIcon &icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
-    static const QPixmap icoMsgBox = iconProvider.pixmap(FileStatus::Calculating);
 
     QMessageBox msgBox(view_);
     connect(proc_, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
 
-    msgBox.setIconPixmap(icoMsgBox);
+    msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::Calculating));
     msgBox.setWindowTitle(QStringLiteral(u"Processing..."));
     msgBox.setText(strAct + QStringLiteral(u" current process?"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
