@@ -26,9 +26,9 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 * Having a ready-made database, the program becomes able to check the integrity of the folder's data by reading its current contents and comparing it with the previously created data set.
 * The resulting data also makes it possible to find new or missing items by comparing the current contents with a previously one.
 
-| ![Main](screenshots/veretino_mainview.png)              | ![Filter](screenshots/veretino_fc.png)       |
-|---------------------------------------------------------|----------------------------------------------|
-| ![Database](screenshots/veretino_db_format_example.png) | ![Db_View](screenshots/veretino_newlost.png) |
+| ![Filter](screenshots/dialog_dbcreation_dark.png) | ![Db_View](screenshots/viewdb_light.png)                |
+|---------------------------------------------------|---------------------------------------------------------|
+| ![Main](screenshots/veretino_mainview.png)        | ![Database](screenshots/veretino_db_format_example.png) |
 
 The program allows analyzing the contents of folders by file types, their number and size. Finding the largest and most numerous file types, which is useful when creating a database with a specific filter.
 
