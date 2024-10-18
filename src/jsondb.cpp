@@ -91,9 +91,13 @@ QJsonObject JsonDb::dbHeader(const DataContainer *data, const QModelIndex &rootF
     header[h_key_Algo] = format::algoToStr(_meta.algorithm);
 
     // DateTime
-    header[h_key_DateTime] = QString("%1, %2, %3").arg(_meta.datetime[DTstr::DateCreated],
-                                                       _meta.datetime[DTstr::DateUpdated],
-                                                       _meta.datetime[DTstr::DateVerified]);
+    if (isBranching && data->isAllMatched(_num)) {
+        header[h_key_DateTime] = QStringLiteral(u"Created: ") + format::currentDateTime();
+    } else {
+        header[h_key_DateTime] = QString("%1, %2, %3").arg(_meta.datetime[DTstr::DateCreated],
+                                                           _meta.datetime[DTstr::DateUpdated],
+                                                           _meta.datetime[DTstr::DateVerified]);
+    }
 
     // WorkDir
     if (!isBranching && !data->isWorkDirRelative())

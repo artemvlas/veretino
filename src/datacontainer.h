@@ -54,7 +54,8 @@ public:
     bool isFilterApplied() const;
     bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
-    bool isAllMatched() const;
+    bool isAllMatched(const QModelIndex &subfolder = QModelIndex()) const;
+    bool isAllMatched(const Numbers &nums) const;
     bool isInCreation() const;
     bool isImmutable() const; // has FlagConst
 

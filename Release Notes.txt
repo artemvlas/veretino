@@ -1,3 +1,8 @@
+Veretino 0.5.2
+* DateTime stamp inheritance during Branching has become a bit smarter.
+    If the selected subfolder contains only checked and matched items, the Branch will be created with a new timestamp, as a new DB.
+
+---
 Veretino 0.5.1
 * Fixed saving the DB file name prefix.
 * Optimization of manual input of the filtered types list.

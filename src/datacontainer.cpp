@@ -102,10 +102,17 @@ bool DataContainer::isAllChecked() const
             && !contains(FileStatus::CombNotChecked | FileStatus::CombProcessing));
 }
 
-bool DataContainer::isAllMatched() const
+bool DataContainer::isAllMatched(const QModelIndex &subfolder) const
 {
-    return (!contains(FileStatus::CombProcessing)
-            && numbers_.numberOf(FileStatus::Matched) == numbers_.numberOf(FileStatus::CombHasChecksum));
+    const Numbers &_nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers_;
+
+    return isAllMatched(_nums);
+}
+
+bool DataContainer::isAllMatched(const Numbers &nums) const
+{
+    return (!nums.contains(FileStatus::CombProcessing)
+            && nums.numberOf(FileStatus::Matched) == nums.numberOf(FileStatus::CombHasChecksum));
 }
 
 bool DataContainer::isDbFileState(DbFileState state) const
