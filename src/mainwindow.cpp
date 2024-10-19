@@ -199,13 +199,15 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
         return;
     }
 
+    clearDialogs();
+
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
         DialogDbStatus statusDialog(ui->treeView->data_, this);
         statusDialog.setCurrentTab(tab);
 
-        if (proc_->isStarted()) {
+        /*if (proc_->isStarted()) { // replaced with ::clearDialogs()
             connect(proc_, &ProcState::progressFinished, &statusDialog, &DialogDbStatus::reject); // TMP
-        }
+        }*/
 
         statusDialog.exec();
     }
@@ -225,6 +227,8 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     if (extList.isEmpty()) {
         return;
     }
+
+    clearDialogs();
 
     if (!dbFiles.isEmpty()) {
         DialogExistingDbs _dialog(dbFiles, this);
@@ -276,6 +280,8 @@ void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeL
 
 void MainWindow::showFolderCheckResult(const Numbers &result, const QString &subFolder)
 {
+    clearDialogs();
+
     QMessageBox msgBox(this);
 
     QString titleText = result.contains(FileStatus::Mismatched) ? "FAILED" : "Success";
@@ -332,6 +338,8 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
 void MainWindow::showFileCheckResult(const QString &filePath, const FileValues &values)
 {
+    clearDialogs();
+
     DialogFileProcResult dialog(filePath, values, this);
     dialog.exec();
 }
@@ -340,9 +348,10 @@ void MainWindow::dialogSettings()
 {
     DialogSettings dialog(settings_, this);
 
+    /* replaced with ::clearDialogs()
     if (proc_->isState(State::StartVerbose)) {
         connect(proc_, &ProcState::progressFinished, &dialog, &DialogSettings::reject);
-    }
+    }*/
 
     if (dialog.exec()) {
         dialog.updateSettings();
@@ -351,24 +360,28 @@ void MainWindow::dialogSettings()
 
 void MainWindow::dialogChooseFolder()
 {
-    QString path = QFileDialog::getExistingDirectory(this, QString(), QDir::homePath());
+    const QString _path = QFileDialog::getExistingDirectory(this, QString(), QDir::homePath());
 
-    if (!path.isEmpty()) {
-        modeSelect->showFileSystem(path);
+    if (!_path.isEmpty()) {
+        modeSelect->showFileSystem(_path);
     }
 }
 
 void MainWindow::dialogOpenJson()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Select Veretino Database", QDir::homePath(), "Veretino DB (*.ver *.ver.json)");
+    const QString _path = QFileDialog::getOpenFileName(this, "Select Veretino Database",
+                                                       QDir::homePath(),
+                                                       "Veretino DB (*.ver *.ver.json)");
 
-    if (!path.isEmpty()) {
-        modeSelect->openJsonDatabase(path);
+    if (!_path.isEmpty()) {
+        modeSelect->openJsonDatabase(_path);
     }
 }
 
 void MainWindow::showMessage(const QString &message, const QString &title)
 {
+    clearDialogs();
+
     QMessageBox messageBox;
 
     if (!title.compare(QStringLiteral(u"error"), Qt::CaseInsensitive)
@@ -509,6 +522,14 @@ void MainWindow::createContextMenu_Button(const QPoint &point)
     if (modeSelect->isMode(Mode::File | Mode::Folder)) {
         modeSelect->menuAct_->menuAlgorithm(settings_->algorithm())->exec(ui->button->mapToGlobal(point));
     }
+}
+
+void MainWindow::clearDialogs()
+{
+    QDialog *__d = findChild<QDialog*>();
+
+    if (__d)
+        __d->reject();
 }
 
 bool MainWindow::argumentInput()

@@ -56,6 +56,7 @@ private:
     void handleButtonDbHashClick();
     void updateStatusIcon();
     void updateButtonInfo(); // sets the Button icon and text according the current Mode
+    void clearDialogs();
     void saveSettings();
 
     Ui::MainWindow *ui;
