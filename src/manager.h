@@ -104,6 +104,8 @@ private:
     int calculateChecksums(FileStatus status, const QModelIndex &rootIndex = QModelIndex());
     void updateCalcStatus(const QString &_purp, Pieces<int> _p_items);
 
+    QString extractDigestFromFile(const QString &_digest_file);
+
     // variables
     bool isViewFileSysytem;
     Settings *settings_;

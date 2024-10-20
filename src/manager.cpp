@@ -260,17 +260,7 @@ void Manager::importItemDigest(const QModelIndex &fileIndex)
 
     QCryptographicHash::Algorithm _algo = dataMaintainer->data_->metaData_.algorithm;
     const QString _filePath = paths::digestFilePath(dataMaintainer->data_->itemAbsolutePath(fileIndex), _algo);
-
-    QString _line;
-    QFile sumFile(_filePath);
-    if (sumFile.open(QFile::ReadOnly))
-        _line = sumFile.readLine();
-    else {
-        emit showMessage("Error while reading Summary File", "Error");
-        return;
-    }
-
-    const QString _dig = _line.left(tools::algoStrLen(_algo));
+    const QString _dig = extractDigestFromFile(_filePath);
 
     if (tools::canBeChecksum(_dig) && dataMaintainer->updateChecksum(fileIndex, _dig)) {
         // <!TMP!> SHOULD be combined with the function above (Manager::updateItemFile)
@@ -383,35 +373,22 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
 
 void Manager::checkSummaryFile(const QString &path)
 {
-    QFile sumFile(path);
-    QString line;
-    if (sumFile.open(QFile::ReadOnly))
-        line = sumFile.readLine();
-    else {
-        emit showMessage("Error while reading Summary File", "Error");
+    const QString storedChecksum = extractDigestFromFile(path);
+
+    if (storedChecksum.isEmpty())
         return;
-    }
 
-    QFileInfo fileInfo(path);
-    QString storedChecksum;
-
-    if (line.contains("  ") && tools::canBeChecksum(line.left(line.indexOf("  "))))
-        storedChecksum = line.left(line.indexOf("  "));
-    else if (line.contains(" *") && tools::canBeChecksum(line.left(line.indexOf(" *"))))
-        storedChecksum = line.left(line.indexOf(" *"));
-    else if (tools::canBeChecksum(line.left(tools::algoStrLen(tools::strToAlgo(fileInfo.suffix())))))
-        storedChecksum = line.left(tools::algoStrLen(tools::strToAlgo(fileInfo.suffix())));
-
-    if (storedChecksum.isEmpty()) {
-        emit showMessage("Checksum not found", "Warning");
-        return;
-    }
-
-    QString checkFileName = fileInfo.completeBaseName();
+    const QString checkFileName = QFileInfo(path).completeBaseName();
     QString checkFilePath = paths::joinPath(paths::parentFolder(path), checkFileName);
 
     if (!QFileInfo(checkFilePath).isFile()) {
-        checkFilePath = paths::joinPath(paths::parentFolder(path), line.mid(storedChecksum.length() + 2).remove("\n"));
+        QFile sumFile(path);
+        if (!sumFile.open(QFile::ReadOnly))
+            return;
+
+        const QString line = sumFile.readLine();
+        checkFilePath = paths::joinPath(paths::parentFolder(path), line.mid(storedChecksum.length() + 2).remove('\n'));
+
         if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
             return;
@@ -419,6 +396,34 @@ void Manager::checkSummaryFile(const QString &path)
     }
 
     checkFile(checkFilePath, storedChecksum);
+}
+
+QString Manager::extractDigestFromFile(const QString &_digest_file)
+{
+    QFile sumFile(_digest_file);
+    if (!sumFile.open(QFile::ReadOnly)) {
+        emit showMessage("Error while reading Summary File", "Error");
+        return QString();
+    }
+
+    const QString line = sumFile.readLine();
+
+    static const QStringList _l_seps { "  ", " *" };
+
+    for (int it = 0; it <= _l_seps.size(); ++it) {
+        int _cut = (it < _l_seps.size()) ? line.indexOf(_l_seps.at(it))
+                                         : tools::algoStrLen(tools::strToAlgo(paths::suffix(_digest_file)));
+
+        if (_cut > 0) {
+            const QString _dig = line.left(_cut);
+            if (tools::canBeChecksum(_dig)) {
+                return _dig;
+            }
+        }
+    }
+
+    emit showMessage("Checksum not found", "Warning");
+    return QString();
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)
