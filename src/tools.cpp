@@ -278,6 +278,17 @@ QString suffix(const QString &_file)
     return (_dotInd > 0 && _len > 0) ? _file.right(_len).toLower() : QString();
 }
 
+QString digestFilePath(const QString &_file, QCryptographicHash::Algorithm _algo)
+{
+    const QString _ext = format::algoToStr(_algo, false);
+    return tools::joinStrings(_file, _ext, u'.');
+}
+
+QString digestFilePath(const QString &_file, const int _sum_len)
+{
+    return digestFilePath(_file, tools::algoByStrLen(_sum_len));
+}
+
 bool isRoot(const QString &path)
 {
     switch (path.length()) {

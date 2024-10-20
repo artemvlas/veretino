@@ -63,6 +63,8 @@ QString shortenPath(const QString &path); // if not a root (or child of root) pa
 QString joinPath(const QString &absolutePath, const QString &addPath); // returns '/absolutePath/addPath'
 QString composeFilePath(const QString &parentFolder, const QString &fileName, const QString &ext);
 QString suffix(const QString &_file);
+QString digestFilePath(const QString &_file, QCryptographicHash::Algorithm _algo); // ../folder/file.txt --> ../folder/file.txt.shaX
+QString digestFilePath(const QString &_file, const int _sum_len);
 bool isRoot(const QString &path); // true: "/" or "X:'/'"; else false
 bool hasExtension(const QString &file, const QString &ext); // true if the "file" (name or path) have the "ext" suffix
 bool hasExtension(const QString &file, const QStringList &extensions); // true if the file have any extension from the list

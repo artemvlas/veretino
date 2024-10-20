@@ -75,6 +75,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionExportSum, &QAction::triggered, this, &ModeSelector::exportItemSum);
+    connect(menuAct_->actionUpdFileImportDigest, &QAction::triggered, this, &ModeSelector::importItemSum);
 
     connect(menuAct_->actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -503,6 +504,16 @@ void ModeSelector::exportItemSum()
     emit manager_->fileProcessed(filePath, fileVal);
 }
 
+void ModeSelector::importItemSum()
+{
+    if (view_->isViewFiltered())
+        view_->disableFilter();
+
+    manager_->addTaskWithState(State::Idle,
+                               &Manager::importItemDigest,
+                               view_->curIndex());
+}
+
 void ModeSelector::makeFolderContentsList(const QString &folderPath)
 {
     abortProcess();
@@ -806,6 +817,8 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     switch (TreeModel::itemFileStatus(index)) {
                         case FileStatus::New:
                             viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
+                            if (QFileInfo::exists(paths::digestFilePath(view_->data_->itemAbsolutePath(index), view_->data_->metaData_.algorithm)))
+                                viewContextMenu->addAction(menuAct_->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:
                             viewContextMenu->addAction(menuAct_->actionUpdFileRemove);

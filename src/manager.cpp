@@ -250,6 +250,43 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
     }
 }
 
+void Manager::importItemDigest(const QModelIndex &fileIndex)
+{
+    if (!dataMaintainer->data_ ||
+        !TreeModel::hasStatus(FileStatus::New, fileIndex))
+    {
+        return;
+    }
+
+    QCryptographicHash::Algorithm _algo = dataMaintainer->data_->metaData_.algorithm;
+    const QString _filePath = paths::digestFilePath(dataMaintainer->data_->itemAbsolutePath(fileIndex), _algo);
+
+    QString _line;
+    QFile sumFile(_filePath);
+    if (sumFile.open(QFile::ReadOnly))
+        _line = sumFile.readLine();
+    else {
+        emit showMessage("Error while reading Summary File", "Error");
+        return;
+    }
+
+    const QString _dig = _line.left(tools::algoStrLen(_algo));
+
+    if (tools::canBeChecksum(_dig) && dataMaintainer->updateChecksum(fileIndex, _dig)) {
+        // <!TMP!> SHOULD be combined with the function above (Manager::updateItemFile)
+        dataMaintainer->setDbFileState(DbFileState::NotSaved);
+        dataMaintainer->updateNumbers(fileIndex, FileStatus::New);
+        dataMaintainer->updateDateTime();
+
+        if (settings_->instantSaving) {
+            saveData();
+        }
+        else {
+            emit procState->stateChanged(); // temp solution to update Button info
+        }
+    }
+}
+
 void Manager::branchSubfolder(const QModelIndex &subfolder)
 {
     dataMaintainer->forkJsonDb(subfolder);

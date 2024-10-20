@@ -63,6 +63,7 @@ public slots:
     void branchSubfolder(const QModelIndex &subfolder);
     void updateDatabase(const DestDbUpdate dest);
     void updateItemFile(const QModelIndex &fileIndex);
+    void importItemDigest(const QModelIndex &fileIndex);
 
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file

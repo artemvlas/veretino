@@ -173,16 +173,17 @@ void DialogFileProcResult::makeSumFile()
     if (filePath_.isEmpty() || !canBeChecksum(_chsum))
         return;
 
-    const QString ext = format::algoToStr(_chsum.size(), false);
-    const QString sumFile = joinStrings(filePath_, ext, u'.');
-    const QString strToWrite = joinStrings(_chsum, paths::basicName(filePath_), QStringLiteral(u" *"));
+    //const QString ext = format::algoToStr(_chsum.size(), false);
+    //const QString sumFile = joinStrings(filePath_, ext, u'.');
+    const QString _sumFile = paths::digestFilePath(filePath_, _chsum.size());
+    const QString _strToWrite = joinStrings(_chsum, paths::basicName(filePath_), QStringLiteral(u" *"));
 
-    setFileName(sumFile);
+    setFileName(_sumFile);
 
-    QFile file(sumFile);
+    QFile _file(_sumFile);
 
-    if (file.open(QFile::WriteOnly)
-        && file.write(strToWrite.toUtf8()))
+    if (_file.open(QFile::WriteOnly)
+        && _file.write(_strToWrite.toUtf8()))
     {
         setModeStored();
     }
