@@ -29,11 +29,13 @@ public:
     enum DestFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
 
     enum DestDbUpdate {
+        AutoSelect,
         DestUpdateMismatches = 1 << 0,
         DestAddNew = 1 << 1,
         DestClearLost = 1 << 2,
-        DestUpdateNewLost = DestAddNew | DestClearLost
-    };
+        DestUpdateNewLost = DestAddNew | DestClearLost,
+        DestImportDigest = 1 << 3
+    }; // enum DestDbUpdate
 
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
     ProcState *procState = new ProcState(this);
@@ -62,8 +64,7 @@ public slots:
     void processFolderSha(const MetaData &metaData);
     void branchSubfolder(const QModelIndex &subfolder);
     void updateDatabase(const DestDbUpdate dest);
-    void updateItemFile(const QModelIndex &fileIndex);
-    void importItemDigest(const QModelIndex &fileIndex);
+    void updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job);
 
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
@@ -83,9 +84,11 @@ public slots:
     // checking the list of files against the checksums stored in the database
     void verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus);
 
-    void verifyFileItem(const QModelIndex &fileItemIndex); // check only selected file instead of full database verification
+    // check only selected file instead of full database verification
+    void verifyFileItem(const QModelIndex &fileItemIndex);
 
-    void folderContentsList(const QString &folderPath, bool filterCreation); // make a list of the file types contained in the folder, their number and size
+    // make a list of the file types contained in the folder, their number and size
+    void folderContentsList(const QString &folderPath, bool filterCreation);
 
     void runTasks();
 

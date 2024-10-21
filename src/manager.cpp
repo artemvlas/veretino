@@ -209,69 +209,54 @@ void Manager::updateDatabase(const DestDbUpdate dest)
     }
 }
 
-void Manager::updateItemFile(const QModelIndex &fileIndex)
+void Manager::updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job)
 {
-    if (!dataMaintainer->data_ || !fileIndex.isValid() || dataMaintainer->data_->isImmutable()) {
+    const DataContainer *_data = dataMaintainer->data_;
+    const FileStatus _prevStatus = TreeModel::itemFileStatus(fileIndex);
+
+    if (!_data
+        || _data->isImmutable()
+        || !(_prevStatus & FileStatus::CombUpdatable))
+    {
         return;
     }
 
-    const FileStatus fileStatusBefore = TreeModel::itemFileStatus(fileIndex);
+    if (_prevStatus == FileStatus::New) {
+        QString _dig;
 
-    if (fileStatusBefore == FileStatus::New) {
-        dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
-        QString filePath = dataMaintainer->data_->itemAbsolutePath(fileIndex);
-        QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData_.algorithm);
-
-        if (sum.isEmpty()) { // return previous status
-            dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::New);
+        if (_job == DestImportDigest) {
+            _dig = extractDigestFromFile(_data->digestFilePath(fileIndex));
         }
-        else {
-            dataMaintainer->updateChecksum(fileIndex, sum);
+        else { // calc the new one
+            dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
+            _dig = calculateChecksum(_data->itemAbsolutePath(fileIndex),
+                                     _data->metaData_.algorithm);
+
+            if (_dig.isEmpty()) // return previous status
+                dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, _prevStatus);
+        }
+
+        if (!_dig.isEmpty()) {
+            dataMaintainer->updateChecksum(fileIndex, _dig);
         }
     }
-    else if (fileStatusBefore == FileStatus::Missing) {
+    else if (_prevStatus == FileStatus::Missing) {
         dataMaintainer->itemFileRemoveLost(fileIndex);
     }
-    else if (fileStatusBefore == FileStatus::Mismatched) {
+    else if (_prevStatus == FileStatus::Mismatched) {
         dataMaintainer->itemFileUpdateChecksum(fileIndex);
     }
 
     if (TreeModel::hasStatus(FileStatus::CombDbChanged, fileIndex)) {
         dataMaintainer->setDbFileState(DbFileState::NotSaved);
-        dataMaintainer->updateNumbers(fileIndex, fileStatusBefore);
+        dataMaintainer->updateNumbers(fileIndex, _prevStatus);
         dataMaintainer->updateDateTime();
 
         if (settings_->instantSaving) {
             saveData();
         }
-        else {
-            emit procState->stateChanged(); // temp solution to update Button info
-        }
-    }
-}
-
-void Manager::importItemDigest(const QModelIndex &fileIndex)
-{
-    if (!dataMaintainer->data_
-        || !TreeModel::hasStatus(FileStatus::New, fileIndex))
-    {
-        return;
-    }
-
-    const QString _filePath = dataMaintainer->data_->digestFilePath(fileIndex);
-    const QString _dig = extractDigestFromFile(_filePath);
-
-    if (tools::canBeChecksum(_dig) && dataMaintainer->updateChecksum(fileIndex, _dig)) {
-        // <!TMP!> SHOULD be combined with the function above (Manager::updateItemFile)
-        dataMaintainer->setDbFileState(DbFileState::NotSaved);
-        dataMaintainer->updateNumbers(fileIndex, FileStatus::New);
-        dataMaintainer->updateDateTime();
-
-        if (settings_->instantSaving) {
-            saveData();
-        }
-        else {
-            emit procState->stateChanged(); // temp solution to update Button info
+        else { // temp solution to update Button info
+            emit procState->stateChanged();
         }
     }
 }

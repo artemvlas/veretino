@@ -16,7 +16,7 @@
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), settings_(settings)
 {
-    iconProvider.setTheme(view_->palette());
+    _icons.setTheme(view_->palette());
     menuAct_->setIconTheme(view_->palette());
     menuAct_->setSettings(settings_);
 
@@ -171,23 +171,23 @@ QIcon ModeSelector::getButtonIcon()
     switch (mode()) {
         case FileProcessing:
         case DbProcessing:
-            return iconProvider.icon(Icons::ProcessStop);
+            return _icons.icon(Icons::ProcessStop);
         case DbCreating:
-            return iconProvider.icon(Icons::ProcessAbort);
+            return _icons.icon(Icons::ProcessAbort);
         case Folder:
-            return iconProvider.icon(Icons::FolderSync);
+            return _icons.icon(Icons::FolderSync);
         case File:
-            return iconProvider.icon(Icons::HashFile);
+            return _icons.icon(Icons::HashFile);
         case DbFile:
-            return iconProvider.icon(Icons::Database);
+            return _icons.icon(Icons::Database);
         case SumFile:
-            return iconProvider.icon(Icons::Scan);
+            return _icons.icon(Icons::Scan);
         case Model:
-            return iconProvider.icon(Icons::Start);
+            return _icons.icon(Icons::Start);
         case ModelNewLost:
-            return iconProvider.icon(Icons::Update);
+            return _icons.icon(Icons::Update);
         case UpdateMismatch:
-            return iconProvider.icon(FileStatus::Updated);
+            return _icons.icon(FileStatus::Updated);
         default:
             break;
     }
@@ -280,29 +280,29 @@ void ModeSelector::promptItemFileUpd()
 
     switch (storedStatus) {
     case FileStatus::New:
-        msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::New));
+        msgBox.setIconPixmap(_icons.pixmap(FileStatus::New));
         msgBox.setWindowTitle("New File...");
         msgBox.setText("The database does not yet contain\n"
                        "a corresponding checksum.");
         msgBox.setInformativeText("Would you like to calculate and add it?");
         msgBox.button(QMessageBox::Ok)->setText("Add");
-        msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Added));
+        msgBox.button(QMessageBox::Ok)->setIcon(_icons.icon(FileStatus::Added));
         break;
     case FileStatus::Missing:
-        msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::Missing));
+        msgBox.setIconPixmap(_icons.pixmap(FileStatus::Missing));
         msgBox.setWindowTitle("Missing File...");
         msgBox.setText("File does not exist.");
         msgBox.setInformativeText("Remove the Item from the database?");
         msgBox.button(QMessageBox::Ok)->setText("Remove");
-        msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Removed));
+        msgBox.button(QMessageBox::Ok)->setIcon(_icons.icon(FileStatus::Removed));
         break;
     case FileStatus::Mismatched:
-        msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::Mismatched));
+        msgBox.setIconPixmap(_icons.pixmap(FileStatus::Mismatched));
         msgBox.setWindowTitle("Mismatched Checksum...");
         msgBox.setText("The calculated and stored checksums do not match.");
         msgBox.setInformativeText("Do you want to update the stored one?");
         msgBox.button(QMessageBox::Ok)->setText("Update");
-        msgBox.button(QMessageBox::Ok)->setIcon(iconProvider.icon(FileStatus::Updated));
+        msgBox.button(QMessageBox::Ok)->setIcon(_icons.icon(FileStatus::Updated));
         break;
     default:
         break;
@@ -322,7 +322,7 @@ void ModeSelector::verifyDb()
     verify();
 }
 
-void ModeSelector::updateDbItem()
+void ModeSelector::updateItemFile(DestDbUpdate _job)
 {
     /*  At the moment, updating a separate file
      *  with the View filtering enabled is unstable,
@@ -331,7 +331,19 @@ void ModeSelector::updateDbItem()
     if (view_->isViewFiltered())
         view_->disableFilter();
 
-    manager_->addTask(&Manager::updateItemFile, view_->curIndex());
+    manager_->addTask(&Manager::updateItemFile,
+                      view_->curIndex(),
+                      _job);
+}
+
+void ModeSelector::updateDbItem()
+{
+    updateItemFile(DestDbUpdate::AutoSelect);
+}
+
+void ModeSelector::importItemSum()
+{
+    updateItemFile(DestDbUpdate::DestImportDigest);
 }
 
 void ModeSelector::showFolderContentTypes()
@@ -502,16 +514,6 @@ void ModeSelector::exportItemSum()
                                                       : TreeModel::itemFileChecksum(_ind);
 
     emit manager_->fileProcessed(filePath, fileVal);
-}
-
-void ModeSelector::importItemSum()
-{
-    if (view_->isViewFiltered())
-        view_->disableFilter();
-
-    manager_->addTaskWithState(State::Idle,
-                               &Manager::importItemDigest,
-                               view_->curIndex());
 }
 
 void ModeSelector::makeFolderContentsList(const QString &folderPath)
@@ -898,12 +900,12 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
         return true;
 
     const QString strAct = abort ? QStringLiteral(u"Abort") : QStringLiteral(u"Stop");
-    const QIcon &icoAct = abort ? iconProvider.icon(Icons::ProcessAbort) : iconProvider.icon(Icons::ProcessStop);
+    const QIcon &icoAct = abort ? _icons.icon(Icons::ProcessAbort) : _icons.icon(Icons::ProcessStop);
 
     QMessageBox msgBox(view_);
     connect(proc_, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
 
-    msgBox.setIconPixmap(iconProvider.pixmap(FileStatus::Calculating));
+    msgBox.setIconPixmap(_icons.pixmap(FileStatus::Calculating));
     msgBox.setWindowTitle(QStringLiteral(u"Processing..."));
     msgBox.setText(strAct + QStringLiteral(u" current process?"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -911,7 +913,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     msgBox.button(QMessageBox::Yes)->setText(strAct);
     msgBox.button(QMessageBox::No)->setText(QStringLiteral(u"Continue..."));
     msgBox.button(QMessageBox::Yes)->setIcon(icoAct);
-    msgBox.button(QMessageBox::No)->setIcon(iconProvider.icon(Icons::DoubleGear));
+    msgBox.button(QMessageBox::No)->setIcon(_icons.icon(Icons::DoubleGear));
 
     if (msgBox.exec() == QMessageBox::Yes) {
         abort ? abortProcess() : stopProcess();

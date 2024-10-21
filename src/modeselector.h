@@ -68,8 +68,6 @@ public:
     void verifyModified();
     void verifyItems(const QModelIndex &_root, FileStatus _status);
     void branchSubfolder();
-    void exportItemSum();
-    void importItemSum();
 
     void makeFolderContentsList(const QString &folderPath);
     void makeFolderContentsFilter(const QString &folderPath);
@@ -90,7 +88,7 @@ public:
     void checkFileByClipboardChecksum();
     void copyFsItem();
 
-    IconProvider iconProvider;
+    IconProvider _icons;
     MenuActions *menuAct_ = new MenuActions(this);
 
 public slots:
@@ -102,6 +100,9 @@ private:
     void connectActions();
     void copyDataToClipboard(Column column);
     void updateDbItem();
+    void updateItemFile(DestDbUpdate _job);
+    void exportItemSum();
+    void importItemSum();
     bool promptMessageProcCancelation_(bool abort);
 
     QString composeDbFilePath();

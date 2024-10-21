@@ -57,7 +57,7 @@ public:
         Computed = 1 << 14,    // the checksum has been calculated and is ready for further processing (copy or save)
         ToClipboard = 1 << 15, // the calculated checksum is intended to be copied to the clipboard
         ToSumFile = 1 << 16,   // the calculated checksum is intended to be stored in the summary file
-    };
+    }; // enum FileStatus
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 

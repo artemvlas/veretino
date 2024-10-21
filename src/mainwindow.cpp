@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     modeSelect->menuAct_->populateMenuFile(ui->menuFile);
     ui->menuHelp->addAction(modeSelect->menuAct_->actionAbout);
 
-    statusBar->setIconProvider(&modeSelect->iconProvider);
+    statusBar->setIconProvider(&modeSelect->_icons);
     setStatusBar(statusBar);
     updatePermanentStatus();
 
@@ -217,7 +217,7 @@ void MainWindow::showDialogContentsList(const QString &folderName, const FileTyp
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
-        dialog.setWindowIcon(modeSelect->iconProvider.iconFolder());
+        dialog.setWindowIcon(modeSelect->_icons.iconFolder());
         dialog.exec();
     }
 }
@@ -252,7 +252,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     }
     else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
-        msgBox.setIconPixmap(modeSelect->iconProvider.pixmap(Icons::Filter));
+        msgBox.setIconPixmap(modeSelect->_icons.pixmap(Icons::Filter));
         msgBox.setWindowTitle("No filter specified");
         msgBox.setText("File filtering is not set.");
         msgBox.setInformativeText("Continue with all files?");
@@ -269,7 +269,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeL
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
-        dialog.setWindowIcon(modeSelect->iconProvider.icon(Icons::Database));
+        dialog.setWindowIcon(modeSelect->_icons.icon(Icons::Database));
         QString strWindowTitle = QStringLiteral(u"Database Contents");
         if (ui->treeView->data_ && ui->treeView->data_->numbers_.contains(FileStatus::Missing))
             strWindowTitle.append(QStringLiteral(u" [available ones]"));
@@ -294,7 +294,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         else {
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
             msgBox.button(QMessageBox::Ok)->setText("Update");
-            msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->iconProvider.icon(FileStatus::Updated));
+            msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->_icons.icon(FileStatus::Updated));
             msgBox.setDefaultButton(QMessageBox::Cancel);
         }
 
@@ -322,7 +322,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     FileStatus _st_icon = result.contains(FileStatus::Mismatched) ? FileStatus::Mismatched
                                                                   : FileStatus::Matched;
 
-    msgBox.setIconPixmap(modeSelect->iconProvider.pixmap(_st_icon));
+    msgBox.setIconPixmap(modeSelect->_icons.pixmap(_st_icon));
     msgBox.setWindowTitle(titleText);
     msgBox.setText(messageText);
 
@@ -403,7 +403,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
         return;
 
     QMessageBox msgBox(this);
-    msgBox.setIconPixmap(modeSelect->iconProvider.pixmap(Icons::AddFork));
+    msgBox.setIconPixmap(modeSelect->_icons.pixmap(Icons::AddFork));
     msgBox.setWindowTitle("A new Branch has been created");
     msgBox.setText("The subfolder data is forked:\n" + paths::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
@@ -427,16 +427,16 @@ void MainWindow::updateStatusIcon()
 {
     QIcon statusIcon;
     if (proc_->isStarted()) {
-        statusIcon = modeSelect->iconProvider.icon(FileStatus::Calculating);
+        statusIcon = modeSelect->_icons.icon(FileStatus::Calculating);
     }
     else if (ui->treeView->isViewFileSystem()) {
-        statusIcon = modeSelect->iconProvider.icon(ui->treeView->curAbsPath());
+        statusIcon = modeSelect->_icons.icon(ui->treeView->curAbsPath());
     }
     else if (ui->treeView->isViewDatabase()) {
         if (TreeModel::isFileRow(ui->treeView->curIndex()))
-            statusIcon = modeSelect->iconProvider.icon(TreeModel::itemFileStatus(ui->treeView->curIndex()));
+            statusIcon = modeSelect->_icons.icon(TreeModel::itemFileStatus(ui->treeView->curIndex()));
         else
-            statusIcon = modeSelect->iconProvider.iconFolder();
+            statusIcon = modeSelect->_icons.iconFolder();
     }
 
     statusBar->setStatusIcon(statusIcon);
