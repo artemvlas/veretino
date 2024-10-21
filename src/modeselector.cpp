@@ -817,7 +817,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     switch (TreeModel::itemFileStatus(index)) {
                         case FileStatus::New:
                             viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
-                            if (QFileInfo::exists(paths::digestFilePath(view_->data_->itemAbsolutePath(index), view_->data_->metaData_.algorithm)))
+                            if (QFileInfo::exists(view_->data_->digestFilePath(index)))
                                 viewContextMenu->addAction(menuAct_->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:

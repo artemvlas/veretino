@@ -252,14 +252,13 @@ void Manager::updateItemFile(const QModelIndex &fileIndex)
 
 void Manager::importItemDigest(const QModelIndex &fileIndex)
 {
-    if (!dataMaintainer->data_ ||
-        !TreeModel::hasStatus(FileStatus::New, fileIndex))
+    if (!dataMaintainer->data_
+        || !TreeModel::hasStatus(FileStatus::New, fileIndex))
     {
         return;
     }
 
-    QCryptographicHash::Algorithm _algo = dataMaintainer->data_->metaData_.algorithm;
-    const QString _filePath = paths::digestFilePath(dataMaintainer->data_->itemAbsolutePath(fileIndex), _algo);
+    const QString _filePath = dataMaintainer->data_->digestFilePath(fileIndex);
     const QString _dig = extractDigestFromFile(_filePath);
 
     if (tools::canBeChecksum(_dig) && dataMaintainer->updateChecksum(fileIndex, _dig)) {

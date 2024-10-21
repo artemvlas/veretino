@@ -61,6 +61,11 @@ QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool exis
     return Files::firstDbFile(folderPath);
 }
 
+QString DataContainer::digestFilePath(const QModelIndex &fileIndex) const
+{
+    return paths::digestFilePath(itemAbsolutePath(fileIndex), metaData_.algorithm);
+}
+
 QString DataContainer::basicDate() const
 {
     // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"

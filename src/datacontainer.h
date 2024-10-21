@@ -47,6 +47,7 @@ public:
     QString backupFilePath() const;
     QString itemAbsolutePath(const QModelIndex &curIndex) const; // returns the absolute path to the database item (file or subfolder)
     QString getBranchFilePath(const QModelIndex &subfolder, bool existing = false) const;
+    QString digestFilePath(const QModelIndex &fileIndex) const;
     QString basicDate() const; // the date until which files are considered unmodified
 
     bool isDbFileState(DbFileState state) const;

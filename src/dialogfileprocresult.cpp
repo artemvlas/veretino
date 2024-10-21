@@ -167,16 +167,13 @@ void DialogFileProcResult::addButtonSave()
 
 void DialogFileProcResult::makeSumFile()
 {
-    using namespace tools;
     const QString &_chsum = values_.checksum;
 
-    if (filePath_.isEmpty() || !canBeChecksum(_chsum))
+    if (filePath_.isEmpty() || !tools::canBeChecksum(_chsum))
         return;
 
-    //const QString ext = format::algoToStr(_chsum.size(), false);
-    //const QString sumFile = joinStrings(filePath_, ext, u'.');
     const QString _sumFile = paths::digestFilePath(filePath_, _chsum.size());
-    const QString _strToWrite = joinStrings(_chsum, paths::basicName(filePath_), QStringLiteral(u" *"));
+    const QString _strToWrite = tools::joinStrings(_chsum, paths::basicName(filePath_), QStringLiteral(u" *"));
 
     setFileName(_sumFile);
 
