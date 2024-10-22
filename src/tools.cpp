@@ -111,6 +111,11 @@ bool canBeChecksum(const QString &str)
     return true;
 }
 
+bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo)
+{
+    return (str.size() == algoStrLen(algo)) && canBeChecksum(str);
+}
+
 bool isLater(const QString &dt_before, const QString &dt_later)
 {
     // format "yyyy/MM/dd HH:mm"

@@ -225,7 +225,9 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job)
         QString _dig;
 
         if (_job == DestImportDigest) {
-            _dig = extractDigestFromFile(_data->digestFilePath(fileIndex));
+            const QString __d = extractDigestFromFile(_data->digestFilePath(fileIndex));
+            if (tools::canBeChecksum(__d, _data->metaData_.algorithm)) // checking for compliance with the current algo
+                _dig = __d;
         }
         else { // calc the new one
             dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Calculating);

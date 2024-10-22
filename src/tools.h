@@ -34,6 +34,7 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
 int digitsToNum(const QList<int> &digits); // {0,1,2,3} --> 123
 
 bool canBeChecksum(const QString &str);
+bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo);
 bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
