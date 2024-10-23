@@ -1,6 +1,6 @@
 Veretino 0.5.2
 * Added new status: Moved.
-    It will mark renamed or moved files if the corresponding option is enabled in Settings.
+    It will mark renamed or moved files [if enabled in settings]. Will be detected when new ones are calculated.
 * Implemented import from digest files (*.sha1/256/512) to DB item ("new file" status only).
 * DateTime stamp inheritance during Branching has become a bit smarter.
     If the selected subfolder contains only checked and matched items, the Branch will be created with a new timestamp, as a new DB.

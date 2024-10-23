@@ -61,7 +61,7 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbInstantSaving->setChecked(settings.instantSaving);
     ui->cbExcludeUnpermitted->setChecked(settings.excludeUnpermitted);
     ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
-    ui->cbConsiderMoved->setChecked(settings.considerMoved);
+    ui->cbDetectMoved->setChecked(settings.detectMoved);
 
     // Tab Database
     if (settings.dbPrefix.isEmpty() || (settings.dbPrefix == Lit::s_db_prefix))
@@ -95,7 +95,7 @@ void DialogSettings::updateSettings()
     settings_->instantSaving = ui->cbInstantSaving->isChecked();
     settings_->excludeUnpermitted = ui->cbExcludeUnpermitted->isChecked();
     settings_->considerDateModified = ui->cbConsiderDateModified->isChecked();
-    settings_->considerMoved = ui->cbConsiderMoved->isChecked();
+    settings_->detectMoved = ui->cbDetectMoved->isChecked();
 
     // database
     const QString _inpPrefix = ui->inputJsonFileNamePrefix->text();

@@ -93,12 +93,12 @@ immediately after any changes are made.</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QCheckBox" name="cbConsiderMoved">
+          <widget class="QCheckBox" name="cbDetectMoved">
            <property name="toolTip">
             <string>Check newly added checksums for presence among the Missing items.</string>
            </property>
            <property name="text">
-            <string>Consider Moved</string>
+            <string>Detect Moved</string>
            </property>
           </widget>
          </item>

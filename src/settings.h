@@ -38,7 +38,7 @@ public:
     bool excludeUnpermitted = true;
     bool dbFlagConst = false;
     bool considerDateModified = true;
-    bool considerMoved = false;
+    bool detectMoved = false;
 
     FilterMode filter_mode = FilterMode::NotSet;
     QStringList filter_last_exts;
@@ -66,7 +66,7 @@ private:
     static const QString s_key_instantSaving;
     static const QString s_key_excludeUnPerm;
     static const QString s_key_considerDateModified;
-    static const QString s_key_considerMoved;
+    static const QString s_key_detectMoved;
     static const QString s_key_history_lastFsPath;
     static const QString s_key_history_recentDbFiles;
     static const QString s_key_view_geometry;

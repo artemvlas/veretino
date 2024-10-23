@@ -139,7 +139,7 @@ void Manager::createDataModel(const QString &dbFilePath)
     }
 
     dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
-    dataMaintainer->json_->considerMovedItems = settings_->considerMoved;
+    dataMaintainer->json_->_cacheMissingChecksums = settings_->detectMoved;
 
     if (dataMaintainer->importJson(dbFilePath)) {
         emit setViewData(dataMaintainer->data_);
