@@ -41,22 +41,23 @@ public:
         Added = 1 << 9,         // item (file path and its checksum) has been added to the database
         Removed = 1 << 10,      // item^ removed from the database
         Updated = 1 << 11,      // the checksum has been updated
-        UnPermitted = 1 << 12,  // no read permissions
-        ReadError = 1 << 13,    // an error occurred during reading
+        Moved = 1 << 12,        // the newly calculated checksum corresponds to some missing item (renamed or moved file)
+        UnPermitted = 1 << 13,  // no read permissions
+        ReadError = 1 << 14,    // an error occurred during reading
 
         CombNotChecked = NotChecked | NotCheckedMod,
-        CombAvailable = CombNotChecked | Matched | Mismatched | Added | Updated,
+        CombAvailable = CombNotChecked | Matched | Mismatched | Added | Updated | Moved,
         CombHasChecksum = CombAvailable | Missing,
         CombUpdatable = New | Missing | Mismatched,
-        CombDbChanged = Added | Removed | Updated,
+        CombDbChanged = Added | Removed | Updated | Moved,
         CombChecked = Matched | Mismatched,
-        CombMatched = Matched | Added | Updated,
+        CombMatched = Matched | Added | Updated | Moved,
         CombNewLost = New | Missing,
-        CombUnreadable = UnPermitted | ReadError, // present on the disk, but unreadable (no read permission or read error)
+        CombUnreadable = UnPermitted | ReadError,
 
-        Computed = 1 << 14,    // the checksum has been calculated and is ready for further processing (copy or save)
-        ToClipboard = 1 << 15, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile = 1 << 16,   // the calculated checksum is intended to be stored in the summary file
+        Computed = 1 << 15,    // the checksum has been calculated and is ready for further processing (copy or save)
+        ToClipboard = 1 << 16, // the calculated checksum is intended to be copied to the clipboard
+        ToSumFile = 1 << 17,   // the calculated checksum is intended to be stored in the summary file
     }; // enum FileStatus
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)

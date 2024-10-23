@@ -75,6 +75,8 @@ public:
     ProxyModel *proxyModel_ = new ProxyModel(model_, this);
     MetaData metaData_;
     Numbers numbers_;
+
+    QHash<QString, QModelIndex> _cacheMissing;
 }; // class DataContainer
 
 #endif // DATACONTAINER_H

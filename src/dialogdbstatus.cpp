@@ -219,11 +219,15 @@ QStringList DialogDbStatus::infoChanges()
     const Numbers &_num = data_->numbers_;
     QStringList result;
 
+    const NumSize _n_moved = _num.values(FileStatus::Moved);
+    if (_n_moved)
+        result.append(QStringLiteral(u"Moved: ") + format::filesNumSize(_n_moved));
+
     const NumSize _n_added = _num.values(FileStatus::Added);
     if (_n_added)
         result.append(QStringLiteral(u"Added: ") + format::filesNumSize(_n_added));
 
-    const int _n_removed = _num.numberOf(FileStatus::Removed);
+    const int _n_removed = _num.numberOf(FileStatus::Removed) - _n_moved._num;
     if (_n_removed)
         result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _n_removed));
 

@@ -25,6 +25,7 @@ public:
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
 
     bool considerFileModDate = false;
+    bool considerMovedItems = false;
 
 private:   
     QJsonDocument readJsonFile(const QString &filePath);

@@ -203,7 +203,13 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
 
     if (storedChecksum.isEmpty()) {
         setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
-        setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+
+        if (data_->_cacheMissing.contains(computedChecksum)) {
+            setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Moved);
+            itemFileRemoveLost(data_->_cacheMissing.value(computedChecksum));
+        } else {
+            setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+        }
         return true;
     }
     else if (storedChecksum == computedChecksum) {

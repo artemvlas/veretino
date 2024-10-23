@@ -37,7 +37,7 @@ public:
                         int role = Qt::EditRole) override;
 
     bool isEmpty() const;
-    void add_file(const QString &filePath, const FileValues &values);
+    QModelIndex add_file(const QString &filePath, const FileValues &values);
     bool add_file_unforced(const QString &filePath, const FileValues &values); // checks for presence first; much slower for large lists
     void populate(const FileList &filesData);
 

@@ -52,7 +52,7 @@ bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &val
     return true;
 }
 
-void TreeModel::add_file(const QString &filePath, const FileValues &values)
+QModelIndex TreeModel::add_file(const QString &filePath, const FileValues &values)
 {
     // data preparation
     QVector<QVariant> _tiData(rootItem->columnCount());
@@ -68,7 +68,9 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
 
     // item adding
     TreeItem *parentItem = add_folder(paths::parentFolder(filePath));
-    parentItem->addChild(_tiData);
+    TreeItem *_ti = parentItem->addChild(_tiData);
+
+    return createIndex(_ti->childNumber(), 0, _ti);
 }
 
 TreeItem *TreeModel::add_folder(const QString &path)

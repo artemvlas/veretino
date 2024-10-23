@@ -27,10 +27,10 @@
        <item>
         <widget class="QFrame" name="frame">
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -60,7 +60,7 @@
        <item>
         <widget class="Line" name="line_2">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -93,12 +93,12 @@ immediately after any changes are made.</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QCheckBox" name="cbExcludeUnpermitted">
+          <widget class="QCheckBox" name="cbConsiderMoved">
            <property name="toolTip">
-            <string>Exclude files without read permissions.</string>
+            <string>Check newly added checksums for presence among the Missing items.</string>
            </property>
            <property name="text">
-            <string>Exclude UnPermitted</string>
+            <string>Consider Moved</string>
            </property>
           </widget>
          </item>
@@ -114,7 +114,7 @@ immediately after any changes are made.</string>
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -147,7 +147,7 @@ immediately after any changes are made.</string>
           <string>labelDatabaseFilename</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -164,10 +164,10 @@ immediately after any changes are made.</string>
        <item row="2" column="1">
         <widget class="QFrame" name="frame_3">
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -196,7 +196,7 @@ immediately after any changes are made.</string>
        <item row="3" column="0" colspan="2">
         <widget class="Line" name="line">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -228,7 +228,7 @@ to prevent changes from being made.</string>
        <string>Extra</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0" colspan="2">
+       <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>With no filter</string>
@@ -257,6 +257,16 @@ to prevent changes from being made.</string>
          </layout>
         </widget>
        </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="cbExcludeUnpermitted">
+         <property name="toolTip">
+          <string>Exclude files without read permissions.</string>
+         </property>
+         <property name="text">
+          <string>Exclude UnPermitted</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -264,10 +274,10 @@ to prevent changes from being made.</string>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok|QDialogButtonBox::StandardButton::RestoreDefaults</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
     </widget>
    </item>

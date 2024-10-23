@@ -18,6 +18,7 @@ const QString Settings::s_key_dbFlagConst = "dbFlagConst";
 const QString Settings::s_key_instantSaving = "instantSaving";
 const QString Settings::s_key_excludeUnPerm = "excludeUnPerm";
 const QString Settings::s_key_considerDateModified = "considerDateModified";
+const QString Settings::s_key_considerMoved = "considerMoved";
 const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
 const QString Settings::s_key_history_recentDbFiles = "history/recentDbFiles";
 
@@ -100,6 +101,7 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_instantSaving, instantSaving);
     storedSettings.setValue(s_key_excludeUnPerm, excludeUnpermitted);
     storedSettings.setValue(s_key_considerDateModified, considerDateModified);
+    storedSettings.setValue(s_key_considerMoved, considerMoved);
 
     // filter
     storedSettings.setValue(s_key_filter_ignore_db, filter_ignore_db);
@@ -139,6 +141,7 @@ void Settings::loadSettings()
     instantSaving = storedSettings.value(s_key_instantSaving, defaults.instantSaving).toBool();
     excludeUnpermitted = storedSettings.value(s_key_excludeUnPerm, defaults.excludeUnpermitted).toBool();
     considerDateModified = storedSettings.value(s_key_considerDateModified, defaults.considerDateModified).toBool();
+    considerMoved = storedSettings.value(s_key_considerMoved, defaults.considerMoved).toBool();
 
     // filter
     filter_mode = static_cast<FilterRule::FilterMode>(storedSettings.value(s_key_filter_mode, FilterRule::NotSet).toInt());

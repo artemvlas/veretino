@@ -139,6 +139,7 @@ void Manager::createDataModel(const QString &dbFilePath)
     }
 
     dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
+    dataMaintainer->json_->considerMovedItems = settings_->considerMoved;
 
     if (dataMaintainer->importJson(dbFilePath)) {
         emit setViewData(dataMaintainer->data_);
@@ -240,6 +241,10 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job)
 
         if (!_dig.isEmpty()) {
             dataMaintainer->updateChecksum(fileIndex, _dig);
+
+            // TMP (Missing --> Removed)
+            if (TreeModel::hasStatus(FileStatus::Moved, fileIndex))
+                dataMaintainer->updateNumbers(_data->_cacheMissing.value(_dig), FileStatus::Missing);
         }
     }
     else if (_prevStatus == FileStatus::Missing) {

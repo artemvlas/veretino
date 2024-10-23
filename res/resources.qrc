@@ -73,5 +73,6 @@
         <file>icons/generic/unreadable.svg</file>
         <file>icons/generic/locked.svg</file>
         <file>icons/generic/outdated.svg</file>
+        <file>icons/generic/moved.svg</file>
     </qresource>
 </RCC>
