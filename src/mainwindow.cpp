@@ -360,7 +360,7 @@ void MainWindow::dialogSettings()
                 && _d->contains(FileStatus::New)
                 && _d->contains(FileStatus::Missing))
             {
-                manager->addTask(&Manager::cacheMissingItems);
+                manager->addTaskWithState(State::Idle, &Manager::cacheMissingItems);
             }
             else if (!settings_->detectMoved
                        && !_d->_cacheMissing.isEmpty())

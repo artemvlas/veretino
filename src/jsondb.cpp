@@ -237,11 +237,7 @@ DataContainer* JsonDb::parseJson(const QString &filePath)
         FileValues _values = makeFileValues(_fullPath, _basicDT);
         _values.checksum = it.value().toString();
 
-        const QModelIndex &_item = parsedData->model_->add_file(it.key(), _values);
-
-        // add missing items to cache
-        if (_cacheMissingChecksums && (_values.status == FileStatus::Missing))
-            parsedData->_cacheMissing.insert(_values.checksum, _item);
+        parsedData->model_->add_file(it.key(), _values);
     }
 
     // additional data

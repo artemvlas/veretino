@@ -139,9 +139,11 @@ void Manager::createDataModel(const QString &dbFilePath)
     }
 
     dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
-    dataMaintainer->json_->_cacheMissingChecksums = settings_->detectMoved;
 
     if (dataMaintainer->importJson(dbFilePath)) {
+        if (settings_->detectMoved)
+            cacheMissingItems();
+
         emit setViewData(dataMaintainer->data_);
         sendDbUpdated(); // using timer 0
     }
@@ -641,8 +643,12 @@ void Manager::cacheMissingItems()
 {
     DataContainer *_data = dataMaintainer->data_;
 
-    if (!_data || !_data->contains(FileStatus::Missing))
+    if (!_data
+        || !_data->contains(FileStatus::New)
+        || !_data->contains(FileStatus::Missing))
+    {
         return;
+    }
 
     TreeModelIterator it(_data->model_);
 
