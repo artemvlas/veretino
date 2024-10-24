@@ -1,10 +1,12 @@
 Veretino 0.5.2
-* Added new status: Moved.
-    It will mark renamed or moved files [if enabled in settings]. Will be detected when new ones are calculated.
+* Implemented the ability to detect Moved files.
+    Added item Status: "Moved". It will mark renamed or moved files [if enabled in settings].
+    An item will be marked with the "Moved" status if its computed checksum matches any Missing item's one.
 * Implemented import from digest files (*.sha1/256/512) to DB item ("new file" status only).
 * DateTime stamp inheritance during Branching has become a bit smarter.
     If the selected subfolder contains only checked and matched items, the Branch will be created with a new timestamp, as a new DB.
-* Minor improvements to dialog boxes.
+* Improved Presets for filterable file types.
+* Minor improvements to UI and dialog boxes.
 
 ---
 Veretino 0.5.1

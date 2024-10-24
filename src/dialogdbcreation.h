@@ -58,6 +58,7 @@ private:
     void createMenuWidgetTypes(const QPoint &point);
     void handlePresetClicked(const QAction *_act);
     int cmbAlgoIndex();
+    QIcon presetIcon(const QString &_name) const;
     QStringList inputedExts() const;
     FilterMode curFilterMode() const;
 
@@ -65,6 +66,7 @@ private:
     WidgetFileTypes *types_ = nullptr;
     Settings *settings_ = nullptr;
     QString workDir_;
+    IconProvider _icons;
 
     static const QMap<QString, QSet<QString>> _presets;
 

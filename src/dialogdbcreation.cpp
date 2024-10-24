@@ -11,6 +11,9 @@
 #include <QMenu>
 
 const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
+    { QStringLiteral(u"Archives"), { QStringLiteral(u"zip"), QStringLiteral(u"7z"), QStringLiteral(u"gz"), QStringLiteral(u"tgz"),
+                                   QStringLiteral(u"tar"), QStringLiteral(u"rar"), QStringLiteral(u"img"), QStringLiteral(u"iso") }},
+
     { QStringLiteral(u"Documents"), { QStringLiteral(u"odt"), QStringLiteral(u"ods"), QStringLiteral(u"pdf"), QStringLiteral(u"docx"),
                                       QStringLiteral(u"xlsx"), QStringLiteral(u"doc"), QStringLiteral(u"rtf"), QStringLiteral(u"txt"),
                                       QStringLiteral(u"epub"), QStringLiteral(u"fb2"), QStringLiteral(u"djvu") }},
@@ -22,10 +25,12 @@ const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
                                   QStringLiteral(u"ogg"), QStringLiteral(u"opus"), QStringLiteral(u"m4a"), QStringLiteral(u"mp3"),
                                   QStringLiteral(u"wav") }},
 
-    { QStringLiteral(u"Videos"), { QStringLiteral(u"mkv"), QStringLiteral(u"webm"), QStringLiteral(u"mp4"),
-                                   QStringLiteral(u"m4v"), QStringLiteral(u"avi") }},
+    { QStringLiteral(u"Videos"), { QStringLiteral(u"mkv"), QStringLiteral(u"webm"), QStringLiteral(u"mp4"), QStringLiteral(u"m4v"),
+                                   QStringLiteral(u"avi"), QStringLiteral(u"mpg"), QStringLiteral(u"mov") }},
 
-    { QStringLiteral(u"! Triflings"), { QStringLiteral(u"log"), QStringLiteral(u"cue"), QStringLiteral(u"info"), QStringLiteral(u"txt") }}
+    { QStringLiteral(u"! Triflings"), { QStringLiteral(u"log"), QStringLiteral(u"cue"), QStringLiteral(u"info"), QStringLiteral(u"inf"),
+                                        QStringLiteral(u"srt"), QStringLiteral(u"m3u"), QStringLiteral(u"bak"), QStringLiteral(u"bat"),
+                                        QStringLiteral(u"sh"), QStringLiteral(u"txt") }}
 };
 
 DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList &extList, QWidget *parent)
@@ -35,7 +40,7 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
 {
     ui->setupUi(this);
 
-    IconProvider _icons(palette());
+    _icons.setTheme(palette());
     setWindowIcon(_icons.icon(Icons::Database));
     types_ = ui->treeWidget;
     types_->setColumnWidth(ItemFileType::ColumnType, 130);
@@ -368,6 +373,28 @@ void DialogDbCreation::updateViewMode()
         ui->rb_ignore->setChecked(true);
 }
 
+QIcon DialogDbCreation::presetIcon(const QString &_name) const
+{
+    if (_name.startsWith('!'))
+        return _icons.icon(Icons::ClearHistory);
+
+    QString _ext;
+    if (!_name.compare(QStringLiteral(u"Archives")))
+        _ext = QStringLiteral(u"zip");
+    else if (!_name.compare(QStringLiteral(u"Documents")))
+        _ext = QStringLiteral(u"docx");
+    else if (!_name.compare(QStringLiteral(u"Pictures")))
+        _ext = QStringLiteral(u"jpg");
+    else if (!_name.compare(QStringLiteral(u"Music")))
+        _ext = QStringLiteral(u"mp3");
+    else if (!_name.compare(QStringLiteral(u"Videos")))
+        _ext = QStringLiteral(u"mkv");
+    else
+        return QIcon();
+
+    return _icons.icon(QStringLiteral(u"file.") + _ext);
+}
+
 void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
 {
     QMenu *dispMenu = new QMenu(this);
@@ -376,7 +403,7 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
 
     QMap<QString, QSet<QString>>::const_iterator it;
     for (it = _presets.constBegin(); it != _presets.constEnd(); ++it) {
-        QAction *_act = new QAction(it.key(), dispMenu);
+        QAction *_act = new QAction(presetIcon(it.key()), it.key(), dispMenu);
         dispMenu->addAction(_act);
     }
 
