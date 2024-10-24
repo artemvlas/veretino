@@ -28,13 +28,13 @@ MainWindow::MainWindow(QWidget *parent)
     thread->setObjectName("Manager Thread");
 
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->treeView->setSettings(settings_);
+    ui->view->setSettings(settings_);
 
     settings_->loadSettings();
 
     restoreGeometry(settings_->geometryMainWindow);
 
-    modeSelect = new ModeSelector(ui->treeView, settings_, this);
+    modeSelect = new ModeSelector(ui->view, settings_, this);
     modeSelect->setManager(manager);
     modeSelect->setProcState(manager->procState);
     ui->progressBar->setProcState(manager->procState);
@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     connections();
 
     if (!argumentInput())
-        ui->treeView->setFileSystemModel();
+        ui->view->setFileSystemModel();
 }
 
 MainWindow::~MainWindow()
@@ -68,8 +68,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         modeSelect->saveData();
         saveSettings();
 
-        if (ui->treeView->isViewDatabase())
-            ui->treeView->setModel(nullptr);
+        if (ui->view->isViewDatabase())
+            ui->view->setModel(nullptr);
 
         event->accept();
     }
@@ -89,18 +89,18 @@ void MainWindow::connections()
     connect(settings_, &Settings::algorithmChanged, this, &MainWindow::updateButtonInfo);
 
     // TreeView
-    connect(ui->treeView, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);
-    connect(ui->treeView, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
-    connect(ui->treeView, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
-    connect(ui->treeView, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
-    connect(ui->treeView, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
-    connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateButtonInfo);
-    connect(ui->treeView, &View::pathChanged, this, &MainWindow::updateStatusIcon);
-    connect(ui->treeView, &View::modelChanged, this, &MainWindow::handleChangedModel);
-    connect(ui->treeView, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
-    connect(ui->treeView, &View::modelChanged, this, &MainWindow::updateWindowTitle);
-    connect(ui->treeView, &View::showMessage, this, &MainWindow::showMessage);
-    connect(ui->treeView, &View::showDbStatus, this, &MainWindow::showDbStatus);
+    connect(ui->view, &View::keyEnterPressed, modeSelect, &ModeSelector::quickAction);
+    connect(ui->view, &View::doubleClicked, modeSelect, &ModeSelector::quickAction);
+    connect(ui->view, &View::customContextMenuRequested, modeSelect, &ModeSelector::createContextMenu_View);
+    connect(ui->view, &View::pathChanged, ui->pathEdit, &QLineEdit::setText);
+    connect(ui->view, &View::pathChanged, modeSelect, &ModeSelector::getInfoPathItem);
+    connect(ui->view, &View::pathChanged, this, &MainWindow::updateButtonInfo);
+    connect(ui->view, &View::pathChanged, this, &MainWindow::updateStatusIcon);
+    connect(ui->view, &View::modelChanged, this, &MainWindow::handleChangedModel);
+    connect(ui->view, &View::modelChanged, this, &MainWindow::updatePermanentStatus);
+    connect(ui->view, &View::modelChanged, this, &MainWindow::updateWindowTitle);
+    connect(ui->view, &View::showMessage, this, &MainWindow::showMessage);
+    connect(ui->view, &View::showDbStatus, this, &MainWindow::showDbStatus);
 
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
 
@@ -120,7 +120,7 @@ void MainWindow::connections()
     connect(manager->procState, &ProcState::progressStarted, this,
             [=] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); });
     connect(manager->procState, &ProcState::progressFinished, this,
-            [=] { if (ui->treeView->isViewDatabase()) statusBar->setButtonsEnabled(true); });
+            [=] { if (ui->view->isViewDatabase()) statusBar->setButtonsEnabled(true); });
 }
 
 void MainWindow::connectManager()
@@ -141,7 +141,7 @@ void MainWindow::connectManager()
     // info and notifications
     connect(manager, &Manager::setStatusbarText, statusBar, &StatusBar::setStatusText);
     connect(manager, &Manager::showMessage, this, &MainWindow::showMessage);
-    connect(manager, &Manager::folderChecked, ui->treeView, &View::setMismatchFiltering);
+    connect(manager, &Manager::folderChecked, ui->view, &View::setMismatchFiltering);
     connect(manager, &Manager::folderChecked, this, &MainWindow::showFolderCheckResult);
     connect(manager, &Manager::fileProcessed, this, &MainWindow::showFileCheckResult);
     connect(manager, &Manager::folderContentsListCreated, this, &MainWindow::showDialogContentsList);
@@ -150,16 +150,16 @@ void MainWindow::connectManager()
     connect(manager, &Manager::mismatchFound, this, &MainWindow::setWinTitleMismatchFound);
 
     // results processing
-    connect(manager, &Manager::setViewData, ui->treeView, &View::setData);
+    connect(manager, &Manager::setViewData, ui->view, &View::setData);
     connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
     connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updateWindowTitle);
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
     connect(manager->dataMaintainer, &DataMaintainer::failedDataCreation, this,
-            [=]{ if (ui->treeView->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
+            [=]{ if (ui->view->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
 
     // process status
-    connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->treeView->setViewProxy(); });
+    connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
     connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateButtonInfo);
     connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
     connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
@@ -170,19 +170,19 @@ void MainWindow::connectManager()
     connect(manager->procState, &ProcState::progressFinished, modeSelect, &ModeSelector::getInfoPathItem);
 
     // change view
-    connect(manager, &Manager::switchToFsPrepared, ui->treeView, &View::setFileSystemModel);
-    connect(ui->treeView, &View::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
-    connect(ui->treeView, &View::modelChanged, manager, &Manager::modelChanged);
-    connect(ui->treeView, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
-    connect(ui->treeView, &View::dataSetted, this,
-            [=]{ if (ui->treeView->data_) settings_->addRecentFile(ui->treeView->data_->metaData_.dbFilePath); });
+    connect(manager, &Manager::switchToFsPrepared, ui->view, &View::setFileSystemModel);
+    connect(ui->view, &View::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
+    connect(ui->view, &View::modelChanged, manager, &Manager::modelChanged);
+    connect(ui->view, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
+    connect(ui->view, &View::dataSetted, this,
+            [=]{ if (ui->view->data_) settings_->addRecentFile(ui->view->data_->metaData_.dbFilePath); });
 
     thread->start();
 }
 
 void MainWindow::saveSettings()
 {
-    ui->treeView->saveHeaderState();
+    ui->view->saveHeaderState();
     settings_->geometryMainWindow = saveGeometry();
     settings_->saveSettings();
 }
@@ -202,7 +202,7 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
     clearDialogs();
 
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
-        DialogDbStatus statusDialog(ui->treeView->data_, this);
+        DialogDbStatus statusDialog(ui->view->data_, this);
         statusDialog.setCurrentTab(tab);
 
         /*if (proc_->isStarted()) { // replaced with ::clearDialogs()
@@ -271,7 +271,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeL
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->_icons.icon(Icons::Database));
         QString strWindowTitle = QStringLiteral(u"Database Contents");
-        if (ui->treeView->data_ && ui->treeView->data_->numbers_.contains(FileStatus::Missing))
+        if (ui->view->data_ && ui->view->data_->numbers_.contains(FileStatus::Missing))
             strWindowTitle.append(QStringLiteral(u" [available ones]"));
         dialog.setWindowTitle(strWindowTitle);
         dialog.exec();
@@ -348,13 +348,25 @@ void MainWindow::dialogSettings()
 {
     DialogSettings dialog(settings_, this);
 
-    /* replaced with ::clearDialogs()
-    if (proc_->isState(State::StartVerbose)) {
-        connect(proc_, &ProcState::progressFinished, &dialog, &DialogSettings::reject);
-    }*/
-
     if (dialog.exec()) {
         dialog.updateSettings();
+
+        if (ui->view->isViewDatabase()) {
+            DataContainer *_d = ui->view->data_;
+
+            if (settings_->detectMoved
+                && _d->_cacheMissing.isEmpty()
+                && _d->contains(FileStatus::New)
+                && _d->contains(FileStatus::Missing))
+            {
+                manager->addTask(&Manager::cacheMissingItems);
+            }
+            else if (!settings_->detectMoved
+                       && !_d->_cacheMissing.isEmpty())
+            {
+                _d->_cacheMissing.clear();
+            }
+        }
     }
 }
 
@@ -429,12 +441,12 @@ void MainWindow::updateStatusIcon()
     if (proc_->isStarted()) {
         statusIcon = modeSelect->_icons.icon(FileStatus::Calculating);
     }
-    else if (ui->treeView->isViewFileSystem()) {
-        statusIcon = modeSelect->_icons.icon(ui->treeView->curAbsPath());
+    else if (ui->view->isViewFileSystem()) {
+        statusIcon = modeSelect->_icons.icon(ui->view->curAbsPath());
     }
-    else if (ui->treeView->isViewDatabase()) {
-        if (TreeModel::isFileRow(ui->treeView->curIndex()))
-            statusIcon = modeSelect->_icons.icon(TreeModel::itemFileStatus(ui->treeView->curIndex()));
+    else if (ui->view->isViewDatabase()) {
+        if (TreeModel::isFileRow(ui->view->curIndex()))
+            statusIcon = modeSelect->_icons.icon(TreeModel::itemFileStatus(ui->view->curIndex()));
         else
             statusIcon = modeSelect->_icons.iconFolder();
     }
@@ -444,11 +456,11 @@ void MainWindow::updateStatusIcon()
 
 void MainWindow::updatePermanentStatus()
 {
-    if (ui->treeView->isViewDatabase()) {
+    if (ui->view->isViewDatabase()) {
         if (modeSelect->isMode(Mode::DbCreating))
             statusBar->setModeDbCreating();
         else if (!proc_->isStarted())
-            statusBar->setModeDb(ui->treeView->data_);
+            statusBar->setModeDb(ui->view->data_);
     }
     else {
         statusBar->clearButtons();
@@ -465,8 +477,8 @@ void MainWindow::setWinTitleMismatchFound()
 
 void MainWindow::updateWindowTitle()
 {
-    if (ui->treeView->isViewDatabase()) {
-        const DataContainer *data = ui->treeView->data_;
+    if (ui->view->isViewDatabase()) {
+        const DataContainer *data = ui->view->data_;
 
         if (data->numbers_.contains(FileStatus::Mismatched)) {
             setWinTitleMismatchFound();
@@ -486,28 +498,28 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::handlePathEdit()
 {
-    if (ui->pathEdit->text() == ui->treeView->curAbsPath())
+    if (ui->pathEdit->text() == ui->view->curAbsPath())
         modeSelect->quickAction();
     else
-        ui->treeView->setIndexByPath(ui->pathEdit->text().replace('\\', '/'));
+        ui->view->setIndexByPath(ui->pathEdit->text().replace('\\', '/'));
 }
 
 void MainWindow::handleChangedModel()
 {
-    bool isViewFS = ui->treeView->isViewFileSystem();
+    bool isViewFS = ui->view->isViewFileSystem();
 
     ui->pathEdit->setEnabled(isViewFS);
     ui->pathEdit->setClearButtonEnabled(isViewFS);
 
     modeSelect->menuAct_->actionShowFilesystem->setEnabled(!isViewFS);
-    modeSelect->menuAct_->actionSave->setEnabled(ui->treeView->isViewDatabase()
-                                                 && ui->treeView->data_->isDbFileState(DbFileState::NotSaved));
+    modeSelect->menuAct_->actionSave->setEnabled(ui->view->isViewDatabase()
+                                                 && ui->view->data_->isDbFileState(DbFileState::NotSaved));
 }
 
 void MainWindow::handleButtonDbHashClick()
 {
-    if (!proc_->isStarted() && ui->treeView->isViewDatabase()) {
-        Numbers &numbers = ui->treeView->data_->numbers_;
+    if (!proc_->isStarted() && ui->view->isViewDatabase()) {
+        Numbers &numbers = ui->view->data_->numbers_;
         if (numbers.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
         else if (numbers.contains(FileStatus::CombDbChanged))
@@ -542,8 +554,8 @@ bool MainWindow::argumentInput()
                 modeSelect->openJsonDatabase(argPath);
             }
             else {
-                ui->treeView->setFileSystemModel();
-                ui->treeView->setIndexByPath(argPath);
+                ui->view->setFileSystemModel();
+                ui->view->setIndexByPath(argPath);
             }
             return true;
         }
@@ -578,8 +590,8 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_Escape) {
         // Idle DB
         if (modeSelect->isMode(Mode::DbIdle)) {
-            if (ui->treeView->isViewFiltered())
-                ui->treeView->disableFilter();
+            if (ui->view->isViewFiltered())
+                ui->view->disableFilter();
             else if (QMessageBox::question(this, "Exit...", "Close the Database?") == QMessageBox::Yes)
                 modeSelect->showFileSystem();
         }
@@ -589,7 +601,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
         }
         // other cases
         else if (modeSelect->promptProcessAbort()
-                 && !ui->treeView->isViewFileSystem())
+                 && !ui->view->isViewFileSystem())
         {
             modeSelect->showFileSystem();
         }

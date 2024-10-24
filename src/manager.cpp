@@ -636,6 +636,21 @@ void Manager::makeDbContentsList()
         emit dbContentsListCreated(dataMaintainer->data_->metaData_.workDir, _typesList);
 }
 
+void Manager::cacheMissingItems()
+{
+    DataContainer *_data = dataMaintainer->data_;
+
+    if (!_data || !_data->contains(FileStatus::Missing))
+        return;
+
+    TreeModelIterator it(_data->model_);
+
+    while (it.hasNext()) {
+        if (it.nextFile().status() == FileStatus::Missing)
+            _data->_cacheMissing[it.checksum()] = it.index();
+    }
+}
+
 void Manager::modelChanged(ModelView modelView)
 {
     isViewFileSysytem = (modelView == ModelView::FileSystem);

@@ -90,6 +90,8 @@ public slots:
     // make a list of the file types contained in the folder, their number and size
     void folderContentsList(const QString &folderPath, bool filterCreation);
 
+    void cacheMissingItems();
+
     void runTasks();
 
 private:
