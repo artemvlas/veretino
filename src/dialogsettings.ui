@@ -134,7 +134,7 @@ immediately after any changes are made.</string>
        <item row="1" column="0" colspan="2">
         <widget class="QLineEdit" name="inputJsonFileNamePrefix">
          <property name="placeholderText">
-          <string>Input a prefix for the DB filename. Default: checksums</string>
+          <string>Name prefix. Default: checksums</string>
          </property>
          <property name="clearButtonEnabled">
           <bool>true</bool>

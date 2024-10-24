@@ -8,6 +8,7 @@
 
 #include <QDialog>
 #include <QKeyEvent>
+#include <QCheckBox>
 #include "iconprovider.h"
 #include "itemfiletype.h"
 #include "files.h"
@@ -38,6 +39,7 @@ public:
 
 private:
     Ui::DialogDbCreation *ui;
+    QCheckBox *cb_file_filter = new QCheckBox(this);
 
     void connections();
     void setDbConfig();

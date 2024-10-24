@@ -27,7 +27,7 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
         else if (_ext == Files::strNoPerm)
             _icon = icons_.icon(FileStatus::UnPermitted);
         else
-            _icon = icons_.icon(QStringLiteral(u"file.") + _ext);
+            _icon = icons_.type_icon(_ext);
 
         ItemFileType *_item = new ItemFileType(this);
         _item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);

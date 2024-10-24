@@ -53,7 +53,9 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
     connections();
     types_->setItems(extList);
 
+    ui->tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, cb_file_filter);
     ui->tabWidget->setTabIcon(0, _icons.icon(Icons::Filter));
+    ui->tabWidget->setTabIcon(1, _icons.icon(Icons::Configure));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(_icons.icon(FileStatus::Calculating));
 
     ui->cb_flag_const->setToolTip(QStringLiteral(u"The database will contain a flag\n"
@@ -76,7 +78,7 @@ void DialogDbCreation::connections()
     connect(ui->cb_top10, &QCheckBox::toggled, this, &DialogDbCreation::setItemsVisibility);
 
     // filter
-    connect(ui->cb_enable_filter, &QCheckBox::toggled, this,
+    connect(cb_file_filter, &QCheckBox::toggled, this,
             [=](bool isChecked){ setFilterCreation(isChecked ? FC_Enabled : FC_Disabled); });
     connect(ui->rb_ignore, &QRadioButton::toggled, this, &DialogDbCreation::updateFilterDisplay);
     connect(ui->cb_editable_exts, &QCheckBox::toggled, this, [=](bool _chk) { ui->le_exts_list->setReadOnly(!_chk); });
@@ -122,8 +124,8 @@ void DialogDbCreation::updateSettings()
     settings_->filter_remember_exts = ui->cb_remember_exts->isChecked();
 
     settings_->filter_mode = curFilterMode();
-    settings_->filter_last_exts = (mode_ == FC_Enabled) ? types_->checkedExtensions()
-                                                        : QStringList();
+    settings_->filter_last_exts = isFilterCreating() ? types_->checkedExtensions()
+                                                     : QStringList();
 
     // algo
     settings_->setAlgorithm(tools::strToAlgo(ui->cmb_algo->currentText()));
@@ -183,7 +185,7 @@ void DialogDbCreation::restoreLastExts()
         return;
     }
 
-    if (mode_ != FC_Enabled) {
+    if (!isFilterCreating()) {
         setFilterCreation(FC_Enabled);
     }
 
@@ -221,7 +223,7 @@ QStringList DialogDbCreation::inputedExts() const
 
 FilterMode DialogDbCreation::curFilterMode() const
 {
-    if (mode_ == FC_Disabled)
+    if (!isFilterCreating())
         return FilterMode::NotSet;
 
     return ui->rb_include->isChecked() ? FilterMode::Include : FilterMode::Ignore;
@@ -278,7 +280,7 @@ void DialogDbCreation::setCheckboxesVisible(bool visible)
 
 void DialogDbCreation::clearChecked()
 {
-    if (mode_ == FC_Enabled) {
+    if (isFilterCreating()) {
         ui->rb_ignore->setChecked(true);
         setCheckboxesVisible(true);
     }
@@ -286,7 +288,7 @@ void DialogDbCreation::clearChecked()
 
 void DialogDbCreation::activateItem(QTreeWidgetItem *t_item)
 {
-    if (mode_ == FC_Disabled) {
+    if (!isFilterCreating()) {
         setFilterCreation(FC_Enabled);
         return;
     }
@@ -301,11 +303,11 @@ void DialogDbCreation::updateFilterDisplay()
     updateLabelTotalFiltered();
 
     // TMP
-    bool isFiltered = ui->rb_include->isChecked() ? types_->hasChecked()
-                                                  : types_->hasChecked()
-                                                        && types_->itemsContain(WidgetFileTypes::UnChecked);
+    const bool isFiltered = ui->rb_include->isChecked() ? types_->hasChecked()
+                                                        : types_->hasChecked()
+                                                              && types_->itemsContain(WidgetFileTypes::UnChecked);
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((mode_ != FC_Enabled)
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((!isFilterCreating())
                                                             || !types_->hasChecked()
                                                             || isFiltered);
 
@@ -314,19 +316,19 @@ void DialogDbCreation::updateFilterDisplay()
 
 void DialogDbCreation::updateLabelFilterExtensions()
 {
-    if (mode_ != FC_Enabled) {
+    if (!isFilterCreating()) {
         ui->le_exts_list->clear();
         return;
     }
 
     const QString  _color = format::coloredText(QStringLiteral(u"QLineEdit"), ui->rb_ignore->isChecked());
     ui->le_exts_list->setStyleSheet(_color);
-    ui->le_exts_list->setText(types_->checkedExtensions().join(QStringLiteral(u", ")));
+    ui->le_exts_list->setText(types_->checkedExtensions().join(Lit::s_sepCommaSpace));
 }
 
 void DialogDbCreation::updateLabelTotalFiltered()
 {
-    if (mode_ != FC_Enabled) {
+    if (!isFilterCreating()) {
         ui->l_total_filtered->clear();
         return;
     }
@@ -366,7 +368,7 @@ void DialogDbCreation::updateViewMode()
 
     ui->fr_total_filtered->setVisible(_is_f);
     ui->fr_filter_exts->setVisible(_is_f);
-    ui->cb_enable_filter->setChecked(_is_f);
+    cb_file_filter->setChecked(_is_f);
     setCheckboxesVisible(_is_f);
 
     if (_is_f)
@@ -392,7 +394,7 @@ QIcon DialogDbCreation::presetIcon(const QString &_name) const
     else
         return QIcon();
 
-    return _icons.icon(QStringLiteral(u"file.") + _ext);
+    return _icons.type_icon(_ext);
 }
 
 void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
@@ -451,7 +453,7 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
     }
 
     if (event->key() == Qt::Key_Escape
-        && mode_ == FC_Enabled
+        && isFilterCreating()
         && ui->tabWidget->currentIndex() == 0)
     {
         if (types_->hasChecked())

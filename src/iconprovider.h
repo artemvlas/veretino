@@ -58,6 +58,7 @@ public:
     QIcon icon(FileStatus status) const;
     QIcon icon(Icons themeIcon) const;
     QIcon icon(const QString &file) const;
+    QIcon type_icon(const QString &suffix) const;
     QPixmap pixmap(FileStatus status, int size = 64) const;
     QPixmap pixmap(Icons themeIcon, int size = 64) const;
 

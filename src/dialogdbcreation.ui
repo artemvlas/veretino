@@ -74,7 +74,7 @@
         <string>db file name</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -83,30 +83,23 @@
    <item>
     <widget class="Line" name="line">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="0">
-      <widget class="QLabel" name="l_total_files">
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="cb_top10">
        <property name="text">
-        <string>Total</string>
+        <string>Top10</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QCheckBox" name="cb_enable_filter">
+      <widget class="QLabel" name="l_total_files">
        <property name="text">
-        <string>Enable Filter</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="cb_top10">
-       <property name="text">
-        <string>Top10</string>
+        <string>Total</string>
        </property>
       </widget>
      </item>
@@ -150,10 +143,10 @@
        <item>
         <widget class="QFrame" name="fr_filter_exts">
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -220,7 +213,7 @@ if there are any in the folder.</string>
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -239,10 +232,10 @@ if there are any in the folder.</string>
      <item>
       <widget class="QFrame" name="fr_total_filtered">
        <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
+        <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Shadow::Raised</enum>
+        <enum>QFrame::Raised</enum>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
@@ -258,7 +251,7 @@ if there are any in the folder.</string>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -277,10 +270,10 @@ if there are any in the folder.</string>
         </size>
        </property>
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="standardButtons">
-        <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok|QDialogButtonBox::StandardButton::Reset</set>
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::Reset</set>
        </property>
       </widget>
      </item>

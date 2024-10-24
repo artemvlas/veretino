@@ -216,6 +216,11 @@ QIcon IconProvider::icon(const QString &file) const
     return fsIcons.icon(QFileInfo(file));
 }
 
+QIcon IconProvider::type_icon(const QString &suffix) const
+{
+    return icon(QStringLiteral(u"file.") + suffix);
+}
+
 QIcon IconProvider::iconFolder() const
 {
     return fsIcons.icon(QFileIconProvider::Folder);
