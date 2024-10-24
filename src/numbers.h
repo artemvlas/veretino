@@ -23,7 +23,7 @@ public:
 
 private:
     // { FileStatus : number of corresponding files, total size }
-    QHash<FileStatus, NumSize> val_;
+    QHash<FileStatus, NumSize> _val;
 }; // class Numbers
 
 #endif // NUMBERS_H

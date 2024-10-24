@@ -648,8 +648,11 @@ void Manager::cacheMissingItems()
     TreeModelIterator it(_data->model_);
 
     while (it.hasNext()) {
-        if (it.nextFile().status() == FileStatus::Missing)
-            _data->_cacheMissing[it.checksum()] = it.index();
+        if (it.nextFile().status() == FileStatus::Missing) {
+            const QString _chsum = it.checksum();
+            if (!_data->_cacheMissing.contains(_chsum))
+                _data->_cacheMissing[_chsum] = it.index();
+        }
     }
 }
 
