@@ -243,11 +243,6 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job)
 
         if (!_dig.isEmpty()) {
             dataMaintainer->updateChecksum(fileIndex, _dig);
-
-            // TMP (Missing --> Removed)
-            if (TreeModel::hasStatus(FileStatus::Moved, fileIndex)) {
-                dataMaintainer->updateNumbers(FileStatus::Missing, FileStatus::Removed);
-            }
         }
     }
     else if (_prevStatus == FileStatus::Missing) {
