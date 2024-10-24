@@ -351,6 +351,7 @@ void MainWindow::dialogSettings()
     if (dialog.exec()) {
         dialog.updateSettings();
 
+        // switching "Detect Moved" cache
         if (ui->view->isViewDatabase()) {
             DataContainer *_d = ui->view->data_;
 

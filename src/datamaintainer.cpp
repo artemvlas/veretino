@@ -175,10 +175,22 @@ void DataMaintainer::updateNumbers()
 // if only one file has changed, there is no need to iterate over the entire list
 void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore)
 {
-    if (data_
+    /*if (data_
         && data_->numbers_.moveFile(statusBefore,
                                     TreeModel::itemFileStatus(fileIndex),
                                     TreeModel::itemFileSize(fileIndex)))
+    {
+        emit numbersUpdated();
+    }*/
+    updateNumbers(statusBefore,
+                  TreeModel::itemFileStatus(fileIndex),
+                  TreeModel::itemFileSize(fileIndex));
+}
+
+void DataMaintainer::updateNumbers(const FileStatus status_old, const FileStatus status_new, const qint64 size)
+{
+    if (data_
+        && data_->numbers_.moveFile(status_old, status_new, size))
     {
         emit numbersUpdated();
     }
