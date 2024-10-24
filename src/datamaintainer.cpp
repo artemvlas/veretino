@@ -219,7 +219,7 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
         if (data_->_cacheMissing.contains(computedChecksum)) {
             setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Moved);
             if (itemFileRemoveLost(data_->_cacheMissing.take(computedChecksum))) {
-                data_->numbers_.moveFile(FileStatus::Missing, FileStatus::Missing, 0);
+                data_->numbers_.moveFile(FileStatus::Missing, FileStatus::Removed);
             }
         } else {
             setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Added);

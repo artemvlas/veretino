@@ -14,10 +14,16 @@ void Numbers::addFile(const FileStatus status, const qint64 size)
 
 void Numbers::removeFile(const FileStatus status, const qint64 size)
 {
-    if (val_.contains(status)) {
+    /*if (val_.contains(status)) {
         val_[status].subtractOne(size);
         if (val_[status]._num == 0)
             val_.remove(status);
+    }*/
+
+    if (val_.contains(status)
+        && !(val_[status] -= size)) // 0
+    {
+        val_.remove(status);
     }
 }
 
