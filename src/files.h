@@ -140,6 +140,12 @@ struct NumSize { // number and total size (of files)
     NumSize& operator++() { ++_num; return *this; } // prefix
     friend NumSize operator+(NumSize lhs, const NumSize& rhs) { lhs += rhs; return lhs; }
     friend NumSize operator-(NumSize lhs, const NumSize& rhs) { lhs -= rhs; return lhs; }
+    friend bool operator==(const NumSize& lhs, const NumSize& rhs) { return (lhs._num == rhs._num) && (lhs._size == rhs._size); }
+    friend bool operator!=(const NumSize& lhs, const NumSize& rhs) { return !(lhs == rhs); }
+    friend bool operator< (const NumSize& lhs, const NumSize& rhs) { return (lhs._num < rhs._num) && (lhs._size <= rhs._size); }
+    friend bool operator> (const NumSize& lhs, const NumSize& rhs) { return (rhs < lhs); }
+    friend bool operator<=(const NumSize& lhs, const NumSize& rhs) { return (lhs < rhs) || (lhs == rhs); }
+    friend bool operator>=(const NumSize& lhs, const NumSize& rhs) { return (rhs < lhs) || (lhs == rhs); }
     explicit operator bool() const { return _num > 0; }
 
     // values

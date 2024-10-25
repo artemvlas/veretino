@@ -16,11 +16,15 @@ public:
     void addFile(const FileStatus status, const qint64 size);
     void removeFile(const FileStatus status, const qint64 size);
     bool moveFile(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size = 0);
-    bool changeStatus(const FileStatus _before, const FileStatus _after);
     bool contains(const FileStatuses flag) const;
     int numberOf(const FileStatuses flag) const;
     qint64 totalSize(const FileStatuses flag) const;
     NumSize values(const FileStatuses flag) const;
+
+    // assigns new status to numbers
+    bool changeStatus(const FileStatus _before, const FileStatus _after);
+    // moves the specified value to a new status
+    bool changeStatus(const NumSize &_nums, const FileStatus _before, const FileStatus _after);
 
 private:
     // { FileStatus : number of corresponding files, total size }

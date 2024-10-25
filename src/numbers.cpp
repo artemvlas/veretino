@@ -48,6 +48,19 @@ bool Numbers::changeStatus(const FileStatus _before, const FileStatus _after)
     return false;
 }
 
+bool Numbers::changeStatus(const NumSize &_nums, const FileStatus _before, const FileStatus _after)
+{
+    if (_nums && (_nums <= _val.value(_before))) {
+        if (!(_val[_before] -= _nums))
+            _val.remove(_before); // if the remainder is 0
+
+        _val[_after] += _nums;
+        return true;
+    }
+
+    return false;
+}
+
 bool Numbers::contains(const FileStatuses flag) const
 {
     QHash<FileStatus, NumSize>::const_iterator it;
