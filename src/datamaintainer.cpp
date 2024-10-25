@@ -83,6 +83,11 @@ bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, c
     return (data_ && data_->model_->setData(fileIndex.siblingAtColumn(column), value));
 }
 
+void DataMaintainer::setFileStatus(const QModelIndex &_index, FileStatus _status)
+{
+    setItemValue(_index, Column::ColumnStatus, _status);
+}
+
 void DataMaintainer::setConsiderDateModified(bool consider)
 {
     json_->considerFileModDate = consider;
@@ -223,20 +228,20 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
         setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
 
         if (data_->_cacheMissing.contains(computedChecksum)) {
-            setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Moved);
+            setFileStatus(fileRowIndex, FileStatus::Moved);
             itemFileMoveOut(data_->_cacheMissing.take(computedChecksum));
         } else {
-            setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
+            setFileStatus(fileRowIndex, FileStatus::Added);
         }
         return true;
     }
     else if (storedChecksum == computedChecksum) {
-        setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Matched);
+        setFileStatus(fileRowIndex, FileStatus::Matched);
         return true;
     }
     else {
         setItemValue(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
-        setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Mismatched);
+        setFileStatus(fileRowIndex, FileStatus::Mismatched);
         return false;
     }
 }
@@ -253,7 +258,7 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
-            setItemValue(iter.index(), Column::ColumnStatus, newStatus);
+            setFileStatus(iter.index(), newStatus);
             ++number;
         }
     }
@@ -267,6 +272,11 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
 int DataMaintainer::addToQueue(const FileStatuses flags, const QModelIndex &rootIndex)
 {
     return changeFilesStatus(flags, FileStatus::Queued, rootIndex);
+}
+
+void DataMaintainer::clearChecksum(const QModelIndex &fileIndex)
+{
+    setItemValue(fileIndex, Column::ColumnChecksum);
 }
 
 int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &rootIndex)
@@ -316,8 +326,8 @@ int DataMaintainer::clearLostFiles()
 bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
 {
     if (data_ && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
-        setItemValue(fileIndex, Column::ColumnChecksum);
-        setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Removed);
+        clearChecksum(fileIndex);
+        setFileStatus(fileIndex, FileStatus::Removed);
         return true;
     }
 
@@ -329,8 +339,8 @@ bool DataMaintainer::itemFileMoveOut(const QModelIndex &fileIndex)
     const FileStatus _status = TreeModel::itemFileStatus(fileIndex);
 
     if (data_ && (_status & (FileStatus::Missing | FileStatus::Removed))) {
-        setItemValue(fileIndex, Column::ColumnChecksum);
-        setItemValue(fileIndex, Column::ColumnStatus, FileStatus::MovedOut);
+        clearChecksum(fileIndex);
+        setFileStatus(fileIndex, FileStatus::MovedOut);
         data_->numbers_.moveFile(_status, FileStatus::MovedOut);
         return true;
     }

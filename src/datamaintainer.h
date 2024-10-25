@@ -25,6 +25,7 @@ public:
     void setSourceData(const MetaData &meta);
     bool setSourceData(DataContainer *sourceData);
     bool setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value = QVariant());
+    void setFileStatus(const QModelIndex &_index, FileStatus _status);
     void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
@@ -50,6 +51,7 @@ public:
     int addToQueue(const FileStatuses flags,
                    const QModelIndex &rootIndex = QModelIndex());
 
+    void clearChecksum(const QModelIndex &fileIndex);
     int clearChecksums(const FileStatuses flags,
                        const QModelIndex &rootIndex = QModelIndex());
 
