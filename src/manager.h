@@ -8,6 +8,7 @@
 
 #include <QObject>
 #include "datamaintainer.h"
+#include "shacalculator.h"
 #include "view.h"
 #include "procstate.h"
 #include "settings.h"
@@ -115,6 +116,7 @@ private:
     bool isViewFileSysytem;
     Settings *settings_;
     Files *files_ = new Files(this);
+    ShaCalculator shaCalc;
     QList<Task> taskQueue_;
 
     const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";

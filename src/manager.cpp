@@ -12,7 +12,6 @@
 #include <QDebug>
 #include <QStringBuilder>
 #include "files.h"
-#include "shacalculator.h"
 #include "treemodeliterator.h"
 #include "tools.h"
 
@@ -21,7 +20,9 @@ Manager::Manager(Settings *settings, QObject *parent)
 {
     files_->setProcState(procState);
     dataMaintainer->setProcState(procState);
+    shaCalc.setProcState(procState);
 
+    connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     connect(files_, &Files::setStatusbarText, this, &Manager::setStatusbarText);
@@ -433,11 +434,6 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 {
     procState->setTotalSize(QFileInfo(filePath).size());
 
-    ShaCalculator shaCalc(algo);
-    shaCalc.setProcState(procState);
-
-    connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
-
     const QString _calcPurp = isVerification ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     emit setStatusbarText(QString("%1 %2: %3").arg(_calcPurp,
                                                    format::algoToStr(algo),
@@ -508,12 +504,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     Pieces<int> _p_items(_queued._num);
     procState->setTotalSize(_queued._size);
 
-    ShaCalculator shaCalc(_data->metaData_.algorithm);
-    shaCalc.setProcState(procState);
-
     bool isMismatchFound = false;
-
-    connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
 
     // checking whether this is a Calculation or Verification process
     const FileStatus procStatus = (status & FileStatus::CombAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
@@ -528,7 +519,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
             updateCalcStatus(procStatusText, _p_items);
 
             const QString _filePath = _data->itemAbsolutePath(iter.index());
-            const QString _checksum = shaCalc.calculate(_filePath);
+            const QString _checksum = shaCalc.calculate(_filePath, _data->metaData_.algorithm);
 
             if (procState->isCanceled())
                 break;
@@ -638,10 +629,7 @@ void Manager::cacheMissingItems()
 {
     DataContainer *_data = dataMaintainer->data_;
 
-    if (!_data
-        || !_data->contains(FileStatus::New)
-        || !_data->contains(FileStatus::Missing))
-    {
+    if (!_data || !_data->hasPossiblyMovedItems()) {
         return;
     }
 

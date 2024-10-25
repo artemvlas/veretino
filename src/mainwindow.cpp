@@ -357,8 +357,7 @@ void MainWindow::dialogSettings()
 
             if (settings_->detectMoved
                 && _d->_cacheMissing.isEmpty()
-                && _d->contains(FileStatus::New)
-                && _d->contains(FileStatus::Missing))
+                && _d->hasPossiblyMovedItems())
             {
                 manager->addTaskWithState(State::Idle, &Manager::cacheMissingItems);
             }

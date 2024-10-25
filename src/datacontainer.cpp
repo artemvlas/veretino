@@ -135,6 +135,11 @@ bool DataContainer::isImmutable() const
     return (metaData_.flags & MetaData::FlagConst);
 }
 
+bool DataContainer::hasPossiblyMovedItems() const
+{
+    return (contains(FileStatus::New) && contains(FileStatus::Missing));
+}
+
 bool DataContainer::isBackupExists() const
 {
     return QFileInfo::exists(backupFilePath());

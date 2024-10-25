@@ -59,6 +59,7 @@ public:
     bool isAllMatched(const Numbers &nums) const;
     bool isInCreation() const;
     bool isImmutable() const; // has FlagConst
+    bool hasPossiblyMovedItems() const; // has New and Missing
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;

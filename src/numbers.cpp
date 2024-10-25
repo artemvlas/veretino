@@ -38,6 +38,17 @@ bool Numbers::moveFile(const FileStatus statusBefore, const FileStatus statusAft
     return true;
 }
 
+bool Numbers::changeStatus(const FileStatus _before, const FileStatus _after)
+{
+    if (_val.contains(_before)) {
+        _val[_after] << _val.value(_before);
+        _val.remove(_before);
+        return true;
+    }
+
+    return false;
+}
+
 bool Numbers::contains(const FileStatuses flag) const
 {
     QHash<FileStatus, NumSize>::const_iterator it;
