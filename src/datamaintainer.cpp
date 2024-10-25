@@ -196,6 +196,12 @@ void DataMaintainer::updateNumbers(const FileStatus status_old, const FileStatus
     }
 }
 
+void DataMaintainer::moveNumbers(const FileStatus _before, const FileStatus _after)
+{
+    if (data_ && data_->numbers_.changeStatus(_before, _after))
+        emit numbersUpdated();
+}
+
 void DataMaintainer::setDbFileState(DbFileState state)
 {
     if (data_ && !data_->isDbFileState(state)) {
@@ -302,7 +308,8 @@ int DataMaintainer::clearLostFiles()
 
     if (number > 0) {
         setDbFileState(DbFileState::NotSaved);
-        updateNumbers();
+        //updateNumbers();
+        moveNumbers(FileStatus::Missing, FileStatus::Removed); // experimental
     }
 
     return number;

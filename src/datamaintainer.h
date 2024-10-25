@@ -31,6 +31,7 @@ public:
     void updateNumbers();
     void updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore);
     void updateNumbers(const FileStatus status_old, const FileStatus status_new, const qint64 size = 0);
+    void moveNumbers(const FileStatus _before, const FileStatus _after);
     void setDbFileState(DbFileState state);
 
     // iterate the 'data_->metaData.workDir' and add the finded files to the data_->model_

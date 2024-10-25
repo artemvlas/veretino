@@ -41,8 +41,7 @@ bool Numbers::moveFile(const FileStatus statusBefore, const FileStatus statusAft
 bool Numbers::changeStatus(const FileStatus _before, const FileStatus _after)
 {
     if (_val.contains(_before)) {
-        _val[_after] << _val.value(_before);
-        _val.remove(_before);
+        _val[_after] << _val.take(_before);
         return true;
     }
 
