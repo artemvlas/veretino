@@ -79,13 +79,14 @@ QString IconProvider::svgFilePath(FileStatus status) const
     case FileStatus::Added:
         iconFileName = QStringLiteral(u"added");
         break;
-    case Files::Removed:
+    case FileStatus::Removed:
         iconFileName = QStringLiteral(u"removed");
         break;
     case FileStatus::Updated:
         iconFileName = QStringLiteral(u"update");
         break;
     case FileStatus::Moved:
+    case FileStatus::MovedOut:
         iconFileName = QStringLiteral(u"moved");
         break;
     case FileStatus::UnPermitted:

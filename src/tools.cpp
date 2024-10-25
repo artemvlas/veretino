@@ -558,9 +558,10 @@ QString fileItemStatus(FileStatus status)
     case FileStatus::New: return QStringLiteral(u"new file");
     case FileStatus::Missing: return QStringLiteral(u"missing");
     case FileStatus::Added: return QStringLiteral(u"added");
-    case Files::Removed: return QStringLiteral(u"removed");
+    case FileStatus::Removed: return QStringLiteral(u"removed");
     case FileStatus::Updated: return QStringLiteral(u"updated");
     case FileStatus::Moved: return QStringLiteral(u"moved");
+    case FileStatus::MovedOut: return QStringLiteral(u"moved out");
     case FileStatus::UnPermitted: return QStringLiteral(u"no permissions");
     case FileStatus::ReadError: return QStringLiteral(u"read error");
     default: return "unknown";

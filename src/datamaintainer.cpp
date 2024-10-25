@@ -224,9 +224,7 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
 
         if (data_->_cacheMissing.contains(computedChecksum)) {
             setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Moved);
-            if (itemFileRemoveLost(data_->_cacheMissing.take(computedChecksum))) {
-                data_->numbers_.moveFile(FileStatus::Missing, FileStatus::Removed);
-            }
+            itemFileMoveOut(data_->_cacheMissing.take(computedChecksum));
         } else {
             setItemValue(fileRowIndex, Column::ColumnStatus, FileStatus::Added);
         }
@@ -320,6 +318,20 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
     if (data_ && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
         setItemValue(fileIndex, Column::ColumnChecksum);
         setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Removed);
+        return true;
+    }
+
+    return false;
+}
+
+bool DataMaintainer::itemFileMoveOut(const QModelIndex &fileIndex)
+{
+    const FileStatus _status = TreeModel::itemFileStatus(fileIndex);
+
+    if (data_ && (_status & (FileStatus::Missing | FileStatus::Removed))) {
+        setItemValue(fileIndex, Column::ColumnChecksum);
+        setItemValue(fileIndex, Column::ColumnStatus, FileStatus::MovedOut);
+        data_->numbers_.moveFile(_status, FileStatus::MovedOut);
         return true;
     }
 

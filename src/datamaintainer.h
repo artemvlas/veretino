@@ -59,6 +59,7 @@ public:
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
+    bool itemFileMoveOut(const QModelIndex &fileIndex);
 
     bool importJson(const QString &jsonFilePath);
     void exportToJson();

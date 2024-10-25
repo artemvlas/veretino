@@ -42,8 +42,9 @@ public:
         Removed = 1 << 10,      // item^ removed from the database
         Updated = 1 << 11,      // the checksum has been updated
         Moved = 1 << 12,        // the newly calculated checksum corresponds to some missing item (renamed or moved file)
-        UnPermitted = 1 << 13,  // no read permissions
-        ReadError = 1 << 14,    // an error occurred during reading
+        MovedOut = 1 << 13,     // former Missing when moving
+        UnPermitted = 1 << 14,  // no read permissions
+        ReadError = 1 << 15,    // an error occurred during reading
 
         CombNotChecked = NotChecked | NotCheckedMod,
         CombAvailable = CombNotChecked | Matched | Mismatched | Added | Updated | Moved,
@@ -55,10 +56,11 @@ public:
         CombNewLost = New | Missing,
         CombUnreadable = UnPermitted | ReadError,
 
-        Computed = 1 << 15,    // the checksum has been calculated and is ready for further processing (copy or save)
-        ToClipboard = 1 << 16, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile = 1 << 17,   // the calculated checksum is intended to be stored in the summary file
+        Computed = 1 << 16,    // the checksum has been calculated and is ready for further processing (copy or save)
+        ToClipboard = 1 << 17, // the calculated checksum is intended to be copied to the clipboard
+        ToSumFile = 1 << 18,   // the calculated checksum is intended to be stored in the summary file
     }; // enum FileStatus
+
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 

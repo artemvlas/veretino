@@ -227,7 +227,7 @@ QStringList DialogDbStatus::infoChanges()
     if (_n_added)
         result.append(QStringLiteral(u"Added: ") + format::filesNumSize(_n_added));
 
-    const int _n_removed = _num.numberOf(FileStatus::Removed) - _n_moved._num;
+    const int _n_removed = _num.numberOf(FileStatus::Removed);
     if (_n_removed)
         result.append(tools::joinStrings(QStringLiteral(u"Removed:"), _n_removed));
 
