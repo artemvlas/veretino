@@ -19,7 +19,7 @@ public:
     void setAlgorithm(QCryptographicHash::Algorithm algo);
     void setProcState(const ProcState *procState);
 
-public slots:
+//public slots:
     QString calculate(const QString &filePath);
     QString calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
 

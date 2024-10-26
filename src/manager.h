@@ -107,7 +107,9 @@ private:
                               QCryptographicHash::Algorithm algo,
                               bool isVerification = false);
 
-    int calculateChecksums(FileStatus status, const QModelIndex &rootIndex = QModelIndex());
+    QString hashItem(const QModelIndex &_ind, bool isVerification = false);
+
+    int calculateChecksums(FileStatus _status, const QModelIndex &_root = QModelIndex());
     void updateCalcStatus(const QString &_purp, Pieces<int> _p_items);
 
     QString extractDigestFromFile(const QString &_digest_file);

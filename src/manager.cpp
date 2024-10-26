@@ -451,6 +451,21 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return _digest;
 }
 
+QString Manager::hashItem(const QModelIndex &_ind, bool isVerification)
+{
+    dataMaintainer->setFileStatus(_ind,
+                                  isVerification ? FileStatus::Verifying : FileStatus::Calculating);
+
+    const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
+    const QString _checksum = shaCalc.calculate(_filePath, dataMaintainer->data_->metaData_.algorithm);
+
+    if (_checksum.isEmpty() && !procState->isCanceled()) {
+        dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, isVerification));
+    }
+
+    return _checksum;
+}
+
 void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items)
 {
     const Pieces<qint64> _p_size = procState->piecesSize();
@@ -480,21 +495,21 @@ void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items)
                               .arg(doneData));*/
 }
 
-int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
+int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
 {
     DataContainer *_data = dataMaintainer->data_;
 
     if (!_data
-        || (rootIndex.isValid() && rootIndex.model() != _data->model_))
+        || (_root.isValid() && _root.model() != _data->model_))
     {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
     }
 
-    if (status != FileStatus::Queued)
-        dataMaintainer->addToQueue(status, rootIndex);
+    if (_status != FileStatus::Queued)
+        dataMaintainer->addToQueue(_status, _root);
 
-    const NumSize _queued = _data->getNumbers(rootIndex).values(FileStatus::Queued);
+    const NumSize _queued = _data->getNumbers(_root).values(FileStatus::Queued);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << _queued._num;
 
@@ -507,37 +522,33 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
     bool isMismatchFound = false;
 
     // checking whether this is a Calculation or Verification process
-    const FileStatus procStatus = (status & FileStatus::CombAvailable) ? FileStatus::Verifying : FileStatus::Calculating;
-    const QString procStatusText = (procStatus == FileStatus::Verifying) ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
+    const bool _isVerif = (_status & FileStatus::CombAvailable);
+    const QString _str_proc_status = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
 
     // process
-    TreeModelIterator iter(_data->model_, rootIndex);
+    TreeModelIterator iter(_data->model_, _root);
 
     while (iter.hasNext() && !procState->isCanceled()) {
-        if (iter.nextFile().status() == FileStatus::Queued) {
-            dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus, procStatus);
-            updateCalcStatus(procStatusText, _p_items);
+        if (iter.nextFile().status() != FileStatus::Queued)
+            continue;
 
-            const QString _filePath = _data->itemAbsolutePath(iter.index());
-            const QString _checksum = shaCalc.calculate(_filePath, _data->metaData_.algorithm);
+        updateCalcStatus(_str_proc_status, _p_items); // update statusbar text
 
-            if (procState->isCanceled())
-                break;
+        const QString _checksum = hashItem(iter.index(), _isVerif); // hashing
 
-            if (_checksum.isEmpty()) {
-                FileStatus _failStatus = tools::failedCalcStatus(_filePath, TreeModel::hasChecksum(iter.index()));
-                dataMaintainer->setItemValue(iter.index(), Column::ColumnStatus,  _failStatus);
+        if (procState->isCanceled())
+            break;
 
-                _p_items.decreaseTotal(1);
-                procState->decreaseTotalSize(iter.size());
-            }
-            else { // success
-                ++_p_items;
-                if (!dataMaintainer->updateChecksum(iter.index(), _checksum)) {
-                    if (!isMismatchFound) { // the signal is only needed once
-                        emit mismatchFound();
-                        isMismatchFound = true;
-                    }
+        if (_checksum.isEmpty()) {
+            _p_items.decreaseTotal(1);
+            procState->decreaseTotalSize(iter.size());
+        }
+        else { // success
+            ++_p_items;
+            if (!dataMaintainer->updateChecksum(iter.index(), _checksum)) {
+                if (!isMismatchFound) { // the signal is only needed once
+                    emit mismatchFound();
+                    isMismatchFound = true;
                 }
             }
         }
@@ -550,7 +561,7 @@ int Manager::calculateChecksums(FileStatus status, const QModelIndex &rootIndex)
         }
 
         // rolling back file statuses
-        dataMaintainer->rollBackStoppedCalc(rootIndex, status);
+        dataMaintainer->rollBackStoppedCalc(_root, _status);
         qDebug() << "Manager::calculateChecksums >> Stopped | Done" << _p_items._done;
     }
 
