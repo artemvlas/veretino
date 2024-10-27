@@ -5,7 +5,7 @@
 */
 #include "datacontainer.h"
 #include <QDebug>
-#include <QFile>
+#include <QFileInfo>
 #include "treemodeliterator.h"
 #include "tools.h"
 

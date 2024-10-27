@@ -71,7 +71,7 @@ private:
     QString svgFilePath(Icons icon) const;
 
     Theme theme_ = Light;
-    QFileIconProvider fsIcons;
+    QFileIconProvider _fsIcons;
 
     static const int _pix_size = 64; // default pixmap size
     static const QString s_folderGeneric;
@@ -97,7 +97,6 @@ private:
             return *_cache.insert(_value, _pic);
         }
     }
-
 }; // class IconProvider
 
 using Icons = IconProvider::Icons;

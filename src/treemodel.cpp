@@ -6,6 +6,7 @@
 #include "treemodel.h"
 #include "treemodeliterator.h"
 #include "tools.h"
+#include "iconprovider.h"
 #include <QDebug>
 
 const QVector<QVariant> TreeModel::s_rootItemData = {
@@ -150,12 +151,13 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
         return QVariant();
 
     if (role == Qt::DecorationRole) {
+        static IconProvider _icons;
         if (curIndex.column() == ColumnName) {
-            return isFileRow(curIndex) ? icons_.icon(curIndex.data().toString())
-                                       : icons_.iconFolder();
+            return isFileRow(curIndex) ? _icons.icon(curIndex.data().toString())
+                                       : _icons.iconFolder();
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
-            return icons_.icon(curIndex.data(RawDataRole).value<FileStatus>());
+            return _icons.icon(curIndex.data(RawDataRole).value<FileStatus>());
         }
     }
 

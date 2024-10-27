@@ -602,7 +602,7 @@ bool ModeSelector::overwriteDbPrompt()
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Open);
-    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setIconPixmap(_icons.pixmap(Icons::Database));
     msgBox.button(QMessageBox::Save)->setText("Overwrite");
     int ret = msgBox.exec();
 

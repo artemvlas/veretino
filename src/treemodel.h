@@ -9,7 +9,6 @@
 #include <QAbstractItemModel>
 #include "treeitem.h"
 #include "files.h"
-#include "iconprovider.h"
 
 class TreeItem;
 
@@ -65,7 +64,6 @@ private:
 
     static const QVector<QVariant> s_rootItemData;
     TreeItem *rootItem;
-    IconProvider icons_;
     QHash<QString, TreeItem*> cacheFolderItems_;
 }; // class TreeModel
 

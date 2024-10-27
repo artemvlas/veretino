@@ -214,7 +214,7 @@ QIcon IconProvider::icon(Icons themeIcon) const
 
 QIcon IconProvider::icon(const QString &file) const
 {
-    return fsIcons.icon(QFileInfo(file));
+    return _fsIcons.icon(QFileInfo(file));
 }
 
 QIcon IconProvider::type_icon(const QString &suffix) const
@@ -224,7 +224,7 @@ QIcon IconProvider::type_icon(const QString &suffix) const
 
 QIcon IconProvider::iconFolder() const
 {
-    return fsIcons.icon(QFileIconProvider::Folder);
+    return _fsIcons.icon(QFileIconProvider::Folder);
 }
 
 QIcon IconProvider::appIcon()
