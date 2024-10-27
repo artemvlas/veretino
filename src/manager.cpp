@@ -466,8 +466,9 @@ QString Manager::hashItem(const QModelIndex &_ind, bool isVerification)
     return _checksum;
 }
 
-void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items)
+void Manager::updateProgText(const Pieces<int> _p_queue, bool _isVerif)
 {
+    const QString _purp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     const Pieces<qint64> _p_size = procState->piecesSize();
 
     // to avoid calling the dataSizeReadable() func for each file
@@ -480,8 +481,8 @@ void Manager::updateCalcStatus(const QString &_purp, Pieces<int> _p_items)
     }
 
     // UGLY, but better performance (should be). And should be re-implemented.
-    const QString _res = _purp % ' ' % QString::number(_p_items._done + 1) % QStringLiteral(u" of ")
-                    % QString::number(_p_items._total) % QStringLiteral(u" checksums ")
+    const QString _res = _purp % ' ' % QString::number(_p_queue._done + 1) % QStringLiteral(u" of ")
+                    % QString::number(_p_queue._total) % QStringLiteral(u" checksums ")
                     % ((_p_size._done == 0) ? format::inParentheses(_lastTotalSizeR) // (%1)
                     : ('(' % format::dataSizeReadable(_p_size._done) % QStringLiteral(u" / ") % _lastTotalSizeR % ')')); // "(%1 / %2)"
 
@@ -523,7 +524,6 @@ int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
 
     // checking whether this is a Calculation or Verification process
     const bool _isVerif = (_status & FileStatus::CombAvailable);
-    const QString _str_proc_status = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
 
     // process
     TreeModelIterator iter(_data->model_, _root);
@@ -532,8 +532,7 @@ int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
         if (iter.nextFile().status() != FileStatus::Queued)
             continue;
 
-        updateCalcStatus(_str_proc_status, _p_items); // update statusbar text
-
+        updateProgText(_p_items, _isVerif); // update statusbar text
         const QString _checksum = hashItem(iter.index(), _isVerif); // hashing
 
         if (procState->isCanceled())
