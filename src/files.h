@@ -13,7 +13,6 @@
 #include "procstate.h"
 
 struct FileValues;
-struct NumSize;
 using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
 using FileTypeList = QHash<QString, NumSize>;
 
@@ -122,35 +121,5 @@ struct FileValues {
     QString checksum; // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues
-
-struct NumSize { // number and total size (of files)
-    NumSize() {}
-    NumSize(int num, qint64 size) : _num(num), _size(size) {}
-    void add(int num, qint64 size) { _num += num; _size += size; }
-    void add(const NumSize &other) { add(other._num, other._size); }
-    void addOne(qint64 size = 0) { ++_num; _size += size; }
-    void subtract(int num, qint64 size) { _num -= num; _size -= size; }
-    void subtract(const NumSize &other) { subtract(other._num, other._size); }
-    void subtractOne(qint64 size = 0) { --_num; _size -= size; }
-    NumSize& operator<<(qint64 size) { addOne(size); return *this; }
-    NumSize& operator<<(const NumSize &other) { add(other); return *this; }
-    NumSize& operator+=(const NumSize &other) { add(other); return *this; }
-    NumSize& operator-=(const NumSize &other) { subtract(other); return *this; }
-    NumSize& operator-=(qint64 size) { subtractOne(size); return *this; }
-    NumSize& operator++() { ++_num; return *this; } // prefix
-    friend NumSize operator+(NumSize lhs, const NumSize& rhs) { lhs += rhs; return lhs; }
-    friend NumSize operator-(NumSize lhs, const NumSize& rhs) { lhs -= rhs; return lhs; }
-    friend bool operator==(const NumSize& lhs, const NumSize& rhs) { return (lhs._num == rhs._num) && (lhs._size == rhs._size); }
-    friend bool operator!=(const NumSize& lhs, const NumSize& rhs) { return !(lhs == rhs); }
-    friend bool operator< (const NumSize& lhs, const NumSize& rhs) { return (lhs._num < rhs._num) && (lhs._size <= rhs._size); }
-    friend bool operator> (const NumSize& lhs, const NumSize& rhs) { return (rhs < lhs); }
-    friend bool operator<=(const NumSize& lhs, const NumSize& rhs) { return (lhs < rhs) || (lhs == rhs); }
-    friend bool operator>=(const NumSize& lhs, const NumSize& rhs) { return (rhs < lhs) || (lhs == rhs); }
-    explicit operator bool() const { return _num > 0; }
-
-    // values
-    int _num = 0;
-    qint64 _size = 0;
-}; // struct NumSize
 
 #endif // FILES_H

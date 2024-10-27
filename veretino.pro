@@ -9,6 +9,42 @@ DEFINES += APP_VERSION=\\\"$${VERSION}\\\"
 DEFINES += APP_NAME=\\\"Veretino\\\"
 DEFINES += "APP_NAME_VERSION=\"\\\"Veretino $${VERSION}\\\"\""
 
+HEADERS += \
+    src/clickablelabel.h \
+    src/datacontainer.h \
+    src/datamaintainer.h \
+    src/dialogabout.h \
+    src/dialogcontentslist.h \
+    src/dialogdbcreation.h \
+    src/dialogdbstatus.h \
+    src/dialogexistingdbs.h \
+    src/dialogfileprocresult.h \
+    src/dialogsettings.h \
+    src/files.h \
+    src/filterrule.h \
+    src/iconprovider.h \
+    src/itemfiletype.h \
+    src/jsondb.h \
+    src/lineedit.h \
+    src/mainwindow.h \
+    src/manager.h \
+    src/menuactions.h \
+    src/modeselector.h \
+    src/numbers.h \
+    src/nums.h \
+    src/procstate.h \
+    src/progressbar.h \
+    src/proxymodel.h \
+    src/settings.h \
+    src/shacalculator.h \
+    src/statusbar.h \
+    src/tools.h \
+    src/treeitem.h \
+    src/treemodel.h \
+    src/treemodeliterator.h \
+    src/view.h \
+    src/widgetfiletypes.h
+
 SOURCES += \
     src/clickablelabel.cpp \
     src/datacontainer.cpp \
@@ -44,41 +80,6 @@ SOURCES += \
     src/treemodeliterator.cpp \
     src/view.cpp \
     src/widgetfiletypes.cpp
-
-HEADERS += \
-    src/clickablelabel.h \
-    src/datacontainer.h \
-    src/datamaintainer.h \
-    src/dialogabout.h \
-    src/dialogcontentslist.h \
-    src/dialogdbcreation.h \
-    src/dialogdbstatus.h \
-    src/dialogexistingdbs.h \
-    src/dialogfileprocresult.h \
-    src/dialogsettings.h \
-    src/files.h \
-    src/filterrule.h \
-    src/iconprovider.h \
-    src/itemfiletype.h \
-    src/jsondb.h \
-    src/lineedit.h \
-    src/mainwindow.h \
-    src/manager.h \
-    src/menuactions.h \
-    src/modeselector.h \
-    src/numbers.h \
-    src/procstate.h \
-    src/progressbar.h \
-    src/proxymodel.h \
-    src/settings.h \
-    src/shacalculator.h \
-    src/statusbar.h \
-    src/tools.h \
-    src/treeitem.h \
-    src/treemodel.h \
-    src/treemodeliterator.h \
-    src/view.h \
-    src/widgetfiletypes.h
 
 FORMS += \
     src/dialogabout.ui \

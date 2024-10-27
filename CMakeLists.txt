@@ -44,6 +44,7 @@ set(PROJECT_SOURCES
     src/menuactions.h
     src/modeselector.h
     src/numbers.h
+    src/nums.h
     src/procstate.h
     src/progressbar.h
     src/proxymodel.h

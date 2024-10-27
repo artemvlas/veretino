@@ -7,28 +7,7 @@
 #define PROCSTATE_H
 
 #include <QObject>
-
-template <typename T = int> // (int, qint64...)
-struct Pieces {
-    Pieces() {}
-    Pieces(T total) : _total(total) {}
-    T remain() const { return _total - _done; }
-    int percent() const { return (_done * 100) / _total; }
-    void setTotal(T total) { _total = total; _done = 0; }
-    bool decreaseTotal(T by_size) { if (remain() < by_size) return false; _total -= by_size; return true; }
-    bool hasSet() const { return _total > 0; }
-    bool hasChunks() const { return _done > 0; }
-    void addChunks(T number) { _done += number; } // same as P <<
-    void addChunk() { ++_done; } // same as ++P
-    Pieces& operator<<(T done_num) { _done += done_num; return *this; }
-    Pieces& operator++() { ++_done; return *this; } // prefix
-    Pieces  operator++(int) { Pieces _res(*this); ++(*this); return _res; } // postfix
-    explicit operator bool() const { return _total > 0; } // same as hasSet()
-
-    // values
-    T _total = 0;
-    T _done = 0;
-}; // struct Pieces
+#include "nums.h"
 
 class ProcState : public QObject
 {
