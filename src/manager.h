@@ -110,7 +110,7 @@ private:
     QString hashItem(const QModelIndex &_ind, bool isVerification = false);
 
     int calculateChecksums(FileStatus _status, const QModelIndex &_root = QModelIndex());
-    void updateProgText(const Pieces<int> _p_queue, bool _isVerif = false);
+    void updateProgText(bool _isVerif = false);
 
     QString extractDigestFromFile(const QString &_digest_file);
 

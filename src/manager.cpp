@@ -466,10 +466,11 @@ QString Manager::hashItem(const QModelIndex &_ind, bool isVerification)
     return _checksum;
 }
 
-void Manager::updateProgText(const Pieces<int> _p_queue, bool _isVerif)
+void Manager::updateProgText(bool _isVerif)
 {
     const QString _purp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
-    const Pieces<qint64> _p_size = procState->piecesSize();
+    const Pieces<qint64> _p_size = procState->pSize();
+    const Pieces<int> _p_queue = procState->pQueue();
 
     // to avoid calling the dataSizeReadable() func for each file
     static qint64 _lastTotalSize;
@@ -517,8 +518,7 @@ int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
     if (!_queued)
         return 0;
 
-    Pieces<int> _p_items(_queued._num);
-    procState->setTotalSize(_queued._size);
+    procState->setTotal(_queued);
 
     bool isMismatchFound = false;
 
@@ -532,18 +532,18 @@ int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
         if (iter.nextFile().status() != FileStatus::Queued)
             continue;
 
-        updateProgText(_p_items, _isVerif); // update statusbar text
+        updateProgText(_isVerif); // update statusbar text
         const QString _checksum = hashItem(iter.index(), _isVerif); // hashing
 
         if (procState->isCanceled())
             break;
 
         if (_checksum.isEmpty()) {
-            _p_items.decreaseTotal(1);
+            procState->decreaseTotalQueued();
             procState->decreaseTotalSize(iter.size());
         }
         else { // success
-            ++_p_items;
+            procState->addDoneOne();
             if (!dataMaintainer->updateChecksum(iter.index(), _checksum)) {
                 if (!isMismatchFound) { // the signal is only needed once
                     emit mismatchFound();
@@ -553,6 +553,7 @@ int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
         }
     }
 
+    const int _done = procState->pQueue()._done;
     if (procState->isCanceled()) {
         if (procState->isState(State::Abort)) {
             qDebug() << "Manager::calculateChecksums >> Aborted";
@@ -561,12 +562,12 @@ int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
 
         // rolling back file statuses
         dataMaintainer->rollBackStoppedCalc(_root, _status);
-        qDebug() << "Manager::calculateChecksums >> Stopped | Done" << _p_items._done;
+        qDebug() << "Manager::calculateChecksums >> Stopped | Done" << _done;
     }
 
     // end
     dataMaintainer->updateNumbers();
-    return _p_items._done;
+    return _done;
 }
 
 void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)

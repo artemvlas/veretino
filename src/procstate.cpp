@@ -40,9 +40,16 @@ bool ProcState::isCanceled() const
     return (state_ & Canceled);
 }
 
+void ProcState::setTotal(const NumSize &_nums)
+{
+    _p_size.setTotal(_nums._size);
+    _p_queue.setTotal(_nums._num);
+}
+
 void ProcState::setTotalSize(qint64 totalSize)
 {
     _p_size.setTotal(totalSize);
+    _p_queue.reset();
 }
 
 void ProcState::changeTotalSize(qint64 totalSize)
@@ -55,6 +62,16 @@ void ProcState::changeTotalSize(qint64 totalSize)
 bool ProcState::decreaseTotalSize(qint64 by_size)
 {
     return _p_size.decreaseTotal(by_size);
+}
+
+bool ProcState::decreaseTotalQueued(int by_num)
+{
+    return _p_queue.decreaseTotal(by_num);
+}
+
+void ProcState::addDoneOne()
+{
+    ++_p_queue;
 }
 
 void ProcState::startProgress()
@@ -109,7 +126,12 @@ qint64 ProcState::remainingSize() const
     return _p_size.remain();
 }
 
-Pieces<qint64> ProcState::piecesSize() const
+Pieces<qint64> ProcState::pSize() const
 {
     return _p_size;
+}
+
+Pieces<int> ProcState::pQueue() const
+{
+    return _p_queue;
 }

@@ -14,9 +14,12 @@ class ProcState : public QObject
     Q_OBJECT
 public:
     explicit ProcState(QObject *parent = nullptr);
+    void setTotal(const NumSize &_nums);
     void setTotalSize(qint64 totalSize);
     void changeTotalSize(qint64 totalSize);
     bool decreaseTotalSize(qint64 by_size);
+    bool decreaseTotalQueued(int by_num = 1); // decreases the total number of elements in the queue [_p_queue] by number
+    void addDoneOne(); // increases the number of finished pieces from the queue by one
 
     enum State {
         Idle = 1 << 0,
@@ -39,7 +42,8 @@ public:
     qint64 doneSize() const; // returns the total size of the processed data
     qint64 donePieceSize() const; // returns the size of the data processed since the previous function call
     qint64 remainingSize() const;
-    Pieces<qint64> piecesSize() const;
+    Pieces<qint64> pSize() const;
+    Pieces<int> pQueue() const;
 
 public slots:
     void addChunk(int chunk);
@@ -51,6 +55,7 @@ private:
     static qint64 prevDoneSize_;
     int lastPerc_ = 0; // percentage before current chunk added
     Pieces<qint64> _p_size;
+    Pieces<int> _p_queue;
 
     State state_ = Idle;
 
