@@ -564,23 +564,24 @@ int Manager::calculateChecksums(const CalcParams &_params)
         if (_checksum.isEmpty()) {
             procState->decreaseTotalQueued();
             procState->decreaseTotalSize(iter.size());
+            continue;
         }
-        else { // success
-            procState->addDoneOne();
 
-            if (_params._purpose == DM_FindMoved
-                && !_data->_cacheMissing.contains(_checksum))
-            {
-                dataMaintainer->setFileStatus(iter.index(), _params._status);
-                continue;
-            }
+        // success
+        procState->addDoneOne();
 
-            if (!dataMaintainer->updateChecksum(iter.index(), _checksum)) {
-                if (!isMismatchFound) { // the signal is only needed once
-                    emit mismatchFound();
-                    isMismatchFound = true;
-                }
-            }
+        if (_params._purpose == DM_FindMoved) {
+            if (!dataMaintainer->tryMoved(iter.index(), _checksum))
+                dataMaintainer->setFileStatus(iter.index(), _params._status); // rollback status
+            continue;
+        }
+
+        // != DM_FindMoved
+        if (!dataMaintainer->updateChecksum(iter.index(), _checksum)
+            && !isMismatchFound) // the signal is only needed once
+        {
+            emit mismatchFound();
+            isMismatchFound = true;
         }
     }
 

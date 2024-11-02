@@ -225,12 +225,8 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
     const QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
-        setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
-
-        if (data_->_cacheMissing.contains(computedChecksum)) {
-            setFileStatus(fileRowIndex, FileStatus::Moved);
-            itemFileMoveOut(data_->_cacheMissing.take(computedChecksum));
-        } else {
+        if (!tryMoved(fileRowIndex, computedChecksum)) {
+            setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
             setFileStatus(fileRowIndex, FileStatus::Added);
         }
         return true;
@@ -334,14 +330,23 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
     return false;
 }
 
-bool DataMaintainer::itemFileMoveOut(const QModelIndex &fileIndex)
+bool DataMaintainer::tryMoved(const QModelIndex &_file, const QString &_checksum)
 {
-    const FileStatus _status = TreeModel::itemFileStatus(fileIndex);
+    if (!data_ || !data_->_cacheMissing.contains(_checksum))
+        return false;
 
-    if (data_ && (_status & (FileStatus::Missing | FileStatus::Removed))) {
-        clearChecksum(fileIndex);
-        setFileStatus(fileIndex, FileStatus::MovedOut);
+    // moved out
+    QModelIndex _i_movedout = data_->_cacheMissing.take(_checksum);
+    const FileStatus _status = TreeModel::itemFileStatus(_i_movedout);
+
+    if (_status & (FileStatus::Missing | FileStatus::Removed)) {
+        clearChecksum(_i_movedout);
+        setFileStatus(_i_movedout, FileStatus::MovedOut);
         data_->numbers_.moveFile(_status, FileStatus::MovedOut);
+
+        // moved
+        setFileStatus(_file, FileStatus::Moved);
+        setItemValue(_file, Column::ColumnChecksum, _checksum);
         return true;
     }
 
