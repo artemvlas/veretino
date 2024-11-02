@@ -65,10 +65,6 @@ public:
     QAction *actionShowDbStatus = new QAction(QStringLiteral(u"Status"), this);
     QAction *actionResetDb = new QAction(QStringLiteral(u"Reset"), this);
     QAction *actionForgetChanges = new QAction(QStringLiteral(u"Forget all changes"), this);
-    QAction *actionUpdateDbWithReChecksums = new QAction(QStringLiteral(u"Update Mismatched checksums"), this);
-    QAction *actionUpdateDbWithNewLost = new QAction(QStringLiteral(u"Add New && Clear Lost"), this);
-    QAction *actionDbAddNew = new QAction(QStringLiteral(u"Add New files"), this);
-    QAction *actionDbClearLost = new QAction(QStringLiteral(u"Clear Lost files"), this);
     QAction *actionFilterNewLost = new QAction(QStringLiteral(u"Filter New/Lost"), this);
     QAction *actionFilterMismatches = new QAction(QStringLiteral(u"Filter Mismatches"), this);
     QAction *actionFilterUnreadable = new QAction(QStringLiteral(u"Filter Unreadable"), this);
@@ -83,6 +79,12 @@ public:
     QAction *actionCopyStoredChecksum = new QAction(QStringLiteral(u"Copy stored Checksum"), this);
     QAction *actionCopyReChecksum = new QAction(QStringLiteral(u"Copy ReChecksum"), this);
     QAction *actionExportSum = new QAction(QStringLiteral(u"Export to *.sha"), this);
+
+    QAction *actionUpdDbAddNew = new QAction(QStringLiteral(u"Add New files"), this);
+    QAction *actionUpdDbClearLost = new QAction(QStringLiteral(u"Clear Lost files"), this);
+    QAction *actionUpdDbNewLost = new QAction(QStringLiteral(u"Add New && Clear Lost"), this);
+    QAction *actionUpdDbReChecksums = new QAction(QStringLiteral(u"Update Mismatched checksums"), this);
+    QAction *actionUpdDbFindMoved = new QAction(QStringLiteral(u"Find Moved"), this);
 
     QAction *actionUpdFileAdd = new QAction(QStringLiteral(u"Add to DB"), this);
     QAction *actionUpdFileRemove = new QAction(QStringLiteral(u"Remove from DB"), this);
@@ -110,7 +112,7 @@ public:
 
 private:
     void setActionsIcons();
-    IconProvider iconProvider;
+    IconProvider _icons;
     const Settings *settings_ = nullptr;
 
 }; // class MenuActions

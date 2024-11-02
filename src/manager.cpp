@@ -184,11 +184,25 @@ void Manager::updateDatabase(const DbMod dest)
     if (dest == DM_UpdateMismatches) {
         dataMaintainer->updateMismatchedChecksums();
     }
+    else if (dest == DM_FindMoved) {
+        CalcParams __p;
+        __p._purpose = DM_FindMoved;
+        __p._status = FileStatus::New;
+        calculateChecksums(__p);
+
+        if (procState->isCanceled())
+            return;
+
+        if (_num.numberOf(FileStatus::MovedOut) > 0)
+            dataMaintainer->setDbFileState(DbFileState::NotSaved);
+        else
+            emit showMessage("No Moved items found");
+    }
     else {
         if ((dest & DM_AddNew)
             && _num.contains(FileStatus::New))
         {
-            int numAdded = calculateChecksums(FileStatus::New);
+            const int numAdded = calculateChecksums(FileStatus::New);
 
             if (procState->isCanceled())
                 return;
@@ -430,11 +444,11 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
     }
 }
 
-QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, bool isVerification)
+QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, const bool _isVerif)
 {
     procState->setTotalSize(QFileInfo(filePath).size());
 
-    const QString _calcPurp = isVerification ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
+    const QString _calcPurp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     emit setStatusbarText(QString("%1 %2: %3").arg(_calcPurp,
                                                    format::algoToStr(algo),
                                                    format::fileNameAndSize(filePath)));
@@ -451,22 +465,22 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
     return _digest;
 }
 
-QString Manager::hashItem(const QModelIndex &_ind, bool isVerification)
+QString Manager::hashItem(const QModelIndex &_ind, const bool _isVerif)
 {
     dataMaintainer->setFileStatus(_ind,
-                                  isVerification ? FileStatus::Verifying : FileStatus::Calculating);
+                                  _isVerif ? FileStatus::Verifying : FileStatus::Calculating);
 
     const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
     const QString _checksum = shaCalc.calculate(_filePath, dataMaintainer->data_->metaData_.algorithm);
 
     if (_checksum.isEmpty() && !procState->isCanceled()) {
-        dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, isVerification));
+        dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, _isVerif));
     }
 
     return _checksum;
 }
 
-void Manager::updateProgText(bool _isVerif)
+void Manager::updateProgText(const bool _isVerif)
 {
     const QString _purp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     const Chunks<qint64> _p_size = procState->pSize();
@@ -499,19 +513,28 @@ void Manager::updateProgText(bool _isVerif)
 
 int Manager::calculateChecksums(const FileStatus _status, const QModelIndex &_root)
 {
+    CalcParams __p;
+    __p._status = _status;
+    __p._root = _root;
+
+    return calculateChecksums(__p);
+}
+
+int Manager::calculateChecksums(const CalcParams &_params)
+{
     DataContainer *_data = dataMaintainer->data_;
 
     if (!_data
-        || (_root.isValid() && _root.model() != _data->model_))
+        || (_params._root.isValid() && _params._root.model() != _data->model_))
     {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
     }
 
-    if (_status != FileStatus::Queued)
-        dataMaintainer->addToQueue(_status, _root);
+    if (_params._status != FileStatus::Queued)
+        dataMaintainer->addToQueue(_params._status, _params._root);
 
-    const NumSize _queued = _data->getNumbers(_root).values(FileStatus::Queued);
+    const NumSize _queued = _data->getNumbers(_params._root).values(FileStatus::Queued);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << _queued._num;
 
@@ -523,10 +546,10 @@ int Manager::calculateChecksums(const FileStatus _status, const QModelIndex &_ro
     bool isMismatchFound = false;
 
     // checking whether this is a Calculation or Verification process
-    const bool _isVerif = (_status & FileStatus::CombAvailable);
+    const bool _isVerif = (_params._status & FileStatus::CombAvailable);
 
     // process
-    TreeModelIterator iter(_data->model_, _root);
+    TreeModelIterator iter(_data->model_, _params._root);
 
     while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() != FileStatus::Queued)
@@ -544,6 +567,14 @@ int Manager::calculateChecksums(const FileStatus _status, const QModelIndex &_ro
         }
         else { // success
             procState->addDoneOne();
+
+            if (_params._purpose == DM_FindMoved
+                && !_data->_cacheMissing.contains(_checksum))
+            {
+                dataMaintainer->setFileStatus(iter.index(), _params._status);
+                continue;
+            }
+
             if (!dataMaintainer->updateChecksum(iter.index(), _checksum)) {
                 if (!isMismatchFound) { // the signal is only needed once
                     emit mismatchFound();
@@ -561,7 +592,7 @@ int Manager::calculateChecksums(const FileStatus _status, const QModelIndex &_ro
         }
 
         // rolling back file statuses
-        dataMaintainer->rollBackStoppedCalc(_root, _status);
+        dataMaintainer->rollBackStoppedCalc(_params._root, _params._status);
         qDebug() << "Manager::calculateChecksums >> Stopped | Done" << _done;
     }
 

@@ -41,7 +41,7 @@ MenuActions::~MenuActions()
 
 void MenuActions::setIconTheme(const QPalette &palette)
 {
-    iconProvider.setTheme(palette);
+    _icons.setTheme(palette);
     setActionsIcons();
 }
 
@@ -53,59 +53,63 @@ void MenuActions::setSettings(const Settings *settings)
 void MenuActions::setActionsIcons()
 {
     // MainWindow menu
-    actionChooseFolder->setIcon(iconProvider.icon(Icons::Folder));
-    actionOpenDatabaseFile->setIcon(iconProvider.icon(Icons::Database));
-    actionSave->setIcon(iconProvider.icon(Icons::Save));
-    actionShowFilesystem->setIcon(iconProvider.icon(Icons::FileSystem));
-    actionOpenDialogSettings->setIcon(iconProvider.icon(Icons::Configure));
+    actionChooseFolder->setIcon(_icons.icon(Icons::Folder));
+    actionOpenDatabaseFile->setIcon(_icons.icon(Icons::Database));
+    actionSave->setIcon(_icons.icon(Icons::Save));
+    actionShowFilesystem->setIcon(_icons.icon(Icons::FileSystem));
+    actionOpenDialogSettings->setIcon(_icons.icon(Icons::Configure));
 
-    menuOpenRecent->menuAction()->setIcon(iconProvider.icon(Icons::Clock));
-    actionClearRecent->setIcon(iconProvider.icon(Icons::ClearHistory));
-    actionAbout->setIcon(iconProvider.icon(Icons::Info));
+    menuOpenRecent->menuAction()->setIcon(_icons.icon(Icons::Clock));
+    actionClearRecent->setIcon(_icons.icon(Icons::ClearHistory));
+    actionAbout->setIcon(_icons.icon(Icons::Info));
 
     // File system View
-    actionToHome->setIcon(iconProvider.icon(Icons::GoHome));
-    actionStop->setIcon(iconProvider.icon(Icons::ProcessStop));
-    actionShowFolderContentsTypes->setIcon(iconProvider.icon(Icons::ChartPie));
-    actionProcessChecksumsNoFilter->setIcon(iconProvider.icon(Icons::Folder));
-    actionProcessChecksumsCustomFilter->setIcon(iconProvider.icon(Icons::FolderSync));
-    actionCheckFileByClipboardChecksum->setIcon(iconProvider.icon(Icons::Paste));
-    actionProcessSha_toClipboard->setIcon(iconProvider.icon(Icons::Copy));
-    actionOpenDatabase->setIcon(iconProvider.icon(Icons::Database));
-    actionCheckSumFile->setIcon(iconProvider.icon(Icons::Scan));
+    actionToHome->setIcon(_icons.icon(Icons::GoHome));
+    actionStop->setIcon(_icons.icon(Icons::ProcessStop));
+    actionShowFolderContentsTypes->setIcon(_icons.icon(Icons::ChartPie));
+    actionProcessChecksumsNoFilter->setIcon(_icons.icon(Icons::Folder));
+    actionProcessChecksumsCustomFilter->setIcon(_icons.icon(Icons::FolderSync));
+    actionCheckFileByClipboardChecksum->setIcon(_icons.icon(Icons::Paste));
+    actionProcessSha_toClipboard->setIcon(_icons.icon(Icons::Copy));
+    actionOpenDatabase->setIcon(_icons.icon(Icons::Database));
+    actionCheckSumFile->setIcon(_icons.icon(Icons::Scan));
 
-    menuAlgo->menuAction()->setIcon(iconProvider.icon(Icons::DoubleGear));
-    menuCreateDigest->menuAction()->setIcon(iconProvider.icon(Icons::Save));
+    menuAlgo->menuAction()->setIcon(_icons.icon(Icons::DoubleGear));
+    menuCreateDigest->menuAction()->setIcon(_icons.icon(Icons::Save));
 
-    actionCopyFile->setIcon(iconProvider.icon(Icons::Copy));
-    actionCopyFolder->setIcon(iconProvider.icon(Icons::Copy));
+    actionCopyFile->setIcon(_icons.icon(Icons::Copy));
+    actionCopyFolder->setIcon(_icons.icon(Icons::Copy));
 
     // DB Model View
-    actionCancelBackToFS->setIcon(iconProvider.icon(Icons::ProcessAbort));
-    actionShowDbStatus->setIcon(iconProvider.icon(Icons::Database));
-    actionResetDb->setIcon(iconProvider.icon(Icons::Undo));
-    actionForgetChanges->setIcon(iconProvider.icon(Icons::Backup));
-    actionUpdateDbWithReChecksums->setIcon(iconProvider.icon(FileStatus::Updated));
-    actionUpdateDbWithNewLost->setIcon(iconProvider.icon(Icons::Update));
-    actionDbAddNew->setIcon(iconProvider.icon(FileStatus::Added));
-    actionDbClearLost->setIcon(iconProvider.icon(FileStatus::Removed));
-    actionFilterNewLost->setIcon(iconProvider.icon(Icons::NewFile));
-    actionFilterMismatches->setIcon(iconProvider.icon(Icons::DocClose));
-    actionFilterUnreadable->setIcon(iconProvider.icon(FileStatus::ReadError));
-    actionFilterModified->setIcon(iconProvider.icon(FileStatus::NotCheckedMod));
-    actionCheckCurFileFromModel->setIcon(iconProvider.icon(Icons::Scan));
-    actionCheckCurSubfolderFromModel->setIcon(iconProvider.icon(Icons::FolderSync));
-    //actionCheckAllMod->setIcon(iconProvider.icon(FileStatus::NotCheckedMod));
-    actionCheckAll->setIcon(iconProvider.icon(Icons::Start));
-    actionCopyStoredChecksum->setIcon(iconProvider.icon(Icons::Copy));
-    actionCopyReChecksum->setIcon(iconProvider.icon(Icons::Copy));
-    actionBranchMake->setIcon(iconProvider.icon(Icons::AddFork));
-    actionBranchOpen->setIcon(iconProvider.icon(Icons::Branch));
-    actionUpdFileAdd->setIcon(iconProvider.icon(FileStatus::Added));
-    actionUpdFileRemove->setIcon(iconProvider.icon(FileStatus::Removed));
-    actionUpdFileReChecksum->setIcon(iconProvider.icon(FileStatus::Updated));
-    actionExportSum->setIcon(iconProvider.icon(Icons::HashFile));
-    actionUpdFileImportDigest->setIcon(iconProvider.icon(Icons::HashFile));
+    actionCancelBackToFS->setIcon(_icons.icon(Icons::ProcessAbort));
+    actionShowDbStatus->setIcon(_icons.icon(Icons::Database));
+    actionResetDb->setIcon(_icons.icon(Icons::Undo));
+    actionForgetChanges->setIcon(_icons.icon(Icons::Backup));
+    actionCheckCurFileFromModel->setIcon(_icons.icon(Icons::Scan));
+    actionCheckCurSubfolderFromModel->setIcon(_icons.icon(Icons::FolderSync));
+    //actionCheckAllMod->setIcon(_icons.icon(FileStatus::NotCheckedMod));
+    actionCheckAll->setIcon(_icons.icon(Icons::Start));
+    actionCopyStoredChecksum->setIcon(_icons.icon(Icons::Copy));
+    actionCopyReChecksum->setIcon(_icons.icon(Icons::Copy));
+    actionBranchMake->setIcon(_icons.icon(Icons::AddFork));
+    actionBranchOpen->setIcon(_icons.icon(Icons::Branch));
+    actionExportSum->setIcon(_icons.icon(Icons::HashFile));
+
+    actionFilterNewLost->setIcon(_icons.icon(Icons::NewFile));
+    actionFilterMismatches->setIcon(_icons.icon(Icons::DocClose));
+    actionFilterUnreadable->setIcon(_icons.icon(FileStatus::ReadError));
+    actionFilterModified->setIcon(_icons.icon(FileStatus::NotCheckedMod));
+
+    actionUpdFileAdd->setIcon(_icons.icon(FileStatus::Added));
+    actionUpdFileRemove->setIcon(_icons.icon(FileStatus::Removed));
+    actionUpdFileReChecksum->setIcon(_icons.icon(FileStatus::Updated));
+    actionUpdFileImportDigest->setIcon(_icons.icon(Icons::HashFile));
+
+    actionUpdDbAddNew->setIcon(_icons.icon(FileStatus::Added));
+    actionUpdDbClearLost->setIcon(_icons.icon(FileStatus::Removed));
+    actionUpdDbNewLost->setIcon(_icons.icon(Icons::Update));
+    actionUpdDbReChecksums->setIcon(_icons.icon(FileStatus::Updated));
+    actionUpdDbFindMoved->setIcon(_icons.icon(FileStatus::Moved));
 }
 
 void MenuActions::setShortcuts()
@@ -143,7 +147,7 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
     if (!menuOpenRecent->isEnabled())
         return;
 
-    QIcon dbIcon = iconProvider.icon(Icons::Database);
+    QIcon dbIcon = _icons.icon(Icons::Database);
 
     for (const QString &recentFilePath : recentFiles) {
         if (QFileInfo::exists(recentFilePath)) {
@@ -160,37 +164,37 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
 {
     if (!menuUpdateDatabase) {
         menuUpdateDatabase = new QMenu(QStringLiteral(u"Update the Database"));
-        menuUpdateDatabase->menuAction()->setIcon(iconProvider.icon(Icons::Update));
+        menuUpdateDatabase->menuAction()->setIcon(_icons.icon(Icons::Update));
 
-        menuUpdateDatabase->addAction(actionDbAddNew);
-        menuUpdateDatabase->addAction(actionDbClearLost);
-        menuUpdateDatabase->addAction(actionUpdateDbWithNewLost);
+        menuUpdateDatabase->addAction(actionUpdDbAddNew);
+        menuUpdateDatabase->addAction(actionUpdDbClearLost);
+        menuUpdateDatabase->addAction(actionUpdDbNewLost);
         menuUpdateDatabase->addSeparator();
-        menuUpdateDatabase->addAction(actionUpdateDbWithReChecksums);
+        menuUpdateDatabase->addAction(actionUpdDbReChecksums);
     }
 
-    actionDbAddNew->setEnabled(dataNum.contains(FileStatus::New));        
-    actionDbClearLost->setEnabled(dataNum.contains(FileStatus::Missing));
-    actionUpdateDbWithNewLost->setEnabled(actionDbAddNew->isEnabled() && actionDbClearLost->isEnabled());
-    actionUpdateDbWithReChecksums->setEnabled(dataNum.contains(FileStatus::Mismatched));
+    actionUpdDbAddNew->setEnabled(dataNum.contains(FileStatus::New));
+    actionUpdDbClearLost->setEnabled(dataNum.contains(FileStatus::Missing));
+    actionUpdDbNewLost->setEnabled(actionUpdDbAddNew->isEnabled() && actionUpdDbClearLost->isEnabled());
+    actionUpdDbReChecksums->setEnabled(dataNum.contains(FileStatus::Mismatched));
 
     // show number of items
-    static const QString defstrAddNew = actionDbAddNew->text();
-    static const QString defstrClearLost = actionDbClearLost->text();
-    static const QString defstrUpdateRe = actionUpdateDbWithReChecksums->text();
+    static const QString defstrAddNew = actionUpdDbAddNew->text();
+    static const QString defstrClearLost = actionUpdDbClearLost->text();
+    static const QString defstrUpdateRe = actionUpdDbReChecksums->text();
     static const QString defstrNumFormat = QStringLiteral(u" [%1]");
 
-    QString _strAddNew = defstrAddNew + (actionDbAddNew->isEnabled() ? QString(defstrNumFormat)
+    QString _strAddNew = defstrAddNew + (actionUpdDbAddNew->isEnabled() ? QString(defstrNumFormat)
                                          .arg(dataNum.numberOf(FileStatus::New)) : QString());
-    actionDbAddNew->setText(_strAddNew);
+    actionUpdDbAddNew->setText(_strAddNew);
 
-    QString _strClearLost = defstrClearLost + (actionDbClearLost->isEnabled() ? QString(defstrNumFormat)
+    QString _strClearLost = defstrClearLost + (actionUpdDbClearLost->isEnabled() ? QString(defstrNumFormat)
                                                 .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
-    actionDbClearLost->setText(_strClearLost);
+    actionUpdDbClearLost->setText(_strClearLost);
 
-    QString _strUpdateRe = defstrUpdateRe + (actionUpdateDbWithReChecksums->isEnabled() ? QString(defstrNumFormat)
+    QString _strUpdateRe = defstrUpdateRe + (actionUpdDbReChecksums->isEnabled() ? QString(defstrNumFormat)
                                                         .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
-    actionUpdateDbWithReChecksums->setText(_strUpdateRe);
+    actionUpdDbReChecksums->setText(_strUpdateRe);
 
     return menuUpdateDatabase;
 }

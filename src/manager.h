@@ -106,12 +106,19 @@ private:
 
     QString calculateChecksum(const QString &filePath,
                               QCryptographicHash::Algorithm algo,
-                              bool isVerification = false);
+                              const bool _isVerif = false);
 
-    QString hashItem(const QModelIndex &_ind, bool isVerification = false);
+    QString hashItem(const QModelIndex &_ind, const bool _isVerif = false);
+
+    struct CalcParams {
+        DbMod _purpose = DM_AutoSelect;
+        FileStatus _status = FileStatus::NotSet;
+        QModelIndex _root;
+    };
 
     int calculateChecksums(const FileStatus _status, const QModelIndex &_root = QModelIndex());
-    void updateProgText(bool _isVerif = false);
+    int calculateChecksums(const CalcParams &_params);
+    void updateProgText(const bool _isVerif = false);
 
     QString extractDigestFromFile(const QString &_digest_file);
 

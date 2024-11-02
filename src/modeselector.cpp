@@ -50,10 +50,11 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(menuAct_->actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(menuAct_->actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
-    connect(menuAct_->actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateMismatches); });
-    connect(menuAct_->actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateNewLost); });
-    connect(menuAct_->actionDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_AddNew); });
-    connect(menuAct_->actionDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_ClearLost); });
+    connect(menuAct_->actionUpdDbReChecksums, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateMismatches); });
+    connect(menuAct_->actionUpdDbNewLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateNewLost); });
+    connect(menuAct_->actionUpdDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_AddNew); });
+    connect(menuAct_->actionUpdDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_ClearLost); });
+    connect(menuAct_->actionUpdDbFindMoved, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_FindMoved); });
     connect(menuAct_->actionFilterNewLost, &QAction::triggered, this,
             [=](bool isChecked){ view_->editFilter(FileStatus::CombNewLost, isChecked); });
     connect(menuAct_->actionFilterMismatches, &QAction::triggered, this,
@@ -811,6 +812,9 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
             if (_num.contains(FileStatus::CombUpdatable))
                 viewContextMenu->addSeparator();
         }
+
+        if (!isDbConst() && view_->data_->hasPossiblyMovedItems())
+            viewContextMenu->addAction(menuAct_->actionUpdDbFindMoved);
 
         if (index.isValid()) {
             if (TreeModel::isFileRow(index)) {
