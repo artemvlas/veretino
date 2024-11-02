@@ -40,9 +40,9 @@ struct NumSize { // number and total size (for example, files)
 }; // struct NumSize
 
 template <typename T = int> // parts of progress (int, qint64...)
-struct Pieces {
-    Pieces() {}
-    Pieces(T total) : _total(total) {}
+struct Chunks {
+    Chunks() {}
+    Chunks(T total) : _total(total) {}
     T remain() const { return _total - _done; }
     int percent() const { return (_done * 100) / _total; }
     void setTotal(T total) { _total = total; _done = 0; }
@@ -52,14 +52,14 @@ struct Pieces {
     void addChunks(T number) { _done += number; } // same as P <<
     void addChunk() { ++_done; } // same as ++P
     void reset() { setTotal(0); }
-    Pieces& operator<<(T done_num) { _done += done_num; return *this; }
-    Pieces& operator++() { ++_done; return *this; } // prefix
-    Pieces  operator++(int) { Pieces _res(*this); ++(*this); return _res; } // postfix
+    Chunks& operator<<(T done_num) { _done += done_num; return *this; }
+    Chunks& operator++() { ++_done; return *this; } // prefix
+    Chunks  operator++(int) { Chunks _res(*this); ++(*this); return _res; } // postfix
     explicit operator bool() const { return _total > 0; } // same as hasSet()
 
     // values
     T _total = 0;
     T _done = 0;
-}; // struct Pieces
+}; // struct Chunks
 
 #endif // NUMS_H

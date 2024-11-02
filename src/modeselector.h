@@ -60,7 +60,7 @@ public:
 
     void resetDatabase(); // reopening and reparsing current database
     void restoreDatabase();
-    void updateDatabase(const DestDbUpdate task);
+    void updateDatabase(const DbMod task);
     void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result = DestFileProc::Generic);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
@@ -100,7 +100,7 @@ private:
     void connectActions();
     void copyDataToClipboard(Column column);
     void updateDbItem();
-    void updateItemFile(DestDbUpdate _job);
+    void updateItemFile(DbMod _job);
     void exportItemSum();
     void importItemSum();
     bool promptMessageProcCancelation_(bool abort);

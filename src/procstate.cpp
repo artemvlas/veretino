@@ -126,12 +126,12 @@ qint64 ProcState::remainingSize() const
     return _p_size.remain();
 }
 
-Pieces<qint64> ProcState::pSize() const
+Chunks<qint64> ProcState::pSize() const
 {
     return _p_size;
 }
 
-Pieces<int> ProcState::pQueue() const
+Chunks<int> ProcState::pQueue() const
 {
     return _p_queue;
 }

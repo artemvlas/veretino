@@ -42,8 +42,8 @@ public:
     qint64 doneSize() const; // returns the total size of the processed data
     qint64 donePieceSize() const; // returns the size of the data processed since the previous function call
     qint64 remainingSize() const;
-    Pieces<qint64> pSize() const;
-    Pieces<int> pQueue() const;
+    Chunks<qint64> pSize() const;
+    Chunks<int> pQueue() const;
 
 public slots:
     void addChunk(int chunk);
@@ -54,8 +54,8 @@ private:
 
     static qint64 prevDoneSize_;
     int lastPerc_ = 0; // percentage before current chunk added
-    Pieces<qint64> _p_size;
-    Pieces<int> _p_queue;
+    Chunks<qint64> _p_size;
+    Chunks<int> _p_queue;
 
     State state_ = Idle;
 

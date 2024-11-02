@@ -169,7 +169,7 @@ void Manager::prepareSwitchToFs()
     qDebug() << "Manager::prepareSwitchToFs >> Done";
 }
 
-void Manager::updateDatabase(const DestDbUpdate dest)
+void Manager::updateDatabase(const DbMod dest)
 {
     if (!dataMaintainer->data_ || dataMaintainer->data_->isImmutable())
         return;
@@ -181,11 +181,11 @@ void Manager::updateDatabase(const DestDbUpdate dest)
         return;
     }
 
-    if (dest == DestUpdateMismatches) {
+    if (dest == DM_UpdateMismatches) {
         dataMaintainer->updateMismatchedChecksums();
     }
     else {
-        if ((dest & DestAddNew)
+        if ((dest & DM_AddNew)
             && _num.contains(FileStatus::New))
         {
             int numAdded = calculateChecksums(FileStatus::New);
@@ -196,7 +196,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
                 dataMaintainer->setDbFileState(DbFileState::NotSaved);
         }
 
-        if ((dest & DestClearLost)
+        if ((dest & DM_ClearLost)
             && _num.contains(FileStatus::Missing))
         {
             dataMaintainer->clearLostFiles();
@@ -213,7 +213,7 @@ void Manager::updateDatabase(const DestDbUpdate dest)
     }
 }
 
-void Manager::updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job)
+void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
 {
     const DataContainer *_data = dataMaintainer->data_;
     const FileStatus _prevStatus = TreeModel::itemFileStatus(fileIndex);
@@ -228,7 +228,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job)
     if (_prevStatus == FileStatus::New) {
         QString _dig;
 
-        if (_job == DestImportDigest) {
+        if (_job == DM_ImportDigest) {
             const QString __d = extractDigestFromFile(_data->digestFilePath(fileIndex));
             if (tools::canBeChecksum(__d, _data->metaData_.algorithm)) // checking for compliance with the current algo
                 _dig = __d;
@@ -469,14 +469,14 @@ QString Manager::hashItem(const QModelIndex &_ind, bool isVerification)
 void Manager::updateProgText(bool _isVerif)
 {
     const QString _purp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
-    const Pieces<qint64> _p_size = procState->pSize();
-    const Pieces<int> _p_queue = procState->pQueue();
+    const Chunks<qint64> _p_size = procState->pSize();
+    const Chunks<int> _p_queue = procState->pQueue();
 
     // to avoid calling the dataSizeReadable() func for each file
     static qint64 _lastTotalSize;
     static QString _lastTotalSizeR;
 
-    if (_p_size._done == 0 || (_lastTotalSize != _p_size._total)) {
+    if (!_p_size.hasChunks() || (_lastTotalSize != _p_size._total)) {
         _lastTotalSize = _p_size._total;
         _lastTotalSizeR = format::dataSizeReadable(_lastTotalSize);
     }
@@ -484,7 +484,7 @@ void Manager::updateProgText(bool _isVerif)
     // UGLY, but better performance (should be). And should be re-implemented.
     const QString _res = _purp % ' ' % QString::number(_p_queue._done + 1) % QStringLiteral(u" of ")
                     % QString::number(_p_queue._total) % QStringLiteral(u" checksums ")
-                    % ((_p_size._done == 0) ? format::inParentheses(_lastTotalSizeR) // (%1)
+                    % (!_p_size.hasChunks() ? format::inParentheses(_lastTotalSizeR) // (%1)
                     : ('(' % format::dataSizeReadable(_p_size._done) % QStringLiteral(u" / ") % _lastTotalSizeR % ')')); // "(%1 / %2)"
 
     emit setStatusbarText(_res);
@@ -497,7 +497,7 @@ void Manager::updateProgText(bool _isVerif)
                               .arg(doneData));*/
 }
 
-int Manager::calculateChecksums(FileStatus _status, const QModelIndex &_root)
+int Manager::calculateChecksums(const FileStatus _status, const QModelIndex &_root)
 {
     DataContainer *_data = dataMaintainer->data_;
 

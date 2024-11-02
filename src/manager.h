@@ -14,8 +14,8 @@
 #include "settings.h"
 
 struct Task {
-    Task(std::function<void()> func, State state = State::StartSilently)
-        : _func(func), _state(state) {}
+    Task(std::function<void()> func, State run_with = State::StartSilently)
+        : _func(func), _state(run_with) {}
 
     std::function<void()> _func;
     State _state;
@@ -29,14 +29,15 @@ public:
 
     enum DestFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
 
-    enum DestDbUpdate {
-        AutoSelect,
-        DestUpdateMismatches = 1 << 0,
-        DestAddNew = 1 << 1,
-        DestClearLost = 1 << 2,
-        DestUpdateNewLost = DestAddNew | DestClearLost,
-        DestImportDigest = 1 << 3
-    }; // enum DestDbUpdate
+    enum DbMod {
+        DM_AutoSelect = 0,
+        DM_AddNew = 1 << 0,
+        DM_ClearLost = 1 << 1,
+        DM_UpdateNewLost = DM_AddNew | DM_ClearLost,
+        DM_UpdateMismatches = 1 << 2,
+        DM_FindMoved = 1 << 3,
+        DM_ImportDigest = 1 << 4
+    }; // enum DbMod
 
     DataMaintainer *dataMaintainer = new DataMaintainer(this);
     ProcState *procState = new ProcState(this);
@@ -64,8 +65,8 @@ public:
 public slots:
     void processFolderSha(const MetaData &metaData);
     void branchSubfolder(const QModelIndex &subfolder);
-    void updateDatabase(const DestDbUpdate dest);
-    void updateItemFile(const QModelIndex &fileIndex, DestDbUpdate _job);
+    void updateDatabase(const DbMod dest);
+    void updateItemFile(const QModelIndex &fileIndex, DbMod _job);
 
     void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
     void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
@@ -109,7 +110,7 @@ private:
 
     QString hashItem(const QModelIndex &_ind, bool isVerification = false);
 
-    int calculateChecksums(FileStatus _status, const QModelIndex &_root = QModelIndex());
+    int calculateChecksums(const FileStatus _status, const QModelIndex &_root = QModelIndex());
     void updateProgText(bool _isVerif = false);
 
     QString extractDigestFromFile(const QString &_digest_file);
@@ -138,6 +139,6 @@ signals:
 }; // class Manager
 
 using DestFileProc = Manager::DestFileProc;
-using DestDbUpdate = Manager::DestDbUpdate;
+using DbMod = Manager::DbMod;
 
 #endif // MANAGER_H

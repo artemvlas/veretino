@@ -50,10 +50,10 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
     connect(menuAct_->actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
     connect(menuAct_->actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
-    connect(menuAct_->actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{ updateDatabase(DestDbUpdate::DestUpdateMismatches); });
-    connect(menuAct_->actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{ updateDatabase(DestDbUpdate::DestUpdateNewLost); });
-    connect(menuAct_->actionDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DestDbUpdate::DestAddNew); });
-    connect(menuAct_->actionDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DestDbUpdate::DestClearLost); });
+    connect(menuAct_->actionUpdateDbWithReChecksums, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateMismatches); });
+    connect(menuAct_->actionUpdateDbWithNewLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateNewLost); });
+    connect(menuAct_->actionDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_AddNew); });
+    connect(menuAct_->actionDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_ClearLost); });
     connect(menuAct_->actionFilterNewLost, &QAction::triggered, this,
             [=](bool isChecked){ view_->editFilter(FileStatus::CombNewLost, isChecked); });
     connect(menuAct_->actionFilterMismatches, &QAction::triggered, this,
@@ -322,7 +322,7 @@ void ModeSelector::verifyDb()
     verify();
 }
 
-void ModeSelector::updateItemFile(DestDbUpdate _job)
+void ModeSelector::updateItemFile(DbMod _job)
 {
     /*  At the moment, updating a separate file
      *  with the View filtering enabled is unstable,
@@ -338,12 +338,12 @@ void ModeSelector::updateItemFile(DestDbUpdate _job)
 
 void ModeSelector::updateDbItem()
 {
-    updateItemFile(DestDbUpdate::AutoSelect);
+    updateItemFile(DbMod::DM_AutoSelect);
 }
 
 void ModeSelector::importItemSum()
 {
-    updateItemFile(DestDbUpdate::DestImportDigest);
+    updateItemFile(DbMod::DM_ImportDigest);
 }
 
 void ModeSelector::showFolderContentTypes()
@@ -400,7 +400,7 @@ void ModeSelector::copyDataToClipboard(Column column)
     }
 }
 
-void ModeSelector::updateDatabase(const DestDbUpdate task)
+void ModeSelector::updateDatabase(const DbMod task)
 {
     stopProcess();
     view_->setViewSource();
@@ -651,11 +651,11 @@ void ModeSelector::doWork()
             break;
         case ModelNewLost:
             if (!proc_->isStarted())
-                updateDatabase(DestDbUpdate::DestUpdateNewLost);
+                updateDatabase(DbMod::DM_UpdateNewLost);
             break;
         case UpdateMismatch:
             if (!proc_->isStarted())
-                updateDatabase(DestDbUpdate::DestUpdateMismatches);
+                updateDatabase(DbMod::DM_UpdateMismatches);
             break;
         case NoMode:
             if (!proc_->isStarted())

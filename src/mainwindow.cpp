@@ -332,7 +332,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         && result.contains(FileStatus::Mismatched)
         && ret == QMessageBox::Ok)
     {
-        modeSelect->updateDatabase(DestDbUpdate::DestUpdateMismatches);
+        modeSelect->updateDatabase(DbMod::DM_UpdateMismatches);
     }
 }
 
