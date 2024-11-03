@@ -148,7 +148,8 @@ void View::clear()
 void View::setViewProxy()
 {
     if (isViewModel(ModelView::ModelSource)) {
-        setTreeModel(ModelView::ModelProxy);
+        //setTreeModel(ModelView::ModelProxy);
+        QTimer::singleShot(0, this, [=]{ setTreeModel(ModelView::ModelProxy); });
     }
 }
 
