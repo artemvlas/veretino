@@ -185,10 +185,7 @@ void Manager::updateDatabase(const DbMod dest)
         dataMaintainer->updateMismatchedChecksums();
     }
     else if (dest == DM_FindMoved) {
-        CalcParams __p;
-        __p._purpose = DM_FindMoved;
-        __p._status = FileStatus::New;
-        calculateChecksums(__p);
+        calculateChecksums(DM_FindMoved, FileStatus::New);
 
         if (procState->isCanceled())
             return;
@@ -513,28 +510,24 @@ void Manager::updateProgText(const bool _isVerif)
 
 int Manager::calculateChecksums(const FileStatus _status, const QModelIndex &_root)
 {
-    CalcParams __p;
-    __p._status = _status;
-    __p._root = _root;
-
-    return calculateChecksums(__p);
+    return calculateChecksums(DM_AutoSelect, _status, _root);
 }
 
-int Manager::calculateChecksums(const CalcParams &_params)
+int Manager::calculateChecksums(const DbMod _purpose, const FileStatus _status, const QModelIndex &_root)
 {
     DataContainer *_data = dataMaintainer->data_;
 
     if (!_data
-        || (_params._root.isValid() && _params._root.model() != _data->model_))
+        || (_root.isValid() && _root.model() != _data->model_))
     {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
     }
 
-    if (_params._status != FileStatus::Queued)
-        dataMaintainer->addToQueue(_params._status, _params._root);
+    if (_status != FileStatus::Queued)
+        dataMaintainer->addToQueue(_status, _root);
 
-    const NumSize _queued = _data->getNumbers(_params._root).values(FileStatus::Queued);
+    const NumSize _queued = _data->getNumbers(_root).values(FileStatus::Queued);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << _queued._num;
 
@@ -546,10 +539,10 @@ int Manager::calculateChecksums(const CalcParams &_params)
     bool isMismatchFound = false;
 
     // checking whether this is a Calculation or Verification process
-    const bool _isVerif = (_params._status & FileStatus::CombAvailable);
+    const bool _isVerif = (_status & FileStatus::CombAvailable);
 
     // process
-    TreeModelIterator iter(_data->model_, _params._root);
+    TreeModelIterator iter(_data->model_, _root);
 
     while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() != FileStatus::Queued)
@@ -570,9 +563,9 @@ int Manager::calculateChecksums(const CalcParams &_params)
         // success
         procState->addDoneOne();
 
-        if (_params._purpose == DM_FindMoved) {
+        if (_purpose == DM_FindMoved) {
             if (!dataMaintainer->tryMoved(iter.index(), _checksum))
-                dataMaintainer->setFileStatus(iter.index(), _params._status); // rollback status
+                dataMaintainer->setFileStatus(iter.index(), _status); // rollback status
             continue;
         }
 
@@ -593,7 +586,7 @@ int Manager::calculateChecksums(const CalcParams &_params)
         }
 
         // rolling back file statuses
-        dataMaintainer->rollBackStoppedCalc(_params._root, _params._status);
+        dataMaintainer->rollBackStoppedCalc(_root, _status);
         qDebug() << "Manager::calculateChecksums >> Stopped | Done" << _done;
     }
 

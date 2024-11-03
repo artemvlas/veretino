@@ -110,14 +110,13 @@ private:
 
     QString hashItem(const QModelIndex &_ind, const bool _isVerif = false);
 
-    struct CalcParams {
-        DbMod _purpose = DM_AutoSelect;
-        FileStatus _status = FileStatus::NotSet;
-        QModelIndex _root;
-    };
+    int calculateChecksums(const FileStatus _status,
+                           const QModelIndex &_root = QModelIndex());
 
-    int calculateChecksums(const FileStatus _status, const QModelIndex &_root = QModelIndex());
-    int calculateChecksums(const CalcParams &_params);
+    int calculateChecksums(const DbMod _purpose,
+                           const FileStatus _status,
+                           const QModelIndex &_root = QModelIndex());
+
     void updateProgText(const bool _isVerif = false);
 
     QString extractDigestFromFile(const QString &_digest_file);
