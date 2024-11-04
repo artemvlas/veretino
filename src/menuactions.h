@@ -71,7 +71,7 @@ public:
     QAction *actionFilterModified = new QAction(QStringLiteral(u"Filter Modified"), this);
     QAction *actionShowAll = new QAction(QStringLiteral(u"Show All"), this);
     QAction *actionCheckCurFileFromModel = new QAction(QStringLiteral(u"Check File"), this);
-    QAction *actionCheckCurSubfolderFromModel = new QAction(QStringLiteral(u"Check Folder"), this);
+    QAction *actionCheckItemSubfolder = new QAction(QStringLiteral(u"Check Folder"), this);
     QAction *actionBranchMake = new QAction(QStringLiteral(u"Branch Folder"), this);
     QAction *actionBranchOpen = new QAction(QStringLiteral(u"Open Branch"), this);
     QAction *actionBranchImport = new QAction(QStringLiteral(u"Import Branch"), this);

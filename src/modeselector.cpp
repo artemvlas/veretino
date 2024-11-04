@@ -65,7 +65,7 @@ void ModeSelector::connectActions()
             [=](bool isChecked){ view_->editFilter(FileStatus::NotCheckedMod, isChecked); });
     connect(menuAct_->actionShowAll, &QAction::triggered, view_, &View::disableFilter);
     connect(menuAct_->actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
-    connect(menuAct_->actionCheckCurSubfolderFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
+    connect(menuAct_->actionCheckItemSubfolder, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(menuAct_->actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
     connect(menuAct_->actionCheckAllMod, &QAction::triggered, this, &ModeSelector::verifyModified);
     connect(menuAct_->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
@@ -865,22 +865,25 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     viewContextMenu->addAction(menuAct_->actionCheckCurFileFromModel);
                 }
             }
-            // Folder item
-            else if (TreeModel::contains(FileStatus::CombAvailable, index)) {
-                viewContextMenu->addAction(menuAct_->actionCopyFolder);
+            else { // Folder item
+                const bool _has_avail = TreeModel::contains(FileStatus::CombAvailable, index);
+                const bool _has_new = TreeModel::contains(FileStatus::New, index);
 
-                if (!view_->data_->getBranchFilePath(index, true).isEmpty())
-                    viewContextMenu->addAction(menuAct_->actionBranchOpen);
-                else
-                    viewContextMenu->addAction(menuAct_->actionBranchMake);
+                if (_has_avail || _has_new) {
+                    viewContextMenu->addAction(menuAct_->actionCopyFolder);
 
-                viewContextMenu->addAction(menuAct_->actionCheckCurSubfolderFromModel);
-            }
-            else if (TreeModel::contains(FileStatus::New, index)
-                       && !view_->data_->getBranchFilePath(index, true).isEmpty())
-            {
-                viewContextMenu->addAction(menuAct_->actionBranchOpen);
-                viewContextMenu->addAction(menuAct_->actionBranchImport);
+                    // contains branch db file
+                    if (!view_->data_->getBranchFilePath(index, true).isEmpty()) {
+                        viewContextMenu->addAction(menuAct_->actionBranchOpen);
+                        if (_has_new && !isDbConst())
+                            viewContextMenu->addAction(menuAct_->actionBranchImport);
+                    } else {
+                        viewContextMenu->addAction(menuAct_->actionBranchMake);
+                    }
+
+                    if (_has_avail)
+                        viewContextMenu->addAction(menuAct_->actionCheckItemSubfolder);
+                }
             }
         }
 

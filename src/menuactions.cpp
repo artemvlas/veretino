@@ -86,7 +86,7 @@ void MenuActions::setActionsIcons()
     actionResetDb->setIcon(_icons.icon(Icons::Undo));
     actionForgetChanges->setIcon(_icons.icon(Icons::Backup));
     actionCheckCurFileFromModel->setIcon(_icons.icon(Icons::Scan));
-    actionCheckCurSubfolderFromModel->setIcon(_icons.icon(Icons::FolderSync));
+    actionCheckItemSubfolder->setIcon(_icons.icon(Icons::FolderSync));
     //actionCheckAllMod->setIcon(_icons.icon(FileStatus::NotCheckedMod));
     actionCheckAll->setIcon(_icons.icon(Icons::Start));
     actionCopyStoredChecksum->setIcon(_icons.icon(Icons::Copy));
