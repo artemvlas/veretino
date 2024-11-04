@@ -242,6 +242,19 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
     }
 }
 
+bool DataMaintainer::importChecksum(const QModelIndex &_file, const QString &_checksum)
+{
+    if (TreeModel::hasStatus(FileStatus::New, _file) && !_checksum.isEmpty()) {
+        setItemValue(_file, Column::ColumnChecksum, _checksum);
+        setFileStatus(_file, FileStatus::Imported);
+        return true;
+
+        // data_->numbers_.moveFile(FileStatus::New, FileStatus::Imported, TreeModel::itemFileSize(_file));
+    }
+
+    return false;
+}
+
 int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
     if (!data_ || tools::isFlagCombined(newStatus)) {
@@ -465,10 +478,11 @@ int DataMaintainer::importBranch(const QString &jsonFilePath, const QModelIndex 
     while (_it.hasNext()) {
         _it.nextFile();
         if (_it.status() == FileStatus::New) {
-            const QString __v = _mainList.value(_it.path(rootFolder)).toString();
-            if (!__v.isEmpty()) {
-                setItemValue(_it.index(), Column::ColumnChecksum, __v);
-                setFileStatus(_it.index(), FileStatus::NotChecked);
+            const QJsonValue __v = _mainList.value(_it.path(rootFolder));
+
+            if (!__v.isUndefined()
+                && importChecksum(_it.index(), __v.toString()))
+            {
                 ++_num;
             }
         }

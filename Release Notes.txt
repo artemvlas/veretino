@@ -2,8 +2,9 @@ Veretino 0.5.2
 * Implemented the ability to detect Moved files.
     Added item Status: "Moved". It will mark renamed or moved files [if enabled in settings].
     An item will be marked with the "Moved" status if its computed checksum matches any Missing item's one.
-* Added the ability to import Branches. If the subfolder contains New Items and also has a separate database file, its data can be imported.
-* Implemented import from digest files (*.sha1/256/512) to DB item ("new file" status only).
+* Implemented the ability to Import checksums from existing Branches (subfolder databases) and Digest files.
+    This can only be done for New Items. Once completed, they are assigned a new status: Imported.
+    Further work with them is no different from parsed ones.
 * DateTime stamp inheritance during Branching has become a bit smarter.
     If the selected subfolder contains only checked and matched items, the Branch will be created with a new timestamp, as a new DB.
 * Improved Presets for filterable file types.

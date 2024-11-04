@@ -237,24 +237,20 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
     }
 
     if (_prevStatus == FileStatus::New) {
-        QString _dig;
-
         if (_job == DM_ImportDigest) {
             const QString __d = extractDigestFromFile(_data->digestFilePath(fileIndex));
             if (tools::canBeChecksum(__d, _data->metaData_.algorithm)) // checking for compliance with the current algo
-                _dig = __d;
+                dataMaintainer->importChecksum(fileIndex, __d);
         }
         else { // calc the new one
-            dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Calculating);
-            _dig = calculateChecksum(_data->itemAbsolutePath(fileIndex),
-                                     _data->metaData_.algorithm);
+            dataMaintainer->setFileStatus(fileIndex, FileStatus::Calculating);
+            const QString _dig = calculateChecksum(_data->itemAbsolutePath(fileIndex),
+                                                   _data->metaData_.algorithm);
 
             if (_dig.isEmpty()) // return previous status
-                dataMaintainer->setItemValue(fileIndex, Column::ColumnStatus, _prevStatus);
-        }
-
-        if (!_dig.isEmpty()) {
-            dataMaintainer->updateChecksum(fileIndex, _dig);
+                dataMaintainer->setFileStatus(fileIndex, _prevStatus);
+            else
+                dataMaintainer->updateChecksum(fileIndex, _dig);
         }
     }
     else if (_prevStatus == FileStatus::Missing) {

@@ -85,6 +85,9 @@ QString IconProvider::svgFilePath(FileStatus status) const
     case FileStatus::Updated:
         iconFileName = QStringLiteral(u"update");
         break;
+    case FileStatus::Imported:
+        iconFileName = QStringLiteral(u"imported");
+        break;
     case FileStatus::Moved:
     case FileStatus::MovedOut:
         iconFileName = QStringLiteral(u"moved");

@@ -219,6 +219,7 @@ QStringList DialogDbStatus::infoChanges()
     const Numbers &_num = data_->numbers_;
     QStringList result;
 
+    /*
     const NumSize _n_moved = _num.values(FileStatus::Moved);
     if (_n_moved)
         result.append(QStringLiteral(u"Moved: ") + format::filesNumSize(_n_moved));
@@ -234,6 +235,25 @@ QStringList DialogDbStatus::infoChanges()
     const int _n_upd = _num.numberOf(FileStatus::Updated);
     if (_n_upd)
         result.append(tools::joinStrings(QStringLiteral(u"Updated:"), _n_upd));
+
+    const int _n_imp = _num.numberOf(FileStatus::Imported);
+    if (_n_imp)
+        result.append(tools::joinStrings(QStringLiteral(u"Imported:"), _n_imp));*/
+
+    static const QList<FileStatus> _statuses { FileStatus::Moved, FileStatus::Added, FileStatus::Removed,
+                                               FileStatus::Updated, FileStatus::Imported };
+
+    static const FileStatuses _flag_numsize = (FileStatus::Added | FileStatus::Moved); // for these the size will be shown
+
+    for (const FileStatus _st : _statuses) {
+        const NumSize _ns = _num.values(_st);
+        if (_ns) {
+            const QString _str = (_st & _flag_numsize) ? format::filesNumSize(_ns)
+                                                       : QString::number(_ns._num);
+
+            result << tools::joinStrings(tools::enumToString(_st), _str, QStringLiteral(u": "));
+        }
+    }
 
     return result;
 }

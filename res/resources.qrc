@@ -74,5 +74,6 @@
         <file>icons/generic/locked.svg</file>
         <file>icons/generic/outdated.svg</file>
         <file>icons/generic/moved.svg</file>
+        <file>icons/generic/imported.svg</file>
     </qresource>
 </RCC>

@@ -43,6 +43,9 @@ public:
     bool updateChecksum(const QModelIndex &fileRowIndex,
                         const QString &computedChecksum);
 
+    bool importChecksum(const QModelIndex &_file,
+                        const QString &_checksum);
+
     int changeFilesStatus(const FileStatuses flags,
                           const FileStatus newStatus,
                           const QModelIndex &rootIndex = QModelIndex());

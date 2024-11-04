@@ -40,24 +40,25 @@ public:
         Added = 1 << 9,         // item (file path and its checksum) has been added to the database
         Removed = 1 << 10,      // item^ removed from the database
         Updated = 1 << 11,      // the checksum has been updated
-        Moved = 1 << 12,        // the newly calculated checksum corresponds to some missing item (renamed or moved file)
-        MovedOut = 1 << 13,     // former Missing when moving
-        UnPermitted = 1 << 14,  // no read permissions
-        ReadError = 1 << 15,    // an error occurred during reading
+        Imported = 1 << 12,     // the checksum was imported from another file
+        Moved = 1 << 13,        // the newly calculated checksum corresponds to some missing item (renamed or moved file)
+        MovedOut = 1 << 14,     // former Missing when moving
+        UnPermitted = 1 << 15,  // no read permissions
+        ReadError = 1 << 16,    // an error occurred during reading
 
-        CombNotChecked = NotChecked | NotCheckedMod,
+        CombNotChecked = NotChecked | NotCheckedMod | Imported,
         CombAvailable = CombNotChecked | Matched | Mismatched | Added | Updated | Moved,
         CombHasChecksum = CombAvailable | Missing,
         CombUpdatable = New | Missing | Mismatched,
-        CombDbChanged = Added | Removed | Updated | Moved,
+        CombDbChanged = Added | Removed | Updated | Imported | Moved,
         CombChecked = Matched | Mismatched,
         CombMatched = Matched | Added | Updated | Moved,
         CombNewLost = New | Missing,
         CombUnreadable = UnPermitted | ReadError,
 
-        Computed = 1 << 16,    // the checksum has been calculated and is ready for further processing (copy or save)
-        ToClipboard = 1 << 17, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile = 1 << 18,   // the calculated checksum is intended to be stored in the summary file
+        Computed = 1 << 17,    // the checksum has been calculated and is ready for further processing (copy or save)
+        ToClipboard = 1 << 18, // the calculated checksum is intended to be copied to the clipboard
+        ToSumFile = 1 << 19,   // the calculated checksum is intended to be stored in the summary file
     }; // enum FileStatus
 
     Q_ENUM(FileStatus)
