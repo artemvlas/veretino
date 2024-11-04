@@ -95,3 +95,8 @@ NumSize Numbers::values(const FileStatuses flag) const
 
     return _res;
 }
+
+const QList<FileStatus> Numbers::statuses() const
+{
+    return _val.keys();
+}

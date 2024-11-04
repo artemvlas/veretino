@@ -26,6 +26,8 @@ public:
     // moves the specified value to a new status
     bool changeStatus(const NumSize &_nums, const FileStatus _before, const FileStatus _after);
 
+    const QList<FileStatus> statuses() const; // returns a list of available statuses
+
 private:
     // { FileStatus : number of corresponding files, total size }
     QHash<FileStatus, NumSize> _val;
