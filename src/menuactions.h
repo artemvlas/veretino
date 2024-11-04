@@ -74,6 +74,7 @@ public:
     QAction *actionCheckCurSubfolderFromModel = new QAction(QStringLiteral(u"Check Folder"), this);
     QAction *actionBranchMake = new QAction(QStringLiteral(u"Branch Folder"), this);
     QAction *actionBranchOpen = new QAction(QStringLiteral(u"Open Branch"), this);
+    QAction *actionBranchImport = new QAction(QStringLiteral(u"Import Branch"), this);
     QAction *actionCheckAll = new QAction(QStringLiteral(u"Check ALL available files"), this);
     QAction *actionCheckAllMod = new QAction(QStringLiteral(u"Check Modified files"), this);
     QAction *actionCopyStoredChecksum = new QAction(QStringLiteral(u"Copy stored Checksum"), this);

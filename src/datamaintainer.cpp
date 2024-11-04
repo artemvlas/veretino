@@ -448,6 +448,41 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
     emit subDbForked(json_->makeJson(data_, rootFolder));
 }
 
+int DataMaintainer::importBranch(const QString &jsonFilePath, const QModelIndex &rootFolder)
+{
+    const QJsonArray _j_array = json_->loadJsonDB(jsonFilePath);
+    const QJsonObject _mainList = (_j_array.size() >= 2) ? _j_array.at(1).toObject() : QJsonObject();
+
+    if (_mainList.isEmpty() || !data_
+        || tools::algoStrLen(data_->metaData_.algorithm) != _mainList.begin().value().toString().length())
+    {
+        return 0;
+    }
+
+    int _num = 0;
+    TreeModelIterator _it(data_->model_, rootFolder);
+
+    while (_it.hasNext()) {
+        _it.nextFile();
+        if (_it.status() == FileStatus::New) {
+            const QString __v = _mainList.value(_it.path(rootFolder)).toString();
+            if (!__v.isEmpty()) {
+                setItemValue(_it.index(), Column::ColumnChecksum, __v);
+                setFileStatus(_it.index(), FileStatus::NotChecked);
+                ++_num;
+            }
+        }
+    }
+
+    if (_num) {
+        setDbFileState(DbFileState::NotSaved);
+        updateDateTime();
+        updateNumbers();
+    }
+
+    return _num;
+}
+
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 {
     if (!data_ || !curIndex.isValid() || (curIndex.model() != data_->model_))

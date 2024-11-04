@@ -21,6 +21,7 @@ public:
     explicit JsonDb(const QString &filePath, QObject *parent = nullptr);
     void setProcState(const ProcState *procState);
 
+    QJsonArray loadJsonDB(const QString &filePath);
     DataContainer* parseJson(const QString &filePath);
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
 
@@ -29,7 +30,6 @@ public:
 private:   
     QJsonDocument readJsonFile(const QString &filePath);
     bool saveJsonFile(const QJsonDocument &document, const QString &filePath);
-    QJsonArray loadJsonDB(const QString &filePath);
     QJsonObject dbHeader(const DataContainer *data, const QModelIndex &rootFolder);
     MetaData getMetaData(const QString &filePath, const QJsonObject &header, const QJsonObject &fileList);
     FileValues makeFileValues(const QString &filePath, const QString &basicDate);

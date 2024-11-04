@@ -278,6 +278,17 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
     }
 }
 
+void Manager::importBranch(const QString &jsonFilePath, const QModelIndex &rootFolder)
+{
+    const int _imported = dataMaintainer->importBranch(jsonFilePath, rootFolder);
+
+    if (_imported && settings_->instantSaving) {
+        dataMaintainer->saveData();
+    }
+
+    emit showMessage(QString::number(_imported) + " checksums imported");
+}
+
 void Manager::branchSubfolder(const QModelIndex &subfolder)
 {
     dataMaintainer->forkJsonDb(subfolder);

@@ -72,6 +72,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
     connect(menuAct_->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
     connect(menuAct_->actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
+    connect(menuAct_->actionBranchImport, &QAction::triggered, this, &ModeSelector::importBranch);
     connect(menuAct_->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
@@ -451,6 +452,21 @@ void ModeSelector::openBranchDb()
 
     if (QFileInfo::exists(assumedPath))
         openJsonDatabase(assumedPath);
+}
+
+void ModeSelector::importBranch()
+{
+    if (!view_->data_)
+        return;
+
+    const QModelIndex _ind = view_->curIndex();
+    const QString _path = view_->data_->getBranchFilePath(_ind, true);
+
+    if (!_path.isEmpty()) {
+        stopProcess();
+        view_->setViewSource();
+        manager_->addTask(&Manager::importBranch, _path, _ind);
+    }
 }
 
 void ModeSelector::processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result)
@@ -859,6 +875,12 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     viewContextMenu->addAction(menuAct_->actionBranchMake);
 
                 viewContextMenu->addAction(menuAct_->actionCheckCurSubfolderFromModel);
+            }
+            else if (TreeModel::contains(FileStatus::New, index)
+                       && !view_->data_->getBranchFilePath(index, true).isEmpty())
+            {
+                viewContextMenu->addAction(menuAct_->actionBranchOpen);
+                viewContextMenu->addAction(menuAct_->actionBranchImport);
             }
         }
 
