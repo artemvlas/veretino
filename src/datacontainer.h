@@ -46,8 +46,8 @@ public:
     QString databaseFileName() const;
     QString backupFilePath() const;
     QString itemAbsolutePath(const QModelIndex &curIndex) const;        // returns the absolute path to the database item (file or subfolder)
-    QString branch_file_existing(const QModelIndex &subfolder);         // returns the path to the found Branch, an empty string if not found; caches the result
-    QString branch_file_composed(const QModelIndex &subfolder) const;   // returns the composed path regardless of the file's existence
+    QString branch_path_existing(const QModelIndex &subfolder);         // returns the path to the found Branch, an empty string if not found; caches the result
+    QString branch_path_composed(const QModelIndex &subfolder) const;   // returns the composed path regardless of the file's existence
     QString digestFilePath(const QModelIndex &fileIndex) const;
     QString basicDate() const;                                          // the date until which files are considered unmodified
 

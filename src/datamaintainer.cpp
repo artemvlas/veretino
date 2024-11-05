@@ -466,7 +466,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     if (!data_)
         return 0;
 
-    const QString _filePath = data_->branch_file_existing(rootFolder);
+    const QString _filePath = data_->branch_path_existing(rootFolder);
     const QJsonArray _j_array = json_->loadJsonDB(_filePath);
     const QJsonObject _mainList = (_j_array.size() >= 2) ? _j_array.at(1).toObject() : QJsonObject();
 

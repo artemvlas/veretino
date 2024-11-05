@@ -448,7 +448,7 @@ void ModeSelector::openBranchDb()
     if (!view_->data_)
         return;
 
-    QString assumedPath = view_->data_->branch_file_existing(view_->curIndex());
+    QString assumedPath = view_->data_->branch_path_existing(view_->curIndex());
 
     if (QFileInfo::exists(assumedPath))
         openJsonDatabase(assumedPath);
@@ -460,7 +460,7 @@ void ModeSelector::importBranch()
         return;
 
     const QModelIndex _ind = view_->curIndex();
-    const QString _path = view_->data_->branch_file_existing(_ind);
+    const QString _path = view_->data_->branch_path_existing(_ind);
 
     if (!_path.isEmpty()) {
         stopProcess();
@@ -874,7 +874,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     viewContextMenu->addAction(menuAct_->actionCopyFolder);
 
                     // contains branch db file
-                    if (!view_->data_->branch_file_existing(index).isEmpty()) {
+                    if (!view_->data_->branch_path_existing(index).isEmpty()) {
                         viewContextMenu->addAction(menuAct_->actionBranchOpen);
                         if (_has_new && !isDbConst())
                             viewContextMenu->addAction(menuAct_->actionBranchImport);

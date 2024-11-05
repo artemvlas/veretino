@@ -161,7 +161,7 @@ QString JsonDb::makeJson(const DataContainer* data, const QModelIndex &rootFolde
         return QString();
     }
 
-    const QString &pathToSave = rootFolder.isValid() ? data->branch_file_composed(rootFolder) // branching
+    const QString &pathToSave = rootFolder.isValid() ? data->branch_path_composed(rootFolder) // branching
                                                      : data->metaData_.dbFilePath; // main database
 
     if (saveJsonFile(doc, pathToSave)) {
