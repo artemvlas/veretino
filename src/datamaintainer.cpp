@@ -461,9 +461,13 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
     emit subDbForked(json_->makeJson(data_, rootFolder));
 }
 
-int DataMaintainer::importBranch(const QString &jsonFilePath, const QModelIndex &rootFolder)
+int DataMaintainer::importBranch(const QModelIndex &rootFolder)
 {
-    const QJsonArray _j_array = json_->loadJsonDB(jsonFilePath);
+    if (!data_)
+        return 0;
+
+    const QString _filePath = data_->branchExistFilePath(rootFolder);
+    const QJsonArray _j_array = json_->loadJsonDB(_filePath);
     const QJsonObject _mainList = (_j_array.size() >= 2) ? _j_array.at(1).toObject() : QJsonObject();
 
     if (_mainList.isEmpty() || !data_

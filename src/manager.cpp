@@ -274,9 +274,9 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
     }
 }
 
-void Manager::importBranch(const QString &jsonFilePath, const QModelIndex &rootFolder)
+void Manager::importBranch(const QModelIndex &rootFolder)
 {
-    const int _imported = dataMaintainer->importBranch(jsonFilePath, rootFolder);
+    const int _imported = dataMaintainer->importBranch(rootFolder);
 
     if (_imported && settings_->instantSaving) {
         dataMaintainer->saveData();

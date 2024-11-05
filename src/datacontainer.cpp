@@ -42,12 +42,29 @@ QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
     return paths::joinPath(metaData_.workDir, TreeModel::getPath(curIndex));
 }
 
+QString DataContainer::branchExistFilePath(const QModelIndex &subfolder)
+{
+    const QString _b_path = branchFilePath(subfolder, true);
+
+    // caching the result
+    if (!_cacheBranches.contains(subfolder))
+        _cacheBranches[subfolder] = _b_path;
+
+    return _b_path;
+}
+
 // existing = false: returns the predefined path to the branch database file, regardless of the file's existence
 // true: returns the path to the existing branch's database file; empty str if missing
-QString DataContainer::getBranchFilePath(const QModelIndex &subfolder, bool existing) const
+QString DataContainer::branchFilePath(const QModelIndex &subfolder, bool existing) const
 {
     if (!TreeModel::isFolderRow(subfolder))
         return QString();
+
+    if (_cacheBranches.contains(subfolder)) {
+        const QString __fp = _cacheBranches.value(subfolder);
+        qDebug() << "DC::branchFilePath >> return cached:" << __fp;
+        return __fp;
+    }
 
     const bool _isLongExt = paths::hasExtension(metaData_.dbFilePath, Lit::sl_db_exts.first());
     QString extension = Lit::sl_db_exts.at(_isLongExt ? 0 : 1);

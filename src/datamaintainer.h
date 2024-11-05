@@ -69,7 +69,7 @@ public:
     bool importJson(const QString &jsonFilePath);
     void exportToJson();
     void forkJsonDb(const QModelIndex &rootFolder);
-    int importBranch(const QString &jsonFilePath, const QModelIndex &rootFolder);
+    int importBranch(const QModelIndex &rootFolder);
 
     bool isDataNotSaved() const;
 
