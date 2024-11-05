@@ -45,12 +45,11 @@ public:
     ProxyModel* setProxyModel();
     QString databaseFileName() const;
     QString backupFilePath() const;
-    QString itemAbsolutePath(const QModelIndex &curIndex) const;     // returns the absolute path to the database item (file or subfolder)
-    QString branchExistFilePath(const QModelIndex &subfolder);       // returns the path to an existing Branch, or an empty string; caches the result
-    QString branchFilePath(const QModelIndex &subfolder,             // returns either an existing or an supposed path
-                           bool existing = false) const;
+    QString itemAbsolutePath(const QModelIndex &curIndex) const;        // returns the absolute path to the database item (file or subfolder)
+    QString branch_file_existing(const QModelIndex &subfolder);         // returns the path to the found Branch, an empty string if not found; caches the result
+    QString branch_file_composed(const QModelIndex &subfolder) const;   // returns the composed path regardless of the file's existence
     QString digestFilePath(const QModelIndex &fileIndex) const;
-    QString basicDate() const;                                       // the date until which files are considered unmodified
+    QString basicDate() const;                                          // the date until which files are considered unmodified
 
     bool isDbFileState(DbFileState state) const;
     bool isWorkDirRelative() const;

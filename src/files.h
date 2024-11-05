@@ -118,8 +118,8 @@ struct FileValues {
         : status(fileStatus), size(fileSize) {}
 
     FileStatus status;
-    qint64 size; // file size in bytes
-    QString checksum; // newly computed or imported from the database
+    qint64 size;        // file size in bytes
+    QString checksum;   // newly computed or imported from the database
     QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues
 
