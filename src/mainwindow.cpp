@@ -205,10 +205,6 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
         DialogDbStatus statusDialog(ui->view->data_, this);
         statusDialog.setCurrentTab(tab);
 
-        /*if (proc_->isStarted()) { // replaced with ::clearDialogs()
-            connect(proc_, &ProcState::progressFinished, &statusDialog, &DialogDbStatus::reject); // TMP
-        }*/
-
         statusDialog.exec();
     }
 }
@@ -519,10 +515,10 @@ void MainWindow::handleChangedModel()
 void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->view->isViewDatabase()) {
-        Numbers &numbers = ui->view->data_->numbers_;
-        if (numbers.contains(FileStatus::CombChecked))
+        const Numbers &_nums = ui->view->data_->numbers_;
+        if (_nums.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
-        else if (numbers.contains(FileStatus::CombDbChanged))
+        else if (_nums.contains(FileStatus::CombDbChanged))
             showDbStatusTab(DialogDbStatus::TabChanges);
         else
             showMessage("There are no checked items yet.", "Unchecked DB");
@@ -573,14 +569,14 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWindow::dropEvent(QDropEvent *event)
 {
-    QString path = event->mimeData()->urls().first().toLocalFile();
+    const QString _path = event->mimeData()->urls().first().toLocalFile();
 
-    if (QFileInfo::exists(path)) {
-        if (paths::isDbFile(path)) {
-            modeSelect->openJsonDatabase(path);
+    if (QFileInfo::exists(_path)) {
+        if (paths::isDbFile(_path)) {
+            modeSelect->openJsonDatabase(_path);
         }
         else {
-            modeSelect->showFileSystem(path);
+            modeSelect->showFileSystem(_path);
         }
     }
 }

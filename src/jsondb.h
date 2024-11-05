@@ -25,6 +25,8 @@ public:
     DataContainer* parseJson(const QString &filePath);
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
 
+    QCryptographicHash::Algorithm getAlgorithm(const QJsonObject &_header_or_main);
+
     bool considerFileModDate = false;
 
 private:   

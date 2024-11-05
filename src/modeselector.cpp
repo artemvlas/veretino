@@ -360,11 +360,11 @@ void ModeSelector::checkFileByClipboardChecksum()
 
 void ModeSelector::copyFsItem()
 {
-    QString itemPath = view_->curAbsPath();
+    const QString _itemPath = view_->curAbsPath();
 
-    if (!itemPath.isEmpty()) {
+    if (!_itemPath.isEmpty()) {
         QMimeData* mimeData = new QMimeData();
-        mimeData->setUrls({ QUrl::fromLocalFile(itemPath) });
+        mimeData->setUrls({ QUrl::fromLocalFile(_itemPath) });
         QGuiApplication::clipboard()->setMimeData(mimeData);
     }
 }

@@ -391,3 +391,16 @@ QString JsonDb::findValueStr(const QJsonObject &object, const QString &approxKey
 
     return QString();
 }
+
+QCryptographicHash::Algorithm JsonDb::getAlgorithm(const QJsonObject &_header_or_main)
+{
+    const QString _first_value = !_header_or_main.isEmpty() ? _header_or_main.begin().value().toString() : QString();
+
+    // main list object
+    if (tools::canBeChecksum(_first_value))
+        return tools::algoByStrLen(_first_value.length());
+
+    // header object
+    const QString strAlgo = findValueStr(_header_or_main, QStringLiteral(u"Algo"));
+    return tools::strToAlgo(strAlgo);
+}
