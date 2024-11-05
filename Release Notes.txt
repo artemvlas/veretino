@@ -9,6 +9,7 @@ Veretino 0.5.2
     If the selected subfolder contains only checked and matched items, the Branch will be created with a new timestamp, as a new DB.
 * Improved Presets for filterable file types.
 * Minor improvements to UI and dialog boxes.
+* Multiple minor optimizations.
 
 ---
 Veretino 0.5.1

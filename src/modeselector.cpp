@@ -779,7 +779,8 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
         return;
 
     const Numbers &_num = view_->data_->numbers_;
-    const QModelIndex index = view_->indexAt(point);
+    const QModelIndex _v_ind = view_->indexAt(point);
+    const QModelIndex index = view_->isViewModel(ModelView::ModelProxy) ? view_->data_->proxyModel_->mapToSource(_v_ind) : _v_ind;
     QMenu *viewContextMenu = menuAct_->disposableMenu();
 
     if (proc_->isStarted()) {
