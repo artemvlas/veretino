@@ -459,6 +459,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
     }
 
     emit subDbForked(json_->makeJson(data_, rootFolder));
+    data_->_cacheBranches.remove(rootFolder);
 }
 
 int DataMaintainer::importBranch(const QModelIndex &rootFolder)

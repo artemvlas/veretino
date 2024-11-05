@@ -79,8 +79,6 @@ public:
     Numbers numbers_;
 
     QHash<QString, QModelIndex> _cacheMissing;
-
-private:
     QHash<QModelIndex, QString> _cacheBranches;
 }; // class DataContainer
 

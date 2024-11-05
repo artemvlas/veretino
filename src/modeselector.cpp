@@ -509,8 +509,9 @@ void ModeSelector::verifyItems(const QModelIndex &_root, FileStatus _status)
 
 void ModeSelector::branchSubfolder()
 {
-    if (view_->curIndex().isValid()) {
-        manager_->addTask(&Manager::branchSubfolder, view_->curIndex());
+    const QModelIndex _ind = view_->curIndex();
+    if (_ind.isValid()) {
+        manager_->addTask(&Manager::branchSubfolder, _ind);
     }
 }
 
