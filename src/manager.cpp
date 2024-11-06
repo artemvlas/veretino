@@ -95,10 +95,12 @@ void Manager::processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
-    QString sum = calculateChecksum(filePath, algo);
+    const QString _dig = hashFile(filePath, algo);
 
-    if (sum.isEmpty())
+    if (_dig.isEmpty()) {
+        calcFailedMessage(filePath);
         return;
+    }
 
     FileStatus purpose;
 
@@ -115,7 +117,7 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     }
 
     FileValues fileVal(purpose, QFileInfo(filePath).size());
-    fileVal.checksum = sum.toLower();
+    fileVal.checksum = _dig.toLower();
 
     emit fileProcessed(filePath, fileVal);
 }
@@ -437,42 +439,42 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    const QString _digest = calculateChecksum(filePath, algo, true);
+    const QString _digest = hashFile(filePath, algo, true);
 
     if (!_digest.isEmpty()) {
         showFileCheckResultMessage(filePath, checkSum, _digest);
+    } else {
+        calcFailedMessage(filePath);
     }
 }
 
-QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, const bool _isVerif)
+void Manager::calcFailedMessage(const QString &filePath)
 {
-    procState->setTotalSize(QFileInfo(filePath).size());
-    updateProgText(_isVerif, filePath);
-
-    const QString _digest = shaCalc.calculate(filePath, algo);
-
-    if (_digest.isEmpty() && !procState->isCanceled()) {
+    if (!procState->isCanceled()) {
         QString __s = tools::enumToString(tools::failedCalcStatus(filePath)) + ":\n";
 
         emit showMessage(__s += filePath, "Warning");
         emit setStatusbarText("failed to read file");
     }
+}
 
-    return _digest;
+QString Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const bool _isVerif)
+{
+    if (!procState->hasTotalSize())
+        procState->setTotalSize(QFileInfo(filePath).size());
+
+    updateProgText(_isVerif, filePath);
+
+    return shaCalc.calculate(filePath, algo);
 }
 
 QString Manager::hashItem(const QModelIndex &_ind, const bool _isVerif)
 {
-    if (!procState->hasTotalSize())
-        procState->setTotalSize(TreeModel::itemFileSize(_ind));
-
-    const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
-    updateProgText(_isVerif, _filePath);
-
     dataMaintainer->setFileStatus(_ind,
                                   _isVerif ? FileStatus::Verifying : FileStatus::Calculating);
 
-    const QString _digest = shaCalc.calculate(_filePath, dataMaintainer->data_->metaData_.algorithm);
+    const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
+    const QString _digest = hashFile(_filePath, dataMaintainer->data_->metaData_.algorithm, _isVerif);
 
     if (_digest.isEmpty() && !procState->isCanceled()) {
         dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, _isVerif));

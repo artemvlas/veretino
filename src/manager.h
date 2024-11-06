@@ -105,9 +105,11 @@ private:
                                     const QString &checksumEstimated,
                                     const QString &checksumCalculated);
 
-    QString calculateChecksum(const QString &filePath,
-                              QCryptographicHash::Algorithm algo,
-                              const bool _isVerif = false);
+    void calcFailedMessage(const QString &filePath);
+
+    QString hashFile(const QString &filePath,
+                     QCryptographicHash::Algorithm algo,
+                     const bool _isVerif = false);
 
     QString hashItem(const QModelIndex &_ind, const bool _isVerif = false);
 
