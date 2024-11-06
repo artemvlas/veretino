@@ -118,7 +118,7 @@ private:
                            const FileStatus _status,
                            const QModelIndex &_root = QModelIndex());
 
-    void updateProgText(const bool _isVerif = false);
+    void updateProgText(const bool _isVerif, const QString &_file = QString());
 
     QString extractDigestFromFile(const QString &_digest_file);
 

@@ -40,6 +40,11 @@ bool ProcState::isCanceled() const
     return (state_ & Canceled);
 }
 
+bool ProcState::hasTotalSize() const
+{
+    return _p_size.hasSet();
+}
+
 void ProcState::setTotal(const NumSize &_nums)
 {
     _p_size.setTotal(_nums._size);

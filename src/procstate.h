@@ -38,6 +38,7 @@ public:
     bool isState(State state) const;
     bool isStarted() const;
     bool isCanceled() const;
+    bool hasTotalSize() const;
 
     qint64 doneSize() const; // returns the total size of the processed data
     qint64 donePieceSize() const; // returns the size of the data processed since the previous function call

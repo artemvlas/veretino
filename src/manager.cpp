@@ -243,9 +243,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
                 dataMaintainer->importChecksum(fileIndex, __d);
         }
         else { // calc the new one
-            dataMaintainer->setFileStatus(fileIndex, FileStatus::Calculating);
-            const QString _dig = calculateChecksum(_data->itemAbsolutePath(fileIndex),
-                                                   _data->metaData_.algorithm);
+            const QString _dig = hashItem(fileIndex);
 
             if (_dig.isEmpty()) // return previous status
                 dataMaintainer->setFileStatus(fileIndex, _prevStatus);
@@ -321,17 +319,15 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    dataMaintainer->setItemValue(fileItemIndex, Column::ColumnStatus, FileStatus::Verifying);
-    const QString filePath = dataMaintainer->data_->itemAbsolutePath(fileItemIndex);
-    const QString sum = calculateChecksum(filePath, dataMaintainer->data_->metaData_.algorithm, true);
+    const QString _sum = hashItem(fileItemIndex, true);
 
-    if (sum.isEmpty()) { // return previous status
-        dataMaintainer->setItemValue(fileItemIndex, Column::ColumnStatus, storedStatus);
-    }
-    else {
-        showFileCheckResultMessage(filePath, storedSum, sum);
-        dataMaintainer->updateChecksum(fileItemIndex, sum);
+    if (!_sum.isEmpty()) {
+        showFileCheckResultMessage(dataMaintainer->data_->itemAbsolutePath(fileItemIndex), storedSum, _sum);
+        dataMaintainer->updateChecksum(fileItemIndex, _sum);
         dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
+    } else if (procState->isCanceled()) {
+        // return previous status
+        dataMaintainer->setFileStatus(fileItemIndex, storedStatus);
     }
 }
 
@@ -451,11 +447,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
 QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::Algorithm algo, const bool _isVerif)
 {
     procState->setTotalSize(QFileInfo(filePath).size());
-
-    const QString _calcPurp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
-    emit setStatusbarText(QString("%1 %2: %3").arg(_calcPurp,
-                                                   format::algoToStr(algo),
-                                                   format::fileNameAndSize(filePath)));
+    updateProgText(_isVerif, filePath);
 
     const QString _digest = shaCalc.calculate(filePath, algo);
 
@@ -471,24 +463,37 @@ QString Manager::calculateChecksum(const QString &filePath, QCryptographicHash::
 
 QString Manager::hashItem(const QModelIndex &_ind, const bool _isVerif)
 {
+    if (!procState->hasTotalSize())
+        procState->setTotalSize(TreeModel::itemFileSize(_ind));
+
+    const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
+    updateProgText(_isVerif, _filePath);
+
     dataMaintainer->setFileStatus(_ind,
                                   _isVerif ? FileStatus::Verifying : FileStatus::Calculating);
 
-    const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
-    const QString _checksum = shaCalc.calculate(_filePath, dataMaintainer->data_->metaData_.algorithm);
+    const QString _digest = shaCalc.calculate(_filePath, dataMaintainer->data_->metaData_.algorithm);
 
-    if (_checksum.isEmpty() && !procState->isCanceled()) {
+    if (_digest.isEmpty() && !procState->isCanceled()) {
         dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, _isVerif));
     }
 
-    return _checksum;
+    return _digest;
 }
 
-void Manager::updateProgText(const bool _isVerif)
+void Manager::updateProgText(const bool _isVerif, const QString &_file)
 {
     const QString _purp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     const Chunks<qint64> _p_size = procState->pSize();
     const Chunks<int> _p_queue = procState->pQueue();
+
+    // single file
+    if (!_p_queue.hasSet()) {
+        emit setStatusbarText(QString("%1: %2 (%3)").arg(_purp,
+                                                         paths::basicName(_file),
+                                                         format::dataSizeReadable(_p_size._total)));
+        return;
+    }
 
     // to avoid calling the dataSizeReadable() func for each file
     static qint64 _lastTotalSize;
@@ -555,7 +560,6 @@ int Manager::calculateChecksums(const DbMod _purpose, const FileStatus _status, 
         if (iter.nextFile().status() != FileStatus::Queued)
             continue;
 
-        updateProgText(_isVerif); // update statusbar text
         const QString _checksum = hashItem(iter.index(), _isVerif); // hashing
 
         if (procState->isCanceled())
