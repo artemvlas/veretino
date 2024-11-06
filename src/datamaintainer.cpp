@@ -458,10 +458,11 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
     }
 
-    emit subDbForked(json_->makeJson(data_, rootFolder));
+    const QString _path = json_->makeJson(data_, rootFolder);
+    emit subDbForked(_path);
 
-    // clear empty value
-    data_->_cacheBranches.remove(rootFolder);
+    // update cached value
+    data_->_cacheBranches[rootFolder] = _path;
 }
 
 int DataMaintainer::importBranch(const QModelIndex &rootFolder)
@@ -476,7 +477,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     if (!tools::canBeChecksum(JsonDb::firstValueString(_mainList),
                               data_->metaData_.algorithm))
     {
-        return 0;
+        return _mainList.isEmpty() ? 0 : -1;
     }
 
     int _num = 0;

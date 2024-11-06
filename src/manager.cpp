@@ -278,11 +278,16 @@ void Manager::importBranch(const QModelIndex &rootFolder)
 {
     const int _imported = dataMaintainer->importBranch(rootFolder);
 
-    if (_imported && settings_->instantSaving) {
+    if (_imported > 0 && settings_->instantSaving) {
         dataMaintainer->saveData();
     }
 
-    emit showMessage(QString::number(_imported) + " checksums imported");
+    if (_imported == -1) {
+        emit showMessage("Only checksums of the same Algorithm can be imported.",
+                         "Inappropriate Algorithm"); // title
+    } else {
+        emit showMessage(QString::number(_imported) + " checksums imported");
+    }
 }
 
 void Manager::branchSubfolder(const QModelIndex &subfolder)
