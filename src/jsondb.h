@@ -26,6 +26,7 @@ public:
     QString makeJson(const DataContainer *data, const QModelIndex &rootFolder = QModelIndex());
 
     QCryptographicHash::Algorithm getAlgorithm(const QJsonObject &_header_or_main);
+    static QString firstValueString(const QJsonObject &_obj);
 
     bool considerFileModDate = false;
 

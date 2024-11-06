@@ -402,5 +402,14 @@ QCryptographicHash::Algorithm JsonDb::getAlgorithm(const QJsonObject &_header_or
 
     // header object
     const QString strAlgo = findValueStr(_header_or_main, QStringLiteral(u"Algo"));
+
+    if (strAlgo.isEmpty())
+        qDebug() << "JsonDb::getAlgorithm >> Not found!";
+
     return tools::strToAlgo(strAlgo);
+}
+
+QString JsonDb::firstValueString(const QJsonObject &_obj)
+{
+    return !_obj.isEmpty() ? _obj.begin().value().toString() : QString();
 }

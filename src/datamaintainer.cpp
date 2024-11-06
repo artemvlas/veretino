@@ -459,6 +459,8 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
     }
 
     emit subDbForked(json_->makeJson(data_, rootFolder));
+
+    // clear empty value
     data_->_cacheBranches.remove(rootFolder);
 }
 
@@ -471,8 +473,8 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     const QJsonArray _j_array = json_->loadJsonDB(_filePath);
     const QJsonObject _mainList = (_j_array.size() >= 2) ? _j_array.at(1).toObject() : QJsonObject();
 
-    if (_mainList.isEmpty() || !data_
-        || tools::algoStrLen(data_->metaData_.algorithm) != _mainList.begin().value().toString().length())
+    if (!tools::canBeChecksum(JsonDb::firstValueString(_mainList),
+                              data_->metaData_.algorithm))
     {
         return 0;
     }
