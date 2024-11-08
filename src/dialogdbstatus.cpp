@@ -231,7 +231,7 @@ QStringList DialogDbStatus::infoChanges()
             const QString _str = (_st & _flag_numsize) ? format::filesNumSize(_ns)
                                                        : QString::number(_ns._num);
 
-            result << tools::joinStrings(tools::enumToString(_st), _str, QStringLiteral(u": "));
+            result << tools::joinStrings(tools::enumToString(_st), _str, Lit::s_sepColonSpace);
         }
     }
 

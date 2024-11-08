@@ -167,7 +167,7 @@ QString Files::getFolderSize(const QString &path)
         const QString _folderName = paths::basicName(path);
         const QString _folderSize = format::filesNumSize(__n);
 
-        return tools::joinStrings(_folderName, _folderSize, QStringLiteral(u": "));
+        return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
     }
     else {
         qDebug() << "Files::getFolderSize | Canceled" << path;

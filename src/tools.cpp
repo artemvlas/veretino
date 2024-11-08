@@ -33,6 +33,7 @@ const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
 const QString Lit::s_app_name = QStringLiteral(u"veretino");
 const QString Lit::s_sepStick = QStringLiteral(u" | ");
 const QString Lit::s_sepCommaSpace = QStringLiteral(u", ");
+const QString Lit::s_sepColonSpace = QStringLiteral(u": ");
 const QString Lit::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
 const QString Lit::s_db_prefix = QStringLiteral(u"checksums");
 
@@ -543,6 +544,11 @@ QString fileNameAndSize(const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
     return addStrInParentheses(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
+}
+
+QString fileNameAndSize(const QString &_file, const qint64 _size)
+{
+    return addStrInParentheses(paths::basicName(_file), dataSizeReadable(_size));
 }
 
 QString fileItemStatus(FileStatus status)

@@ -496,9 +496,11 @@ void Manager::updateProgText(const CalcKind _calckind, const QString &_file)
 
     // single file
     if (!_p_queue.hasSet()) {
-        emit setStatusbarText(QString("%1: %2 (%3)").arg(_purp,
-                                                         paths::basicName(_file),
-                                                         format::dataSizeReadable(_p_size._total)));
+        // _purp: file (size)
+        const QString __s = tools::joinStrings(_purp,
+                                               format::fileNameAndSize(_file, _p_size._total),
+                                               Lit::s_sepColonSpace);
+        emit setStatusbarText(__s);
         return;
     }
 

@@ -24,6 +24,7 @@ static const QString s_appNameVersion;
 static const QString s_app_name;
 static const QString s_sepStick;
 static const QString s_sepCommaSpace;
+static const QString s_sepColonSpace;
 static const QString s_dt_format;
 static const QString s_db_prefix;
 }; // struct Lit
@@ -92,6 +93,7 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true
 QString algoToStr(int sumStrLength, bool capitalLetters = true);
 
 QString fileNameAndSize(const QString &filePath); // returns "filename (readable size)" for file
+QString fileNameAndSize(const QString &_file, const qint64 _size);
 QString filesNumber(int number);
 QString filesNumSize(int number, qint64 filesSize); // returns "number file's' (readable size)"
 QString filesNumSize(const Numbers &num, FileStatus status);
