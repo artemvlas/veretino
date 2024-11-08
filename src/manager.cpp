@@ -326,7 +326,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    const QString _sum = hashItem(fileItemIndex, true);
+    const QString _sum = hashItem(fileItemIndex, Verification);
 
     if (!_sum.isEmpty()) {
         showFileCheckResultMessage(dataMaintainer->data_->itemAbsolutePath(fileItemIndex), storedSum, _sum);
@@ -444,7 +444,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    const QString _digest = hashFile(filePath, algo, true);
+    const QString _digest = hashFile(filePath, algo, Verification);
 
     if (!_digest.isEmpty()) {
         showFileCheckResultMessage(filePath, checkSum, _digest);
@@ -463,34 +463,34 @@ void Manager::calcFailedMessage(const QString &filePath)
     }
 }
 
-QString Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const bool _isVerif)
+QString Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const CalcKind _calckind)
 {
     if (!procState->hasTotalSize())
         procState->setTotalSize(QFileInfo(filePath).size());
 
-    updateProgText(_isVerif, filePath);
+    updateProgText(_calckind, filePath);
 
     return shaCalc.calculate(filePath, algo);
 }
 
-QString Manager::hashItem(const QModelIndex &_ind, const bool _isVerif)
+QString Manager::hashItem(const QModelIndex &_ind, const CalcKind _calckind)
 {
     dataMaintainer->setFileStatus(_ind,
-                                  _isVerif ? FileStatus::Verifying : FileStatus::Calculating);
+                                  _calckind ? FileStatus::Verifying : FileStatus::Calculating);
 
     const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
-    const QString _digest = hashFile(_filePath, dataMaintainer->data_->metaData_.algorithm, _isVerif);
+    const QString _digest = hashFile(_filePath, dataMaintainer->data_->metaData_.algorithm, _calckind);
 
     if (_digest.isEmpty() && !procState->isCanceled()) {
-        dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, _isVerif));
+        dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, _calckind));
     }
 
     return _digest;
 }
 
-void Manager::updateProgText(const bool _isVerif, const QString &_file)
+void Manager::updateProgText(const CalcKind _calckind, const QString &_file)
 {
-    const QString _purp = _isVerif ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
+    const QString _purp = _calckind ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     const Chunks<qint64> _p_size = procState->pSize();
     const Chunks<int> _p_queue = procState->pQueue();
 
@@ -558,7 +558,7 @@ int Manager::calculateChecksums(const DbMod _purpose, const FileStatus _status, 
     bool isMismatchFound = false;
 
     // checking whether this is a Calculation or Verification process
-    const bool _isVerif = (_status & FileStatus::CombAvailable);
+    const CalcKind _calckind = (_status & FileStatus::CombAvailable) ? Verification : Calculation;
 
     // process
     TreeModelIterator iter(_data->model_, _root);
@@ -567,7 +567,7 @@ int Manager::calculateChecksums(const DbMod _purpose, const FileStatus _status, 
         if (iter.nextFile().status() != FileStatus::Queued)
             continue;
 
-        const QString _checksum = hashItem(iter.index(), _isVerif); // hashing
+        const QString _checksum = hashItem(iter.index(), _calckind); // hashing
 
         if (procState->isCanceled())
             break;

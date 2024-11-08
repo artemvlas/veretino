@@ -69,19 +69,27 @@ public slots:
     void updateItemFile(const QModelIndex &fileIndex, DbMod _job);
     void importBranch(const QModelIndex &rootFolder);
 
-    void processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result);
-    void checkSummaryFile(const QString &path); // path to *.sha1/256/512 summary file
-    void checkFile(const QString &filePath, const QString &checkSum);
-    void checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo);
+    void processFileSha(const QString &filePath,
+                        QCryptographicHash::Algorithm algo,
+                        DestFileProc result);
+
+    void checkSummaryFile(const QString &path);                        // path to *.sha1/256/512 summary file
+
+    void checkFile(const QString &filePath,
+                   const QString &checkSum);
+
+    void checkFile(const QString &filePath,
+                   const QString &checkSum,
+                   QCryptographicHash::Algorithm algo);
 
     void createDataModel(const QString &dbFilePath);
     void restoreDatabase();
     void saveData();
     void prepareSwitchToFs();
 
-    void getPathInfo(const QString &path); // info about file (size) or folder contents
-    void getIndexInfo(const QModelIndex &curIndex); // info about database item (the file or subfolder index)
-    void modelChanged(ModelView modelView); // recive the signal when Model has been changed
+    void getPathInfo(const QString &path);                             // info about file (size) or folder contents
+    void getIndexInfo(const QModelIndex &curIndex);                    // info about database item (the file or subfolder index)
+    void modelChanged(ModelView modelView);                            // recive the signal when Model has been changed
     void makeDbContentsList();
 
     // checking the list of files against the checksums stored in the database
@@ -98,6 +106,8 @@ public slots:
     void runTasks();
 
 private:
+    enum CalcKind : quint8 { Calculation, Verification };
+
     void queueTask(Task task);
     void sendDbUpdated();
 
@@ -109,9 +119,10 @@ private:
 
     QString hashFile(const QString &filePath,
                      QCryptographicHash::Algorithm algo,
-                     const bool _isVerif = false);
+                     const CalcKind _calckind = Calculation);
 
-    QString hashItem(const QModelIndex &_ind, const bool _isVerif = false);
+    QString hashItem(const QModelIndex &_ind,
+                     const CalcKind _calckind = Calculation);
 
     int calculateChecksums(const FileStatus _status,
                            const QModelIndex &_root = QModelIndex());
@@ -120,8 +131,7 @@ private:
                            const FileStatus _status,
                            const QModelIndex &_root = QModelIndex());
 
-    void updateProgText(const bool _isVerif, const QString &_file = QString());
-
+    void updateProgText(const CalcKind _calckind, const QString &_file);
     QString extractDigestFromFile(const QString &_digest_file);
 
     // variables
@@ -131,7 +141,7 @@ private:
     ShaCalculator shaCalc;
     QList<Task> taskQueue_;
 
-    const QString movedDbWarning = "The database file may have been moved or refers to an inaccessible location.";
+    const QString movedDbWarning = QStringLiteral(u"The database file may have been moved or refers to an inaccessible location.");
 
 signals:
     void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
@@ -141,7 +151,7 @@ signals:
     void dbContentsListCreated(const QString &folderPath, const FileTypeList &extList);
     void folderChecked(const Numbers &result, const QString &subFolder = QString());
     void fileProcessed(const QString &fileName, const FileValues &result);
-    void showMessage(const QString &text, const QString &title = "Info");
+    void showMessage(const QString &text, const QString &title = QStringLiteral(u"Info"));
     void switchToFsPrepared();
     void mismatchFound();
     void taskAdded();
