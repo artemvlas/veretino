@@ -498,8 +498,8 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
 
     if (_num) {
         setDbFileState(DbFileState::NotSaved);
-        updateDateTime();
         updateNumbers();
+        updateDateTime();
     }
 
     return _num;
