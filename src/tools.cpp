@@ -62,7 +62,7 @@ QCryptographicHash::Algorithm algoByStrLen(int strLen)
         case 128:
             return QCryptographicHash::Sha512;
         default:
-            return QCryptographicHash::Sha256;
+            return static_cast<QCryptographicHash::Algorithm>(0);
     }
 }
 
@@ -78,10 +78,12 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
     switch (digitsToNum(digits)) {
         case 1:
             return QCryptographicHash::Sha1;
+        case 256:
+            return QCryptographicHash::Sha256;
         case 512:
             return QCryptographicHash::Sha512;
         default:
-            return QCryptographicHash::Sha256;
+            return static_cast<QCryptographicHash::Algorithm>(0);
     }
 }
 

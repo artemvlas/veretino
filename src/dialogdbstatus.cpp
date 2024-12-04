@@ -58,16 +58,16 @@ void DialogDbStatus::setLabelsInfo()
         ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
-    const QString (&dt)[3] = data_->metaData_.datetime;
+    //const QString (&dt)[3] = data_->metaData_.datetime;
 
-    if (dt[DTstr::DateUpdated].isEmpty())
-        ui->labelDateTime_Update->setText(dt[DTstr::DateCreated]);
+    if (data_->metaData_.datetime.m_updated.isEmpty())
+        ui->labelDateTime_Update->setText(data_->metaData_.datetime.m_created);
     else {
-        ui->labelDateTime_Update->setText(dt[DTstr::DateUpdated]);
-        ui->labelDateTime_Update->setToolTip(dt[DTstr::DateCreated]);
+        ui->labelDateTime_Update->setText(data_->metaData_.datetime.m_updated);
+        ui->labelDateTime_Update->setToolTip(data_->metaData_.datetime.m_created);
     }
 
-    ui->labelDateTime_Check->setText(dt[DTstr::DateVerified]);
+    ui->labelDateTime_Check->setText(data_->metaData_.datetime.m_verified);
 }
 
 void DialogDbStatus::setTabsInfo()

@@ -8,7 +8,7 @@
 
 #include <QObject>
 #include "datacontainer.h"
-#include "jsondb.h"
+#include "verjson.h"
 #include "procstate.h"
 
 class DataMaintainer : public QObject
@@ -66,7 +66,7 @@ public:
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
     bool tryMoved(const QModelIndex &_file, const QString &_checksum);
 
-    bool importJson(const QString &jsonFilePath);
+    bool importJson(const QString &filePath);
     void exportToJson();
     void forkJsonDb(const QModelIndex &rootFolder);
     int importBranch(const QModelIndex &rootFolder);
@@ -78,7 +78,7 @@ public:
 
     // variables
     DataContainer *data_ = nullptr; // main data
-    JsonDb *json_ = new JsonDb(this);
+    //JsonDb *json_ = new JsonDb(this);
 
 public slots:
     void clearData();
@@ -88,9 +88,16 @@ public slots:
 private:
     void connections();
     bool isCanceled() const;
+    MetaData getMetaData(const VerJson &_json) const;
+    FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
+    QString makeJson(const QModelIndex &rootFolder = QModelIndex());
+    QString findWorkDir(const VerJson &_json) const;
+    bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList) const;
 
     DataContainer *oldData_ = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
     const ProcState *proc_ = nullptr;
+
+    bool considerFileModDate;
 
 signals:
     void databaseUpdated();

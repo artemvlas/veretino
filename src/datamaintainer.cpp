@@ -25,18 +25,13 @@ DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
 
 void DataMaintainer::connections()
 {
-    // JsonDb
-    connect(json_, &JsonDb::setStatusbarText, this, &DataMaintainer::setStatusbarText);
-    connect(json_, &JsonDb::showMessage, this, &DataMaintainer::showMessage);
-
     connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
-                                                                  data_->metaData_.datetime[DTstr::DateVerified].clear(); });
+                                                                  data_->metaData_.datetime.m_verified.clear(); });
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
 {
     proc_ = procState;
-    json_->setProcState(procState);
 }
 
 void DataMaintainer::setSourceData()
@@ -90,18 +85,20 @@ void DataMaintainer::setFileStatus(const QModelIndex &_index, FileStatus _status
 
 void DataMaintainer::setConsiderDateModified(bool consider)
 {
-    json_->considerFileModDate = consider;
+    considerFileModDate = consider;
 }
 
 void DataMaintainer::updateDateTime()
 {
     if (data_) {
         if (data_->isDbFileState(DbFileState::NoFile)) {
-            data_->metaData_.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
+            //data_->metaData_.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
+            data_->metaData_.datetime.set(VerDateTime::Created, QStringLiteral(u"Created: ") + format::currentDateTime());
         }
         else if (data_->contains(FileStatus::CombDbChanged)) {
-            data_->metaData_.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
-            data_->metaData_.datetime[DTstr::DateVerified].clear();
+            //data_->metaData_.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
+            //data_->metaData_.datetime[DTstr::DateVerified].clear();
+            data_->metaData_.datetime.set(VerDateTime::Updated, QStringLiteral(u"Updated: ") + format::currentDateTime());
         }
     }
 }
@@ -109,7 +106,7 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateVerifDateTime()
 {
     if (data_ && data_->isAllMatched()) {
-        data_->metaData_.datetime[DTstr::DateVerified] = QStringLiteral(u"Verified: ") + format::currentDateTime();
+        data_->metaData_.datetime.set(VerDateTime::Verified, QStringLiteral(u"Verified: ") + format::currentDateTime());
         setDbFileState(DbFileState::NotSaved);
     }
 }
@@ -417,13 +414,276 @@ void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatu
     }
 }
 
-bool DataMaintainer::importJson(const QString &jsonFilePath)
+// checks if there is at least one file from the list (keys) in the folder (workDir)
+bool DataMaintainer::isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList) const
 {
-    const bool _success = setSourceData(json_->parseJson(jsonFilePath));
+    if (!QFileInfo::exists(workDir))
+        return false;
+
+    QJsonObject::const_iterator i;
+
+    for (i = fileList.constBegin(); i != fileList.constEnd(); ++i) { // !isCanceled() &&
+        if (QFileInfo::exists(paths::joinPath(workDir, i.key()))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// whether the current folder is the working one
+QString DataMaintainer::findWorkDir(const VerJson &_json) const
+{
+    const QString strWorkDir = _json.getInfo(VerJson::h_key_WorkDir);
+
+    // [checking for files in the intended WorkDir]
+    const bool isSpecWorkDir = strWorkDir.contains('/')
+                               && (isPresentInWorkDir(strWorkDir, _json.data())
+                                   || !isPresentInWorkDir(paths::parentFolder(_json.file_path()), _json.data()));
+
+    return isSpecWorkDir ? strWorkDir : paths::parentFolder(_json.file_path());
+}
+
+MetaData DataMaintainer::getMetaData(const VerJson &_json) const
+{
+    MetaData _meta;
+    _meta.dbFilePath = _json.file_path();
+    _meta.workDir = findWorkDir(_json);
+    _meta.dbFileState = MetaData::Saved;
+
+    // [filter rule]
+    FilterMode _filter_mode = FilterMode::NotSet;
+    QString _filter_str = _json.getInfo(VerJson::h_key_Ignored);
+
+    if (!_filter_str.isEmpty()) {
+        _filter_mode = FilterMode::Ignore;
+    } else {
+        _filter_str = _json.getInfo(VerJson::h_key_Included);
+        if (!_filter_str.isEmpty())
+            _filter_mode = FilterMode::Include;
+    }
+
+    if (_filter_mode)
+        _meta.filter.setFilter(_filter_mode, _filter_str);
+
+    // [algorithm]
+    _meta.algorithm = _json.algorithm();
+
+    // [datetime] version 0.4.0+
+    QString _strDateTime = _json.getInfo(QStringLiteral(u"time"));
+
+    // compatibility with previous versions
+    if (_strDateTime.isEmpty()) {
+        const QString _old_upd = _json.getInfo(VerJson::h_key_Updated);
+        if (!_old_upd.isEmpty()) {
+            _strDateTime = tools::joinStrings(VerJson::h_key_Updated, _old_upd, Lit::s_sepColonSpace);
+
+            const QString _old_verif = _json.getInfo(VerJson::h_key_Verified);
+            if (!_old_verif.isEmpty()) {
+                _strDateTime += Lit::s_sepCommaSpace;
+                _strDateTime += tools::joinStrings(VerJson::h_key_Verified, _old_verif, Lit::s_sepColonSpace);
+            }
+        }
+    }
+
+    _meta.datetime.set(_strDateTime);
+
+    // [flags]
+    const QString _strFlags = _json.getInfo(VerJson::h_key_Flags);
+    if (_strFlags.contains(QStringLiteral(u"const")))
+        _meta.flags |= MetaData::FlagConst;
+
+    return _meta;
+}
+
+FileValues DataMaintainer::makeFileValues(const QString &filePath, const QString &basicDate) const
+{
+    if (QFileInfo::exists(filePath)) {
+        QFileInfo _fi(filePath);
+        FileStatus _status = (!basicDate.isEmpty()
+                              && tools::isLater(basicDate, _fi.lastModified()))
+                                 ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
+
+        return FileValues(_status, _fi.size());
+    }
+
+    return FileValues(FileStatus::Missing);
+}
+
+bool DataMaintainer::importJson(const QString &filePath)
+{
+    VerJson _json(filePath);
+
+    if (!_json.load()) {
+        emit setStatusbarText("An error occurred while opening the database.");
+        return false;
+    }
+
+    if (!_json) {
+        emit showMessage(paths::basicName(filePath) + "\n\n"
+                                                      "The database doesn't contain checksums.\n"
+                                                      "Probably all files have been ignored.", "Empty Database!");
+        emit setStatusbarText();
+        return false;
+    }
+
+    emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
+
+    DataContainer *parsedData = new DataContainer(getMetaData(_json));
+    const QString &workDir = parsedData->metaData_.workDir;
+
+    // populating the main data
+    emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
+    const QString _basicDT = considerFileModDate ? parsedData->basicDate() : QString();
+    const QJsonObject &filelistData = _json.data(); // { file_path : checksum }
+
+    for (QJsonObject::const_iterator it = filelistData.constBegin();
+         !isCanceled() && it != filelistData.constEnd(); ++it)
+    {
+        const QString _fullPath = paths::joinPath(workDir, it.key());
+        FileValues _values = makeFileValues(_fullPath, _basicDT);
+        _values.checksum = it.value().toString();
+
+        parsedData->model_->add_file(it.key(), _values);
+    }
+
+    // additional data
+    QSet<QString> _unrCache; // the cache is used when searching for new files.
+
+    if (!_json.unreadableFiles().isEmpty()) {
+        const QJsonArray &unreadableFiles = _json.unreadableFiles();
+
+        for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
+            const QString _relPath = unreadableFiles.at(var).toString();
+            const QString _fullPath = paths::joinPath(workDir, _relPath);
+            const FileStatus _status = tools::failedCalcStatus(_fullPath);
+
+            if (_status & FileStatus::CombUnreadable) {
+                parsedData->model_->add_file(_relPath, FileValues(_status));
+                _unrCache << _relPath;
+            }
+        }
+    }
+
+    // adding new files
+    emit setStatusbarText(QStringLiteral(u"Looking for new files..."));
+    QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
+
+    while (it.hasNext() && !isCanceled()) {
+        const QString _fullPath = it.next();
+        const QString _relPath = paths::relativePath(workDir, _fullPath);
+
+        if (parsedData->metaData_.filter.isFileAllowed(_relPath)
+            && !filelistData.contains(_relPath)
+            && !_unrCache.contains(_relPath)
+            && it.fileInfo().isReadable())
+        {
+            parsedData->model_->add_file(_relPath,
+                                         FileValues(FileStatus::New, it.fileInfo().size()));
+        }
+    }
+
+    // end
+    emit setStatusbarText();
+
+    if (isCanceled()) {
+        qDebug() << "parseJson | Canceled:" << paths::basicName(filePath);
+        delete parsedData;
+        return false;
+    }
+
+    parsedData->model_->clearCacheFolderItems();
+
+    const bool _success = setSourceData(parsedData);
     if (!_success)
         emit failedDataCreation();
 
     return _success;
+}
+
+// returns the path to the file if the write was successful, otherwise an empty string
+QString DataMaintainer::makeJson(const QModelIndex &rootFolder)
+{
+    if (!data_ || data_->model_->isEmpty()) {
+        qDebug() << "makeJson | no data!";
+        return QString();
+    }
+
+    // [Header]
+    const bool isBranching = TreeModel::isFolderRow(rootFolder);
+    const Numbers &_num = isBranching ? data_->getNumbers(rootFolder) : data_->numbers_;
+    const MetaData &_meta = data_->metaData_;
+
+    const QString &pathToSave = isBranching ? data_->branch_path_composed(rootFolder) // branching
+                                            : data_->metaData_.dbFilePath; // main database
+
+    VerJson _json(pathToSave);
+    _json.addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : paths::basicName(_meta.workDir));
+    _json.addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(_num.totalSize(FileStatus::CombAvailable)));
+
+    // DateTime
+    const QString _dt = (isBranching && data_->isAllMatched(_num)) ? QStringLiteral(u"Created: ") + format::currentDateTime()
+                                                                   : _meta.datetime.toString();
+    _json.addInfo(VerJson::h_key_DateTime, _dt);
+
+    // WorkDir
+    if (!isBranching && !data_->isWorkDirRelative())
+        _json.addInfo(VerJson::h_key_WorkDir, _meta.workDir);
+
+    // Filter
+    if (data_->isFilterApplied()) {
+        const bool _inc = _meta.filter.isFilter(FilterRule::Include);
+        const QString &_h_key = _inc ? VerJson::h_key_Included : VerJson::h_key_Ignored;
+        _json.addInfo(_h_key, _meta.filter.extensionString());
+    }
+
+    // Flags (needs to be redone after expanding the flags list)
+    if (_meta.flags)
+        _json.addInfo(VerJson::h_key_Flags, QStringLiteral(u"const"));
+
+
+    // [Main data]
+    emit setStatusbarText(QStringLiteral(u"Exporting data to json..."));
+
+    TreeModelIterator iter(data_->model_, rootFolder);
+
+    while (iter.hasNext() && !isCanceled()) {
+        iter.nextFile();
+        const QString checksum = iter.checksum();
+        if (!checksum.isEmpty()) {
+            _json.addItem(iter.path(rootFolder), checksum);
+        }
+        else if (iter.status() & FileStatus::CombUnreadable) {
+            _json.addItemUnr(iter.path(rootFolder));
+        }
+    }
+
+    if (isCanceled()) {
+        qDebug() << "JsonDb::makeJson | Canceled";
+        return QString();
+    }
+
+    if (_json.save()) {
+        emit setStatusbarText(QStringLiteral(u"Saved"));
+        return pathToSave;
+    }
+    else {
+        const QString _workdir = isBranching ? paths::parentFolder(pathToSave) : _meta.workDir;
+        _json.addInfo(VerJson::h_key_WorkDir, _workdir);
+
+        QString resPathToSave = paths::joinPath(Files::desktopFolderPath, paths::basicName(pathToSave));
+        _json.setFilePath(resPathToSave);
+
+        if (_json.save()) {
+            emit setStatusbarText("Saved to Desktop");
+            return resPathToSave;
+        }
+        else {
+            emit setStatusbarText("NOT Saved");
+            emit showMessage("Unable to save json file: " + pathToSave, "Error");
+            return QString();
+        }
+    }
 }
 
 void DataMaintainer::exportToJson()
@@ -433,7 +693,7 @@ void DataMaintainer::exportToJson()
 
     data_->makeBackup();
 
-    const QString _dbFilePath = json_->makeJson(data_);
+    const QString _dbFilePath = makeJson();
 
     if (!_dbFilePath.isEmpty()) {
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
@@ -458,7 +718,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
     }
 
-    const QString _path = json_->makeJson(data_, rootFolder);
+    const QString _path = makeJson(rootFolder);
     emit subDbForked(_path);
 
     // update cached value
@@ -471,14 +731,14 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
         return 0;
 
     const QString _filePath = data_->branch_path_existing(rootFolder);
-    const QJsonArray _j_array = json_->loadJsonDB(_filePath);
-    const QJsonObject _mainList = (_j_array.size() >= 2) ? _j_array.at(1).toObject() : QJsonObject();
+    VerJson _json(_filePath);
+    if (!_json.load() || !_json)
+        return 0;
 
-    if (!tools::canBeChecksum(JsonDb::firstValueString(_mainList),
-                              data_->metaData_.algorithm))
-    {
-        return _mainList.isEmpty() ? 0 : -1;
-    }
+    if (_json.algorithm() != data_->metaData_.algorithm)
+        return -1;
+
+    const QJsonObject &_mainList = _json.data();
 
     int _num = 0;
     TreeModelIterator _it(data_->model_, rootFolder);

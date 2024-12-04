@@ -87,16 +87,17 @@ QString DataContainer::basicDate() const
 {
     // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
     const int r_len = Lit::s_dt_format.size(); // 16
-    const QString (&dt)[3] = metaData_.datetime;
+    //const QString (&dt)[3] = metaData_.datetime;
+    const VerDateTime &dt =  metaData_.datetime;
 
-    if (!dt[DTstr::DateVerified].isEmpty())
-        return dt[DTstr::DateVerified].right(r_len);
+    if (!dt.m_verified.isEmpty())
+        return dt.m_verified.right(r_len);
 
     // if the update time is not empty and there is no verification time,
     // return an empty string
 
-    if (dt[DTstr::DateUpdated].isEmpty())
-        return dt[DTstr::DateCreated].right(r_len);
+    if (dt.m_updated.isEmpty())
+        return dt.m_created.right(r_len);
 
     return QString();
 }

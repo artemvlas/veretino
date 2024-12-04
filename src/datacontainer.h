@@ -11,6 +11,7 @@
 #include "treemodel.h"
 #include "proxymodel.h"
 #include "numbers.h"
+#include "verdatetime.h"
 
 class TreeModel;
 
@@ -20,9 +21,7 @@ struct MetaData {
     QString workDir; // current working folder
     QString dbFilePath;
 
-    // DateVerified == (all files exist and match the checksums)
-    enum DTstr { DateCreated, DateUpdated, DateVerified };
-    QString datetime[3];
+    VerDateTime datetime;
 
     enum DbFileState : quint8 { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
@@ -32,7 +31,6 @@ struct MetaData {
 }; // struct MetaData
 
 using DbFileState = MetaData::DbFileState;
-using DTstr = MetaData::DTstr;
 
 class DataContainer : public QObject
 {
