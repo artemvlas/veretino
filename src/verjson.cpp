@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include "treemodeliterator.h"
 #include <QDirIterator>
+#include "qmicroz.h"
 
 const QString VerJson::h_key_DateTime = QStringLiteral(u"DateTime");
 const QString VerJson::h_key_Ignored = QStringLiteral(u"Ignored");
@@ -63,8 +64,20 @@ bool VerJson::load()
     }
 
     QFile _file(m_file_path);
-    const QJsonDocument _doc = _file.open(QFile::ReadOnly) ? QJsonDocument::fromJson(_file.readAll())
-                                                           : QJsonDocument();
+    if (!_file.open(QFile::ReadOnly)) {
+        qWarning() << "Failed to open file!";
+        return false;
+    }
+
+    QByteArray __b = _file.readAll();
+
+    if (__b.startsWith("PK")) { // is compressed
+        QMicroz _qmz(__b);
+        if (_qmz)
+            __b = _qmz.extract_to_ram(0).m_data;
+    }
+
+    const QJsonDocument _doc = QJsonDocument::fromJson(__b);
 
     // the Veretino json file is QJsonArray of QJsonObjects [{}, {}, ...]
     if (_doc.isArray()) {
@@ -117,6 +130,13 @@ bool VerJson::save()
     }
 
     const QJsonDocument _doc(_content);
+
+    if (paths::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
+        return QMicroz::compress_buf(_doc.toJson(),
+                                     QStringLiteral("checksums.ver.json"),
+                                     m_file_path);
+    }
+
     QFile _file(m_file_path);
 
     return (_file.open(QFile::WriteOnly) && _file.write(_doc.toJson()));

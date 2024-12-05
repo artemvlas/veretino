@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories("include")
 
 add_definitions(-DAPP_NAME="Veretino")
 add_definitions(-DAPP_VERSION="${CMAKE_PROJECT_VERSION}")
