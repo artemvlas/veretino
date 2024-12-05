@@ -68,6 +68,7 @@ set(PROJECT_SOURCES
     treeitem.cpp
     treemodel.cpp
     treemodeliterator.cpp
+    verdatetime.cpp
     verjson.cpp
     view.cpp
     widgetfiletypes.cpp

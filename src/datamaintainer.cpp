@@ -93,12 +93,12 @@ void DataMaintainer::updateDateTime()
     if (data_) {
         if (data_->isDbFileState(DbFileState::NoFile)) {
             //data_->metaData_.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
-            data_->metaData_.datetime.set(VerDateTime::Created, QStringLiteral(u"Created: ") + format::currentDateTime());
+            data_->metaData_.datetime.update(VerDateTime::Created);
         }
         else if (data_->contains(FileStatus::CombDbChanged)) {
             //data_->metaData_.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
             //data_->metaData_.datetime[DTstr::DateVerified].clear();
-            data_->metaData_.datetime.set(VerDateTime::Updated, QStringLiteral(u"Updated: ") + format::currentDateTime());
+            data_->metaData_.datetime.update(VerDateTime::Updated);
         }
     }
 }
@@ -106,7 +106,7 @@ void DataMaintainer::updateDateTime()
 void DataMaintainer::updateVerifDateTime()
 {
     if (data_ && data_->isAllMatched()) {
-        data_->metaData_.datetime.set(VerDateTime::Verified, QStringLiteral(u"Verified: ") + format::currentDateTime());
+        data_->metaData_.datetime.update(VerDateTime::Verified);
         setDbFileState(DbFileState::NotSaved);
     }
 }
