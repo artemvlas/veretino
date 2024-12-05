@@ -1,10 +1,12 @@
 Veretino 0.6.0
 What's new:
+* Improved database storage format. Now files with the *.ver extension are compressed.
 * If it is not possible to write to the current folder, the location of the database file is now user-selectable.
     (previously it was saved to the Desktop)
 
 Internal changes:
 * The way of processing JSON file data has been redesigned.
+* Switched to CMake-only.
 
 ---
 Veretino 0.5.2
