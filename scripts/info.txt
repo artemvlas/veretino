@@ -1,4 +1,4 @@
-# Scripts were created and tested on Arch Linux (or based).
+# The Scripts were created and tested on Arch Linux (or based).
 # Other distros may have different command and package names, so some changes may need to be made.
 
 # Building and running the application requires to be installed on the system:

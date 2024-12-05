@@ -1,7 +1,8 @@
 #! /bin/bash
 
-# It is assumed that 'make' is installed
-# sudo pacman -S make
+# [Arch Linux]
+# Required packages: make, cmake
+# sudo pacman -S base-devel cmake
 
 set -x
 set -e
@@ -21,7 +22,7 @@ trap cleanup EXIT
 pushd "$BUILD_DIR"
 
 # make the project
-qmake "$REPO_ROOT"
+cmake "$REPO_ROOT" -DCMAKE_BUILD_TYPE=Release
 
 # build the application on all CPU cores
 make -j$(nproc)

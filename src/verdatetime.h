@@ -22,6 +22,7 @@ struct VerDateTime {
         case Created: return m_created;
         case Updated: return m_updated;
         case Verified: return m_verified;
+        default: return m_updated;
         }
     }
 
