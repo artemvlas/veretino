@@ -129,17 +129,17 @@ bool VerJson::save()
         _content.append(_unr);
     }
 
-    const QJsonDocument _doc(_content);
+    const QByteArray _data = QJsonDocument(_content).toJson();
 
     if (paths::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
-        return QMicroz::compress_buf(_doc.toJson(),
+        return QMicroz::compress_buf(_data,
                                      QStringLiteral("checksums.ver.json"),
                                      m_file_path);
     }
 
     QFile _file(m_file_path);
 
-    return (_file.open(QFile::WriteOnly) && _file.write(_doc.toJson()));
+    return (_file.open(QFile::WriteOnly) && _file.write(_data));
 }
 
 void VerJson::addItem(const QString &_file, const QString &_checksum)

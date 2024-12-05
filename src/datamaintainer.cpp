@@ -428,7 +428,7 @@ bool DataMaintainer::isPresentInWorkDir(const QString &workDir, const QJsonObjec
 
     QJsonObject::const_iterator i;
 
-    for (i = fileList.constBegin(); i != fileList.constEnd(); ++i) { // !isCanceled() &&
+    for (i = fileList.constBegin(); !isCanceled() && i != fileList.constEnd(); ++i) {
         if (QFileInfo::exists(paths::joinPath(workDir, i.key()))) {
             return true;
         }
