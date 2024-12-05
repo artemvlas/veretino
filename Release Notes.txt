@@ -1,3 +1,12 @@
+Veretino 0.6.0
+What's new:
+* If it is not possible to write to the current folder, the location of the database file is now user-selectable.
+    (previously it was saved to the Desktop)
+
+Internal changes:
+* The way of processing JSON file data has been redesigned.
+
+---
 Veretino 0.5.2
 * Implemented the ability to detect Moved files.
     Added item Status: "Moved". It will mark renamed or moved files [if enabled in settings].
