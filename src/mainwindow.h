@@ -45,6 +45,7 @@ public slots:
     void promptOpenBranch(const QString &dbFilePath);
     void showFolderCheckResult(const Numbers &result, const QString &subFolder);
     void showFileCheckResult(const QString &filePath, const FileValues &values);
+    void dialogSaveJson();
 
     void createContextMenu_Button(const QPoint &point);
 

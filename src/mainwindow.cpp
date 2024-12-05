@@ -157,6 +157,7 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
     connect(manager->dataMaintainer, &DataMaintainer::failedDataCreation, this,
             [=]{ if (ui->view->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
+    connect(manager->dataMaintainer, &DataMaintainer::failedJsonSave, this, &MainWindow::dialogSaveJson);
 
     // process status
     connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
@@ -423,6 +424,36 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
         modeSelect->openJsonDatabase(dbFilePath);
     }
 }
+
+void MainWindow::dialogSaveJson()
+{
+    VerJson *_json = manager->dataMaintainer->m_unsaved;
+    if (!_json) {
+        qWarning() << "No unsaved json found";
+        return;
+    }
+
+    const QString _cur_file_path = _json->file_path();
+
+    const bool isLongExt = paths::hasExtension(_cur_file_path, Lit::sl_db_exts.at(0));
+    const QString _str_filter = QStringLiteral(u"Veretino DB (%1)")
+                                    .arg(isLongExt ? "*.ver.json *.ver" : "*.ver *.ver.json");
+
+    QString _def_path = QFileDialog::getSaveFileName(this, QStringLiteral(u"Save DB File"),
+                                                    _cur_file_path,
+                                                    _str_filter);
+
+    if (_def_path.isEmpty())
+        return;
+
+    if (!paths::isDbFile(_def_path))
+        _def_path.append(isLongExt ? ".ver.json" : ".ver");
+
+    qDebug() << "dialogSaveJson:" << _def_path;
+    _json->setFilePath(_def_path);
+    modeSelect->saveData();
+}
+
 
 void MainWindow::updateButtonInfo()
 {

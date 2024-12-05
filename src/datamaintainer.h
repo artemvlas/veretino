@@ -78,7 +78,7 @@ public:
 
     // variables
     DataContainer *data_ = nullptr; // main data
-    //JsonDb *json_ = new JsonDb(this);
+    VerJson *m_unsaved = nullptr;
 
 public slots:
     void clearData();
@@ -88,9 +88,10 @@ public slots:
 private:
     void connections();
     bool isCanceled() const;
+    void clearUnsavedJson();
     MetaData getMetaData(const VerJson &_json) const;
     FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
-    QString makeJson(const QModelIndex &rootFolder = QModelIndex());
+    VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
     QString findWorkDir(const VerJson &_json) const;
     bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList) const;
 
@@ -107,6 +108,7 @@ signals:
     void subDbForked(const QString &forkedDbFilePath);
     void dbFileStateChanged(bool isNotSaved);
     void failedDataCreation();
+    void failedJsonSave();
 }; // class DataMaintainer
 
 #endif // DATAMAINTAINER_H

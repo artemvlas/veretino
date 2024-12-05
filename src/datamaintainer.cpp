@@ -52,6 +52,7 @@ bool DataMaintainer::setSourceData(DataContainer *sourceData)
         data_ = sourceData;
         data_->setParent(this);
         updateNumbers();
+        clearUnsavedJson();
     }
 
     return sourceData; // false if sourceData == nullptr, else true
@@ -70,6 +71,14 @@ void DataMaintainer::clearOldData()
     if (oldData_) {
         delete oldData_;
         oldData_ = nullptr;
+    }
+}
+
+void DataMaintainer::clearUnsavedJson()
+{
+    if (m_unsaved) {
+        delete m_unsaved;
+        m_unsaved = nullptr;
     }
 }
 
@@ -92,12 +101,9 @@ void DataMaintainer::updateDateTime()
 {
     if (data_) {
         if (data_->isDbFileState(DbFileState::NoFile)) {
-            //data_->metaData_.datetime[DTstr::DateCreated] = QStringLiteral(u"Created: ") + format::currentDateTime();
             data_->metaData_.datetime.update(VerDateTime::Created);
         }
         else if (data_->contains(FileStatus::CombDbChanged)) {
-            //data_->metaData_.datetime[DTstr::DateUpdated] = QStringLiteral(u"Updated: ") + format::currentDateTime();
-            //data_->metaData_.datetime[DTstr::DateVerified].clear();
             data_->metaData_.datetime.update(VerDateTime::Updated);
         }
     }
@@ -602,11 +608,11 @@ bool DataMaintainer::importJson(const QString &filePath)
 }
 
 // returns the path to the file if the write was successful, otherwise an empty string
-QString DataMaintainer::makeJson(const QModelIndex &rootFolder)
+VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 {
     if (!data_ || data_->model_->isEmpty()) {
         qDebug() << "makeJson | no data!";
-        return QString();
+        return nullptr;
     }
 
     // [Header]
@@ -617,29 +623,29 @@ QString DataMaintainer::makeJson(const QModelIndex &rootFolder)
     const QString &pathToSave = isBranching ? data_->branch_path_composed(rootFolder) // branching
                                             : data_->metaData_.dbFilePath; // main database
 
-    VerJson _json(pathToSave);
-    _json.addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : paths::basicName(_meta.workDir));
-    _json.addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(_num.totalSize(FileStatus::CombAvailable)));
+    VerJson *_json = new VerJson(pathToSave);
+    _json->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : paths::basicName(_meta.workDir));
+    _json->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(_num.totalSize(FileStatus::CombAvailable)));
 
     // DateTime
     const QString _dt = (isBranching && data_->isAllMatched(_num)) ? QStringLiteral(u"Created: ") + format::currentDateTime()
                                                                    : _meta.datetime.toString();
-    _json.addInfo(VerJson::h_key_DateTime, _dt);
+    _json->addInfo(VerJson::h_key_DateTime, _dt);
 
     // WorkDir
     if (!isBranching && !data_->isWorkDirRelative())
-        _json.addInfo(VerJson::h_key_WorkDir, _meta.workDir);
+        _json->addInfo(VerJson::h_key_WorkDir, _meta.workDir);
 
     // Filter
     if (data_->isFilterApplied()) {
         const bool _inc = _meta.filter.isFilter(FilterRule::Include);
         const QString &_h_key = _inc ? VerJson::h_key_Included : VerJson::h_key_Ignored;
-        _json.addInfo(_h_key, _meta.filter.extensionString());
+        _json->addInfo(_h_key, _meta.filter.extensionString());
     }
 
     // Flags (needs to be redone after expanding the flags list)
     if (_meta.flags)
-        _json.addInfo(VerJson::h_key_Flags, QStringLiteral(u"const"));
+        _json->addInfo(VerJson::h_key_Flags, QStringLiteral(u"const"));
 
 
     // [Main data]
@@ -651,18 +657,22 @@ QString DataMaintainer::makeJson(const QModelIndex &rootFolder)
         iter.nextFile();
         const QString checksum = iter.checksum();
         if (!checksum.isEmpty()) {
-            _json.addItem(iter.path(rootFolder), checksum);
+            _json->addItem(iter.path(rootFolder), checksum);
         }
         else if (iter.status() & FileStatus::CombUnreadable) {
-            _json.addItemUnr(iter.path(rootFolder));
+            _json->addItemUnr(iter.path(rootFolder));
         }
     }
 
     if (isCanceled()) {
-        qDebug() << "JsonDb::makeJson | Canceled";
-        return QString();
+        qDebug() << "makeJson: Canceled";
+        delete _json;
+        return nullptr;
     }
 
+    return _json;
+
+    /*
     if (_json.save()) {
         emit setStatusbarText(QStringLiteral(u"Saved"));
         return pathToSave;
@@ -683,7 +693,7 @@ QString DataMaintainer::makeJson(const QModelIndex &rootFolder)
             emit showMessage("Unable to save json file: " + pathToSave, "Error");
             return QString();
         }
-    }
+    }*/
 }
 
 void DataMaintainer::exportToJson()
@@ -691,16 +701,27 @@ void DataMaintainer::exportToJson()
     if (!data_)
         return;
 
+    VerJson *_json = m_unsaved ? m_unsaved : makeJson();
+    if (!_json)
+        return;
+
     data_->makeBackup();
 
-    const QString _dbFilePath = makeJson();
-
-    if (!_dbFilePath.isEmpty()) {
+    if (_json->save()) {
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
-        data_->metaData_.dbFilePath = _dbFilePath;
+        data_->metaData_.dbFilePath = _json->file_path();
+        clearUnsavedJson();
+
+        emit setStatusbarText(QStringLiteral(u"Saved"));
     }
     else {
         setDbFileState(DbFileState::NotSaved);
+        _json->addInfo(VerJson::h_key_WorkDir, data_->metaData_.workDir);
+
+        m_unsaved = _json;
+        emit failedJsonSave();
+
+        emit setStatusbarText("NOT Saved");
     }
 
     // debug info
@@ -718,11 +739,16 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         return;
     }
 
-    const QString _path = makeJson(rootFolder);
-    emit subDbForked(_path);
+    VerJson *_json = makeJson(rootFolder);
 
-    // update cached value
-    data_->_cacheBranches[rootFolder] = _path;
+    if (_json && _json->save()) {
+        emit subDbForked(_json->file_path());
+
+        // update cached value
+        data_->_cacheBranches[rootFolder] = _json->file_path();
+    } else {
+        qWarning() << "An error occurred while creating the Branch!";
+    }
 }
 
 int DataMaintainer::importBranch(const QModelIndex &rootFolder)
