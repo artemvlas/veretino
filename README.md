@@ -22,7 +22,7 @@ Analyze the contents of folders, calculate checksums, and easily find modified o
 ### Veretino can check the integrity of a large amount of data, for example, after a disk or file system error occurs, bad or unreadable sectors appear, a sudden power outage and similar cases...
 
 #### How it works:
-* To begin with, the program calculates a list of checksums for all files (or filtered file types) in the specified folder (and its subfolders) and stores it in the local json file (see [Veretino Database](wiki/Veretino-Database) format).
+* To begin with, the program calculates a list of checksums for all files (or filtered file types) in the specified folder (and its subfolders) and stores it in the local json file (see [Veretino Database](https://github.com/artemvlas/veretino/wiki/Veretino-Database) format).
 * Having a ready-made database, the program becomes able to check the integrity of the folder's data by reading its current contents and comparing it with the previously created data set.
 * The resulting data also makes it possible to find new or missing items by comparing the current contents with a previously one.
 
@@ -42,4 +42,4 @@ Veretino App is Qt based and cross platform. Prebuilt packages for Linux and Win
 
 For users of Arch-based distros: [AUR](https://aur.archlinux.org/packages/veretino)
 
-[Build](wiki/Build-from-source-code) from source code.
+[Build](https://github.com/artemvlas/veretino/wiki/Build-from-source-code) from source code.
