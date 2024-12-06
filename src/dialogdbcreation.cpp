@@ -6,6 +6,7 @@
 #include "dialogdbcreation.h"
 #include "ui_dialogdbcreation.h"
 #include "tools.h"
+#include "pathstr.h"
 #include <QPushButton>
 #include <QDebug>
 #include <QMenu>
@@ -236,7 +237,7 @@ void DialogDbCreation::updateDbFilename()
     const QString &_folderName = ui->cb_add_folder_name->isChecked() ? workDir_ : QString(); // QStringLiteral(u"@FolderName")
     const QString _ext = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
     const QString _dbFileName = format::composeDbFileName(_prefix, _folderName, _ext);
-    const QString _dbFilePath = paths::joinPath(workDir_, _dbFileName);
+    const QString _dbFilePath = pathstr::joinPath(workDir_, _dbFileName);
     const bool _exists = QFileInfo::exists(_dbFilePath);
     const QString _color = _exists ? format::coloredText(true) : QString();
     const QString _toolTip = _exists ? QStringLiteral(u"The file already exists") : QStringLiteral(u"Available");

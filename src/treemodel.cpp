@@ -6,6 +6,7 @@
 #include "treemodel.h"
 #include "treemodeliterator.h"
 #include "tools.h"
+#include "pathstr.h"
 #include "iconprovider.h"
 #include <QDebug>
 
@@ -43,9 +44,9 @@ void TreeModel::populate(const FileList &filesData)
 
 bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &values)
 {
-    const TreeItem *parentItem = add_folder(paths::parentFolder(filePath));
+    const TreeItem *parentItem = add_folder(pathstr::parentFolder(filePath));
 
-    if (parentItem->findChild(paths::basicName(filePath))) {
+    if (parentItem->findChild(pathstr::basicName(filePath))) {
         return false;
     }
 
@@ -57,7 +58,7 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
 {
     // data preparation
     QVector<QVariant> _tiData(rootItem->columnCount());
-    _tiData[ColumnName] = paths::basicName(filePath);
+    _tiData[ColumnName] = pathstr::basicName(filePath);
 
     if (values.size >= 0)
         _tiData[ColumnSize] = values.size;
@@ -68,7 +69,7 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
         _tiData[ColumnChecksum] = values.checksum;
 
     // item adding
-    TreeItem *parentItem = add_folder(paths::parentFolder(filePath));
+    TreeItem *parentItem = add_folder(pathstr::parentFolder(filePath));
     parentItem->addChild(_tiData);
 }
 
@@ -249,7 +250,7 @@ QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
         while (_ind = _ind.parent(),
                _ind.isValid() && _ind != root)
         {
-            path = paths::joinPath(_ind.data().toString(), path);
+            path = pathstr::joinPath(_ind.data().toString(), path);
         }
     }
 

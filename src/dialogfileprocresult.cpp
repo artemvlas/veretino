@@ -6,6 +6,7 @@
 #include "dialogfileprocresult.h"
 #include "ui_dialogfileprocresult.h"
 #include "tools.h"
+#include "pathstr.h"
 #include <QPushButton>
 #include <QFile>
 #include <QClipboard>
@@ -135,7 +136,7 @@ void DialogFileProcResult::setIcon(FileStatus _status)
 
 void DialogFileProcResult::setFileName(const QString &filePath)
 {
-    ui->labelFileName->setText(QStringLiteral(u"File: ") + paths::basicName(filePath));
+    ui->labelFileName->setText(QStringLiteral(u"File: ") + pathstr::basicName(filePath));
 }
 
 void DialogFileProcResult::setExtLineVisible(bool visible)
@@ -173,7 +174,7 @@ void DialogFileProcResult::makeSumFile()
         return;
 
     const QString _sumFile = paths::digestFilePath(filePath_, _chsum.size());
-    const QString _strToWrite = tools::joinStrings(_chsum, paths::basicName(filePath_), QStringLiteral(u" *"));
+    const QString _strToWrite = tools::joinStrings(_chsum, pathstr::basicName(filePath_), QStringLiteral(u" *"));
 
     setFileName(_sumFile);
 

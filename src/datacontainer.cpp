@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include "treemodeliterator.h"
 #include "tools.h"
+#include "pathstr.h"
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}
@@ -26,20 +27,21 @@ ProxyModel* DataContainer::setProxyModel()
 
 QString DataContainer::databaseFileName() const
 {
-    return paths::basicName(metaData_.dbFilePath);
+    return pathstr::basicName(metaData_.dbFilePath);
 }
 
 QString DataContainer::backupFilePath() const
 {
-    return paths::joinPath(paths::parentFolder(metaData_.dbFilePath),
-                           QStringLiteral(u".tmp-backup_") + paths::basicName(metaData_.dbFilePath));
+    using namespace pathstr;
+    return joinPath(parentFolder(metaData_.dbFilePath),
+                    QStringLiteral(u".tmp-backup_") + basicName(metaData_.dbFilePath));
 }
 
 // returns the absolute path to the db item (file or subfolder)
 // (working folder path in filesystem + relative path in the database)
 QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
 {
-    return paths::joinPath(metaData_.workDir, TreeModel::getPath(curIndex));
+    return pathstr::joinPath(metaData_.workDir, TreeModel::getPath(curIndex));
 }
 
 QString DataContainer::branch_path_existing(const QModelIndex &subfolder)
@@ -58,7 +60,7 @@ QString DataContainer::branch_path_existing(const QModelIndex &subfolder)
     // searching
     QString __path = branch_path_composed(subfolder);
     if (!QFileInfo::exists(__path))
-        __path = Files::firstDbFile(paths::parentFolder(__path));
+        __path = Files::firstDbFile(pathstr::parentFolder(__path));
 
     // caching the result; an empty value means no branches
     _cacheBranches[subfolder] = __path;
@@ -69,11 +71,11 @@ QString DataContainer::branch_path_existing(const QModelIndex &subfolder)
 // returns the predefined/supposed path to the branch db file, regardless of its existence
 QString DataContainer::branch_path_composed(const QModelIndex &subfolder) const
 {
-    const bool _isLongExt = paths::hasExtension(metaData_.dbFilePath, Lit::sl_db_exts.first());
+    const bool _isLongExt = pathstr::hasExtension(metaData_.dbFilePath, Lit::sl_db_exts.first());
     QString extension = Lit::sl_db_exts.at(_isLongExt ? 0 : 1);
     QString folderPath = itemAbsolutePath(subfolder);
     QString fileName = format::composeDbFileName(QStringLiteral(u"checksums"), folderPath, extension);
-    QString filePath = paths::joinPath(folderPath, fileName);
+    QString filePath = pathstr::joinPath(folderPath, fileName);
 
     return filePath;
 }
@@ -104,7 +106,7 @@ QString DataContainer::basicDate() const
 
 bool DataContainer::isWorkDirRelative() const
 {
-    return (paths::parentFolder(metaData_.dbFilePath) == metaData_.workDir);
+    return (pathstr::parentFolder(metaData_.dbFilePath) == metaData_.workDir);
 }
 
 bool DataContainer::isFilterApplied() const

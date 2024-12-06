@@ -1,3 +1,5 @@
+include_directories(pathstr)
+
 set(PROJECT_SOURCES
     # HEADERS
     clickablelabel.h
@@ -35,6 +37,7 @@ set(PROJECT_SOURCES
     verjson.h
     view.h
     widgetfiletypes.h
+    pathstr/pathstr.h
 
     # SOURCES
     clickablelabel.cpp
@@ -72,6 +75,7 @@ set(PROJECT_SOURCES
     verjson.cpp
     view.cpp
     widgetfiletypes.cpp
+    pathstr/pathstr.cpp
 
     # FORMS
     dialogabout.ui

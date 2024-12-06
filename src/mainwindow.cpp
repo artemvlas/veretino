@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "tools.h"
+#include "pathstr.h"
 #include "dialogcontentslist.h"
 #include "dialogdbcreation.h"
 #include "dialogexistingdbs.h"
@@ -230,7 +231,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     if (!dbFiles.isEmpty()) {
         DialogExistingDbs _dialog(dbFiles, this);
         if (_dialog.exec() && !_dialog.curFile().isEmpty()) {
-            modeSelect->openJsonDatabase(paths::joinPath(folder, _dialog.curFile()));
+            modeSelect->openJsonDatabase(pathstr::joinPath(folder, _dialog.curFile()));
             return;
         }
     }
@@ -414,7 +415,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     QMessageBox msgBox(this);
     msgBox.setIconPixmap(modeSelect->_icons.pixmap(Icons::AddFork));
     msgBox.setWindowTitle("A new Branch has been created");
-    msgBox.setText("The subfolder data is forked:\n" + paths::shortenPath(dbFilePath));
+    msgBox.setText("The subfolder data is forked:\n" + pathstr::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
@@ -435,7 +436,7 @@ void MainWindow::dialogSaveJson()
 
     const QString _cur_file_path = _json->file_path();
 
-    const bool isLongExt = paths::hasExtension(_cur_file_path, Lit::sl_db_exts.at(0));
+    const bool isLongExt = pathstr::hasExtension(_cur_file_path, Lit::sl_db_exts.at(0));
     const QString _str_filter = QStringLiteral(u"Veretino DB (%1)")
                                     .arg(isLongExt ? "*.ver.json *.ver" : "*.ver *.ver.json");
 
@@ -513,7 +514,7 @@ void MainWindow::updateWindowTitle()
         }
 
         QString _s_add = data->isAllMatched() ? QStringLiteral(u"✓ verified")
-                                              : QStringLiteral(u"DB > ") + paths::shortenPath(data->metaData_.workDir);
+                                              : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->metaData_.workDir);
 
         const QString _s = tools::joinStrings(Lit::s_appName, _s_add, Lit::s_sepStick);
         setWindowTitle(_s);

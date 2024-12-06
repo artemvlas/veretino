@@ -6,6 +6,7 @@
 
 #include "menuactions.h"
 #include "tools.h"
+#include "pathstr.h"
 #include <QFileInfo>
 
 MenuActions::MenuActions(QObject *parent)
@@ -151,7 +152,7 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
 
     for (const QString &recentFilePath : recentFiles) {
         if (QFileInfo::exists(recentFilePath)) {
-            QAction *act = menuOpenRecent->addAction(dbIcon, paths::basicName(recentFilePath));
+            QAction *act = menuOpenRecent->addAction(dbIcon, pathstr::basicName(recentFilePath));
             act->setToolTip(recentFilePath);
         }
     }

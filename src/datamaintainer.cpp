@@ -9,6 +9,7 @@
 #include <QDirIterator>
 #include "treemodeliterator.h"
 #include "tools.h"
+#include "pathstr.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)
@@ -138,7 +139,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable
 
     while (it.hasNext() && !isCanceled()) {
         const QString _fullPath = it.next();
-        const QString _relPath = paths::relativePath(_workDir, _fullPath);
+        const QString _relPath = pathstr::relativePath(_workDir, _fullPath);
 
         if (data_->metaData_.filter.isFileAllowed(_relPath)) {
             const bool _isReadable = it.fileInfo().isReadable();
@@ -422,7 +423,7 @@ bool DataMaintainer::isPresentInWorkDir(const QString &workDir, const QJsonObjec
     QJsonObject::const_iterator i;
 
     for (i = fileList.constBegin(); !isCanceled() && i != fileList.constEnd(); ++i) {
-        if (QFileInfo::exists(paths::joinPath(workDir, i.key()))) {
+        if (QFileInfo::exists(pathstr::joinPath(workDir, i.key()))) {
             return true;
         }
     }
@@ -438,9 +439,9 @@ QString DataMaintainer::findWorkDir(const VerJson &_json) const
     // [checking for files in the intended WorkDir]
     const bool isSpecWorkDir = strWorkDir.contains('/')
                                && (isPresentInWorkDir(strWorkDir, _json.data())
-                                   || !isPresentInWorkDir(paths::parentFolder(_json.file_path()), _json.data()));
+                                   || !isPresentInWorkDir(pathstr::parentFolder(_json.file_path()), _json.data()));
 
-    return isSpecWorkDir ? strWorkDir : paths::parentFolder(_json.file_path());
+    return isSpecWorkDir ? strWorkDir : pathstr::parentFolder(_json.file_path());
 }
 
 MetaData DataMaintainer::getMetaData(const VerJson &_json) const
@@ -519,7 +520,7 @@ bool DataMaintainer::importJson(const QString &filePath)
     }
 
     if (!_json) {
-        emit showMessage(paths::basicName(filePath) + "\n\n"
+        emit showMessage(pathstr::basicName(filePath) + "\n\n"
                                                       "The database doesn't contain checksums.\n"
                                                       "Probably all files have been ignored.", "Empty Database!");
         emit setStatusbarText();
@@ -539,7 +540,7 @@ bool DataMaintainer::importJson(const QString &filePath)
     for (QJsonObject::const_iterator it = filelistData.constBegin();
          !isCanceled() && it != filelistData.constEnd(); ++it)
     {
-        const QString _fullPath = paths::joinPath(workDir, it.key());
+        const QString _fullPath = pathstr::joinPath(workDir, it.key());
         FileValues _values = makeFileValues(_fullPath, _basicDT);
         _values.checksum = it.value().toString();
 
@@ -554,7 +555,7 @@ bool DataMaintainer::importJson(const QString &filePath)
 
         for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
             const QString _relPath = unreadableFiles.at(var).toString();
-            const QString _fullPath = paths::joinPath(workDir, _relPath);
+            const QString _fullPath = pathstr::joinPath(workDir, _relPath);
             const FileStatus _status = tools::failedCalcStatus(_fullPath);
 
             if (_status & FileStatus::CombUnreadable) {
@@ -570,7 +571,7 @@ bool DataMaintainer::importJson(const QString &filePath)
 
     while (it.hasNext() && !isCanceled()) {
         const QString _fullPath = it.next();
-        const QString _relPath = paths::relativePath(workDir, _fullPath);
+        const QString _relPath = pathstr::relativePath(workDir, _fullPath);
 
         if (parsedData->metaData_.filter.isFileAllowed(_relPath)
             && !filelistData.contains(_relPath)
@@ -586,7 +587,7 @@ bool DataMaintainer::importJson(const QString &filePath)
     emit setStatusbarText();
 
     if (isCanceled()) {
-        qDebug() << "parseJson | Canceled:" << paths::basicName(filePath);
+        qDebug() << "parseJson | Canceled:" << pathstr::basicName(filePath);
         delete parsedData;
         return false;
     }
@@ -617,7 +618,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
                                             : data_->metaData_.dbFilePath; // main database
 
     VerJson *_json = new VerJson(pathToSave);
-    _json->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : paths::basicName(_meta.workDir));
+    _json->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : pathstr::basicName(_meta.workDir));
     _json->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(_num.totalSize(FileStatus::CombAvailable)));
 
     // DateTime

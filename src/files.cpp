@@ -7,6 +7,7 @@
 #include <QDirIterator>
 #include <QDebug>
 #include "tools.h"
+#include "pathstr.h"
 #include "treemodeliterator.h"
 #include "treemodel.h"
 
@@ -61,7 +62,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
 
     while (it.hasNext() && !isCanceled()) {
         const QString _fullPath = it.next();
-        const QString _relPath = paths::relativePath(rootFolder, _fullPath);
+        const QString _relPath = pathstr::relativePath(rootFolder, _fullPath);
 
         if (filter.isFileAllowed(_relPath)) {
             FileStatus _status = it.fileInfo().isReadable() ? FileStatus::NotSet
@@ -165,7 +166,7 @@ QString Files::getFolderSize(const QString &path)
     }
 
     // result processing
-    const QString _folderName = paths::basicName(path);
+    const QString _folderName = pathstr::basicName(path);
     const QString _folderSize = format::filesNumSize(__n);
 
     return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
@@ -231,7 +232,7 @@ QString Files::suffixName(const QString &_file)
     else if (paths::isDigestFile(_file))
         _ext = strShaFiles;
     else
-        _ext = paths::suffix(_file);
+        _ext = pathstr::suffix(_file);
 
     if (_ext.isEmpty())
         _ext = strNoType;

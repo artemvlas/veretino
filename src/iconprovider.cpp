@@ -5,6 +5,7 @@
 */
 #include "iconprovider.h"
 #include "tools.h"
+#include "pathstr.h"
 
 const QString IconProvider::s_folderGeneric = QStringLiteral(u":/icons/generic");
 const QString IconProvider::s_folderDark = QStringLiteral(u":/icons/dark");
@@ -103,7 +104,7 @@ QString IconProvider::svgFilePath(FileStatus status) const
         break;
     }
 
-    return paths::composeFilePath(s_folderGeneric, iconFileName, s_svg);
+    return pathstr::composeFilePath(s_folderGeneric, iconFileName, s_svg);
 }
 
 QString IconProvider::svgFilePath(Icons icon) const
@@ -202,7 +203,7 @@ QString IconProvider::svgFilePath(Icons icon) const
         return QString();
     }
 
-    return paths::composeFilePath(themeFolder(), iconFileName, s_svg);
+    return pathstr::composeFilePath(themeFolder(), iconFileName, s_svg);
 }
 
 QIcon IconProvider::icon(FileStatus status) const
@@ -232,7 +233,7 @@ QIcon IconProvider::iconFolder() const
 
 QIcon IconProvider::appIcon()
 {
-    static const QIcon _icon = QIcon(paths::composeFilePath(s_folderGeneric, Lit::s_app_name, s_svg));
+    static const QIcon _icon = QIcon(pathstr::composeFilePath(s_folderGeneric, Lit::s_app_name, s_svg));
     return _icon; // ":/icons/generic/veretino.svg"
 }
 

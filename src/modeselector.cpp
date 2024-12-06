@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QAbstractButton>
 #include "tools.h"
+#include "pathstr.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, view_(view), settings_(settings)
@@ -555,11 +556,11 @@ void ModeSelector::_makeDbContentsList()
 
 QString ModeSelector::composeDbFilePath()
 {
-    QString folderName = settings_->addWorkDirToFilename ? paths::basicName(view_->_lastPathFS) : QString();
+    QString folderName = settings_->addWorkDirToFilename ? pathstr::basicName(view_->_lastPathFS) : QString();
     QString _prefix = settings_->dbPrefix.isEmpty() ? Lit::s_db_prefix : settings_->dbPrefix;
     QString databaseFileName = format::composeDbFileName(_prefix, folderName, settings_->dbFileExtension());
 
-    return paths::joinPath(view_->_lastPathFS, databaseFileName);
+    return pathstr::joinPath(view_->_lastPathFS, databaseFileName);
 }
 
 void ModeSelector::processChecksumsFiltered()
@@ -616,7 +617,7 @@ bool ModeSelector::overwriteDbPrompt()
 
     QMessageBox msgBox(view_);
     msgBox.setWindowTitle("Existing database detected");
-    msgBox.setText("The folder already contains the database file:\n" + paths::basicName(dbFilePath));
+    msgBox.setText("The folder already contains the database file:\n" + pathstr::basicName(dbFilePath));
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Open);

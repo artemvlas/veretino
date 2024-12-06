@@ -6,6 +6,7 @@
 #include "verjson.h"
 #include "files.h"
 #include "tools.h"
+#include "pathstr.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
@@ -132,7 +133,7 @@ bool VerJson::save()
 
     const QByteArray _data = QJsonDocument(_content).toJson();
 
-    if (paths::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
+    if (pathstr::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
         return QMicroz::compress_buf(_data,
                                      QStringLiteral("checksums.ver.json"),
                                      m_file_path);
@@ -162,7 +163,7 @@ void VerJson::fillHeader()
 {
     static const QString _app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
     m_header[QStringLiteral(u"App/Origin")] = _app_origin;
-    //m_header[QStringLiteral(u"Folder")] = paths::basicName(workDir());
+    //m_header[QStringLiteral(u"Folder")] = pathstr::basicName(workDir());
     m_header[QStringLiteral(u"Total Checksums")] = m_data.size();
 
     if (!m_header.contains(h_key_Algo))

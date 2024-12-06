@@ -11,6 +11,7 @@
 #include <QAction>
 #include <QMenu>
 #include "tools.h"
+#include "pathstr.h"
 #include "treemodeliterator.h"
 
 View::View(QWidget *parent)
@@ -210,7 +211,7 @@ void View::setIndexByPath()
 {
     if (isViewFileSystem()) {
         if (!_lastPathFS.isEmpty() && !QFileInfo::exists(_lastPathFS))
-            _lastPathFS = paths::parentFolder(_lastPathFS);
+            _lastPathFS = pathstr::parentFolder(_lastPathFS);
 
         QFileInfo::exists(_lastPathFS) ? setIndexByPath(_lastPathFS) : toHome();
     }

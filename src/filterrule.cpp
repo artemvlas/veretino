@@ -5,6 +5,7 @@
 */
 #include "filterrule.h"
 #include "tools.h"
+#include "pathstr.h"
 #include <QRegularExpression>
 
 FilterRule::FilterRule(bool ignoreSummaries)
@@ -67,7 +68,7 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
     // if 'isFilter(Include)': a file ('filePath') with any extension from 'extensions_' is allowed
     // if 'isFilter(Ignore)': than all files except these types are allowed
 
-    return paths::hasExtension(filePath, extensions_) ? isFilter(Include): isFilter(Ignore);
+    return pathstr::hasExtension(filePath, extensions_) ? isFilter(Include): isFilter(Ignore);
 }
 
 QString FilterRule::extensionString(const QString &sep) const

@@ -14,6 +14,7 @@
 #include "files.h"
 #include "treemodeliterator.h"
 #include "tools.h"
+#include "pathstr.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), settings_(settings)
@@ -390,7 +391,7 @@ void Manager::checkSummaryFile(const QString &path)
         return;
 
     const QString checkFileName = QFileInfo(path).completeBaseName();
-    QString checkFilePath = paths::joinPath(paths::parentFolder(path), checkFileName);
+    QString checkFilePath = pathstr::joinPath(pathstr::parentFolder(path), checkFileName);
 
     if (!QFileInfo(checkFilePath).isFile()) {
         QFile sumFile(path);
@@ -398,7 +399,7 @@ void Manager::checkSummaryFile(const QString &path)
             return;
 
         const QString line = sumFile.readLine();
-        checkFilePath = paths::joinPath(paths::parentFolder(path), line.mid(storedChecksum.length() + 2).remove('\n'));
+        checkFilePath = pathstr::joinPath(pathstr::parentFolder(path), line.mid(storedChecksum.length() + 2).remove('\n'));
 
         if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
@@ -423,7 +424,7 @@ QString Manager::extractDigestFromFile(const QString &_digest_file)
 
     for (int it = 0; it <= _l_seps.size(); ++it) {
         int _cut = (it < _l_seps.size()) ? line.indexOf(_l_seps.at(it))
-                                         : tools::algoStrLen(tools::strToAlgo(paths::suffix(_digest_file)));
+                                         : tools::algoStrLen(tools::strToAlgo(pathstr::suffix(_digest_file)));
 
         if (_cut > 0) {
             const QString _dig = line.left(_cut);
