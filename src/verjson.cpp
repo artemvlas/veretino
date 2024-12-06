@@ -8,6 +8,7 @@
 #include "tools.h"
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonDocument>
 #include "treemodeliterator.h"
 #include <QDirIterator>
 #include "qmicroz.h"

@@ -39,7 +39,6 @@ private:
 
     bool isCreating() const;
     bool isJustCreated() const;
-    bool isSavedToDesktop() const;
 
     void selectCurTab();
     bool autoTabSelection = true; // automatic selection of the current tab during execution

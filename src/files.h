@@ -91,8 +91,6 @@ public:
     static QString firstDbFile(const QString &folderPath); // returns full path
     static QStringList dbFiles(const QString &folderPath); // file names only
 
-    static const QString desktopFolderPath; // path to the user's Desktop folder
-
     static const QString strNoType;
     static const QString strVeretinoDb;
     static const QString strShaFiles;

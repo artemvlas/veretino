@@ -44,30 +44,27 @@ void DialogDbStatus::connections()
 
 void DialogDbStatus::setLabelsInfo()
 {
-    QString dbFileName = data_->databaseFileName();
+    const MetaData &_meta = data_->metaData_;
 
-    if (isSavedToDesktop())
-        dbFileName.prepend("../DESKTOP/");
-
-    ui->labelDbFileName->setText(dbFileName);
-    ui->labelDbFileName->setToolTip(data_->metaData_.dbFilePath);
-    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(data_->metaData_.algorithm));
-    ui->labelWorkDir->setToolTip(data_->metaData_.workDir);
+    ui->labelDbFileName->setText(data_->databaseFileName());
+    ui->labelDbFileName->setToolTip(_meta.dbFilePath);
+    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(_meta.algorithm));
+    ui->labelWorkDir->setToolTip(_meta.workDir);
 
     if (!data_->isWorkDirRelative())
         ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
-    //const QString (&dt)[3] = data_->metaData_.datetime;
+    const VerDateTime &_dt = _meta.datetime;
 
-    if (data_->metaData_.datetime.m_updated.isEmpty())
-        ui->labelDateTime_Update->setText(data_->metaData_.datetime.m_created);
+    if (_dt.m_updated.isEmpty())
+        ui->labelDateTime_Update->setText(_dt.m_created);
     else {
-        ui->labelDateTime_Update->setText(data_->metaData_.datetime.m_updated);
-        ui->labelDateTime_Update->setToolTip(data_->metaData_.datetime.m_created);
+        ui->labelDateTime_Update->setText(_dt.m_updated);
+        ui->labelDateTime_Update->setToolTip(_dt.m_created);
     }
 
-    ui->labelDateTime_Check->setText(data_->metaData_.datetime.m_verified);
+    ui->labelDateTime_Check->setText(_dt.m_verified);
 }
 
 void DialogDbStatus::setTabsInfo()
@@ -130,12 +127,6 @@ QStringList DialogDbStatus::infoContent()
     const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
     if (_n_unr)
         contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _n_unr._num));
-
-    if (isSavedToDesktop()) {
-        contentNumbers.append(QString());
-        contentNumbers.append("Unable to save to working folder!");
-        contentNumbers.append("The database is saved on the Desktop.");
-    }
 
     if (isJustCreated())
         return contentNumbers;
@@ -273,12 +264,6 @@ bool DialogDbStatus::isCreating() const
 bool DialogDbStatus::isJustCreated() const
 {
     return data_->isDbFileState(MetaData::Created);
-}
-
-bool DialogDbStatus::isSavedToDesktop() const
-{
-    return (isJustCreated() && !data_->isWorkDirRelative()
-            && (paths::parentFolder(data_->metaData_.dbFilePath) == Files::desktopFolderPath));
 }
 
 void DialogDbStatus::showEvent(QShowEvent *event)

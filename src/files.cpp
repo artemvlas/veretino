@@ -5,7 +5,6 @@
 */
 #include "files.h"
 #include <QDirIterator>
-#include <QStandardPaths>
 #include <QDebug>
 #include "tools.h"
 #include "treemodeliterator.h"
@@ -15,8 +14,6 @@ const QString Files::strNoType = QStringLiteral(u"No type");
 const QString Files::strVeretinoDb = QStringLiteral(u"Veretino DB");
 const QString Files::strShaFiles = QStringLiteral(u"sha1/256/512");
 const QString Files::strNoPerm = QStringLiteral(u"No Permissions");
-
-const QString Files::desktopFolderPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 
 Files::Files(QObject *parent)
     : QObject(parent)
@@ -162,18 +159,16 @@ QString Files::getFolderSize(const QString &path)
         __n << it.fileInfo().size();
     }
 
-    // result processing
-    if (!isCanceled()) {
-        const QString _folderName = paths::basicName(path);
-        const QString _folderSize = format::filesNumSize(__n);
-
-        return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
-    }
-    else {
+    if (isCanceled()) {
         qDebug() << "Files::getFolderSize | Canceled" << path;
+        return QString();
     }
 
-    return QString();
+    // result processing
+    const QString _folderName = paths::basicName(path);
+    const QString _folderSize = format::filesNumSize(__n);
+
+    return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
 }
 
 FileTypeList Files::getFileTypes(const QString &folderPath, bool excludeUnPerm)

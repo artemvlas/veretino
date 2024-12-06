@@ -183,13 +183,6 @@ void DataMaintainer::updateNumbers()
 // if only one file has changed, there is no need to iterate over the entire list
 void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore)
 {
-    /*if (data_
-        && data_->numbers_.moveFile(statusBefore,
-                                    TreeModel::itemFileStatus(fileIndex),
-                                    TreeModel::itemFileSize(fileIndex)))
-    {
-        emit numbersUpdated();
-    }*/
     updateNumbers(statusBefore,
                   TreeModel::itemFileStatus(fileIndex),
                   TreeModel::itemFileSize(fileIndex));
@@ -671,29 +664,6 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
     }
 
     return _json;
-
-    /*
-    if (_json.save()) {
-        emit setStatusbarText(QStringLiteral(u"Saved"));
-        return pathToSave;
-    }
-    else {
-        const QString _workdir = isBranching ? paths::parentFolder(pathToSave) : _meta.workDir;
-        _json.addInfo(VerJson::h_key_WorkDir, _workdir);
-
-        QString resPathToSave = paths::joinPath(Files::desktopFolderPath, paths::basicName(pathToSave));
-        _json.setFilePath(resPathToSave);
-
-        if (_json.save()) {
-            emit setStatusbarText("Saved to Desktop");
-            return resPathToSave;
-        }
-        else {
-            emit setStatusbarText("NOT Saved");
-            emit showMessage("Unable to save json file: " + pathToSave, "Error");
-            return QString();
-        }
-    }*/
 }
 
 void DataMaintainer::exportToJson()

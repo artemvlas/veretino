@@ -7,7 +7,6 @@
 #define VERJSON_H
 
 #include <QObject>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QCryptographicHash>
