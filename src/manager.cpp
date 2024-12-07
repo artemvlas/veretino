@@ -87,10 +87,12 @@ void Manager::processFolderSha(const MetaData &metaData)
     // calculating checksums
     calculateChecksums(FileStatus::Queued);
 
-    if (!procState->isCanceled()) { // saving to json
+    // saving to json
+    if (!procState->isCanceled()) {
         dataMaintainer->updateDateTime();
         dataMaintainer->exportToJson();
-        sendDbUpdated();
+        if (!dataMaintainer->m_unsaved) // if saved successfully
+            sendDbUpdated();
     }
 }
 

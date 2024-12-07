@@ -92,6 +92,21 @@ QString suffix(const QString &_file)
     return (_dotInd > 0 && _len > 0) ? _file.right(_len).toLower() : QString();
 }
 
+QString setSuffix(const QString &_file, const QString &_suf)
+{
+    if (hasExtension(_file, _suf))
+        return _file;
+
+    const int _dotInd = basicName(_file).lastIndexOf(_dot);
+    if (_dotInd < 1)
+        return joinStrings(_file, _suf, _dot);
+
+    const int _cur_suf_size = _file.size() - _file.lastIndexOf(_dot) - 1;
+
+    QStringView _chopped = QStringView(_file).left(_file.size() - _cur_suf_size);
+    return _chopped % _suf;
+}
+
 bool isRoot(const QString &path)
 {
     switch (path.length()) {

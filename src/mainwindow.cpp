@@ -436,9 +436,9 @@ void MainWindow::dialogSaveJson()
 
     const QString _cur_file_path = _json->file_path();
 
-    const bool isLongExt = pathstr::hasExtension(_cur_file_path, Lit::sl_db_exts.at(0));
-    const QString _str_filter = QStringLiteral(u"Veretino DB (%1)")
-                                    .arg(isLongExt ? "*.ver.json *.ver" : "*.ver *.ver.json");
+    const bool _is_short = pathstr::hasExtension(_cur_file_path, Lit::sl_db_exts.at(1));
+    const QString _ext = Lit::sl_db_exts.at(_is_short); // index 0 is long, 1 is short
+    const QString _str_filter = QStringLiteral(u"Veretino DB (*.%1)").arg(_ext);
 
     QString _def_path = QFileDialog::getSaveFileName(this, QStringLiteral(u"Save DB File"),
                                                     _cur_file_path,
@@ -447,8 +447,8 @@ void MainWindow::dialogSaveJson()
     if (_def_path.isEmpty())
         return;
 
-    if (!paths::isDbFile(_def_path))
-        _def_path.append(isLongExt ? ".ver.json" : ".ver");
+    if (!pathstr::hasExtension(_def_path, _ext))
+        _def_path = pathstr::setSuffix(_def_path, _ext);
 
     qDebug() << "dialogSaveJson:" << _def_path;
     _json->setFilePath(_def_path);

@@ -23,6 +23,7 @@ QString joinPath(const QString &absolutePath, const QString &addPath);        //
 QString composeFilePath(const QString &parentFolder,
                         const QString &fileName, const QString &ext);
 QString suffix(const QString &_file);                                         // "file.txt" --> "txt"
+QString setSuffix(const QString &_file, const QString &_suf);                 // "file" or "file.txt" --> "file.zip"
 
 bool isRoot(const QString &path);                                             // true: "/" or "X:'/'"; else false
 bool hasExtension(const QString &file, const QString &ext);                   // true if the "file" (name or path) have the "ext" suffix
