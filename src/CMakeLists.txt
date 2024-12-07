@@ -91,6 +91,10 @@ set(PROJECT_SOURCES
     ../res/resources.qrc
 )
 
+if(WIN32)
+    list(APPEND PROJECT_SOURCES ../res/win_ico.rc)
+endif()
+
 # ${PROJECT_NAME} is veretino
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}

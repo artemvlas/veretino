@@ -13,6 +13,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories("include")
 
+if(WIN32)
+    # folder containing libqmicroz.dll
+    link_directories("libs")
+endif()
+
 add_definitions(-DAPP_NAME="Veretino")
 add_definitions(-DAPP_VERSION="${CMAKE_PROJECT_VERSION}")
 add_definitions(-DAPP_NAME_VERSION="Veretino ${CMAKE_PROJECT_VERSION}")
