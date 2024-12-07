@@ -87,24 +87,33 @@ QString composeFilePath(const QString &parentFolder, const QString &fileName, co
 
 QString suffix(const QString &_file)
 {
-    const int _dotInd = _file.lastIndexOf(_dot);
-    const int _len = _file.size() - _dotInd - 1;
-    return (_dotInd > 0 && _len > 0) ? _file.right(_len).toLower() : QString();
+    const int _len = suffixSize(_file);
+    return (_len > 0) ? _file.right(_len).toLower() : QString();
 }
 
 QString setSuffix(const QString &_file, const QString &_suf)
 {
-    if (hasExtension(_file, _suf))
-        return _file;
+    //if (hasExtension(_file, _suf))
+    //    return _file;
 
-    const int _dotInd = basicName(_file).lastIndexOf(_dot);
-    if (_dotInd < 1)
+    const int _cur_suf_size = suffixSize(_file);
+
+    if (_cur_suf_size == 0)
         return joinStrings(_file, _suf, _dot);
-
-    const int _cur_suf_size = _file.size() - _file.lastIndexOf(_dot) - 1;
 
     QStringView _chopped = QStringView(_file).left(_file.size() - _cur_suf_size);
     return _chopped % _suf;
+}
+
+int suffixSize(const QString &_file)
+{
+    const QString _file_name = basicName(_file); // in case: /folder.22/filename_with_no_dots
+    const int _dot_ind = _file_name.lastIndexOf(_dot);
+
+    if (_dot_ind < 1)
+        return 0;
+
+    return _file_name.size() - _dot_ind - 1;
 }
 
 bool isRoot(const QString &path)
