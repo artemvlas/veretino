@@ -67,7 +67,7 @@ public:
     bool tryMoved(const QModelIndex &_file, const QString &_checksum);
 
     bool importJson(const QString &filePath);
-    void exportToJson();
+    bool exportToJson();
     void forkJsonDb(const QModelIndex &rootFolder);
     int importBranch(const QModelIndex &rootFolder);
 

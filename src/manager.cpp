@@ -90,8 +90,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     // saving to json
     if (!procState->isCanceled()) {
         dataMaintainer->updateDateTime();
-        dataMaintainer->exportToJson();
-        if (!dataMaintainer->m_unsaved) // if saved successfully
+        if (dataMaintainer->exportToJson()) // if saved successfully
             sendDbUpdated();
     }
 }

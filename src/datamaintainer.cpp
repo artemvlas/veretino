@@ -667,14 +667,14 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
     return _json;
 }
 
-void DataMaintainer::exportToJson()
+bool DataMaintainer::exportToJson()
 {
     if (!data_)
-        return;
+        return false;
 
     VerJson *_json = m_unsaved ? m_unsaved : makeJson();
     if (!_json)
-        return;
+        return false;
 
     data_->makeBackup();
 
@@ -684,6 +684,8 @@ void DataMaintainer::exportToJson()
         clearUnsavedJson();
 
         emit setStatusbarText(QStringLiteral(u"Saved"));
+        qDebug() << "DM::exportToJson >> Saved";
+        return true;
     }
     else {
         setDbFileState(DbFileState::NotSaved);
@@ -693,11 +695,9 @@ void DataMaintainer::exportToJson()
         emit failedJsonSave();
 
         emit setStatusbarText("NOT Saved");
+        qDebug() << "DM::exportToJson >> NOT Saved";
+        return false;
     }
-
-    // debug info
-    if (data_->isDbFileState(DbFileState::Saved))
-        qDebug() << "DM::exportToJson >> Saved";
 }
 
 void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)

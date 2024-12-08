@@ -47,7 +47,7 @@ void DialogDbStatus::setLabelsInfo()
 {
     const MetaData &_meta = data_->metaData_;
 
-    ui->labelDbFileName->setText(data_->databaseFileName());
+    ui->labelDbFileName->setText(QFileInfo::exists(_meta.dbFilePath) ? data_->databaseFileName() : "no file yet");
     ui->labelDbFileName->setToolTip(_meta.dbFilePath);
     ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(_meta.algorithm));
     ui->labelWorkDir->setToolTip(_meta.workDir);
