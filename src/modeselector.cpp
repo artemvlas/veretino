@@ -356,7 +356,7 @@ void ModeSelector::showFolderContentTypes()
 
 void ModeSelector::checkFileByClipboardChecksum()
 {
-    checkFile(view_->curAbsPath(), QGuiApplication::clipboard()->text());
+    checkFile(view_->curAbsPath(), QGuiApplication::clipboard()->text().simplified());
 }
 
 void ModeSelector::copyFsItem()
@@ -757,7 +757,7 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
             viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
             viewContextMenu->addMenu(menuAct_->menuCreateDigest);
 
-            QString clipboardText = QGuiApplication::clipboard()->text();
+            QString clipboardText = QGuiApplication::clipboard()->text().simplified();
             if (tools::canBeChecksum(clipboardText)) {
                 QString _s = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(clipboardText, 20);
                 menuAct_->actionCheckFileByClipboardChecksum->setText(_s);
