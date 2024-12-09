@@ -679,7 +679,7 @@ bool DataMaintainer::exportToJson()
     data_->makeBackup();
 
     if (_json->save()) {
-        setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
+        setDbFileState(DbFileState::Saved);
         data_->metaData_.dbFilePath = _json->file_path();
         clearUnsavedJson();
 

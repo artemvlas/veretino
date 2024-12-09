@@ -23,7 +23,7 @@ struct MetaData {
 
     VerDateTime datetime;
 
-    enum DbFileState : quint8 { NoFile, Created, NotSaved, Saved };
+    enum DbFileState : quint8 { NoFile, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
 
     enum PropertyFlag : quint8 { NotSet = 0, FlagConst = 1 };

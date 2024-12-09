@@ -38,7 +38,6 @@ private:
     void setLabelsInfo();
 
     bool isCreating() const;
-    bool isJustCreated() const;
 
     void selectCurTab();
     bool autoTabSelection = true; // automatic selection of the current tab during execution

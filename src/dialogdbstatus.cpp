@@ -72,12 +72,12 @@ void DialogDbStatus::setTabsInfo()
 {
     IconProvider icons(palette()); // to set tabs icons
 
-    // tab Content
+    // TabListed
     ui->labelContentNumbers->setStyleSheet(QStringLiteral(u"QLabel { font-family: monospace; }"));
     ui->labelContentNumbers->setText(infoContent().join('\n'));
     ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
-    // tab Filter
+    // TabFilter
     ui->tabWidget->setTabEnabled(TabFilter, data_->isFilterApplied());
     if (data_->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
@@ -91,16 +91,19 @@ void DialogDbStatus::setTabsInfo()
         ui->labelFiltersInfo->setText(_str_mode + _exts);
     }
 
-    // tab Verification
+    // TabVerification
     ui->tabWidget->setTabEnabled(TabVerification, data_->contains(FileStatus::CombChecked));
     if (data_->contains(FileStatus::CombChecked)) {
         ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         ui->labelVerification->setText(infoVerification().join('\n'));
     }
 
-    // tab Result
-    ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && data_->contains(FileStatus::CombDbChanged));
-    if (ui->tabWidget->isTabEnabled(TabChanges)) {
+    // TabChanges
+    const bool _has_changes = !data_->metaData_.datetime.m_updated.isEmpty() // to exclude the newly created db
+                              && data_->contains(FileStatus::CombDbChanged);
+
+    ui->tabWidget->setTabEnabled(TabChanges, _has_changes);
+    if (_has_changes) {
         ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         ui->labelResult->setText(infoChanges().join('\n'));
     }
@@ -112,30 +115,26 @@ QStringList DialogDbStatus::infoContent()
         return { QStringLiteral(u"The checksum list is being calculated...") };
 
     const Numbers &_num = data_->numbers_;
-    QStringList contentNumbers;
+    QStringList contentNumbers; // result strings
     const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
-    const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
+    const int _n_checksums = _num.numberOf(FileStatus::CombHasChecksum);
+    QString _storedChecksums = tools::joinStrings(QStringLiteral(u"Stored checksums:"), _n_checksums);
 
-    if (isJustCreated() || (numChecksums != _n_avail._num)) {
-        QString _storedChecksums = tools::joinStrings(QStringLiteral(u"Stored checksums:"), numChecksums);
-
-        if (isJustCreated())
-            contentNumbers << format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(_n_avail._size));
-        else
-            contentNumbers << _storedChecksums;
+    if (_n_checksums == _n_avail._num) {
+        _storedChecksums = format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(_n_avail._size));
     }
+    contentNumbers << _storedChecksums;
 
     const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
     if (_n_unr)
         contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _n_unr._num));
 
-    if (isJustCreated())
-        return contentNumbers;
-
-    if (_n_avail)
-        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(_n_avail));
-    else
-        contentNumbers.append("NO FILES available to check");
+    if (_n_checksums != _n_avail._num) {
+        if (_n_avail)
+            contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(_n_avail));
+        else
+            contentNumbers.append("NO FILES available to check");
+    }
 
     // [experimental]
     const NumSize _n_mod = _num.values(FileStatus::NotCheckedMod);
@@ -144,11 +143,13 @@ QStringList DialogDbStatus::infoContent()
         // addit. space is needed for align. with "Available: " (monospace fonts)
     // [exp.]
 
-    contentNumbers.append(QString());
-    contentNumbers.append(QStringLiteral(u"***"));
+    if (_num.contains(FileStatus::CombNewLost)) {
+        contentNumbers.append(QString());
+        contentNumbers.append(QStringLiteral(u"***"));
 
-    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(_num, FileStatus::New));
-    contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(_num.numberOf(FileStatus::Missing)));
+        contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(_num, FileStatus::New));
+        contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(_num.numberOf(FileStatus::Missing)));
+    }
 
     if (data_->isImmutable()) {
         contentNumbers.append(QString());
@@ -260,11 +261,6 @@ void DialogDbStatus::setCurrentTab(Tabs tab)
 bool DialogDbStatus::isCreating() const
 {
     return data_->isDbFileState(MetaData::NoFile);
-}
-
-bool DialogDbStatus::isJustCreated() const
-{
-    return data_->isDbFileState(MetaData::Created);
 }
 
 void DialogDbStatus::showEvent(QShowEvent *event)
