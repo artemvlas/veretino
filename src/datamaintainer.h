@@ -58,9 +58,9 @@ public:
     int clearChecksums(const FileStatuses flags,
                        const QModelIndex &rootIndex = QModelIndex());
 
-    int clearLostFiles(); // returns the number of cleared
-    int updateMismatchedChecksums(); // returns the number of updated checksums
-    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);
+    int clearLostFiles();                                                                  // returns the number of cleared
+    int updateMismatchedChecksums();                                                       // returns the number of updated checksums
+    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);         // rolls back file statuses when canceling an operation
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
@@ -77,8 +77,8 @@ public:
     QString itemContentsInfo(const QModelIndex &curIndex);
 
     // variables
-    DataContainer *data_ = nullptr; // main data
-    VerJson *m_unsaved = nullptr;
+    DataContainer *data_ = nullptr;     // main data
+    VerJson *p_unsaved_json = nullptr;  // temporarily stores a pointer to a json object when saving fails
 
 public slots:
     void clearData();

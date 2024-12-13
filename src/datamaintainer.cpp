@@ -77,9 +77,9 @@ void DataMaintainer::clearOldData()
 
 void DataMaintainer::clearUnsavedJson()
 {
-    if (m_unsaved) {
-        delete m_unsaved;
-        m_unsaved = nullptr;
+    if (p_unsaved_json) {
+        delete p_unsaved_json;
+        p_unsaved_json = nullptr;
     }
 }
 
@@ -672,7 +672,7 @@ bool DataMaintainer::exportToJson()
     if (!data_)
         return false;
 
-    VerJson *_json = m_unsaved ? m_unsaved : makeJson();
+    VerJson *_json = p_unsaved_json ? p_unsaved_json : makeJson();
     if (!_json)
         return false;
 
@@ -691,7 +691,7 @@ bool DataMaintainer::exportToJson()
         setDbFileState(DbFileState::NotSaved);
         _json->addInfo(VerJson::h_key_WorkDir, data_->metaData_.workDir);
 
-        m_unsaved = _json;
+        p_unsaved_json = _json;
         emit failedJsonSave();
 
         emit setStatusbarText("NOT Saved");

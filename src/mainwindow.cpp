@@ -428,7 +428,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
 
 void MainWindow::dialogSaveJson()
 {
-    VerJson *_json = manager->dataMaintainer->m_unsaved;
+    VerJson *_json = manager->dataMaintainer->p_unsaved_json;
     if (!_json) {
         qWarning() << "No unsaved json found";
         return;
