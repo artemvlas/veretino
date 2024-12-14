@@ -53,7 +53,6 @@ bool DataMaintainer::setSourceData(DataContainer *sourceData)
         data_ = sourceData;
         data_->setParent(this);
         updateNumbers();
-        clearUnsavedJson();
     }
 
     return sourceData; // false if sourceData == nullptr, else true
@@ -72,14 +71,6 @@ void DataMaintainer::clearOldData()
     if (oldData_) {
         delete oldData_;
         oldData_ = nullptr;
-    }
-}
-
-void DataMaintainer::clearUnsavedJson()
-{
-    if (p_unsaved_json) {
-        delete p_unsaved_json;
-        p_unsaved_json = nullptr;
     }
 }
 
@@ -672,30 +663,45 @@ bool DataMaintainer::exportToJson()
     if (!data_)
         return false;
 
-    VerJson *_json = p_unsaved_json ? p_unsaved_json : makeJson();
+    VerJson *_json = makeJson();
     if (!_json)
         return false;
 
     data_->makeBackup();
 
+    if (saveJsonFile(_json)) {
+        delete _json;
+        return true;
+    } else {
+        // adding the WorkDir info
+        _json->addInfo(VerJson::h_key_WorkDir, data_->metaData_.workDir);
+
+        // ownership is transferred to the GUI thread (will be deleted there)
+        emit failedJsonSave(_json);
+        return false;
+    }
+}
+
+bool DataMaintainer::saveJsonFile(VerJson *_json)
+{
+    if (!data_ || !_json)
+        return false;
+
     if (_json->save()) {
         setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
         data_->metaData_.dbFilePath = _json->file_path();
-        clearUnsavedJson();
 
         emit setStatusbarText(QStringLiteral(u"Saved"));
         qDebug() << "DM::exportToJson >> Saved";
+
         return true;
     }
     else {
         setDbFileState(DbFileState::NotSaved);
-        _json->addInfo(VerJson::h_key_WorkDir, data_->metaData_.workDir);
-
-        p_unsaved_json = _json;
-        emit failedJsonSave();
 
         emit setStatusbarText("NOT Saved");
         qDebug() << "DM::exportToJson >> NOT Saved";
+
         return false;
     }
 }

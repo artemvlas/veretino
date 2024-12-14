@@ -68,6 +68,7 @@ public:
 
     bool importJson(const QString &filePath);
     bool exportToJson();
+    bool saveJsonFile(VerJson *_json);
     void forkJsonDb(const QModelIndex &rootFolder);
     int importBranch(const QModelIndex &rootFolder);
 
@@ -78,7 +79,6 @@ public:
 
     // variables
     DataContainer *data_ = nullptr;     // main data
-    VerJson *p_unsaved_json = nullptr;  // temporarily stores a pointer to a json object when saving fails
 
 public slots:
     void clearData();
@@ -88,7 +88,6 @@ public slots:
 private:
     void connections();
     bool isCanceled() const;
-    void clearUnsavedJson();
     MetaData getMetaData(const VerJson &_json) const;
     FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
     VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
@@ -108,7 +107,7 @@ signals:
     void subDbForked(const QString &forkedDbFilePath);
     void dbFileStateChanged(bool isNotSaved);
     void failedDataCreation();
-    void failedJsonSave();
+    void failedJsonSave(VerJson *p_unsaved);
 }; // class DataMaintainer
 
 #endif // DATAMAINTAINER_H

@@ -3,6 +3,7 @@ What's new:
 * Improved database storage format. Now files with the *.ver extension are compressed.
 * When working with non-writable folders, the location of the database file is now user-selectable.
     (previously it was saved to the Desktop)
+* Also a more reliable process for saving databases.
 * More accurate detection of the presence of a checksum string in the clipboard (for file verification).
 
 Internal changes:

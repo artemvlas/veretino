@@ -66,7 +66,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     // if a computing process is running, show a prompt when user wants to close the app
     if (modeSelect->promptProcessAbort()) {
-        modeSelect->saveData();
+        if (!awaiting_closure && manager->dataMaintainer->isDataNotSaved()) {
+            awaiting_closure = true;
+            modeSelect->saveData();
+            event->ignore();
+            return;
+        }
+
         saveSettings();
 
         if (ui->view->isViewDatabase())
@@ -112,6 +118,7 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
     connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, modeSelect->menuAct_->actionSave, &QAction::setEnabled);
+    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, [=] {if (awaiting_closure) close(); });
 
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
@@ -426,35 +433,53 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     }
 }
 
-void MainWindow::dialogSaveJson()
+void MainWindow::dialogSaveJson(VerJson *p_unsaved)
 {
-    VerJson *_json = manager->dataMaintainer->p_unsaved_json;
-    if (!_json) {
+    if (!p_unsaved) {
         qWarning() << "No unsaved json found";
         return;
     }
 
-    const QString _cur_file_path = _json->file_path();
+    QString _file_path = p_unsaved->file_path();
 
-    const bool _is_short = pathstr::hasExtension(_cur_file_path, Lit::sl_db_exts.at(1));
+    const bool _is_short = pathstr::hasExtension(_file_path, Lit::sl_db_exts.at(1));
     const QString _ext = Lit::sl_db_exts.at(_is_short); // index 0 is long, 1 is short
     const QString _str_filter = QStringLiteral(u"Veretino DB (*.%1)").arg(_ext);
 
-    QString _def_path = QFileDialog::getSaveFileName(this, QStringLiteral(u"Save DB File"),
-                                                    _cur_file_path,
-                                                    _str_filter);
+    while (true) {
+        const QString _sel_path = QFileDialog::getSaveFileName(this,
+                                                               QStringLiteral(u"Save DB File"),
+                                                               _file_path,
+                                                               _str_filter);
 
-    if (_def_path.isEmpty())
-        return;
+        if (_sel_path.isEmpty()) { // canceled
+            if (awaiting_closure
+                && QMessageBox::question(this, "Unsaved data...",
+                                         "Exit without saving data?") != QMessageBox::Yes)
+            {
+                continue;
+            }
 
-    if (!pathstr::hasExtension(_def_path, _ext))
-        _def_path = pathstr::setSuffix(_def_path, _ext);
+            break;
+        }
 
-    qDebug() << "dialogSaveJson:" << _def_path;
-    _json->setFilePath(_def_path);
-    modeSelect->saveData();
+        _file_path = _sel_path;
+
+        if (!pathstr::hasExtension(_file_path, _ext))
+            _file_path = pathstr::setSuffix(_file_path, _ext);
+
+        p_unsaved->setFilePath(_file_path);
+
+        if (manager->dataMaintainer->saveJsonFile(p_unsaved))
+            break;
+    }
+
+    delete p_unsaved;
+    qDebug() << "dialogSaveJson:" << _file_path;
+
+    if (awaiting_closure)
+        close();
 }
-
 
 void MainWindow::updateButtonInfo()
 {

@@ -45,7 +45,7 @@ public slots:
     void promptOpenBranch(const QString &dbFilePath);
     void showFolderCheckResult(const Numbers &result, const QString &subFolder);
     void showFileCheckResult(const QString &filePath, const FileValues &values);
-    void dialogSaveJson();
+    void dialogSaveJson(VerJson *p_unsaved);
 
     void createContextMenu_Button(const QPoint &point);
 
@@ -67,6 +67,7 @@ private:
     ModeSelector *modeSelect = nullptr;
     ProcState *proc_ = nullptr;
     StatusBar *statusBar = new StatusBar;
+    bool awaiting_closure = false;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
