@@ -19,15 +19,18 @@ const QStringList Lit::sl_db_exts = {
     QStringLiteral(u"ver")
 };
 const QStringList Lit::sl_digest_exts = {
+    QStringLiteral(u"md5"),
     QStringLiteral(u"sha1"),
     QStringLiteral(u"sha256"),
     QStringLiteral(u"sha512")
 };
 const QStringList Lit::sl_digest_Exts = {
+    QStringLiteral(u"MD5"),
     QStringLiteral(u"SHA-1"),
     QStringLiteral(u"SHA-256"),
     QStringLiteral(u"SHA-512")
 };
+
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
 const QString Lit::s_appNameVersion = QStringLiteral(APP_NAME_VERSION);
@@ -42,28 +45,32 @@ namespace tools {
 int algoStrLen(QCryptographicHash::Algorithm algo)
 {
     switch (algo) {
-        case QCryptographicHash::Sha1:
-            return 40;
-        case QCryptographicHash::Sha256:
-            return 64;
-        case QCryptographicHash::Sha512:
-            return 128;
-        default:
-            return 0;
+    case QCryptographicHash::Md5:
+        return 32;
+    case QCryptographicHash::Sha1:
+        return 40;
+    case QCryptographicHash::Sha256:
+        return 64;
+    case QCryptographicHash::Sha512:
+        return 128;
+    default:
+        return 0;
     }
 }
 
 QCryptographicHash::Algorithm algoByStrLen(int strLen)
 {
     switch (strLen) {
-        case 40:
-            return QCryptographicHash::Sha1;
-        case 64:
-            return QCryptographicHash::Sha256;
-        case 128:
-            return QCryptographicHash::Sha512;
-        default:
-            return static_cast<QCryptographicHash::Algorithm>(0);
+    case 32:
+        return QCryptographicHash::Md5;
+    case 40:
+        return QCryptographicHash::Sha1;
+    case 64:
+        return QCryptographicHash::Sha256;
+    case 128:
+        return QCryptographicHash::Sha512;
+    default:
+        return static_cast<QCryptographicHash::Algorithm>(0);
     }
 }
 
@@ -83,6 +90,8 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
             return QCryptographicHash::Sha256;
         case 512:
             return QCryptographicHash::Sha512;
+        case 5:
+            return QCryptographicHash::Md5;
         default:
             return static_cast<QCryptographicHash::Algorithm>(0);
     }
@@ -101,10 +110,9 @@ int digitsToNum(const QList<int> &digits)
 
 bool canBeChecksum(const QString &str)
 {
-    if (str.length() != 40
-        && str.length() != 64
-        && str.length() != 128)
-    {
+    static const QSet<int> s_perm_length = {32, 40, 64, 128};
+
+    if (!s_perm_length.contains(str.length())) {
         return false;
     }
 
@@ -387,14 +395,16 @@ QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
     const QStringList &_list = capitalLetters ? Lit::sl_digest_Exts : Lit::sl_digest_exts;
 
     switch (algo) {
-        case QCryptographicHash::Sha1:
-            return _list.at(0);
-        case QCryptographicHash::Sha256:
-            return _list.at(1);
-        case QCryptographicHash::Sha512:
-            return _list.at(2);
-        default:
-            return "Unknown";
+    case QCryptographicHash::Md5:
+        return _list.at(0);
+    case QCryptographicHash::Sha1:
+        return _list.at(1);
+    case QCryptographicHash::Sha256:
+        return _list.at(2);
+    case QCryptographicHash::Sha512:
+        return _list.at(3);
+    default:
+        return "Unknown";
     }
 }
 
