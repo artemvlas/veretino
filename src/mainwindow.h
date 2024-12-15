@@ -27,7 +27,8 @@ public:
     ~MainWindow();
 
 public slots:
-    void showMessage(const QString &message, const QString &title = "Info");
+    void showMessage(const QString &message,
+                     const QString &title = "Info");
     void updatePermanentStatus();
     void handlePathEdit();
     void setWinTitleMismatchFound();
@@ -36,34 +37,41 @@ public slots:
     // dialogs
     void showDbStatus();
     void showDbStatusTab(DialogDbStatus::Tabs tab);
-    void showDialogContentsList(const QString &folderName, const FileTypeList &extList); // view folder contents
-    void showDialogDbCreation(const QString &folder, const QStringList &dbFiles, const FileTypeList &extList);
-    void showDialogDbContents(const QString &folderName, const FileTypeList &extList); // view DB contents
+    void showDialogContentsList(const QString &folderName,
+                                const FileTypeList &extList);   // view folder contents
+    void showDialogDbCreation(const QString &folder,
+                              const QStringList &dbFiles,
+                              const FileTypeList &extList);
+    void showDialogDbContents(const QString &folderName,
+                              const FileTypeList &extList);     // view DB contents
     void dialogSettings();
     void dialogChooseFolder();
     void dialogOpenJson();
     void promptOpenBranch(const QString &dbFilePath);
-    void showFolderCheckResult(const Numbers &result, const QString &subFolder);
-    void showFileCheckResult(const QString &filePath, const FileValues &values);
+    void showFolderCheckResult(const Numbers &result,
+                               const QString &subFolder);
+    void showFileCheckResult(const QString &filePath,
+                             const FileValues &values);
     void dialogSaveJson(VerJson *p_unsaved);
 
     void createContextMenu_Button(const QPoint &point);
 
 private:
-    void connectManager(); // connections are separated for convenience
-    void connections();
-    bool argumentInput(); // using the path argument if it's provided
+    void connections();                                        // generic
+    void connectManager();                                     // Manager connections are separated for convenience
+    bool argumentInput();                                      // using the path argument if it's provided
     void handleChangedModel();
     void handleButtonDbHashClick();
+    void handleChangedDbFileState(DbFileState state);
     void updateStatusIcon();
-    void updateButtonInfo(); // sets the Button icon and text according the current Mode
+    void updateButtonInfo();                                   // sets the Button icon and text according the current Mode
     void clearDialogs();
     void saveSettings();
 
     Ui::MainWindow *ui;
-    Settings *settings_ = new Settings(this); // current app settings
-    QThread *thread = new QThread;
-    Manager *manager = new Manager(settings_); // Manager performs the main tasks. Works in separate thread^
+    Settings *settings_ = new Settings(this);                  // current app settings
+    QThread *thread = new QThread;                             // Manager thread
+    Manager *manager = new Manager(settings_);                 // Manager performs the main tasks. Works in separate thread^
     ModeSelector *modeSelect = nullptr;
     ProcState *proc_ = nullptr;
     StatusBar *statusBar = new StatusBar;

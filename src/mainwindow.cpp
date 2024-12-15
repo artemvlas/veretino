@@ -117,8 +117,6 @@ void MainWindow::connections()
     connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
     connect(modeSelect->menuAct_->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
     connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
-    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, modeSelect->menuAct_->actionSave, &QAction::setEnabled);
-    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, [=] {if (awaiting_closure) close(); });
 
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
@@ -139,6 +137,7 @@ void MainWindow::connectManager()
     qRegisterMetaType<FileTypeList>("FileTypeList");
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
+    qRegisterMetaType<DbFileState>("DbFileState");
 
     manager->moveToThread(thread);
 
@@ -166,6 +165,7 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::failedDataCreation, this,
             [=]{ if (ui->view->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
     connect(manager->dataMaintainer, &DataMaintainer::failedJsonSave, this, &MainWindow::dialogSaveJson);
+    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, this, &MainWindow::handleChangedDbFileState);
 
     // process status
     connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
@@ -580,6 +580,16 @@ void MainWindow::handleButtonDbHashClick()
         else
             showMessage("There are no checked items yet.", "Unchecked DB");
     }
+}
+
+void MainWindow::handleChangedDbFileState(DbFileState state)
+{
+    if (awaiting_closure) {
+        close();
+        return;
+    }
+
+    modeSelect->menuAct_->actionSave->setEnabled(state == DbFileState::NotSaved);
 }
 
 void MainWindow::createContextMenu_Button(const QPoint &point)

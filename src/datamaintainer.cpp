@@ -199,7 +199,7 @@ void DataMaintainer::setDbFileState(DbFileState state)
 {
     if (data_ && !data_->isDbFileState(state)) {
         data_->metaData_.dbFileState = state;
-        emit dbFileStateChanged(state == DbFileState::NotSaved);
+        emit dbFileStateChanged(state);
     }
 }
 
