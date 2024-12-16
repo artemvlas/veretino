@@ -147,7 +147,7 @@ void DialogDbCreation::setDbConfig()
     updateDbFilename();
 
     // algo
-    ui->cmb_algo->addItems(Lit::sl_digest_Exts);
+    ui->cmb_algo->addItems(Lit::sl_digest_Exts.mid(1)); // all except index 0 (MD5)
     ui->cmb_algo->setCurrentIndex(cmbAlgoIndex());
 }
 
