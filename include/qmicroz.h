@@ -3,8 +3,7 @@
  * under the MIT License.
  * https://github.com/artemvlas/qmicroz
  *
- * Author: Artem Vlasenko
- * https://github.com/artemvlas
+ * Copyright (c) 2024 Artem Vlasenko
 */
 
 #ifndef QMICROZ_H
@@ -82,15 +81,15 @@ public:
 
 private:
     const ZipContentsList& updateZipContents();                                        // updates the list of current archive contents
-    const QString& outputFolder();                                                     // returns the current folder for extracting the archive
+    const QString& outputFolder();                                                     // returns the path to place the extracted files
     int findIndex(const QString &file_name);                                           // finds the file index by the specified name
 
     // the void pointer is used to allow the miniz header not to be included
     void *m_archive = nullptr;
 
     QString m_zip_path;                                                                // path to the current zip file
-    QString m_output_folder;                                                           // folder for extracting the archive
-    ZipContentsList m_zip_contents;                                                    // list of current contents { index : filename (or path) }
+    QString m_output_folder;                                                           // folder to place the extracted files
+    ZipContentsList m_zip_contents;                                                    // holds the list of current contents { index : filename (or path) }
     static const QString s_zip_ext;
 
 }; // class QMicroz
