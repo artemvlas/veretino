@@ -62,11 +62,11 @@ private:
     bool argumentInput();                                      // using the path argument if it's provided
     void handleChangedModel();
     void handleButtonDbHashClick();
-    void handleChangedDbFileState(DbFileState state);
-    void updateStatusIcon();
+    void updateStatusIcon();                                   // updates the icon in the lower left corner
     void updateButtonInfo();                                   // sets the Button icon and text according the current Mode
-    void clearDialogs();
-    void saveSettings();
+    void updateMenuActions();                                  // updates the state of main menu actions
+    void clearDialogs();                                       // closes open dialog boxes, if any
+    void saveSettings();                                       // saves current settings to the file
 
     Ui::MainWindow *ui;
     Settings *settings_ = new Settings(this);                  // current app settings
@@ -75,7 +75,7 @@ private:
     ModeSelector *modeSelect = nullptr;
     ProcState *proc_ = nullptr;
     StatusBar *statusBar = new StatusBar;
-    bool awaiting_closure = false;
+    bool awaiting_closure = false;                             // true if the exit attempt was rejected (to perform data saving)
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

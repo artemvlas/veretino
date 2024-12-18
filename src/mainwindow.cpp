@@ -165,7 +165,8 @@ void MainWindow::connectManager()
     connect(manager->dataMaintainer, &DataMaintainer::failedDataCreation, this,
             [=]{ if (ui->view->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
     connect(manager->dataMaintainer, &DataMaintainer::failedJsonSave, this, &MainWindow::dialogSaveJson);
-    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, this, &MainWindow::handleChangedDbFileState);
+    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, this, &MainWindow::updateMenuActions);
+    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, this, [=]{ if (awaiting_closure) close(); });
 
     // process status
     connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
@@ -488,6 +489,13 @@ void MainWindow::updateButtonInfo()
     ui->button->setToolTip(modeSelect->getButtonToolTip());
 }
 
+void MainWindow::updateMenuActions()
+{
+    modeSelect->menuAct_->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
+    modeSelect->menuAct_->actionSave->setEnabled(ui->view->isViewDatabase()
+                                                 && ui->view->data_->isDbFileState(DbFileState::NotSaved));
+}
+
 void MainWindow::updateStatusIcon()
 {
     QIcon statusIcon;
@@ -564,9 +572,7 @@ void MainWindow::handleChangedModel()
     ui->pathEdit->setEnabled(isViewFS);
     ui->pathEdit->setClearButtonEnabled(isViewFS);
 
-    modeSelect->menuAct_->actionShowFilesystem->setEnabled(!isViewFS);
-    modeSelect->menuAct_->actionSave->setEnabled(ui->view->isViewDatabase()
-                                                 && ui->view->data_->isDbFileState(DbFileState::NotSaved));
+    updateMenuActions();
 }
 
 void MainWindow::handleButtonDbHashClick()
@@ -580,16 +586,6 @@ void MainWindow::handleButtonDbHashClick()
         else
             showMessage("There are no checked items yet.", "Unchecked DB");
     }
-}
-
-void MainWindow::handleChangedDbFileState(DbFileState state)
-{
-    if (awaiting_closure) {
-        close();
-        return;
-    }
-
-    modeSelect->menuAct_->actionSave->setEnabled(state == DbFileState::NotSaved);
 }
 
 void MainWindow::createContextMenu_Button(const QPoint &point)
@@ -615,8 +611,7 @@ bool MainWindow::argumentInput()
         if (QFileInfo::exists(argPath)) {
             if (QFileInfo(argPath).isFile() && paths::isDbFile(argPath)) {
                 modeSelect->openJsonDatabase(argPath);
-            }
-            else {
+            } else {
                 ui->view->setFileSystemModel();
                 ui->view->setIndexByPath(argPath);
             }
