@@ -76,7 +76,7 @@ bool VerJson::load()
     if (__b.startsWith("PK")) { // is compressed
         QMicroz _qmz(__b);
         if (_qmz)
-            __b = _qmz.extract_to_ram(0).m_data;
+            __b = _qmz.extractData(0);
     }
 
     const QJsonDocument _doc = QJsonDocument::fromJson(__b);
