@@ -2,8 +2,9 @@
  * A small library for handling filesystem paths as strings.
  *
  * MIT License
- * Author: Artem Vlasenko <artemvlas (at) proton (dot) me>
+ * Copyright (c) 2021 - present Artem Vlasenko
  *
+ * <artemvlas (at) proton (dot) me>
  * https://github.com/artemvlas
 */
 #include "pathstr.h"
@@ -85,6 +86,28 @@ QString composeFilePath(const QString &parentFolder, const QString &fileName, co
     return parentFolder % _sep % fileName % _dot % ext;
 }
 
+QString root(const QString &path)
+{
+    // Unix-style fs root "/"
+    if (path.startsWith(_sep))
+        return _sep;
+
+    // Windows-style root "C:/"
+    if (path.size() > 1
+        && path.at(0).isLetter()
+        && path.at(1) == u':')
+    {
+        if (path.size() == 2)    // "C:"
+            return path + _sep;  // --> "C:/"
+
+        if (isSeparator(path.at(2)))
+            return path.left(3);
+    }
+
+    // no root found
+    return QString();
+}
+
 QString suffix(const QString &_file)
 {
     const int _len = suffixSize(_file);
@@ -145,6 +168,11 @@ bool hasExtension(const QString &file, const QStringList &extensions)
     }
 
     return false;
+}
+
+bool isSeparator(const QChar sep)
+{
+    return (sep == _sep) || (sep == '\\');
 }
 
 QString joinStrings(const QString &str1, const QString &str2, QChar sep)
