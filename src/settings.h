@@ -36,6 +36,7 @@ public:
     bool saveVerificationDateTime = false;
     bool instantSaving = false;
     bool excludeUnpermitted = true;
+    bool excludeSymlinks = true;
     bool dbFlagConst = false;
     bool considerDateModified = true;
     bool detectMoved = false;

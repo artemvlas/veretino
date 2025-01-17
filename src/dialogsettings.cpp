@@ -60,6 +60,7 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
     ui->cbInstantSaving->setChecked(settings.instantSaving);
     ui->cbExcludeUnpermitted->setChecked(settings.excludeUnpermitted);
+    ui->cbExcludeSymlinks->setChecked(settings.excludeSymlinks);
     ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
     ui->cbDetectMoved->setChecked(settings.detectMoved);
 
@@ -94,6 +95,7 @@ void DialogSettings::updateSettings()
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
     settings_->instantSaving = ui->cbInstantSaving->isChecked();
     settings_->excludeUnpermitted = ui->cbExcludeUnpermitted->isChecked();
+    settings_->excludeSymlinks = ui->cbExcludeSymlinks->isChecked();
     settings_->considerDateModified = ui->cbConsiderDateModified->isChecked();
     settings_->detectMoved = ui->cbDetectMoved->isChecked();
 

@@ -41,7 +41,7 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
 
 void WidgetFileTypes::setCheckboxesVisible(bool visible)
 {
-    static const QSet<QString> _s_excl { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
+    static const QSet<QString> _s_excl { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
 
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
@@ -85,7 +85,7 @@ bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
 
 bool WidgetFileTypes::isPassedUnChecked(const ItemFileType *item) const
 {
-    static const QSet<QString> _s_unfilt { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm };
+    static const QSet<QString> _s_unfilt { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
 
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())

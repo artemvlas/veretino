@@ -6,6 +6,7 @@ What's new:
 * More reliable database saving process.
 * More accurate detection of the presence of a checksum string in the clipboard (for file verification).
 * Added support for checking using the outdated (but still used) MD5 algorithm.
+* Added the ability to exclude shortcuts and symbolic links from the list of files.
 
 Internal changes:
 * The way of processing JSON file data has been redesigned.

@@ -661,7 +661,13 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
             return;
         }
 
-        const FileTypeList _typesList = files_->getFileTypes(folderPath, settings_->excludeUnpermitted);
+        quint8 _comb = 0; // should be reimpl. with flags Files::CombinedType
+        if (settings_->excludeUnpermitted)
+            _comb |= Files::CombTUnpermitted;
+        if (settings_->excludeSymlinks)
+            _comb = Files::CombTSymlink;
+
+        const FileTypeList _typesList = files_->getFileTypes(folderPath, (Files::CombinedType)_comb);
 
         if (!_typesList.isEmpty()) {
             if (filterCreation)

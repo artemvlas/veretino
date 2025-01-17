@@ -15,6 +15,7 @@ const QString Files::strNoType = QStringLiteral(u"No type");
 const QString Files::strVeretinoDb = QStringLiteral(u"Veretino DB");
 const QString Files::strShaFiles = QStringLiteral(u"sha1/256/512");
 const QString Files::strNoPerm = QStringLiteral(u"No Permissions");
+const QString Files::strSymLink = QStringLiteral(u"SymLinks");
 
 Files::Files(QObject *parent)
     : QObject(parent)
@@ -172,7 +173,7 @@ QString Files::getFolderSize(const QString &path)
     return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
 }
 
-FileTypeList Files::getFileTypes(const QString &folderPath, bool excludeUnPerm)
+FileTypeList Files::getFileTypes(const QString &folderPath, CombinedType combine)
 {
     emit setStatusbarText(QStringLiteral(u"Parsing folder contents..."));
 
@@ -181,8 +182,22 @@ FileTypeList Files::getFileTypes(const QString &folderPath, bool excludeUnPerm)
 
     while (it.hasNext() && !isCanceled()) {
         it.next();
-        QString _ext = (excludeUnPerm && !it.fileInfo().isReadable()) ? strNoPerm
-                                                                      : suffixName(it.fileName());
+
+        // TODO: reimplement needed
+        QString _ext;
+        if (combine & CombTUnpermitted
+            && !it.fileInfo().isReadable())
+        {
+            _ext = strNoPerm;
+        }
+        else if (combine & CombTSymlink
+                 && it.fileInfo().isSymLink())
+        {
+            _ext = strSymLink;
+        }
+        else
+            _ext = suffixName(it.fileName());
+
         _res[_ext] << it.fileInfo().size();
     }
 

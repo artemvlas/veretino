@@ -13,8 +13,8 @@
 #include "procstate.h"
 
 struct FileValues;
-using FileList = QMap<QString, FileValues>; // {relative path to file : FileValues struct}
-using FileTypeList = QHash<QString, NumSize>;
+using FileList = QMap<QString, FileValues>;    // {relative path to file : FileValues struct}
+using FileTypeList = QHash<QString, NumSize>;  // {file extension : files number and size}
 
 class Files : public QObject
 {
@@ -64,23 +64,37 @@ public:
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 
+    // serves to summarize some types when displaying a list of folder contents:
+    // e.g. Veretino db files, Digest files, Files without extension, etc...
+    enum CombinedType : quint8 {
+        CombTNotSet = 0,
+        //CombTNotype = 1,
+        //CombTVeretinoDb = 2,
+        //CombTDigest = 4,
+        CombTUnpermitted = 8,
+        CombTSymlink = 16
+    }; // enum CombinedType
+
     // functions
     void setProcState(const ProcState *procState);
-    void setPath(const QString &path); // path to file or folder >> 'fsPath_'
-    FileList getFileList(); // 'fsPath_' --> getFileList(const QString &rootFolder)
-    FileList getFileList(const FilterRule &filter); // return filtered filelist: can ignore or include only files with specified extensions
-    FileList getFileList(const QString &rootFolder, const FilterRule &filter = FilterRule());
-    FileList getFileList(const QAbstractItemModel *model, const FileStatuses flag, const QModelIndex &rootIndex = QModelIndex());
+    void setPath(const QString &path);                    // path to file or folder >> 'fsPath_'
+    FileList getFileList();                               // 'fsPath_' --> getFileList(const QString &rootFolder)
+    FileList getFileList(const FilterRule &filter);       // return filtered filelist: can ignore or include only files with specified extensions
+    FileList getFileList(const QString &rootFolder,
+                         const FilterRule &filter = FilterRule());
+    FileList getFileList(const QAbstractItemModel *model,
+                         const FileStatuses flag,
+                         const QModelIndex &rootIndex = QModelIndex());
 
-    qint64 dataSize(); // total size of all files in the 'fsPath_' folder
-    qint64 dataSize(const QString &folder); // total size of getFileList('folder')
+    qint64 dataSize();                                // total size of all files in the 'fsPath_' folder
+    qint64 dataSize(const QString &folder);           // total size of getFileList('folder')
     static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
 
     QString getFolderSize(); // returns "folder name: number of files (redable size)"
     QString getFolderSize(const QString &path);
 
     // returns a list of file types (extensions) with files number and their size
-    FileTypeList getFileTypes(const QString &folderPath, bool excludeUnPerm = false);
+    FileTypeList getFileTypes(const QString &folderPath, CombinedType combine);
     FileTypeList getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
 
     static NumSize totalListed(const FileTypeList &_typeList);
@@ -95,6 +109,7 @@ public:
     static const QString strVeretinoDb;
     static const QString strShaFiles;
     static const QString strNoPerm;
+    static const QString strSymLink;
 
 private:
     bool isCanceled() const;
