@@ -665,7 +665,7 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
         if (settings_->excludeUnpermitted)
             _comb |= Files::CombTUnpermitted;
         if (settings_->excludeSymlinks)
-            _comb = Files::CombTSymlink;
+            _comb |= Files::CombTSymlink;
 
         const FileTypeList _typesList = files_->getFileTypes(folderPath, (Files::CombinedType)_comb);
 

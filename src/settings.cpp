@@ -17,6 +17,7 @@ const QString Settings::s_key_saveVerifDate = "saveVerifDate";
 const QString Settings::s_key_dbFlagConst = "dbFlagConst";
 const QString Settings::s_key_instantSaving = "instantSaving";
 const QString Settings::s_key_excludeUnPerm = "excludeUnPerm";
+const QString Settings::s_key_excludeSymlinks = "excludeSymlinks";
 const QString Settings::s_key_considerDateModified = "considerDateModified";
 const QString Settings::s_key_detectMoved = "detectMoved";
 const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
@@ -100,6 +101,7 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_dbFlagConst, dbFlagConst);
     storedSettings.setValue(s_key_instantSaving, instantSaving);
     storedSettings.setValue(s_key_excludeUnPerm, excludeUnpermitted);
+    storedSettings.setValue(s_key_excludeSymlinks, excludeSymlinks);
     storedSettings.setValue(s_key_considerDateModified, considerDateModified);
     storedSettings.setValue(s_key_detectMoved, detectMoved);
 
@@ -140,11 +142,12 @@ void Settings::loadSettings()
     dbFlagConst = storedSettings.value(s_key_dbFlagConst, defaults.dbFlagConst).toBool();
     instantSaving = storedSettings.value(s_key_instantSaving, defaults.instantSaving).toBool();
     excludeUnpermitted = storedSettings.value(s_key_excludeUnPerm, defaults.excludeUnpermitted).toBool();
+    excludeSymlinks = storedSettings.value(s_key_excludeSymlinks, defaults.excludeSymlinks).toBool();
     considerDateModified = storedSettings.value(s_key_considerDateModified, defaults.considerDateModified).toBool();
     detectMoved = storedSettings.value(s_key_detectMoved, defaults.detectMoved).toBool();
 
     // filter
-    filter_mode = static_cast<FilterRule::FilterMode>(storedSettings.value(s_key_filter_mode, FilterRule::NotSet).toInt());
+    filter_mode = static_cast<FilterMode>(storedSettings.value(s_key_filter_mode, FilterMode::NotSet).toInt());
     filter_last_exts = storedSettings.value(s_key_filter_last_exts).toStringList();
     filter_editable_exts = storedSettings.value(s_key_filter_editable_exts, defaults.filter_editable_exts).toBool();
     filter_remember_exts = storedSettings.value(s_key_filter_remember_exts, defaults.filter_remember_exts).toBool();

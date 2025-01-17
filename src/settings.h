@@ -66,6 +66,7 @@ private:
     static const QString s_key_dbFlagConst;
     static const QString s_key_instantSaving;
     static const QString s_key_excludeUnPerm;
+    static const QString s_key_excludeSymlinks;
     static const QString s_key_considerDateModified;
     static const QString s_key_detectMoved;
     static const QString s_key_history_lastFsPath;
