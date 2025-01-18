@@ -76,9 +76,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     dataMaintainer->setSourceData(metaData);
 
     // create the filelist
-    if (!dataMaintainer->folderBasedData(FileStatus::Queued,
-                                         settings_->excludeUnpermitted))
-    {
+    if (!dataMaintainer->folderBasedData(FileStatus::Queued)) {
         return;
     }
 

@@ -110,12 +110,13 @@ void DataMaintainer::updateVerifDateTime()
 }
 
 // adds the WorkDir contents to the data_->model_
-int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable)
+int DataMaintainer::folderBasedData(FileStatus fileStatus)
 {
     if (!data_)
         return 0;
 
     const QString &_workDir = data_->metaData_.workDir;
+    const FilterRule &_filter = data_->metaData_.filter;
 
     if (!QFileInfo(_workDir).isDir()) {
         qDebug() << "DM::folderBasedData | Wrong path:" << _workDir;
@@ -132,11 +133,14 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus, bool ignoreUnreadable
         const QString _fullPath = it.next();
         const QString _relPath = pathstr::relativePath(_workDir, _fullPath);
 
-        if (data_->metaData_.filter.isFileAllowed(_relPath)) {
+        if (_filter.isFileAllowed(_relPath)) {
             const bool _isReadable = it.fileInfo().isReadable();
 
-            if (!_isReadable && ignoreUnreadable)
+            if (!_isReadable && _filter.hasAttribute(FilterAttribute::IgnoreUnpermitted)
+                || _filter.hasAttribute(FilterAttribute::IgnoreSymlinks) && it.fileInfo().isSymLink())
+            {
                 continue;
+            }
 
             const FileValues &_values = _isReadable ? FileValues(fileStatus, it.fileInfo().size())
                                                     : FileValues(FileStatus::UnPermitted);

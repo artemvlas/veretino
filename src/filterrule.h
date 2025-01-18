@@ -16,7 +16,16 @@ public:
         Ignore   // files with extensions from [m_extensions] are ignored (not included in the database)
     };
 
-    FilterRule(bool ignoreSummaries = true);
+    enum FilterAttribute : quint8 {
+        NoAttributes = 0,
+        IgnoreDigestFiles = 1,
+        IgnoreDbFiles = 2,
+        IgnoreUnpermitted = 4,
+        IgnoreSymlinks = 8,
+        IgnoreAllPointless = (IgnoreDigestFiles | IgnoreDbFiles | IgnoreUnpermitted | IgnoreSymlinks)
+    };
+
+    FilterRule(FilterAttribute attr = IgnoreAllPointless);
     FilterRule(const FilterMode filterMode, const QStringList &extensions);
 
     FilterMode mode() const;                                                            // returns m_mode
@@ -29,16 +38,21 @@ public:
     QString extensionString(const QString &sep = QStringLiteral(u", ")) const;          // creates a string listing the elements of a list (m_extensions)
     const QStringList& extensionList() const;                                           // returns a ref to m_extensions
 
-    explicit operator bool() const { return isEnabled(); }
+    // Attributes
+    void setAttributes(quint8 attr);                                                    // replace current ones (m_attributes = attr)
+    void addAttribute(FilterAttribute attr);                                            // add flag
+    void removeAttribute(FilterAttribute attr);                                         // remove flag
+    bool hasAttribute(FilterAttribute attr) const;                                      // checks if the flag is set
 
-    bool ignoreShaFiles = true;
-    bool ignoreDbFiles = true;
+    explicit operator bool() const { return isEnabled(); }
 
 private:
     FilterMode m_mode = NotSet;                                                          // current mode. if set, the extension list is assumed to be non-empty
     QStringList m_extensions;                                                            // list of file extensions (suffixes) for filtering
+    quint8 m_attributes = IgnoreAllPointless;
 }; // class FilterRule
 
 using FilterMode = FilterRule::FilterMode;
+using FilterAttribute = FilterRule::FilterAttribute;
 
 #endif // FILTERRULE_H

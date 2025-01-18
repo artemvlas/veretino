@@ -575,9 +575,23 @@ void ModeSelector::processChecksumsFiltered()
 void ModeSelector::processChecksumsNoFilter()
 {
     if (isSelectedCreateDb()) {
-        FilterRule _filter;
-        _filter.ignoreDbFiles = settings_->filter_ignore_db;
-        _filter.ignoreShaFiles = settings_->filter_ignore_sha;
+
+        //_filter.ignoreDbFiles = settings_->filter_ignore_db;
+        //_filter.ignoreShaFiles = settings_->filter_ignore_sha;
+
+        quint8 _attr = 0;
+
+        if (settings_->filter_ignore_db)
+            _attr |= FilterAttribute::IgnoreDbFiles;
+        if (settings_->filter_ignore_sha)
+            _attr |= FilterAttribute::IgnoreDigestFiles;
+        if (settings_->excludeSymlinks)
+            _attr |= FilterAttribute::IgnoreSymlinks;
+        if (settings_->excludeUnpermitted)
+            _attr |= FilterAttribute::IgnoreUnpermitted;
+
+        FilterRule _filter((FilterAttribute)_attr);
+
         processFolderChecksums(_filter);
     }
 }

@@ -86,11 +86,11 @@ public:
                          const FileStatuses flag,
                          const QModelIndex &rootIndex = QModelIndex());
 
-    qint64 dataSize();                                // total size of all files in the 'fsPath_' folder
-    qint64 dataSize(const QString &folder);           // total size of getFileList('folder')
-    static qint64 dataSize(const FileList &filelist); // total size of all files in the 'filelist'
+    qint64 dataSize();                                     // total size of all files in the 'fsPath_' folder
+    qint64 dataSize(const QString &folder);                // total size of getFileList('folder')
+    static qint64 dataSize(const FileList &filelist);      // total size of all files in the 'filelist'
 
-    QString getFolderSize(); // returns "folder name: number of files (redable size)"
+    QString getFolderSize();                               // returns "folder name: number of files (redable size)"
     QString getFolderSize(const QString &path);
 
     // returns a list of file types (extensions) with files number and their size
@@ -101,7 +101,7 @@ public:
     static QString suffixName(const QString &_file);
 
     // checks whether there are any (or filtered) files the folder/subfolders
-    static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(false));
+    static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(FilterAttribute::NoAttributes));
     static QString firstDbFile(const QString &folderPath); // returns full path
     static QStringList dbFiles(const QString &folderPath); // file names only
 

@@ -231,20 +231,10 @@ to prevent changes from being made.</string>
        <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>With no filter</string>
+          <string>Global Ignoring</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="ignoreDbFiles">
-            <property name="toolTip">
-             <string>Exclude *.ver and *.ver.json files from the filelist</string>
-            </property>
-            <property name="text">
-             <string>Ignore Veretino DB files</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
+          <item row="2" column="1">
            <widget class="QCheckBox" name="ignoreShaFiles">
             <property name="toolTip">
              <string>Exclude digest files from the list</string>
@@ -254,27 +244,37 @@ to prevent changes from being made.</string>
             </property>
            </widget>
           </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="ignoreDbFiles">
+            <property name="toolTip">
+             <string>Exclude *.ver and *.ver.json files from the filelist</string>
+            </property>
+            <property name="text">
+             <string>Ignore Veretino DB files</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="cbExcludeUnpermitted">
+            <property name="toolTip">
+             <string>Exclude files without read permissions</string>
+            </property>
+            <property name="text">
+             <string>Exclude UnPermitted</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="cbExcludeSymlinks">
+            <property name="toolTip">
+             <string>Exclude links and shortcuts from the list of files</string>
+            </property>
+            <property name="text">
+             <string>Exclude SymLinks</string>
+            </property>
+           </widget>
+          </item>
          </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="cbExcludeUnpermitted">
-         <property name="toolTip">
-          <string>Exclude files without read permissions</string>
-         </property>
-         <property name="text">
-          <string>Exclude UnPermitted</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="cbExcludeSymlinks">
-         <property name="toolTip">
-          <string>Exclude links and shortcuts from the list of files</string>
-         </property>
-         <property name="text">
-          <string>Exclude SymLinks</string>
-         </property>
         </widget>
        </item>
       </layout>
