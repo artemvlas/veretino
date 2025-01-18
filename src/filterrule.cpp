@@ -20,7 +20,7 @@ FilterRule::FilterRule(const FilterMode filterMode, const QStringList &extension
 
 FilterMode FilterRule::mode() const
 {
-    return mode_;
+    return m_mode;
 }
 
 void FilterRule::setFilter(const FilterMode filterMode, const QString &extensions)
@@ -31,21 +31,21 @@ void FilterRule::setFilter(const FilterMode filterMode, const QString &extension
 
 void FilterRule::setFilter(const FilterMode filterMode, const QStringList &extensions)
 {
-    extensions_ = extensions;
-    mode_ = extensions.isEmpty() ? NotSet : filterMode;
+    m_extensions = extensions;
+    m_mode = extensions.isEmpty() ? NotSet : filterMode;
 }
 
 void FilterRule::clearFilter()
 {
-    mode_ = NotSet;
-    extensions_.clear();
+    m_mode = NotSet;
+    m_extensions.clear();
     ignoreShaFiles = true;
     ignoreDbFiles = true;
 }
 
 bool FilterRule::isFilter(const FilterMode filterMode) const
 {
-    return (filterMode == mode_);
+    return (filterMode == m_mode);
 }
 
 bool FilterRule::isEnabled() const
@@ -65,18 +65,18 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
     if (isFilter(NotSet))
         return true;
 
-    // if 'isFilter(Include)': a file ('filePath') with any extension from 'extensions_' is allowed
+    // if 'isFilter(Include)': a file ('filePath') with any extension from 'm_extensions' is allowed
     // if 'isFilter(Ignore)': than all files except these types are allowed
 
-    return pathstr::hasExtension(filePath, extensions_) ? isFilter(Include): isFilter(Ignore);
+    return pathstr::hasExtension(filePath, m_extensions) ? isFilter(Include): isFilter(Ignore);
 }
 
 QString FilterRule::extensionString(const QString &sep) const
 {
-    return extensions_.join(sep);
+    return m_extensions.join(sep);
 }
 
-QStringList FilterRule::extensionList() const
+const QStringList& FilterRule::extensionList() const
 {
-    return extensions_;
+    return m_extensions;
 }
