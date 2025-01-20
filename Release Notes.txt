@@ -10,6 +10,7 @@ What's new:
 
 Internal changes:
 * The way of processing JSON file data has been redesigned.
+* The file filtering system now has attributes.
 * Switched to CMake-only.
 
 ---

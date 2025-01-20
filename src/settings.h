@@ -35,8 +35,6 @@ public:
     bool isLongExtension = true;
     bool saveVerificationDateTime = false;
     bool instantSaving = false;
-    bool excludeUnpermitted = true;
-    bool excludeSymlinks = true;
     bool dbFlagConst = false;
     bool considerDateModified = true;
     bool detectMoved = false;
@@ -47,6 +45,8 @@ public:
     bool filter_remember_exts = true;
     bool filter_ignore_sha = true;
     bool filter_ignore_db = true;
+    bool filter_ignore_unpermitted = true;
+    bool filter_ignore_symlinks = true;
 
     QByteArray geometryMainWindow;
     QByteArray headerStateFs;
@@ -65,8 +65,6 @@ private:
     static const QString s_key_saveVerifDate;
     static const QString s_key_dbFlagConst;
     static const QString s_key_instantSaving;
-    static const QString s_key_excludeUnPerm;
-    static const QString s_key_excludeSymlinks;
     static const QString s_key_considerDateModified;
     static const QString s_key_detectMoved;
     static const QString s_key_history_lastFsPath;
@@ -80,6 +78,8 @@ private:
     static const QString s_key_filter_editable_exts;
     static const QString s_key_filter_ignore_sha;
     static const QString s_key_filter_ignore_db;
+    static const QString s_key_filter_ignore_unpermitted;
+    static const QString s_key_filter_ignore_symlinks;
 
 signals:
     void algorithmChanged();

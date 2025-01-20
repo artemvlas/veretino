@@ -16,10 +16,10 @@ const QString Settings::s_key_isLongExt = "isLongExtension";
 const QString Settings::s_key_saveVerifDate = "saveVerifDate";
 const QString Settings::s_key_dbFlagConst = "dbFlagConst";
 const QString Settings::s_key_instantSaving = "instantSaving";
-const QString Settings::s_key_excludeUnPerm = "excludeUnPerm";
-const QString Settings::s_key_excludeSymlinks = "excludeSymlinks";
 const QString Settings::s_key_considerDateModified = "considerDateModified";
 const QString Settings::s_key_detectMoved = "detectMoved";
+
+// history
 const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
 const QString Settings::s_key_history_recentDbFiles = "history/recentDbFiles";
 
@@ -35,6 +35,8 @@ const QString Settings::s_key_filter_ignore_db = "filter/ignore_db";
 const QString Settings::s_key_filter_ignore_sha = "filter/ignore_sha";
 const QString Settings::s_key_filter_remember_exts = "filter/remember_exts";
 const QString Settings::s_key_filter_editable_exts = "filter/editable_exts";
+const QString Settings::s_key_filter_ignore_unpermitted = "filter/ignore_unpermitted";
+const QString Settings::s_key_filter_ignore_symlinks = "filter/ignore_symlinks";
 
 Settings::Settings(QObject *parent)
     : QObject{parent}
@@ -100,8 +102,6 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_saveVerifDate, saveVerificationDateTime);
     storedSettings.setValue(s_key_dbFlagConst, dbFlagConst);
     storedSettings.setValue(s_key_instantSaving, instantSaving);
-    storedSettings.setValue(s_key_excludeUnPerm, excludeUnpermitted);
-    storedSettings.setValue(s_key_excludeSymlinks, excludeSymlinks);
     storedSettings.setValue(s_key_considerDateModified, considerDateModified);
     storedSettings.setValue(s_key_detectMoved, detectMoved);
 
@@ -112,6 +112,8 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_filter_last_exts, filter_last_exts);
     storedSettings.setValue(s_key_filter_editable_exts, filter_editable_exts);
     storedSettings.setValue(s_key_filter_remember_exts, filter_remember_exts);
+    storedSettings.setValue(s_key_filter_ignore_unpermitted, filter_ignore_unpermitted);
+    storedSettings.setValue(s_key_filter_ignore_symlinks, filter_ignore_symlinks);
 
     // recent files
     storedSettings.setValue(s_key_history_recentDbFiles, recentFiles);
@@ -141,8 +143,6 @@ void Settings::loadSettings()
     saveVerificationDateTime = storedSettings.value(s_key_saveVerifDate, defaults.saveVerificationDateTime).toBool();
     dbFlagConst = storedSettings.value(s_key_dbFlagConst, defaults.dbFlagConst).toBool();
     instantSaving = storedSettings.value(s_key_instantSaving, defaults.instantSaving).toBool();
-    excludeUnpermitted = storedSettings.value(s_key_excludeUnPerm, defaults.excludeUnpermitted).toBool();
-    excludeSymlinks = storedSettings.value(s_key_excludeSymlinks, defaults.excludeSymlinks).toBool();
     considerDateModified = storedSettings.value(s_key_considerDateModified, defaults.considerDateModified).toBool();
     detectMoved = storedSettings.value(s_key_detectMoved, defaults.detectMoved).toBool();
 
@@ -153,6 +153,8 @@ void Settings::loadSettings()
     filter_remember_exts = storedSettings.value(s_key_filter_remember_exts, defaults.filter_remember_exts).toBool();
     filter_ignore_db = storedSettings.value(s_key_filter_ignore_db, defaults.filter_ignore_db).toBool();
     filter_ignore_sha = storedSettings.value(s_key_filter_ignore_sha, defaults.filter_ignore_db).toBool();
+    filter_ignore_unpermitted = storedSettings.value(s_key_filter_ignore_unpermitted, defaults.filter_ignore_unpermitted).toBool();
+    filter_ignore_symlinks = storedSettings.value(s_key_filter_ignore_symlinks, defaults.filter_ignore_symlinks).toBool();
 
     // recent files
     recentFiles = storedSettings.value(s_key_history_recentDbFiles).toStringList();

@@ -235,42 +235,42 @@ to prevent changes from being made.</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="2" column="1">
-           <widget class="QCheckBox" name="ignoreShaFiles">
+           <widget class="QCheckBox" name="cbIgnoreShaFiles">
             <property name="toolTip">
-             <string>Exclude digest files from the list</string>
+             <string>Exclude digest files from the filelist</string>
             </property>
             <property name="text">
-             <string>Ignore *.sha1/256/512 files</string>
+             <string>*.sha1/256/512 files</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QCheckBox" name="ignoreDbFiles">
+           <widget class="QCheckBox" name="cbIgnoreDbFiles">
             <property name="toolTip">
              <string>Exclude *.ver and *.ver.json files from the filelist</string>
             </property>
             <property name="text">
-             <string>Ignore Veretino DB files</string>
+             <string>Veretino DB files</string>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QCheckBox" name="cbExcludeUnpermitted">
+           <widget class="QCheckBox" name="cbIgnoreUnpermitted">
             <property name="toolTip">
              <string>Exclude files without read permissions</string>
             </property>
             <property name="text">
-             <string>Exclude UnPermitted</string>
+             <string>UnPermitted</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QCheckBox" name="cbExcludeSymlinks">
+           <widget class="QCheckBox" name="cbIgnoreSymlinks">
             <property name="toolTip">
-             <string>Exclude links and shortcuts from the list of files</string>
+             <string>Exclude symlinks and shortcuts from the list of files</string>
             </property>
             <property name="text">
-             <string>Exclude SymLinks</string>
+             <string>SymLinks</string>
             </property>
            </widget>
           </item>

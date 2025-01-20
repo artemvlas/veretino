@@ -59,8 +59,6 @@ void DialogSettings::loadSettings(const Settings &settings)
 
     ui->cbLastPath->setChecked(settings.restoreLastPathOnStartup);
     ui->cbInstantSaving->setChecked(settings.instantSaving);
-    ui->cbExcludeUnpermitted->setChecked(settings.excludeUnpermitted);
-    ui->cbExcludeSymlinks->setChecked(settings.excludeSymlinks);
     ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
     ui->cbDetectMoved->setChecked(settings.detectMoved);
 
@@ -78,8 +76,10 @@ void DialogSettings::loadSettings(const Settings &settings)
     updateLabelDatabaseFilename();
 
     // Tab Extra
-    ui->ignoreDbFiles->setChecked(settings.filter_ignore_db);
-    ui->ignoreShaFiles->setChecked(settings.filter_ignore_sha);
+    ui->cbIgnoreDbFiles->setChecked(settings.filter_ignore_db);
+    ui->cbIgnoreShaFiles->setChecked(settings.filter_ignore_sha);
+    ui->cbIgnoreUnpermitted->setChecked(settings.filter_ignore_unpermitted);
+    ui->cbIgnoreSymlinks->setChecked(settings.filter_ignore_symlinks);
 }
 
 void DialogSettings::updateSettings()
@@ -94,8 +94,6 @@ void DialogSettings::updateSettings()
 
     settings_->restoreLastPathOnStartup = ui->cbLastPath->isChecked();
     settings_->instantSaving = ui->cbInstantSaving->isChecked();
-    settings_->excludeUnpermitted = ui->cbExcludeUnpermitted->isChecked();
-    settings_->excludeSymlinks = ui->cbExcludeSymlinks->isChecked();
     settings_->considerDateModified = ui->cbConsiderDateModified->isChecked();
     settings_->detectMoved = ui->cbDetectMoved->isChecked();
 
@@ -108,9 +106,11 @@ void DialogSettings::updateSettings()
     settings_->saveVerificationDateTime = ui->cbSaveVerificationDateTime->isChecked();
     settings_->dbFlagConst = ui->cbDbFlagConst->isChecked();
 
-    // filters
-    settings_->filter_ignore_db = ui->ignoreDbFiles->isChecked();
-    settings_->filter_ignore_sha = ui->ignoreShaFiles->isChecked();
+    // extra filters
+    settings_->filter_ignore_db = ui->cbIgnoreDbFiles->isChecked();
+    settings_->filter_ignore_sha = ui->cbIgnoreShaFiles->isChecked();
+    settings_->filter_ignore_unpermitted = ui->cbIgnoreUnpermitted->isChecked();
+    settings_->filter_ignore_symlinks = ui->cbIgnoreSymlinks->isChecked();
 }
 
 void DialogSettings::updateLabelDatabaseFilename()
