@@ -64,17 +64,6 @@ public:
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 
-    // serves to summarize some types when displaying a list of folder contents:
-    // e.g. Veretino db files, Digest files, Files without extension, etc...
-    enum CombinedType : quint8 {
-        CombTNotSet = 0,
-        //CombTNotype = 1,
-        //CombTVeretinoDb = 2,
-        //CombTDigest = 4,
-        CombTUnpermitted = 8,
-        CombTSymlink = 16
-    }; // enum CombinedType
-
     // functions
     void setProcState(const ProcState *procState);
     void setPath(const QString &path);                    // path to file or folder >> 'fsPath_'
@@ -94,7 +83,7 @@ public:
     QString getFolderSize(const QString &path);
 
     // returns a list of file types (extensions) with files number and their size
-    FileTypeList getFileTypes(const QString &folderPath, CombinedType combine);
+    FileTypeList getFileTypes(const QString &folderPath, FilterRule combine); // FilterAttributes are used to combine types
     FileTypeList getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
 
     static NumSize totalListed(const FileTypeList &_typeList);

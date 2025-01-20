@@ -173,7 +173,7 @@ QString Files::getFolderSize(const QString &path)
     return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
 }
 
-FileTypeList Files::getFileTypes(const QString &folderPath, CombinedType combine)
+FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
 {
     emit setStatusbarText(QStringLiteral(u"Parsing folder contents..."));
 
@@ -185,18 +185,19 @@ FileTypeList Files::getFileTypes(const QString &folderPath, CombinedType combine
 
         // TODO: reimplement needed
         QString _ext;
-        if (combine & CombTUnpermitted
+        if (combine.hasAttribute(FilterAttribute::IgnoreUnpermitted)
             && !it.fileInfo().isReadable())
         {
             _ext = strNoPerm;
         }
-        else if (combine & CombTSymlink
+        else if (combine.hasAttribute(FilterAttribute::IgnoreSymlinks)
                  && it.fileInfo().isSymLink())
         {
             _ext = strSymLink;
         }
-        else
+        else {
             _ext = suffixName(it.fileName());
+        }
 
         _res[_ext] << it.fileInfo().size();
     }

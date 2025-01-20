@@ -106,12 +106,12 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_detectMoved, detectMoved);
 
     // filter
-    storedSettings.setValue(s_key_filter_ignore_db, filter_ignore_db);
-    storedSettings.setValue(s_key_filter_ignore_sha, filter_ignore_sha);
     storedSettings.setValue(s_key_filter_mode, filter_mode);
     storedSettings.setValue(s_key_filter_last_exts, filter_last_exts);
     storedSettings.setValue(s_key_filter_editable_exts, filter_editable_exts);
     storedSettings.setValue(s_key_filter_remember_exts, filter_remember_exts);
+    storedSettings.setValue(s_key_filter_ignore_db, filter_ignore_db);
+    storedSettings.setValue(s_key_filter_ignore_sha, filter_ignore_sha);
     storedSettings.setValue(s_key_filter_ignore_unpermitted, filter_ignore_unpermitted);
     storedSettings.setValue(s_key_filter_ignore_symlinks, filter_ignore_symlinks);
 
