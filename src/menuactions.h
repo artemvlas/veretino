@@ -91,6 +91,7 @@ public:
     QAction *actionUpdFileRemove = new QAction(QStringLiteral(u"Remove from DB"), this);
     QAction *actionUpdFileReChecksum = new QAction(QStringLiteral(u"Update Checksum"), this);
     QAction *actionUpdFileImportDigest = new QAction(QStringLiteral(u"Import Digest (*.sha)"), this);
+    QAction *actionUpdFilePasteDigest = new QAction(QStringLiteral(u"Paste Digest"), this);
 
     QAction *actionCollapseAll = new QAction(QStringLiteral(u"Collapse all"), this);
     QAction *actionExpandAll = new QAction(QStringLiteral(u"Expand all"), this);

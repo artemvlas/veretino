@@ -79,6 +79,7 @@ void ModeSelector::connectActions()
     connect(menuAct_->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
     connect(menuAct_->actionExportSum, &QAction::triggered, this, &ModeSelector::exportItemSum);
     connect(menuAct_->actionUpdFileImportDigest, &QAction::triggered, this, &ModeSelector::importItemSum);
+    connect(menuAct_->actionUpdFilePasteDigest, &QAction::triggered, this, &ModeSelector::pasteItemSum);
 
     connect(menuAct_->actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
     connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
@@ -347,6 +348,18 @@ void ModeSelector::updateDbItem()
 void ModeSelector::importItemSum()
 {
     updateItemFile(DbMod::DM_ImportDigest);
+}
+
+void ModeSelector::pasteItemSum()
+{
+    if (!view_->isViewDatabase())
+        return;
+
+    const QString _copied = copiedDigest(view_->data_->metaData_.algorithm);
+    if (!_copied.isEmpty()) {
+        manager_->dataMaintainer->setItemValue(view_->curIndex(), Column::ColumnChecksum, _copied);
+        updateItemFile(DbMod::DM_PasteDigest);
+    }
 }
 
 void ModeSelector::showFolderContentTypes()
@@ -765,9 +778,9 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
             viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
             viewContextMenu->addMenu(menuAct_->menuCreateDigest);
 
-            QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-            if (tools::canBeChecksum(clipboardText)) {
-                QString _s = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(clipboardText, 20);
+            const QString _copied = copiedDigest();
+            if (!_copied.isEmpty()) {
+                QString _s = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(_copied, 20);
                 menuAct_->actionCheckFileByClipboardChecksum->setText(_s);
                 viewContextMenu->addSeparator();
                 viewContextMenu->addAction(menuAct_->actionCheckFileByClipboardChecksum);
@@ -850,6 +863,10 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     switch (TreeModel::itemFileStatus(index)) {
                         case FileStatus::New:
                             viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
+                            // paste from clipboard
+                            if (settings_->allowPasteIntoDb && !copiedDigest(view_->data_->metaData_.algorithm).isEmpty())
+                                viewContextMenu->addAction(menuAct_->actionUpdFilePasteDigest);
+                            // import from digest file
                             if (QFileInfo::exists(view_->data_->digestFilePath(index)))
                                 viewContextMenu->addAction(menuAct_->actionUpdFileImportDigest);
                             break;
@@ -912,6 +929,18 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     viewContextMenu->addAction(menuAct_->actionExpandAll);
 
     viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+}
+
+QString ModeSelector::copiedDigest() const
+{
+    QString clipboardText = QGuiApplication::clipboard()->text().simplified();
+    return tools::canBeChecksum(clipboardText) ? clipboardText : QString();
+}
+
+QString ModeSelector::copiedDigest(QCryptographicHash::Algorithm algo) const
+{
+    QString clipboardText = QGuiApplication::clipboard()->text().simplified();
+    return tools::canBeChecksum(clipboardText, algo) ? clipboardText : QString();
 }
 
 bool ModeSelector::isDbConst() const

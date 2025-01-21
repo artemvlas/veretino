@@ -105,6 +105,7 @@ void MenuActions::setActionsIcons()
     actionUpdFileRemove->setIcon(_icons.icon(FileStatus::Removed));
     actionUpdFileReChecksum->setIcon(_icons.icon(FileStatus::Updated));
     actionUpdFileImportDigest->setIcon(_icons.icon(Icons::HashFile));
+    actionUpdFilePasteDigest->setIcon(_icons.icon(Icons::Paste));
 
     actionUpdDbAddNew->setIcon(_icons.icon(FileStatus::Added));
     actionUpdDbClearLost->setIcon(_icons.icon(FileStatus::Removed));

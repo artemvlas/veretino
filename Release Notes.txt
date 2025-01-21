@@ -7,6 +7,8 @@ What's new:
 * More accurate detection of the presence of a checksum string in the clipboard (for file verification).
 * Added support for checking using the outdated (but still used) MD5 algorithm.
 * Added the ability to exclude shortcuts and symbolic links from the list of files.
+* Added the ability to paste checksums from the clipboard into the database. (For advanced users only!)
+    Available for 'New-status' items if the option is enabled in the settings.
 
 Internal changes:
 * The way of processing JSON file data has been redesigned.

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
-    <height>246</height>
+    <width>450</width>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -110,6 +110,9 @@ immediately after any changes are made.</string>
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3"/>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -276,6 +279,21 @@ to prevent changes from being made.</string>
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QCheckBox" name="cbAllowPaste">
+           <property name="toolTip">
+            <string>(Experts) Allow adding new checksums from the clipboard.
+Only for items with the New status.</string>
+           </property>
+           <property name="text">
+            <string>Allow Paste into Database</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

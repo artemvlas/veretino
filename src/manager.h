@@ -36,7 +36,8 @@ public:
         DM_UpdateNewLost = DM_AddNew | DM_ClearLost,
         DM_UpdateMismatches = 1 << 2,
         DM_FindMoved = 1 << 3,
-        DM_ImportDigest = 1 << 4
+        DM_ImportDigest = 1 << 4,
+        DM_PasteDigest = 1 << 5
     }; // enum DbMod
 
     DataMaintainer *dataMaintainer = new DataMaintainer(this);

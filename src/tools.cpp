@@ -117,7 +117,7 @@ bool canBeChecksum(const QString &str)
     }
 
     for (int i = 0; i < str.length(); ++i) {
-        if (!str.at(i).isLetterOrNumber())
+        if (!isHexChar(str.at(i)))
             return false;
     }
 
@@ -127,6 +127,18 @@ bool canBeChecksum(const QString &str)
 bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo)
 {
     return (str.size() == algoStrLen(algo)) && canBeChecksum(str);
+}
+
+bool isHexChar(const char ch)
+{
+    return (ch >= '0' && ch <= '9')
+           || (ch >= 'A' && ch <= 'F')
+           || (ch >= 'a' && ch <= 'f');
+}
+
+bool isHexChar(const QChar ch)
+{
+    return isHexChar(ch.toLatin1());
 }
 
 bool isLater(const QString &dt_before, const QString &dt_later)

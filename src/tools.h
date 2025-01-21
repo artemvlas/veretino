@@ -37,13 +37,15 @@ int digitsToNum(const QList<int> &digits); // {0,1,2,3} --> 123
 
 bool canBeChecksum(const QString &str);
 bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo);
-bool isLater(const QString &dt_before, const QString &dt_later); // true ("2024/09/24 18:35", "2024/09/25 11:40")
+bool isHexChar(const char ch);                                                             // whether the char is a digit or a letter from 'Aa' to 'Ff'
+bool isHexChar(const QChar ch);
+bool isLater(const QString &dt_before, const QString &dt_later);                           // true ("2024/09/24 18:35", "2024/09/25 11:40")
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
 bool isLater(const QString &dt_str, const QDateTime &other);
 
-QString joinStrings(const QString &str1, const QString &str2, QChar sep); // checks for the absence of sep duplication
-QString joinStrings(const QString &str1, const QString &str2, const QString &sep); // no such check
+QString joinStrings(const QString &str1, const QString &str2, QChar sep);                  // checks for the absence of sep duplication
+QString joinStrings(const QString &str1, const QString &str2, const QString &sep);         // no such check
 QString joinStrings(int num, const QString &str); // --> "X str"
 QString joinStrings(const QString &str, int num); // --> "str X"
 
@@ -57,7 +59,7 @@ QString enumToString(const QEnum value)
 } // namespace tools
 
 namespace paths {
-QString digestFilePath(const QString &_file, QCryptographicHash::Algorithm _algo); // ../folder/file.txt --> ../folder/file.txt.shaX
+QString digestFilePath(const QString &_file, QCryptographicHash::Algorithm _algo);          // ../folder/file.txt --> ../folder/file.txt.shaX
 QString digestFilePath(const QString &_file, const int _sum_len);
 bool isDbFile(const QString &filePath);
 bool isDigestFile(const QString &filePath);

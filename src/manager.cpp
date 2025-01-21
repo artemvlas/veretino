@@ -239,8 +239,10 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
     }
 
     if (_prevStatus == FileStatus::New) {
-        if (_job == DM_ImportDigest) {
-            const QString __d = extractDigestFromFile(_data->digestFilePath(fileIndex));
+        if (_job & (DM_ImportDigest | DM_PasteDigest)) {
+            const QString __d = (_job == DM_ImportDigest) ? extractDigestFromFile(_data->digestFilePath(fileIndex))
+                                                          : TreeModel::itemFileChecksum(fileIndex);
+
             if (tools::canBeChecksum(__d, _data->metaData_.algorithm)) // checking for compliance with the current algo
                 dataMaintainer->importChecksum(fileIndex, __d);
         }

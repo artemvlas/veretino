@@ -104,6 +104,7 @@ private:
     void updateItemFile(DbMod _job);
     void exportItemSum();
     void importItemSum();
+    void pasteItemSum();
     bool promptMessageProcCancelation_(bool abort);
 
     QString composeDbFilePath();
@@ -111,6 +112,9 @@ private:
 
     void createContextMenu_ViewFs(const QPoint &point);
     void createContextMenu_ViewDb(const QPoint &point);
+
+    QString copiedDigest() const;                                                            // returns the digest string if there is one on the clipboard
+    QString copiedDigest(QCryptographicHash::Algorithm algo) const;                          // additionally checks whether the length matches the algorithm
 
     View *view_;
     Settings *settings_;
