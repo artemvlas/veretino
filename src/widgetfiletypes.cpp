@@ -14,29 +14,58 @@ WidgetFileTypes::WidgetFileTypes(QWidget *parent)
 
 void WidgetFileTypes::setItems(const FileTypeList &extList)
 {
-    FileTypeList::const_iterator it;
-    for (it = extList.constBegin(); it != extList.constEnd(); ++it) {
-        QIcon _icon;
-        const QString _ext = it.key();
-        const NumSize _nums = it.value();
-
-        if (_ext == Files::strVeretinoDb)
-            _icon = icons_.icon(Icons::Database);
-        else if (_ext == Files::strShaFiles)
-            _icon = icons_.icon(Icons::HashFile);
-        else if (_ext == Files::strNoPerm)
-            _icon = icons_.icon(FileStatus::UnPermitted);
-        else
-            _icon = icons_.type_icon(_ext);
-
-        ItemFileType *_item = new ItemFileType(this);
-        _item->setData(ItemFileType::ColumnType, Qt::DisplayRole, _ext);
-        _item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, _nums._num);
-        _item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(_nums._size));
-        _item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, _nums._size);
-        _item->setIcon(ItemFileType::ColumnType, _icon);
-        items_.append(_item);
+    if (!extList.m_extensions.isEmpty()) {
+        QHash<QString, NumSize>::const_iterator it;
+        for (it = extList.m_extensions.constBegin(); it != extList.m_extensions.constEnd(); ++it) {
+            if (it.key().isEmpty())
+                addItem(Files::strNoType, it.value());
+            else
+                addItem(it.key(), it.value(), icons_.type_icon(it.key()));
+        }
     }
+
+    if (!extList.m_combined.isEmpty()) {
+        QHash<FilterAttribute, NumSize>::const_iterator it;
+        for (it = extList.m_combined.constBegin(); it != extList.m_combined.constEnd(); ++it) {
+            QIcon _icon;
+            QString _type;
+
+            switch (it.key()) {
+            case FilterAttribute::IgnoreDbFiles:
+                _icon = icons_.icon(Icons::Database);
+                _type = Files::strVeretinoDb;
+                break;
+            case FilterAttribute::IgnoreDigestFiles:
+                _icon = icons_.icon(Icons::HashFile);
+                _type = Files::strShaFiles;
+                break;
+            case FilterAttribute::IgnoreUnpermitted:
+                _icon = icons_.icon(FileStatus::UnPermitted);
+                _type = Files::strNoPerm;
+                break;
+            case FilterAttribute::IgnoreSymlinks:
+                _type = Files::strSymLink;
+                break;
+            default:
+                _type = "Undefined";
+                break;
+            }
+
+            addItem(_type, it.value(), _icon);
+        }
+    }
+}
+
+void WidgetFileTypes::addItem(const QString &type, const NumSize &nums, const QIcon &icon)
+{
+    ItemFileType *_item = new ItemFileType(this);
+    _item->setData(ItemFileType::ColumnType, Qt::DisplayRole, type);
+    _item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, nums._num);
+    _item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(nums._size));
+    _item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, nums._size);
+    _item->setIcon(ItemFileType::ColumnType, icon);
+
+    m_items.append(_item);
 }
 
 void WidgetFileTypes::setCheckboxesVisible(bool visible)
@@ -45,7 +74,7 @@ void WidgetFileTypes::setCheckboxesVisible(bool visible)
 
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
-    for (ItemFileType *_item : std::as_const(items_)) {
+    for (ItemFileType *_item : std::as_const(m_items)) {
         _item->setCheckBoxVisible(visible
                                   && !_s_excl.contains(_item->extension()));
     }
@@ -57,7 +86,7 @@ QList<ItemFileType*> WidgetFileTypes::items(CheckState state) const
 {
     QList<ItemFileType*> _res;
 
-    for (ItemFileType *_item : std::as_const(items_)) {
+    for (ItemFileType *_item : std::as_const(m_items)) {
         if (isPassed(state, _item))
             _res.append(_item);
     }
@@ -100,7 +129,7 @@ bool WidgetFileTypes::isPassed(CheckState state, const ItemFileType *item) const
 
 bool WidgetFileTypes::itemsContain(CheckState state) const
 {
-    for (const ItemFileType *item : std::as_const(items_)) {
+    for (const ItemFileType *item : std::as_const(m_items)) {
         if (isPassed(state, item)) {
             return true;
         }
@@ -168,7 +197,7 @@ void WidgetFileTypes::setChecked(const QStringList &exts)
 
 void WidgetFileTypes::setChecked(const QSet<QString> &exts)
 {
-    for (ItemFileType *_item : std::as_const(items_)) {
+    for (ItemFileType *_item : std::as_const(m_items)) {
         if (_item->isCheckBoxVisible())
             _item->setChecked(exts.contains(_item->extension()));
     }

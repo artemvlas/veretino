@@ -182,24 +182,32 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
 
     while (it.hasNext() && !isCanceled()) {
         it.next();
+        const qint64 _size = it.fileInfo().size();
 
         // TODO: reimplement needed
-        QString _ext;
+        //QString _ext;
         if (combine.hasAttribute(FilterAttribute::IgnoreUnpermitted)
             && !it.fileInfo().isReadable())
         {
-            _ext = strNoPerm;
+            _res.m_combined[FilterAttribute::IgnoreUnpermitted] << _size;
         }
         else if (combine.hasAttribute(FilterAttribute::IgnoreSymlinks)
                  && it.fileInfo().isSymLink())
         {
-            _ext = strSymLink;
+            _res.m_combined[FilterAttribute::IgnoreSymlinks] << _size;
         }
         else {
-            _ext = suffixName(it.fileName());
+            const QString _filename = it.fileName();
+
+            if (paths::isDbFile(_filename))
+                _res.m_combined[FilterAttribute::IgnoreDbFiles] << _size;
+            else if (paths::isDigestFile(_filename))
+                _res.m_combined[FilterAttribute::IgnoreDigestFiles] << _size;
+            else
+                _res.m_extensions[pathstr::suffix(_filename)] << _size;
         }
 
-        _res[_ext] << it.fileInfo().size();
+        //_res[_ext] << _size;
     }
 
     if (isCanceled()) {
@@ -208,7 +216,7 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
         return FileTypeList();
     }
 
-    emit setStatusbarText(tools::joinStrings(_res.size(), QStringLiteral(u"types found")));
+    emit setStatusbarText(tools::joinStrings(_res.count(), QStringLiteral(u"types found")));
     return _res;
 }
 
@@ -220,8 +228,14 @@ FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIn
     while (it.hasNext() && !isCanceled()) {
         it.nextFile();
         if (it.status() & FileStatus::CombAvailable) {
-            const QString _ext = suffixName(it.path());
-            _res[_ext] << it.size();
+            const QString _file = it.path();
+
+            if (paths::isDbFile(_file))
+                _res.m_combined[FilterAttribute::IgnoreDbFiles] << it.size();
+            else if (paths::isDigestFile(_file))
+                _res.m_combined[FilterAttribute::IgnoreDigestFiles] << it.size();
+            else
+                _res.m_extensions[pathstr::suffix(_file)] << it.size();
         }
     }
 
@@ -231,14 +245,22 @@ FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIn
 NumSize Files::totalListed(const FileTypeList &_typeList)
 {
     NumSize _res;
-    FileTypeList::const_iterator it;
-    for (it = _typeList.constBegin(); it != _typeList.constEnd(); ++it) {
-        _res.add(it.value());
+
+    if (!_typeList.m_extensions.isEmpty()) {
+        QHash<QString, NumSize>::const_iterator it;
+        for (it = _typeList.m_extensions.constBegin(); it != _typeList.m_extensions.constEnd(); ++it)
+            _res.add(it.value());
+    }
+
+    if (!_typeList.m_combined.isEmpty()) {
+        QHash<FilterAttribute, NumSize>::const_iterator it2;
+        for (it2 = _typeList.m_combined.constBegin(); it2 != _typeList.m_combined.constEnd(); ++it2)
+            _res.add(it2.value());
     }
 
     return _res;
 }
-
+/*
 QString Files::suffixName(const QString &_file)
 {
     QString _ext;
@@ -254,7 +276,7 @@ QString Files::suffixName(const QString &_file)
         _ext = strNoType;
 
     return _ext;
-}
+}*/
 
 qint64 Files::dataSize()
 {

@@ -14,7 +14,16 @@
 
 struct FileValues;
 using FileList = QMap<QString, FileValues>;    // {relative path to file : FileValues struct}
-using FileTypeList = QHash<QString, NumSize>;  // {file extension : files number and size}
+//using FileTypeList = QHash<QString, NumSize>;  // {file extension : files number and size}
+
+struct FileTypeList {
+    QHash<QString, NumSize> m_extensions;       // {file extension (suffix) : files number and size}
+    QHash<FilterAttribute, NumSize> m_combined; // {combined type like 'SymLinks' or 'UnPermitted' : files number and size}
+
+    int count() const { return m_extensions.size() + m_combined.size(); }
+    bool isEmpty() const { return count() == 0; }
+    explicit operator bool() const { return !isEmpty(); }
+}; // struct FileTypeList
 
 class Files : public QObject
 {
@@ -87,7 +96,7 @@ public:
     FileTypeList getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
 
     static NumSize totalListed(const FileTypeList &_typeList);
-    static QString suffixName(const QString &_file);
+    //static QString suffixName(const QString &_file);
 
     // checks whether there are any (or filtered) files the folder/subfolders
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(FilterAttribute::NoAttributes));

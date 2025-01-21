@@ -22,7 +22,7 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const FileType
 
     ui->labelFolderName->setText(pathstr::shortenPath(folderPath));
     ui->labelFolderName->setToolTip(folderPath);
-    ui->chbTop10->setVisible(extList.size() > 15);
+    ui->chbTop10->setVisible(extList.count() > 15);
 
     setTotalInfo(extList);
     ui->types_->setItems(extList);
@@ -51,7 +51,7 @@ void DialogContentsList::setTotalInfo(const FileTypeList &extList)
 {
     _n_total = Files::totalListed(extList);
     ui->labelTotal->setText(QString("Total: %1 types, %2 ")
-                                .arg(extList.size())
+                                .arg(extList.count())
                                 .arg(format::filesNumSize(_n_total)));
 }
 

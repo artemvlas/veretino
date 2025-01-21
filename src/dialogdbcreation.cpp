@@ -48,7 +48,7 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
     types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
     types_->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
-    ui->cb_top10->setVisible(extList.size() > 15);
+    ui->cb_top10->setVisible(extList.count() > 15);
 
     setTotalInfo(extList);
     connections();
@@ -269,7 +269,7 @@ void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
 void DialogDbCreation::setTotalInfo(const FileTypeList &exts)
 {
     ui->l_total_files->setText(QString("Total: %1 types, %2 ")
-                                .arg(exts.size())
+                                .arg(exts.count())
                                 .arg(format::filesNumSize(Files::totalListed(exts))));
 }
 

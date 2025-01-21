@@ -34,9 +34,10 @@ public:
     NumSize numSizeVisible() const;
     NumSize numSize(CheckState chk_state) const;
 
-    QList<ItemFileType*> items_;
+    QList<ItemFileType*> m_items;
 
 private:
+    void addItem(const QString &type, const NumSize &nums, const QIcon &icon = QIcon());
     IconProvider icons_;
 
 }; // class WidgetFileTypes
