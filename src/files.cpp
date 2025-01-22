@@ -11,12 +11,6 @@
 #include "treemodeliterator.h"
 #include "treemodel.h"
 
-const QString Files::strNoType = QStringLiteral(u"No type");
-const QString Files::strVeretinoDb = QStringLiteral(u"Veretino DB");
-const QString Files::strShaFiles = QStringLiteral(u"sha1/256/512");
-const QString Files::strNoPerm = QStringLiteral(u"No Permissions");
-const QString Files::strSymLink = QStringLiteral(u"SymLinks");
-
 Files::Files(QObject *parent)
     : QObject(parent)
 {}

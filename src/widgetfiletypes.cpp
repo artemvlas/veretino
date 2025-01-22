@@ -17,10 +17,12 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
     if (!extList.m_extensions.isEmpty()) {
         QHash<QString, NumSize>::const_iterator it;
         for (it = extList.m_extensions.constBegin(); it != extList.m_extensions.constEnd(); ++it) {
-            if (it.key().isEmpty())
-                addItem(Files::strNoType, it.value());
-            else
+            if (it.key().isEmpty()) {
+                ItemFileType *_added = addItem(QStringLiteral(u"No type"), it.value());
+                _added->setData(ItemFileType::ColumnType, Qt::UserRole, TypeAttribute::UnCheckable);
+            } else {
                 addItem(it.key(), it.value(), icons_.type_icon(it.key()));
+            }
         }
     }
 
@@ -33,30 +35,33 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
             switch (it.key()) {
             case FilterAttribute::IgnoreDbFiles:
                 _icon = icons_.icon(Icons::Database);
-                _type = Files::strVeretinoDb;
+                _type = QStringLiteral(u"Veretino DB");
                 break;
             case FilterAttribute::IgnoreDigestFiles:
                 _icon = icons_.icon(Icons::HashFile);
-                _type = Files::strShaFiles;
+                _type = QStringLiteral(u"sha1/256/512");
                 break;
             case FilterAttribute::IgnoreUnpermitted:
                 _icon = icons_.icon(FileStatus::UnPermitted);
-                _type = Files::strNoPerm;
+                _type = QStringLiteral(u"No Permissions");
                 break;
             case FilterAttribute::IgnoreSymlinks:
-                _type = Files::strSymLink;
+                _type = QStringLiteral(u"SymLinks");
                 break;
             default:
                 _type = "Undefined";
                 break;
             }
 
-            addItem(_type, it.value(), _icon);
+            ItemFileType *_added = addItem(_type, it.value(), _icon);
+
+            if (it.key() & FilterAttribute::IgnoreAllPointless) // all except "Undefined"
+                _added->setData(ItemFileType::ColumnType, Qt::UserRole, (TypeAttribute::UnCheckable | TypeAttribute::UnFilterable));
         }
     }
 }
 
-void WidgetFileTypes::addItem(const QString &type, const NumSize &nums, const QIcon &icon)
+ItemFileType* WidgetFileTypes::addItem(const QString &type, const NumSize &nums, const QIcon &icon)
 {
     ItemFileType *_item = new ItemFileType(this);
     _item->setData(ItemFileType::ColumnType, Qt::DisplayRole, type);
@@ -66,17 +71,18 @@ void WidgetFileTypes::addItem(const QString &type, const NumSize &nums, const QI
     _item->setIcon(ItemFileType::ColumnType, icon);
 
     m_items.append(_item);
+    return _item;
 }
 
 void WidgetFileTypes::setCheckboxesVisible(bool visible)
 {
-    static const QSet<QString> _s_excl { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
+    //static const QSet<QString> _s_excl { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
 
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
     for (ItemFileType *_item : std::as_const(m_items)) {
         _item->setCheckBoxVisible(visible
-                                  && !_s_excl.contains(_item->extension()));
+                                  && !_item->hasAttribute(TypeAttribute::UnCheckable)); //!_s_excl.contains(_item->extension()));
     }
 
     this->blockSignals(false);
@@ -114,11 +120,11 @@ bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
 
 bool WidgetFileTypes::isPassedUnChecked(const ItemFileType *item) const
 {
-    static const QSet<QString> _s_unfilt { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
+    //static const QSet<QString> _s_unfilt { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
 
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())
-           && !_s_unfilt.contains(item->extension());
+           && !item->hasAttribute(TypeAttribute::UnFilterable); //!_s_unfilt.contains(item->extension());
 }
 
 bool WidgetFileTypes::isPassed(CheckState state, const ItemFileType *item) const

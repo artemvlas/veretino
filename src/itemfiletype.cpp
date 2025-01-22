@@ -49,6 +49,12 @@ bool ItemFileType::isCheckBoxVisible() const
     return data(ColumnType, Qt::CheckStateRole).isValid();
 }
 
+bool ItemFileType::hasAttribute(TypeAttribute attr) const
+{
+    const QVariant __d = data(ColumnType, Qt::UserRole);
+    return __d.isValid() && (__d.toInt() & attr);
+}
+
 void ItemFileType::toggle()
 {
     if (isCheckBoxVisible())

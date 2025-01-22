@@ -37,7 +37,7 @@ public:
     QList<ItemFileType*> m_items;
 
 private:
-    void addItem(const QString &type, const NumSize &nums, const QIcon &icon = QIcon());
+    ItemFileType* addItem(const QString &type, const NumSize &nums, const QIcon &icon = QIcon());
     IconProvider icons_;
 
 }; // class WidgetFileTypes

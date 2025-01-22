@@ -14,7 +14,6 @@
 
 struct FileValues;
 using FileList = QMap<QString, FileValues>;    // {relative path to file : FileValues struct}
-//using FileTypeList = QHash<QString, NumSize>;  // {file extension : files number and size}
 
 struct FileTypeList {
     QHash<QString, NumSize> m_extensions;       // {file extension (suffix) : files number and size}
@@ -102,12 +101,6 @@ public:
     static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(FilterAttribute::NoAttributes));
     static QString firstDbFile(const QString &folderPath); // returns full path
     static QStringList dbFiles(const QString &folderPath); // file names only
-
-    static const QString strNoType;
-    static const QString strVeretinoDb;
-    static const QString strShaFiles;
-    static const QString strNoPerm;
-    static const QString strSymLink;
 
 private:
     bool isCanceled() const;

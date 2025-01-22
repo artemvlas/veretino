@@ -4,7 +4,7 @@ What's new:
 * When working with non-writable folders, the location of the database file is now user-selectable.
     (previously it was saved to the Desktop)
 * More reliable database saving process.
-* More accurate detection of the presence of a checksum string in the clipboard (for file verification).
+* More accurate detection of the presence of a checksum string in the clipboard.
 * Added support for checking using the outdated (but still used) MD5 algorithm.
 * Added the ability to exclude shortcuts and symbolic links from the list of files.
 * Added the ability to paste checksums from the clipboard into the database. (For advanced users only!)
@@ -13,6 +13,7 @@ What's new:
 Internal changes:
 * The way of processing JSON file data has been redesigned.
 * The file filtering system now has attributes.
+* Improved processing of the file types list.
 * Switched to CMake-only.
 
 ---
