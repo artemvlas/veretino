@@ -16,32 +16,32 @@ Files::Files(QObject *parent)
 {}
 
 Files::Files(const QString &path, QObject *parent)
-    : QObject(parent), fsPath_(path)
+    : QObject(parent), m_fsPath(path)
 {}
 
 void Files::setProcState(const ProcState *procState)
 {
-    proc_ = procState;
+    p_proc = procState;
 }
 
 void Files::setPath(const QString &path)
 {
-    fsPath_ = path;
+    m_fsPath = path;
 }
 
 bool Files::isCanceled() const
 {
-    return (proc_ && proc_->isCanceled());
+    return (p_proc && p_proc->isCanceled());
 }
 
 FileList Files::getFileList()
 {
-    return getFileList(fsPath_);
+    return getFileList(m_fsPath);
 }
 
 FileList Files::getFileList(const FilterRule &filter)
 {
-    return getFileList(fsPath_, filter);
+    return getFileList(m_fsPath, filter);
 }
 
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
@@ -138,7 +138,7 @@ QStringList Files::dbFiles(const QString &folderPath)
 
 QString Files::getFolderSize()
 {
-    return getFolderSize(fsPath_);
+    return getFolderSize(m_fsPath);
 }
 
 QString Files::getFolderSize(const QString &path)
@@ -178,8 +178,6 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
         it.next();
         const qint64 _size = it.fileInfo().size();
 
-        // TODO: reimplement needed
-        //QString _ext;
         if (combine.hasAttribute(FilterAttribute::IgnoreUnpermitted)
             && !it.fileInfo().isReadable())
         {
@@ -200,8 +198,6 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
             else
                 _res.m_extensions[pathstr::suffix(_filename)] << _size;
         }
-
-        //_res[_ext] << _size;
     }
 
     if (isCanceled()) {
@@ -254,27 +250,10 @@ NumSize Files::totalListed(const FileTypeList &_typeList)
 
     return _res;
 }
-/*
-QString Files::suffixName(const QString &_file)
-{
-    QString _ext;
-
-    if (paths::isDbFile(_file))
-        _ext = strVeretinoDb;
-    else if (paths::isDigestFile(_file))
-        _ext = strShaFiles;
-    else
-        _ext = pathstr::suffix(_file);
-
-    if (_ext.isEmpty())
-        _ext = strNoType;
-
-    return _ext;
-}*/
 
 qint64 Files::dataSize()
 {
-    return !fsPath_.isEmpty() ? dataSize(getFileList()) : 0;
+    return !m_fsPath.isEmpty() ? dataSize(getFileList()) : 0;
 }
 
 qint64 Files::dataSize(const QString &folder)

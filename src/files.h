@@ -92,13 +92,14 @@ public:
 
     // returns a list of file types (extensions) with files number and their size
     FileTypeList getFileTypes(const QString &folderPath, FilterRule combine); // FilterAttributes are used to combine types
-    FileTypeList getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
+    FileTypeList getFileTypes(const QAbstractItemModel *model,
+                              const QModelIndex &rootIndex = QModelIndex());
 
     static NumSize totalListed(const FileTypeList &_typeList);
-    //static QString suffixName(const QString &_file);
 
     // checks whether there are any (or filtered) files the folder/subfolders
-    static bool isEmptyFolder(const QString &folderPath, const FilterRule &filter = FilterRule(FilterAttribute::NoAttributes));
+    static bool isEmptyFolder(const QString &folderPath,
+                              const FilterRule &filter = FilterRule(FilterAttribute::NoAttributes));
     static QString firstDbFile(const QString &folderPath); // returns full path
     static QStringList dbFiles(const QString &folderPath); // file names only
 
@@ -106,8 +107,8 @@ private:
     bool isCanceled() const;
 
     // variables
-    QString fsPath_; // path to the File or Folder specified when creating the object
-    const ProcState *proc_ = nullptr;
+    QString m_fsPath; // path to the File or Folder specified when creating the object
+    const ProcState *p_proc = nullptr;
 
 signals:
     void setStatusbarText(const QString &text = QString());

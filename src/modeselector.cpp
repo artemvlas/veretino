@@ -15,11 +15,11 @@
 #include "pathstr.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
-    : QObject{parent}, view_(view), settings_(settings)
+    : QObject{parent}, p_view(view), p_settings(settings)
 {
-    _icons.setTheme(view_->palette());
-    menuAct_->setIconTheme(view_->palette());
-    menuAct_->setSettings(settings_);
+    m_icons.setTheme(p_view->palette());
+    p_menuAct->setIconTheme(p_view->palette());
+    p_menuAct->setSettings(p_settings);
 
     connectActions();
 }
@@ -27,116 +27,116 @@ ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
 void ModeSelector::connectActions()
 {
     // MainWindow menu
-    connect(menuAct_->actionShowFilesystem, SIGNAL(triggered()), this, SLOT(showFileSystem())); // the old syntax is used to apply the default argument
-    connect(menuAct_->actionClearRecent, &QAction::triggered, settings_, &Settings::clearRecentFiles);
-    connect(menuAct_->actionSave, &QAction::triggered, this, &ModeSelector::saveData);
+    connect(p_menuAct->actionShowFilesystem, SIGNAL(triggered()), this, SLOT(showFileSystem())); // the old syntax is used to apply the default argument
+    connect(p_menuAct->actionClearRecent, &QAction::triggered, p_settings, &Settings::clearRecentFiles);
+    connect(p_menuAct->actionSave, &QAction::triggered, this, &ModeSelector::saveData);
 
     // File system View
-    connect(menuAct_->actionToHome, &QAction::triggered, view_, &View::toHome);
-    connect(menuAct_->actionStop, &QAction::triggered, this, &ModeSelector::stopProcess);
-    connect(menuAct_->actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
-    connect(menuAct_->actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
-    connect(menuAct_->actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processChecksumsFiltered);
-    connect(menuAct_->actionCheckFileByClipboardChecksum, &QAction::triggered, this, &ModeSelector::checkFileByClipboardChecksum);
-    connect(menuAct_->actionProcessSha1File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha1); });
-    connect(menuAct_->actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
-    connect(menuAct_->actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
-    connect(menuAct_->actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{ processFileSha(view_->curAbsPath(), settings_->algorithm(), DestFileProc::Clipboard); });
-    connect(menuAct_->actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
-    connect(menuAct_->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
+    connect(p_menuAct->actionToHome, &QAction::triggered, p_view, &View::toHome);
+    connect(p_menuAct->actionStop, &QAction::triggered, this, &ModeSelector::stopProcess);
+    connect(p_menuAct->actionShowFolderContentsTypes, &QAction::triggered, this, &ModeSelector::showFolderContentTypes);
+    connect(p_menuAct->actionProcessChecksumsNoFilter, &QAction::triggered, this, &ModeSelector::processChecksumsNoFilter);
+    connect(p_menuAct->actionProcessChecksumsCustomFilter, &QAction::triggered, this, &ModeSelector::processChecksumsFiltered);
+    connect(p_menuAct->actionCheckFileByClipboardChecksum, &QAction::triggered, this, &ModeSelector::checkFileByClipboardChecksum);
+    connect(p_menuAct->actionProcessSha1File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha1); });
+    connect(p_menuAct->actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
+    connect(p_menuAct->actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
+    connect(p_menuAct->actionProcessSha_toClipboard, &QAction::triggered, this,
+            [=]{ processFileSha(p_view->curAbsPath(), p_settings->algorithm(), DestFileProc::Clipboard); });
+    connect(p_menuAct->actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
+    connect(p_menuAct->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
     // DB Model View
-    connect(menuAct_->actionCancelBackToFS, SIGNAL(triggered()), this, SLOT(showFileSystem()));
-    connect(menuAct_->actionShowDbStatus, &QAction::triggered, view_, &View::showDbStatus);
-    connect(menuAct_->actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
-    connect(menuAct_->actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
-    connect(menuAct_->actionUpdDbReChecksums, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateMismatches); });
-    connect(menuAct_->actionUpdDbNewLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateNewLost); });
-    connect(menuAct_->actionUpdDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_AddNew); });
-    connect(menuAct_->actionUpdDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_ClearLost); });
-    connect(menuAct_->actionUpdDbFindMoved, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_FindMoved); });
-    connect(menuAct_->actionFilterNewLost, &QAction::triggered, this,
-            [=](bool isChecked){ view_->editFilter(FileStatus::CombNewLost, isChecked); });
-    connect(menuAct_->actionFilterMismatches, &QAction::triggered, this,
-            [=](bool isChecked){ view_->editFilter(FileStatus::Mismatched, isChecked); });
-    connect(menuAct_->actionFilterUnreadable, &QAction::triggered, this,
-            [=](bool isChecked){ view_->editFilter(FileStatus::CombUnreadable, isChecked); });
-    connect(menuAct_->actionFilterModified, &QAction::triggered, this,
-            [=](bool isChecked){ view_->editFilter(FileStatus::NotCheckedMod, isChecked); });
-    connect(menuAct_->actionShowAll, &QAction::triggered, view_, &View::disableFilter);
-    connect(menuAct_->actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
-    connect(menuAct_->actionCheckItemSubfolder, &QAction::triggered, this, &ModeSelector::verifyItem);
-    connect(menuAct_->actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
-    connect(menuAct_->actionCheckAllMod, &QAction::triggered, this, &ModeSelector::verifyModified);
-    connect(menuAct_->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
-    connect(menuAct_->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
-    connect(menuAct_->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
-    connect(menuAct_->actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
-    connect(menuAct_->actionBranchImport, &QAction::triggered, this, &ModeSelector::importBranch);
-    connect(menuAct_->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
-    connect(menuAct_->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
-    connect(menuAct_->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
-    connect(menuAct_->actionExportSum, &QAction::triggered, this, &ModeSelector::exportItemSum);
-    connect(menuAct_->actionUpdFileImportDigest, &QAction::triggered, this, &ModeSelector::importItemSum);
-    connect(menuAct_->actionUpdFilePasteDigest, &QAction::triggered, this, &ModeSelector::pasteItemSum);
+    connect(p_menuAct->actionCancelBackToFS, SIGNAL(triggered()), this, SLOT(showFileSystem()));
+    connect(p_menuAct->actionShowDbStatus, &QAction::triggered, p_view, &View::showDbStatus);
+    connect(p_menuAct->actionResetDb, &QAction::triggered, this, &ModeSelector::resetDatabase);
+    connect(p_menuAct->actionForgetChanges, &QAction::triggered, this, &ModeSelector::restoreDatabase);
+    connect(p_menuAct->actionUpdDbReChecksums, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateMismatches); });
+    connect(p_menuAct->actionUpdDbNewLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_UpdateNewLost); });
+    connect(p_menuAct->actionUpdDbAddNew, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_AddNew); });
+    connect(p_menuAct->actionUpdDbClearLost, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_ClearLost); });
+    connect(p_menuAct->actionUpdDbFindMoved, &QAction::triggered, this, [=]{ updateDatabase(DbMod::DM_FindMoved); });
+    connect(p_menuAct->actionFilterNewLost, &QAction::triggered, this,
+            [=](bool isChecked){ p_view->editFilter(FileStatus::CombNewLost, isChecked); });
+    connect(p_menuAct->actionFilterMismatches, &QAction::triggered, this,
+            [=](bool isChecked){ p_view->editFilter(FileStatus::Mismatched, isChecked); });
+    connect(p_menuAct->actionFilterUnreadable, &QAction::triggered, this,
+            [=](bool isChecked){ p_view->editFilter(FileStatus::CombUnreadable, isChecked); });
+    connect(p_menuAct->actionFilterModified, &QAction::triggered, this,
+            [=](bool isChecked){ p_view->editFilter(FileStatus::NotCheckedMod, isChecked); });
+    connect(p_menuAct->actionShowAll, &QAction::triggered, p_view, &View::disableFilter);
+    connect(p_menuAct->actionCheckCurFileFromModel, &QAction::triggered, this, &ModeSelector::verifyItem);
+    connect(p_menuAct->actionCheckItemSubfolder, &QAction::triggered, this, &ModeSelector::verifyItem);
+    connect(p_menuAct->actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
+    connect(p_menuAct->actionCheckAllMod, &QAction::triggered, this, &ModeSelector::verifyModified);
+    connect(p_menuAct->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
+    connect(p_menuAct->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
+    connect(p_menuAct->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
+    connect(p_menuAct->actionBranchOpen, &QAction::triggered, this, &ModeSelector::openBranchDb);
+    connect(p_menuAct->actionBranchImport, &QAction::triggered, this, &ModeSelector::importBranch);
+    connect(p_menuAct->actionUpdFileAdd, &QAction::triggered, this, &ModeSelector::updateDbItem);
+    connect(p_menuAct->actionUpdFileRemove, &QAction::triggered, this, &ModeSelector::updateDbItem);
+    connect(p_menuAct->actionUpdFileReChecksum, &QAction::triggered, this, &ModeSelector::updateDbItem);
+    connect(p_menuAct->actionExportSum, &QAction::triggered, this, &ModeSelector::exportItemSum);
+    connect(p_menuAct->actionUpdFileImportDigest, &QAction::triggered, this, &ModeSelector::importItemSum);
+    connect(p_menuAct->actionUpdFilePasteDigest, &QAction::triggered, this, &ModeSelector::pasteItemSum);
 
-    connect(menuAct_->actionCollapseAll, &QAction::triggered, view_, &View::collapseAll);
-    connect(menuAct_->actionExpandAll, &QAction::triggered, view_, &View::expandAll);
+    connect(p_menuAct->actionCollapseAll, &QAction::triggered, p_view, &View::collapseAll);
+    connect(p_menuAct->actionExpandAll, &QAction::triggered, p_view, &View::expandAll);
 
     // both
-    connect(menuAct_->actionCopyFile, &QAction::triggered, this, &ModeSelector::copyFsItem);
-    connect(menuAct_->actionCopyFolder, &QAction::triggered, this, &ModeSelector::copyFsItem);
+    connect(p_menuAct->actionCopyFile, &QAction::triggered, this, &ModeSelector::copyFsItem);
+    connect(p_menuAct->actionCopyFolder, &QAction::triggered, this, &ModeSelector::copyFsItem);
 
     // Algorithm selection
-    connect(menuAct_->actionSetAlgoSha1, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha1); });
-    connect(menuAct_->actionSetAlgoSha256, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha256); });
-    connect(menuAct_->actionSetAlgoSha512, &QAction::triggered, this, [=]{ settings_->setAlgorithm(QCryptographicHash::Sha512); });
+    connect(p_menuAct->actionSetAlgoSha1, &QAction::triggered, this, [=]{ p_settings->setAlgorithm(QCryptographicHash::Sha1); });
+    connect(p_menuAct->actionSetAlgoSha256, &QAction::triggered, this, [=]{ p_settings->setAlgorithm(QCryptographicHash::Sha256); });
+    connect(p_menuAct->actionSetAlgoSha512, &QAction::triggered, this, [=]{ p_settings->setAlgorithm(QCryptographicHash::Sha512); });
 
     // recent files menu
-    connect(menuAct_->menuOpenRecent, &QMenu::triggered, this, &ModeSelector::openRecentDatabase);
+    connect(p_menuAct->menuOpenRecent, &QMenu::triggered, this, &ModeSelector::openRecentDatabase);
 }
 
 void ModeSelector::setManager(Manager *manager)
 {
-    manager_ = manager;
+    p_manager = manager;
 }
 
 void ModeSelector::setProcState(ProcState *procState)
 {
-    proc_ = procState;
+    p_proc = procState;
 }
 
 void ModeSelector::abortProcess()
 {
-    if (proc_->isStarted()) {
-        manager_->clearTasks();
-        proc_->setState(State::Abort);
+    if (p_proc->isStarted()) {
+        p_manager->clearTasks();
+        p_proc->setState(State::Abort);
     }
 }
 
 void ModeSelector::stopProcess()
 {
-    if (proc_->isStarted()) {
-        manager_->clearTasks();
-        proc_->setState(State::Stop);
+    if (p_proc->isStarted()) {
+        p_manager->clearTasks();
+        p_proc->setState(State::Stop);
     }
 }
 
 void ModeSelector::getInfoPathItem()
 {
-    if (proc_->isState(State::StartVerbose))
+    if (p_proc->isState(State::StartVerbose))
         return;
 
-    if (view_->isViewFileSystem()) {
+    if (p_view->isViewFileSystem()) {
         abortProcess();
-        manager_->addTask(&Manager::getPathInfo, view_->curAbsPath());
+        p_manager->addTask(&Manager::getPathInfo, p_view->curAbsPath());
     }
-    else if (view_->isViewDatabase()) {
+    else if (p_view->isViewDatabase()) {
         // info about db item (file or subfolder index)
-        manager_->addTaskWithState(State::Idle,
-                                   &Manager::getIndexInfo,
-                                   view_->curIndex());
+        p_manager->addTaskWithState(State::Idle,
+                                    &Manager::getIndexInfo,
+                                    p_view->curIndex());
     }
 }
 
@@ -150,7 +150,7 @@ QString ModeSelector::getButtonText()
             return QStringLiteral(u"Abort");
         case Folder:
         case File:
-            return format::algoToStr(settings_->algorithm());
+            return format::algoToStr(p_settings->algorithm());
         case DbFile:
             return QStringLiteral(u"Open");
         case SumFile:
@@ -175,23 +175,23 @@ QIcon ModeSelector::getButtonIcon()
     switch (mode()) {
         case FileProcessing:
         case DbProcessing:
-            return _icons.icon(Icons::ProcessStop);
+            return m_icons.icon(Icons::ProcessStop);
         case DbCreating:
-            return _icons.icon(Icons::ProcessAbort);
+            return m_icons.icon(Icons::ProcessAbort);
         case Folder:
-            return _icons.icon(Icons::FolderSync);
+            return m_icons.icon(Icons::FolderSync);
         case File:
-            return _icons.icon(Icons::HashFile);
+            return m_icons.icon(Icons::HashFile);
         case DbFile:
-            return _icons.icon(Icons::Database);
+            return m_icons.icon(Icons::Database);
         case SumFile:
-            return _icons.icon(Icons::Scan);
+            return m_icons.icon(Icons::Scan);
         case Model:
-            return _icons.icon(Icons::Start);
+            return m_icons.icon(Icons::Start);
         case ModelNewLost:
-            return _icons.icon(Icons::Update);
+            return m_icons.icon(Icons::Update);
         case UpdateMismatch:
-            return _icons.icon(FileStatus::Updated);
+            return m_icons.icon(FileStatus::Updated);
         default:
             break;
     }
@@ -222,35 +222,35 @@ QString ModeSelector::getButtonToolTip()
 
 Mode ModeSelector::mode() const
 {
-    if (view_->isViewDatabase()) {
-        if (proc_ && proc_->isStarted()) {
-            if (view_->data_->isInCreation())
+    if (p_view->isViewDatabase()) {
+        if (p_proc && p_proc->isStarted()) {
+            if (p_view->data_->isInCreation())
                 return DbCreating;
-            else if (proc_->isState(State::StartVerbose))
+            else if (p_proc->isState(State::StartVerbose))
                 return DbProcessing;
         }
 
         if (!isDbConst()) {
-            if (view_->data_->numbers_.contains(FileStatus::Mismatched))
+            if (p_view->data_->numbers_.contains(FileStatus::Mismatched))
                 return UpdateMismatch;
-            else if (view_->data_->numbers_.contains(FileStatus::CombNewLost))
+            else if (p_view->data_->numbers_.contains(FileStatus::CombNewLost))
                 return ModelNewLost;
         }
 
         return Model;
     }
 
-    if (view_->isViewFileSystem()) {
-        if (proc_ && proc_->isState(State::StartVerbose))
+    if (p_view->isViewFileSystem()) {
+        if (p_proc && p_proc->isState(State::StartVerbose))
             return FileProcessing;
 
-        QFileInfo pathInfo(view_->_lastPathFS);
+        QFileInfo pathInfo(p_view->_lastPathFS);
         if (pathInfo.isDir())
             return Folder;
         else if (pathInfo.isFile()) {
-            if (paths::isDbFile(view_->_lastPathFS))
+            if (paths::isDbFile(p_view->_lastPathFS))
                 return DbFile;
-            else if (paths::isDigestFile(view_->_lastPathFS))
+            else if (paths::isDigestFile(p_view->_lastPathFS))
                 return SumFile;
             else
                 return File;
@@ -268,45 +268,45 @@ bool ModeSelector::isMode(const Modes expected)
 // tasks execution --->>>
 void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
 {
-    processFileSha(view_->curAbsPath(), algo, DestFileProc::SumFile);
+    processFileSha(p_view->curAbsPath(), algo, DestFileProc::SumFile);
 }
 
 void ModeSelector::promptItemFileUpd()
 {
-    FileStatus storedStatus = TreeModel::itemFileStatus(view_->curIndex());
+    FileStatus storedStatus = TreeModel::itemFileStatus(p_view->curIndex());
 
     if (!(storedStatus & FileStatus::CombUpdatable))
         return;
 
-    QMessageBox msgBox(view_);
+    QMessageBox msgBox(p_view);
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
 
     switch (storedStatus) {
     case FileStatus::New:
-        msgBox.setIconPixmap(_icons.pixmap(FileStatus::New));
+        msgBox.setIconPixmap(m_icons.pixmap(FileStatus::New));
         msgBox.setWindowTitle("New File...");
         msgBox.setText("The database does not yet contain\n"
                        "a corresponding checksum.");
         msgBox.setInformativeText("Would you like to calculate and add it?");
         msgBox.button(QMessageBox::Ok)->setText("Add");
-        msgBox.button(QMessageBox::Ok)->setIcon(_icons.icon(FileStatus::Added));
+        msgBox.button(QMessageBox::Ok)->setIcon(m_icons.icon(FileStatus::Added));
         break;
     case FileStatus::Missing:
-        msgBox.setIconPixmap(_icons.pixmap(FileStatus::Missing));
+        msgBox.setIconPixmap(m_icons.pixmap(FileStatus::Missing));
         msgBox.setWindowTitle("Missing File...");
         msgBox.setText("File does not exist.");
         msgBox.setInformativeText("Remove the Item from the database?");
         msgBox.button(QMessageBox::Ok)->setText("Remove");
-        msgBox.button(QMessageBox::Ok)->setIcon(_icons.icon(FileStatus::Removed));
+        msgBox.button(QMessageBox::Ok)->setIcon(m_icons.icon(FileStatus::Removed));
         break;
     case FileStatus::Mismatched:
-        msgBox.setIconPixmap(_icons.pixmap(FileStatus::Mismatched));
+        msgBox.setIconPixmap(m_icons.pixmap(FileStatus::Mismatched));
         msgBox.setWindowTitle("Mismatched Checksum...");
         msgBox.setText("The calculated and stored checksums do not match.");
         msgBox.setInformativeText("Do you want to update the stored one?");
         msgBox.button(QMessageBox::Ok)->setText("Update");
-        msgBox.button(QMessageBox::Ok)->setIcon(_icons.icon(FileStatus::Updated));
+        msgBox.button(QMessageBox::Ok)->setIcon(m_icons.icon(FileStatus::Updated));
         break;
     default:
         break;
@@ -318,7 +318,7 @@ void ModeSelector::promptItemFileUpd()
 
 void ModeSelector::verifyItem()
 {
-    verify(view_->curIndex());
+    verify(p_view->curIndex());
 }
 
 void ModeSelector::verifyDb()
@@ -332,11 +332,11 @@ void ModeSelector::updateItemFile(DbMod _job)
      *  with the View filtering enabled is unstable,
      *  so the filter should be disabled before making changes.
      */
-    if (view_->isViewFiltered())
-        view_->disableFilter();
+    if (p_view->isViewFiltered())
+        p_view->disableFilter();
 
-    manager_->addTask(&Manager::updateItemFile,
-                      view_->curIndex(),
+    p_manager->addTask(&Manager::updateItemFile,
+                      p_view->curIndex(),
                       _job);
 }
 
@@ -352,29 +352,29 @@ void ModeSelector::importItemSum()
 
 void ModeSelector::pasteItemSum()
 {
-    if (!view_->isViewDatabase())
+    if (!p_view->isViewDatabase())
         return;
 
-    const QString _copied = copiedDigest(view_->data_->metaData_.algorithm);
+    const QString _copied = copiedDigest(p_view->data_->metaData_.algorithm);
     if (!_copied.isEmpty()) {
-        manager_->dataMaintainer->setItemValue(view_->curIndex(), Column::ColumnChecksum, _copied);
+        p_manager->dataMaintainer->setItemValue(p_view->curIndex(), Column::ColumnChecksum, _copied);
         updateItemFile(DbMod::DM_PasteDigest);
     }
 }
 
 void ModeSelector::showFolderContentTypes()
 {
-    makeFolderContentsList(view_->curAbsPath());
+    makeFolderContentsList(p_view->curAbsPath());
 }
 
 void ModeSelector::checkFileByClipboardChecksum()
 {
-    checkFile(view_->curAbsPath(), QGuiApplication::clipboard()->text().simplified());
+    checkFile(p_view->curAbsPath(), QGuiApplication::clipboard()->text().simplified());
 }
 
 void ModeSelector::copyFsItem()
 {
-    const QString _itemPath = view_->curAbsPath();
+    const QString _itemPath = p_view->curAbsPath();
 
     if (!_itemPath.isEmpty()) {
         QMimeData* mimeData = new QMimeData();
@@ -387,30 +387,30 @@ void ModeSelector::showFileSystem(const QString &path)
 {
     if (promptProcessAbort()) {
         if (QFileInfo::exists(path))
-            view_->_lastPathFS = path;
+            p_view->_lastPathFS = path;
 
-        if (view_->data_
-            && view_->data_->isDbFileState(DbFileState::NotSaved))
+        if (p_view->data_
+            && p_view->data_->isDbFileState(DbFileState::NotSaved))
         {
-            manager_->addTask(&Manager::prepareSwitchToFs);
+            p_manager->addTask(&Manager::prepareSwitchToFs);
         }
         else {
-            view_->setFileSystemModel();
+            p_view->setFileSystemModel();
         }
     }
 }
 
 void ModeSelector::saveData()
 {
-    manager_->addTask(&Manager::saveData);
+    p_manager->addTask(&Manager::saveData);
 }
 
 void ModeSelector::copyDataToClipboard(Column column)
 {
-    if (view_->isViewDatabase()
-        && view_->curIndex().isValid())
+    if (p_view->isViewDatabase()
+        && p_view->curIndex().isValid())
     {
-        const QString _strData = view_->curIndex().siblingAtColumn(column).data().toString();
+        const QString _strData = p_view->curIndex().siblingAtColumn(column).data().toString();
         if (!_strData.isEmpty())
             QGuiApplication::clipboard()->setText(_strData);
     }
@@ -419,32 +419,32 @@ void ModeSelector::copyDataToClipboard(Column column)
 void ModeSelector::updateDatabase(const DbMod task)
 {
     stopProcess();
-    view_->setViewSource();
-    manager_->addTask(&Manager::updateDatabase, task);
+    p_view->setViewSource();
+    p_manager->addTask(&Manager::updateDatabase, task);
 }
 
 void ModeSelector::resetDatabase()
 {
-    if (view_->data_) {
-        view_->saveHeaderState();
-        openJsonDatabase(view_->data_->metaData_.dbFilePath);
+    if (p_view->data_) {
+        p_view->saveHeaderState();
+        openJsonDatabase(p_view->data_->metaData_.dbFilePath);
     }
 }
 
 void ModeSelector::restoreDatabase()
 {
-    manager_->addTask(&Manager::restoreDatabase);
+    p_manager->addTask(&Manager::restoreDatabase);
 }
 
 void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (promptProcessAbort()) {
         // aborted process
-        if (view_->isViewDatabase() && view_->data_->contains(FileStatus::CombProcessing))
-            view_->clear();
+        if (p_view->isViewDatabase() && p_view->data_->contains(FileStatus::CombProcessing))
+            p_view->clear();
 
-        manager_->addTask(&Manager::saveData);
-        manager_->addTask(&Manager::createDataModel, filePath);
+        p_manager->addTask(&Manager::saveData);
+        p_manager->addTask(&Manager::createDataModel, filePath);
     }
 }
 
@@ -459,10 +459,10 @@ void ModeSelector::openRecentDatabase(const QAction *action)
 
 void ModeSelector::openBranchDb()
 {
-    if (!view_->data_)
+    if (!p_view->data_)
         return;
 
-    QString assumedPath = view_->data_->branch_path_existing(view_->curIndex());
+    QString assumedPath = p_view->data_->branch_path_existing(p_view->curIndex());
 
     if (QFileInfo::exists(assumedPath))
         openJsonDatabase(assumedPath);
@@ -470,39 +470,39 @@ void ModeSelector::openBranchDb()
 
 void ModeSelector::importBranch()
 {
-    if (!view_->data_)
+    if (!p_view->data_)
         return;
 
-    const QModelIndex _ind = view_->curIndex();
-    const QString _path = view_->data_->branch_path_existing(_ind);
+    const QModelIndex _ind = p_view->curIndex();
+    const QString _path = p_view->data_->branch_path_existing(_ind);
 
     if (!_path.isEmpty()) {
         stopProcess();
-        view_->setViewSource();
-        manager_->addTask(&Manager::importBranch, _ind);
+        p_view->setViewSource();
+        p_manager->addTask(&Manager::importBranch, _ind);
     }
 }
 
 void ModeSelector::processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
-    manager_->addTask(&Manager::processFileSha, path, algo, result);
+    p_manager->addTask(&Manager::processFileSha, path, algo, result);
 }
 
 void ModeSelector::checkSummaryFile(const QString &path)
 {
-    manager_->addTask(&Manager::checkSummaryFile, path);
+    p_manager->addTask(&Manager::checkSummaryFile, path);
 }
 
 void ModeSelector::checkFile(const QString &filePath, const QString &checkSum)
 {
-    manager_->addTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
+    p_manager->addTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
 }
 
 void ModeSelector::verify(const QModelIndex _index)
 {
     if (TreeModel::isFileRow(_index)) {
-        view_->disableFilter();
-        manager_->addTask(&Manager::verifyFileItem, _index);
+        p_view->disableFilter();
+        p_manager->addTask(&Manager::verifyFileItem, _index);
     }
     else {
         verifyItems(_index, FileStatus::CombNotChecked);
@@ -517,63 +517,63 @@ void ModeSelector::verifyModified()
 void ModeSelector::verifyItems(const QModelIndex &_root, FileStatus _status)
 {
     stopProcess();
-    view_->setViewSource();
-    manager_->addTask(&Manager::verifyFolderItem, _root, _status);
+    p_view->setViewSource();
+    p_manager->addTask(&Manager::verifyFolderItem, _root, _status);
 }
 
 void ModeSelector::branchSubfolder()
 {
-    const QModelIndex _ind = view_->curIndex();
+    const QModelIndex _ind = p_view->curIndex();
     if (_ind.isValid()) {
-        manager_->addTask(&Manager::branchSubfolder, _ind);
+        p_manager->addTask(&Manager::branchSubfolder, _ind);
     }
 }
 
 void ModeSelector::exportItemSum()
 {
-    const QModelIndex _ind = view_->curIndex();
+    const QModelIndex _ind = p_view->curIndex();
 
-    if (!view_->data_ ||
+    if (!p_view->data_ ||
         !TreeModel::hasStatus(FileStatus::CombAvailable, _ind))
     {
         return;
     }
 
-    const QString filePath = view_->data_->itemAbsolutePath(_ind);
+    const QString filePath = p_view->data_->itemAbsolutePath(_ind);
 
     FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
     fileVal.checksum = TreeModel::hasReChecksum(_ind) ? TreeModel::itemFileReChecksum(_ind)
                                                       : TreeModel::itemFileChecksum(_ind);
 
-    emit manager_->fileProcessed(filePath, fileVal);
+    emit p_manager->fileProcessed(filePath, fileVal);
 }
 
 void ModeSelector::makeFolderContentsList(const QString &folderPath)
 {
     abortProcess();
-    manager_->addTask(&Manager::folderContentsList, folderPath, false);
+    p_manager->addTask(&Manager::folderContentsList, folderPath, false);
 }
 
 void ModeSelector::makeFolderContentsFilter(const QString &folderPath)
 {
     abortProcess();
-    manager_->addTask(&Manager::folderContentsList, folderPath, true);
+    p_manager->addTask(&Manager::folderContentsList, folderPath, true);
 }
 
 void ModeSelector::_makeDbContentsList()
 {
-    if (!proc_->isStarted() && view_->isViewDatabase()) {
-        manager_->addTask(&Manager::makeDbContentsList);
+    if (!p_proc->isStarted() && p_view->isViewDatabase()) {
+        p_manager->addTask(&Manager::makeDbContentsList);
     }
 }
 
 QString ModeSelector::composeDbFilePath()
 {
-    QString folderName = settings_->addWorkDirToFilename ? pathstr::basicName(view_->_lastPathFS) : QString();
-    QString _prefix = settings_->dbPrefix.isEmpty() ? Lit::s_db_prefix : settings_->dbPrefix;
-    QString databaseFileName = format::composeDbFileName(_prefix, folderName, settings_->dbFileExtension());
+    QString folderName = p_settings->addWorkDirToFilename ? pathstr::basicName(p_view->_lastPathFS) : QString();
+    QString _prefix = p_settings->dbPrefix.isEmpty() ? Lit::s_db_prefix : p_settings->dbPrefix;
+    QString databaseFileName = format::composeDbFileName(_prefix, folderName, p_settings->dbFileExtension());
 
-    return pathstr::joinPath(view_->_lastPathFS, databaseFileName);
+    return pathstr::joinPath(p_view->_lastPathFS, databaseFileName);
 }
 
 void ModeSelector::processChecksumsFiltered()
@@ -582,7 +582,7 @@ void ModeSelector::processChecksumsFiltered()
     abortProcess();
 
     if (emptyFolderPrompt())
-        makeFolderContentsFilter(view_->_lastPathFS);
+        makeFolderContentsFilter(p_view->_lastPathFS);
 }
 
 void ModeSelector::processChecksumsNoFilter()
@@ -590,13 +590,13 @@ void ModeSelector::processChecksumsNoFilter()
     if (isSelectedCreateDb()) {
         FilterRule _filter(FilterAttribute::NoAttributes);
 
-        if (settings_->filter_ignore_db)
+        if (p_settings->filter_ignore_db)
             _filter.addAttribute(FilterAttribute::IgnoreDbFiles);
-        if (settings_->filter_ignore_sha)
+        if (p_settings->filter_ignore_sha)
             _filter.addAttribute(FilterAttribute::IgnoreDigestFiles);
-        if (settings_->filter_ignore_symlinks)
+        if (p_settings->filter_ignore_symlinks)
             _filter.addAttribute(FilterAttribute::IgnoreSymlinks);
-        if (settings_->filter_ignore_unpermitted)
+        if (p_settings->filter_ignore_unpermitted)
             _filter.addAttribute(FilterAttribute::IgnoreUnpermitted);
 
         processFolderChecksums(_filter);
@@ -606,15 +606,15 @@ void ModeSelector::processChecksumsNoFilter()
 void ModeSelector::processFolderChecksums(const FilterRule &filter)
 {
     MetaData metaData;
-    metaData.workDir = view_->_lastPathFS;
-    metaData.algorithm = settings_->algorithm();
+    metaData.workDir = p_view->_lastPathFS;
+    metaData.algorithm = p_settings->algorithm();
     metaData.filter = filter;
     metaData.dbFilePath = composeDbFilePath();
     metaData.dbFileState = DbFileState::NoFile;
-    if (settings_->dbFlagConst)
+    if (p_settings->dbFlagConst)
         metaData.flags |= MetaData::FlagConst;
 
-    manager_->addTask(&Manager::processFolderSha, metaData);
+    p_manager->addTask(&Manager::processFolderSha, metaData);
 }
 
 bool ModeSelector::isSelectedCreateDb()
@@ -636,13 +636,13 @@ bool ModeSelector::overwriteDbPrompt()
     if (!QFileInfo(dbFilePath).isFile())
         return true;
 
-    QMessageBox msgBox(view_);
+    QMessageBox msgBox(p_view);
     msgBox.setWindowTitle("Existing database detected");
     msgBox.setText("The folder already contains the database file:\n" + pathstr::basicName(dbFilePath));
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Open);
-    msgBox.setIconPixmap(_icons.pixmap(Icons::Database));
+    msgBox.setIconPixmap(m_icons.pixmap(Icons::Database));
     msgBox.button(QMessageBox::Save)->setText("Overwrite");
     int ret = msgBox.exec();
 
@@ -654,9 +654,9 @@ bool ModeSelector::overwriteDbPrompt()
 
 bool ModeSelector::emptyFolderPrompt()
 {
-    if (Files::isEmptyFolder(view_->_lastPathFS)) {
+    if (Files::isEmptyFolder(p_view->_lastPathFS)) {
         QMessageBox messageBox;
-        messageBox.information(view_, "Empty folder", "Nothing to do.");
+        messageBox.information(p_view, "Empty folder", "Nothing to do.");
         return false;
     }
 
@@ -677,28 +677,28 @@ void ModeSelector::doWork()
             processChecksumsFiltered();
             break;
         case File:
-            processFileSha(view_->_lastPathFS, settings_->algorithm());
+            processFileSha(p_view->_lastPathFS, p_settings->algorithm());
             break;
         case DbFile:
-            openJsonDatabase(view_->_lastPathFS);
+            openJsonDatabase(p_view->_lastPathFS);
             break;
         case SumFile:
-            checkSummaryFile(view_->_lastPathFS);
+            checkSummaryFile(p_view->_lastPathFS);
             break;
         case Model:
-            if (!proc_->isStarted())
+            if (!p_proc->isStarted())
                 verify();
             break;
         case ModelNewLost:
-            if (!proc_->isStarted())
+            if (!p_proc->isStarted())
                 updateDatabase(DbMod::DM_UpdateNewLost);
             break;
         case UpdateMismatch:
-            if (!proc_->isStarted())
+            if (!p_proc->isStarted())
                 updateDatabase(DbMod::DM_UpdateMismatches);
             break;
         case NoMode:
-            if (!proc_->isStarted())
+            if (!p_proc->isStarted())
                 showFileSystem();
             break;
         default:
@@ -709,7 +709,7 @@ void ModeSelector::doWork()
 
 void ModeSelector::quickAction()
 {
-    if (proc_->isStarted())
+    if (p_proc->isStarted())
             return;
 
     switch (mode()) {
@@ -717,16 +717,16 @@ void ModeSelector::quickAction()
             doWork();
             break;
         case DbFile:
-            openJsonDatabase(view_->_lastPathFS);
+            openJsonDatabase(p_view->_lastPathFS);
             break;
         case SumFile:
-            checkSummaryFile(view_->_lastPathFS);
+            checkSummaryFile(p_view->_lastPathFS);
             break;
         case Model:
         case ModelNewLost:
         case UpdateMismatch:
-            if (TreeModel::isFileRow(view_->curIndex())) {
-                if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, view_->curIndex()))
+            if (TreeModel::isFileRow(p_view->curIndex())) {
+                if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, p_view->curIndex()))
                     promptItemFileUpd();
                 else
                     verifyItem();
@@ -739,122 +739,122 @@ void ModeSelector::quickAction()
 
 void ModeSelector::createContextMenu_View(const QPoint &point)
 {
-    if (view_->isViewFileSystem())
+    if (p_view->isViewFileSystem())
         createContextMenu_ViewFs(point);
-    else if (view_->isViewDatabase())
+    else if (p_view->isViewDatabase())
         createContextMenu_ViewDb(point);
-    else if (view_->isViewModel(ModelView::NotSetted))
-        menuAct_->contextMenuViewNot()->exec(view_->viewport()->mapToGlobal(point));
+    else if (p_view->isViewModel(ModelView::NotSetted))
+        p_menuAct->contextMenuViewNot()->exec(p_view->viewport()->mapToGlobal(point));
 }
 
 void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
 {
     // Filesystem View
-    if (!view_->isViewFileSystem())
+    if (!p_view->isViewFileSystem())
         return;
 
-    QModelIndex index = view_->indexAt(point);
-    QMenu *viewContextMenu = menuAct_->disposableMenu();
+    QModelIndex index = p_view->indexAt(point);
+    QMenu *viewContextMenu = p_menuAct->disposableMenu();
 
-    viewContextMenu->addAction(menuAct_->actionToHome);
+    viewContextMenu->addAction(p_menuAct->actionToHome);
     viewContextMenu->addSeparator();
 
-    if (proc_->isState(State::StartVerbose)) {
-        viewContextMenu->addAction(menuAct_->actionStop);
+    if (p_proc->isState(State::StartVerbose)) {
+        viewContextMenu->addAction(p_menuAct->actionStop);
     }
     else if (index.isValid()) {
         if (isMode(Folder)) {
-            viewContextMenu->addAction(menuAct_->actionShowFolderContentsTypes);
-            viewContextMenu->addAction(menuAct_->actionCopyFolder);
-            viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
+            viewContextMenu->addAction(p_menuAct->actionShowFolderContentsTypes);
+            viewContextMenu->addAction(p_menuAct->actionCopyFolder);
+            viewContextMenu->addMenu(p_menuAct->menuAlgorithm(p_settings->algorithm()));
             viewContextMenu->addSeparator();
 
-            viewContextMenu->addAction(menuAct_->actionProcessChecksumsNoFilter);
-            viewContextMenu->addAction(menuAct_->actionProcessChecksumsCustomFilter);
+            viewContextMenu->addAction(p_menuAct->actionProcessChecksumsNoFilter);
+            viewContextMenu->addAction(p_menuAct->actionProcessChecksumsCustomFilter);
         }
         else if (isMode(File)) {
-            viewContextMenu->addAction(menuAct_->actionCopyFile);
-            viewContextMenu->addAction(menuAct_->actionProcessSha_toClipboard);
-            viewContextMenu->addMenu(menuAct_->menuAlgorithm(settings_->algorithm()));
-            viewContextMenu->addMenu(menuAct_->menuCreateDigest);
+            viewContextMenu->addAction(p_menuAct->actionCopyFile);
+            viewContextMenu->addAction(p_menuAct->actionProcessSha_toClipboard);
+            viewContextMenu->addMenu(p_menuAct->menuAlgorithm(p_settings->algorithm()));
+            viewContextMenu->addMenu(p_menuAct->menuCreateDigest);
 
             const QString _copied = copiedDigest();
             if (!_copied.isEmpty()) {
                 QString _s = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(_copied, 20);
-                menuAct_->actionCheckFileByClipboardChecksum->setText(_s);
+                p_menuAct->actionCheckFileByClipboardChecksum->setText(_s);
                 viewContextMenu->addSeparator();
-                viewContextMenu->addAction(menuAct_->actionCheckFileByClipboardChecksum);
+                viewContextMenu->addAction(p_menuAct->actionCheckFileByClipboardChecksum);
             }
         }
         else if (isMode(DbFile))
-            viewContextMenu->addAction(menuAct_->actionOpenDatabase);
+            viewContextMenu->addAction(p_menuAct->actionOpenDatabase);
         else if (isMode(SumFile))
-            viewContextMenu->addAction(menuAct_->actionCheckSumFile);
+            viewContextMenu->addAction(p_menuAct->actionCheckSumFile);
     }
 
-    viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+    viewContextMenu->exec(p_view->viewport()->mapToGlobal(point));
 }
 
 void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 {
     // TreeModel or ProxyModel View
-    if (!view_->isViewDatabase())
+    if (!p_view->isViewDatabase())
         return;
 
-    const Numbers &_num = view_->data_->numbers_;
-    const QModelIndex _v_ind = view_->indexAt(point);
-    const QModelIndex index = view_->isViewModel(ModelView::ModelProxy) ? view_->data_->proxyModel_->mapToSource(_v_ind) : _v_ind;
-    QMenu *viewContextMenu = menuAct_->disposableMenu();
+    const Numbers &_num = p_view->data_->numbers_;
+    const QModelIndex _v_ind = p_view->indexAt(point);
+    const QModelIndex index = p_view->isViewModel(ModelView::ModelProxy) ? p_view->data_->proxyModel_->mapToSource(_v_ind) : _v_ind;
+    QMenu *viewContextMenu = p_menuAct->disposableMenu();
 
-    if (proc_->isStarted()) {
-        if (!view_->data_->isInCreation())
-            viewContextMenu->addAction(menuAct_->actionStop);
-        viewContextMenu->addAction(menuAct_->actionCancelBackToFS);
+    if (p_proc->isStarted()) {
+        if (!p_view->data_->isInCreation())
+            viewContextMenu->addAction(p_menuAct->actionStop);
+        viewContextMenu->addAction(p_menuAct->actionCancelBackToFS);
     }
     else {
-        viewContextMenu->addAction(menuAct_->actionShowDbStatus);
-        viewContextMenu->addAction(menuAct_->actionResetDb);
+        viewContextMenu->addAction(p_menuAct->actionShowDbStatus);
+        viewContextMenu->addAction(p_menuAct->actionResetDb);
 
-        if (view_->data_->isDbFileState(DbFileState::NotSaved)
-            || QFile::exists(view_->data_->backupFilePath()))
+        if (p_view->data_->isDbFileState(DbFileState::NotSaved)
+            || QFile::exists(p_view->data_->backupFilePath()))
         {
-            viewContextMenu->addAction(menuAct_->actionForgetChanges);
+            viewContextMenu->addAction(p_menuAct->actionForgetChanges);
         }
 
         viewContextMenu->addSeparator();
-        viewContextMenu->addAction(menuAct_->actionShowFilesystem);
-        if (view_->isViewFiltered())
-            viewContextMenu->addAction(menuAct_->actionShowAll);
+        viewContextMenu->addAction(p_menuAct->actionShowFilesystem);
+        if (p_view->isViewFiltered())
+            viewContextMenu->addAction(p_menuAct->actionShowAll);
         viewContextMenu->addSeparator();
 
         // filter view
-        if (view_->isViewModel(ModelView::ModelProxy)) {
+        if (p_view->isViewModel(ModelView::ModelProxy)) {
             if (_num.contains(FileStatus::Mismatched)) {
-                menuAct_->actionFilterMismatches->setChecked(view_->isViewFiltered(FileStatus::Mismatched));
-                viewContextMenu->addAction(menuAct_->actionFilterMismatches);
+                p_menuAct->actionFilterMismatches->setChecked(p_view->isViewFiltered(FileStatus::Mismatched));
+                viewContextMenu->addAction(p_menuAct->actionFilterMismatches);
             }
 
             if (_num.contains(FileStatus::CombUnreadable)) {
-                menuAct_->actionFilterUnreadable->setChecked(view_->isViewFiltered(FileStatus::CombUnreadable));
-                viewContextMenu->addAction(menuAct_->actionFilterUnreadable);
+                p_menuAct->actionFilterUnreadable->setChecked(p_view->isViewFiltered(FileStatus::CombUnreadable));
+                viewContextMenu->addAction(p_menuAct->actionFilterUnreadable);
             }
 
             if (_num.contains(FileStatus::NotCheckedMod)) {
-                menuAct_->actionFilterModified->setChecked(view_->isViewFiltered(FileStatus::NotCheckedMod));
-                viewContextMenu->addAction(menuAct_->actionFilterModified);
+                p_menuAct->actionFilterModified->setChecked(p_view->isViewFiltered(FileStatus::NotCheckedMod));
+                viewContextMenu->addAction(p_menuAct->actionFilterModified);
             }
 
             if (_num.contains(FileStatus::CombNewLost)) {
-                menuAct_->actionFilterNewLost->setChecked(view_->isViewFiltered(FileStatus::New));
-                viewContextMenu->addAction(menuAct_->actionFilterNewLost);
+                p_menuAct->actionFilterNewLost->setChecked(p_view->isViewFiltered(FileStatus::New));
+                viewContextMenu->addAction(p_menuAct->actionFilterNewLost);
             }
 
             if (_num.contains(FileStatus::CombUpdatable))
                 viewContextMenu->addSeparator();
         }
 
-        if (!isDbConst() && view_->data_->hasPossiblyMovedItems())
-            viewContextMenu->addAction(menuAct_->actionUpdDbFindMoved);
+        if (!isDbConst() && p_view->data_->hasPossiblyMovedItems())
+            viewContextMenu->addAction(p_menuAct->actionUpdDbFindMoved);
 
         if (index.isValid()) {
             if (TreeModel::isFileRow(index)) {
@@ -862,35 +862,35 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 if (!isDbConst() && TreeModel::hasStatus(FileStatus::CombUpdatable, index)) {
                     switch (TreeModel::itemFileStatus(index)) {
                         case FileStatus::New:
-                            viewContextMenu->addAction(menuAct_->actionUpdFileAdd);
+                            viewContextMenu->addAction(p_menuAct->actionUpdFileAdd);
                             // paste from clipboard
-                            if (settings_->allowPasteIntoDb && !copiedDigest(view_->data_->metaData_.algorithm).isEmpty())
-                                viewContextMenu->addAction(menuAct_->actionUpdFilePasteDigest);
+                            if (p_settings->allowPasteIntoDb && !copiedDigest(p_view->data_->metaData_.algorithm).isEmpty())
+                                viewContextMenu->addAction(p_menuAct->actionUpdFilePasteDigest);
                             // import from digest file
-                            if (QFileInfo::exists(view_->data_->digestFilePath(index)))
-                                viewContextMenu->addAction(menuAct_->actionUpdFileImportDigest);
+                            if (QFileInfo::exists(p_view->data_->digestFilePath(index)))
+                                viewContextMenu->addAction(p_menuAct->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:
-                            viewContextMenu->addAction(menuAct_->actionUpdFileRemove);
+                            viewContextMenu->addAction(p_menuAct->actionUpdFileRemove);
                             break;
                         case FileStatus::Mismatched:
-                            viewContextMenu->addAction(menuAct_->actionUpdFileReChecksum);
+                            viewContextMenu->addAction(p_menuAct->actionUpdFileReChecksum);
                             break;
                         default: break;
                     }
                 }
 
                 if (TreeModel::hasReChecksum(index))
-                    viewContextMenu->addAction(menuAct_->actionCopyReChecksum);
+                    viewContextMenu->addAction(p_menuAct->actionCopyReChecksum);
                 else if (TreeModel::hasChecksum(index))
-                    viewContextMenu->addAction(menuAct_->actionCopyStoredChecksum);
+                    viewContextMenu->addAction(p_menuAct->actionCopyStoredChecksum);
 
                 // Available file item
                 if (TreeModel::hasStatus(FileStatus::CombAvailable, index)) {
-                    viewContextMenu->addAction(menuAct_->actionExportSum);
-                    viewContextMenu->addAction(menuAct_->actionCopyFile);
+                    viewContextMenu->addAction(p_menuAct->actionExportSum);
+                    viewContextMenu->addAction(p_menuAct->actionCopyFile);
 
-                    viewContextMenu->addAction(menuAct_->actionCheckCurFileFromModel);
+                    viewContextMenu->addAction(p_menuAct->actionCheckCurFileFromModel);
                 }
             }
             else { // Folder item
@@ -898,37 +898,37 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 const bool _has_new = TreeModel::contains(FileStatus::New, index);
 
                 if (_has_avail || _has_new) {
-                    viewContextMenu->addAction(menuAct_->actionCopyFolder);
+                    viewContextMenu->addAction(p_menuAct->actionCopyFolder);
 
                     // contains branch db file
-                    if (!view_->data_->branch_path_existing(index).isEmpty()) {
-                        viewContextMenu->addAction(menuAct_->actionBranchOpen);
+                    if (!p_view->data_->branch_path_existing(index).isEmpty()) {
+                        viewContextMenu->addAction(p_menuAct->actionBranchOpen);
                         if (_has_new && !isDbConst())
-                            viewContextMenu->addAction(menuAct_->actionBranchImport);
+                            viewContextMenu->addAction(p_menuAct->actionBranchImport);
                     } else {
-                        viewContextMenu->addAction(menuAct_->actionBranchMake);
+                        viewContextMenu->addAction(p_menuAct->actionBranchMake);
                     }
 
                     if (_has_avail)
-                        viewContextMenu->addAction(menuAct_->actionCheckItemSubfolder);
+                        viewContextMenu->addAction(p_menuAct->actionCheckItemSubfolder);
                 }
             }
         }
 
         if (_num.contains(FileStatus::NotCheckedMod))
-            viewContextMenu->addAction(menuAct_->actionCheckAllMod);
+            viewContextMenu->addAction(p_menuAct->actionCheckAllMod);
 
-        viewContextMenu->addAction(menuAct_->actionCheckAll);
+        viewContextMenu->addAction(p_menuAct->actionCheckAll);
 
         if (!isDbConst() && _num.contains(FileStatus::CombUpdatable))
-            viewContextMenu->addMenu(menuAct_->menuUpdateDb(_num));
+            viewContextMenu->addMenu(p_menuAct->menuUpdateDb(_num));
     }
 
     viewContextMenu->addSeparator();
-    viewContextMenu->addAction(menuAct_->actionCollapseAll);
-    viewContextMenu->addAction(menuAct_->actionExpandAll);
+    viewContextMenu->addAction(p_menuAct->actionCollapseAll);
+    viewContextMenu->addAction(p_menuAct->actionExpandAll);
 
-    viewContextMenu->exec(view_->viewport()->mapToGlobal(point));
+    viewContextMenu->exec(p_view->viewport()->mapToGlobal(point));
 }
 
 QString ModeSelector::copiedDigest() const
@@ -945,7 +945,7 @@ QString ModeSelector::copiedDigest(QCryptographicHash::Algorithm algo) const
 
 bool ModeSelector::isDbConst() const
 {
-    return (view_->data_ && view_->data_->isImmutable());
+    return (p_view->data_ && p_view->data_->isImmutable());
 }
 
 bool ModeSelector::promptProcessStop()
@@ -960,21 +960,21 @@ bool ModeSelector::promptProcessAbort()
 
 bool ModeSelector::promptMessageProcCancelation_(bool abort)
 {
-    if (proc_->isState(State::StartSilently)) {
+    if (p_proc->isState(State::StartSilently)) {
         abortProcess();
         return true;
     }
 
-    if (!proc_->isState(State::StartVerbose))
+    if (!p_proc->isState(State::StartVerbose))
         return true;
 
     const QString strAct = abort ? QStringLiteral(u"Abort") : QStringLiteral(u"Stop");
-    const QIcon &icoAct = abort ? _icons.icon(Icons::ProcessAbort) : _icons.icon(Icons::ProcessStop);
+    const QIcon &icoAct = abort ? m_icons.icon(Icons::ProcessAbort) : m_icons.icon(Icons::ProcessStop);
 
-    QMessageBox msgBox(view_);
-    connect(proc_, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
+    QMessageBox msgBox(p_view);
+    connect(p_proc, &ProcState::progressFinished, &msgBox, &QMessageBox::reject);
 
-    msgBox.setIconPixmap(_icons.pixmap(FileStatus::Calculating));
+    msgBox.setIconPixmap(m_icons.pixmap(FileStatus::Calculating));
     msgBox.setWindowTitle(QStringLiteral(u"Processing..."));
     msgBox.setText(strAct + QStringLiteral(u" current process?"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -982,7 +982,7 @@ bool ModeSelector::promptMessageProcCancelation_(bool abort)
     msgBox.button(QMessageBox::Yes)->setText(strAct);
     msgBox.button(QMessageBox::No)->setText(QStringLiteral(u"Continue..."));
     msgBox.button(QMessageBox::Yes)->setIcon(icoAct);
-    msgBox.button(QMessageBox::No)->setIcon(_icons.icon(Icons::DoubleGear));
+    msgBox.button(QMessageBox::No)->setIcon(m_icons.icon(Icons::DoubleGear));
 
     if (msgBox.exec() == QMessageBox::Yes) {
         abort ? abortProcess() : stopProcess();

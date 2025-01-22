@@ -41,10 +41,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar->setProcState(manager->procState);
     proc_ = manager->procState;
 
-    modeSelect->menuAct_->populateMenuFile(ui->menuFile);
-    ui->menuHelp->addAction(modeSelect->menuAct_->actionAbout);
+    modeSelect->p_menuAct->populateMenuFile(ui->menuFile);
+    ui->menuHelp->addAction(modeSelect->p_menuAct->actionAbout);
 
-    statusBar->setIconProvider(&modeSelect->_icons);
+    statusBar->setIconProvider(&modeSelect->m_icons);
     setStatusBar(statusBar);
     updatePermanentStatus();
 
@@ -112,11 +112,11 @@ void MainWindow::connections()
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
 
     // menu actions
-    connect(modeSelect->menuAct_->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
-    connect(modeSelect->menuAct_->actionChooseFolder, &QAction::triggered, this, &MainWindow::dialogChooseFolder);
-    connect(modeSelect->menuAct_->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(modeSelect->menuAct_->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
-    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->menuAct_, qOverload<>(&MenuActions::updateMenuOpenRecent));
+    connect(modeSelect->p_menuAct->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
+    connect(modeSelect->p_menuAct->actionChooseFolder, &QAction::triggered, this, &MainWindow::dialogChooseFolder);
+    connect(modeSelect->p_menuAct->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
+    connect(modeSelect->p_menuAct->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->p_menuAct, qOverload<>(&MenuActions::updateMenuOpenRecent));
 
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
@@ -223,7 +223,7 @@ void MainWindow::showDialogContentsList(const QString &folderName, const FileTyp
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
-        dialog.setWindowIcon(modeSelect->_icons.iconFolder());
+        dialog.setWindowIcon(modeSelect->m_icons.iconFolder());
         dialog.exec();
     }
 }
@@ -258,7 +258,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     }
     else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
-        msgBox.setIconPixmap(modeSelect->_icons.pixmap(Icons::Filter));
+        msgBox.setIconPixmap(modeSelect->m_icons.pixmap(Icons::Filter));
         msgBox.setWindowTitle("No filter specified");
         msgBox.setText("File filtering is not set.");
         msgBox.setInformativeText("Continue with all files?");
@@ -275,7 +275,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeL
 {
     if (!extList.isEmpty()) {
         DialogContentsList dialog(folderName, extList, this);
-        dialog.setWindowIcon(modeSelect->_icons.icon(Icons::Database));
+        dialog.setWindowIcon(modeSelect->m_icons.icon(Icons::Database));
         QString strWindowTitle = QStringLiteral(u"Database Contents");
         if (ui->view->data_ && ui->view->data_->numbers_.contains(FileStatus::Missing))
             strWindowTitle.append(QStringLiteral(u" [available ones]"));
@@ -300,7 +300,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         else {
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
             msgBox.button(QMessageBox::Ok)->setText("Update");
-            msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->_icons.icon(FileStatus::Updated));
+            msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->m_icons.icon(FileStatus::Updated));
             msgBox.setDefaultButton(QMessageBox::Cancel);
         }
 
@@ -328,7 +328,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     FileStatus _st_icon = result.contains(FileStatus::Mismatched) ? FileStatus::Mismatched
                                                                   : FileStatus::Matched;
 
-    msgBox.setIconPixmap(modeSelect->_icons.pixmap(_st_icon));
+    msgBox.setIconPixmap(modeSelect->m_icons.pixmap(_st_icon));
     msgBox.setWindowTitle(titleText);
     msgBox.setText(messageText);
 
@@ -421,7 +421,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
         return;
 
     QMessageBox msgBox(this);
-    msgBox.setIconPixmap(modeSelect->_icons.pixmap(Icons::AddFork));
+    msgBox.setIconPixmap(modeSelect->m_icons.pixmap(Icons::AddFork));
     msgBox.setWindowTitle("A new Branch has been created");
     msgBox.setText("The subfolder data is forked:\n" + pathstr::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
@@ -491,8 +491,8 @@ void MainWindow::updateButtonInfo()
 
 void MainWindow::updateMenuActions()
 {
-    modeSelect->menuAct_->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
-    modeSelect->menuAct_->actionSave->setEnabled(ui->view->isViewDatabase()
+    modeSelect->p_menuAct->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
+    modeSelect->p_menuAct->actionSave->setEnabled(ui->view->isViewDatabase()
                                                  && ui->view->data_->isDbFileState(DbFileState::NotSaved));
 }
 
@@ -500,16 +500,16 @@ void MainWindow::updateStatusIcon()
 {
     QIcon statusIcon;
     if (proc_->isStarted()) {
-        statusIcon = modeSelect->_icons.icon(FileStatus::Calculating);
+        statusIcon = modeSelect->m_icons.icon(FileStatus::Calculating);
     }
     else if (ui->view->isViewFileSystem()) {
-        statusIcon = modeSelect->_icons.icon(ui->view->curAbsPath());
+        statusIcon = modeSelect->m_icons.icon(ui->view->curAbsPath());
     }
     else if (ui->view->isViewDatabase()) {
         if (TreeModel::isFileRow(ui->view->curIndex()))
-            statusIcon = modeSelect->_icons.icon(TreeModel::itemFileStatus(ui->view->curIndex()));
+            statusIcon = modeSelect->m_icons.icon(TreeModel::itemFileStatus(ui->view->curIndex()));
         else
-            statusIcon = modeSelect->_icons.iconFolder();
+            statusIcon = modeSelect->m_icons.iconFolder();
     }
 
     statusBar->setStatusIcon(statusIcon);
@@ -591,7 +591,7 @@ void MainWindow::handleButtonDbHashClick()
 void MainWindow::createContextMenu_Button(const QPoint &point)
 {
     if (modeSelect->isMode(Mode::File | Mode::Folder)) {
-        modeSelect->menuAct_->menuAlgorithm(settings_->algorithm())->exec(ui->button->mapToGlobal(point));
+        modeSelect->p_menuAct->menuAlgorithm(settings_->algorithm())->exec(ui->button->mapToGlobal(point));
     }
 }
 

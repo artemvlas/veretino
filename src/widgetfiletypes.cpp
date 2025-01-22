@@ -9,7 +9,7 @@ WidgetFileTypes::WidgetFileTypes(QWidget *parent)
     : QTreeWidget(parent)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
-    icons_.setTheme(palette());
+    m_icons.setTheme(palette());
 }
 
 void WidgetFileTypes::setItems(const FileTypeList &extList)
@@ -21,7 +21,7 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
                 ItemFileType *_added = addItem(QStringLiteral(u"No type"), it.value());
                 _added->setData(ItemFileType::ColumnType, Qt::UserRole, TypeAttribute::UnCheckable);
             } else {
-                addItem(it.key(), it.value(), icons_.type_icon(it.key()));
+                addItem(it.key(), it.value(), m_icons.type_icon(it.key()));
             }
         }
     }
@@ -34,15 +34,15 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
 
             switch (it.key()) {
             case FilterAttribute::IgnoreDbFiles:
-                _icon = icons_.icon(Icons::Database);
+                _icon = m_icons.icon(Icons::Database);
                 _type = QStringLiteral(u"Veretino DB");
                 break;
             case FilterAttribute::IgnoreDigestFiles:
-                _icon = icons_.icon(Icons::HashFile);
+                _icon = m_icons.icon(Icons::HashFile);
                 _type = QStringLiteral(u"sha1/256/512");
                 break;
             case FilterAttribute::IgnoreUnpermitted:
-                _icon = icons_.icon(FileStatus::UnPermitted);
+                _icon = m_icons.icon(FileStatus::UnPermitted);
                 _type = QStringLiteral(u"No Permissions");
                 break;
             case FilterAttribute::IgnoreSymlinks:
@@ -76,13 +76,11 @@ ItemFileType* WidgetFileTypes::addItem(const QString &type, const NumSize &nums,
 
 void WidgetFileTypes::setCheckboxesVisible(bool visible)
 {
-    //static const QSet<QString> _s_excl { Files::strNoType, Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
-
     this->blockSignals(true); // to avoid multiple calls &QTreeWidget::itemChanged --> ::updateFilterDisplay
 
     for (ItemFileType *_item : std::as_const(m_items)) {
         _item->setCheckBoxVisible(visible
-                                  && !_item->hasAttribute(TypeAttribute::UnCheckable)); //!_s_excl.contains(_item->extension()));
+                                  && !_item->hasAttribute(TypeAttribute::UnCheckable));
     }
 
     this->blockSignals(false);
@@ -120,11 +118,9 @@ bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
 
 bool WidgetFileTypes::isPassedUnChecked(const ItemFileType *item) const
 {
-    //static const QSet<QString> _s_unfilt { Files::strVeretinoDb, Files::strShaFiles, Files::strNoPerm, Files::strSymLink };
-
     // allow all except visible_checked and Db-Sha
     return (!item->isChecked() || item->isHidden())
-           && !item->hasAttribute(TypeAttribute::UnFilterable); //!_s_unfilt.contains(item->extension());
+           && !item->hasAttribute(TypeAttribute::UnFilterable);
 }
 
 bool WidgetFileTypes::isPassed(CheckState state, const ItemFileType *item) const

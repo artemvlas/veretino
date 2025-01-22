@@ -56,7 +56,7 @@ public:
 private:
     StatusBarButton* addPermanentButton();
 
-    const IconProvider *icons_ = nullptr;
+    const IconProvider *p_icons = nullptr;
     QLabel *statusTextLabel = new QLabel(this);
     QLabel *statusIconLabel = new QLabel(this);
     StatusBarButton *buttonDbHash = nullptr;

@@ -22,7 +22,7 @@ void ShaCalculator::setAlgorithm(QCryptographicHash::Algorithm algo)
 
 void ShaCalculator::setProcState(const ProcState *procState)
 {
-    proc_ = procState;
+    p_proc = procState;
 }
 
 QString ShaCalculator::calculate(const QString &filePath)
@@ -57,5 +57,5 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
 
 bool ShaCalculator::isCanceled() const
 {
-    return (proc_ && proc_->isCanceled());
+    return (p_proc && p_proc->isCanceled());
 }

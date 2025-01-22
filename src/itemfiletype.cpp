@@ -51,8 +51,7 @@ bool ItemFileType::isCheckBoxVisible() const
 
 bool ItemFileType::hasAttribute(TypeAttribute attr) const
 {
-    const QVariant __d = data(ColumnType, Qt::UserRole);
-    return __d.isValid() && (__d.toInt() & attr);
+    return attr & data(ColumnType, Qt::UserRole).toInt();
 }
 
 void ItemFileType::toggle()

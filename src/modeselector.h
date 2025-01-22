@@ -89,8 +89,8 @@ public:
     void checkFileByClipboardChecksum();
     void copyFsItem();
 
-    IconProvider _icons;
-    MenuActions *menuAct_ = new MenuActions(this);
+    IconProvider m_icons;
+    MenuActions *p_menuAct = new MenuActions(this);
 
 public slots:
     void showFileSystem(const QString &path = QString());
@@ -116,10 +116,10 @@ private:
     QString copiedDigest() const;                                                            // returns the digest string if there is one on the clipboard
     QString copiedDigest(QCryptographicHash::Algorithm algo) const;                          // additionally checks whether the length matches the algorithm
 
-    View *view_;
-    Settings *settings_;
-    ProcState *proc_ = nullptr;
-    Manager *manager_ = nullptr;
+    View *p_view;
+    Settings *p_settings;
+    ProcState *p_proc = nullptr;
+    Manager *p_manager = nullptr;
 
 }; // class ModeSelector
 

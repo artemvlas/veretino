@@ -20,7 +20,7 @@ StatusBar::StatusBar(QWidget *parent)
 
 void StatusBar::setIconProvider(const IconProvider *iconProvider)
 {
-    icons_ = iconProvider;
+    p_icons = iconProvider;
 }
 
 void StatusBar::setStatusText(const QString &text)
@@ -40,22 +40,22 @@ void StatusBar::setModeDb(const DataContainer *data)
     // adding buttons if needed
     if (!buttonDbHash) {
         buttonDbHash = addPermanentButton();
-        if (icons_)
-            buttonDbHash->setIcon(icons_->icon(Icons::HashFile));
+        if (p_icons)
+            buttonDbHash->setIcon(p_icons->icon(Icons::HashFile));
         connect(buttonDbHash, &StatusBarButton::clicked, this, &StatusBar::buttonDbHashClicked);
     }
 
     if (!buttonDbSize) {
         buttonDbSize = addPermanentButton();
-        if (icons_)
-            buttonDbSize->setIcon(icons_->icon(Icons::ChartPie));
+        if (p_icons)
+            buttonDbSize->setIcon(p_icons->icon(Icons::ChartPie));
         connect(buttonDbSize, &StatusBarButton::clicked, this, &StatusBar::buttonDbContentsClicked);
     }
 
     if (!buttonDbMain) {
         buttonDbMain = addPermanentButton();
-        if (icons_)
-            buttonDbMain->setIcon(icons_->icon(Icons::Database));
+        if (p_icons)
+            buttonDbMain->setIcon(p_icons->icon(Icons::Database));
         connect(buttonDbMain, &StatusBarButton::clicked, this, &StatusBar::buttonDbListedClicked);
     }
 
@@ -87,8 +87,8 @@ void StatusBar::setModeDbCreating()
 
     if (!buttonDbCreating) {
         buttonDbCreating = addPermanentButton();
-        if (icons_)
-            buttonDbCreating->setIcon(icons_->icon(Icons::Database));
+        if (p_icons)
+            buttonDbCreating->setIcon(p_icons->icon(Icons::Database));
         buttonDbCreating->setText(QStringLiteral(u"Creating..."));
         connect(buttonDbCreating, &StatusBarButton::clicked, this, &StatusBar::buttonDbListedClicked);
     }

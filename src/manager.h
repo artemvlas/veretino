@@ -137,16 +137,16 @@ private:
 
     // variables
     bool isViewFileSysytem;
-    Settings *settings_;
-    Files *files_ = new Files(this);
+    Settings *p_settings;
+    Files *p_files = new Files(this);
     ShaCalculator shaCalc;
-    QList<Task> taskQueue_;
+    QList<Task> m_taskQueue;
 
     const QString movedDbWarning = QStringLiteral(u"The database file may have been moved or refers to an inaccessible location.");
 
 signals:
-    void setStatusbarText(const QString &text = QString()); // send the 'text' to statusbar
-    void setViewData(DataContainer *data = nullptr);
+    void setStatusbarText(const QString &text = QString());                                       // sends the 'text' to statusbar
+    void setViewData(DataContainer *data = nullptr);                                              // sends the data (models) to the tree View
     void folderContentsListCreated(const QString &folderPath, const FileTypeList &extList);
     void dbCreationDataCollected(const QString &folderPath, const QStringList &dbFiles, const FileTypeList &extList);
     void dbContentsListCreated(const QString &folderPath, const FileTypeList &extList);

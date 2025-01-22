@@ -17,34 +17,34 @@
 #include "pathstr.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
-    : QObject(parent), settings_(settings)
+    : QObject(parent), p_settings(settings)
 {
-    files_->setProcState(procState);
+    p_files->setProcState(procState);
     dataMaintainer->setProcState(procState);
     shaCalc.setProcState(procState);
 
     connect(&shaCalc, &ShaCalculator::doneChunk, procState, &ProcState::addChunk);
     connect(dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
-    connect(files_, &Files::setStatusbarText, this, &Manager::setStatusbarText);
+    connect(p_files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
 
     connect(this, &Manager::taskAdded, this, &Manager::runTasks);
 }
 
 void Manager::queueTask(Task task)
 {
-    taskQueue_.append(task);
+    m_taskQueue.append(task);
 
-    if (procState->isState(State::Idle) && taskQueue_.size() == 1)
+    if (procState->isState(State::Idle) && m_taskQueue.size() == 1)
         emit taskAdded();
 }
 
 void Manager::runTasks()
 {
-    // qDebug() << thread()->objectName() << Q_FUNC_INFO << taskQueue_.size();
+    // qDebug() << thread()->objectName() << Q_FUNC_INFO << m_taskQueue.size();
 
-    while (!taskQueue_.isEmpty()) {
-        Task _task = taskQueue_.takeFirst();
+    while (!m_taskQueue.isEmpty()) {
+        Task _task = m_taskQueue.takeFirst();
         procState->setState(_task._state);
         _task._func();
     }
@@ -54,10 +54,10 @@ void Manager::runTasks()
 
 void Manager::clearTasks()
 {
-    if (taskQueue_.size() > 0)
-        qDebug() << "Manager::clearTasks:" << taskQueue_.size();
+    if (m_taskQueue.size() > 0)
+        qDebug() << "Manager::clearTasks:" << m_taskQueue.size();
 
-    taskQueue_.clear();
+    m_taskQueue.clear();
 }
 
 void Manager::sendDbUpdated()
@@ -141,10 +141,10 @@ void Manager::createDataModel(const QString &dbFilePath)
         return;
     }
 
-    dataMaintainer->setConsiderDateModified(settings_->considerDateModified);
+    dataMaintainer->setConsiderDateModified(p_settings->considerDateModified);
 
     if (dataMaintainer->importJson(dbFilePath)) {
-        if (settings_->detectMoved)
+        if (p_settings->detectMoved)
             cacheMissingItems();
 
         emit setViewData(dataMaintainer->data_);
@@ -219,7 +219,7 @@ void Manager::updateDatabase(const DbMod dest)
     if (dataMaintainer->isDataNotSaved()) {
         dataMaintainer->updateDateTime();
 
-        if (settings_->instantSaving)
+        if (p_settings->instantSaving)
             dataMaintainer->saveData();            
 
         sendDbUpdated();
@@ -267,7 +267,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
         dataMaintainer->updateNumbers(fileIndex, _prevStatus);
         dataMaintainer->updateDateTime();
 
-        if (settings_->instantSaving) {
+        if (p_settings->instantSaving) {
             saveData();
         }
         else { // temp solution to update Button info
@@ -280,7 +280,7 @@ void Manager::importBranch(const QModelIndex &rootFolder)
 {
     const int _imported = dataMaintainer->importBranch(rootFolder);
 
-    if (_imported > 0 && settings_->instantSaving) {
+    if (_imported > 0 && p_settings->instantSaving) {
         dataMaintainer->saveData();
     }
 
@@ -372,7 +372,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
         emit folderChecked(dataMaintainer->data_->numbers_);
 
         // Save the verification datetime, if needed
-        if (settings_->saveVerificationDateTime) {
+        if (p_settings->saveVerificationDateTime) {
             dataMaintainer->updateVerifDateTime();
         }
     }
@@ -642,7 +642,7 @@ void Manager::getPathInfo(const QString &path)
         }
         else if (fileInfo.isDir()) {
             emit setStatusbarText(QStringLiteral(u"counting..."));
-            emit setStatusbarText(files_->getFolderSize(path));
+            emit setStatusbarText(p_files->getFolderSize(path));
         }
     }
 }
@@ -662,12 +662,12 @@ void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
         }
 
         FilterRule _comb_attr(FilterAttribute::NoAttributes);
-        if (settings_->filter_ignore_unpermitted)
+        if (p_settings->filter_ignore_unpermitted)
             _comb_attr.addAttribute(FilterAttribute::IgnoreUnpermitted);
-        if (settings_->filter_ignore_symlinks)
+        if (p_settings->filter_ignore_symlinks)
             _comb_attr.addAttribute(FilterAttribute::IgnoreSymlinks);
 
-        const FileTypeList _typesList = files_->getFileTypes(folderPath, _comb_attr);
+        const FileTypeList _typesList = p_files->getFileTypes(folderPath, _comb_attr);
 
         if (!_typesList.isEmpty()) {
             if (filterCreation)
@@ -683,7 +683,7 @@ void Manager::makeDbContentsList()
     if (!dataMaintainer->data_)
         return;
 
-    const FileTypeList _typesList = files_->getFileTypes(dataMaintainer->data_->model_);
+    const FileTypeList _typesList = p_files->getFileTypes(dataMaintainer->data_->model_);
 
     if (!_typesList.isEmpty())
         emit dbContentsListCreated(dataMaintainer->data_->metaData_.workDir, _typesList);
