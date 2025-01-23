@@ -18,8 +18,7 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
         QHash<QString, NumSize>::const_iterator it;
         for (it = extList.m_extensions.constBegin(); it != extList.m_extensions.constEnd(); ++it) {
             if (it.key().isEmpty()) {
-                ItemFileType *_added = addItem(QStringLiteral(u"No type"), it.value());
-                _added->setData(ItemFileType::ColumnType, Qt::UserRole, TypeAttribute::UnCheckable);
+                addItem(QStringLiteral(u"No type"), it.value(), QIcon(), TypeAttribute::UnCheckable);
             } else {
                 addItem(it.key(), it.value(), m_icons.type_icon(it.key()));
             }
@@ -53,22 +52,27 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
                 break;
             }
 
-            ItemFileType *_added = addItem(_type, it.value(), _icon);
-
-            if (it.key() & FilterAttribute::IgnoreAllPointless) // all except "Undefined"
-                _added->setData(ItemFileType::ColumnType, Qt::UserRole, (TypeAttribute::UnCheckable | TypeAttribute::UnFilterable));
+            addItem(_type, it.value(), _icon, (TypeAttribute::UnCheckable | TypeAttribute::UnFilterable));
         }
     }
 }
 
-ItemFileType* WidgetFileTypes::addItem(const QString &type, const NumSize &nums, const QIcon &icon)
+ItemFileType* WidgetFileTypes::addItem(const QString &type, const NumSize &nums, const QIcon &icon, int attribute)
 {
     ItemFileType *_item = new ItemFileType(this);
+
+    // ColumnType (0)
+    _item->setIcon(ItemFileType::ColumnType, icon);
     _item->setData(ItemFileType::ColumnType, Qt::DisplayRole, type);
+    if (attribute) // TypeAttribute
+        _item->setAttribute(attribute);
+
+    // ColumnFilesNumber (1)
     _item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, nums._num);
+
+    // ColumnTotalSize (2)
     _item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(nums._size));
     _item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, nums._size);
-    _item->setIcon(ItemFileType::ColumnType, icon);
 
     m_items.append(_item);
     return _item;
@@ -152,7 +156,7 @@ void WidgetFileTypes::showAllItems()
     }
 }
 
-void WidgetFileTypes::hideExtra(int nomore)
+void WidgetFileTypes::hideExtra(int max_visible)
 {
     ItemFileType::Column _sortColumn = (sortColumn() == ItemFileType::ColumnFilesNumber)
                                              ? ItemFileType::ColumnFilesNumber
@@ -162,7 +166,7 @@ void WidgetFileTypes::hideExtra(int nomore)
 
     for (int i = 0; i < topLevelItemCount(); ++i) {
         QTreeWidgetItem *_item = topLevelItem(i);
-        _item->setHidden(i >= nomore);
+        _item->setHidden(i >= max_visible);
     }
 }
 

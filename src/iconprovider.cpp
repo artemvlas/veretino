@@ -223,7 +223,7 @@ QIcon IconProvider::icon(const QString &file) const
 
 QIcon IconProvider::type_icon(const QString &suffix) const
 {
-    return icon(QStringLiteral(u"file.") + suffix);
+    return suffix.isEmpty() ? QIcon() : icon(QStringLiteral(u"file.") + suffix);
 }
 
 QIcon IconProvider::iconFolder() const

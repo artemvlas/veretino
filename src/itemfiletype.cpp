@@ -38,6 +38,11 @@ void ItemFileType::setCheckBoxVisible(bool visible)
     visible ? setChecked(false) : setData(ColumnType, Qt::CheckStateRole, QVariant());
 }
 
+void ItemFileType::setAttribute(int attr)
+{
+    setData(ColumnType, Qt::UserRole, attr);
+}
+
 bool ItemFileType::isChecked() const
 {
     QVariant checkState = data(ColumnType, Qt::CheckStateRole);

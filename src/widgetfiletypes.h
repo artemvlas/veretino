@@ -30,12 +30,15 @@ public:
     bool itemsContain(CheckState state) const;
     bool hasChecked() const;                                                                         // checkboxes are enabled and at least one is checked
     void showAllItems();                                                                             // show hidden ones
-    void hideExtra(int nomore = 10);                                                                 // leave only this number of items visible
+    void hideExtra(int max_visible = 10);                                                            // leave only this number of items visible
     NumSize numSizeVisible() const;                                                                  // total number and size of files (visible types only)
     NumSize numSize(CheckState chk_state) const;                                                     // total number and size of listed files (all types)
 
 private:
-    ItemFileType* addItem(const QString &type, const NumSize &nums, const QIcon &icon = QIcon());    // create and add new Item to 'this' and the 'm_items' list
+    ItemFileType* addItem(const QString &type,                                                       // create and add new Item to 'this' and the 'm_items' list
+                          const NumSize &nums,                                                       // 'type' is file extension (suffix) or combined name
+                          const QIcon &icon = QIcon(),
+                          int attribute = 0);                                                        // TypeAttribute or combined value
 
     QList<ItemFileType*> m_items;
     IconProvider m_icons;
