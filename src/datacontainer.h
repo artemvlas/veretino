@@ -38,9 +38,14 @@ class DataContainer : public QObject
 public:
     explicit DataContainer(QObject *parent = nullptr);
     explicit DataContainer(const MetaData &meta, QObject *parent = nullptr);
+    explicit DataContainer(const MetaData &meta, TreeModel *data, QObject *parent = nullptr);
     ~DataContainer();
 
-    ProxyModel* setProxyModel();
+    void setData();
+    void setData(const MetaData &meta, TreeModel *data);
+    bool hasData() const;
+    void clearData();                                                               // deletes data models and clears m_numbers
+
     QString databaseFileName() const;
     QString backupFilePath() const;
     QString itemAbsolutePath(const QModelIndex &curIndex) const;                    // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
@@ -70,16 +75,17 @@ public:
     static Numbers getNumbers(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
 
-    void clearData();                                                                 // removes data models and resets: p_model, p_proxy, m_numbers
-
     // DATA
-    TreeModel *p_model = new TreeModel(this);                                         // main data
-    ProxyModel *p_proxy = new ProxyModel(p_model, this);
-    MetaData metaData_;
+    TreeModel *p_model = nullptr;                                                     // main data
+    ProxyModel *p_proxy = nullptr;
+    MetaData m_metadata;
     Numbers m_numbers;
 
     QHash<QString, QModelIndex> _cacheMissing;
     QHash<QModelIndex, QString> _cacheBranches;
+
+private:
+    void createModels();
 }; // class DataContainer
 
 #endif // DATACONTAINER_H

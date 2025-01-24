@@ -67,7 +67,7 @@ void StatusBar::setModeDb(const DataContainer *data)
                               .arg(_num.numberOf(FileStatus::CombMatched));
 
     buttonDbHash->setToolTip(checkResult);
-    buttonDbHash->setText(format::algoToStr(data->metaData_.algorithm));
+    buttonDbHash->setText(format::algoToStr(data->m_metadata.algorithm));
     buttonDbSize->setText(format::dataSizeReadable(_num.totalSize(FileStatus::CombAvailable)));
 
     QString strDbMain = QString::number(_num.numberOf(FileStatus::CombAvailable));

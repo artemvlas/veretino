@@ -185,7 +185,7 @@ void MainWindow::connectManager()
     connect(ui->view, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->view, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
     connect(ui->view, &View::dataSetted, this,
-            [=]{ if (ui->view->data_) settings_->addRecentFile(ui->view->data_->metaData_.dbFilePath); });
+            [=]{ if (ui->view->data_) settings_->addRecentFile(ui->view->data_->m_metadata.dbFilePath); });
 
     thread->start();
 }
@@ -547,7 +547,7 @@ void MainWindow::updateWindowTitle()
         }
 
         QString _s_add = data->isAllMatched() ? QStringLiteral(u"✓ verified")
-                                              : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->metaData_.workDir);
+                                              : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
 
         const QString _s = tools::joinStrings(Lit::s_appName, _s_add, Lit::s_sepStick);
         setWindowTitle(_s);

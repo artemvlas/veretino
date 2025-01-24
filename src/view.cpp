@@ -119,7 +119,7 @@ void View::setData(DataContainer *data)
     }
 
     data_ = data;
-    _lastPathFS = data->metaData_.dbFilePath;
+    _lastPathFS = data->m_metadata.dbFilePath;
 
     if (data->isInCreation()) {
         setTreeModel(ModelView::ModelSource);

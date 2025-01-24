@@ -39,13 +39,13 @@ DialogDbStatus::~DialogDbStatus()
 
 void DialogDbStatus::connections()
 {
-    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(pathstr::parentFolder(data_->metaData_.dbFilePath)); });
-    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->metaData_.workDir); });
+    connect(ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(pathstr::parentFolder(data_->m_metadata.dbFilePath)); });
+    connect(ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(data_->m_metadata.workDir); });
 }
 
 void DialogDbStatus::setLabelsInfo()
 {
-    const MetaData &_meta = data_->metaData_;
+    const MetaData &_meta = data_->m_metadata;
 
     ui->labelDbFileName->setText(data_->databaseFileName());
     ui->labelDbFileName->setToolTip(_meta.dbFilePath);
@@ -82,7 +82,7 @@ void DialogDbStatus::setTabsInfo()
     if (data_->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
-        const FilterRule &_filter = data_->metaData_.filter;
+        const FilterRule &_filter = data_->m_metadata.filter;
         ui->labelFiltersInfo->setStyleSheet(format::coloredText(_filter.isFilter(FilterRule::Ignore)));
 
         const QString _exts = _filter.extensionString();

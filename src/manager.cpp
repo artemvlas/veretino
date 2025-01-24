@@ -127,7 +127,7 @@ void Manager::restoreDatabase()
     if (dataMaintainer->data_
         && (dataMaintainer->data_->restoreBackupFile() || dataMaintainer->isDataNotSaved()))
     {
-        createDataModel(dataMaintainer->data_->metaData_.dbFilePath);
+        createDataModel(dataMaintainer->data_->m_metadata.dbFilePath);
     }
     else {
         emit setStatusbarText("No saved changes");
@@ -243,7 +243,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod _job)
             const QString __d = (_job == DM_ImportDigest) ? extractDigestFromFile(_data->digestFilePath(fileIndex))
                                                           : TreeModel::itemFileChecksum(fileIndex);
 
-            if (tools::canBeChecksum(__d, _data->metaData_.algorithm)) // checking for compliance with the current algo
+            if (tools::canBeChecksum(__d, _data->m_metadata.algorithm)) // checking for compliance with the current algo
                 dataMaintainer->importChecksum(fileIndex, __d);
         }
         else { // calc the new one
@@ -481,7 +481,7 @@ QString Manager::hashItem(const QModelIndex &_ind, const CalcKind _calckind)
                                   _calckind ? FileStatus::Verifying : FileStatus::Calculating);
 
     const QString _filePath = dataMaintainer->data_->itemAbsolutePath(_ind);
-    const QString _digest = hashFile(_filePath, dataMaintainer->data_->metaData_.algorithm, _calckind);
+    const QString _digest = hashFile(_filePath, dataMaintainer->data_->m_metadata.algorithm, _calckind);
 
     if (_digest.isEmpty() && !procState->isCanceled()) {
         dataMaintainer->setFileStatus(_ind, tools::failedCalcStatus(_filePath, _calckind));
@@ -686,7 +686,7 @@ void Manager::makeDbContentsList()
     const FileTypeList _typesList = p_files->getFileTypes(dataMaintainer->data_->p_model);
 
     if (!_typesList.isEmpty())
-        emit dbContentsListCreated(dataMaintainer->data_->metaData_.workDir, _typesList);
+        emit dbContentsListCreated(dataMaintainer->data_->m_metadata.workDir, _typesList);
 }
 
 void Manager::cacheMissingItems()

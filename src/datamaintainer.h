@@ -65,6 +65,7 @@ public:
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
     bool tryMoved(const QModelIndex &_file, const QString &_checksum);
 
+    TreeModel* createDataModel(const VerJson &_json, const MetaData &_meta);
     bool importJson(const QString &filePath);
     bool exportToJson();
     bool saveJsonFile(VerJson *_json);

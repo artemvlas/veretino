@@ -355,7 +355,7 @@ void ModeSelector::pasteItemSum()
     if (!p_view->isViewDatabase())
         return;
 
-    const QString _copied = copiedDigest(p_view->data_->metaData_.algorithm);
+    const QString _copied = copiedDigest(p_view->data_->m_metadata.algorithm);
     if (!_copied.isEmpty()) {
         p_manager->dataMaintainer->setItemValue(p_view->curIndex(), Column::ColumnChecksum, _copied);
         updateItemFile(DbMod::DM_PasteDigest);
@@ -427,7 +427,7 @@ void ModeSelector::resetDatabase()
 {
     if (p_view->data_) {
         p_view->saveHeaderState();
-        openJsonDatabase(p_view->data_->metaData_.dbFilePath);
+        openJsonDatabase(p_view->data_->m_metadata.dbFilePath);
     }
 }
 
@@ -864,7 +864,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                         case FileStatus::New:
                             viewContextMenu->addAction(p_menuAct->actionUpdFileAdd);
                             // paste from clipboard
-                            if (p_settings->allowPasteIntoDb && !copiedDigest(p_view->data_->metaData_.algorithm).isEmpty())
+                            if (p_settings->allowPasteIntoDb && !copiedDigest(p_view->data_->m_metadata.algorithm).isEmpty())
                                 viewContextMenu->addAction(p_menuAct->actionUpdFilePasteDigest);
                             // import from digest file
                             if (QFileInfo::exists(p_view->data_->digestFilePath(index)))
