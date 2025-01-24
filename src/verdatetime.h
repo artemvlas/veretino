@@ -14,8 +14,7 @@ public:
     VerDateTime(const QString &str);
     explicit operator bool() const;
 
-    // DateVerified == (all files exist and match the checksums)
-    enum DT { Created, Updated, Verified };
+    enum DT { Created, Updated, Verified };                             // DateVerified == (all files exist and match the checksums)
 
     const QString& value(DT type) const;
 
@@ -24,7 +23,9 @@ public:
     void update(DT type);
 
     QString toString(bool keep_empty_values = true) const;
+    QString basicDate() const;                                          // the date until which files are considered unmodified
 
+    // values
     QString m_created, m_updated, m_verified;
 }; // struct VerDateTime
 

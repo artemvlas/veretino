@@ -60,7 +60,7 @@ void StatusBar::setModeDb(const DataContainer *data)
     }
 
     // update info
-    const Numbers &_num = data->numbers_;
+    const Numbers &_num = data->m_numbers;
 
     QString checkResult = QString("☒ %1\n✓ %2")
                               .arg(_num.numberOf(FileStatus::Mismatched))

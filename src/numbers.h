@@ -27,6 +27,7 @@ public:
     bool changeStatus(const NumSize &_nums, const FileStatus _before, const FileStatus _after);
 
     const QList<FileStatus> statuses() const; // returns a list of available statuses
+    void clear();
 
 private:
     // { FileStatus : number of corresponding files, total size }

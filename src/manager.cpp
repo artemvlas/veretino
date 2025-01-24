@@ -176,7 +176,7 @@ void Manager::updateDatabase(const DbMod dest)
     if (!dataMaintainer->data_ || dataMaintainer->data_->isImmutable())
         return;
 
-    const Numbers &_num = dataMaintainer->data_->numbers_;
+    const Numbers &_num = dataMaintainer->data_->m_numbers;
 
     if (!_num.contains(FileStatus::CombAvailable)) {
         emit showMessage("Failure to delete all database items.\n\n" + movedDbWarning, "Warning");
@@ -363,13 +363,13 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
 
     // changing accompanying statuses to "Matched"
     FileStatuses flagAddedUpdated = (FileStatus::Added | FileStatus::Updated);
-    if (dataMaintainer->data_->numbers_.contains(flagAddedUpdated)) {
+    if (dataMaintainer->data_->m_numbers.contains(flagAddedUpdated)) {
         dataMaintainer->changeFilesStatus(flagAddedUpdated, FileStatus::Matched, folderItemIndex);
     }
 
     // result
     if (!folderItemIndex.isValid()) { // if root folder
-        emit folderChecked(dataMaintainer->data_->numbers_);
+        emit folderChecked(dataMaintainer->data_->m_numbers);
 
         // Save the verification datetime, if needed
         if (p_settings->saveVerificationDateTime) {
@@ -541,7 +541,7 @@ int Manager::calculateChecksums(const DbMod _purpose, const FileStatus _status, 
     DataContainer *_data = dataMaintainer->data_;
 
     if (!_data
-        || (_root.isValid() && _root.model() != _data->model_))
+        || (_root.isValid() && _root.model() != _data->p_model))
     {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
@@ -565,7 +565,7 @@ int Manager::calculateChecksums(const DbMod _purpose, const FileStatus _status, 
     const CalcKind _calckind = (_status & FileStatus::CombAvailable) ? Verification : Calculation;
 
     // process
-    TreeModelIterator iter(_data->model_, _root);
+    TreeModelIterator iter(_data->p_model, _root);
 
     while (iter.hasNext() && !procState->isCanceled()) {
         if (iter.nextFile().status() != FileStatus::Queued)
@@ -683,7 +683,7 @@ void Manager::makeDbContentsList()
     if (!dataMaintainer->data_)
         return;
 
-    const FileTypeList _typesList = p_files->getFileTypes(dataMaintainer->data_->model_);
+    const FileTypeList _typesList = p_files->getFileTypes(dataMaintainer->data_->p_model);
 
     if (!_typesList.isEmpty())
         emit dbContentsListCreated(dataMaintainer->data_->metaData_.workDir, _typesList);
@@ -697,7 +697,7 @@ void Manager::cacheMissingItems()
         return;
     }
 
-    TreeModelIterator it(_data->model_);
+    TreeModelIterator it(_data->p_model);
 
     while (it.hasNext()) {
         if (it.nextFile().status() == FileStatus::Missing) {

@@ -76,7 +76,7 @@ void DataMaintainer::clearOldData()
 
 bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value)
 {
-    return (data_ && data_->model_->setData(fileIndex.siblingAtColumn(column), value));
+    return (data_ && data_->p_model->setData(fileIndex.siblingAtColumn(column), value));
 }
 
 void DataMaintainer::setFileStatus(const QModelIndex &_index, FileStatus _status)
@@ -109,7 +109,7 @@ void DataMaintainer::updateVerifDateTime()
     }
 }
 
-// adds the WorkDir contents to the data_->model_
+// adds the WorkDir contents to the data_->p_model
 int DataMaintainer::folderBasedData(FileStatus fileStatus)
 {
     if (!data_)
@@ -145,7 +145,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
             const FileValues &_values = _isReadable ? FileValues(fileStatus, it.fileInfo().size())
                                                     : FileValues(FileStatus::UnPermitted);
 
-            data_->model_->add_file(_relPath, _values);
+            data_->p_model->add_file(_relPath, _values);
             ++numAdded;
         }
     }
@@ -161,7 +161,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
     //if (numAdded > 0)
     updateNumbers();
 
-    data_->model_->clearCacheFolderItems();
+    data_->p_model->clearCacheFolderItems();
     return numAdded;
 }
 
@@ -187,7 +187,7 @@ void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatu
 void DataMaintainer::updateNumbers(const FileStatus status_old, const FileStatus status_new, const qint64 size)
 {
     if (data_
-        && data_->numbers_.moveFile(status_old, status_new, size))
+        && data_->m_numbers.moveFile(status_old, status_new, size))
     {
         emit numbersUpdated();
     }
@@ -195,7 +195,7 @@ void DataMaintainer::updateNumbers(const FileStatus status_old, const FileStatus
 
 void DataMaintainer::moveNumbers(const FileStatus _before, const FileStatus _after)
 {
-    if (data_ && data_->numbers_.changeStatus(_before, _after))
+    if (data_ && data_->m_numbers.changeStatus(_before, _after))
         emit numbersUpdated();
 }
 
@@ -209,7 +209,7 @@ void DataMaintainer::setDbFileState(DbFileState state)
 
 bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
 {
-    if (!data_ || !fileRowIndex.isValid() || fileRowIndex.model() != data_->model_) {
+    if (!data_ || !fileRowIndex.isValid() || fileRowIndex.model() != data_->p_model) {
         qDebug() << "DM::updateChecksum >> Error";
         return false;
     }
@@ -255,7 +255,7 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->model_, rootIndex);
+    TreeModelIterator iter(data_->p_model, rootIndex);
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
@@ -288,7 +288,7 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->model_, rootIndex);
+    TreeModelIterator iter(data_->p_model, rootIndex);
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
@@ -308,7 +308,7 @@ int DataMaintainer::clearLostFiles()
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->model_);
+    TreeModelIterator iter(data_->p_model);
 
     while (iter.hasNext()) {
         if (itemFileRemoveLost(iter.nextFile().index()))
@@ -347,7 +347,7 @@ bool DataMaintainer::tryMoved(const QModelIndex &_file, const QString &_checksum
     if (_status & (FileStatus::Missing | FileStatus::Removed)) {
         clearChecksum(_i_movedout);
         setFileStatus(_i_movedout, FileStatus::MovedOut);
-        data_->numbers_.moveFile(_status, FileStatus::MovedOut);
+        data_->m_numbers.moveFile(_status, FileStatus::MovedOut);
 
         // moved
         setFileStatus(_file, FileStatus::Moved);
@@ -366,7 +366,7 @@ int DataMaintainer::updateMismatchedChecksums()
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->model_);
+    TreeModelIterator iter(data_->p_model);
 
     while (iter.hasNext()) {
         if (itemFileUpdateChecksum(iter.nextFile().index()))
@@ -524,12 +524,13 @@ bool DataMaintainer::importJson(const QString &filePath)
 
     emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
 
-    DataContainer *parsedData = new DataContainer(getMetaData(_json));
-    const QString &workDir = parsedData->metaData_.workDir;
+    const MetaData _meta = getMetaData(_json);
+    const QString &workDir = _meta.workDir;
+    DataContainer *parsedData = new DataContainer(_meta);
 
     // populating the main data
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
-    const QString _basicDT = considerFileModDate ? parsedData->basicDate() : QString();
+    const QString _basicDT = considerFileModDate ? _meta.datetime.basicDate() : QString();
     const QJsonObject &filelistData = _json.data(); // { file_path : checksum }
 
     for (QJsonObject::const_iterator it = filelistData.constBegin();
@@ -539,7 +540,7 @@ bool DataMaintainer::importJson(const QString &filePath)
         FileValues _values = makeFileValues(_fullPath, _basicDT);
         _values.checksum = it.value().toString();
 
-        parsedData->model_->add_file(it.key(), _values);
+        parsedData->p_model->add_file(it.key(), _values);
     }
 
     // additional data
@@ -554,7 +555,7 @@ bool DataMaintainer::importJson(const QString &filePath)
             const FileStatus _status = tools::failedCalcStatus(_fullPath);
 
             if (_status & FileStatus::CombUnreadable) {
-                parsedData->model_->add_file(_relPath, FileValues(_status));
+                parsedData->p_model->add_file(_relPath, FileValues(_status));
                 _unrCache << _relPath;
             }
         }
@@ -568,12 +569,12 @@ bool DataMaintainer::importJson(const QString &filePath)
         const QString _fullPath = it.next();
         const QString _relPath = pathstr::relativePath(workDir, _fullPath);
 
-        if (parsedData->metaData_.filter.isFileAllowed(_relPath)
+        if (_meta.filter.isFileAllowed(_relPath)
             && !filelistData.contains(_relPath)
             && !_unrCache.contains(_relPath)
             && it.fileInfo().isReadable())
         {
-            parsedData->model_->add_file(_relPath,
+            parsedData->p_model->add_file(_relPath,
                                          FileValues(FileStatus::New, it.fileInfo().size()));
         }
     }
@@ -587,7 +588,7 @@ bool DataMaintainer::importJson(const QString &filePath)
         return false;
     }
 
-    parsedData->model_->clearCacheFolderItems();
+    parsedData->p_model->clearCacheFolderItems();
 
     const bool _success = setSourceData(parsedData);
     if (!_success)
@@ -599,14 +600,14 @@ bool DataMaintainer::importJson(const QString &filePath)
 // returns the path to the file if the write was successful, otherwise an empty string
 VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 {
-    if (!data_ || data_->model_->isEmpty()) {
+    if (!data_ || data_->p_model->isEmpty()) {
         qDebug() << "makeJson | no data!";
         return nullptr;
     }
 
     // [Header]
     const bool isBranching = TreeModel::isFolderRow(rootFolder);
-    const Numbers &_num = isBranching ? data_->getNumbers(rootFolder) : data_->numbers_;
+    const Numbers &_num = isBranching ? data_->getNumbers(rootFolder) : data_->m_numbers;
     const MetaData &_meta = data_->metaData_;
 
     const QString &pathToSave = isBranching ? data_->branch_path_composed(rootFolder) // branching
@@ -640,7 +641,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
     // [Main data]
     emit setStatusbarText(QStringLiteral(u"Exporting data to json..."));
 
-    TreeModelIterator iter(data_->model_, rootFolder);
+    TreeModelIterator iter(data_->p_model, rootFolder);
 
     while (iter.hasNext() && !isCanceled()) {
         iter.nextFile();
@@ -748,7 +749,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     const QJsonObject &_mainList = _json.data();
 
     int _num = 0;
-    TreeModelIterator _it(data_->model_, rootFolder);
+    TreeModelIterator _it(data_->p_model, rootFolder);
 
     while (_it.hasNext()) {
         _it.nextFile();
@@ -774,7 +775,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 {
-    if (!data_ || !curIndex.isValid() || (curIndex.model() != data_->model_))
+    if (!data_ || !curIndex.isValid() || (curIndex.model() != data_->p_model))
         return QString();
 
     if (TreeModel::isFileRow(curIndex)) {

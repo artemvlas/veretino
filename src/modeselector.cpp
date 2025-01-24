@@ -231,9 +231,9 @@ Mode ModeSelector::mode() const
         }
 
         if (!isDbConst()) {
-            if (p_view->data_->numbers_.contains(FileStatus::Mismatched))
+            if (p_view->data_->m_numbers.contains(FileStatus::Mismatched))
                 return UpdateMismatch;
-            else if (p_view->data_->numbers_.contains(FileStatus::CombNewLost))
+            else if (p_view->data_->m_numbers.contains(FileStatus::CombNewLost))
                 return ModelNewLost;
         }
 
@@ -801,9 +801,9 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     if (!p_view->isViewDatabase())
         return;
 
-    const Numbers &_num = p_view->data_->numbers_;
+    const Numbers &_num = p_view->data_->m_numbers;
     const QModelIndex _v_ind = p_view->indexAt(point);
-    const QModelIndex index = p_view->isViewModel(ModelView::ModelProxy) ? p_view->data_->proxyModel_->mapToSource(_v_ind) : _v_ind;
+    const QModelIndex index = p_view->isViewModel(ModelView::ModelProxy) ? p_view->data_->p_proxy->mapToSource(_v_ind) : _v_ind;
     QMenu *viewContextMenu = p_menuAct->disposableMenu();
 
     if (p_proc->isStarted()) {

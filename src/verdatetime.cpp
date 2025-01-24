@@ -125,3 +125,19 @@ QString VerDateTime::toString(bool keep_empty_values) const
 
     return __s;
 }
+
+QString VerDateTime::basicDate() const
+{
+    // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
+    const int r_len = Lit::s_dt_format.size(); // 16
+
+    if (!m_verified.isEmpty())
+        return m_verified.right(r_len);
+
+    if (m_updated.isEmpty())
+        return m_created.right(r_len);
+
+    // if the update time is not empty and there is no verification time,
+    // return an empty string
+    return QString();
+}

@@ -18,11 +18,11 @@ DataContainer::DataContainer(const MetaData &meta, QObject *parent)
 
 ProxyModel* DataContainer::setProxyModel()
 {
-    if (proxyModel_)
-        delete proxyModel_;
+    if (p_proxy)
+        delete p_proxy;
 
-    proxyModel_ = new ProxyModel(model_, this);
-    return proxyModel_;
+    p_proxy = new ProxyModel(p_model, this);
+    return p_proxy;
 }
 
 QString DataContainer::databaseFileName() const
@@ -85,25 +85,6 @@ QString DataContainer::digestFilePath(const QModelIndex &fileIndex) const
     return paths::digestFilePath(itemAbsolutePath(fileIndex), metaData_.algorithm);
 }
 
-QString DataContainer::basicDate() const
-{
-    // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
-    const int r_len = Lit::s_dt_format.size(); // 16
-    //const QString (&dt)[3] = metaData_.datetime;
-    const VerDateTime &dt =  metaData_.datetime;
-
-    if (!dt.m_verified.isEmpty())
-        return dt.m_verified.right(r_len);
-
-    // if the update time is not empty and there is no verification time,
-    // return an empty string
-
-    if (dt.m_updated.isEmpty())
-        return dt.m_created.right(r_len);
-
-    return QString();
-}
-
 bool DataContainer::isWorkDirRelative() const
 {
     return (pathstr::parentFolder(metaData_.dbFilePath) == metaData_.workDir);
@@ -116,7 +97,7 @@ bool DataContainer::isFilterApplied() const
 
 bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfolder) const
 {
-    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers_;
+    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
 
     return num.contains(flags);
 }
@@ -129,7 +110,7 @@ bool DataContainer::isAllChecked() const
 
 bool DataContainer::isAllMatched(const QModelIndex &subfolder) const
 {
-    const Numbers &_nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : numbers_;
+    const Numbers &_nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
 
     return isAllMatched(_nums);
 }
@@ -197,13 +178,13 @@ void DataContainer::removeBackupFile() const
 
 const Numbers& DataContainer::updateNumbers()
 {
-    numbers_ = getNumbers();
-    return numbers_;
+    m_numbers = getNumbers();
+    return m_numbers;
 }
 
 Numbers DataContainer::getNumbers(const QModelIndex &rootIndex) const
 {
-    return getNumbers(model_, rootIndex);
+    return getNumbers(p_model, rootIndex);
 }
 
 Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
@@ -218,6 +199,19 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     }
 
     return num;
+}
+
+void DataContainer::clearData()
+{
+    if (p_proxy)
+        delete p_proxy;
+    if (p_model)
+        delete p_model;
+
+    p_model = new TreeModel(this);
+    p_proxy = new ProxyModel(p_model, this);
+
+    m_numbers.clear();
 }
 
 DataContainer::~DataContainer()

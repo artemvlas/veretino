@@ -100,3 +100,8 @@ const QList<FileStatus> Numbers::statuses() const
 {
     return _val.keys();
 }
+
+void Numbers::clear()
+{
+    _val.clear();
+}

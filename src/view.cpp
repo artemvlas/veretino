@@ -53,7 +53,7 @@ QModelIndex View::curIndex() const
     const QModelIndex _ind = selectionModel()->currentIndex();
 
     if (isViewModel(ModelProxy))
-        return data_->proxyModel_->mapToSource(_ind);
+        return data_->p_proxy->mapToSource(_ind);
 
     return _ind;
 }
@@ -94,9 +94,9 @@ void View::setTreeModel(ModelView modelSel)
     saveHeaderState();
 
     if (modelSel == ModelSource) {
-        setModel(data_->model_);
+        setModel(data_->p_model);
     } else {
-        setModel(data_->proxyModel_);
+        setModel(data_->p_proxy);
     }
 
     emit modelChanged(modelSel);
@@ -272,19 +272,19 @@ void View::setFilter(const FileStatuses flags)
 {
     if (isViewModel(ModelProxy)) {
         QString prePathModel = _lastPathModel;
-        data_->proxyModel_->setFilter(flags);
+        data_->p_proxy->setFilter(flags);
         setIndexByPath(prePathModel);
         setBackgroundColor();
     }
     else if (isViewModel(ModelSource)) {
-        data_->proxyModel_->setFilter(flags);
+        data_->p_proxy->setFilter(flags);
     }
 }
 
 void View::editFilter(const FileStatuses flags, bool add)
 {
     if (isViewModel(ModelProxy)) {
-        FileStatuses curFilter = data_->proxyModel_->currentlyFiltered();
+        FileStatuses curFilter = data_->p_proxy->currentlyFiltered();
 
         setFilter(add ? (curFilter | flags) : (curFilter & ~flags));
     }
@@ -309,9 +309,9 @@ ModelView View::curViewModel() const
 {
     if (model() == fileSystem)
         return FileSystem;
-    else if (data_ && model() == data_->model_)
+    else if (data_ && model() == data_->p_model)
         return ModelSource;
-    else if (data_ && model() == data_->proxyModel_)
+    else if (data_ && model() == data_->p_proxy)
         return ModelProxy;
     else
         return NotSetted;
@@ -335,13 +335,13 @@ bool View::isViewDatabase() const
 bool View::isViewFiltered() const
 {
     return isViewModel(ModelView::ModelProxy)
-           && data_->proxyModel_->isFilterEnabled();
+           && data_->p_proxy->isFilterEnabled();
 }
 
 bool View::isViewFiltered(const FileStatus status) const
 {
     return isViewModel(ModelView::ModelProxy)
-           && (data_->proxyModel_->currentlyFiltered() & status);
+           && (data_->p_proxy->currentlyFiltered() & status);
 }
 
 void View::deleteOldSelModel()

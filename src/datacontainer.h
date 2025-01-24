@@ -17,11 +17,11 @@ class TreeModel;
 
 struct MetaData {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
-    FilterRule filter;
-    QString workDir; // current working folder
-    QString dbFilePath;
+    QString workDir;               // current working folder
+    QString dbFilePath;            // path to the db file
 
-    VerDateTime datetime;
+    FilterRule filter;             // file filtering rules for the current database
+    VerDateTime datetime;          // time stamps: date and time of creation, update, verification
 
     enum DbFileState : quint8 { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
@@ -43,22 +43,22 @@ public:
     ProxyModel* setProxyModel();
     QString databaseFileName() const;
     QString backupFilePath() const;
-    QString itemAbsolutePath(const QModelIndex &curIndex) const;        // returns the absolute path to the database item (file or subfolder)
-    QString branch_path_existing(const QModelIndex &subfolder);         // returns the path to the found Branch, an empty string if not found; caches the result
-    QString branch_path_composed(const QModelIndex &subfolder) const;   // returns the composed path regardless of the file's existence
+    QString itemAbsolutePath(const QModelIndex &curIndex) const;                    // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
+    QString branch_path_existing(const QModelIndex &subfolder);                     // returns the path to the found Branch, an empty string if not found; caches the result
+    QString branch_path_composed(const QModelIndex &subfolder) const;               // returns the composed path regardless of the file's existence
     QString digestFilePath(const QModelIndex &fileIndex) const;
-    QString basicDate() const;                                          // the date until which files are considered unmodified
 
     bool isDbFileState(DbFileState state) const;
     bool isWorkDirRelative() const;
     bool isFilterApplied() const;
-    bool contains(const FileStatuses flags, const QModelIndex &subfolder = QModelIndex()) const;
+    bool contains(const FileStatuses flags,
+                  const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllChecked() const;
     bool isAllMatched(const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllMatched(const Numbers &nums) const;
     bool isInCreation() const;
-    bool isImmutable() const;           // has FlagConst
-    bool hasPossiblyMovedItems() const; // has New and Missing
+    bool isImmutable() const;                                                        // has FlagConst
+    bool hasPossiblyMovedItems() const;                                              // has New and Missing
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;
@@ -70,11 +70,13 @@ public:
     static Numbers getNumbers(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
 
+    void clearData();                                                                 // removes data models and resets: p_model, p_proxy, m_numbers
+
     // DATA
-    TreeModel *model_ = new TreeModel(this);  // main data
-    ProxyModel *proxyModel_ = new ProxyModel(model_, this);
+    TreeModel *p_model = new TreeModel(this);                                         // main data
+    ProxyModel *p_proxy = new ProxyModel(p_model, this);
     MetaData metaData_;
-    Numbers numbers_;
+    Numbers m_numbers;
 
     QHash<QString, QModelIndex> _cacheMissing;
     QHash<QModelIndex, QString> _cacheBranches;

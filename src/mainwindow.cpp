@@ -277,7 +277,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeL
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->m_icons.icon(Icons::Database));
         QString strWindowTitle = QStringLiteral(u"Database Contents");
-        if (ui->view->data_ && ui->view->data_->numbers_.contains(FileStatus::Missing))
+        if (ui->view->data_ && ui->view->data_->m_numbers.contains(FileStatus::Missing))
             strWindowTitle.append(QStringLiteral(u" [available ones]"));
         dialog.setWindowTitle(strWindowTitle);
         dialog.exec();
@@ -541,7 +541,7 @@ void MainWindow::updateWindowTitle()
     if (ui->view->isViewDatabase()) {
         const DataContainer *data = ui->view->data_;
 
-        if (data->numbers_.contains(FileStatus::Mismatched)) {
+        if (data->m_numbers.contains(FileStatus::Mismatched)) {
             setWinTitleMismatchFound();
             return;
         }
@@ -578,7 +578,7 @@ void MainWindow::handleChangedModel()
 void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->view->isViewDatabase()) {
-        const Numbers &_nums = ui->view->data_->numbers_;
+        const Numbers &_nums = ui->view->data_->m_numbers;
         if (_nums.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
         else if (_nums.contains(FileStatus::CombDbChanged))

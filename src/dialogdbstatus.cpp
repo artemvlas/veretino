@@ -111,7 +111,7 @@ QStringList DialogDbStatus::infoContent()
     if (isCreating())
         return { QStringLiteral(u"The checksum list is being calculated...") };
 
-    const Numbers &_num = data_->numbers_;
+    const Numbers &_num = data_->m_numbers;
     QStringList contentNumbers;
     const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
     const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
@@ -161,7 +161,7 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const Numbers &_num = data_->numbers_;
+    const Numbers &_num = data_->m_numbers;
     const int _n_available = _num.numberOf(FileStatus::CombAvailable);
     const int _n_mismatch = _num.numberOf(FileStatus::Mismatched);
 
@@ -208,7 +208,7 @@ QStringList DialogDbStatus::infoVerification()
 
 QStringList DialogDbStatus::infoChanges()
 {
-    const Numbers &_numb = data_->numbers_;
+    const Numbers &_numb = data_->m_numbers;
     QStringList result;
 
     // This list is used instead of Numbers::statuses() to order the strings
