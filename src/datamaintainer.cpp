@@ -26,8 +26,8 @@ DataMaintainer::DataMaintainer(DataContainer* initData, QObject *parent)
 
 void DataMaintainer::connections()
 {
-    connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (data_->contains(FileStatus::Mismatched | FileStatus::Missing))
-                                                                  data_->m_metadata.datetime.m_verified.clear(); });
+    connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (m_data->contains(FileStatus::Mismatched | FileStatus::Missing))
+                                                                  m_data->m_metadata.datetime.m_verified.clear(); });
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
@@ -49,9 +49,9 @@ bool DataMaintainer::setSourceData(DataContainer *sourceData)
 {
     if (sourceData) {
         clearOldData();
-        oldData_ = data_;
-        data_ = sourceData;
-        data_->setParent(this);
+        m_oldData = m_data;
+        m_data = sourceData;
+        m_data->setParent(this);
         updateNumbers();
     }
 
@@ -60,28 +60,28 @@ bool DataMaintainer::setSourceData(DataContainer *sourceData)
 
 void DataMaintainer::clearData()
 {
-    if (data_) {
-        delete data_;
-        data_ = nullptr;
+    if (m_data) {
+        delete m_data;
+        m_data = nullptr;
     }
 }
 
 void DataMaintainer::clearOldData()
 {
-    if (oldData_) {
-        delete oldData_;
-        oldData_ = nullptr;
+    if (m_oldData) {
+        delete m_oldData;
+        m_oldData = nullptr;
     }
 }
 
 bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value)
 {
-    return (data_ && data_->p_model->setData(fileIndex.siblingAtColumn(column), value));
+    return (m_data && m_data->m_model->setData(fileIndex.siblingAtColumn(column), value));
 }
 
-void DataMaintainer::setFileStatus(const QModelIndex &_index, FileStatus _status)
+void DataMaintainer::setFileStatus(const QModelIndex &index, FileStatus status)
 {
-    setItemValue(_index, Column::ColumnStatus, _status);
+    setItemValue(index, Column::ColumnStatus, status);
 }
 
 void DataMaintainer::setConsiderDateModified(bool consider)
@@ -91,32 +91,32 @@ void DataMaintainer::setConsiderDateModified(bool consider)
 
 void DataMaintainer::updateDateTime()
 {
-    if (data_) {
-        if (data_->isDbFileState(DbFileState::NoFile)) {
-            data_->m_metadata.datetime.update(VerDateTime::Created);
+    if (m_data) {
+        if (m_data->isDbFileState(DbFileState::NoFile)) {
+            m_data->m_metadata.datetime.update(VerDateTime::Created);
         }
-        else if (data_->contains(FileStatus::CombDbChanged)) {
-            data_->m_metadata.datetime.update(VerDateTime::Updated);
+        else if (m_data->contains(FileStatus::CombDbChanged)) {
+            m_data->m_metadata.datetime.update(VerDateTime::Updated);
         }
     }
 }
 
 void DataMaintainer::updateVerifDateTime()
 {
-    if (data_ && data_->isAllMatched()) {
-        data_->m_metadata.datetime.update(VerDateTime::Verified);
+    if (m_data && m_data->isAllMatched()) {
+        m_data->m_metadata.datetime.update(VerDateTime::Verified);
         setDbFileState(DbFileState::NotSaved);
     }
 }
 
-// adds the WorkDir contents to the data_->p_model
+// adds the WorkDir contents to the m_data->m_model
 int DataMaintainer::folderBasedData(FileStatus fileStatus)
 {
-    if (!data_)
+    if (!m_data)
         return 0;
 
-    const QString &_workDir = data_->m_metadata.workDir;
-    const FilterRule &_filter = data_->m_metadata.filter;
+    const QString &_workDir = m_data->m_metadata.workDir;
+    const FilterRule &_filter = m_data->m_metadata.filter;
 
     if (!QFileInfo(_workDir).isDir()) {
         qDebug() << "DM::folderBasedData | Wrong path:" << _workDir;
@@ -145,7 +145,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
             const FileValues &_values = _isReadable ? FileValues(fileStatus, it.fileInfo().size())
                                                     : FileValues(FileStatus::UnPermitted);
 
-            data_->p_model->add_file(_relPath, _values);
+            m_data->m_model->add_file(_relPath, _values);
             ++numAdded;
         }
     }
@@ -161,18 +161,18 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
     //if (numAdded > 0)
     updateNumbers();
 
-    data_->p_model->clearCacheFolderItems();
+    m_data->m_model->clearCacheFolderItems();
     return numAdded;
 }
 
 void DataMaintainer::updateNumbers()
 {
-    if (!data_) {
-        qDebug() << "DM::updateNumbers | NO data_";
+    if (!m_data) {
+        qDebug() << "DM::updateNumbers | NO m_data";
         return;
     }
 
-    data_->updateNumbers();
+    m_data->updateNumbers();
     emit numbersUpdated();
 }
 
@@ -186,30 +186,30 @@ void DataMaintainer::updateNumbers(const QModelIndex &fileIndex, const FileStatu
 
 void DataMaintainer::updateNumbers(const FileStatus status_old, const FileStatus status_new, const qint64 size)
 {
-    if (data_
-        && data_->m_numbers.moveFile(status_old, status_new, size))
+    if (m_data
+        && m_data->m_numbers.moveFile(status_old, status_new, size))
     {
         emit numbersUpdated();
     }
 }
 
-void DataMaintainer::moveNumbers(const FileStatus _before, const FileStatus _after)
+void DataMaintainer::moveNumbers(const FileStatus before, const FileStatus after)
 {
-    if (data_ && data_->m_numbers.changeStatus(_before, _after))
+    if (m_data && m_data->m_numbers.changeStatus(before, after))
         emit numbersUpdated();
 }
 
 void DataMaintainer::setDbFileState(DbFileState state)
 {
-    if (data_ && !data_->isDbFileState(state)) {
-        data_->m_metadata.dbFileState = state;
+    if (m_data && !m_data->isDbFileState(state)) {
+        m_data->m_metadata.dbFileState = state;
         emit dbFileStateChanged(state);
     }
 }
 
 bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
 {
-    if (!data_ || !fileRowIndex.isValid() || fileRowIndex.model() != data_->p_model) {
+    if (!m_data || !fileRowIndex.isValid() || fileRowIndex.model() != m_data->m_model) {
         qDebug() << "DM::updateChecksum >> Error";
         return false;
     }
@@ -234,14 +234,14 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
     }
 }
 
-bool DataMaintainer::importChecksum(const QModelIndex &_file, const QString &_checksum)
+bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &checksum)
 {
-    if (TreeModel::hasStatus(FileStatus::New, _file) && !_checksum.isEmpty()) {
-        setItemValue(_file, Column::ColumnChecksum, _checksum);
-        setFileStatus(_file, FileStatus::Imported);
+    if (TreeModel::hasStatus(FileStatus::New, file) && !checksum.isEmpty()) {
+        setItemValue(file, Column::ColumnChecksum, checksum);
+        setFileStatus(file, FileStatus::Imported);
         return true;
 
-        // data_->numbers_.moveFile(FileStatus::New, FileStatus::Imported, TreeModel::itemFileSize(_file));
+        // m_data->numbers_.moveFile(FileStatus::New, FileStatus::Imported, TreeModel::itemFileSize(_file));
     }
 
     return false;
@@ -249,13 +249,13 @@ bool DataMaintainer::importChecksum(const QModelIndex &_file, const QString &_ch
 
 int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
-    if (!data_ || tools::isFlagCombined(newStatus)) {
+    if (!m_data || tools::isFlagCombined(newStatus)) {
         qDebug() << "DM::changeFilesStatus >> Error";
         return 0;
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->p_model, rootIndex);
+    TreeModelIterator iter(m_data->m_model, rootIndex);
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
@@ -282,13 +282,13 @@ void DataMaintainer::clearChecksum(const QModelIndex &fileIndex)
 
 int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &rootIndex)
 {
-    if (!data_) {
-        qDebug() << "DM::clearChecksums | NO data_";
+    if (!m_data) {
+        qDebug() << "DM::clearChecksums | NO m_data";
         return 0;
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->p_model, rootIndex);
+    TreeModelIterator iter(m_data->m_model, rootIndex);
 
     while (iter.hasNext()) {
         if (flags & iter.nextFile().status()) {
@@ -302,13 +302,13 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
 
 int DataMaintainer::clearLostFiles()
 {
-    if (!data_) {
-        qDebug() << "DM::clearLostFiles | NO data_";
+    if (!m_data) {
+        qDebug() << "DM::clearLostFiles | NO m_data";
         return 0;
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->p_model);
+    TreeModelIterator iter(m_data->m_model);
 
     while (iter.hasNext()) {
         if (itemFileRemoveLost(iter.nextFile().index()))
@@ -326,7 +326,7 @@ int DataMaintainer::clearLostFiles()
 
 bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
 {
-    if (data_ && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
+    if (m_data && TreeModel::hasStatus(FileStatus::Missing, fileIndex)) {
         clearChecksum(fileIndex);
         setFileStatus(fileIndex, FileStatus::Removed);
         return true;
@@ -335,23 +335,23 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
     return false;
 }
 
-bool DataMaintainer::tryMoved(const QModelIndex &_file, const QString &_checksum)
+bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
 {
-    if (!data_ || !data_->_cacheMissing.contains(_checksum))
+    if (!m_data || !m_data->_cacheMissing.contains(checksum))
         return false;
 
     // moved out
-    QModelIndex _i_movedout = data_->_cacheMissing.take(_checksum);
+    QModelIndex _i_movedout = m_data->_cacheMissing.take(checksum);
     const FileStatus _status = TreeModel::itemFileStatus(_i_movedout);
 
     if (_status & (FileStatus::Missing | FileStatus::Removed)) {
         clearChecksum(_i_movedout);
         setFileStatus(_i_movedout, FileStatus::MovedOut);
-        data_->m_numbers.moveFile(_status, FileStatus::MovedOut);
+        m_data->m_numbers.moveFile(_status, FileStatus::MovedOut);
 
         // moved
-        setFileStatus(_file, FileStatus::Moved);
-        setItemValue(_file, Column::ColumnChecksum, _checksum);
+        setFileStatus(file, FileStatus::Moved);
+        setItemValue(file, Column::ColumnChecksum, checksum);
         return true;
     }
 
@@ -360,13 +360,13 @@ bool DataMaintainer::tryMoved(const QModelIndex &_file, const QString &_checksum
 
 int DataMaintainer::updateMismatchedChecksums()
 {
-    if (!data_) {
-        qDebug() << "DM::updateMismatchedChecksums | NO data_";
+    if (!m_data) {
+        qDebug() << "DM::updateMismatchedChecksums | NO m_data";
         return 0;
     }
 
     int number = 0;
-    TreeModelIterator iter(data_->p_model);
+    TreeModelIterator iter(m_data->m_model);
 
     while (iter.hasNext()) {
         if (itemFileUpdateChecksum(iter.nextFile().index()))
@@ -383,7 +383,7 @@ int DataMaintainer::updateMismatchedChecksums()
 
 bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
 {
-    if (data_ && TreeModel::hasReChecksum(fileIndex)) {
+    if (m_data && TreeModel::hasReChecksum(fileIndex)) {
         const QString _reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
         if (!_reChecksum.isEmpty()) {
@@ -399,7 +399,7 @@ bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
 
 void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus)
 {
-    if (prevStatus != FileStatus::Queued) { // data_ && !data_->isInCreation()
+    if (prevStatus != FileStatus::Queued) { // m_data && !m_data->isInCreation()
         if (prevStatus == FileStatus::New)
             clearChecksums(FileStatus::Added, rootIndex);
         else if (tools::isFlagCombined(prevStatus)) // CombNotChecked == NotChecked | NotCheckedMod
@@ -505,40 +505,40 @@ FileValues DataMaintainer::makeFileValues(const QString &filePath, const QString
     return FileValues(FileStatus::Missing);
 }
 
-TreeModel* DataMaintainer::createDataModel(const VerJson &_json, const MetaData &_meta)
+TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &meta)
 {
-    const QString &workDir = _meta.workDir;
-    TreeModel *_model = new TreeModel();
+    const QString &workDir = meta.workDir;
+    TreeModel *model = new TreeModel();
 
     // populating the main data
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
-    const QString _basicDT = considerFileModDate ? _meta.datetime.basicDate() : QString();
-    const QJsonObject &filelistData = _json.data(); // { file_path : checksum }
+    const QString basicDT = considerFileModDate ? meta.datetime.basicDate() : QString();
+    const QJsonObject &filelistData = json.data(); // { file_path : checksum }
 
     for (QJsonObject::const_iterator it = filelistData.constBegin();
          !isCanceled() && it != filelistData.constEnd(); ++it)
     {
-        const QString _fullPath = pathstr::joinPath(workDir, it.key());
-        FileValues _values = makeFileValues(_fullPath, _basicDT);
-        _values.checksum = it.value().toString();
+        const QString fullPath = pathstr::joinPath(workDir, it.key());
+        FileValues values = makeFileValues(fullPath, basicDT);
+        values.checksum = it.value().toString();
 
-        _model->add_file(it.key(), _values);
+        model->add_file(it.key(), values);
     }
 
     // additional data
-    QSet<QString> _unrCache; // the cache is used when searching for new files
+    QSet<QString> unrCache; // the cache is used when searching for new files
 
-    if (!_json.unreadableFiles().isEmpty()) {
-        const QJsonArray &unreadableFiles = _json.unreadableFiles();
+    if (!json.unreadableFiles().isEmpty()) {
+        const QJsonArray &unreadableFiles = json.unreadableFiles();
 
         for (int var = 0; !isCanceled() && var < unreadableFiles.size(); ++var) {
-            const QString _relPath = unreadableFiles.at(var).toString();
-            const QString _fullPath = pathstr::joinPath(workDir, _relPath);
-            const FileStatus _status = tools::failedCalcStatus(_fullPath);
+            const QString relPath = unreadableFiles.at(var).toString();
+            const QString fullPath = pathstr::joinPath(workDir, relPath);
+            const FileStatus status = tools::failedCalcStatus(fullPath);
 
-            if (_status & FileStatus::CombUnreadable) {
-                _model->add_file(_relPath, FileValues(_status));
-                _unrCache << _relPath;
+            if (status & FileStatus::CombUnreadable) {
+                model->add_file(relPath, FileValues(status));
+                unrCache << relPath;
             }
         }
     }
@@ -548,15 +548,15 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &_json, const MetaData 
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString _fullPath = it.next();
-        const QString _relPath = pathstr::relativePath(workDir, _fullPath);
+        const QString fullPath = it.next();
+        const QString relPath = pathstr::relativePath(workDir, fullPath);
 
-        if (_meta.filter.isFileAllowed(_relPath)
-            && !filelistData.contains(_relPath)
-            && !_unrCache.contains(_relPath)
+        if (meta.filter.isFileAllowed(relPath)
+            && !filelistData.contains(relPath)
+            && !unrCache.contains(relPath)
             && it.fileInfo().isReadable())
         {
-            _model->add_file(_relPath, FileValues(FileStatus::New, it.fileInfo().size()));
+            model->add_file(relPath, FileValues(FileStatus::New, it.fileInfo().size()));
         }
     }
 
@@ -564,25 +564,25 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &_json, const MetaData 
     emit setStatusbarText();
 
     if (isCanceled()) {
-        qDebug() << "parseJson | Canceled:" << pathstr::basicName(_json.file_path());
-        delete _model;
+        qDebug() << "parseJson | Canceled:" << pathstr::basicName(json.file_path());
+        delete model;
         return nullptr;
     }
 
-    _model->clearCacheFolderItems();
-    return _model;
+    model->clearCacheFolderItems();
+    return model;
 }
 
 bool DataMaintainer::importJson(const QString &filePath)
 {
-    VerJson _json(filePath);
+    VerJson json(filePath);
 
-    if (!_json.load()) {
+    if (!json.load()) {
         emit setStatusbarText("An error occurred while opening the database.");
         return false;
     }
 
-    if (!_json) {
+    if (!json) {
         emit showMessage(pathstr::basicName(filePath) + "\n\n"
                                                       "The database doesn't contain checksums.\n"
                                                       "Probably all files have been ignored.", "Empty Database!");
@@ -593,53 +593,54 @@ bool DataMaintainer::importJson(const QString &filePath)
     emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
 
     // parsing
-    const MetaData _meta = getMetaData(_json);         // meta data
-    TreeModel *_model = createDataModel(_json, _meta); // main data
+    const MetaData meta = getMetaData(json);         // meta data
+    TreeModel *model = createDataModel(json, meta); // main data
 
-    if (!_model) // canceled
+    if (!model) // canceled
         return false;
 
     // setting the parsed data
-    DataContainer *parsedData = new DataContainer(_meta, _model);
+    DataContainer *parsedData = new DataContainer(meta, model);
 
-    const bool _success = setSourceData(parsedData);
-    if (!_success)
+    // ToDo: reimplement needed
+    const bool success = setSourceData(parsedData);
+    if (!success)
         emit failedDataCreation();
 
-    return _success;
+    return success;
 }
 
 // returns the path to the file if the write was successful, otherwise an empty string
 VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 {
-    if (!data_ || data_->p_model->isEmpty()) {
+    if (!m_data || m_data->m_model->isEmpty()) {
         qDebug() << "makeJson | no data!";
         return nullptr;
     }
 
     // [Header]
     const bool isBranching = TreeModel::isFolderRow(rootFolder);
-    const Numbers &_num = isBranching ? data_->getNumbers(rootFolder) : data_->m_numbers;
-    const MetaData &_meta = data_->m_metadata;
+    const Numbers &_num = isBranching ? m_data->getNumbers(rootFolder) : m_data->m_numbers;
+    const MetaData &_meta = m_data->m_metadata;
 
-    const QString &pathToSave = isBranching ? data_->branch_path_composed(rootFolder) // branching
-                                            : data_->m_metadata.dbFilePath; // main database
+    const QString &pathToSave = isBranching ? m_data->branch_path_composed(rootFolder) // branching
+                                            : m_data->m_metadata.dbFilePath; // main database
 
     VerJson *_json = new VerJson(pathToSave);
     _json->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : pathstr::basicName(_meta.workDir));
     _json->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(_num.totalSize(FileStatus::CombAvailable)));
 
     // DateTime
-    const QString _dt = (isBranching && data_->isAllMatched(_num)) ? QStringLiteral(u"Created: ") + format::currentDateTime()
+    const QString _dt = (isBranching && m_data->isAllMatched(_num)) ? QStringLiteral(u"Created: ") + format::currentDateTime()
                                                                    : _meta.datetime.toString();
     _json->addInfo(VerJson::h_key_DateTime, _dt);
 
     // WorkDir
-    if (!isBranching && !data_->isWorkDirRelative())
+    if (!isBranching && !m_data->isWorkDirRelative())
         _json->addInfo(VerJson::h_key_WorkDir, _meta.workDir);
 
     // Filter
-    if (data_->isFilterApplied()) {
+    if (m_data->isFilterApplied()) {
         const bool _inc = _meta.filter.isFilter(FilterRule::Include);
         const QString &_h_key = _inc ? VerJson::h_key_Included : VerJson::h_key_Ignored;
         _json->addInfo(_h_key, _meta.filter.extensionString());
@@ -653,7 +654,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
     // [Main data]
     emit setStatusbarText(QStringLiteral(u"Exporting data to json..."));
 
-    TreeModelIterator iter(data_->p_model, rootFolder);
+    TreeModelIterator iter(m_data->m_model, rootFolder);
 
     while (iter.hasNext() && !isCanceled()) {
         iter.nextFile();
@@ -677,21 +678,21 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 
 bool DataMaintainer::exportToJson()
 {
-    if (!data_)
+    if (!m_data)
         return false;
 
     VerJson *_json = makeJson();
     if (!_json)
         return false;
 
-    data_->makeBackup();
+    m_data->makeBackup();
 
     if (saveJsonFile(_json)) {
         delete _json;
         return true;
     } else {
         // adding the WorkDir info
-        _json->addInfo(VerJson::h_key_WorkDir, data_->m_metadata.workDir);
+        _json->addInfo(VerJson::h_key_WorkDir, m_data->m_metadata.workDir);
 
         // ownership is transferred to the GUI thread (will be deleted there)
         emit failedJsonSave(_json);
@@ -701,12 +702,12 @@ bool DataMaintainer::exportToJson()
 
 bool DataMaintainer::saveJsonFile(VerJson *_json)
 {
-    if (!data_ || !_json)
+    if (!m_data || !_json)
         return false;
 
     if (_json->save()) {
-        setDbFileState(data_->isInCreation() ? DbFileState::Created : DbFileState::Saved);
-        data_->m_metadata.dbFilePath = _json->file_path();
+        setDbFileState(m_data->isInCreation() ? DbFileState::Created : DbFileState::Saved);
+        m_data->m_metadata.dbFilePath = _json->file_path();
 
         emit setStatusbarText(QStringLiteral(u"Saved"));
         qDebug() << "DM::exportToJson >> Saved";
@@ -725,7 +726,7 @@ bool DataMaintainer::saveJsonFile(VerJson *_json)
 
 void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
 {
-    if (!data_)
+    if (!m_data)
         return;
 
     if (!TreeModel::isFolderRow(rootFolder)) {
@@ -739,7 +740,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         emit subDbForked(_json->file_path());
 
         // update cached value
-        data_->_cacheBranches[rootFolder] = _json->file_path();
+        m_data->_cacheBranches[rootFolder] = _json->file_path();
     } else {
         qWarning() << "An error occurred while creating the Branch!";
     }
@@ -747,21 +748,21 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
 
 int DataMaintainer::importBranch(const QModelIndex &rootFolder)
 {
-    if (!data_)
+    if (!m_data)
         return 0;
 
-    const QString _filePath = data_->branch_path_existing(rootFolder);
+    const QString _filePath = m_data->branch_path_existing(rootFolder);
     VerJson _json(_filePath);
     if (!_json.load() || !_json)
         return 0;
 
-    if (_json.algorithm() != data_->m_metadata.algorithm)
+    if (_json.algorithm() != m_data->m_metadata.algorithm)
         return -1;
 
     const QJsonObject &_mainList = _json.data();
 
     int _num = 0;
-    TreeModelIterator _it(data_->p_model, rootFolder);
+    TreeModelIterator _it(m_data->m_model, rootFolder);
 
     while (_it.hasNext()) {
         _it.nextFile();
@@ -787,7 +788,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
 
 QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 {
-    if (!data_ || !curIndex.isValid() || (curIndex.model() != data_->p_model))
+    if (!m_data || !curIndex.isValid() || (curIndex.model() != m_data->m_model))
         return QString();
 
     if (TreeModel::isFileRow(curIndex)) {
@@ -803,7 +804,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        const Numbers &_num = data_->getNumbers(curIndex);
+        const Numbers &_num = m_data->getNumbers(curIndex);
         QStringList _sl;
 
         const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
@@ -839,7 +840,7 @@ bool DataMaintainer::isCanceled() const
 
 bool DataMaintainer::isDataNotSaved() const
 {
-    return (data_ && data_->isDbFileState(DbFileState::NotSaved));
+    return (m_data && m_data->isDbFileState(DbFileState::NotSaved));
 }
 
 void DataMaintainer::saveData()

@@ -38,11 +38,11 @@ public:
     bool isViewFiltered(const FileStatus status) const;
     QModelIndex curIndex() const;
 
-    DataContainer *data_ = nullptr;
-    QItemSelectionModel *oldSelectionModel_ = nullptr;
+    DataContainer *m_data = nullptr;
+    QItemSelectionModel *m_oldSelectionModel = nullptr;
 
-    QString _lastPathFS;
-    QString _lastPathModel;
+    QString m_lastPathFS;
+    QString m_lastPathModel;
 
 public slots:
     void setFileSystemModel();
@@ -76,8 +76,8 @@ private:
     void setCurIndex(const QModelIndex &ind);
     void scrollToCurrent();
 
-    QFileSystemModel *fileSystem = new QFileSystemModel(this);
-    Settings *settings_ = nullptr;
+    QFileSystemModel *m_fileSystem = new QFileSystemModel(this);
+    Settings *m_settings = nullptr;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

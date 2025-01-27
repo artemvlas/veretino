@@ -90,7 +90,7 @@ public:
     void copyFsItem();
 
     IconProvider m_icons;
-    MenuActions *p_menuAct = new MenuActions(this);
+    MenuActions *m_menuAct = new MenuActions(this);
 
 public slots:
     void showFileSystem(const QString &path = QString());

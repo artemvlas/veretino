@@ -37,33 +37,33 @@ void DataContainer::setData()
 void DataContainer::setData(const MetaData &meta, TreeModel *data)
 {
     clearData();
-    p_model = data;
-    p_model->setParent(this);
-    p_proxy = new ProxyModel(p_model, this);
+    m_model = data;
+    m_model->setParent(this);
+    m_proxy = new ProxyModel(m_model, this);
 
     m_metadata = meta;
 }
 
 bool DataContainer::hasData() const
 {
-    return p_model && !p_model->isEmpty();
+    return m_model && !m_model->isEmpty();
 }
 
 void DataContainer::createModels()
 {
-    p_model = new TreeModel(this);
-    p_proxy = new ProxyModel(p_model, this);
+    m_model = new TreeModel(this);
+    m_proxy = new ProxyModel(m_model, this);
 }
 
 void DataContainer::clearData()
 {
-    if (p_proxy) {
-        delete p_proxy;
-        p_proxy = nullptr;
+    if (m_proxy) {
+        delete m_proxy;
+        m_proxy = nullptr;
     }
-    if (p_model) {
-        delete p_model;
-        p_model = nullptr;
+    if (m_model) {
+        delete m_model;
+        m_model = nullptr;
     }
 
     m_numbers.clear();
@@ -228,7 +228,7 @@ const Numbers& DataContainer::updateNumbers()
 
 Numbers DataContainer::getNumbers(const QModelIndex &rootIndex) const
 {
-    return getNumbers(p_model, rootIndex);
+    return getNumbers(m_model, rootIndex);
 }
 
 Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)

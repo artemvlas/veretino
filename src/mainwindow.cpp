@@ -41,8 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar->setProcState(manager->procState);
     proc_ = manager->procState;
 
-    modeSelect->p_menuAct->populateMenuFile(ui->menuFile);
-    ui->menuHelp->addAction(modeSelect->p_menuAct->actionAbout);
+    modeSelect->m_menuAct->populateMenuFile(ui->menuFile);
+    ui->menuHelp->addAction(modeSelect->m_menuAct->actionAbout);
 
     statusBar->setIconProvider(&modeSelect->m_icons);
     setStatusBar(statusBar);
@@ -112,11 +112,11 @@ void MainWindow::connections()
     connect(ui->pathEdit, &QLineEdit::returnPressed, this, &MainWindow::handlePathEdit);
 
     // menu actions
-    connect(modeSelect->p_menuAct->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
-    connect(modeSelect->p_menuAct->actionChooseFolder, &QAction::triggered, this, &MainWindow::dialogChooseFolder);
-    connect(modeSelect->p_menuAct->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
-    connect(modeSelect->p_menuAct->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
-    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->p_menuAct, qOverload<>(&MenuActions::updateMenuOpenRecent));
+    connect(modeSelect->m_menuAct->actionOpenDialogSettings, &QAction::triggered, this, &MainWindow::dialogSettings);
+    connect(modeSelect->m_menuAct->actionChooseFolder, &QAction::triggered, this, &MainWindow::dialogChooseFolder);
+    connect(modeSelect->m_menuAct->actionOpenDatabaseFile, &QAction::triggered, this, &MainWindow::dialogOpenJson);
+    connect(modeSelect->m_menuAct->actionAbout, &QAction::triggered, this, [=]{ DialogAbout about(this); about.exec(); });
+    connect(ui->menuFile, &QMenu::aboutToShow, modeSelect->m_menuAct, qOverload<>(&MenuActions::updateMenuOpenRecent));
 
     // statusbar
     connect(statusBar, &StatusBar::buttonFsFilterClicked, this, &MainWindow::dialogSettings);
@@ -185,7 +185,7 @@ void MainWindow::connectManager()
     connect(ui->view, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->view, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
     connect(ui->view, &View::dataSetted, this,
-            [=]{ if (ui->view->data_) settings_->addRecentFile(ui->view->data_->m_metadata.dbFilePath); });
+            [=]{ if (ui->view->m_data) settings_->addRecentFile(ui->view->m_data->m_metadata.dbFilePath); });
 
     thread->start();
 }
@@ -212,7 +212,7 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
     clearDialogs();
 
     if (modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
-        DialogDbStatus statusDialog(ui->view->data_, this);
+        DialogDbStatus statusDialog(ui->view->m_data, this);
         statusDialog.setCurrentTab(tab);
 
         statusDialog.exec();
@@ -277,7 +277,7 @@ void MainWindow::showDialogDbContents(const QString &folderName, const FileTypeL
         DialogContentsList dialog(folderName, extList, this);
         dialog.setWindowIcon(modeSelect->m_icons.icon(Icons::Database));
         QString strWindowTitle = QStringLiteral(u"Database Contents");
-        if (ui->view->data_ && ui->view->data_->m_numbers.contains(FileStatus::Missing))
+        if (ui->view->m_data && ui->view->m_data->m_numbers.contains(FileStatus::Missing))
             strWindowTitle.append(QStringLiteral(u" [available ones]"));
         dialog.setWindowTitle(strWindowTitle);
         dialog.exec();
@@ -359,7 +359,7 @@ void MainWindow::dialogSettings()
 
         // switching "Detect Moved" cache
         if (ui->view->isViewDatabase()) {
-            DataContainer *_d = ui->view->data_;
+            DataContainer *_d = ui->view->m_data;
 
             if (settings_->detectMoved
                 && _d->_cacheMissing.isEmpty()
@@ -491,9 +491,9 @@ void MainWindow::updateButtonInfo()
 
 void MainWindow::updateMenuActions()
 {
-    modeSelect->p_menuAct->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
-    modeSelect->p_menuAct->actionSave->setEnabled(ui->view->isViewDatabase()
-                                                 && ui->view->data_->isDbFileState(DbFileState::NotSaved));
+    modeSelect->m_menuAct->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
+    modeSelect->m_menuAct->actionSave->setEnabled(ui->view->isViewDatabase()
+                                                 && ui->view->m_data->isDbFileState(DbFileState::NotSaved));
 }
 
 void MainWindow::updateStatusIcon()
@@ -521,7 +521,7 @@ void MainWindow::updatePermanentStatus()
         if (modeSelect->isMode(Mode::DbCreating))
             statusBar->setModeDbCreating();
         else if (!proc_->isStarted())
-            statusBar->setModeDb(ui->view->data_);
+            statusBar->setModeDb(ui->view->m_data);
     }
     else {
         statusBar->clearButtons();
@@ -539,7 +539,7 @@ void MainWindow::setWinTitleMismatchFound()
 void MainWindow::updateWindowTitle()
 {
     if (ui->view->isViewDatabase()) {
-        const DataContainer *data = ui->view->data_;
+        const DataContainer *data = ui->view->m_data;
 
         if (data->m_numbers.contains(FileStatus::Mismatched)) {
             setWinTitleMismatchFound();
@@ -578,7 +578,7 @@ void MainWindow::handleChangedModel()
 void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->view->isViewDatabase()) {
-        const Numbers &_nums = ui->view->data_->m_numbers;
+        const Numbers &_nums = ui->view->m_data->m_numbers;
         if (_nums.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
         else if (_nums.contains(FileStatus::CombDbChanged))
@@ -591,7 +591,7 @@ void MainWindow::handleButtonDbHashClick()
 void MainWindow::createContextMenu_Button(const QPoint &point)
 {
     if (modeSelect->isMode(Mode::File | Mode::Folder)) {
-        modeSelect->p_menuAct->menuAlgorithm(settings_->algorithm())->exec(ui->button->mapToGlobal(point));
+        modeSelect->m_menuAct->menuAlgorithm(settings_->algorithm())->exec(ui->button->mapToGlobal(point));
     }
 }
 

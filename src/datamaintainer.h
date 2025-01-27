@@ -25,14 +25,14 @@ public:
     void setSourceData(const MetaData &meta);
     bool setSourceData(DataContainer *sourceData);
     bool setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value = QVariant());
-    void setFileStatus(const QModelIndex &_index, FileStatus _status);
+    void setFileStatus(const QModelIndex &index, FileStatus status);
     void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
     void updateNumbers();
     void updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore);
     void updateNumbers(const FileStatus status_old, const FileStatus status_new, const qint64 size = 0);
-    void moveNumbers(const FileStatus _before, const FileStatus _after);
+    void moveNumbers(const FileStatus before, const FileStatus after);
     void setDbFileState(DbFileState state);
 
     // iterate the 'data_->metaData.workDir' folder and add the finded files to the data_->model_
@@ -42,8 +42,8 @@ public:
     bool updateChecksum(const QModelIndex &fileRowIndex,
                         const QString &computedChecksum);
 
-    bool importChecksum(const QModelIndex &_file,
-                        const QString &_checksum);
+    bool importChecksum(const QModelIndex &file,
+                        const QString &checksum);
 
     int changeFilesStatus(const FileStatuses flags,
                           const FileStatus newStatus,
@@ -63,9 +63,9 @@ public:
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
-    bool tryMoved(const QModelIndex &_file, const QString &_checksum);
+    bool tryMoved(const QModelIndex &file, const QString &checksum);
 
-    TreeModel* createDataModel(const VerJson &_json, const MetaData &_meta);
+    TreeModel* createDataModel(const VerJson &json, const MetaData &meta);
     bool importJson(const QString &filePath);
     bool exportToJson();
     bool saveJsonFile(VerJson *_json);
@@ -78,7 +78,7 @@ public:
     QString itemContentsInfo(const QModelIndex &curIndex);
 
     // variables
-    DataContainer *data_ = nullptr;     // main data
+    DataContainer *m_data = nullptr;     // main data
 
 public slots:
     void clearData();
@@ -94,7 +94,7 @@ private:
     QString findWorkDir(const VerJson &_json) const;
     bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList) const;
 
-    DataContainer *oldData_ = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
+    DataContainer *m_oldData = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
     const ProcState *proc_ = nullptr;
 
     bool considerFileModDate;

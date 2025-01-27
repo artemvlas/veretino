@@ -76,8 +76,8 @@ public:
                               const QModelIndex &rootIndex = QModelIndex());
 
     // DATA
-    TreeModel *p_model = nullptr;                                                     // main data
-    ProxyModel *p_proxy = nullptr;
+    TreeModel *m_model = nullptr;                                                     // main data
+    ProxyModel *m_proxy = nullptr;
     MetaData m_metadata;
     Numbers m_numbers;
 

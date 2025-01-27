@@ -18,8 +18,8 @@ View::View(QWidget *parent)
     : QTreeView(parent)
 {
     sortByColumn(0, Qt::AscendingOrder);
-    fileSystem->setObjectName("fileSystem");
-    fileSystem->setRootPath(QDir::rootPath());
+    m_fileSystem->setObjectName("fileSystem");
+    m_fileSystem->setRootPath(QDir::rootPath());
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -39,8 +39,8 @@ void View::connectModel()
 
 void View::setSettings(Settings *settings)
 {
-    settings_ = settings;
-    settings_->lastFsPath = &_lastPathFS;
+    m_settings = settings;
+    m_settings->lastFsPath = &m_lastPathFS;
 }
 
 QModelIndex View::curIndex() const
@@ -50,12 +50,12 @@ QModelIndex View::curIndex() const
         return QModelIndex();
     }
 
-    const QModelIndex _ind = selectionModel()->currentIndex();
+    const QModelIndex ind = selectionModel()->currentIndex();
 
     if (isViewModel(ModelProxy))
-        return data_->p_proxy->mapToSource(_ind);
+        return m_data->m_proxy->mapToSource(ind);
 
-    return _ind;
+    return ind;
 }
 
 void View::setFileSystemModel()
@@ -65,12 +65,12 @@ void View::setFileSystemModel()
         return;
     }
 
-    oldSelectionModel_ = selectionModel();
+    m_oldSelectionModel = selectionModel();
     saveHeaderState();
 
-    setModel(fileSystem);
+    setModel(m_fileSystem);
 
-    data_ = nullptr;
+    m_data = nullptr;
 
     emit modelChanged(FileSystem);
 
@@ -82,7 +82,7 @@ void View::setFileSystemModel()
 
 void View::setTreeModel(ModelView modelSel)
 {
-    if (!data_ || !(modelSel & ModelDb)) {
+    if (!m_data || !(modelSel & ModelDb)) {
         setFileSystemModel();
         return;
     }
@@ -90,13 +90,13 @@ void View::setTreeModel(ModelView modelSel)
     if (isViewModel(modelSel))
         return; // if the current model remains the same
 
-    oldSelectionModel_ = selectionModel();
+    m_oldSelectionModel = selectionModel();
     saveHeaderState();
 
     if (modelSel == ModelSource) {
-        setModel(data_->p_model);
+        setModel(m_data->m_model);
     } else {
-        setModel(data_->p_proxy);
+        setModel(m_data->m_proxy);
     }
 
     emit modelChanged(modelSel);
@@ -113,13 +113,13 @@ void View::setData(DataContainer *data)
         return;
     }
 
-    if (data == data_) {
+    if (data == m_data) {
         qDebug() << "View::setData >> SKIP: this data is already setted";
         return;
     }
 
-    data_ = data;
-    _lastPathFS = data->m_metadata.dbFilePath;
+    m_data = data;
+    m_lastPathFS = data->m_metadata.dbFilePath;
 
     if (data->isInCreation()) {
         setTreeModel(ModelView::ModelSource);
@@ -136,11 +136,11 @@ void View::setData(DataContainer *data)
 
 void View::clear()
 {
-    oldSelectionModel_ = selectionModel();
+    m_oldSelectionModel = selectionModel();
     // ? saveHeaderState();
 
     setModel(nullptr);
-    data_ = nullptr;
+    m_data = nullptr;
 
     emit modelChanged(NotSetted);
 }
@@ -169,7 +169,7 @@ void View::setViewSource()
 
 void View::setMismatchFiltering(const Numbers &num)
 {
-    if (!data_)
+    if (!m_data)
         return;
 
     if (num.contains(FileStatus::Mismatched)) {
@@ -184,10 +184,10 @@ void View::setMismatchFiltering(const Numbers &num)
 QString View::curAbsPath() const
 {
     if (isViewFileSystem())
-        return fileSystem->filePath(curIndex());
+        return m_fileSystem->filePath(curIndex());
 
     if (isViewDatabase())
-        return data_->itemAbsolutePath(curIndex());
+        return m_data->itemAbsolutePath(curIndex());
 
     return QString();
 }
@@ -195,12 +195,12 @@ QString View::curAbsPath() const
 void View::changeCurPath(const QModelIndex &curIndex)
 {
     if (isViewFileSystem()) {
-        _lastPathFS = curAbsPath();
-        emit pathChanged(_lastPathFS);
+        m_lastPathFS = curAbsPath();
+        emit pathChanged(m_lastPathFS);
     }
     else if (isViewDatabase()) {
-        _lastPathModel = TreeModel::getPath(curIndex);
-        emit pathChanged(_lastPathModel);
+        m_lastPathModel = TreeModel::getPath(curIndex);
+        emit pathChanged(m_lastPathModel);
     }
     else {
         qDebug() << "View::changeCurPath | FAILURE";
@@ -210,13 +210,13 @@ void View::changeCurPath(const QModelIndex &curIndex)
 void View::setIndexByPath()
 {
     if (isViewFileSystem()) {
-        if (!_lastPathFS.isEmpty() && !QFileInfo::exists(_lastPathFS))
-            _lastPathFS = pathstr::parentFolder(_lastPathFS);
+        if (!m_lastPathFS.isEmpty() && !QFileInfo::exists(m_lastPathFS))
+            m_lastPathFS = pathstr::parentFolder(m_lastPathFS);
 
-        QFileInfo::exists(_lastPathFS) ? setIndexByPath(_lastPathFS) : toHome();
+        QFileInfo::exists(m_lastPathFS) ? setIndexByPath(m_lastPathFS) : toHome();
     }
     else if (isViewDatabase()) {
-        setIndexByPath(_lastPathModel);
+        setIndexByPath(m_lastPathModel);
     }
 }
 
@@ -224,17 +224,17 @@ void View::setIndexByPath(const QString &path)
 {
     if (isViewFileSystem()) {
         if (QFileInfo::exists(path)) {
-            setCurIndex(fileSystem->index(path));
+            setCurIndex(m_fileSystem->index(path));
 
             //OLD
-            /*QModelIndex index = fileSystem->index(path);
+            /*QModelIndex index = m_fileSystem->index(path);
             expand(index);
             setCurrentIndex(index);
-            QTimer::singleShot(500, this, [=]{ scrollTo(fileSystem->index(path), QAbstractItemView::PositionAtCenter); });
+            QTimer::singleShot(500, this, [=]{ scrollTo(m_fileSystem->index(path), QAbstractItemView::PositionAtCenter); });
             // for better scrolling work, a timer^ is used
             // QFileSystemModel needs some time after setup to Scrolling be able
-            // this is weird, but the Scrolling works well with the Timer, and only when specified [fileSystem->index(path)],
-            // 'index' (wich is ==fileSystem->index(path)) is NOT working good*/
+            // this is weird, but the Scrolling works well with the Timer, and only when specified [m_fileSystem->index(path)],
+            // 'index' (wich is == m_fileSystem->index(path)) is NOT working good*/
         }
         else if (!path.isEmpty()) {
             emit showMessage("Wrong path: " + path, "Error");
@@ -255,7 +255,7 @@ void View::setCurIndex(const QModelIndex &ind)
     if (ind.isValid()) {
         expand(ind);
         setCurrentIndex(ind);
-        const int _tmr = (ind.model() == fileSystem) ? 500 : 0;
+        const int _tmr = (ind.model() == m_fileSystem) ? 500 : 0;
         QTimer::singleShot(_tmr, this, &View::scrollToCurrent);
 
         if (_tmr) // second, the control one :)
@@ -271,20 +271,20 @@ void View::scrollToCurrent()
 void View::setFilter(const FileStatuses flags)
 {
     if (isViewModel(ModelProxy)) {
-        QString prePathModel = _lastPathModel;
-        data_->p_proxy->setFilter(flags);
+        QString prePathModel = m_lastPathModel;
+        m_data->m_proxy->setFilter(flags);
         setIndexByPath(prePathModel);
         setBackgroundColor();
     }
     else if (isViewModel(ModelSource)) {
-        data_->p_proxy->setFilter(flags);
+        m_data->m_proxy->setFilter(flags);
     }
 }
 
 void View::editFilter(const FileStatuses flags, bool add)
 {
     if (isViewModel(ModelProxy)) {
-        FileStatuses curFilter = data_->p_proxy->currentlyFiltered();
+        FileStatuses curFilter = m_data->m_proxy->currentlyFiltered();
 
         setFilter(add ? (curFilter | flags) : (curFilter & ~flags));
     }
@@ -300,18 +300,18 @@ void View::disableFilter()
 void View::toHome()
 {
     if (isViewFileSystem()) {
-        _lastPathFS = QDir::homePath();
-        setIndexByPath(_lastPathFS);
+        m_lastPathFS = QDir::homePath();
+        setIndexByPath(m_lastPathFS);
     }
 }
 
 ModelView View::curViewModel() const
 {
-    if (model() == fileSystem)
+    if (model() == m_fileSystem)
         return FileSystem;
-    else if (data_ && model() == data_->p_model)
+    else if (m_data && model() == m_data->m_model)
         return ModelSource;
-    else if (data_ && model() == data_->p_proxy)
+    else if (m_data && model() == m_data->m_proxy)
         return ModelProxy;
     else
         return NotSetted;
@@ -324,7 +324,7 @@ bool View::isViewModel(const ModelView modelView) const
 
 bool View::isViewFileSystem() const
 {
-    return (model() == fileSystem);
+    return (model() == m_fileSystem);
 }
 
 bool View::isViewDatabase() const
@@ -335,21 +335,21 @@ bool View::isViewDatabase() const
 bool View::isViewFiltered() const
 {
     return isViewModel(ModelView::ModelProxy)
-           && data_->p_proxy->isFilterEnabled();
+           && m_data->m_proxy->isFilterEnabled();
 }
 
 bool View::isViewFiltered(const FileStatus status) const
 {
     return isViewModel(ModelView::ModelProxy)
-           && (data_->p_proxy->currentlyFiltered() & status);
+           && (m_data->m_proxy->currentlyFiltered() & status);
 }
 
 void View::deleteOldSelModel()
 {
-    if (oldSelectionModel_ && (oldSelectionModel_ != selectionModel())) {
+    if (m_oldSelectionModel && (m_oldSelectionModel != selectionModel())) {
         //qDebug() << "'oldSelectionModel' will be deleted...";
-        delete oldSelectionModel_;
-        oldSelectionModel_ = nullptr;
+        delete m_oldSelectionModel;
+        m_oldSelectionModel = nullptr;
     }
 }
 
@@ -381,24 +381,24 @@ void View::setDefaultColumnsWidth()
 
 void View::saveHeaderState()
 {
-    if (!settings_)
+    if (!m_settings)
         return;
 
     if (isViewFileSystem())
-        settings_->headerStateFs = header()->saveState();
+        m_settings->headerStateFs = header()->saveState();
     else if (isViewDatabase())
-        settings_->headerStateDb = header()->saveState();
+        m_settings->headerStateDb = header()->saveState();
 }
 
 void View::restoreHeaderState()
 {
     QByteArray headerState;
 
-    if (settings_) {
+    if (m_settings) {
         if (isViewFileSystem())
-            headerState = settings_->headerStateFs;
+            headerState = m_settings->headerStateFs;
         else if (isViewDatabase())
-            headerState = settings_->headerStateDb;
+            headerState = m_settings->headerStateDb;
     }
 
     if (!headerState.isEmpty())
