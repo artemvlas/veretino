@@ -121,37 +121,37 @@ bool VerJson::save()
 
     fillHeader();
 
-    QJsonArray _content;
-    _content.append(m_header);
-    _content.append(m_data);
+    QJsonArray content;
+    content.append(m_header);
+    content.append(m_data);
 
     if (!m_unredable.isEmpty()) {
-        QJsonObject _unr;
-        _unr[a_key_Unreadable] = m_unredable;
-        _content.append(_unr);
+        QJsonObject unr;
+        unr[a_key_Unreadable] = m_unredable;
+        content.append(unr);
     }
 
-    const QByteArray _data = QJsonDocument(_content).toJson();
+    const QByteArray data = QJsonDocument(content).toJson();
 
     if (pathstr::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
-        return QMicroz::compress_buf(_data,
+        return QMicroz::compress_buf(data,
                                      QStringLiteral("checksums.ver.json"),
                                      m_file_path);
     }
 
-    QFile _file(m_file_path);
+    QFile file(m_file_path);
 
-    return (_file.open(QFile::WriteOnly) && _file.write(_data));
+    return (file.open(QFile::WriteOnly) && file.write(data));
 }
 
-void VerJson::addItem(const QString &_file, const QString &_checksum)
+void VerJson::addItem(const QString &file, const QString &checksum)
 {
-    m_data[_file] = _checksum;
+    m_data[file] = checksum;
 }
 
-void VerJson::addItemUnr(const QString &_file)
+void VerJson::addItemUnr(const QString &file)
 {
-    m_unredable.append(_file);
+    m_unredable.append(file);
 }
 
 void VerJson::addInfo(const QString &header_key, const QString &value)
@@ -191,18 +191,18 @@ QString VerJson::getInfo(const QString &header_key) const
     return findValueStr(m_header, header_key);
 }
 
-QString VerJson::firstValueString(const QJsonObject &_obj) const
+QString VerJson::firstValueString(const QJsonObject &obj) const
 {
-    return !_obj.isEmpty() ? _obj.begin().value().toString() : QString();
+    return !obj.isEmpty() ? obj.begin().value().toString() : QString();
 }
 
 QCryptographicHash::Algorithm VerJson::algorithm() const
 {
-    const QString _first_value = firstValueString(m_data);
+    const QString first_value = firstValueString(m_data);
 
     // main list object
-    if (tools::canBeChecksum(_first_value))
-        return tools::algoByStrLen(_first_value.length());
+    if (tools::canBeChecksum(first_value))
+        return tools::algoByStrLen(first_value.length());
 
     // header object
     const QString strAlgo = findValueStr(m_header, QStringLiteral(u"Algo"));

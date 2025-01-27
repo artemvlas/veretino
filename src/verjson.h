@@ -25,8 +25,8 @@ public:
     bool load();
     bool save();
 
-    void addItem(const QString &_file, const QString &_checksum);
-    void addItemUnr(const QString &_file);
+    void addItem(const QString &file, const QString &checksum);
+    void addItemUnr(const QString &file);
     void addInfo(const QString &header_key, const QString &value);
 
     const QJsonObject& data() const;
@@ -49,7 +49,7 @@ private:
     void fillHeader();
     QString findValueStr(const QJsonObject &object,
                          const QString &approxKey, int sampleLength = 4) const;
-    QString firstValueString(const QJsonObject &_obj) const;
+    QString firstValueString(const QJsonObject &obj) const;
 
     QString m_file_path;
     QString m_workdir;

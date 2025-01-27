@@ -67,7 +67,7 @@ public slots:
     void processFolderSha(const MetaData &metaData);
     void branchSubfolder(const QModelIndex &subfolder);
     void updateDatabase(const DbMod dest);
-    void updateItemFile(const QModelIndex &fileIndex, DbMod _job);
+    void updateItemFile(const QModelIndex &fileIndex, DbMod job);
     void importBranch(const QModelIndex &rootFolder);
 
     void processFileSha(const QString &filePath,
@@ -120,23 +120,23 @@ private:
 
     QString hashFile(const QString &filePath,
                      QCryptographicHash::Algorithm algo,
-                     const CalcKind _calckind = Calculation);
+                     const CalcKind calckind = Calculation);
 
-    QString hashItem(const QModelIndex &_ind,
-                     const CalcKind _calckind = Calculation);
+    QString hashItem(const QModelIndex &ind,
+                     const CalcKind calckind = Calculation);
 
-    int calculateChecksums(const FileStatus _status,
-                           const QModelIndex &_root = QModelIndex());
+    int calculateChecksums(const FileStatus status,
+                           const QModelIndex &root = QModelIndex());
 
-    int calculateChecksums(const DbMod _purpose,
-                           const FileStatus _status,
-                           const QModelIndex &_root = QModelIndex());
+    int calculateChecksums(const DbMod purpose,
+                           const FileStatus status,
+                           const QModelIndex &root = QModelIndex());
 
-    void updateProgText(const CalcKind _calckind, const QString &_file);
-    QString extractDigestFromFile(const QString &_digest_file);
+    void updateProgText(const CalcKind calckind, const QString &file);
+    QString extractDigestFromFile(const QString &digest_file);
 
     // variables
-    bool isViewFileSysytem;
+    bool m_isViewFileSysytem;
     Settings *p_settings;
     Files *p_files = new Files(this);
     ShaCalculator shaCalc;

@@ -68,7 +68,7 @@ public:
     TreeModel* createDataModel(const VerJson &json, const MetaData &meta);
     bool importJson(const QString &filePath);
     bool exportToJson();
-    bool saveJsonFile(VerJson *_json);
+    bool saveJsonFile(VerJson *json);
     void forkJsonDb(const QModelIndex &rootFolder);
     int importBranch(const QModelIndex &rootFolder);
 
@@ -88,16 +88,16 @@ public slots:
 private:
     void connections();
     bool isCanceled() const;
-    MetaData getMetaData(const VerJson &_json) const;
+    MetaData getMetaData(const VerJson &json) const;
     FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
     VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
-    QString findWorkDir(const VerJson &_json) const;
-    bool isPresentInWorkDir(const QString &workDir, const QJsonObject &fileList) const;
+    QString findWorkDir(const VerJson &json) const;
+    bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
 
     DataContainer *m_oldData = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
-    const ProcState *proc_ = nullptr;
+    const ProcState *m_proc = nullptr;
 
-    bool considerFileModDate;
+    bool m_considerFileModDate;
 
 signals:
     void databaseUpdated();

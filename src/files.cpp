@@ -232,23 +232,23 @@ FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIn
     return _res;
 }
 
-NumSize Files::totalListed(const FileTypeList &_typeList)
+NumSize Files::totalListed(const FileTypeList &typeList)
 {
-    NumSize _res;
+    NumSize res;
 
-    if (!_typeList.m_extensions.isEmpty()) {
+    if (!typeList.m_extensions.isEmpty()) {
         QHash<QString, NumSize>::const_iterator it;
-        for (it = _typeList.m_extensions.constBegin(); it != _typeList.m_extensions.constEnd(); ++it)
-            _res.add(it.value());
+        for (it = typeList.m_extensions.constBegin(); it != typeList.m_extensions.constEnd(); ++it)
+            res.add(it.value());
     }
 
-    if (!_typeList.m_combined.isEmpty()) {
+    if (!typeList.m_combined.isEmpty()) {
         QHash<FilterAttribute, NumSize>::const_iterator it2;
-        for (it2 = _typeList.m_combined.constBegin(); it2 != _typeList.m_combined.constEnd(); ++it2)
-            _res.add(it2.value());
+        for (it2 = typeList.m_combined.constBegin(); it2 != typeList.m_combined.constEnd(); ++it2)
+            res.add(it2.value());
     }
 
-    return _res;
+    return res;
 }
 
 qint64 Files::dataSize()

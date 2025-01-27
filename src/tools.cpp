@@ -227,15 +227,15 @@ FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
 } // namespace tools
 
 namespace paths {
-QString digestFilePath(const QString &_file, QCryptographicHash::Algorithm _algo)
+QString digestFilePath(const QString &file, QCryptographicHash::Algorithm algo)
 {
-    const QString _ext = format::algoToStr(_algo, false);
-    return tools::joinStrings(_file, _ext, u'.');
+    const QString ext = format::algoToStr(algo, false);
+    return tools::joinStrings(file, ext, u'.');
 }
 
-QString digestFilePath(const QString &_file, const int _sum_len)
+QString digestFilePath(const QString &file, const int sum_len)
 {
-    return digestFilePath(_file, tools::algoByStrLen(_sum_len));
+    return digestFilePath(file, tools::algoByStrLen(sum_len));
 }
 
 bool isDbFile(const QString &filePath)
@@ -459,9 +459,9 @@ QString fileNameAndSize(const QString &filePath)
     return addStrInParentheses(fileInfo.fileName(), dataSizeReadable(fileInfo.size()));
 }
 
-QString fileNameAndSize(const QString &_file, const qint64 _size)
+QString fileNameAndSize(const QString &file, const qint64 size)
 {
-    return addStrInParentheses(pathstr::basicName(_file), dataSizeReadable(_size));
+    return addStrInParentheses(pathstr::basicName(file), dataSizeReadable(size));
 }
 
 QString fileItemStatus(FileStatus status)
