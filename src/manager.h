@@ -27,7 +27,8 @@ class Manager : public QObject
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
 
-    enum DestFileProc { Generic, Clipboard, SumFile }; // Purpose of file processing (checksum calculation)
+    // Purpose of file processing (checksum calculation)
+    enum DestFileProc { Generic, Clipboard, SumFile };
 
     enum DbMod {
         DM_AutoSelect = 0,
@@ -40,8 +41,8 @@ public:
         DM_PasteDigest = 1 << 5
     }; // enum DbMod
 
-    DataMaintainer *dataMaintainer = new DataMaintainer(this);
-    ProcState *procState = new ProcState(this);
+    DataMaintainer *m_dataMaintainer = new DataMaintainer(this);
+    ProcState *m_proc = new ProcState(this);
 
     template<typename Callable, typename... Args>
     void addTask(Callable&& _func, Args&&... _args)
@@ -52,11 +53,11 @@ public:
     }
 
     template<typename Callable, typename... Args>
-    void addTaskWithState(State p_state, Callable&& _func, Args&&... _args)
+    void addTaskWithState(State _state, Callable&& _func, Args&&... _args)
     {
         Task _task(std::bind(std::forward<Callable>(_func),
                              this, std::forward<Args>(_args)...),
-                   p_state);
+                   _state);
 
         queueTask(_task);
     }
@@ -74,7 +75,8 @@ public slots:
                         QCryptographicHash::Algorithm algo,
                         DestFileProc result);
 
-    void checkSummaryFile(const QString &path);                        // path to *.sha1/256/512 summary file
+    // path to *.sha1/256/512 summary file
+    void checkSummaryFile(const QString &path);
 
     void checkFile(const QString &filePath,
                    const QString &checkSum);
@@ -88,9 +90,9 @@ public slots:
     void saveData();
     void prepareSwitchToFs();
 
-    void getPathInfo(const QString &path);                             // info about file (size) or folder contents
-    void getIndexInfo(const QModelIndex &curIndex);                    // info about database item (the file or subfolder index)
-    void modelChanged(ModelView modelView);                            // recive the signal when Model has been changed
+    void getPathInfo(const QString &path);                                                           // info about file (size) or folder contents
+    void getIndexInfo(const QModelIndex &curIndex);                                                  // info about database item (the file or subfolder index)
+    void modelChanged(ModelView modelView);                                                          // recive the signal when Model has been changed
     void makeDbContentsList();
 
     // checking the list of files against the checksums stored in the database
@@ -137,12 +139,12 @@ private:
 
     // variables
     bool m_isViewFileSysytem;
-    Settings *p_settings;
-    Files *p_files = new Files(this);
-    ShaCalculator shaCalc;
+    Settings *m_settings = nullptr;
+    Files *m_files = new Files(this);
+    ShaCalculator m_shaCalc;
     QList<Task> m_taskQueue;
 
-    const QString movedDbWarning = QStringLiteral(u"The database file may have been moved or refers to an inaccessible location.");
+    const QString k_movedDbWarning = QStringLiteral(u"The database file may have been moved or refers to an inaccessible location.");
 
 signals:
     void setStatusbarText(const QString &text = QString());                                       // sends the 'text' to statusbar

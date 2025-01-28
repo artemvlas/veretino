@@ -341,13 +341,13 @@ bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
         return false;
 
     // moved out
-    QModelIndex _i_movedout = m_data->_cacheMissing.take(checksum);
-    const FileStatus _status = TreeModel::itemFileStatus(_i_movedout);
+    QModelIndex ind_movedout = m_data->_cacheMissing.take(checksum);
+    const FileStatus status = TreeModel::itemFileStatus(ind_movedout);
 
-    if (_status & (FileStatus::Missing | FileStatus::Removed)) {
-        clearChecksum(_i_movedout);
-        setFileStatus(_i_movedout, FileStatus::MovedOut);
-        m_data->m_numbers.moveFile(_status, FileStatus::MovedOut);
+    if (status & (FileStatus::Missing | FileStatus::Removed)) {
+        clearChecksum(ind_movedout);
+        setFileStatus(ind_movedout, FileStatus::MovedOut);
+        m_data->m_numbers.moveFile(status, FileStatus::MovedOut);
 
         // moved
         setFileStatus(file, FileStatus::Moved);
@@ -384,10 +384,10 @@ int DataMaintainer::updateMismatchedChecksums()
 bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
 {
     if (m_data && TreeModel::hasReChecksum(fileIndex)) {
-        const QString _reChecksum = TreeModel::itemFileReChecksum(fileIndex);
+        const QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
-        if (!_reChecksum.isEmpty()) {
-            setItemValue(fileIndex, Column::ColumnChecksum, _reChecksum);
+        if (!reChecksum.isEmpty()) {
+            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum);
             setItemValue(fileIndex, Column::ColumnReChecksum);
             setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Updated);
             return true;
@@ -496,12 +496,12 @@ MetaData DataMaintainer::getMetaData(const VerJson &json) const
 FileValues DataMaintainer::makeFileValues(const QString &filePath, const QString &basicDate) const
 {
     if (QFileInfo::exists(filePath)) {
-        QFileInfo _fi(filePath);
-        FileStatus _status = (!basicDate.isEmpty()
-                              && tools::isLater(basicDate, _fi.lastModified()))
+        QFileInfo __fi(filePath);
+        FileStatus status = (!basicDate.isEmpty()
+                              && tools::isLater(basicDate, __fi.lastModified()))
                                  ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
 
-        return FileValues(_status, _fi.size());
+        return FileValues(status, __fi.size());
     }
 
     return FileValues(FileStatus::Missing);

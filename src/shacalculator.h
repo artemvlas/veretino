@@ -25,9 +25,9 @@ public:
 
 private:
     inline bool isCanceled() const;
-    int chunk = 1048576; // file read buffer size
-    QCryptographicHash::Algorithm algo_ = QCryptographicHash::Sha256;
-    const ProcState *p_proc = nullptr;
+    int m_chunk = 1048576; // file read buffer size
+    QCryptographicHash::Algorithm m_algo = QCryptographicHash::Sha256;
+    const ProcState *m_proc = nullptr;
 
 signals:   
     void doneChunk(int done);

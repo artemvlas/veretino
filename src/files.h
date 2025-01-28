@@ -108,7 +108,7 @@ private:
 
     // variables
     QString m_fsPath; // path to the File or Folder specified when creating the object
-    const ProcState *p_proc = nullptr;
+    const ProcState *m_proc = nullptr;
 
 signals:
     void setStatusbarText(const QString &text = QString());

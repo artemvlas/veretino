@@ -15,20 +15,20 @@ namespace pathstr {
 QString basicName(const QString &path)
 {
     if (isRoot(path)) {
-        const QChar _ch = path.at(0);
-        return _ch.isLetter() ? QStringLiteral(u"Drive_") + _ch.toUpper() : "Root";
+        const QChar ch = path.at(0);
+        return ch.isLetter() ? QStringLiteral(u"Drive_") + ch.toUpper() : "Root";
     }
 
     // _sep == '/'
-    const bool _endsWithSep = path.endsWith(_sep);
-    const int _lastSepInd = path.lastIndexOf(_sep, -2);
+    const bool endsWithSep = path.endsWith(_sep);
+    const int lastSepInd = path.lastIndexOf(_sep, -2);
 
-    if (_lastSepInd == -1) {
-        return _endsWithSep ? path.chopped(1) : path;
+    if (lastSepInd == -1) {
+        return endsWithSep ? path.chopped(1) : path;
     }
 
-    const int _len = _endsWithSep ? (path.size() - _lastSepInd - 2) : -1;
-    return path.mid(_lastSepInd + 1, _len);
+    const int len = endsWithSep ? (path.size() - lastSepInd - 2) : -1;
+    return path.mid(lastSepInd + 1, len);
 }
 
 QString parentFolder(const QString &path)
@@ -56,9 +56,9 @@ QString relativePath(const QString &rootFolder, const QString &fullPath)
         return QString();
 
     // _sep == u'/';
-    const int _cut = rootFolder.endsWith(_sep) ? rootFolder.size() - 1 : rootFolder.size();
+    const int cut = rootFolder.endsWith(_sep) ? rootFolder.size() - 1 : rootFolder.size();
 
-    return ((_cut < fullPath.size()) && (fullPath.at(_cut) == _sep)) ? fullPath.mid(_cut + 1) : QString();
+    return ((cut < fullPath.size()) && (fullPath.at(cut) == _sep)) ? fullPath.mid(cut + 1) : QString();
 
     // #2 impl. --> x2 slower due to (rootFolder + '/')
     // const QString &_root = rootFolder.endsWith('/') ? rootFolder : rootFolder + '/';
@@ -108,35 +108,35 @@ QString root(const QString &path)
     return QString();
 }
 
-QString suffix(const QString &_file)
+QString suffix(const QString &file)
 {
-    const int _len = suffixSize(_file);
-    return (_len > 0) ? _file.right(_len).toLower() : QString();
+    const int len = suffixSize(file);
+    return (len > 0) ? file.right(len).toLower() : QString();
 }
 
-QString setSuffix(const QString &_file, const QString &_suf)
+QString setSuffix(const QString &file, const QString &suf)
 {
     //if (hasExtension(_file, _suf))
     //    return _file;
 
-    const int _cur_suf_size = suffixSize(_file);
+    const int cur_suf_size = suffixSize(file);
 
-    if (_cur_suf_size == 0)
-        return joinStrings(_file, _suf, _dot);
+    if (cur_suf_size == 0)
+        return joinStrings(file, suf, _dot);
 
-    QStringView _chopped = QStringView(_file).left(_file.size() - _cur_suf_size);
-    return _chopped % _suf;
+    QStringView chopped = QStringView(file).left(file.size() - cur_suf_size);
+    return chopped % suf;
 }
 
-int suffixSize(const QString &_file)
+int suffixSize(const QString &file)
 {
-    const QString _file_name = basicName(_file); // in case: /folder.22/filename_with_no_dots
-    const int _dot_ind = _file_name.lastIndexOf(_dot);
+    const QString file_name = basicName(file); // in case: /folder.22/filename_with_no_dots
+    const int dot_ind = file_name.lastIndexOf(_dot);
 
-    if (_dot_ind < 1)
+    if (dot_ind < 1)
         return 0;
 
-    return _file_name.size() - _dot_ind - 1;
+    return file_name.size() - dot_ind - 1;
 }
 
 bool isRoot(const QString &path)
@@ -154,16 +154,16 @@ bool isRoot(const QString &path)
 
 bool hasExtension(const QString &file, const QString &ext)
 {
-    const int _dotInd = file.size() - ext.size() - 1;
+    const int dotInd = file.size() - ext.size() - 1;
 
-    return ((_dotInd >= 0 && file.at(_dotInd) == _dot)
+    return ((dotInd >= 0 && file.at(dotInd) == _dot)
             && file.endsWith(ext, Qt::CaseInsensitive));
 }
 
 bool hasExtension(const QString &file, const QStringList &extensions)
 {
-    for (const QString &_ext : extensions) {
-        if (hasExtension(file, _ext))
+    for (const QString &ext : extensions) {
+        if (hasExtension(file, ext))
             return true;
     }
 
@@ -181,8 +181,8 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
     const bool s2Starts = str2.startsWith(sep);
 
     if (s1Ends && s2Starts) {
-        QStringView _chopped = QStringView(str1).left(str1.size() - 1);
-        return _chopped % str2;
+        QStringView chopped = QStringView(str1).left(str1.size() - 1);
+        return chopped % str2;
     }
 
     if (s1Ends || s2Starts)

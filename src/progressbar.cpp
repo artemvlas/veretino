@@ -12,12 +12,12 @@ ProgressBar::ProgressBar(QWidget *parent)
     : QProgressBar(parent)
 {
     setVisible(false);
-    connect(timer, &QTimer::timeout, this, &ProgressBar::updateProgressInfo);
+    connect(m_timer, &QTimer::timeout, this, &ProgressBar::updateProgressInfo);
 }
 
 void ProgressBar::setProcState(const ProcState *proc)
 {
-    procState_ = proc;
+    m_proc = proc;
 }
 
 void ProgressBar::start()
@@ -34,11 +34,11 @@ void ProgressBar::setProgEnabled(bool enabled)
 {
     if (enabled) {
         resetFormat();
-        timer->start(1000); // 1 sec
-        elapsedTimer.start();
+        m_timer->start(1000); // 1 sec
+        m_elapsedTimer.start();
     }
     else {
-        timer->stop();
+        m_timer->stop();
     }
 
     setVisible(enabled);
@@ -47,36 +47,36 @@ void ProgressBar::setProgEnabled(bool enabled)
 
 void ProgressBar::updateProgressInfo()
 {
-    if (procState_ && procState_->isState(State::StartVerbose)) {
+    if (m_proc && m_proc->isState(State::StartVerbose)) {
         updateDonePiece();
 
-        QString _format = QStringLiteral(u"%p%")
-                          % Lit::s_sepStick // " | "
-                          % progSpeed()
-                          % Lit::s_sepStick
-                          % progTimeLeft();
+        QString format = QStringLiteral(u"%p%")
+                         % Lit::s_sepStick // " | "
+                         % progSpeed()
+                         % Lit::s_sepStick
+                         % progTimeLeft();
 
-        setFormat(_format);
+        setFormat(format);
     }
     else {
         finish();
         resetFormat();
 
-        if (procState_)
-            qDebug() << "<!> ProgressBar >> wrong state:" << procState_->state();
+        if (m_proc)
+            qDebug() << "<!> ProgressBar >> wrong state:" << m_proc->state();
     }
 }
 
 void ProgressBar::updateDonePiece()
 {
-    pieceTime_ = elapsedTimer.restart();
-    pieceSize_ = procState_->donePieceSize();
+    pieceTime_ = m_elapsedTimer.restart();
+    pieceSize_ = m_proc->donePieceSize();
 }
 
 QString ProgressBar::progTimeLeft() const
 {
     if (pieceSize_ > 0) {
-        qint64 timeleft = (procState_->remainingSize() / pieceSize_) * pieceTime_;
+        qint64 timeleft = (m_proc->remainingSize() / pieceSize_) * pieceTime_;
         return format::millisecToReadable(timeleft, true);
     }
 
@@ -86,8 +86,8 @@ QString ProgressBar::progTimeLeft() const
 QString ProgressBar::progSpeed() const
 {
     if (pieceTime_ > 0 && pieceSize_ > 0) {
-        QString _s = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);
-        return _s + QStringLiteral(u"/s");
+        QString __s = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);
+        return __s + QStringLiteral(u"/s");
     }
 
     return QStringLiteral(u"idle");

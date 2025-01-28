@@ -26,13 +26,13 @@ void TreeModelIterator::setup(const QModelIndex &root)
     if (modelConst_)
         nextIndex_ = stepForward(index_);
     else
-        endReached = true;
+        m_endReached = true;
 }
 
 bool TreeModelIterator::hasNext() const
 {
     // return nextIndex_.isValid();
-    return !endReached;
+    return !m_endReached;
 }
 
 TreeModelIterator& TreeModelIterator::next()
@@ -44,7 +44,7 @@ TreeModelIterator& TreeModelIterator::next()
 
 TreeModelIterator& TreeModelIterator::nextFile()
 {
-    if (endReached)
+    if (m_endReached)
         return next();
 
     return modelConst_->hasChildren(next().index_) ? nextFile() : *this;
@@ -52,7 +52,7 @@ TreeModelIterator& TreeModelIterator::nextFile()
 
 QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
 {
-    if (endReached)
+    if (m_endReached)
         return QModelIndex();
 
     if (modelConst_->hasChildren(curIndex))
@@ -72,9 +72,9 @@ QModelIndex TreeModelIterator::stepForward(const QModelIndex &curIndex)
         estimatedIndex = nextRow(ind);
     } while (!estimatedIndex.isValid());
 
-    endReached = !estimatedIndex.isValid();
+    m_endReached = !estimatedIndex.isValid();
 
-    return endReached ? QModelIndex() : estimatedIndex;
+    return m_endReached ? QModelIndex() : estimatedIndex;
 }
 
 QModelIndex TreeModelIterator::nextRow(const QModelIndex &curIndex) const

@@ -32,10 +32,10 @@ bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent
     if (!isFilterEnabled())
         return true;
 
-    QModelIndex _ind = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
-    FileStatus _status = _ind.data(TreeModel::RawDataRole).value<FileStatus>();
+    QModelIndex ind = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
+    FileStatus status = ind.data(TreeModel::RawDataRole).value<FileStatus>();
 
-    return (_status & filteredFlags);
+    return (status & m_filteredFlags);
 }
 
 bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
@@ -53,8 +53,8 @@ bool ProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) con
 
 void ProxyModel::setFilter(const FileStatuses flags)
 {
-    if (flags != filteredFlags) {
-        filteredFlags = flags;
+    if (flags != m_filteredFlags) {
+        m_filteredFlags = flags;
         invalidateFilter();
     }
 }
@@ -62,17 +62,17 @@ void ProxyModel::setFilter(const FileStatuses flags)
 void ProxyModel::disableFilter()
 {
     if (isFilterEnabled()) {
-        filteredFlags = FileStatus::NotSet;
+        m_filteredFlags = FileStatus::NotSet;
         invalidateFilter();
     }
 }
 
 FileStatuses ProxyModel::currentlyFiltered() const
 {
-    return filteredFlags;
+    return m_filteredFlags;
 }
 
 bool ProxyModel::isFilterEnabled() const
 {
-    return (filteredFlags != FileStatus::NotSet);
+    return (m_filteredFlags != FileStatus::NotSet);
 }

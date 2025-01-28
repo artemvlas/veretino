@@ -21,7 +21,7 @@ Files::Files(const QString &path, QObject *parent)
 
 void Files::setProcState(const ProcState *procState)
 {
-    p_proc = procState;
+    m_proc = procState;
 }
 
 void Files::setPath(const QString &path)
@@ -31,7 +31,7 @@ void Files::setPath(const QString &path)
 
 bool Files::isCanceled() const
 {
-    return (p_proc && p_proc->isCanceled());
+    return (m_proc && m_proc->isCanceled());
 }
 
 FileList Files::getFileList()
@@ -56,14 +56,14 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
     QDirIterator it(rootFolder, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString _fullPath = it.next();
-        const QString _relPath = pathstr::relativePath(rootFolder, _fullPath);
+        const QString fullPath = it.next();
+        const QString relPath = pathstr::relativePath(rootFolder, fullPath);
 
-        if (filter.isFileAllowed(_relPath)) {
-            FileStatus _status = it.fileInfo().isReadable() ? FileStatus::NotSet
-                                                            : FileStatus::UnPermitted;
+        if (filter.isFileAllowed(relPath)) {
+            FileStatus status = it.fileInfo().isReadable() ? FileStatus::NotSet
+                                                           : FileStatus::UnPermitted;
 
-            resultList.insert(_relPath, FileValues(_status, it.fileInfo().size()));
+            resultList.insert(relPath, FileValues(status, it.fileInfo().size()));
         }
     }
 
@@ -125,15 +125,15 @@ QString Files::firstDbFile(const QString &folderPath)
 
 QStringList Files::dbFiles(const QString &folderPath)
 {
-    QStringList _res;
+    QStringList res;
     QDirIterator it(folderPath, QDir::Files);
 
     while (it.hasNext()) {
         if (paths::isDbFile(it.next()))
-            _res << it.fileName();
+            res << it.fileName();
     }
 
-    return _res;
+    return res;
 }
 
 QString Files::getFolderSize()
@@ -161,10 +161,10 @@ QString Files::getFolderSize(const QString &path)
     }
 
     // result processing
-    const QString _folderName = pathstr::basicName(path);
-    const QString _folderSize = format::filesNumSize(__n);
+    const QString folderName = pathstr::basicName(path);
+    const QString folderSize = format::filesNumSize(__n);
 
-    return tools::joinStrings(_folderName, _folderSize, Lit::s_sepColonSpace);
+    return tools::joinStrings(folderName, folderSize, Lit::s_sepColonSpace);
 }
 
 FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
@@ -212,24 +212,24 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
 
 FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)
 {
-    FileTypeList _res;
+    FileTypeList res;
     TreeModelIterator it(model, rootIndex);
 
     while (it.hasNext() && !isCanceled()) {
         it.nextFile();
         if (it.status() & FileStatus::CombAvailable) {
-            const QString _file = it.path();
+            const QString file_path = it.path();
 
-            if (paths::isDbFile(_file))
-                _res.m_combined[FilterAttribute::IgnoreDbFiles] << it.size();
-            else if (paths::isDigestFile(_file))
-                _res.m_combined[FilterAttribute::IgnoreDigestFiles] << it.size();
+            if (paths::isDbFile(file_path))
+                res.m_combined[FilterAttribute::IgnoreDbFiles] << it.size();
+            else if (paths::isDigestFile(file_path))
+                res.m_combined[FilterAttribute::IgnoreDigestFiles] << it.size();
             else
-                _res.m_extensions[pathstr::suffix(_file)] << it.size();
+                res.m_extensions[pathstr::suffix(file_path)] << it.size();
         }
     }
 
-    return _res;
+    return res;
 }
 
 NumSize Files::totalListed(const FileTypeList &typeList)
@@ -263,14 +263,14 @@ qint64 Files::dataSize(const QString &folder)
 
 qint64 Files::dataSize(const FileList &filelist)
 {
-    qint64 _total = 0;
+    qint64 total = 0;
 
     FileList::const_iterator iter;
     for (iter = filelist.constBegin(); iter != filelist.constEnd(); ++iter) {
-        const qint64 _size = iter.value().size;
-        if (_size > 0)
-            _total += _size;
+        const qint64 size = iter.value().size;
+        if (size > 0)
+            total += size;
     }
 
-    return _total;
+    return total;
 }

@@ -26,7 +26,7 @@ protected:
 
 private:
     void setInitSettings();
-    FileStatuses filteredFlags = FileStatus::NotSet;
+    FileStatuses m_filteredFlags = FileStatus::NotSet;
 }; // class ProxyModel
 
 #endif // PROXYMODEL_H

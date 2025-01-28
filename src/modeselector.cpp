@@ -355,9 +355,9 @@ void ModeSelector::pasteItemSum()
     if (!p_view->isViewDatabase())
         return;
 
-    const QString _copied = copiedDigest(p_view->m_data->m_metadata.algorithm);
-    if (!_copied.isEmpty()) {
-        p_manager->dataMaintainer->setItemValue(p_view->curIndex(), Column::ColumnChecksum, _copied);
+    const QString copied = copiedDigest(p_view->m_data->m_metadata.algorithm);
+    if (!copied.isEmpty()) {
+        p_manager->m_dataMaintainer->setItemValue(p_view->curIndex(), Column::ColumnChecksum, copied);
         updateItemFile(DbMod::DM_PasteDigest);
     }
 }

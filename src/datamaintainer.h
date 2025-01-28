@@ -57,8 +57,8 @@ public:
     int clearChecksums(const FileStatuses flags,
                        const QModelIndex &rootIndex = QModelIndex());
 
-    int clearLostFiles();                                                                  // returns the number of cleared
-    int updateMismatchedChecksums();                                                       // returns the number of updated checksums
+    int clearLostFiles();                                                                  // clears the stored checksums of the Missing/Lost items, returns the done number
+    int updateMismatchedChecksums();                                                       // move ReChecksum --> Checksum
     void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);         // rolls back file statuses when canceling an operation
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);

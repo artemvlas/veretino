@@ -29,10 +29,10 @@ private:
     QString progTimeLeft() const;
     QString progSpeed() const;
 
-    const ProcState *procState_ = nullptr;
-    QTimer *timer = new QTimer(this);
+    const ProcState *m_proc = nullptr;
+    QTimer *m_timer = new QTimer(this);
+    QElapsedTimer m_elapsedTimer;
 
-    QElapsedTimer elapsedTimer;
     qint64 pieceTime_; // milliseconds
     qint64 pieceSize_;
 }; // class ProgressBar

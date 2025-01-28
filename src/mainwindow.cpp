@@ -37,9 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     modeSelect = new ModeSelector(ui->view, settings_, this);
     modeSelect->setManager(manager);
-    modeSelect->setProcState(manager->procState);
-    ui->progressBar->setProcState(manager->procState);
-    proc_ = manager->procState;
+    modeSelect->setProcState(manager->m_proc);
+    ui->progressBar->setProcState(manager->m_proc);
+    proc_ = manager->m_proc;
 
     modeSelect->m_menuAct->populateMenuFile(ui->menuFile);
     ui->menuHelp->addAction(modeSelect->m_menuAct->actionAbout);
@@ -66,7 +66,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     // if a computing process is running, show a prompt when user wants to close the app
     if (modeSelect->promptProcessAbort()) {
-        if (!awaiting_closure && manager->dataMaintainer->isDataNotSaved()) {
+        if (!awaiting_closure && manager->m_dataMaintainer->isDataNotSaved()) {
             awaiting_closure = true;
             modeSelect->saveData();
             event->ignore();
@@ -123,9 +123,9 @@ void MainWindow::connections()
     connect(statusBar, &StatusBar::buttonDbListedClicked, this, [=]{ showDbStatusTab(DialogDbStatus::TabListed); });
     connect(statusBar, &StatusBar::buttonDbContentsClicked, modeSelect, &ModeSelector::_makeDbContentsList);
     connect(statusBar, &StatusBar::buttonDbHashClicked, this, &MainWindow::handleButtonDbHashClick);
-    connect(manager->procState, &ProcState::progressStarted, this,
+    connect(manager->m_proc, &ProcState::progressStarted, this,
             [=] { if (modeSelect->isMode(Mode::DbProcessing)) statusBar->setButtonsEnabled(false); });
-    connect(manager->procState, &ProcState::progressFinished, this,
+    connect(manager->m_proc, &ProcState::progressFinished, this,
             [=] { if (ui->view->isViewDatabase()) statusBar->setButtonsEnabled(true); });
 }
 
@@ -158,32 +158,32 @@ void MainWindow::connectManager()
 
     // results processing
     connect(manager, &Manager::setViewData, ui->view, &View::setData);
-    connect(manager->dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
-    connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
-    connect(manager->dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updateWindowTitle);
-    connect(manager->dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
-    connect(manager->dataMaintainer, &DataMaintainer::failedDataCreation, this,
+    connect(manager->m_dataMaintainer, &DataMaintainer::databaseUpdated, this, &MainWindow::showDbStatus);
+    connect(manager->m_dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updatePermanentStatus);
+    connect(manager->m_dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updateWindowTitle);
+    connect(manager->m_dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
+    connect(manager->m_dataMaintainer, &DataMaintainer::failedDataCreation, this,
             [=]{ if (ui->view->isViewModel(ModelView::NotSetted)) modeSelect->showFileSystem(); });
-    connect(manager->dataMaintainer, &DataMaintainer::failedJsonSave, this, &MainWindow::dialogSaveJson);
-    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, this, &MainWindow::updateMenuActions);
-    connect(manager->dataMaintainer, &DataMaintainer::dbFileStateChanged, this, [=]{ if (awaiting_closure) close(); });
+    connect(manager->m_dataMaintainer, &DataMaintainer::failedJsonSave, this, &MainWindow::dialogSaveJson);
+    connect(manager->m_dataMaintainer, &DataMaintainer::dbFileStateChanged, this, &MainWindow::updateMenuActions);
+    connect(manager->m_dataMaintainer, &DataMaintainer::dbFileStateChanged, this, [=]{ if (awaiting_closure) close(); });
 
     // process status
-    connect(manager->procState, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
-    connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateButtonInfo);
-    connect(manager->procState, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
-    connect(manager->procState, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
-    connect(manager->procState, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
-    connect(manager->procState, &ProcState::stateChanged, this, &MainWindow::updateStatusIcon);
+    connect(manager->m_proc, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
+    connect(manager->m_proc, &ProcState::stateChanged, this, &MainWindow::updateButtonInfo);
+    connect(manager->m_proc, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
+    connect(manager->m_proc, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
+    connect(manager->m_proc, &ProcState::percentageChanged, ui->progressBar, &ProgressBar::setValue);
+    connect(manager->m_proc, &ProcState::stateChanged, this, &MainWindow::updateStatusIcon);
 
     // <!> experimental
-    connect(manager->procState, &ProcState::progressFinished, modeSelect, &ModeSelector::getInfoPathItem);
+    connect(manager->m_proc, &ProcState::progressFinished, modeSelect, &ModeSelector::getInfoPathItem);
 
     // change view
     connect(manager, &Manager::switchToFsPrepared, ui->view, &View::setFileSystemModel);
-    connect(ui->view, &View::switchedToFs, manager->dataMaintainer, &DataMaintainer::clearData);
+    connect(ui->view, &View::switchedToFs, manager->m_dataMaintainer, &DataMaintainer::clearData);
     connect(ui->view, &View::modelChanged, manager, &Manager::modelChanged);
-    connect(ui->view, &View::dataSetted, manager->dataMaintainer, &DataMaintainer::clearOldData);
+    connect(ui->view, &View::dataSetted, manager->m_dataMaintainer, &DataMaintainer::clearOldData);
     connect(ui->view, &View::dataSetted, this,
             [=]{ if (ui->view->m_data) settings_->addRecentFile(ui->view->m_data->m_metadata.dbFilePath); });
 
@@ -471,7 +471,7 @@ void MainWindow::dialogSaveJson(VerJson *p_unsaved)
 
         p_unsaved->setFilePath(_file_path);
 
-        if (manager->dataMaintainer->saveJsonFile(p_unsaved))
+        if (manager->m_dataMaintainer->saveJsonFile(p_unsaved))
             break;
     }
 

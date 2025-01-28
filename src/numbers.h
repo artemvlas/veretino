@@ -15,19 +15,24 @@ public:
 
     void addFile(const FileStatus status, const qint64 size);
     void removeFile(const FileStatus status, const qint64 size);
-    bool moveFile(const FileStatus statusBefore, const FileStatus statusAfter, const qint64 size = 0);
+    bool moveFile(const FileStatus statusBefore,
+                  const FileStatus statusAfter,
+                  const qint64 size = 0);
+
     bool contains(const FileStatuses flag) const;
     int numberOf(const FileStatuses flag) const;
     qint64 totalSize(const FileStatuses flag) const;
     NumSize values(const FileStatuses flag) const;
 
-    // assigns new status to numbers
-    bool changeStatus(const FileStatus _before, const FileStatus _after);
-    // moves the specified value to a new status
-    bool changeStatus(const NumSize &_nums, const FileStatus _before, const FileStatus _after);
+    bool changeStatus(const FileStatus before,                         // assigns new status to numbers
+                      const FileStatus after);
 
-    const QList<FileStatus> statuses() const; // returns a list of available statuses
-    void clear();
+    bool changeStatus(const NumSize &nums,                             // moves the specified value to a new status
+                      const FileStatus before,
+                      const FileStatus after);
+
+    const QList<FileStatus> statuses() const;                          // returns a list of available statuses
+    void clear();                                                      // clears the _val
 
 private:
     // { FileStatus : number of corresponding files, total size }

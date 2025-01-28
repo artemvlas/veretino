@@ -38,23 +38,23 @@ bool Numbers::moveFile(const FileStatus statusBefore, const FileStatus statusAft
     return true;
 }
 
-bool Numbers::changeStatus(const FileStatus _before, const FileStatus _after)
+bool Numbers::changeStatus(const FileStatus before, const FileStatus after)
 {
-    if (_val.contains(_before)) {
-        _val[_after] << _val.take(_before);
+    if (_val.contains(before)) {
+        _val[after] << _val.take(before);
         return true;
     }
 
     return false;
 }
 
-bool Numbers::changeStatus(const NumSize &_nums, const FileStatus _before, const FileStatus _after)
+bool Numbers::changeStatus(const NumSize &nums, const FileStatus before, const FileStatus after)
 {
-    if (_nums && (_nums <= _val.value(_before))) {
-        if (!(_val[_before] -= _nums))
-            _val.remove(_before); // if the remainder is 0
+    if (nums && (nums <= _val.value(before))) {
+        if (!(_val[before] -= nums))
+            _val.remove(before); // if the remainder is 0
 
-        _val[_after] += _nums;
+        _val[after] += nums;
         return true;
     }
 

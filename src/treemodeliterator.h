@@ -34,7 +34,7 @@ private:
     // the nextIndex_ is found in advance and used as a cache
     // to avoid calling the ::stepForward twice when hasNext() called
 
-    bool endReached = false;
+    bool m_endReached = false;
 }; // class TreeModelIterator
 
 #endif // TREEMODELITERATOR_H

@@ -12,22 +12,22 @@ ShaCalculator::ShaCalculator(QObject *parent)
 {}
 
 ShaCalculator::ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent)
-    : QObject(parent), algo_(algo)
+    : QObject(parent), m_algo(algo)
 {}
 
 void ShaCalculator::setAlgorithm(QCryptographicHash::Algorithm algo)
 {
-    algo_ = algo;
+    m_algo = algo;
 }
 
 void ShaCalculator::setProcState(const ProcState *procState)
 {
-    p_proc = procState;
+    m_proc = procState;
 }
 
 QString ShaCalculator::calculate(const QString &filePath)
 {
-    return calculate(filePath, algo_);
+    return calculate(filePath, m_algo);
 }
 
 QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
@@ -37,13 +37,13 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
     if (file.open(QIODevice::ReadOnly)) {
         QCryptographicHash hash(algo);
         while (!file.atEnd() && !isCanceled()) {
-            const QByteArray &buf = file.read(chunk);
+            const QByteArray &buf = file.read(m_chunk);
             if (buf.size() > 0) {
                 hash.addData(buf);
                 emit doneChunk(buf.size());
             }
             else {
-                qDebug() << "ShaCalculator::calculate >> ERROR:" << filePath;
+                qWarning() << "ShaCalculator::calculate >> ERROR:" << filePath;
                 return QString();
             }
         }
@@ -57,5 +57,5 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
 
 bool ShaCalculator::isCanceled() const
 {
-    return (p_proc && p_proc->isCanceled());
+    return (m_proc && m_proc->isCanceled());
 }
