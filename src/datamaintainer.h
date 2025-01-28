@@ -77,6 +77,8 @@ public:
     // if file - "filename (size)", if folder - folder contents (availability, size etc.)
     QString itemContentsInfo(const QModelIndex &curIndex);
 
+    bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
+
     // variables
     DataContainer *m_data = nullptr;     // main data
 
@@ -92,7 +94,6 @@ private:
     FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
     VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
     QString findWorkDir(const VerJson &json) const;
-    bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
 
     DataContainer *m_oldData = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
     const ProcState *m_proc = nullptr;

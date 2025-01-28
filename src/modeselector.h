@@ -59,15 +59,17 @@ public:
     void importBranch();
     void _makeDbContentsList();
 
-    void resetDatabase(); // reopening and reparsing current database
+    void resetDatabase();                                                                   // reopening and reparsing current database
     void restoreDatabase();
     void updateDatabase(const DbMod task);
-    void processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result = DestFileProc::Generic);
+    void processFileSha(const QString &path,
+                        QCryptographicHash::Algorithm algo,
+                        DestFileProc result = DestFileProc::Generic);
     void checkSummaryFile(const QString &path);
     void checkFile(const QString &filePath, const QString &checkSum);
-    void verify(const QModelIndex _index = QModelIndex());
+    void verify(const QModelIndex index = QModelIndex());
     void verifyModified();
-    void verifyItems(const QModelIndex &_root, FileStatus _status);
+    void verifyItems(const QModelIndex &root, FileStatus status);
     void branchSubfolder();
 
     void makeFolderContentsList(const QString &folderPath);
@@ -101,7 +103,7 @@ private:
     void connectActions();
     void copyDataToClipboard(Column column);
     void updateDbItem();
-    void updateItemFile(DbMod _job);
+    void updateItemFile(DbMod job);
     void exportItemSum();
     void importItemSum();
     void pasteItemSum();

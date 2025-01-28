@@ -48,14 +48,15 @@ public:
 private:
     void fillHeader();
     QString findValueStr(const QJsonObject &object,
-                         const QString &approxKey, int sampleLength = 4) const;
+                         const QString &approxKey,
+                         int sampleLength = 4) const;
     QString firstValueString(const QJsonObject &obj) const;
 
     QString m_file_path;
     QString m_workdir;
     QJsonObject m_header;
     QJsonObject m_data;
-    QJsonArray m_unredable;
+    QJsonArray m_unreadable;
 
     static const QString a_key_Unreadable;
 }; // class VerJson

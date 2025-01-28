@@ -41,7 +41,7 @@ public:
     explicit DataContainer(const MetaData &meta, TreeModel *data, QObject *parent = nullptr);
     ~DataContainer();
 
-    void setData();
+    void setData();                                                                 // clears the current data models, sets the new empty ones
     void setData(const MetaData &meta, TreeModel *data);
     bool hasData() const;
     void clearData();                                                               // deletes data models and clears m_numbers

@@ -65,36 +65,36 @@ bool VerJson::load()
         return false;
     }
 
-    QFile _file(m_file_path);
-    if (!_file.open(QFile::ReadOnly)) {
+    QFile j_file(m_file_path);
+    if (!j_file.open(QFile::ReadOnly)) {
         qWarning() << "Failed to open file!";
         return false;
     }
 
-    QByteArray __b = _file.readAll();
+    QByteArray __ba = j_file.readAll();
 
-    if (__b.startsWith("PK")) { // is compressed
-        QMicroz _qmz(__b);
-        if (_qmz)
-            __b = _qmz.extractData(0);
+    if (__ba.startsWith("PK")) { // is compressed
+        QMicroz qmz(__ba);
+        if (qmz)
+            __ba = qmz.extractData(0);
     }
 
-    const QJsonDocument _doc = QJsonDocument::fromJson(__b);
+    const QJsonDocument doc = QJsonDocument::fromJson(__ba);
 
     // the Veretino json file is QJsonArray of QJsonObjects [{}, {}, ...]
-    if (_doc.isArray()) {
-        QJsonArray _main_array = _doc.array();
-        if (_main_array.size() > 1) {
-            QJsonValueRef _header = _main_array[0];
-            QJsonValueRef _main_list = _main_array[1];
+    if (doc.isArray()) {
+        QJsonArray main_array = doc.array();
+        if (main_array.size() > 1) {
+            QJsonValueRef header = main_array[0];
+            QJsonValueRef main_list = main_array[1];
 
-            if (_header.isObject() && _main_list.isObject()) {
-                m_header = _header.toObject();
-                m_data = _main_list.toObject();
+            if (header.isObject() && main_list.isObject()) {
+                m_header = header.toObject();
+                m_data = main_list.toObject();
 
-                if (_main_array.size() > 2) {
-                    QJsonValueRef _additional = _main_array[2];
-                    m_unredable = _additional.isObject() ? _additional.toObject().value(a_key_Unreadable).toArray()
+                if (main_array.size() > 2) {
+                    QJsonValueRef additional = main_array[2];
+                    m_unreadable = additional.isObject() ? additional.toObject().value(a_key_Unreadable).toArray()
                                                          : QJsonArray();
                 }
 
@@ -125,9 +125,9 @@ bool VerJson::save()
     content.append(m_header);
     content.append(m_data);
 
-    if (!m_unredable.isEmpty()) {
+    if (!m_unreadable.isEmpty()) {
         QJsonObject unr;
-        unr[a_key_Unreadable] = m_unredable;
+        unr[a_key_Unreadable] = m_unreadable;
         content.append(unr);
     }
 
@@ -151,7 +151,7 @@ void VerJson::addItem(const QString &file, const QString &checksum)
 
 void VerJson::addItemUnr(const QString &file)
 {
-    m_unredable.append(file);
+    m_unreadable.append(file);
 }
 
 void VerJson::addInfo(const QString &header_key, const QString &value)
@@ -222,5 +222,5 @@ const QJsonObject& VerJson::data() const
 
 const QJsonArray& VerJson::unreadableFiles() const
 {
-    return m_unredable;
+    return m_unreadable;
 }
