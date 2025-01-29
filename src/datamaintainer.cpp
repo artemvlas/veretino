@@ -247,10 +247,10 @@ bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &chec
     return false;
 }
 
-int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus newStatus, const QModelIndex &rootIndex)
+int DataMaintainer::changeStatuses(const FileStatuses statuses, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
     if (!m_data || tools::isFlagCombined(newStatus)) {
-        qDebug() << "DM::changeFilesStatus >> Error";
+        qDebug() << "DM::changeStatuses >> Error";
         return 0;
     }
 
@@ -258,7 +258,7 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
     TreeModelIterator iter(m_data->m_model, rootIndex);
 
     while (iter.hasNext()) {
-        if (flags & iter.nextFile().status()) {
+        if (statuses & iter.nextFile().status()) {
             setFileStatus(iter.index(), newStatus);
             ++number;
         }
@@ -270,9 +270,9 @@ int DataMaintainer::changeFilesStatus(const FileStatuses flags, const FileStatus
     return number;
 }
 
-int DataMaintainer::addToQueue(const FileStatuses flags, const QModelIndex &rootIndex)
+int DataMaintainer::addToQueue(const FileStatuses statuses, const QModelIndex &rootIndex)
 {
-    return changeFilesStatus(flags, FileStatus::Queued, rootIndex);
+    return changeStatuses(statuses, FileStatus::Queued, rootIndex);
 }
 
 void DataMaintainer::clearChecksum(const QModelIndex &fileIndex)
@@ -280,7 +280,7 @@ void DataMaintainer::clearChecksum(const QModelIndex &fileIndex)
     setItemValue(fileIndex, Column::ColumnChecksum);
 }
 
-int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &rootIndex)
+int DataMaintainer::clearChecksums(const FileStatuses statuses, const QModelIndex &rootIndex)
 {
     if (!m_data) {
         qDebug() << "DM::clearChecksums | NO m_data";
@@ -291,7 +291,7 @@ int DataMaintainer::clearChecksums(const FileStatuses flags, const QModelIndex &
     TreeModelIterator iter(m_data->m_model, rootIndex);
 
     while (iter.hasNext()) {
-        if (flags & iter.nextFile().status()) {
+        if (statuses & iter.nextFile().status()) {
             setItemValue(iter.index(), Column::ColumnChecksum);
             ++number;
         }
@@ -405,7 +405,7 @@ void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatu
         else if (tools::isFlagCombined(prevStatus)) // CombNotChecked == NotChecked | NotCheckedMod
             prevStatus = FileStatus::NotChecked;
 
-        changeFilesStatus((FileStatus::CombProcessing | FileStatus::Added), prevStatus, rootIndex);
+        changeStatuses((FileStatus::CombProcessing | FileStatus::Added), prevStatus, rootIndex);
     }
 }
 
@@ -596,20 +596,15 @@ bool DataMaintainer::importJson(const QString &filePath)
 
     // parsing
     const MetaData meta = getMetaData(json);         // meta data
-    TreeModel *model = createDataModel(json, meta); // main data
+    TreeModel *model = createDataModel(json, meta);  // main data
 
-    if (!model) // canceled
+    if (!model) { // canceled
+        emit failedDataCreation();
         return false;
+    }
 
     // setting the parsed data
-    DataContainer *parsedData = new DataContainer(meta, model);
-
-    // ToDo: reimplement needed
-    const bool success = setSourceData(parsedData);
-    if (!success)
-        emit failedDataCreation();
-
-    return success;
+    return setSourceData(new DataContainer(meta, model));
 }
 
 // returns the path to the file if the write was successful, otherwise an empty string
@@ -633,7 +628,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
     p_json->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(nums.totalSize(FileStatus::CombAvailable)));
 
     // DateTime
-    const QString timestamp = (isBranching && m_data->isAllMatched(nums)) ? QStringLiteral(u"Created: ") + format::currentDateTime()
+    const QString timestamp = (isBranching && m_data->isAllMatched(nums)) ? VerDateTime::current(VerDateTime::Created)
                                                                           : meta.datetime.toString();
     p_json->addInfo(VerJson::h_key_DateTime, timestamp);
 

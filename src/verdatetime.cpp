@@ -84,25 +84,7 @@ void VerDateTime::set(const QString &str)
 
 void VerDateTime::update(DT type)
 {
-    QString __s;
-
-    switch (type) {
-    case Created:
-        __s = QStringLiteral(u"Created: ");
-        break;
-    case Updated:
-        __s = QStringLiteral(u"Updated: ");
-        break;
-    case Verified:
-        __s = QStringLiteral(u"Verified: ");
-        break;
-    default:
-        return;
-    }
-
-    // for example: "Created: 2023/11/09 17:45"
-    QString _value = __s + format::currentDateTime();
-    set(type, _value);
+    set(type, current(type));
 }
 
 QString VerDateTime::toString(bool keep_empty_values) const
@@ -140,4 +122,26 @@ QString VerDateTime::basicDate() const
     // if the update time is not empty and there is no verification time,
     // return an empty string
     return QString();
+}
+
+QString VerDateTime::current(DT type)
+{
+    QString __s;
+
+    switch (type) {
+    case Created:
+        __s = QStringLiteral(u"Created: ");
+        break;
+    case Updated:
+        __s = QStringLiteral(u"Updated: ");
+        break;
+    case Verified:
+        __s = QStringLiteral(u"Verified: ");
+        break;
+    default:
+        break;
+    }
+
+    // for example: "Created: 2023/11/09 17:45"
+    return __s + format::currentDateTime();
 }

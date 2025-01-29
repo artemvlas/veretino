@@ -24,42 +24,44 @@ public:
     void setSourceData();
     void setSourceData(const MetaData &meta);
     bool setSourceData(DataContainer *sourceData);
-    bool setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value = QVariant());
+    bool setItemValue(const QModelIndex &fileIndex,
+                      Column column,
+                      const QVariant &value = QVariant());
     void setFileStatus(const QModelIndex &index, FileStatus status);
     void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
     void updateNumbers();
-    void updateNumbers(const QModelIndex &fileIndex, const FileStatus statusBefore);
-    void updateNumbers(const FileStatus status_old, const FileStatus status_new, const qint64 size = 0);
+    void updateNumbers(const QModelIndex &fileIndex,
+                       const FileStatus statusBefore);
+    void updateNumbers(const FileStatus status_old,
+                       const FileStatus status_new,
+                       const qint64 size = 0);
     void moveNumbers(const FileStatus before, const FileStatus after);
     void setDbFileState(DbFileState state);
 
-    // iterate the 'data_->metaData.workDir' folder and add the finded files to the data_->model_
-    int folderBasedData(FileStatus fileStatus = FileStatus::New);
+    int folderBasedData(FileStatus fileStatus = FileStatus::New);                         // iterate the 'm_data->metaData.workDir' folder and add the finded files to the m_data->m_model
 
-    // returns 'true' if Added or Matched. returns false if Mismatched
-    bool updateChecksum(const QModelIndex &fileRowIndex,
+    bool updateChecksum(const QModelIndex &fileRowIndex,                                  // returns 'true' if Added or Matched. returns false if Mismatched
                         const QString &computedChecksum);
 
     bool importChecksum(const QModelIndex &file,
                         const QString &checksum);
 
-    int changeFilesStatus(const FileStatuses flags,
-                          const FileStatus newStatus,
-                          const QModelIndex &rootIndex = QModelIndex());
-
-    // changes statuses of files in data_->model_ from <flags> to FileStatus::Queued
-    int addToQueue(const FileStatuses flags,
-                   const QModelIndex &rootIndex = QModelIndex());
-
-    void clearChecksum(const QModelIndex &fileIndex);
-    int clearChecksums(const FileStatuses flags,
+    int changeStatuses(const FileStatuses statuses,                                       // changes the status of all items with <statuses> to the <newStatus>
+                       const FileStatus newStatus,
                        const QModelIndex &rootIndex = QModelIndex());
 
-    int clearLostFiles();                                                                  // clears the stored checksums of the Missing/Lost items, returns the done number
-    int updateMismatchedChecksums();                                                       // move ReChecksum --> Checksum
-    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);         // rolls back file statuses when canceling an operation
+    int addToQueue(const FileStatuses statuses,                                           // changes items status from <statuses> to FileStatus::Queued
+                   const QModelIndex &rootIndex = QModelIndex());
+
+    void clearChecksum(const QModelIndex &fileIndex);                                     // clears stored checksum string, single file item
+    int clearChecksums(const FileStatuses statuses,                                       // ... for all items with given statuses, returns done number
+                       const QModelIndex &rootIndex = QModelIndex());
+
+    int clearLostFiles();                                                                 // clears the stored checksums of the Missing/Lost items, returns the done number
+    int updateMismatchedChecksums();                                                      // move ReChecksum --> Checksum
+    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);        // rolls back file statuses when canceling an operation
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
@@ -74,13 +76,10 @@ public:
 
     bool isDataNotSaved() const;
 
-    // if file - "filename (size)", if folder - folder contents (availability, size etc.)
-    QString itemContentsInfo(const QModelIndex &curIndex);
-
-    bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
+    QString itemContentsInfo(const QModelIndex &curIndex);                                 // file: "filename (size)"; folder: contents (availability, size etc.)
 
     // variables
-    DataContainer *m_data = nullptr;     // main data
+    DataContainer *m_data = nullptr;                                                       // main data
 
 public slots:
     void clearData();
@@ -93,9 +92,10 @@ private:
     MetaData getMetaData(const VerJson &json) const;
     FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
     VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
+    bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
     QString findWorkDir(const VerJson &json) const;
 
-    DataContainer *m_oldData = nullptr; // backup for the duration of data_ setup, should be deleted after setting the data_ to View
+    DataContainer *m_oldData = nullptr; // backup for the duration of m_data setup, should be deleted after setting the m_data to View
     const ProcState *m_proc = nullptr;
 
     bool m_considerFileModDate;
