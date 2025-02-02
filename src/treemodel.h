@@ -63,8 +63,8 @@ private:
     TreeItem *add_folder(const QString &path);
 
     static const QVector<QVariant> s_rootItemData;
-    TreeItem *rootItem;
-    QHash<QString, TreeItem*> cacheFolderItems_;
+    TreeItem *m_rootItem;
+    QHash<QString, TreeItem*> m_cacheFolderItems;
 }; // class TreeModel
 
 using Column = TreeModel::Column;

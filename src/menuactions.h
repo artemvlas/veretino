@@ -42,7 +42,7 @@ public:
     QAction *actionClearRecent = new QAction(QStringLiteral(u"Clear History"), this);
     QAction *actionAbout = new QAction(QStringLiteral(u"About"), this);
 
-    QList<QAction*> menuFileActions { actionChooseFolder, actionOpenDatabaseFile, actionSave, actionShowFilesystem, actionOpenDialogSettings };
+    QList<QAction*> m_menuFileActions { actionChooseFolder, actionOpenDatabaseFile, actionSave, actionShowFilesystem, actionOpenDialogSettings };
 
     // File system View
     QAction *actionToHome = new QAction(QStringLiteral(u"to Home"), this);
@@ -58,7 +58,7 @@ public:
     QAction *actionOpenDatabase = new QAction(QStringLiteral(u"Open Database"), this);
     QAction *actionCheckSumFile = new QAction(QStringLiteral(u"Check the Checksum"), this);
 
-    QList<QAction*> actionsMakeDigest { actionProcessSha1File, actionProcessSha256File, actionProcessSha512File };
+    QList<QAction*> m_actionsMakeDigest { actionProcessSha1File, actionProcessSha256File, actionProcessSha512File };
 
     // DB Model View
     QAction *actionCancelBackToFS = new QAction(QStringLiteral(u"Close the Database"), this);
@@ -110,12 +110,12 @@ public:
     QMenu *menuCreateDigest = new QMenu(QStringLiteral(u"Create Digest file"));
     QMenu *menuOpenRecent = new QMenu(QStringLiteral(u"Open Recent"));
     QMenu *menuUpdateDatabase = nullptr;
-    QList<QMenu*> listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase };
+    QList<QMenu*> m_listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase };
 
 private:
     void setActionsIcons();
-    IconProvider _icons;
-    const Settings *settings_ = nullptr;
+    IconProvider m_icons;
+    const Settings *m_settings = nullptr;
 
 }; // class MenuActions
 

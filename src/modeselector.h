@@ -57,7 +57,7 @@ public:
     void openRecentDatabase(const QAction *action);
     void openBranchDb();
     void importBranch();
-    void _makeDbContentsList();
+    void makeDbContList();
 
     void resetDatabase();                                                                   // reopening and reparsing current database
     void restoreDatabase();

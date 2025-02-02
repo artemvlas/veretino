@@ -49,31 +49,31 @@ void VerDateTime::set(DT type, const QString &value)
 
 void VerDateTime::set(const QString &str)
 {
-    const QStringList _dtList = str.split(QStringLiteral(u", "));
+    const QStringList dtList = str.split(Lit::s_sepCommaSpace); // ", "
 
-    if (_dtList.size() == 3) {
+    if (dtList.size() == 3) {
         for (int i = 0; i < 3; ++i) {
-            set((DT)i, _dtList.at(i));
+            set((DT)i, dtList.at(i));
         }
     } else {
-        for (const QString &_dt : _dtList) {
-            if (_dt.isEmpty())
+        for (const QString &dt : dtList) {
+            if (dt.isEmpty())
                 continue;
 
-            const char _c = _dt.front().toLatin1();
+            const char ch = dt.front().toLatin1();
 
-            switch (_c) {
+            switch (ch) {
             case 'c':
             case 'C':
-                m_created = _dt;
+                m_created = dt;
                 break;
             case 'u':
             case 'U':
-                m_updated = _dt;
+                m_updated = dt;
                 break;
             case 'v':
             case 'V':
-                m_verified = _dt;
+                m_verified = dt;
                 break;
             default:
                 break;
@@ -99,7 +99,7 @@ QString VerDateTime::toString(bool keep_empty_values) const
 
         if (!__v.isEmpty() || keep_empty_values) {
             if (!__s.isEmpty() || (keep_empty_values && i > 0))
-                __s += QStringLiteral(u", ");
+                __s += Lit::s_sepCommaSpace; // ", "
 
             __s += __v;
         }

@@ -32,7 +32,7 @@ public:
     QString curAbsPath() const;
     ModelView curViewModel() const;
     bool isViewModel(const ModelView modelView) const;
-    bool isViewFileSystem() const; // "true" if this->model() is *fileSystem(QFileSystemModel), else "false"
+    bool isViewFileSystem() const;                                // "true" if this->model() is *m_fileSystem(QFileSystemModel), else "false"
     bool isViewDatabase() const;
     bool isViewFiltered() const;
     bool isViewFiltered(const FileStatus status) const;

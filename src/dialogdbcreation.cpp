@@ -11,7 +11,7 @@
 #include <QDebug>
 #include <QMenu>
 
-const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
+const QMap<QString, QSet<QString>> DialogDbCreation::s_presets = {
     { QStringLiteral(u"Archives"), { QStringLiteral(u"zip"), QStringLiteral(u"7z"), QStringLiteral(u"gz"), QStringLiteral(u"tgz"),
                                    QStringLiteral(u"tar"), QStringLiteral(u"rar"), QStringLiteral(u"img"), QStringLiteral(u"iso") }},
 
@@ -30,34 +30,33 @@ const QMap<QString, QSet<QString>> DialogDbCreation::_presets = {
                                    QStringLiteral(u"avi"), QStringLiteral(u"mpg"), QStringLiteral(u"mov") }},
 
     { QStringLiteral(u"! Triflings"), { QStringLiteral(u"log"), QStringLiteral(u"cue"), QStringLiteral(u"info"), QStringLiteral(u"inf"),
-                                        QStringLiteral(u"srt"), QStringLiteral(u"m3u"), QStringLiteral(u"bak"), QStringLiteral(u"bat"),
-                                        QStringLiteral(u"sh"), QStringLiteral(u"txt") }}
+                                        QStringLiteral(u"m3u"), QStringLiteral(u"bak"), QStringLiteral(u"bat"), QStringLiteral(u"sh") }}
 };
 
 DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList &extList, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDbCreation)
-    , workDir_(folderPath)
+    , m_workDir(folderPath)
 {
     ui->setupUi(this);
 
-    _icons.setTheme(palette());
-    setWindowIcon(_icons.icon(Icons::Database));
-    types_ = ui->treeWidget;
-    types_->setColumnWidth(ItemFileType::ColumnType, 130);
-    types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
-    types_->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
+    m_icons.setTheme(palette());
+    setWindowIcon(m_icons.icon(Icons::Database));
+    m_types = ui->treeWidget;
+    m_types->setColumnWidth(ItemFileType::ColumnType, 130);
+    m_types->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
+    m_types->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
     ui->cb_top10->setVisible(extList.count() > 15);
 
     setTotalInfo(extList);
     connections();
-    types_->setItems(extList);
+    m_types->setItems(extList);
 
     ui->tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, cb_file_filter);
-    ui->tabWidget->setTabIcon(0, _icons.icon(Icons::Filter));
-    ui->tabWidget->setTabIcon(1, _icons.icon(Icons::Configure));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(_icons.icon(FileStatus::Calculating));
+    ui->tabWidget->setTabIcon(0, m_icons.icon(Icons::Filter));
+    ui->tabWidget->setTabIcon(1, m_icons.icon(Icons::Configure));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setIcon(m_icons.icon(FileStatus::Calculating));
 
     ui->cb_flag_const->setToolTip(QStringLiteral(u"The database will contain a flag\n"
                                                  "to prevent changes from being made."));
@@ -73,9 +72,9 @@ DialogDbCreation::~DialogDbCreation()
 void DialogDbCreation::connections()
 {
     // type list
-    connect(types_, &WidgetFileTypes::customContextMenuRequested, this, &DialogDbCreation::createMenuWidgetTypes);
-    connect(types_, &QTreeWidget::itemChanged, this, &DialogDbCreation::updateFilterDisplay);
-    connect(types_, &QTreeWidget::itemDoubleClicked, this, &DialogDbCreation::activateItem);
+    connect(m_types, &WidgetFileTypes::customContextMenuRequested, this, &DialogDbCreation::createMenuWidgetTypes);
+    connect(m_types, &QTreeWidget::itemChanged, this, &DialogDbCreation::updateFilterDisplay);
+    connect(m_types, &QTreeWidget::itemDoubleClicked, this, &DialogDbCreation::activateItem);
     connect(ui->cb_top10, &QCheckBox::toggled, this, &DialogDbCreation::setItemsVisibility);
 
     // filter
@@ -99,50 +98,50 @@ void DialogDbCreation::connections()
 
 void DialogDbCreation::setSettings(Settings *settings)
 {
-    settings_ = settings;
+    m_settings = settings;
     setDbConfig();
     setFilterConfig();
 
-    if (settings_->filter_remember_exts)
+    if (m_settings->filter_remember_exts)
         restoreLastExts();
 }
 
 void DialogDbCreation::updateSettings()
 {
-    if (!settings_)
+    if (!m_settings)
         return;
 
     const QString _inpPrefix = ui->inp_db_prefix->text();
-    settings_->dbPrefix = (_inpPrefix != Lit::s_db_prefix) ? format::simplifiedChars(_inpPrefix)
+    m_settings->dbPrefix = (_inpPrefix != Lit::s_db_prefix) ? format::simplifiedChars(_inpPrefix)
                                                            : QString();
 
-    settings_->isLongExtension = ui->rb_ext_long->isChecked();
-    settings_->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
-    settings_->dbFlagConst = ui->cb_flag_const->isChecked();
+    m_settings->isLongExtension = ui->rb_ext_long->isChecked();
+    m_settings->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
+    m_settings->dbFlagConst = ui->cb_flag_const->isChecked();
 
     // filter
-    settings_->filter_editable_exts = ui->cb_editable_exts->isChecked();
-    settings_->filter_remember_exts = ui->cb_remember_exts->isChecked();
+    m_settings->filter_editable_exts = ui->cb_editable_exts->isChecked();
+    m_settings->filter_remember_exts = ui->cb_remember_exts->isChecked();
 
-    settings_->filter_mode = curFilterMode();
-    settings_->filter_last_exts = isFilterCreating() ? types_->checkedExtensions()
-                                                     : QStringList();
+    m_settings->filter_mode = curFilterMode();
+    m_settings->filter_last_exts = isFilterCreating() ? m_types->checkedExtensions()
+                                                      : QStringList();
 
     // algo
-    settings_->setAlgorithm(tools::strToAlgo(ui->cmb_algo->currentText()));
+    m_settings->setAlgorithm(tools::strToAlgo(ui->cmb_algo->currentText()));
 }
 
 void DialogDbCreation::setDbConfig()
 {
-    if (!settings_)
+    if (!m_settings)
         return;
 
-    ui->rb_ext_short->setChecked(!settings_->isLongExtension);
-    ui->cb_add_folder_name->setChecked(settings_->addWorkDirToFilename);
-    ui->cb_flag_const->setChecked(settings_->dbFlagConst);
+    ui->rb_ext_short->setChecked(!m_settings->isLongExtension);
+    ui->cb_add_folder_name->setChecked(m_settings->addWorkDirToFilename);
+    ui->cb_flag_const->setChecked(m_settings->dbFlagConst);
 
-    if (!settings_->dbPrefix.isEmpty() && (settings_->dbPrefix != Lit::s_db_prefix))
-        ui->inp_db_prefix->setText(settings_->dbPrefix);
+    if (!m_settings->dbPrefix.isEmpty() && (m_settings->dbPrefix != Lit::s_db_prefix))
+        ui->inp_db_prefix->setText(m_settings->dbPrefix);
 
     updateDbFilename();
 
@@ -153,10 +152,10 @@ void DialogDbCreation::setDbConfig()
 
 int DialogDbCreation::cmbAlgoIndex()
 {
-    if (!settings_)
+    if (!m_settings)
         return 0;
 
-    switch (settings_->algorithm()) {
+    switch (m_settings->algorithm()) {
     case QCryptographicHash::Sha1:
         return 0;
     case QCryptographicHash::Sha256:
@@ -170,18 +169,18 @@ int DialogDbCreation::cmbAlgoIndex()
 
 void DialogDbCreation::setFilterConfig()
 {
-    if (!settings_)
+    if (!m_settings)
         return;
 
-    ui->cb_editable_exts->setChecked(settings_->filter_editable_exts);
-    ui->cb_remember_exts->setChecked(settings_->filter_remember_exts);
+    ui->cb_editable_exts->setChecked(m_settings->filter_editable_exts);
+    ui->cb_remember_exts->setChecked(m_settings->filter_remember_exts);
 }
 
 void DialogDbCreation::restoreLastExts()
 {
-    if (!settings_
-        || settings_->filter_last_exts.isEmpty()
-        || settings_->filter_mode == FilterMode::NotSet)
+    if (!m_settings
+        || m_settings->filter_last_exts.isEmpty()
+        || m_settings->filter_mode == FilterMode::NotSet)
     {
         return;
     }
@@ -190,11 +189,11 @@ void DialogDbCreation::restoreLastExts()
         setFilterCreation(FC_Enabled);
     }
 
-    types_->setChecked(settings_->filter_last_exts);
+    m_types->setChecked(m_settings->filter_last_exts);
 
-    QRadioButton *_rb = (settings_->filter_mode == FilterMode::Include) ? ui->rb_include
-                                                                        : ui->rb_ignore;
-    _rb->setChecked(true);
+    QRadioButton *p_rb = (m_settings->filter_mode == FilterMode::Include) ? ui->rb_include
+                                                                          : ui->rb_ignore;
+    p_rb->setChecked(true);
 }
 
 void DialogDbCreation::parseInputedExts()
@@ -202,7 +201,7 @@ void DialogDbCreation::parseInputedExts()
     if (ui->le_exts_list->isReadOnly())
         return;
 
-    types_->setChecked(inputedExts());
+    m_types->setChecked(inputedExts());
 }
 
 QStringList DialogDbCreation::inputedExts() const
@@ -234,10 +233,10 @@ void DialogDbCreation::updateDbFilename()
 {
     const QString _inpText = ui->inp_db_prefix->text();
     const QString _prefix = _inpText.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(_inpText);
-    const QString &_folderName = ui->cb_add_folder_name->isChecked() ? workDir_ : QString(); // QStringLiteral(u"@FolderName")
+    const QString &_folderName = ui->cb_add_folder_name->isChecked() ? m_workDir : QString(); // QStringLiteral(u"@FolderName")
     const QString _ext = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
     const QString _dbFileName = format::composeDbFileName(_prefix, _folderName, _ext);
-    const QString _dbFilePath = pathstr::joinPath(workDir_, _dbFileName);
+    const QString _dbFilePath = pathstr::joinPath(m_workDir, _dbFileName);
     const bool _exists = QFileInfo::exists(_dbFilePath);
     const QString _color = _exists ? format::coloredText(true) : QString();
     const QString _toolTip = _exists ? QStringLiteral(u"The file already exists") : QStringLiteral(u"Available");
@@ -254,11 +253,11 @@ void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
     QString __s;
 
     if (isTop10Checked) {
-        types_->hideExtra();
-        __s = QStringLiteral(u"Top10: ") + format::filesNumSize(types_->numSizeVisible());
+        m_types->hideExtra();
+        __s = QStringLiteral(u"Top10: ") + format::filesNumSize(m_types->numSizeVisible());
     }
     else {
-        types_->showAllItems();
+        m_types->showAllItems();
         __s = QStringLiteral(u"Top10");
     }
 
@@ -275,7 +274,7 @@ void DialogDbCreation::setTotalInfo(const FileTypeList &exts)
 
 void DialogDbCreation::setCheckboxesVisible(bool visible)
 {
-    types_->setCheckboxesVisible(visible);
+    m_types->setCheckboxesVisible(visible);
     updateFilterDisplay();
 }
 
@@ -304,12 +303,12 @@ void DialogDbCreation::updateFilterDisplay()
     updateLabelTotalFiltered();
 
     // TMP
-    const bool isFiltered = ui->rb_include->isChecked() ? types_->hasChecked()
-                                                        : types_->hasChecked()
-                                                              && types_->itemsContain(WidgetFileTypes::UnChecked);
+    const bool isFiltered = ui->rb_include->isChecked() ? m_types->hasChecked()
+                                                        : m_types->hasChecked()
+                                                              && m_types->itemsContain(WidgetFileTypes::UnChecked);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((!isFilterCreating())
-                                                            || !types_->hasChecked()
+                                                            || !m_types->hasChecked()
                                                             || isFiltered);
 
     // !!! TMP !!!
@@ -324,7 +323,7 @@ void DialogDbCreation::updateLabelFilterExtensions()
 
     const QString  _color = format::coloredText(QStringLiteral(u"QLineEdit"), ui->rb_ignore->isChecked());
     ui->le_exts_list->setStyleSheet(_color);
-    ui->le_exts_list->setText(types_->checkedExtensions().join(Lit::s_sepCommaSpace));
+    ui->le_exts_list->setText(m_types->checkedExtensions().join(Lit::s_sepCommaSpace));
 }
 
 void DialogDbCreation::updateLabelTotalFiltered()
@@ -339,8 +338,8 @@ void DialogDbCreation::updateLabelTotalFiltered()
                                                                           : WidgetFileTypes::UnChecked;
 
     QString __s;
-    if (types_->hasChecked()) {
-        __s = QStringLiteral(u"Filtered: ") + format::filesNumSize(types_->numSize(_checkState));
+    if (m_types->hasChecked()) {
+        __s = QStringLiteral(u"Filtered: ") + format::filesNumSize(m_types->numSize(_checkState));
     }
     else {
         __s = QStringLiteral(u"No filter");
@@ -352,13 +351,13 @@ void DialogDbCreation::updateLabelTotalFiltered()
 FilterRule DialogDbCreation::resultFilter()
 {
     return FilterRule(curFilterMode(),
-                      types_->checkedExtensions());
+                      m_types->checkedExtensions());
 }
 
 void DialogDbCreation::setFilterCreation(FilterCreation mode)
 {
-    if (mode_ != mode) {
-        mode_ = mode;
+    if (m_mode != mode) {
+        m_mode = mode;
         updateViewMode();
     }
 }
@@ -376,26 +375,26 @@ void DialogDbCreation::updateViewMode()
         ui->rb_ignore->setChecked(true);
 }
 
-QIcon DialogDbCreation::presetIcon(const QString &_name) const
+QIcon DialogDbCreation::presetIcon(const QString &name) const
 {
-    if (_name.startsWith('!'))
-        return _icons.icon(Icons::ClearHistory);
+    if (name.startsWith('!'))
+        return m_icons.icon(Icons::ClearHistory);
 
-    QString _ext;
-    if (!_name.compare(QStringLiteral(u"Archives")))
-        _ext = QStringLiteral(u"zip");
-    else if (!_name.compare(QStringLiteral(u"Documents")))
-        _ext = QStringLiteral(u"docx");
-    else if (!_name.compare(QStringLiteral(u"Pictures")))
-        _ext = QStringLiteral(u"jpg");
-    else if (!_name.compare(QStringLiteral(u"Music")))
-        _ext = QStringLiteral(u"mp3");
-    else if (!_name.compare(QStringLiteral(u"Videos")))
-        _ext = QStringLiteral(u"mkv");
+    QString ext;
+    if (!name.compare(QStringLiteral(u"Archives")))
+        ext = QStringLiteral(u"zip");
+    else if (!name.compare(QStringLiteral(u"Documents")))
+        ext = QStringLiteral(u"docx");
+    else if (!name.compare(QStringLiteral(u"Pictures")))
+        ext = QStringLiteral(u"jpg");
+    else if (!name.compare(QStringLiteral(u"Music")))
+        ext = QStringLiteral(u"mp3");
+    else if (!name.compare(QStringLiteral(u"Videos")))
+        ext = QStringLiteral(u"mkv");
     else
         return QIcon();
 
-    return _icons.type_icon(_ext);
+    return m_icons.type_icon(ext);
 }
 
 void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
@@ -405,27 +404,27 @@ void DialogDbCreation::createMenuWidgetTypes(const QPoint &point)
     connect(dispMenu, &QMenu::triggered, this, &DialogDbCreation::handlePresetClicked);
 
     QMap<QString, QSet<QString>>::const_iterator it;
-    for (it = _presets.constBegin(); it != _presets.constEnd(); ++it) {
+    for (it = s_presets.constBegin(); it != s_presets.constEnd(); ++it) {
         QAction *_act = new QAction(presetIcon(it.key()), it.key(), dispMenu);
         dispMenu->addAction(_act);
     }
 
-    dispMenu->exec(types_->mapToGlobal(point));
+    dispMenu->exec(m_types->mapToGlobal(point));
 }
 
-void DialogDbCreation::handlePresetClicked(const QAction *_act)
+void DialogDbCreation::handlePresetClicked(const QAction *act)
 {
     if (!isFilterCreating()) {
         setFilterCreation(FC_Enabled);
     }
 
-    // _act->text() may contain an ampersand in some Qt versions (6.7.2 for example)
-    const QString __s = _act->toolTip();
-    types_->setChecked(_presets.value(__s));
+    // act->text() may contain an ampersand in some Qt versions (6.7.2 for example)
+    const QString __s = act->toolTip();
+    m_types->setChecked(s_presets.value(__s));
 
-    QRadioButton *_rb = __s.startsWith('!') ? ui->rb_ignore
-                                            : ui->rb_include;
-    _rb->setChecked(true);
+    QRadioButton *p_rb = __s.startsWith('!') ? ui->rb_ignore
+                                             : ui->rb_include;
+    p_rb->setChecked(true);
 }
 
 void DialogDbCreation::resetView()
@@ -441,15 +440,15 @@ void DialogDbCreation::resetView()
 
 bool DialogDbCreation::isFilterCreating() const
 {
-    return (mode_ == FC_Enabled);
+    return (m_mode == FC_Enabled);
 }
 
 void DialogDbCreation::keyPressEvent(QKeyEvent* event)
 {
     if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-        && types_->hasFocus())
+        && m_types->hasFocus())
     {
-        activateItem(types_->currentItem());
+        activateItem(m_types->currentItem());
         return;
     }
 
@@ -457,7 +456,7 @@ void DialogDbCreation::keyPressEvent(QKeyEvent* event)
         && isFilterCreating()
         && ui->tabWidget->currentIndex() == 0)
     {
-        if (types_->hasChecked())
+        if (m_types->hasChecked())
             clearChecked();
         else
             setFilterCreation(FC_Disabled);

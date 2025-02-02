@@ -27,11 +27,11 @@ private:
     QModelIndex nextRow(const QModelIndex &curIndex) const;
     QModelIndex stepForward(const QModelIndex &curIndex);
 
-    const QAbstractItemModel *modelConst_;
-    QModelIndex index_;
-    QModelIndex rootIndex_;
-    QModelIndex nextIndex_;
-    // the nextIndex_ is found in advance and used as a cache
+    const QAbstractItemModel *m_modelConst;
+    QModelIndex m_index;
+    QModelIndex m_rootIndex;
+    QModelIndex m_nextIndex;
+    // the m_nextIndex is found in advance and used as a cache
     // to avoid calling the ::stepForward twice when hasNext() called
 
     bool m_endReached = false;

@@ -29,7 +29,7 @@ public:
     FilterRule(const FilterMode filterMode, const QStringList &extensions);
 
     FilterMode mode() const;                                                            // returns m_mode
-    void setFilter(const FilterMode filterMode, const QString &extensions);
+    void setFilter(const FilterMode filterMode, const QString &extensions);             // splits the str (e.g. "txt, pdf, mkv") and sets the list
     void setFilter(const FilterMode filterMode, const QStringList &extensions);
     void clearFilter();                                                                 // sets defaults
     bool isFilter(const FilterMode filterMode) const;                                   // checks whether the specified mode is setted (m_mode == filterMode)

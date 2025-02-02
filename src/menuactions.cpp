@@ -26,7 +26,7 @@ MenuActions::MenuActions(QObject *parent)
     actionGroupSelectAlgo->addAction(actionSetAlgoSha512);
 
     menuAlgo->addActions(actionGroupSelectAlgo->actions());
-    menuCreateDigest->addActions(actionsMakeDigest);
+    menuCreateDigest->addActions(m_actionsMakeDigest);
 
     menuOpenRecent->setToolTipsVisible(true);
 
@@ -37,81 +37,81 @@ MenuActions::MenuActions(QObject *parent)
 
 MenuActions::~MenuActions()
 {
-    qDeleteAll(listOfMenus);
+    qDeleteAll(m_listOfMenus);
 }
 
 void MenuActions::setIconTheme(const QPalette &palette)
 {
-    _icons.setTheme(palette);
+    m_icons.setTheme(palette);
     setActionsIcons();
 }
 
 void MenuActions::setSettings(const Settings *settings)
 {
-    settings_ = settings;
+    m_settings = settings;
 }
 
 void MenuActions::setActionsIcons()
 {
     // MainWindow menu
-    actionChooseFolder->setIcon(_icons.icon(Icons::Folder));
-    actionOpenDatabaseFile->setIcon(_icons.icon(Icons::Database));
-    actionSave->setIcon(_icons.icon(Icons::Save));
-    actionShowFilesystem->setIcon(_icons.icon(Icons::FileSystem));
-    actionOpenDialogSettings->setIcon(_icons.icon(Icons::Configure));
+    actionChooseFolder->setIcon(m_icons.icon(Icons::Folder));
+    actionOpenDatabaseFile->setIcon(m_icons.icon(Icons::Database));
+    actionSave->setIcon(m_icons.icon(Icons::Save));
+    actionShowFilesystem->setIcon(m_icons.icon(Icons::FileSystem));
+    actionOpenDialogSettings->setIcon(m_icons.icon(Icons::Configure));
 
-    menuOpenRecent->menuAction()->setIcon(_icons.icon(Icons::Clock));
-    actionClearRecent->setIcon(_icons.icon(Icons::ClearHistory));
-    actionAbout->setIcon(_icons.icon(Icons::Info));
+    menuOpenRecent->menuAction()->setIcon(m_icons.icon(Icons::Clock));
+    actionClearRecent->setIcon(m_icons.icon(Icons::ClearHistory));
+    actionAbout->setIcon(m_icons.icon(Icons::Info));
 
     // File system View
-    actionToHome->setIcon(_icons.icon(Icons::GoHome));
-    actionStop->setIcon(_icons.icon(Icons::ProcessStop));
-    actionShowFolderContentsTypes->setIcon(_icons.icon(Icons::ChartPie));
-    actionProcessChecksumsNoFilter->setIcon(_icons.icon(Icons::Folder));
-    actionProcessChecksumsCustomFilter->setIcon(_icons.icon(Icons::FolderSync));
-    actionCheckFileByClipboardChecksum->setIcon(_icons.icon(Icons::Paste));
-    actionProcessSha_toClipboard->setIcon(_icons.icon(Icons::Copy));
-    actionOpenDatabase->setIcon(_icons.icon(Icons::Database));
-    actionCheckSumFile->setIcon(_icons.icon(Icons::Scan));
+    actionToHome->setIcon(m_icons.icon(Icons::GoHome));
+    actionStop->setIcon(m_icons.icon(Icons::ProcessStop));
+    actionShowFolderContentsTypes->setIcon(m_icons.icon(Icons::ChartPie));
+    actionProcessChecksumsNoFilter->setIcon(m_icons.icon(Icons::Folder));
+    actionProcessChecksumsCustomFilter->setIcon(m_icons.icon(Icons::FolderSync));
+    actionCheckFileByClipboardChecksum->setIcon(m_icons.icon(Icons::Paste));
+    actionProcessSha_toClipboard->setIcon(m_icons.icon(Icons::Copy));
+    actionOpenDatabase->setIcon(m_icons.icon(Icons::Database));
+    actionCheckSumFile->setIcon(m_icons.icon(Icons::Scan));
 
-    menuAlgo->menuAction()->setIcon(_icons.icon(Icons::DoubleGear));
-    menuCreateDigest->menuAction()->setIcon(_icons.icon(Icons::Save));
+    menuAlgo->menuAction()->setIcon(m_icons.icon(Icons::DoubleGear));
+    menuCreateDigest->menuAction()->setIcon(m_icons.icon(Icons::Save));
 
-    actionCopyFile->setIcon(_icons.icon(Icons::Copy));
-    actionCopyFolder->setIcon(_icons.icon(Icons::Copy));
+    actionCopyFile->setIcon(m_icons.icon(Icons::Copy));
+    actionCopyFolder->setIcon(m_icons.icon(Icons::Copy));
 
     // DB Model View
-    actionCancelBackToFS->setIcon(_icons.icon(Icons::ProcessAbort));
-    actionShowDbStatus->setIcon(_icons.icon(Icons::Database));
-    actionResetDb->setIcon(_icons.icon(Icons::Undo));
-    actionForgetChanges->setIcon(_icons.icon(Icons::Backup));
-    actionCheckCurFileFromModel->setIcon(_icons.icon(Icons::Scan));
-    actionCheckItemSubfolder->setIcon(_icons.icon(Icons::FolderSync));
-    //actionCheckAllMod->setIcon(_icons.icon(FileStatus::NotCheckedMod));
-    actionCheckAll->setIcon(_icons.icon(Icons::Start));
-    actionCopyStoredChecksum->setIcon(_icons.icon(Icons::Copy));
-    actionCopyReChecksum->setIcon(_icons.icon(Icons::Copy));
-    actionBranchMake->setIcon(_icons.icon(Icons::AddFork));
-    actionBranchOpen->setIcon(_icons.icon(Icons::Branch));
-    actionExportSum->setIcon(_icons.icon(Icons::HashFile));
+    actionCancelBackToFS->setIcon(m_icons.icon(Icons::ProcessAbort));
+    actionShowDbStatus->setIcon(m_icons.icon(Icons::Database));
+    actionResetDb->setIcon(m_icons.icon(Icons::Undo));
+    actionForgetChanges->setIcon(m_icons.icon(Icons::Backup));
+    actionCheckCurFileFromModel->setIcon(m_icons.icon(Icons::Scan));
+    actionCheckItemSubfolder->setIcon(m_icons.icon(Icons::FolderSync));
+    //actionCheckAllMod->setIcon(m_icons.icon(FileStatus::NotCheckedMod));
+    actionCheckAll->setIcon(m_icons.icon(Icons::Start));
+    actionCopyStoredChecksum->setIcon(m_icons.icon(Icons::Copy));
+    actionCopyReChecksum->setIcon(m_icons.icon(Icons::Copy));
+    actionBranchMake->setIcon(m_icons.icon(Icons::AddFork));
+    actionBranchOpen->setIcon(m_icons.icon(Icons::Branch));
+    actionExportSum->setIcon(m_icons.icon(Icons::HashFile));
 
-    actionFilterNewLost->setIcon(_icons.icon(Icons::NewFile));
-    actionFilterMismatches->setIcon(_icons.icon(Icons::DocClose));
-    actionFilterUnreadable->setIcon(_icons.icon(FileStatus::ReadError));
-    actionFilterModified->setIcon(_icons.icon(FileStatus::NotCheckedMod));
+    actionFilterNewLost->setIcon(m_icons.icon(Icons::NewFile));
+    actionFilterMismatches->setIcon(m_icons.icon(Icons::DocClose));
+    actionFilterUnreadable->setIcon(m_icons.icon(FileStatus::ReadError));
+    actionFilterModified->setIcon(m_icons.icon(FileStatus::NotCheckedMod));
 
-    actionUpdFileAdd->setIcon(_icons.icon(FileStatus::Added));
-    actionUpdFileRemove->setIcon(_icons.icon(FileStatus::Removed));
-    actionUpdFileReChecksum->setIcon(_icons.icon(FileStatus::Updated));
-    actionUpdFileImportDigest->setIcon(_icons.icon(Icons::HashFile));
-    actionUpdFilePasteDigest->setIcon(_icons.icon(Icons::Paste));
+    actionUpdFileAdd->setIcon(m_icons.icon(FileStatus::Added));
+    actionUpdFileRemove->setIcon(m_icons.icon(FileStatus::Removed));
+    actionUpdFileReChecksum->setIcon(m_icons.icon(FileStatus::Updated));
+    actionUpdFileImportDigest->setIcon(m_icons.icon(Icons::HashFile));
+    actionUpdFilePasteDigest->setIcon(m_icons.icon(Icons::Paste));
 
-    actionUpdDbAddNew->setIcon(_icons.icon(FileStatus::Added));
-    actionUpdDbClearLost->setIcon(_icons.icon(FileStatus::Removed));
-    actionUpdDbNewLost->setIcon(_icons.icon(Icons::Update));
-    actionUpdDbReChecksums->setIcon(_icons.icon(FileStatus::Updated));
-    actionUpdDbFindMoved->setIcon(_icons.icon(FileStatus::Moved));
+    actionUpdDbAddNew->setIcon(m_icons.icon(FileStatus::Added));
+    actionUpdDbClearLost->setIcon(m_icons.icon(FileStatus::Removed));
+    actionUpdDbNewLost->setIcon(m_icons.icon(Icons::Update));
+    actionUpdDbReChecksums->setIcon(m_icons.icon(FileStatus::Updated));
+    actionUpdDbFindMoved->setIcon(m_icons.icon(FileStatus::Moved));
 }
 
 void MenuActions::setShortcuts()
@@ -130,15 +130,15 @@ void MenuActions::setShortcuts()
 
 void MenuActions::populateMenuFile(QMenu *menuFile)
 {
-    menuFile->addActions(menuFileActions);
+    menuFile->addActions(m_menuFileActions);
     menuFile->insertSeparator(actionOpenDialogSettings);
     menuFile->insertMenu(actionSave, menuOpenRecent);
 }
 
 void MenuActions::updateMenuOpenRecent()
 {
-    if (settings_)
-        updateMenuOpenRecent(settings_->recentFiles);
+    if (m_settings)
+        updateMenuOpenRecent(m_settings->recentFiles);
 }
 
 void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
@@ -149,7 +149,7 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
     if (!menuOpenRecent->isEnabled())
         return;
 
-    QIcon dbIcon = _icons.icon(Icons::Database);
+    QIcon dbIcon = m_icons.icon(Icons::Database);
 
     for (const QString &recentFilePath : recentFiles) {
         if (QFileInfo::exists(recentFilePath)) {
@@ -166,7 +166,7 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
 {
     if (!menuUpdateDatabase) {
         menuUpdateDatabase = new QMenu(QStringLiteral(u"Update the Database"));
-        menuUpdateDatabase->menuAction()->setIcon(_icons.icon(Icons::Update));
+        menuUpdateDatabase->menuAction()->setIcon(m_icons.icon(Icons::Update));
 
         menuUpdateDatabase->addAction(actionUpdDbAddNew);
         menuUpdateDatabase->addAction(actionUpdDbClearLost);

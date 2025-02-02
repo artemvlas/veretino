@@ -70,10 +70,10 @@ private:
     QString svgFilePath(FileStatus status) const;
     QString svgFilePath(Icons icon) const;
 
-    Theme theme_ = Light;
-    QFileIconProvider _fsIcons;
+    Theme m_theme = Light;
+    QFileIconProvider m_fsIcons;
 
-    static const int _pix_size = 64; // default pixmap size
+    static const int s_pix_size = 64; // default pixmap size
     static const QString s_folderGeneric;
     static const QString s_folderDark;
     static const QString s_folderLight;
@@ -82,19 +82,19 @@ private:
     template<typename _Pic = QIcon, typename _Enum> // _Pic(QIcon or QPixmap); _Enum(FileStatus or enum Icons)
     _Pic cached(const _Enum _value) const
     {
-        static QHash<_Enum, _Pic> _cache;
+        static QHash<_Enum, _Pic> s_cache;
 
-        if (_cache.contains(_value)) {
-            return _cache.value(_value);
+        if (s_cache.contains(_value)) {
+            return s_cache.value(_value);
         }
         else {
-            _Pic _pic;
+            _Pic pic;
             if constexpr(std::is_same_v<_Pic, QIcon>)
-                _pic = QIcon(svgFilePath(_value));
+                pic = QIcon(svgFilePath(_value));
             else if constexpr(std::is_same_v<_Pic, QPixmap>)
-                _pic = icon(_value).pixmap(_pix_size); // 64x64
+                pic = icon(_value).pixmap(s_pix_size); // 64x64
 
-            return *_cache.insert(_value, _pic);
+            return *s_cache.insert(_value, pic);
         }
     }
 }; // class IconProvider

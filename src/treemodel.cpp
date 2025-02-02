@@ -21,17 +21,17 @@ const QVector<QVariant> TreeModel::s_rootItemData = {
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new TreeItem(s_rootItemData);
+    m_rootItem = new TreeItem(s_rootItemData);
 }
 
 TreeModel::~TreeModel()
 {
-    delete rootItem;
+    delete m_rootItem;
 }
 
 bool TreeModel::isEmpty() const
 {
-    return (rootItem->childCount() == 0);
+    return (m_rootItem->childCount() == 0);
 }
 
 void TreeModel::populate(const FileList &filesData)
@@ -57,7 +57,7 @@ bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &val
 void TreeModel::add_file(const QString &filePath, const FileValues &values)
 {
     // data preparation
-    QVector<QVariant> _tiData(rootItem->columnCount());
+    QVector<QVariant> _tiData(m_rootItem->columnCount());
     _tiData[ColumnName] = pathstr::basicName(filePath);
 
     if (values.size >= 0)
@@ -76,13 +76,13 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
 TreeItem *TreeModel::add_folder(const QString &path)
 {
     if (path.isEmpty())
-        return rootItem;
+        return m_rootItem;
 
-    if (cacheFolderItems_.contains(path)) {
-        return cacheFolderItems_.value(path);
+    if (m_cacheFolderItems.contains(path)) {
+        return m_cacheFolderItems.value(path);
     }
 
-    TreeItem *parentItem = rootItem;
+    TreeItem *parentItem = m_rootItem;
     const QStringList pathParts = path.split('/', Qt::SkipEmptyParts);
 
     for (const QString &_subFolder : pathParts) {
@@ -91,13 +91,13 @@ TreeItem *TreeModel::add_folder(const QString &path)
             parentItem = _ti;
         }
         else {
-            QVector<QVariant> _tiData(rootItem->columnCount());
+            QVector<QVariant> _tiData(m_rootItem->columnCount());
             _tiData[ColumnName] = _subFolder;
             parentItem = parentItem->addChild(_tiData);
         }
     }
 
-    cacheFolderItems_.insert(path, parentItem);
+    m_cacheFolderItems.insert(path, parentItem);
     return parentItem;
 }
 
@@ -124,7 +124,7 @@ QModelIndex TreeModel::parent(const QModelIndex &curIndex) const
     TreeItem *childItem = getItem(curIndex);
     TreeItem *parentItem = childItem ? childItem->parent() : nullptr;
 
-    if (parentItem == rootItem || !parentItem)
+    if (parentItem == m_rootItem || !parentItem)
         return QModelIndex();
 
     return createIndex(parentItem->childNumber(), 0, parentItem);
@@ -143,7 +143,7 @@ int TreeModel::rowCount(const QModelIndex &parent) const
 int TreeModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return rootItem->columnCount();
+    return m_rootItem->columnCount();
 }
 
 QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
@@ -152,13 +152,13 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
         return QVariant();
 
     if (role == Qt::DecorationRole) {
-        static IconProvider _icons;
+        static IconProvider s_icons;
         if (curIndex.column() == ColumnName) {
-            return isFileRow(curIndex) ? _icons.icon(curIndex.data().toString())
-                                       : _icons.iconFolder();
+            return isFileRow(curIndex) ? s_icons.icon(curIndex.data().toString())
+                                       : s_icons.iconFolder();
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
-            return _icons.icon(curIndex.data(RawDataRole).value<FileStatus>());
+            return s_icons.icon(curIndex.data(RawDataRole).value<FileStatus>());
         }
     }
 
@@ -183,16 +183,16 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
     if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
         return QVariant();
 
-    const QVariant _tiData = getItem(curIndex)->data(curIndex.column());
+    const QVariant tiData = getItem(curIndex)->data(curIndex.column());
 
-    if (_tiData.isValid() && role != RawDataRole) {
+    if (tiData.isValid() && role != RawDataRole) {
         if (curIndex.column() == ColumnSize)
-            return format::dataSizeReadable(_tiData.toLongLong());
+            return format::dataSizeReadable(tiData.toLongLong());
         if (curIndex.column() == ColumnStatus)
-            return format::fileItemStatus(_tiData.value<FileStatus>());
+            return format::fileItemStatus(tiData.value<FileStatus>());
     }
 
-    return _tiData;
+    return tiData;
 }
 
 bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int role)
@@ -224,7 +224,7 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &curIndex) const
 QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return rootItem->data(section);
+        return m_rootItem->data(section);
 
     return QVariant();
 }
@@ -236,21 +236,21 @@ TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
         if (item)
             return item;
     }
-    return rootItem;
+    return m_rootItem;
 }
 
 QString TreeModel::getPath(const QModelIndex &curIndex, const QModelIndex &root)
 {
     QString path;
-    QModelIndex _ind = curIndex.siblingAtColumn(ColumnName);
+    QModelIndex ind = curIndex.siblingAtColumn(ColumnName);
 
-    if (_ind.isValid()) {
-        path = _ind.data().toString();
+    if (ind.isValid()) {
+        path = ind.data().toString();
 
-        while (_ind = _ind.parent(),
-               _ind.isValid() && _ind != root)
+        while (ind = ind.parent(),
+               ind.isValid() && ind != root)
         {
-            path = pathstr::joinPath(_ind.data().toString(), path);
+            path = pathstr::joinPath(ind.data().toString(), path);
         }
     }
 
@@ -281,7 +281,7 @@ QModelIndex TreeModel::getIndex(const QString &path, const QAbstractItemModel *m
 
 void TreeModel::clearCacheFolderItems()
 {
-    cacheFolderItems_.clear();
+    m_cacheFolderItems.clear();
 }
 
 // the TreeModel implies that if an item has children,

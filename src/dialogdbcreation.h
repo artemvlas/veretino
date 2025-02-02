@@ -58,19 +58,19 @@ private:
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();
     void createMenuWidgetTypes(const QPoint &point);
-    void handlePresetClicked(const QAction *_act);
+    void handlePresetClicked(const QAction *act);
     int cmbAlgoIndex();
-    QIcon presetIcon(const QString &_name) const;
+    QIcon presetIcon(const QString &name) const;
     QStringList inputedExts() const;
     FilterMode curFilterMode() const;
 
-    FilterCreation mode_ = FC_Disabled;
-    WidgetFileTypes *types_ = nullptr;
-    Settings *settings_ = nullptr;
-    QString workDir_;
-    IconProvider _icons;
+    FilterCreation m_mode = FC_Disabled;
+    WidgetFileTypes *m_types = nullptr;
+    Settings *m_settings = nullptr;
+    QString m_workDir;
+    IconProvider m_icons;
 
-    static const QMap<QString, QSet<QString>> _presets;
+    static const QMap<QString, QSet<QString>> s_presets;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

@@ -21,12 +21,12 @@ IconProvider::IconProvider(const QPalette &palette)
 
 void IconProvider::setTheme(Theme theme)
 {
-    theme_ = theme;
+    m_theme = theme;
 }
 
 void IconProvider::setTheme(const QPalette &palette)
 {
-    theme_ = isDarkTheme(palette) ? Dark : Light;
+    m_theme = isDarkTheme(palette) ? Dark : Light;
 }
 
 bool IconProvider::isDarkTheme(const QPalette &palette) const
@@ -37,12 +37,12 @@ bool IconProvider::isDarkTheme(const QPalette &palette) const
 
 IconProvider::Theme IconProvider::theme() const
 {
-    return theme_;
+    return m_theme;
 }
 
 const QString &IconProvider::themeFolder() const
 {
-    return (theme_ == Dark) ? s_folderDark : s_folderLight;
+    return (m_theme == Dark) ? s_folderDark : s_folderLight;
 }
 
 QString IconProvider::svgFilePath(FileStatus status) const
@@ -218,7 +218,7 @@ QIcon IconProvider::icon(Icons themeIcon) const
 
 QIcon IconProvider::icon(const QString &file) const
 {
-    return _fsIcons.icon(QFileInfo(file));
+    return m_fsIcons.icon(QFileInfo(file));
 }
 
 QIcon IconProvider::type_icon(const QString &suffix) const
@@ -228,7 +228,7 @@ QIcon IconProvider::type_icon(const QString &suffix) const
 
 QIcon IconProvider::iconFolder() const
 {
-    return _fsIcons.icon(QFileIconProvider::Folder);
+    return m_fsIcons.icon(QFileIconProvider::Folder);
 }
 
 QIcon IconProvider::appIcon()
@@ -239,7 +239,7 @@ QIcon IconProvider::appIcon()
 
 QPixmap IconProvider::pixmap(FileStatus status, int size) const
 {
-    if (size != _pix_size)
+    if (size != s_pix_size)
         return icon(status).pixmap(size);
 
     return cached<QPixmap>(status);
@@ -247,7 +247,7 @@ QPixmap IconProvider::pixmap(FileStatus status, int size) const
 
 QPixmap IconProvider::pixmap(Icons themeIcon, int size) const
 {
-    if (size != _pix_size)
+    if (size != s_pix_size)
         return icon(themeIcon).pixmap(size);
 
     return cached<QPixmap>(themeIcon);

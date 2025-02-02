@@ -49,13 +49,13 @@ struct Chunks {
     bool decreaseTotal(T by_size) { if (remain() < by_size) return false; _total -= by_size; return true; }
     bool hasSet() const { return _total > 0; }
     bool hasChunks() const { return _done > 0; }
-    void addChunks(T number) { _done += number; } // same as P <<
-    void addChunk() { ++_done; } // same as ++P
+    void addChunks(T number) { _done += number; }                              // same as P <<
+    void addChunk() { ++_done; }                                               // same as ++P
     void reset() { setTotal(0); }
     Chunks& operator<<(T done_num) { _done += done_num; return *this; }
-    Chunks& operator++() { ++_done; return *this; } // prefix
-    Chunks  operator++(int) { Chunks _res(*this); ++(*this); return _res; } // postfix
-    explicit operator bool() const { return _total > 0; } // same as hasSet()
+    Chunks& operator++() { ++_done; return *this; }                            // prefix
+    Chunks  operator++(int) { Chunks _res(*this); ++(*this); return _res; }    // postfix
+    explicit operator bool() const { return _total > 0; }                      // same as hasSet()
 
     // values
     T _total = 0;

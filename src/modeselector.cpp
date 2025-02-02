@@ -560,7 +560,7 @@ void ModeSelector::makeFolderContentsFilter(const QString &folderPath)
     p_manager->addTask(&Manager::folderContentsList, folderPath, true);
 }
 
-void ModeSelector::_makeDbContentsList()
+void ModeSelector::makeDbContList()
 {
     if (!p_proc->isStarted() && p_view->isViewDatabase()) {
         p_manager->addTask(&Manager::makeDbContentsList);
