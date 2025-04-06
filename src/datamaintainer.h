@@ -40,28 +40,40 @@ public:
     void moveNumbers(const FileStatus before, const FileStatus after);
     void setDbFileState(DbFileState state);
 
-    int folderBasedData(FileStatus fileStatus = FileStatus::New);                         // iterate the 'm_data->metaData.workDir' folder and add the finded files to the m_data->m_model
+    // iterate the 'm_data->metaData.workDir' folder and add the finded files to the m_data->m_model
+    int folderBasedData(FileStatus fileStatus = FileStatus::New);
 
-    bool updateChecksum(const QModelIndex &fileRowIndex,                                  // returns 'true' if Added or Matched. returns false if Mismatched
+    // returns 'true' if Added or Matched. returns false if Mismatched
+    bool updateChecksum(const QModelIndex &fileRowIndex,
                         const QString &computedChecksum);
 
     bool importChecksum(const QModelIndex &file,
                         const QString &checksum);
 
-    int changeStatuses(const FileStatuses statuses,                                       // changes the status of all items with <statuses> to the <newStatus>
+    // changes the status of all items with <statuses> to the <newStatus>
+    int changeStatuses(const FileStatuses statuses,
                        const FileStatus newStatus,
                        const QModelIndex &rootIndex = QModelIndex());
 
-    int addToQueue(const FileStatuses statuses,                                           // changes items status from <statuses> to FileStatus::Queued
+    // changes items status from <statuses> to FileStatus::Queued
+    int addToQueue(const FileStatuses statuses,
                    const QModelIndex &rootIndex = QModelIndex());
 
-    void clearChecksum(const QModelIndex &fileIndex);                                     // clears stored checksum string, single file item
-    int clearChecksums(const FileStatuses statuses,                                       // ... for all items with given statuses, returns done number
+    // clears stored checksum string, single file item
+    void clearChecksum(const QModelIndex &fileIndex);
+
+    // ... for all items with given statuses, returns done number
+    int clearChecksums(const FileStatuses statuses,
                        const QModelIndex &rootIndex = QModelIndex());
 
-    int clearLostFiles();                                                                 // clears the stored checksums of the Missing/Lost items, returns the done number
-    int updateMismatchedChecksums();                                                      // move ReChecksum --> Checksum
-    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);        // rolls back file statuses when canceling an operation
+    // clears the stored checksums of the Missing/Lost items, returns the done number
+    int clearLostFiles();
+
+    // move ReChecksum --> Checksum
+    int updateMismatchedChecksums();
+
+    // rolls back file statuses when canceling an operation
+    void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
@@ -76,10 +88,11 @@ public:
 
     bool isDataNotSaved() const;
 
-    QString itemContentsInfo(const QModelIndex &curIndex);                                 // file: "filename (size)"; folder: contents (availability, size etc.)
+    // file: "filename (size)"; folder: contents (availability, size etc.)
+    QString itemContentsInfo(const QModelIndex &curIndex);
 
     // variables
-    DataContainer *m_data = nullptr;                                                       // main data
+    DataContainer *m_data = nullptr; // main data
 
 public slots:
     void clearData();
@@ -95,7 +108,8 @@ private:
     bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
     QString findWorkDir(const VerJson &json) const;
 
-    DataContainer *m_oldData = nullptr; // backup for the duration of m_data setup, should be deleted after setting the m_data to View
+    // backup for the duration of m_data setup, should be deleted after setting the m_data to View
+    DataContainer *m_oldData = nullptr;
     const ProcState *m_proc = nullptr;
 
     bool m_considerFileModDate;

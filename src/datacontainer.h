@@ -17,11 +17,11 @@ class TreeModel;
 
 struct MetaData {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
-    QString workDir;               // current working folder
-    QString dbFilePath;            // path to the db file
+    QString workDir;      // current working folder
+    QString dbFilePath;   // path to the db file
 
-    FilterRule filter;             // file filtering rules for the current database
-    VerDateTime datetime;          // time stamps: date and time of creation, update, verification
+    FilterRule filter;    // file filtering rules for the current database
+    VerDateTime datetime; // time stamps: date and time of creation, update, verification
 
     enum DbFileState : quint8 { NoFile, Created, NotSaved, Saved };
     DbFileState dbFileState = NoFile;
@@ -41,16 +41,26 @@ public:
     explicit DataContainer(const MetaData &meta, TreeModel *data, QObject *parent = nullptr);
     ~DataContainer();
 
-    void setData();                                                                 // clears the current data models, sets the new empty ones
+    // clears the current data models, sets the new empty ones
+    void setData();
     void setData(const MetaData &meta, TreeModel *data);
     bool hasData() const;
-    void clearData();                                                               // deletes data models and clears m_numbers
+
+    // deletes data models and clears m_numbers
+    void clearData();
 
     QString databaseFileName() const;
     QString backupFilePath() const;
-    QString itemAbsolutePath(const QModelIndex &curIndex) const;                    // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
-    QString branch_path_existing(const QModelIndex &subfolder);                     // returns the path to the found Branch, an empty string if not found; caches the result
-    QString branch_path_composed(const QModelIndex &subfolder) const;               // returns the composed path regardless of the file's existence
+
+    // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
+    QString itemAbsolutePath(const QModelIndex &curIndex) const;
+
+    // returns the path to the found Branch, an empty string if not found; caches the result
+    QString branch_path_existing(const QModelIndex &subfolder);
+
+    // returns the composed path regardless of the file's existence
+    QString branch_path_composed(const QModelIndex &subfolder) const;
+
     QString digestFilePath(const QModelIndex &fileIndex) const;
 
     bool isDbFileState(DbFileState state) const;
@@ -62,8 +72,12 @@ public:
     bool isAllMatched(const QModelIndex &subfolder = QModelIndex()) const;
     bool isAllMatched(const Numbers &nums) const;
     bool isInCreation() const;
-    bool isImmutable() const;                                                        // has FlagConst
-    bool hasPossiblyMovedItems() const;                                              // has New and Missing
+
+    // has FlagConst
+    bool isImmutable() const;
+
+    // has New and Missing
+    bool hasPossiblyMovedItems() const;
 
     bool isBackupExists() const;
     bool makeBackup(bool forceOverwrite = false) const;
@@ -76,7 +90,7 @@ public:
                               const QModelIndex &rootIndex = QModelIndex());
 
     // DATA
-    TreeModel *m_model = nullptr;                                                     // main data
+    TreeModel *m_model = nullptr;  // main data
     ProxyModel *m_proxy = nullptr;
     MetaData m_metadata;
     Numbers m_numbers;

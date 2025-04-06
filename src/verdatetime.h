@@ -14,20 +14,28 @@ public:
     VerDateTime(const QString &str);
     explicit operator bool() const;
 
-    enum DT { Created, Updated, Verified };                             // DateVerified == (all files exist and match the checksums)
+    // Verified means all files exist and match the checksums
+    enum DT { Created, Updated, Verified };
 
-    const QString& value(DT type) const;                                // ref to m_created || m_updated || m_verified
+    // ref to m_created || m_updated || m_verified
+    const QString& value(DT type) const;
 
     void set(DT type, const QString &value);
-    void set(const QString &str);                                       // finds type and sets value
+
+    // finds type and sets value
+    void set(const QString &str);
     void update(DT type);
 
-    QString toString(bool keep_empty_values = true) const;              // joins stored values into a single string
-    QString basicDate() const;                                          // the date until which files are considered unmodified
+    // joins stored values into a single string
+    QString toString(bool keep_empty_values = true) const;
 
-    static QString current(DT type);                                    // returns current dt string, e.g. "Created: 2023/11/09 17:45"
+    // the date until which files are considered unmodified
+    QString basicDate() const;
 
-    // values
+    // returns current dt string, e.g. "Created: 2023/11/09 17:45"
+    static QString current(DT type);
+
+    // -- VALUES --
     QString m_created, m_updated, m_verified;
 }; // class VerDateTime
 

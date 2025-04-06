@@ -18,16 +18,20 @@ public:
     void setTotalSize(qint64 totalSize);
     void changeTotalSize(qint64 totalSize);
     bool decreaseTotalSize(qint64 by_size);
-    bool decreaseTotalQueued(int by_num = 1); // decreases the total number of elements in the queue [_p_queue] by number
-    void addDoneOne(); // increases the number of finished pieces from the queue by one
+
+    // decreases the total number of elements in the queue [_p_queue] by number
+    bool decreaseTotalQueued(int by_num = 1);
+
+    // increases the number of finished pieces from the queue by one
+    void addDoneOne();
 
     enum State {
         Idle = 1 << 0,
         StartSilently = 1 << 1,
-        StartVerbose = 1 << 2, // set processing view (enable progress bar, change view model, etc...)
+        StartVerbose = 1 << 2,                  // set processing view (enable progress bar, change view model, etc...)
         Started = StartSilently | StartVerbose,
-        Stop = 1 << 3, // stops the current operation, it is assumed that the list of done things will be saved
-        Abort = 1 << 4, // interrupts the process, an immediate exit is expected (switching to the file system)
+        Stop = 1 << 3,                          // stops the current operation, it is assumed that the list of done things will be saved
+        Abort = 1 << 4,                         // interrupts the process, an immediate exit is expected (switching to the file system)
         Canceled = Stop | Abort
     };
     Q_ENUM(State)
@@ -40,8 +44,12 @@ public:
     bool isCanceled() const;
     bool hasTotalSize() const;
 
-    qint64 doneSize() const; // returns the total size of the processed data
-    qint64 donePieceSize() const; // returns the size of the data processed since the previous function call
+    // returns the total size of the processed data
+    qint64 doneSize() const;
+
+    // returns the size of the data processed since the previous function call
+    qint64 donePieceSize() const;
+
     qint64 remainingSize() const;
     Chunks<qint64> pSize() const;
     Chunks<int> pQueue() const;

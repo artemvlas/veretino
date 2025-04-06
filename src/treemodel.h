@@ -37,13 +37,22 @@ public:
 
     bool isEmpty() const;
     void add_file(const QString &filePath, const FileValues &values);
-    bool add_file_unforced(const QString &filePath, const FileValues &values); // checks for presence first; much slower for large lists
+
+    // checks for presence first; much slower for large lists
+    bool add_file_unforced(const QString &filePath, const FileValues &values);
     void populate(const FileList &filesData);
 
-    static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex()); // build path by current index data
-    static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model); // find index of specified 'path'
-    static bool isFileRow(const QModelIndex &curIndex); // whether the row of curIndex corresponds to a file(true) or (folder(false) || invalid(false))
-    static bool isFolderRow(const QModelIndex &curIndex); // same^, but folder(true); (file(false) || invalid(false))
+    // build path by current index data
+    static QString getPath(const QModelIndex &curIndex, const QModelIndex &root = QModelIndex());
+
+    // find index of specified 'path'
+    static QModelIndex getIndex(const QString &path, const QAbstractItemModel *model);
+
+    // whether the row of curIndex corresponds to a file(true) or (folder(false) || invalid(false))
+    static bool isFileRow(const QModelIndex &curIndex);
+
+    // same^, but folder(true); (file(false) || invalid(false))
+    static bool isFolderRow(const QModelIndex &curIndex);
     static bool hasChecksum(const QModelIndex &fileIndex);
     static bool hasReChecksum(const QModelIndex &fileIndex);
     static bool hasStatus(const FileStatuses flag, const QModelIndex &fileIndex);

@@ -378,21 +378,21 @@ void MainWindow::dialogSettings()
 
 void MainWindow::dialogChooseFolder()
 {
-    const QString _path = QFileDialog::getExistingDirectory(this, QString(), QDir::homePath());
+    const QString path = QFileDialog::getExistingDirectory(this, QString(), QDir::homePath());
 
-    if (!_path.isEmpty()) {
-        modeSelect->showFileSystem(_path);
+    if (!path.isEmpty()) {
+        modeSelect->showFileSystem(path);
     }
 }
 
 void MainWindow::dialogOpenJson()
 {
-    const QString _path = QFileDialog::getOpenFileName(this, "Select Veretino Database",
-                                                       QDir::homePath(),
-                                                       "Veretino DB (*.ver *.ver.json)");
+    const QString path = QFileDialog::getOpenFileName(this, "Select Veretino Database",
+                                                      QDir::homePath(),
+                                                      "Veretino DB (*.ver *.ver.json)");
 
-    if (!_path.isEmpty()) {
-        modeSelect->openJsonDatabase(_path);
+    if (!path.isEmpty()) {
+        modeSelect->openJsonDatabase(path);
     }
 }
 
@@ -546,11 +546,11 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        QString _s_add = data->isAllMatched() ? QStringLiteral(u"✓ verified")
+        QString strAdd = data->isAllMatched() ? QStringLiteral(u"✓ verified")
                                               : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
 
-        const QString _s = tools::joinStrings(Lit::s_appName, _s_add, Lit::s_sepStick);
-        setWindowTitle(_s);
+        const QString strTitle = tools::joinStrings(Lit::s_appName, strAdd, Lit::s_sepStick);
+        setWindowTitle(strTitle);
     }
     else {
         setWindowTitle(Lit::s_appName);
@@ -578,10 +578,10 @@ void MainWindow::handleChangedModel()
 void MainWindow::handleButtonDbHashClick()
 {
     if (!proc_->isStarted() && ui->view->isViewDatabase()) {
-        const Numbers &_nums = ui->view->m_data->m_numbers;
-        if (_nums.contains(FileStatus::CombChecked))
+        const Numbers &nums = ui->view->m_data->m_numbers;
+        if (nums.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
-        else if (_nums.contains(FileStatus::CombDbChanged))
+        else if (nums.contains(FileStatus::CombDbChanged))
             showDbStatusTab(DialogDbStatus::TabChanges);
         else
             showMessage("There are no checked items yet.", "Unchecked DB");
@@ -631,19 +631,19 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWindow::dropEvent(QDropEvent *event)
 {
-    const QString _path = event->mimeData()->urls().first().toLocalFile();
+    const QString path = event->mimeData()->urls().first().toLocalFile();
 
-    if (QFileInfo::exists(_path)) {
-        if (paths::isDbFile(_path)) {
-            modeSelect->openJsonDatabase(_path);
+    if (QFileInfo::exists(path)) {
+        if (paths::isDbFile(path)) {
+            modeSelect->openJsonDatabase(path);
         }
         else {
-            modeSelect->showFileSystem(_path);
+            modeSelect->showFileSystem(path);
         }
     }
 }
 
-void MainWindow::keyPressEvent(QKeyEvent* event)
+void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape) {
         // Idle DB
