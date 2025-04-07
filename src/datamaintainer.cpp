@@ -91,13 +91,16 @@ void DataMaintainer::setConsiderDateModified(bool consider)
 
 void DataMaintainer::updateDateTime()
 {
-    if (m_data) {
-        if (m_data->isDbFileState(DbFileState::NoFile)) {
-            m_data->m_metadata.datetime.update(VerDateTime::Created);
-        }
-        else if (m_data->contains(FileStatus::CombDbChanged)) {
-            m_data->m_metadata.datetime.update(VerDateTime::Updated);
-        }
+    if (!m_data)
+        return;
+
+    VerDateTime &dt = m_data->m_metadata.datetime;
+
+    if (m_data->isDbFileState(DbFileState::NoFile)) {
+        dt.update(VerDateTime::Created);
+    }
+    else if (m_data->contains(FileStatus::CombDbChanged)) {
+        dt.update(VerDateTime::Updated);
     }
 }
 
