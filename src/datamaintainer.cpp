@@ -21,7 +21,7 @@ DataMaintainer::DataMaintainer(DataContainer *initData, QObject *parent)
     : QObject(parent)
 {
     connections();
-    setSourceData(initData);
+    setData(initData);
 }
 
 void DataMaintainer::connections()
@@ -35,17 +35,17 @@ void DataMaintainer::setProcState(const ProcState *procState)
     m_proc = procState;
 }
 
-void DataMaintainer::setSourceData()
+void DataMaintainer::setData()
 {
-    setSourceData(new DataContainer(this));
+    setData(new DataContainer(this));
 }
 
-void DataMaintainer::setSourceData(const MetaData &meta)
+void DataMaintainer::setData(const MetaData &meta, TreeModel *dataModel)
 {
-    setSourceData(new DataContainer(meta, this));
+    setData(new DataContainer(meta, dataModel, this));
 }
 
-bool DataMaintainer::setSourceData(DataContainer *sourceData)
+bool DataMaintainer::setData(DataContainer *sourceData)
 {
     if (sourceData) {
         clearOldData();
@@ -112,14 +112,14 @@ void DataMaintainer::updateVerifDateTime()
     }
 }
 
-// create data model based on the WorkDir contents
-int DataMaintainer::folderBasedData(const MetaData &meta, FileStatus fileStatus)
+// iterate the 'metaData.workDir' folder and add files to the data model
+int DataMaintainer::setFolderBasedData(const MetaData &meta, FileStatus fileStatus)
 {
     const QString &workDir = meta.workDir;
     const FilterRule &filter = meta.filter;
 
     if (!QFileInfo(workDir).isDir()) {
-        qWarning() << "DM::folderBasedData | Wrong path:" << workDir;
+        qWarning() << "DM::setFolderBasedData | Wrong path:" << workDir;
         return 0;
     }
 
@@ -152,7 +152,7 @@ int DataMaintainer::folderBasedData(const MetaData &meta, FileStatus fileStatus)
     }
 
     if (isCanceled() || numAdded == 0) {
-        qDebug() << "DM::folderBasedData | Canceled/No items:" << workDir;
+        qDebug() << "DM::setFolderBasedData | Canceled/No items:" << workDir;
         emit setStatusbarText();
         emit failedDataCreation();
         delete model;
@@ -161,7 +161,7 @@ int DataMaintainer::folderBasedData(const MetaData &meta, FileStatus fileStatus)
 
     model->clearCacheFolderItems();
 
-    setSourceData(new DataContainer(meta, model));
+    setData(meta, model);
 
     return numAdded;
 }
@@ -605,7 +605,8 @@ bool DataMaintainer::importJson(const QString &filePath)
     }
 
     // setting the parsed data
-    return setSourceData(new DataContainer(meta, model));
+    setData(meta, model);
+    return true;
 }
 
 // returns the path to the file if the write was successful, otherwise an empty string

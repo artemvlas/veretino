@@ -21,9 +21,14 @@ public:
 
     // functions() --->>
     void setProcState(const ProcState *procState);
-    void setSourceData();
-    void setSourceData(const MetaData &meta);
-    bool setSourceData(DataContainer *sourceData);
+    void setData();
+    void setData(const MetaData &meta, TreeModel *dataModel);
+    bool setData(DataContainer *sourceData);
+
+    // create data model based on the meta.WorkDir contents
+    // returns the number of added files; sets fileStatus for adding items
+    int setFolderBasedData(const MetaData &meta, FileStatus fileStatus);
+
     bool setItemValue(const QModelIndex &fileIndex,
                       Column column,
                       const QVariant &value = QVariant());
@@ -39,9 +44,6 @@ public:
                        const qint64 size = 0);
     void moveNumbers(const FileStatus before, const FileStatus after);
     void setDbFileState(DbFileState state);
-
-    // iterate the 'metaData.workDir' folder and add files to the data model; fileStatus for added items
-    int folderBasedData(const MetaData &meta, FileStatus fileStatus);
 
     // returns 'true' if Added or Matched. returns false if Mismatched
     bool updateChecksum(const QModelIndex &fileRowIndex,
