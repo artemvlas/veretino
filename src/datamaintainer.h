@@ -40,8 +40,8 @@ public:
     void moveNumbers(const FileStatus before, const FileStatus after);
     void setDbFileState(DbFileState state);
 
-    // iterate the 'm_data->metaData.workDir' folder and add the finded files to the m_data->m_model
-    int folderBasedData(FileStatus fileStatus = FileStatus::New);
+    // iterate the 'metaData.workDir' folder and add files to the data model; fileStatus for added items
+    int folderBasedData(const MetaData &meta, FileStatus fileStatus);
 
     // returns 'true' if Added or Matched. returns false if Mismatched
     bool updateChecksum(const QModelIndex &fileRowIndex,

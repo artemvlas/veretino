@@ -73,10 +73,8 @@ void Manager::processFolderSha(const MetaData &metaData)
         return;
     }
 
-    m_dataMaintainer->setSourceData(metaData);
-
     // create the filelist
-    if (!m_dataMaintainer->folderBasedData(FileStatus::Queued)) {
+    if (!m_dataMaintainer->folderBasedData(metaData, FileStatus::Queued)) {
         return;
     }
 

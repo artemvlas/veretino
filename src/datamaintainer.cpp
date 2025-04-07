@@ -109,23 +109,21 @@ void DataMaintainer::updateVerifDateTime()
     }
 }
 
-// adds the WorkDir contents to the m_data->m_model
-int DataMaintainer::folderBasedData(FileStatus fileStatus)
+// create data model based on the WorkDir contents
+int DataMaintainer::folderBasedData(const MetaData &meta, FileStatus fileStatus)
 {
-    if (!m_data)
-        return 0;
-
-    const QString &workDir = m_data->m_metadata.workDir;
-    const FilterRule &filter = m_data->m_metadata.filter;
+    const QString &workDir = meta.workDir;
+    const FilterRule &filter = meta.filter;
 
     if (!QFileInfo(workDir).isDir()) {
-        qDebug() << "DM::folderBasedData | Wrong path:" << workDir;
+        qWarning() << "DM::folderBasedData | Wrong path:" << workDir;
         return 0;
     }
 
     emit setStatusbarText(QStringLiteral(u"Creating a list of files..."));
 
     int numAdded = 0;
+    TreeModel *model = new TreeModel;
 
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
@@ -145,7 +143,7 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
             const FileValues &values = isReadable ? FileValues(fileStatus, it.fileInfo().size())
                                                   : FileValues(FileStatus::UnPermitted);
 
-            m_data->m_model->add_file(relPath, values);
+            model->add_file(relPath, values);
             ++numAdded;
         }
     }
@@ -154,14 +152,14 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
         qDebug() << "DM::folderBasedData | Canceled/No items:" << workDir;
         emit setStatusbarText();
         emit failedDataCreation();
-        clearData();
+        delete model;
         return 0;
     }
 
-    //if (numAdded > 0)
-    updateNumbers();
+    model->clearCacheFolderItems();
 
-    m_data->m_model->clearCacheFolderItems();
+    setSourceData(new DataContainer(meta, model));
+
     return numAdded;
 }
 
