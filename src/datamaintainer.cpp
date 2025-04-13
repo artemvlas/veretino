@@ -21,7 +21,7 @@ DataMaintainer::DataMaintainer(DataContainer *initData, QObject *parent)
     : QObject(parent)
 {
     connections();
-    setSourceData(initData);
+    setData(initData);
 }
 
 void DataMaintainer::connections()
@@ -35,17 +35,17 @@ void DataMaintainer::setProcState(const ProcState *procState)
     m_proc = procState;
 }
 
-void DataMaintainer::setSourceData()
+void DataMaintainer::setData()
 {
-    setSourceData(new DataContainer(this));
+    setData(new DataContainer(this));
 }
 
-void DataMaintainer::setSourceData(const MetaData &meta)
+void DataMaintainer::setData(const MetaData &meta, TreeModel *dataModel)
 {
-    setSourceData(new DataContainer(meta, this));
+    setData(new DataContainer(meta, dataModel, this));
 }
 
-bool DataMaintainer::setSourceData(DataContainer *sourceData)
+bool DataMaintainer::setData(DataContainer *sourceData)
 {
     if (sourceData) {
         clearOldData();
@@ -91,13 +91,16 @@ void DataMaintainer::setConsiderDateModified(bool consider)
 
 void DataMaintainer::updateDateTime()
 {
-    if (m_data) {
-        if (m_data->isDbFileState(DbFileState::NoFile)) {
-            m_data->m_metadata.datetime.update(VerDateTime::Created);
-        }
-        else if (m_data->contains(FileStatus::CombDbChanged)) {
-            m_data->m_metadata.datetime.update(VerDateTime::Updated);
-        }
+    if (!m_data)
+        return;
+
+    VerDateTime &dt = m_data->m_metadata.datetime;
+
+    if (m_data->isDbFileState(DbFileState::NoFile)) {
+        dt.update(VerDateTime::Created);
+    }
+    else if (m_data->contains(FileStatus::CombDbChanged)) {
+        dt.update(VerDateTime::Updated);
     }
 }
 
@@ -109,23 +112,21 @@ void DataMaintainer::updateVerifDateTime()
     }
 }
 
-// adds the WorkDir contents to the m_data->m_model
-int DataMaintainer::folderBasedData(FileStatus fileStatus)
+// iterate the 'metaData.workDir' folder and add files to the data model
+int DataMaintainer::setFolderBasedData(const MetaData &meta, FileStatus fileStatus)
 {
-    if (!m_data)
-        return 0;
-
-    const QString &workDir = m_data->m_metadata.workDir;
-    const FilterRule &filter = m_data->m_metadata.filter;
+    const QString &workDir = meta.workDir;
+    const FilterRule &filter = meta.filter;
 
     if (!QFileInfo(workDir).isDir()) {
-        qDebug() << "DM::folderBasedData | Wrong path:" << workDir;
+        qWarning() << "DM::setFolderBasedData | Wrong path:" << workDir;
         return 0;
     }
 
     emit setStatusbarText(QStringLiteral(u"Creating a list of files..."));
 
     int numAdded = 0;
+    TreeModel *model = new TreeModel;
 
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
@@ -145,23 +146,23 @@ int DataMaintainer::folderBasedData(FileStatus fileStatus)
             const FileValues &values = isReadable ? FileValues(fileStatus, it.fileInfo().size())
                                                   : FileValues(FileStatus::UnPermitted);
 
-            m_data->m_model->add_file(relPath, values);
+            model->add_file(relPath, values);
             ++numAdded;
         }
     }
 
     if (isCanceled() || numAdded == 0) {
-        qDebug() << "DM::folderBasedData | Canceled/No items:" << workDir;
+        qDebug() << "DM::setFolderBasedData | Canceled/No items:" << workDir;
         emit setStatusbarText();
         emit failedDataCreation();
-        clearData();
+        delete model;
         return 0;
     }
 
-    //if (numAdded > 0)
-    updateNumbers();
+    model->clearCacheFolderItems();
 
-    m_data->m_model->clearCacheFolderItems();
+    setData(meta, model);
+
     return numAdded;
 }
 
@@ -604,7 +605,8 @@ bool DataMaintainer::importJson(const QString &filePath)
     }
 
     // setting the parsed data
-    return setSourceData(new DataContainer(meta, model));
+    setData(meta, model);
+    return true;
 }
 
 // returns the path to the file if the write was successful, otherwise an empty string

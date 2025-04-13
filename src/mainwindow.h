@@ -37,13 +37,18 @@ public slots:
     // dialogs
     void showDbStatus();
     void showDbStatusTab(DialogDbStatus::Tabs tab);
+
+    // view folder contents
     void showDialogContentsList(const QString &folderName,
-                                const FileTypeList &extList);   // view folder contents
+                                const FileTypeList &extList);
+
     void showDialogDbCreation(const QString &folder,
                               const QStringList &dbFiles,
                               const FileTypeList &extList);
+
+    // view DB contents
     void showDialogDbContents(const QString &folderName,
-                              const FileTypeList &extList);     // view DB contents
+                              const FileTypeList &extList);
     void dialogSettings();
     void dialogChooseFolder();
     void dialogOpenJson();
@@ -81,7 +86,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
-    void keyPressEvent(QKeyEvent* event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 }; // class MainWindow
 
 #endif // MAINWINDOW_H

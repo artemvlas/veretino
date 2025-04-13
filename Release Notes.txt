@@ -1,3 +1,6 @@
+Veretino 0.6.1
+Compatibility with older OS, such as Ubuntu 22.04, has been implemented.
+
 Veretino 0.6.0
 What's new:
 * Improved database storage format. Now files with the *.ver extension are compressed.

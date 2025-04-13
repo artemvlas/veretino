@@ -89,11 +89,16 @@ public slots:
     void restoreDatabase();
     void saveData();
     void prepareSwitchToFs();
-
-    void getPathInfo(const QString &path);                                                           // info about file (size) or folder contents
-    void getIndexInfo(const QModelIndex &curIndex);                                                  // info about database item (the file or subfolder index)
-    void modelChanged(ModelView modelView);                                                          // recive the signal when Model has been changed
     void makeDbContentsList();
+
+    // info about file (size) or folder contents
+    void getPathInfo(const QString &path);
+
+    // info about database item (the file or subfolder index)
+    void getIndexInfo(const QModelIndex &curIndex);
+
+    // recive the signal when Model has been changed
+    void modelChanged(ModelView modelView);
 
     // checking the list of files against the checksums stored in the database
     void verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus);
@@ -147,8 +152,12 @@ private:
     const QString k_movedDbWarning = QStringLiteral(u"The database file may have been moved or refers to an inaccessible location.");
 
 signals:
-    void setStatusbarText(const QString &text = QString());                                       // sends the 'text' to statusbar
-    void setViewData(DataContainer *data = nullptr);                                              // sends the data (models) to the tree View
+    // sends the 'text' to statusbar
+    void setStatusbarText(const QString &text = QString());
+
+    // sends the data (models) to the tree View
+    void setViewData(DataContainer *data = nullptr);
+
     void folderContentsListCreated(const QString &folderPath, const FileTypeList &extList);
     void dbCreationDataCollected(const QString &folderPath, const QStringList &dbFiles, const FileTypeList &extList);
     void dbContentsListCreated(const QString &folderPath, const FileTypeList &extList);
