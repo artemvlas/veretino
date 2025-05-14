@@ -791,42 +791,47 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
         return QString();
 
     if (TreeModel::isFileRow(curIndex)) {
-        const QString _fileName = TreeModel::itemName(curIndex);
-        const QVariant _fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
+        const QString fileName = TreeModel::itemName(curIndex);
+        const QVariant fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
 
-        if (_fileSize.isValid()) {
-            return format::addStrInParentheses(_fileName,
-                                               format::dataSizeReadable(_fileSize.toLongLong()));
+        if (fileSize.isValid()) {
+            return format::addStrInParentheses(fileName,
+                                               format::dataSizeReadable(fileSize.toLongLong()));
         }
 
-        return _fileName;
+        return fileName;
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        const Numbers &_num = m_data->getNumbers(curIndex);
-        QStringList _sl;
+        const Numbers &num = m_data->getNumbers(curIndex);
+        QStringList sl;
 
-        const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
-        if (_n_avail) {
-            _sl << QStringLiteral(u"Avail.: ") + format::filesNumSize(_n_avail);
+        const NumSize n_avail = num.values(FileStatus::CombAvailable);
+        if (n_avail) {
+            sl << QStringLiteral(u"Avail.: ") + format::filesNumSize(n_avail);
         }
 
-        const NumSize _n_new = _num.values(FileStatus::New);
-        if (_n_new) {
-            _sl << QStringLiteral(u"New: ") + format::filesNumSize(_n_new);
+        const NumSize n_new = num.values(FileStatus::New);
+        if (n_new) {
+            sl << QStringLiteral(u"New: ") + format::filesNumSize(n_new);
         }
 
-        const NumSize _n_missing = _num.values(FileStatus::Missing);
-        if (_n_missing) {
-            _sl << tools::joinStrings(QStringLiteral(u"Missing:"), _n_missing._num);
+        const NumSize n_missing = num.values(FileStatus::Missing);
+        if (n_missing) {
+            sl << tools::joinStrings(QStringLiteral(u"Missing:"), n_missing._num);
         }
 
-        const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
-        if (_n_unr) {
-            _sl << tools::joinStrings(QStringLiteral(u"Unread.:"), _n_unr._num);
+        const NumSize n_removed = num.values(FileStatus::Removed);
+        if (n_removed) {
+            sl << tools::joinStrings(QStringLiteral(u"Removed:"), n_removed._num);
         }
 
-        return _sl.join(QStringLiteral(u"; "));
+        const NumSize n_unr = num.values(FileStatus::CombUnreadable);
+        if (n_unr) {
+            sl << tools::joinStrings(QStringLiteral(u"Unread.:"), n_unr._num);
+        }
+
+        return sl.join(QStringLiteral(u"; "));
     }
 
     return QString();
