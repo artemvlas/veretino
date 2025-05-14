@@ -804,34 +804,34 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
         const Numbers &num = m_data->getNumbers(curIndex);
+
+        QList<FileStatus> statuses = num.statuses();
+
+        std::sort(statuses.begin(), statuses.end(),
+                  [&num](const FileStatus &t1, const FileStatus &t2) {
+            return num.values(t1) > num.values(t2);
+        }
+        );
+
         QStringList sl;
 
-        const NumSize n_avail = num.values(FileStatus::CombAvailable);
-        if (n_avail) {
-            sl << QStringLiteral(u"Avail.: ") + format::filesNumSize(n_avail);
+        for (const FileStatus status : statuses) {
+            if (status == FileStatus::MovedOut && statuses.contains(FileStatus::Moved))
+                continue;
+
+            const QString statusName = format::fileItemStatus(status);
+            const NumSize numSize = num.values(status);
+            QString str;
+
+            if (numSize._size > 0)
+                str = tools::joinStrings(statusName, format::filesNumSize(numSize), Lit::s_sepColonSpace);
+            else
+                str = tools::joinStrings(statusName, numSize._num);
+
+            sl << str;
         }
 
-        const NumSize n_new = num.values(FileStatus::New);
-        if (n_new) {
-            sl << QStringLiteral(u"New: ") + format::filesNumSize(n_new);
-        }
-
-        const NumSize n_missing = num.values(FileStatus::Missing);
-        if (n_missing) {
-            sl << tools::joinStrings(QStringLiteral(u"Missing:"), n_missing._num);
-        }
-
-        const NumSize n_removed = num.values(FileStatus::Removed);
-        if (n_removed) {
-            sl << tools::joinStrings(QStringLiteral(u"Removed:"), n_removed._num);
-        }
-
-        const NumSize n_unr = num.values(FileStatus::CombUnreadable);
-        if (n_unr) {
-            sl << tools::joinStrings(QStringLiteral(u"Unread.:"), n_unr._num);
-        }
-
-        return sl.join(QStringLiteral(u"; "));
+        return sl.join(Lit::s_sepCommaSpace);
     }
 
     return QString();

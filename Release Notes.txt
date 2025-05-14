@@ -1,3 +1,8 @@
+Veretino 0.6.2
+* Improved display of the subfolder content statuses.
+* The names of some item statuses are simplified.
+
+---
 Veretino 0.6.1
 Compatibility with older OS, such as Ubuntu 22.04, has been implemented.
 

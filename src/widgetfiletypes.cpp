@@ -92,26 +92,26 @@ void WidgetFileTypes::setCheckboxesVisible(bool visible)
 
 QList<ItemFileType*> WidgetFileTypes::items(CheckState state) const
 {
-    QList<ItemFileType*> _res;
+    QList<ItemFileType*> res;
 
     for (ItemFileType *_item : std::as_const(m_items)) {
         if (isPassed(state, _item))
-            _res.append(_item);
+            res.append(_item);
     }
 
-    return _res;
+    return res;
 }
 
 QStringList WidgetFileTypes::checkedExtensions() const
 {
-    QStringList _exts;
-    const QList<ItemFileType*> _checked_items = items(Checked);
+    QStringList exts;
+    const QList<ItemFileType*> checked_items = items(Checked);
 
-    for (const ItemFileType *_item : _checked_items) {
-        _exts.append(_item->extension());
+    for (const ItemFileType *_item : checked_items) {
+        exts.append(_item->extension());
     }
 
-    return _exts;
+    return exts;
 }
 
 bool WidgetFileTypes::isPassedChecked(const ItemFileType *item) const
@@ -172,28 +172,28 @@ void WidgetFileTypes::hideExtra(int max_visible)
 
 NumSize WidgetFileTypes::numSizeVisible() const
 {
-    NumSize _res;
+    NumSize res;
 
     for (int i = 0; i < topLevelItemCount(); ++i) {
         const ItemFileType *_item = static_cast<ItemFileType*>(topLevelItem(i));
         if (!_item->isHidden()) {
-            _res += _item->numSize();
+            res += _item->numSize();
         }
     }
 
-    return _res;
+    return res;
 }
 
 NumSize WidgetFileTypes::numSize(CheckState chk_state) const
 {
     const QList<ItemFileType*> itemList = items(chk_state);
-    NumSize _res;
+    NumSize res;
 
     for (const ItemFileType *_item : itemList) {
-        _res += _item->numSize();
+        res += _item->numSize();
     }
 
-    return _res;
+    return res;
 }
 
 void WidgetFileTypes::setChecked(const QStringList &exts)

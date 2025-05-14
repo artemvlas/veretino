@@ -85,15 +85,15 @@ qint64 Numbers::totalSize(const FileStatuses flag) const
 
 NumSize Numbers::values(const FileStatuses flag) const
 {
-    NumSize _res;
+    NumSize res;
     QHash<FileStatus, NumSize>::const_iterator it;
 
     for (it = _val.constBegin(); it != _val.constEnd(); ++it) {
         if (it.key() & flag)
-            _res += it.value();
+            res += it.value();
     }
 
-    return _res;
+    return res;
 }
 
 const QList<FileStatus> Numbers::statuses() const

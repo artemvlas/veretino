@@ -192,8 +192,8 @@ QString joinStrings(const QString &str1, const QString &str2, QChar sep)
     const bool s2Starts = str2.startsWith(sep);
 
     if (s1Ends && s2Starts) {
-        QStringView _chopped = QStringView(str1).left(str1.size() - 1);
-        return _chopped % str2;
+        QStringView chopped = QStringView(str1).left(str1.size() - 1);
+        return chopped % str2;
     }
 
     if (s1Ends || s2Starts)
@@ -470,11 +470,11 @@ QString fileItemStatus(FileStatus status)
     case FileStatus::Queued: return QStringLiteral(u"queued");
     case FileStatus::Calculating: return QStringLiteral(u"calculating...");
     case FileStatus::Verifying: return QStringLiteral(u"verifying...");
-    case FileStatus::NotChecked: return QStringLiteral(u"ready...");
-    case FileStatus::NotCheckedMod: return QStringLiteral(u"ready... (modif.)");
+    case FileStatus::NotChecked: return QStringLiteral(u"ready");
+    case FileStatus::NotCheckedMod: return QStringLiteral(u"ready (modif.)");
     case FileStatus::Matched: return QStringLiteral(u"match");
     case FileStatus::Mismatched: return QStringLiteral(u"not match");
-    case FileStatus::New: return QStringLiteral(u"new file");
+    case FileStatus::New: return QStringLiteral(u"new");
     case FileStatus::Missing: return QStringLiteral(u"missing");
     case FileStatus::Added: return QStringLiteral(u"added");
     case FileStatus::Removed: return QStringLiteral(u"removed");
