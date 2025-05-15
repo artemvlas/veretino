@@ -9,7 +9,6 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "treemodeliterator.h"
-#include "treemodel.h"
 
 Files::Files(QObject *parent)
     : QObject(parent)
@@ -59,7 +58,7 @@ FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
         const QString fullPath = it.next();
         const QString relPath = pathstr::relativePath(rootFolder, fullPath);
 
-        if (filter.isFileAllowed(relPath)) {
+        if (filter.isAllowed(relPath)) {
             FileStatus status = it.fileInfo().isReadable() ? FileStatus::NotSet
                                                            : FileStatus::UnPermitted;
 
@@ -104,7 +103,7 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 
     QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        if (filter.isFileAllowed(it.next())) {
+        if (filter.isAllowed(it.next())) {
             return false;
         }
     }

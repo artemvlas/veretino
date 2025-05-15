@@ -134,7 +134,7 @@ int DataMaintainer::setFolderBasedData(const MetaData &meta, FileStatus fileStat
         const QString fullPath = it.next();
         const QString relPath = pathstr::relativePath(workDir, fullPath);
 
-        if (filter.isFileAllowed(relPath)) {
+        if (filter.isAllowed(relPath)) {
             const bool isReadable = it.fileInfo().isReadable();
 
             if (!isReadable && filter.hasAttribute(FilterAttribute::IgnoreUnpermitted)
@@ -551,15 +551,14 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString fullPath = it.next();
-        const QString relPath = pathstr::relativePath(workDir, fullPath);
+        const QString relPath = pathstr::relativePath(workDir, it.next());
+        const QFileInfo &fi = it.fileInfo();
 
-        if (meta.filter.isFileAllowed(relPath)
+        if (meta.filter.isAllowed(fi)
             && !filelistData.contains(relPath)
-            && !unrCache.contains(relPath)
-            && it.fileInfo().isReadable())
+            && !unrCache.contains(relPath))
         {
-            model->add_file(relPath, FileValues(FileStatus::New, it.fileInfo().size()));
+            model->add_file(relPath, FileValues(FileStatus::New, fi.size()));
         }
     }
 

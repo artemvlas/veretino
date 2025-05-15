@@ -6,6 +6,7 @@
 #ifndef FILTERRULE_H
 #define FILTERRULE_H
 #include <QStringList>
+#include <QFileInfo>
 
 class FilterRule
 {
@@ -45,7 +46,11 @@ public:
     bool isEnabled() const;
 
     // whether the file extension matches the filter rules
-    bool isFileAllowed(const QString &filePath) const;
+    bool isAllowed(const QString &filePath) const;
+
+    // whether the file attributes (e.g. read permissions, symlink...)
+    // as well as the file extension matches the filter rules
+    bool isAllowed(const QFileInfo &fi) const;
 
     // creates a string listing the elements of a list (m_extensions)
     QString extensionString(const QString &sep = QStringLiteral(u", ")) const;
@@ -65,6 +70,9 @@ public:
 
     // checks if the flag is set
     bool hasAttribute(FilterAttribute attr) const;
+
+    // whether the file (fi) attributes (e.g. symlink, read permissions...) are allowed
+    bool hasAllowedAttributes(const QFileInfo &fi) const;
 
     explicit operator bool() const { return isEnabled(); }
 
