@@ -26,7 +26,7 @@ public:
     bool setData(DataContainer *sourceData);
 
     // create data model based on the meta.WorkDir contents
-    // returns the number of added files; sets fileStatus for adding items
+    // returns the number of added files; sets fileStatus for the items
     int setFolderBasedData(const MetaData &meta, FileStatus fileStatus);
 
     bool setItemValue(const QModelIndex &fileIndex,

@@ -133,18 +133,11 @@ int DataMaintainer::setFolderBasedData(const MetaData &meta, FileStatus fileStat
     while (it.hasNext() && !isCanceled()) {
         const QString fullPath = it.next();
         const QString relPath = pathstr::relativePath(workDir, fullPath);
+        const QFileInfo &fi = it.fileInfo();
 
-        if (filter.isFileAllowed(relPath)) {
-            const bool isReadable = it.fileInfo().isReadable();
-
-            if (!isReadable && filter.hasAttribute(FilterAttribute::IgnoreUnpermitted)
-                || filter.hasAttribute(FilterAttribute::IgnoreSymlinks) && it.fileInfo().isSymLink())
-            {
-                continue;
-            }
-
-            const FileValues &values = isReadable ? FileValues(fileStatus, it.fileInfo().size())
-                                                  : FileValues(FileStatus::UnPermitted);
+        if (filter.isAllowed(fi)) {
+            const FileValues &values = fi.isReadable() ? FileValues(fileStatus, fi.size())
+                                                       : FileValues(FileStatus::UnPermitted);
 
             model->add_file(relPath, values);
             ++numAdded;
@@ -551,15 +544,14 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &
     QDirIterator it(workDir, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
-        const QString fullPath = it.next();
-        const QString relPath = pathstr::relativePath(workDir, fullPath);
+        const QString relPath = pathstr::relativePath(workDir, it.next());
+        const QFileInfo &fi = it.fileInfo();
 
-        if (meta.filter.isFileAllowed(relPath)
+        if (meta.filter.isAllowed(fi)
             && !filelistData.contains(relPath)
-            && !unrCache.contains(relPath)
-            && it.fileInfo().isReadable())
+            && !unrCache.contains(relPath))
         {
-            model->add_file(relPath, FileValues(FileStatus::New, it.fileInfo().size()));
+            model->add_file(relPath, FileValues(FileStatus::New, fi.size()));
         }
     }
 
@@ -791,42 +783,47 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
         return QString();
 
     if (TreeModel::isFileRow(curIndex)) {
-        const QString _fileName = TreeModel::itemName(curIndex);
-        const QVariant _fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
+        const QString fileName = TreeModel::itemName(curIndex);
+        const QVariant fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
 
-        if (_fileSize.isValid()) {
-            return format::addStrInParentheses(_fileName,
-                                               format::dataSizeReadable(_fileSize.toLongLong()));
+        if (fileSize.isValid()) {
+            return format::addStrInParentheses(fileName,
+                                               format::dataSizeReadable(fileSize.toLongLong()));
         }
 
-        return _fileName;
+        return fileName;
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        const Numbers &_num = m_data->getNumbers(curIndex);
-        QStringList _sl;
+        const Numbers &num = m_data->getNumbers(curIndex);
 
-        const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
-        if (_n_avail) {
-            _sl << QStringLiteral(u"Avail.: ") + format::filesNumSize(_n_avail);
+        QList<FileStatus> statuses = num.statuses();
+
+        std::sort(statuses.begin(), statuses.end(),
+                  [&num](const FileStatus &t1, const FileStatus &t2) {
+            return num.values(t1) > num.values(t2);
+        }
+        );
+
+        QStringList sl;
+
+        for (const FileStatus status : statuses) {
+            if (status == FileStatus::MovedOut && statuses.contains(FileStatus::Moved))
+                continue;
+
+            const QString statusName = format::fileItemStatus(status);
+            const NumSize numSize = num.values(status);
+            QString str;
+
+            if (numSize._size > 0)
+                str = tools::joinStrings(statusName, format::filesNumSize(numSize), Lit::s_sepColonSpace);
+            else
+                str = tools::joinStrings(statusName, numSize._num);
+
+            sl << str;
         }
 
-        const NumSize _n_new = _num.values(FileStatus::New);
-        if (_n_new) {
-            _sl << QStringLiteral(u"New: ") + format::filesNumSize(_n_new);
-        }
-
-        const NumSize _n_missing = _num.values(FileStatus::Missing);
-        if (_n_missing) {
-            _sl << tools::joinStrings(QStringLiteral(u"Missing:"), _n_missing._num);
-        }
-
-        const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
-        if (_n_unr) {
-            _sl << tools::joinStrings(QStringLiteral(u"Unread.:"), _n_unr._num);
-        }
-
-        return _sl.join(QStringLiteral(u"; "));
+        return sl.join(Lit::s_sepCommaSpace);
     }
 
     return QString();

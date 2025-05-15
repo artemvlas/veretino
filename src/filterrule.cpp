@@ -39,8 +39,6 @@ void FilterRule::clearFilter()
 {
     m_mode = NotSet;
     m_extensions.clear();
-    //ignoreShaFiles = true;
-    //ignoreDbFiles = true;
     setAttributes(IgnoreAllPointless);
 }
 
@@ -54,13 +52,13 @@ bool FilterRule::isEnabled() const
     return !isFilter(NotSet);
 }
 
-bool FilterRule::isFileAllowed(const QString &filePath) const
+bool FilterRule::isAllowed(const QString &filePath) const
 {
     if (!isFilter(Include)) {
         if (paths::isDbFile(filePath))
-            return !hasAttribute(IgnoreDbFiles); //!ignoreDbFiles;
+            return !hasAttribute(IgnoreDbFiles);
         if (paths::isDigestFile(filePath))
-            return !hasAttribute(IgnoreDigestFiles); //!ignoreShaFiles;
+            return !hasAttribute(IgnoreDigestFiles);
     }
 
     if (isFilter(NotSet))
@@ -70,6 +68,11 @@ bool FilterRule::isFileAllowed(const QString &filePath) const
     // if 'isFilter(Ignore)': than all files except these types are allowed
 
     return pathstr::hasExtension(filePath, m_extensions) ? isFilter(Include) : isFilter(Ignore);
+}
+
+bool FilterRule::isAllowed(const QFileInfo &fi) const
+{
+    return hasAllowedAttributes(fi) && isAllowed(fi.fileName());
 }
 
 QString FilterRule::extensionString(const QString &sep) const
@@ -100,4 +103,10 @@ void FilterRule::removeAttribute(FilterAttribute attr)
 bool FilterRule::hasAttribute(FilterAttribute attr) const
 {
     return attr & m_attributes;
+}
+
+bool FilterRule::hasAllowedAttributes(const QFileInfo &fi) const
+{
+    return !(hasAttribute(IgnoreUnpermitted) && !fi.isReadable()
+             || hasAttribute(IgnoreSymlinks) && fi.isSymLink());
 }

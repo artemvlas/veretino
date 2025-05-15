@@ -24,15 +24,20 @@ public:
     qint64 totalSize(const FileStatuses flag) const;
     NumSize values(const FileStatuses flag) const;
 
-    bool changeStatus(const FileStatus before,                         // assigns new status to numbers
+    // assigns new status to numbers
+    bool changeStatus(const FileStatus before,
                       const FileStatus after);
 
-    bool changeStatus(const NumSize &nums,                             // moves the specified value to a new status
+    // moves the specified value to a new status
+    bool changeStatus(const NumSize &nums,
                       const FileStatus before,
                       const FileStatus after);
 
-    const QList<FileStatus> statuses() const;                          // returns a list of available statuses
-    void clear();                                                      // clears the _val
+    // returns a list of available statuses
+    const QList<FileStatus> statuses() const;
+
+    // clears the _val
+    void clear();
 
 private:
     // { FileStatus : number of corresponding files, total size }

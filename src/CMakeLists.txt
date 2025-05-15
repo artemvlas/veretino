@@ -1,4 +1,5 @@
 include_directories(pathstr)
+add_subdirectory(pathstr)
 
 set(PROJECT_SOURCES
     # HEADERS
@@ -37,7 +38,6 @@ set(PROJECT_SOURCES
     verjson.h
     view.h
     widgetfiletypes.h
-    pathstr/pathstr.h
 
     # SOURCES
     clickablelabel.cpp
@@ -75,7 +75,6 @@ set(PROJECT_SOURCES
     verjson.cpp
     view.cpp
     widgetfiletypes.cpp
-    pathstr/pathstr.cpp
 
     # FORMS
     dialogabout.ui
@@ -111,6 +110,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Svg
     qmicroz
+    pathstr
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

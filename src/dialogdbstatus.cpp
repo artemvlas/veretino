@@ -208,22 +208,22 @@ QStringList DialogDbStatus::infoVerification()
 
 QStringList DialogDbStatus::infoChanges()
 {
-    const Numbers &_numb = data_->m_numbers;
+    const Numbers &numb = data_->m_numbers;
     QStringList result;
 
     // This list is used instead of Numbers::statuses() to order the strings
     static const QList<FileStatus> _statuses { FileStatus::Moved, FileStatus::Added, FileStatus::Removed,
                                                FileStatus::Updated, FileStatus::Imported };
 
-    static const FileStatuses _flag_numsize = (FileStatus::Added | FileStatus::Moved); // for these the size will be shown
+    static const FileStatuses flag_numsize = (FileStatus::Added | FileStatus::Moved); // for these the size will be shown
 
-    for (const FileStatus _st : _statuses) {
-        const NumSize _ns = _numb.values(_st);
-        if (_ns) {
-            const QString _str = (_st & _flag_numsize) ? format::filesNumSize(_ns)
-                                                       : QString::number(_ns._num);
+    for (const FileStatus st : _statuses) {
+        const NumSize ns = numb.values(st);
+        if (ns) {
+            const QString str = (st & flag_numsize) ? format::filesNumSize(ns)
+                                                    : QString::number(ns._num);
 
-            result << tools::joinStrings(tools::enumToString(_st), _str, Lit::s_sepColonSpace);
+            result << tools::joinStrings(tools::enumToString(st), str, Lit::s_sepColonSpace);
         }
     }
 
