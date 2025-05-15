@@ -133,18 +133,11 @@ int DataMaintainer::setFolderBasedData(const MetaData &meta, FileStatus fileStat
     while (it.hasNext() && !isCanceled()) {
         const QString fullPath = it.next();
         const QString relPath = pathstr::relativePath(workDir, fullPath);
+        const QFileInfo &fi = it.fileInfo();
 
-        if (filter.isAllowed(relPath)) {
-            const bool isReadable = it.fileInfo().isReadable();
-
-            if (!isReadable && filter.hasAttribute(FilterAttribute::IgnoreUnpermitted)
-                || filter.hasAttribute(FilterAttribute::IgnoreSymlinks) && it.fileInfo().isSymLink())
-            {
-                continue;
-            }
-
-            const FileValues &values = isReadable ? FileValues(fileStatus, it.fileInfo().size())
-                                                  : FileValues(FileStatus::UnPermitted);
+        if (filter.isAllowed(fi)) {
+            const FileValues &values = fi.isReadable() ? FileValues(fileStatus, fi.size())
+                                                       : FileValues(FileStatus::UnPermitted);
 
             model->add_file(relPath, values);
             ++numAdded;
