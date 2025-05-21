@@ -11,6 +11,7 @@
 class LineEdit : public QLineEdit
 {
     Q_OBJECT
+
 public:
     explicit LineEdit(QWidget *parent = nullptr);
 
@@ -25,7 +26,8 @@ private:
     int _delay_s_edited = 500;
 
 signals:
-    void edited(const QString &text); // more gentle than QLineEdit::textEdited
+    // more gentle than QLineEdit::textEdited
+    void edited(const QString &text);
 }; // class LineEdit
 
 #endif // LINEEDIT_H

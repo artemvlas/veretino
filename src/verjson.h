@@ -14,6 +14,7 @@
 class VerJson : public QObject
 {
     Q_OBJECT
+
 public:
     explicit VerJson(QObject *parent = nullptr);
     explicit VerJson(const QString &filePath, QObject *parent = nullptr);

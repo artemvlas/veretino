@@ -79,8 +79,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             ui->view->setModel(nullptr);
 
         event->accept();
-    }
-    else {
+    } else {
         event->ignore();
     }
 }
@@ -237,9 +236,9 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     clearDialogs();
 
     if (!dbFiles.isEmpty()) {
-        DialogExistingDbs _dialog(dbFiles, this);
-        if (_dialog.exec() && !_dialog.curFile().isEmpty()) {
-            modeSelect->openJsonDatabase(pathstr::joinPath(folder, _dialog.curFile()));
+        DialogExistingDbs dlg(dbFiles, this);
+        if (dlg.exec() && !dlg.curFile().isEmpty()) {
+            modeSelect->openJsonDatabase(pathstr::joinPath(folder, dlg.curFile()));
             return;
         }
     }
@@ -252,9 +251,9 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         return;
     }
 
-    const FilterRule _filter = dialog.resultFilter();
-    if (_filter || !dialog.isFilterCreating()) {
-        modeSelect->processFolderChecksums(_filter);
+    const FilterRule filterRule = dialog.resultFilter();
+    if (filterRule || !dialog.isFilterCreating()) {
+        modeSelect->processFolderChecksums(filterRule);
     }
     else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
@@ -267,7 +266,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         msgBox.button(QMessageBox::Yes)->setText("Continue");
 
         if (msgBox.exec() == QMessageBox::Yes)
-            modeSelect->processFolderChecksums(_filter);
+            modeSelect->processFolderChecksums(filterRule);
     }
 }
 
@@ -296,8 +295,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
     if (result.contains(FileStatus::Mismatched)) {
         if (modeSelect->isDbConst()) {
             msgBox.setStandardButtons(QMessageBox::Cancel);
-        }
-        else {
+        } else {
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
             msgBox.button(QMessageBox::Ok)->setText("Update");
             msgBox.button(QMessageBox::Ok)->setIcon(modeSelect->m_icons.icon(FileStatus::Updated));
@@ -307,32 +305,31 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         msgBox.button(QMessageBox::Cancel)->setText("Continue");
         msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
 
-        const int _n_mismatch = result.numberOf(FileStatus::Mismatched);
+        const int n_mismatch = result.numberOf(FileStatus::Mismatched);
         messageText.append(QString("%1 out of %2 files %3 changed or corrupted.")
-                            .arg(_n_mismatch)
+                            .arg(n_mismatch)
                             .arg(result.numberOf(FileStatus::CombMatched | FileStatus::Mismatched)) // was before: FileStatus::CombAvailable
-                            .arg(_n_mismatch == 1 ? "is" : "are"));
+                            .arg(n_mismatch == 1 ? "is" : "are"));
 
-        const int _n_notchecked = result.numberOf(FileStatus::CombNotChecked);
-        if (_n_notchecked) {
+        const int n_notchecked = result.numberOf(FileStatus::CombNotChecked);
+        if (n_notchecked) {
             messageText.append("\n\n");
-            messageText.append(format::filesNumber(_n_notchecked)
+            messageText.append(format::filesNumber(n_notchecked)
                                + " remain unchecked.");
         }
-    }
-    else {
+    } else {
         messageText.append(QString("ALL %1 files passed verification.")
                             .arg(result.numberOf(FileStatus::CombMatched)));
     }
 
-    FileStatus _st_icon = result.contains(FileStatus::Mismatched) ? FileStatus::Mismatched
-                                                                  : FileStatus::Matched;
+    FileStatus st_icon = result.contains(FileStatus::Mismatched) ? FileStatus::Mismatched
+                                                                 : FileStatus::Matched;
 
-    msgBox.setIconPixmap(modeSelect->m_icons.pixmap(_st_icon));
+    msgBox.setIconPixmap(modeSelect->m_icons.pixmap(st_icon));
     msgBox.setWindowTitle(titleText);
     msgBox.setText(messageText);
 
-    int ret = msgBox.exec();
+    const int ret = msgBox.exec();
 
     if (!modeSelect->isDbConst()
         && result.contains(FileStatus::Mismatched)
@@ -441,19 +438,19 @@ void MainWindow::dialogSaveJson(VerJson *p_unsaved)
         return;
     }
 
-    QString _file_path = p_unsaved->file_path();
+    QString file_path = p_unsaved->file_path();
 
-    const bool _is_short = pathstr::hasExtension(_file_path, Lit::sl_db_exts.at(1));
-    const QString _ext = Lit::sl_db_exts.at(_is_short); // index 0 is long, 1 is short
-    const QString _str_filter = QStringLiteral(u"Veretino DB (*.%1)").arg(_ext);
+    const bool is_short = pathstr::hasExtension(file_path, Lit::sl_db_exts.at(1));
+    const QString ext = Lit::sl_db_exts.at(is_short); // index 0 is long, 1 is short
+    const QString str_filter = QStringLiteral(u"Veretino DB (*.%1)").arg(ext);
 
     while (true) {
-        const QString _sel_path = QFileDialog::getSaveFileName(this,
-                                                               QStringLiteral(u"Save DB File"),
-                                                               _file_path,
-                                                               _str_filter);
+        const QString sel_path = QFileDialog::getSaveFileName(this,
+                                                              QStringLiteral(u"Save DB File"),
+                                                              file_path,
+                                                              str_filter);
 
-        if (_sel_path.isEmpty()) { // canceled
+        if (sel_path.isEmpty()) { // canceled
             if (awaiting_closure
                 && QMessageBox::question(this, "Unsaved data...",
                                          "Exit without saving data?") != QMessageBox::Yes)
@@ -464,19 +461,19 @@ void MainWindow::dialogSaveJson(VerJson *p_unsaved)
             break;
         }
 
-        _file_path = _sel_path;
+        file_path = sel_path;
 
-        if (!pathstr::hasExtension(_file_path, _ext))
-            _file_path = pathstr::setSuffix(_file_path, _ext);
+        if (!pathstr::hasExtension(file_path, ext))
+            file_path = pathstr::setSuffix(file_path, ext);
 
-        p_unsaved->setFilePath(_file_path);
+        p_unsaved->setFilePath(file_path);
 
         if (manager->m_dataMaintainer->saveJsonFile(p_unsaved))
             break;
     }
 
     delete p_unsaved;
-    qDebug() << "dialogSaveJson:" << _file_path;
+    qDebug() << "dialogSaveJson:" << file_path;
 
     if (awaiting_closure)
         close();
@@ -493,7 +490,7 @@ void MainWindow::updateMenuActions()
 {
     modeSelect->m_menuAct->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
     modeSelect->m_menuAct->actionSave->setEnabled(ui->view->isViewDatabase()
-                                                 && ui->view->m_data->isDbFileState(DbFileState::NotSaved));
+                                                  && ui->view->m_data->isDbFileState(DbFileState::NotSaved));
 }
 
 void MainWindow::updateStatusIcon()
@@ -636,8 +633,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     if (QFileInfo::exists(path)) {
         if (paths::isDbFile(path)) {
             modeSelect->openJsonDatabase(path);
-        }
-        else {
+        } else {
             modeSelect->showFileSystem(path);
         }
     }

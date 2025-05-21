@@ -30,9 +30,10 @@ private:
     const QAbstractItemModel *m_modelConst;
     QModelIndex m_index;
     QModelIndex m_rootIndex;
-    QModelIndex m_nextIndex;
+
     // the m_nextIndex is found in advance and used as a cache
     // to avoid calling the ::stepForward twice when hasNext() called
+    QModelIndex m_nextIndex;
 
     bool m_endReached = false;
 }; // class TreeModelIterator

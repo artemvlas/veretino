@@ -10,7 +10,6 @@
 #include <QKeyEvent>
 #include <QCheckBox>
 #include "iconprovider.h"
-#include "itemfiletype.h"
 #include "files.h"
 #include "settings.h"
 #include "widgetfiletypes.h"

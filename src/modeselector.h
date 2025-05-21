@@ -14,6 +14,7 @@
 class ModeSelector : public QObject
 {
     Q_OBJECT
+
 public:
     explicit ModeSelector(View *view, Settings *settings, QObject *parent = nullptr);
 
@@ -47,7 +48,7 @@ public:
     QString getButtonToolTip();
     QIcon getButtonIcon();
 
-    // tasks execution
+    /*** tasks execution ***/
     void quickAction();
     void doWork();
     void processChecksumsNoFilter();
@@ -59,7 +60,8 @@ public:
     void importBranch();
     void makeDbContList();
 
-    void resetDatabase();                                                                   // reopening and reparsing current database
+    // reopening and reparsing current database
+    void resetDatabase();
     void restoreDatabase();
     void updateDatabase(const DbMod task);
     void processFileSha(const QString &path,
@@ -77,7 +79,7 @@ public:
 
     void saveData();
 
-    // prompts
+    /*** prompts ***/
     bool promptProcessStop();
     bool promptProcessAbort();
     bool overwriteDbPrompt();
@@ -115,8 +117,11 @@ private:
     void createContextMenu_ViewFs(const QPoint &point);
     void createContextMenu_ViewDb(const QPoint &point);
 
-    QString copiedDigest() const;                                                            // returns the digest string if there is one on the clipboard
-    QString copiedDigest(QCryptographicHash::Algorithm algo) const;                          // additionally checks whether the length matches the algorithm
+    // returns the digest string if there is one on the clipboard
+    QString copiedDigest() const;
+
+    // additionally checks whether the length matches the algorithm
+    QString copiedDigest(QCryptographicHash::Algorithm algo) const;
 
     View *p_view;
     Settings *p_settings;

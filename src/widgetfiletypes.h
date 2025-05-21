@@ -8,7 +8,6 @@
 
 #include <QTreeWidget>
 #include "files.h"
-#include "tools.h"
 #include "iconprovider.h"
 #include "itemfiletype.h"
 
