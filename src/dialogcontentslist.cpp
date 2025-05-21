@@ -74,19 +74,29 @@ void DialogContentsList::setItemsVisibility(bool isTop10Checked)
 
 void DialogContentsList::updateSelectInfo()
 {
-    const QList<QTreeWidgetItem *> _selected = ui->types_->selectedItems();
-    ui->f_selected_info->setVisible(_selected.size() > 1);
+    const QList<QTreeWidgetItem *> selected = ui->types_->selectedItems();
+    ui->f_selected_info->setVisible(selected.size() > 1);
 
     if (!ui->f_selected_info->isVisible())
         return;
 
-    NumSize _n_sel;
+    NumSize n_sel;
 
-    for (QTreeWidgetItem *_it : _selected) {
-        const ItemFileType *_item = static_cast<ItemFileType *>(_it);
-        _n_sel += _item->numSize();
+    for (QTreeWidgetItem *itm : selected) {
+        const ItemFileType *item = static_cast<ItemFileType *>(itm);
+        n_sel += item->numSize();
     }
 
-    ui->l_selected->setText(format::filesNumSize(_n_sel));
-    ui->l_unselected->setText(format::filesNumSize(_n_total - _n_sel));
+    ui->l_selected->setText(format::filesNumSize(n_sel));
+
+    const NumSize n_unsel = _n_total - n_sel;
+    const bool hasUnsel = (bool)n_unsel;
+
+    // hide 'unselected' label if no items
+    ui->l_unselected->setVisible(hasUnsel);
+    ui->l_sep->setVisible(hasUnsel);
+
+    if (hasUnsel) {
+        ui->l_unselected->setText(format::filesNumSize(n_unsel));
+    }
 }
