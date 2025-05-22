@@ -9,8 +9,6 @@
 #include <QDialog>
 #include <QKeyEvent>
 #include "files.h"
-#include "iconprovider.h"
-#include "itemfiletype.h"
 
 namespace Ui {
 class DialogContentsList;

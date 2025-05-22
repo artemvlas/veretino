@@ -35,7 +35,7 @@ public:
     // returns current dt string, e.g. "Created: 2023/11/09 17:45"
     static QString current(DT type);
 
-    // -- VALUES --
+    /*** VALUES ***/
     QString m_created, m_updated, m_verified;
 }; // class VerDateTime
 

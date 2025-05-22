@@ -4,6 +4,7 @@
  * https://github.com/artemvlas/veretino
 */
 #include "widgetfiletypes.h"
+#include "tools.h"
 
 WidgetFileTypes::WidgetFileTypes(QWidget *parent)
     : QTreeWidget(parent)
@@ -28,31 +29,31 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
     if (!extList.m_combined.isEmpty()) {
         QHash<FilterAttribute, NumSize>::const_iterator it;
         for (it = extList.m_combined.constBegin(); it != extList.m_combined.constEnd(); ++it) {
-            QIcon _icon;
-            QString _type;
+            QIcon icn;
+            QString type;
 
             switch (it.key()) {
             case FilterAttribute::IgnoreDbFiles:
-                _icon = m_icons.icon(Icons::Database);
-                _type = QStringLiteral(u"Veretino DB");
+                icn = m_icons.icon(Icons::Database);
+                type = QStringLiteral(u"Veretino DB");
                 break;
             case FilterAttribute::IgnoreDigestFiles:
-                _icon = m_icons.icon(Icons::HashFile);
-                _type = QStringLiteral(u"sha1/256/512");
+                icn = m_icons.icon(Icons::HashFile);
+                type = QStringLiteral(u"sha1/256/512");
                 break;
             case FilterAttribute::IgnoreUnpermitted:
-                _icon = m_icons.icon(FileStatus::UnPermitted);
-                _type = QStringLiteral(u"No Permissions");
+                icn = m_icons.icon(FileStatus::UnPermitted);
+                type = QStringLiteral(u"No Permissions");
                 break;
             case FilterAttribute::IgnoreSymlinks:
-                _type = QStringLiteral(u"SymLinks");
+                type = QStringLiteral(u"SymLinks");
                 break;
             default:
-                _type = "Undefined";
+                type = "Undefined";
                 break;
             }
 
-            addItem(_type, it.value(), _icon, (TypeAttribute::UnCheckable | TypeAttribute::UnFilterable));
+            addItem(type, it.value(), icn, (TypeAttribute::UnCheckable | TypeAttribute::UnFilterable));
         }
     }
 }

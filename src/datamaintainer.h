@@ -14,6 +14,7 @@
 class DataMaintainer : public QObject
 {
     Q_OBJECT
+
 public:
     explicit DataMaintainer(QObject *parent = nullptr);
     explicit DataMaintainer(DataContainer *initData, QObject *parent = nullptr);

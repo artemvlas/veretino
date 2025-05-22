@@ -490,14 +490,14 @@ QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
 
 void Manager::updateProgText(const CalcKind calckind, const QString &file)
 {
-    const QString _purp = calckind ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
+    const QString purp = calckind ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
     const Chunks<qint64> _p_size = m_proc->pSize();
     const Chunks<int> _p_queue = m_proc->pQueue();
 
     // single file
     if (!_p_queue.hasSet()) {
-        // _purp: file (size)
-        const QString __s = tools::joinStrings(_purp,
+        // purp: file (size)
+        const QString __s = tools::joinStrings(purp,
                                                format::fileNameAndSize(file, _p_size._total),
                                                Lit::s_sepColonSpace);
         emit setStatusbarText(__s);
@@ -514,19 +514,12 @@ void Manager::updateProgText(const CalcKind calckind, const QString &file)
     }
 
     // UGLY, but better performance (should be). And should be re-implemented.
-    const QString _res = _purp % ' ' % QString::number(_p_queue._done + 1) % QStringLiteral(u" of ")
+    const QString res = purp % ' ' % QString::number(_p_queue._done + 1) % QStringLiteral(u" of ")
                     % QString::number(_p_queue._total) % QStringLiteral(u" checksums ")
                     % (!_p_size.hasChunks() ? format::inParentheses(_lastTotalSizeR) // (%1)
                     : ('(' % format::dataSizeReadable(_p_size._done) % QStringLiteral(u" / ") % _lastTotalSizeR % ')')); // "(%1 / %2)"
 
-    emit setStatusbarText(_res);
-
-    // OLD
-    /*emit setStatusbarText(QString("%1 %2 of %3 checksums %4")
-                              .arg(_purp)
-                              .arg(_p_items._done + 1)
-                              .arg(_p_items._total)
-                              .arg(doneData));*/
+    emit setStatusbarText(res);
 }
 
 int Manager::calculateChecksums(const FileStatus status, const QModelIndex &root)

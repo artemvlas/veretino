@@ -15,6 +15,7 @@
 class View : public QTreeView
 {
     Q_OBJECT
+
 public:
     explicit View(QWidget *parent = nullptr);
     enum ModelView {

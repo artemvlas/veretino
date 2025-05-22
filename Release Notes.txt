@@ -1,12 +1,15 @@
+---
 Veretino 0.6.2
 * Improved display of the subfolder content statuses.
 * The names of some item statuses are simplified.
 * Fixed the false response to filtered symlinks during parsing.
+* Folder Contents dialog: if all files are selected, the red 'no files' label is no longer displayed.
 
 ---
 Veretino 0.6.1
 Compatibility with older OS, such as Ubuntu 22.04, has been implemented.
 
+---
 Veretino 0.6.0
 What's new:
 * Improved database storage format. Now files with the *.ver extension are compressed.

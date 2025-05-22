@@ -62,25 +62,48 @@ public slots:
     void createContextMenu_Button(const QPoint &point);
 
 private:
-    void connections();                                        // generic
-    void connectManager();                                     // Manager connections are separated for convenience
-    bool argumentInput();                                      // using the path argument if it's provided
+    // generic
+    void connections();
+
+    // Manager connections are separated for convenience
+    void connectManager();
+
+    // using the path argument if it's provided
+    bool argumentInput();
     void handleChangedModel();
     void handleButtonDbHashClick();
-    void updateStatusIcon();                                   // updates the icon in the lower left corner
-    void updateButtonInfo();                                   // sets the Button icon and text according the current Mode
-    void updateMenuActions();                                  // updates the state of main menu actions
-    void clearDialogs();                                       // closes open dialog boxes, if any
-    void saveSettings();                                       // saves current settings to the file
+
+    // updates the icon in the lower left corner
+    void updateStatusIcon();
+
+    // sets the Button icon and text according the current Mode
+    void updateButtonInfo();
+
+    // updates the state of main menu actions
+    void updateMenuActions();
+
+    // closes open dialog boxes, if any
+    void clearDialogs();
+
+    // saves current settings to the file
+    void saveSettings();
 
     Ui::MainWindow *ui;
-    Settings *settings_ = new Settings(this);                  // current app settings
-    QThread *thread = new QThread;                             // Manager thread
-    Manager *manager = new Manager(settings_);                 // Manager performs the main tasks. Works in separate thread^
+
+    // current app settings
+    Settings *settings_ = new Settings(this);
+
+    // Manager thread
+    QThread *thread = new QThread;
+
+    // Manager performs the main tasks. Works in separate thread^
+    Manager *manager = new Manager(settings_);
     ModeSelector *modeSelect = nullptr;
     ProcState *proc_ = nullptr;
     StatusBar *statusBar = new StatusBar;
-    bool awaiting_closure = false;                             // true if the exit attempt was rejected (to perform data saving)
+
+    // true if the exit attempt was rejected (to perform data saving)
+    bool awaiting_closure = false;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
