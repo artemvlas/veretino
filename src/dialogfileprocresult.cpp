@@ -124,14 +124,14 @@ void DialogFileProcResult::setModeUnstored()
     addButtonCopy();
 }
 
-void DialogFileProcResult::setIcon(Icons _icon)
+void DialogFileProcResult::setIcon(Icons icon)
 {
-    ui->labelIcon->setPixmap(icons_.pixmap(_icon));
+    ui->labelIcon->setPixmap(icons_.pixmap(icon));
 }
 
-void DialogFileProcResult::setIcon(FileStatus _status)
+void DialogFileProcResult::setIcon(FileStatus status)
 {
-    ui->labelIcon->setPixmap(icons_.pixmap(_status));
+    ui->labelIcon->setPixmap(icons_.pixmap(status));
 }
 
 void DialogFileProcResult::setFileName(const QString &filePath)
@@ -168,24 +168,23 @@ void DialogFileProcResult::addButtonSave()
 
 void DialogFileProcResult::makeSumFile()
 {
-    const QString &_chsum = values_.checksum;
+    const QString &chsum = values_.checksum;
 
-    if (filePath_.isEmpty() || !tools::canBeChecksum(_chsum))
+    if (filePath_.isEmpty() || !tools::canBeChecksum(chsum))
         return;
 
-    const QString _sumFile = paths::digestFilePath(filePath_, _chsum.size());
-    const QString _strToWrite = tools::joinStrings(_chsum, pathstr::basicName(filePath_), QStringLiteral(u" *"));
+    const QString sumFile = paths::digestFilePath(filePath_, chsum.size());
+    const QString strToWrite = tools::joinStrings(chsum, pathstr::basicName(filePath_), QStringLiteral(u" *"));
 
-    setFileName(_sumFile);
+    setFileName(sumFile);
 
-    QFile _file(_sumFile);
+    QFile file(sumFile);
 
-    if (_file.open(QFile::WriteOnly)
-        && _file.write(_strToWrite.toUtf8()))
+    if (file.open(QFile::WriteOnly)
+        && file.write(strToWrite.toUtf8()))
     {
         setModeStored();
-    }
-    else {
+    } else {
         setModeUnstored();
     }
 }

@@ -18,6 +18,7 @@
 class MenuActions : public QObject
 {
     Q_OBJECT
+
 public:
     explicit MenuActions(QObject *parent = nullptr);
     ~MenuActions();

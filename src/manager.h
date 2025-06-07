@@ -24,6 +24,7 @@ struct Task {
 class Manager : public QObject
 {
     Q_OBJECT
+
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
 

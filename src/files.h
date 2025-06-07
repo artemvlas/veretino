@@ -27,6 +27,7 @@ struct FileTypeList {
 class Files : public QObject
 {
     Q_OBJECT
+
 public:
     explicit Files(QObject *parent = nullptr);
     explicit Files(const QString &path, QObject *parent = nullptr);

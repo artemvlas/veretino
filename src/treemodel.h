@@ -15,6 +15,7 @@ class TreeItem;
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
+
 public:
     explicit TreeModel(QObject *parent = nullptr);
     ~TreeModel();

@@ -183,8 +183,7 @@ void Manager::updateDatabase(const DbMod dest)
 
     if (dest == DM_UpdateMismatches) {
         m_dataMaintainer->updateMismatchedChecksums();
-    }
-    else if (dest == DM_FindMoved) {
+    } else if (dest == DM_FindMoved) {
         calculateChecksums(DM_FindMoved, FileStatus::New);
 
         if (m_proc->isCanceled())
@@ -194,8 +193,7 @@ void Manager::updateDatabase(const DbMod dest)
             m_dataMaintainer->setDbFileState(DbFileState::NotSaved);
         else
             emit showMessage("No Moved items found");
-    }
-    else {
+    } else {
         if ((dest & DM_AddNew)
             && nums.contains(FileStatus::New))
         {
@@ -241,10 +239,10 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
             const QString __d = (job == DM_ImportDigest) ? extractDigestFromFile(p_data->digestFilePath(fileIndex))
                                                          : TreeModel::itemFileChecksum(fileIndex);
 
-            if (tools::canBeChecksum(__d, p_data->m_metadata.algorithm)) // checking for compliance with the current algo
+            // checking for compliance with the current algo
+            if (tools::canBeChecksum(__d, p_data->m_metadata.algorithm))
                 m_dataMaintainer->importChecksum(fileIndex, __d);
-        }
-        else { // calc the new one
+        } else { // calc the new one
             const QString dig = hashItem(fileIndex);
 
             if (dig.isEmpty()) // return previous status
@@ -267,8 +265,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
 
         if (m_settings->instantSaving) {
             saveData();
-        }
-        else { // temp solution to update Button info
+        } else { // temp solution to update Button info
             emit m_proc->stateChanged();
         }
     }
@@ -373,8 +370,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
         if (m_settings->saveVerificationDateTime) {
             m_dataMaintainer->updateVerifDateTime();
         }
-    }
-    else { // if subfolder
+    } else { // if subfolder
         const Numbers &nums = m_dataMaintainer->m_data->getNumbers(folderItemIndex);
         const QString subfolderName = TreeModel::itemName(folderItemIndex);
 

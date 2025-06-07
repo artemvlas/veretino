@@ -78,9 +78,9 @@ QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
 {
     QList<int> digits;
 
-    for (QChar _ch : strAlgo) {
-        if (_ch.isDigit())
-            digits.append(_ch.digitValue());
+    for (QChar ch : strAlgo) {
+        if (ch.isDigit())
+            digits.append(ch.digitValue());
     }
 
     switch (digitsToNum(digits)) {
@@ -101,8 +101,8 @@ int digitsToNum(const QList<int> &digits)
 {
     int number = 0;
 
-    for (int _digit : digits) {
-        number = (number * 10) + _digit;
+    for (int dgt : digits) {
+        number = (number * 10) + dgt;
     }
 
     return number;
@@ -153,12 +153,12 @@ bool isLater(const QString &dt_before, const QString &dt_later)
     }
 
     for (int i = 0; i < dt_before.size(); ++i) {
-        const int _ch1v = dt_before.at(i).digitValue();
-        const int _ch2v = dt_later.at(i).digitValue();
+        const int ch1v = dt_before.at(i).digitValue();
+        const int ch2v = dt_later.at(i).digitValue();
 
-        if (_ch1v < _ch2v)
+        if (ch1v < ch2v)
             return true;
-        if (_ch1v > _ch2v)
+        if (ch1v > ch2v)
             return false;
     }
 
@@ -312,27 +312,27 @@ QString dataSizeReadable(const qint64 sizeBytes)
         ++it;
     } while (converted > 1000);
 
-    QChar _ch;
+    QChar ch;
     switch (it) {
     case 1:
-        _ch = u'K';
+        ch = u'K';
         break;
     case 2:
-        _ch = u'M';
+        ch = u'M';
         break;
     case 3:
-        _ch = u'G';
+        ch = u'G';
         break;
     case 4:
-        _ch = u'T';
+        ch = u'T';
         break;
     default:
-        _ch = u'?';
+        ch = u'?';
         break;
     }
 
     const float x = std::round(converted * 100) / 100;
-    return QString::number(x, 'f', 2) % _ch % QStringLiteral(u"iB");
+    return QString::number(x, 'f', 2) % ch % QStringLiteral(u"iB");
 }
 
 QString dataSizeReadableExt(const qint64 sizeBytes)
@@ -345,10 +345,10 @@ QString shortenString(const QString &string, int length, bool cutEnd)
     if (string.length() <= length)
         return string;
 
-    QString _dots = QStringLiteral(u"...");
+    QString dots = QStringLiteral(u"...");
 
-    return cutEnd ? string.left(length).append(_dots)
-                  : string.right(length).prepend(_dots);
+    return cutEnd ? string.left(length).append(dots)
+                  : string.right(length).prepend(dots);
 }
 
 QString simplifiedChars(QString str)
@@ -396,25 +396,25 @@ QString composeDbFileName(const QString &prefix, const QString &folder, const QS
     if (folder.isEmpty())
         return tools::joinStrings(prefix, extension, u'.');
 
-    const QString _folderStr = simplifiedChars(pathstr::basicName(folder));
-    const QString _dbFileName = tools::joinStrings(prefix, _folderStr, u'_');
+    const QString folderStr = simplifiedChars(pathstr::basicName(folder));
+    const QString dbFileName = tools::joinStrings(prefix, folderStr, u'_');
 
-    return tools::joinStrings(_dbFileName, extension, u'.');
+    return tools::joinStrings(dbFileName, extension, u'.');
 }
 
 QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
 {
-    const QStringList &_list = capitalLetters ? Lit::sl_digest_Exts : Lit::sl_digest_exts;
+    const QStringList &lst = capitalLetters ? Lit::sl_digest_Exts : Lit::sl_digest_exts;
 
     switch (algo) {
     case QCryptographicHash::Md5:
-        return _list.at(0);
+        return lst.at(0);
     case QCryptographicHash::Sha1:
-        return _list.at(1);
+        return lst.at(1);
     case QCryptographicHash::Sha256:
-        return _list.at(2);
+        return lst.at(2);
     case QCryptographicHash::Sha512:
-        return _list.at(3);
+        return lst.at(3);
     default:
         return "Unknown";
     }
@@ -430,9 +430,9 @@ QString filesNumber(int number)
     if (number == 0)
         return QStringLiteral(u"no files");
 
-    const QString _files = (number == 1) ? QStringLiteral(u"file") : QStringLiteral(u"files");
+    const QString files = (number == 1) ? QStringLiteral(u"file") : QStringLiteral(u"files");
 
-    return tools::joinStrings(number, _files);
+    return tools::joinStrings(number, files);
 }
 
 QString filesNumSize(int number, qint64 filesSize)
@@ -490,8 +490,8 @@ QString fileItemStatus(FileStatus status)
 
 QString coloredText(bool ignore)
 {
-    QString _color = ignore ? QStringLiteral(u"red") : QStringLiteral(u"green");
-    return QStringLiteral(u"color : ") + _color;
+    QString color = ignore ? QStringLiteral(u"red") : QStringLiteral(u"green");
+    return QStringLiteral(u"color : ") + color;
 }
 
 QString coloredText(const QString &className, bool ignore)

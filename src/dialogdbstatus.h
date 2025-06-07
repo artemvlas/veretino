@@ -41,7 +41,9 @@ private:
     bool isJustCreated() const;
 
     void selectCurTab();
-    bool autoTabSelection = true; // automatic selection of the current tab during execution
+
+    // automatic selection of the current tab during execution
+    bool autoTabSelection = true;
 
 protected:
     void showEvent(QShowEvent *event) override;

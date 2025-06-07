@@ -12,6 +12,7 @@
 class ProcState : public QObject
 {
     Q_OBJECT
+
 public:
     explicit ProcState(QObject *parent = nullptr);
     void setTotal(const NumSize &_nums);

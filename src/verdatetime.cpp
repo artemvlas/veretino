@@ -89,23 +89,23 @@ void VerDateTime::update(DT type)
 
 QString VerDateTime::toString(bool keep_empty_values) const
 {
-    QString __s;
+    QString resStr;
 
     if (keep_empty_values)
-        __s.reserve(m_created.size() + m_updated.size() + m_verified.size() + 4); // ", " * 2 = 4
+        resStr.reserve(m_created.size() + m_updated.size() + m_verified.size() + 4); // ", " * 2 = 4
 
     for (int i = 0; i < 3; ++i) {
-        const QString &__v = value((DT)i);
+        const QString &val = value((DT)i);
 
-        if (!__v.isEmpty() || keep_empty_values) {
-            if (!__s.isEmpty() || (keep_empty_values && i > 0))
-                __s += Lit::s_sepCommaSpace; // ", "
+        if (!val.isEmpty() || keep_empty_values) {
+            if (!resStr.isEmpty() || (keep_empty_values && i > 0))
+                resStr += Lit::s_sepCommaSpace; // ", "
 
-            __s += __v;
+            resStr += val;
         }
     }
 
-    return __s;
+    return resStr;
 }
 
 QString VerDateTime::basicDate() const

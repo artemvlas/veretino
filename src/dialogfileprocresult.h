@@ -24,8 +24,8 @@ public:
 
 private:
     void setFileName(const QString &filePath);
-    void setIcon(Icons _icon);
-    void setIcon(FileStatus _status);
+    void setIcon(Icons icon);
+    void setIcon(FileStatus status);
     void setExtLineVisible(bool visible); // Size: ...  Algorithm: ...
     void hideLineSizeAlgo();
     void addButtonCopy();

@@ -14,6 +14,7 @@
 class Settings : public QObject
 {
     Q_OBJECT
+
 public:
     explicit Settings(QObject *parent = nullptr);
 

@@ -170,32 +170,32 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
 {
     emit setStatusbarText(QStringLiteral(u"Parsing folder contents..."));
 
-    FileTypeList _res;
+    FileTypeList res;
     QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
 
     while (it.hasNext() && !isCanceled()) {
         it.next();
-        const qint64 _size = it.fileInfo().size();
+        const qint64 size = it.fileInfo().size();
 
         if (combine.hasAttribute(FilterAttribute::IgnoreUnpermitted)
             && !it.fileInfo().isReadable())
         {
-            _res.m_combined[FilterAttribute::IgnoreUnpermitted] << _size;
+            res.m_combined[FilterAttribute::IgnoreUnpermitted] << size;
         }
         else if (combine.hasAttribute(FilterAttribute::IgnoreSymlinks)
                  && it.fileInfo().isSymLink())
         {
-            _res.m_combined[FilterAttribute::IgnoreSymlinks] << _size;
+            res.m_combined[FilterAttribute::IgnoreSymlinks] << size;
         }
         else {
-            const QString _filename = it.fileName();
+            const QString filename = it.fileName();
 
-            if (paths::isDbFile(_filename))
-                _res.m_combined[FilterAttribute::IgnoreDbFiles] << _size;
-            else if (paths::isDigestFile(_filename))
-                _res.m_combined[FilterAttribute::IgnoreDigestFiles] << _size;
+            if (paths::isDbFile(filename))
+                res.m_combined[FilterAttribute::IgnoreDbFiles] << size;
+            else if (paths::isDigestFile(filename))
+                res.m_combined[FilterAttribute::IgnoreDigestFiles] << size;
             else
-                _res.m_extensions[pathstr::suffix(_filename)] << _size;
+                res.m_extensions[pathstr::suffix(filename)] << size;
         }
     }
 
@@ -205,8 +205,8 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
         return FileTypeList();
     }
 
-    emit setStatusbarText(tools::joinStrings(_res.count(), QStringLiteral(u"types found")));
-    return _res;
+    emit setStatusbarText(tools::joinStrings(res.count(), QStringLiteral(u"types found")));
+    return res;
 }
 
 FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIndex &rootIndex)

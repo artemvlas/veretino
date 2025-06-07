@@ -60,19 +60,19 @@ void StatusBar::setModeDb(const DataContainer *data)
     }
 
     // update info
-    const Numbers &_num = data->m_numbers;
+    const Numbers &num = data->m_numbers;
 
     QString checkResult = QString("☒ %1\n✓ %2")
-                              .arg(_num.numberOf(FileStatus::Mismatched))
-                              .arg(_num.numberOf(FileStatus::CombMatched));
+                              .arg(num.numberOf(FileStatus::Mismatched))
+                              .arg(num.numberOf(FileStatus::CombMatched));
 
     buttonDbHash->setToolTip(checkResult);
     buttonDbHash->setText(format::algoToStr(data->m_metadata.algorithm));
-    buttonDbSize->setText(format::dataSizeReadable(_num.totalSize(FileStatus::CombAvailable)));
+    buttonDbSize->setText(format::dataSizeReadable(num.totalSize(FileStatus::CombAvailable)));
 
-    QString strDbMain = QString::number(_num.numberOf(FileStatus::CombAvailable));
-    if (_num.contains(FileStatus::Missing)) // if not all files are available, display "available/total"
-        strDbMain.append(QString("/%1").arg(_num.numberOf(FileStatus::CombHasChecksum)));
+    QString strDbMain = QString::number(num.numberOf(FileStatus::CombAvailable));
+    if (num.contains(FileStatus::Missing)) // if not all files are available, display "available/total"
+        strDbMain.append(QString("/%1").arg(num.numberOf(FileStatus::CombHasChecksum)));
 
     buttonDbMain->setText(strDbMain);
 
@@ -108,9 +108,9 @@ void StatusBar::setButtonsEnabled(bool enable)
 {
     const QList<StatusBarButton*> buttons = findChildren<StatusBarButton*>();
 
-    for (StatusBarButton *_button : buttons) {
-        if (_button->isVisible())
-            _button->setEnabled(enable);
+    for (StatusBarButton *btn : buttons) {
+        if (btn->isVisible())
+            btn->setEnabled(enable);
     }
 }
 
@@ -118,8 +118,8 @@ void StatusBar::clearButtons()
 {
     const QList<StatusBarButton*> buttons = findChildren<StatusBarButton*>();
 
-    for (StatusBarButton *_button : buttons) {
-        _button->hide();
+    for (StatusBarButton *btn : buttons) {
+        btn->hide();
     }
 }
 
