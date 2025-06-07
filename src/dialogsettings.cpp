@@ -100,8 +100,8 @@ void DialogSettings::updateSettings()
     settings_->allowPasteIntoDb = ui->cbAllowPaste->isChecked();
 
     // database
-    const QString _inpPrefix = ui->inputJsonFileNamePrefix->text();
-    settings_->dbPrefix = format::simplifiedChars(_inpPrefix);
+    const QString inpPrefix = ui->inputJsonFileNamePrefix->text();
+    settings_->dbPrefix = format::simplifiedChars(inpPrefix);
 
     settings_->isLongExtension = ui->rbExtVerJson->isChecked();
     settings_->addWorkDirToFilename = ui->cbAddFolderName->isChecked();
@@ -117,9 +117,9 @@ void DialogSettings::updateSettings()
 
 void DialogSettings::updateLabelDatabaseFilename()
 {
-    const QString _inpPrefix = ui->inputJsonFileNamePrefix->text();
+    const QString inpPrefix = ui->inputJsonFileNamePrefix->text();
 
-    QString prefix = _inpPrefix.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(_inpPrefix);
+    QString prefix = inpPrefix.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(inpPrefix);
     QString folderName = ui->cbAddFolderName->isChecked() ? QStringLiteral(u"@FolderName") : QString();
     QString extension = defaults.dbFileExtension(ui->rbExtVerJson->isChecked());
 

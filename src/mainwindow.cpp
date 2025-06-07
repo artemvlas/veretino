@@ -356,18 +356,18 @@ void MainWindow::dialogSettings()
 
         // switching "Detect Moved" cache
         if (ui->view->isViewDatabase()) {
-            DataContainer *_d = ui->view->m_data;
+            DataContainer *dc = ui->view->m_data;
 
             if (settings_->detectMoved
-                && _d->_cacheMissing.isEmpty()
-                && _d->hasPossiblyMovedItems())
+                && dc->_cacheMissing.isEmpty()
+                && dc->hasPossiblyMovedItems())
             {
                 manager->addTaskWithState(State::Idle, &Manager::cacheMissingItems);
             }
             else if (!settings_->detectMoved
-                       && !_d->_cacheMissing.isEmpty())
+                       && !dc->_cacheMissing.isEmpty())
             {
-                _d->_cacheMissing.clear();
+                dc->_cacheMissing.clear();
             }
         }
     }
@@ -519,18 +519,17 @@ void MainWindow::updatePermanentStatus()
             statusBar->setModeDbCreating();
         else if (!proc_->isStarted())
             statusBar->setModeDb(ui->view->m_data);
-    }
-    else {
+    } else {
         statusBar->clearButtons();
     }
 }
 
 void MainWindow::setWinTitleMismatchFound()
 {
-    static const QString _s = tools::joinStrings(Lit::s_appName,
-                                                 QStringLiteral(u"<!> mismatches found"),
-                                                 Lit::s_sepStick);
-    setWindowTitle(_s);
+    static const QString str = tools::joinStrings(Lit::s_appName,
+                                                  QStringLiteral(u"<!> mismatches found"),
+                                                  Lit::s_sepStick);
+    setWindowTitle(str);
 }
 
 void MainWindow::updateWindowTitle()
@@ -548,8 +547,7 @@ void MainWindow::updateWindowTitle()
 
         const QString strTitle = tools::joinStrings(Lit::s_appName, strAdd, Lit::s_sepStick);
         setWindowTitle(strTitle);
-    }
-    else {
+    } else {
         setWindowTitle(Lit::s_appName);
     }
 }
@@ -594,10 +592,10 @@ void MainWindow::createContextMenu_Button(const QPoint &point)
 
 void MainWindow::clearDialogs()
 {
-    QDialog *__d = findChild<QDialog*>();
+    QDialog *dlg = findChild<QDialog*>();
 
-    if (__d)
-        __d->reject();
+    if (dlg)
+        dlg->reject();
 }
 
 bool MainWindow::argumentInput()

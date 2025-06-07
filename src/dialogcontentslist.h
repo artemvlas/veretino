@@ -17,6 +17,7 @@ class DialogContentsList;
 class DialogContentsList : public QDialog
 {
     Q_OBJECT
+
 public:
     explicit DialogContentsList(const QString &folderPath,
                                 const FileTypeList &extList,

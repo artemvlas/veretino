@@ -7,7 +7,7 @@
 #define ITEMFILETYPE_H
 
 #include <QTreeWidgetItem>
-#include "files.h" // for NumSize
+#include "nums.h"
 
 class ItemFileType : public QTreeWidgetItem
 {
@@ -20,17 +20,28 @@ public:
         UnFilterable = 2, // values ​​do not count toward the filtered list
     }; // enum TypeAttribute
 
-    void toggle();                                                     // toggle checkbox status (checked or unchecked)
+    // toggle checkbox status (checked or unchecked)
+    void toggle();
     void setChecked(bool checked);
     void setCheckBoxVisible(bool visible);
-    void setAttribute(int attr);                                       // TypeAttribute or combined value
+
+    // TypeAttribute or combined value
+    void setAttribute(int attr);
     bool isChecked() const;
     bool isCheckBoxVisible() const;
     bool hasAttribute(TypeAttribute attr) const;
-    int filesNumber() const;                                           // total number of files
-    qint64 filesSize() const;                                          // total size of this type files
-    NumSize numSize() const;                                           // files number and their total size
-    QString extension() const;                                         // --> visible type: file extension (suffix) or combined ("SymLinks", "Veretino DB", etc..)
+
+    // total number of files
+    int filesNumber() const;
+
+    // total size of this type files
+    qint64 filesSize() const;
+
+    // files number and their total size
+    NumSize numSize() const;
+
+    // --> visible type: file extension (suffix) or combined ("SymLinks", "Veretino DB", etc..)
+    QString extension() const;
 
 private:
     bool operator <(const QTreeWidgetItem &other) const override;

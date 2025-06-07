@@ -57,20 +57,20 @@ bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &val
 void TreeModel::add_file(const QString &filePath, const FileValues &values)
 {
     // data preparation
-    QVector<QVariant> _tiData(m_rootItem->columnCount());
-    _tiData[ColumnName] = pathstr::basicName(filePath);
+    QVector<QVariant> tiData(m_rootItem->columnCount());
+    tiData[ColumnName] = pathstr::basicName(filePath);
 
     if (values.size >= 0)
-        _tiData[ColumnSize] = values.size;
+        tiData[ColumnSize] = values.size;
 
-    _tiData[ColumnStatus] = QVariant::fromValue(values.status);
+    tiData[ColumnStatus] = QVariant::fromValue(values.status);
 
     if (!values.checksum.isEmpty())
-        _tiData[ColumnChecksum] = values.checksum;
+        tiData[ColumnChecksum] = values.checksum;
 
     // item adding
     TreeItem *parentItem = add_folder(pathstr::parentFolder(filePath));
-    parentItem->addChild(_tiData);
+    parentItem->addChild(tiData);
 }
 
 TreeItem *TreeModel::add_folder(const QString &path)
@@ -91,9 +91,9 @@ TreeItem *TreeModel::add_folder(const QString &path)
             parentItem = _ti;
         }
         else {
-            QVector<QVariant> _tiData(m_rootItem->columnCount());
-            _tiData[ColumnName] = _subFolder;
-            parentItem = parentItem->addChild(_tiData);
+            QVector<QVariant> tiData(m_rootItem->columnCount());
+            tiData[ColumnName] = _subFolder;
+            parentItem = parentItem->addChild(tiData);
         }
     }
 

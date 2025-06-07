@@ -374,11 +374,11 @@ void ModeSelector::checkFileByClipboardChecksum()
 
 void ModeSelector::copyFsItem()
 {
-    const QString _itemPath = p_view->curAbsPath();
+    const QString itemPath = p_view->curAbsPath();
 
-    if (!_itemPath.isEmpty()) {
+    if (!itemPath.isEmpty()) {
         QMimeData* mimeData = new QMimeData();
-        mimeData->setUrls({ QUrl::fromLocalFile(_itemPath) });
+        mimeData->setUrls({ QUrl::fromLocalFile(itemPath) });
         QGuiApplication::clipboard()->setMimeData(mimeData);
     }
 }
@@ -410,9 +410,9 @@ void ModeSelector::copyDataToClipboard(Column column)
     if (p_view->isViewDatabase()
         && p_view->curIndex().isValid())
     {
-        const QString _strData = p_view->curIndex().siblingAtColumn(column).data().toString();
-        if (!_strData.isEmpty())
-            QGuiApplication::clipboard()->setText(_strData);
+        const QString strData = p_view->curIndex().siblingAtColumn(column).data().toString();
+        if (!strData.isEmpty())
+            QGuiApplication::clipboard()->setText(strData);
     }
 }
 
@@ -473,13 +473,13 @@ void ModeSelector::importBranch()
     if (!p_view->m_data)
         return;
 
-    const QModelIndex _ind = p_view->curIndex();
-    const QString _path = p_view->m_data->branch_path_existing(_ind);
+    const QModelIndex ind = p_view->curIndex();
+    const QString path = p_view->m_data->branch_path_existing(ind);
 
-    if (!_path.isEmpty()) {
+    if (!path.isEmpty()) {
         stopProcess();
         p_view->setViewSource();
-        p_manager->addTask(&Manager::importBranch, _ind);
+        p_manager->addTask(&Manager::importBranch, ind);
     }
 }
 
@@ -503,8 +503,7 @@ void ModeSelector::verify(const QModelIndex index)
     if (TreeModel::isFileRow(index)) {
         p_view->disableFilter();
         p_manager->addTask(&Manager::verifyFileItem, index);
-    }
-    else {
+    } else {
         verifyItems(index, FileStatus::CombNotChecked);
     }
 }
@@ -570,8 +569,8 @@ void ModeSelector::makeDbContList()
 QString ModeSelector::composeDbFilePath()
 {
     QString folderName = p_settings->addWorkDirToFilename ? pathstr::basicName(p_view->m_lastPathFS) : QString();
-    QString _prefix = p_settings->dbPrefix.isEmpty() ? Lit::s_db_prefix : p_settings->dbPrefix;
-    QString databaseFileName = format::composeDbFileName(_prefix, folderName, p_settings->dbFileExtension());
+    QString prefix = p_settings->dbPrefix.isEmpty() ? Lit::s_db_prefix : p_settings->dbPrefix;
+    QString databaseFileName = format::composeDbFileName(prefix, folderName, p_settings->dbFileExtension());
 
     return pathstr::joinPath(p_view->m_lastPathFS, databaseFileName);
 }
@@ -761,8 +760,7 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
 
     if (p_proc->isState(State::StartVerbose)) {
         viewContextMenu->addAction(m_menuAct->actionStop);
-    }
-    else if (index.isValid()) {
+    } else if (index.isValid()) {
         if (isMode(Folder)) {
             viewContextMenu->addAction(m_menuAct->actionShowFolderContentsTypes);
             viewContextMenu->addAction(m_menuAct->actionCopyFolder);
@@ -771,25 +769,24 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
 
             viewContextMenu->addAction(m_menuAct->actionProcessChecksumsNoFilter);
             viewContextMenu->addAction(m_menuAct->actionProcessChecksumsCustomFilter);
-        }
-        else if (isMode(File)) {
+        } else if (isMode(File)) {
             viewContextMenu->addAction(m_menuAct->actionCopyFile);
             viewContextMenu->addAction(m_menuAct->actionProcessSha_toClipboard);
             viewContextMenu->addMenu(m_menuAct->menuAlgorithm(p_settings->algorithm()));
             viewContextMenu->addMenu(m_menuAct->menuCreateDigest);
 
-            const QString _copied = copiedDigest();
-            if (!_copied.isEmpty()) {
-                QString _s = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(_copied, 20);
-                m_menuAct->actionCheckFileByClipboardChecksum->setText(_s);
+            const QString copied = copiedDigest();
+            if (!copied.isEmpty()) {
+                QString str = QStringLiteral(u"Check the file by checksum: ") + format::shortenString(copied, 20);
+                m_menuAct->actionCheckFileByClipboardChecksum->setText(str);
                 viewContextMenu->addSeparator();
                 viewContextMenu->addAction(m_menuAct->actionCheckFileByClipboardChecksum);
             }
-        }
-        else if (isMode(DbFile))
+        } else if (isMode(DbFile)) {
             viewContextMenu->addAction(m_menuAct->actionOpenDatabase);
-        else if (isMode(SumFile))
+        } else if (isMode(SumFile)) {
             viewContextMenu->addAction(m_menuAct->actionCheckSumFile);
+        }
     }
 
     viewContextMenu->exec(p_view->viewport()->mapToGlobal(point));
@@ -893,8 +890,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
                     viewContextMenu->addAction(m_menuAct->actionCheckCurFileFromModel);
                 }
-            }
-            else { // Folder item
+            } else { // Folder item
                 const bool has_avail = TreeModel::contains(FileStatus::CombAvailable, index);
                 const bool has_new = TreeModel::contains(FileStatus::New, index);
 

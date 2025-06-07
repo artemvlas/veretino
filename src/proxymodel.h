@@ -12,6 +12,7 @@
 class ProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
+
 public:
     explicit ProxyModel(QObject *parent = nullptr);
     ProxyModel(QAbstractItemModel *sourceModel, QObject *parent = nullptr);

@@ -13,6 +13,7 @@
 class ShaCalculator : public QObject
 {
     Q_OBJECT
+
 public:
     explicit ShaCalculator(QObject *parent = nullptr);
     explicit ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent = nullptr);

@@ -123,8 +123,7 @@ void View::setData(DataContainer *data)
 
     if (data->isInCreation()) {
         setTreeModel(ModelView::ModelSource);
-    }
-    else {
+    } else {
         setTreeModel(ModelView::ModelProxy);
     }
 
@@ -175,8 +174,7 @@ void View::setMismatchFiltering(const Numbers &num)
     if (num.contains(FileStatus::Mismatched)) {
         showAllColumns();
         setFilter(FileStatus::Mismatched);
-    }
-    else {
+    } else {
         hideColumn(Column::ColumnReChecksum);
     }
 }
@@ -235,12 +233,10 @@ void View::setIndexByPath(const QString &path)
             // QFileSystemModel needs some time after setup to Scrolling be able
             // this is weird, but the Scrolling works well with the Timer, and only when specified [m_fileSystem->index(path)],
             // 'index' (wich is == m_fileSystem->index(path)) is NOT working good*/
-        }
-        else if (!path.isEmpty()) {
+        } else if (!path.isEmpty()) {
             emit showMessage("Wrong path: " + path, "Error");
         }
-    }
-    else if (isViewDatabase()) {
+    } else if (isViewDatabase()) {
         QModelIndex _ind = TreeModel::getIndex(path, model());
 
         if (!_ind.isValid())
@@ -401,9 +397,9 @@ void View::restoreHeaderState()
             headerState = m_settings->headerStateDb;
     }
 
-    if (!headerState.isEmpty())
+    if (!headerState.isEmpty()) {
         header()->restoreState(headerState);
-    else {
+    } else {
         showAllColumns();
         setDefaultColumnsWidth();
     }

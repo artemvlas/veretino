@@ -36,8 +36,7 @@ void ProgressBar::setProgEnabled(bool enabled)
         resetFormat();
         m_timer->start(1000); // 1 sec
         m_elapsedTimer.start();
-    }
-    else {
+    } else {
         m_timer->stop();
     }
 
@@ -57,8 +56,7 @@ void ProgressBar::updateProgressInfo()
                          % progTimeLeft();
 
         setFormat(format);
-    }
-    else {
+    } else {
         finish();
         resetFormat();
 
@@ -86,8 +84,8 @@ QString ProgressBar::progTimeLeft() const
 QString ProgressBar::progSpeed() const
 {
     if (pieceTime_ > 0 && pieceSize_ > 0) {
-        QString __s = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);
-        return __s + QStringLiteral(u"/s");
+        QString str = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);
+        return str + QStringLiteral(u"/s");
     }
 
     return QStringLiteral(u"idle");

@@ -45,27 +45,27 @@ void DialogDbStatus::connections()
 
 void DialogDbStatus::setLabelsInfo()
 {
-    const MetaData &_meta = data_->m_metadata;
+    const MetaData &meta = data_->m_metadata;
 
     ui->labelDbFileName->setText(data_->databaseFileName());
-    ui->labelDbFileName->setToolTip(_meta.dbFilePath);
-    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(_meta.algorithm));
-    ui->labelWorkDir->setToolTip(_meta.workDir);
+    ui->labelDbFileName->setToolTip(meta.dbFilePath);
+    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(meta.algorithm));
+    ui->labelWorkDir->setToolTip(meta.workDir);
 
     if (!data_->isWorkDirRelative())
         ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
-    const VerDateTime &_dt = _meta.datetime;
+    const VerDateTime &dt = meta.datetime;
 
-    if (_dt.m_updated.isEmpty())
-        ui->labelDateTime_Update->setText(_dt.m_created);
-    else {
-        ui->labelDateTime_Update->setText(_dt.m_updated);
-        ui->labelDateTime_Update->setToolTip(_dt.m_created);
+    if (dt.m_updated.isEmpty()) {
+        ui->labelDateTime_Update->setText(dt.m_created);
+    } else {
+        ui->labelDateTime_Update->setText(dt.m_updated);
+        ui->labelDateTime_Update->setToolTip(dt.m_created);
     }
 
-    ui->labelDateTime_Check->setText(_dt.m_verified);
+    ui->labelDateTime_Check->setText(dt.m_verified);
 }
 
 void DialogDbStatus::setTabsInfo()
@@ -82,13 +82,13 @@ void DialogDbStatus::setTabsInfo()
     if (data_->isFilterApplied()) {
         ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
-        const FilterRule &_filter = data_->m_metadata.filter;
-        ui->labelFiltersInfo->setStyleSheet(format::coloredText(_filter.isFilter(FilterRule::Ignore)));
+        const FilterRule &filter = data_->m_metadata.filter;
+        ui->labelFiltersInfo->setStyleSheet(format::coloredText(filter.isFilter(FilterRule::Ignore)));
 
-        const QString _exts = _filter.extensionString();
-        const QString _str_mode = _filter.isFilter(FilterRule::Include) ? QStringLiteral(u"Included:\n")
-                                                                        : QStringLiteral(u"Ignored:\n");
-        ui->labelFiltersInfo->setText(_str_mode + _exts);
+        const QString exts = filter.extensionString();
+        const QString str_mode = filter.isFilter(FilterRule::Include) ? QStringLiteral(u"Included:\n")
+                                                                      : QStringLiteral(u"Ignored:\n");
+        ui->labelFiltersInfo->setText(str_mode + exts);
     }
 
     // tab Verification
@@ -111,44 +111,44 @@ QStringList DialogDbStatus::infoContent()
     if (isCreating())
         return { QStringLiteral(u"The checksum list is being calculated...") };
 
-    const Numbers &_num = data_->m_numbers;
+    const Numbers &num = data_->m_numbers;
     QStringList contentNumbers;
-    const NumSize _n_avail = _num.values(FileStatus::CombAvailable);
-    const int numChecksums = _num.numberOf(FileStatus::CombHasChecksum);
+    const NumSize n_avail = num.values(FileStatus::CombAvailable);
+    const int numChecksums = num.numberOf(FileStatus::CombHasChecksum);
 
-    if (isJustCreated() || (numChecksums != _n_avail._num)) {
+    if (isJustCreated() || (numChecksums != n_avail._num)) {
         QString _storedChecksums = tools::joinStrings(QStringLiteral(u"Stored checksums:"), numChecksums);
 
         if (isJustCreated())
-            contentNumbers << format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(_n_avail._size));
+            contentNumbers << format::addStrInParentheses(_storedChecksums, format::dataSizeReadable(n_avail._size));
         else
             contentNumbers << _storedChecksums;
     }
 
-    const NumSize _n_unr = _num.values(FileStatus::CombUnreadable);
-    if (_n_unr)
-        contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), _n_unr._num));
+    const NumSize n_unr = num.values(FileStatus::CombUnreadable);
+    if (n_unr)
+        contentNumbers.append(tools::joinStrings(QStringLiteral(u"Unreadable files:"), n_unr._num));
 
     if (isJustCreated())
         return contentNumbers;
 
-    if (_n_avail)
-        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(_n_avail));
+    if (n_avail)
+        contentNumbers.append(QStringLiteral(u"Available: ") + format::filesNumSize(n_avail));
     else
         contentNumbers.append("NO FILES available to check");
 
     // [experimental]
-    const NumSize _n_mod = _num.values(FileStatus::NotCheckedMod);
-    if (_n_mod)
-        contentNumbers << tools::joinStrings(QStringLiteral(u"Modified: "), _n_mod._num);
+    const NumSize n_mod = num.values(FileStatus::NotCheckedMod);
+    if (n_mod)
+        contentNumbers << tools::joinStrings(QStringLiteral(u"Modified: "), n_mod._num);
         // addit. space is needed for align. with "Available: " (monospace fonts)
     // [exp.]
 
     contentNumbers.append(QString());
     contentNumbers.append(QStringLiteral(u"***"));
 
-    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(_num, FileStatus::New));
-    contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(_num.numberOf(FileStatus::Missing)));
+    contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(num, FileStatus::New));
+    contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(num.numberOf(FileStatus::Missing)));
 
     if (data_->isImmutable()) {
         contentNumbers.append(QString());
@@ -161,45 +161,45 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const Numbers &_num = data_->m_numbers;
-    const int _n_available = _num.numberOf(FileStatus::CombAvailable);
-    const int _n_mismatch = _num.numberOf(FileStatus::Mismatched);
+    const Numbers &num = data_->m_numbers;
+    const int n_available = num.numberOf(FileStatus::CombAvailable);
+    const int n_mismatch = num.numberOf(FileStatus::Mismatched);
 
     if (data_->isAllChecked()) {
-        const int _n_checksums = _num.numberOf(FileStatus::CombHasChecksum);
+        const int _n_checksums = num.numberOf(FileStatus::CombHasChecksum);
 
-        if (_n_mismatch) {
+        if (n_mismatch) {
             result.append(QString("☒ %1 mismatches out of %2 available files")
-                              .arg(_n_mismatch)
-                              .arg(_n_available));
+                              .arg(n_mismatch)
+                              .arg(n_available));
         }
-        else if (_n_checksums == _n_available)
+        else if (_n_checksums == n_available)
             result.append(QString("✓ ALL %1 stored checksums matched").arg(_n_checksums));
         else
-            result.append(QString("✓ All %1 available files matched the stored checksums").arg(_n_available));
+            result.append(QString("✓ All %1 available files matched the stored checksums").arg(n_available));
     }
     else if (data_->contains(FileStatus::CombChecked)) {
         // to account for added and updated files, the total number in parentheses is used
-        const int _n_added_updated = _num.numberOf(FileStatus::Added | FileStatus::Updated);
+        const int n_added_updated = num.numberOf(FileStatus::Added | FileStatus::Updated);
 
         // info str
-        const int _n_checked = _num.numberOf(FileStatus::CombChecked);
+        const int n_checked = num.numberOf(FileStatus::CombChecked);
         result.append(QString("%1%2 out of %3 files were checked")
-                          .arg(_n_checked)
-                          .arg(_n_added_updated > 0 ? format::inParentheses(_n_checked + _n_added_updated) : QString())
-                          .arg(_n_available));
+                          .arg(n_checked)
+                          .arg(n_added_updated > 0 ? format::inParentheses(n_checked + n_added_updated) : QString())
+                          .arg(n_available));
 
         result.append(QString());
-        if (_n_mismatch)
-            result.append(format::filesNumber(_n_mismatch) + QStringLiteral(u" MISMATCHED"));
+        if (n_mismatch)
+            result.append(format::filesNumber(n_mismatch) + QStringLiteral(u" MISMATCHED"));
         else
             result.append(QStringLiteral(u"No Mismatches found"));
 
-        const int _n_matched = _num.numberOf(FileStatus::Matched);
-        if (_n_matched) {
+        const int n_matched = num.numberOf(FileStatus::Matched);
+        if (n_matched) {
             result.append(QString("%1%2 files matched")
-                              .arg(_n_matched)
-                              .arg(_n_added_updated > 0 ? format::inParentheses(_n_matched + _n_added_updated) : QString()));
+                              .arg(n_matched)
+                              .arg(n_added_updated > 0 ? format::inParentheses(n_matched + n_added_updated) : QString()));
         }
     }
 

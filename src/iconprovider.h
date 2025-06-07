@@ -79,7 +79,8 @@ private:
     static const QString s_folderLight;
     static const QString s_svg;
 
-    template<typename _Pic = QIcon, typename _Enum> // _Pic(QIcon or QPixmap); _Enum(FileStatus or enum Icons)
+    // _Pic(QIcon or QPixmap); _Enum(FileStatus or enum Icons)
+    template<typename _Pic = QIcon, typename _Enum>
     _Pic cached(const _Enum _value) const
     {
         static QHash<_Enum, _Pic> s_cache;

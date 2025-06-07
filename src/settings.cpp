@@ -71,8 +71,7 @@ void Settings::addRecentFile(const QString &filePath)
     int ind = recentFiles.indexOf(filePath);
     if (ind == -1) {
         recentFiles.prepend(filePath); // add to the top of the list
-    }
-    else if (ind > 0) {
+    } else if (ind > 0) {
         recentFiles.move(ind, 0); // move the recent file to the top
     }
 

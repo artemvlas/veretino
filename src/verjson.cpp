@@ -65,21 +65,21 @@ bool VerJson::load()
         return false;
     }
 
-    QFile j_file(m_file_path);
-    if (!j_file.open(QFile::ReadOnly)) {
+    QFile jFile(m_file_path);
+    if (!jFile.open(QFile::ReadOnly)) {
         qWarning() << "Failed to open file!";
         return false;
     }
 
-    QByteArray __ba = j_file.readAll();
+    QByteArray ba = jFile.readAll();
 
-    if (__ba.startsWith("PK")) { // is compressed
-        QMicroz qmz(__ba);
+    if (ba.startsWith("PK")) { // is compressed
+        QMicroz qmz(ba);
         if (qmz)
-            __ba = qmz.extractData(0);
+            ba = qmz.extractData(0);
     }
 
-    const QJsonDocument doc = QJsonDocument::fromJson(__ba);
+    const QJsonDocument doc = QJsonDocument::fromJson(ba);
 
     // the Veretino json file is QJsonArray of QJsonObjects [{}, {}, ...]
     if (doc.isArray()) {

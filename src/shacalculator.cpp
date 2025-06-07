@@ -41,8 +41,7 @@ QString ShaCalculator::calculate(const QString &filePath, QCryptographicHash::Al
             if (buf.size() > 0) {
                 hash.addData(buf);
                 emit doneChunk(buf.size());
-            }
-            else {
+            } else {
                 qWarning() << "ShaCalculator::calculate >> ERROR:" << filePath;
                 return QString();
             }
