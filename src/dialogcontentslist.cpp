@@ -80,23 +80,23 @@ void DialogContentsList::updateSelectInfo()
     if (!ui->f_selected_info->isVisible())
         return;
 
-    NumSize n_sel;
+    NumSize nSel;
 
     for (QTreeWidgetItem *itm : selected) {
         const ItemFileType *item = static_cast<ItemFileType *>(itm);
-        n_sel += item->numSize();
+        nSel += item->numSize();
     }
 
-    ui->l_selected->setText(format::filesNumSize(n_sel));
+    ui->l_selected->setText(format::filesNumSize(nSel));
 
-    const NumSize n_unsel = _n_total - n_sel;
-    const bool hasUnsel = (bool)n_unsel;
+    const NumSize nUnsel = _n_total - nSel;
+    const bool hasUnsel = (bool)nUnsel;
 
     // hide 'unselected' label if no items
     ui->l_unselected->setVisible(hasUnsel);
     ui->l_sep->setVisible(hasUnsel);
 
     if (hasUnsel) {
-        ui->l_unselected->setText(format::filesNumSize(n_unsel));
+        ui->l_unselected->setText(format::filesNumSize(nUnsel));
     }
 }

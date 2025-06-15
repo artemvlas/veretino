@@ -61,6 +61,7 @@ void DataContainer::clearData()
         delete m_proxy;
         m_proxy = nullptr;
     }
+
     if (m_model) {
         delete m_model;
         m_model = nullptr;
@@ -94,29 +95,29 @@ QString DataContainer::branch_path_existing(const QModelIndex &subfolder)
         return QString();
 
     if (_cacheBranches.contains(subfolder)) {
-        const QString __fp = _cacheBranches.value(subfolder);
-        if (__fp.isEmpty() || QFileInfo::exists(__fp)) { // in case of renaming
-            qDebug() << "DC::branchFilePath >> return cached:" << __fp;
-            return __fp;
+        const QString fp = _cacheBranches.value(subfolder);
+        if (fp.isEmpty() || QFileInfo::exists(fp)) { // in case of renaming
+            qDebug() << "DC::branchFilePath >> return cached:" << fp;
+            return fp;
         }
     }
 
     // searching
-    QString __path = branch_path_composed(subfolder);
-    if (!QFileInfo::exists(__path))
-        __path = Files::firstDbFile(pathstr::parentFolder(__path));
+    QString path = branch_path_composed(subfolder);
+    if (!QFileInfo::exists(path))
+        path = Files::firstDbFile(pathstr::parentFolder(path));
 
     // caching the result; an empty value means no branches
-    _cacheBranches[subfolder] = __path;
+    _cacheBranches[subfolder] = path;
 
-    return __path;
+    return path;
 }
 
 // returns the predefined/supposed path to the branch db file, regardless of its existence
 QString DataContainer::branch_path_composed(const QModelIndex &subfolder) const
 {
-    const bool _isLongExt = pathstr::hasExtension(m_metadata.dbFilePath, Lit::sl_db_exts.first());
-    QString extension = Lit::sl_db_exts.at(_isLongExt ? 0 : 1);
+    const bool isLongExt = pathstr::hasExtension(m_metadata.dbFilePath, Lit::sl_db_exts.first());
+    QString extension = Lit::sl_db_exts.at(isLongExt ? 0 : 1);
     QString folderPath = itemAbsolutePath(subfolder);
     QString fileName = format::composeDbFileName(QStringLiteral(u"checksums"), folderPath, extension);
     QString filePath = pathstr::joinPath(folderPath, fileName);
@@ -154,9 +155,9 @@ bool DataContainer::isAllChecked() const
 
 bool DataContainer::isAllMatched(const QModelIndex &subfolder) const
 {
-    const Numbers &_nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
+    const Numbers &nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
 
-    return isAllMatched(_nums);
+    return isAllMatched(nums);
 }
 
 bool DataContainer::isAllMatched(const Numbers &nums) const
