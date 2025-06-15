@@ -357,9 +357,10 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
         return;
 
     // changing accompanying statuses to "Matched"
-    FileStatuses flagAddedUpdated = (FileStatus::Added | FileStatus::Updated);
-    if (m_dataMaintainer->m_data->m_numbers.contains(flagAddedUpdated)) {
-        m_dataMaintainer->changeStatuses(flagAddedUpdated, FileStatus::Matched, folderItemIndex);
+    // item statuses with checksums that can be considered already verified/matched
+    FileStatuses accompStatuses = (FileStatus::Added | FileStatus::Updated | FileStatus::Moved);
+    if (m_dataMaintainer->m_data->m_numbers.contains(accompStatuses)) {
+        m_dataMaintainer->changeStatuses(accompStatuses, FileStatus::Matched, folderItemIndex);
     }
 
     // result

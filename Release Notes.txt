@@ -1,4 +1,8 @@
 ---
+Veretino 0.6.3
+* Fixed the update of the verification date in the presence of moved items.
+
+---
 Veretino 0.6.2
 * Improved display of the subfolder content statuses.
 * The names of some item statuses are simplified.
