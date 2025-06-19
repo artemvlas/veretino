@@ -13,11 +13,12 @@ ProcState::ProcState(QObject *parent)
 
 void ProcState::setState(State state)
 {
-    if (state != state_) {
-        state_ = state;
-        emit stateChanged();
-        isFinished();
-    }
+    if (state_ == state)
+        return;
+
+    state_ = state;
+    emit stateChanged();
+    isFinished();
 }
 
 State ProcState::state() const
@@ -40,43 +41,58 @@ bool ProcState::isCanceled() const
     return (state_ & Canceled);
 }
 
-bool ProcState::hasTotalSize() const
+void ProcState::setAwaiting(Awaiting await)
 {
-    return _p_size.hasSet();
+    awaiting_ = await;
 }
 
-void ProcState::setTotal(const NumSize &_nums)
+bool ProcState::isAwaiting() const
 {
-    _p_size.setTotal(_nums._size);
-    _p_queue.setTotal(_nums._num);
+    return awaiting_;
+}
+
+bool ProcState::isAwaiting(Awaiting await) const
+{
+    return awaiting_ == await;
+}
+
+bool ProcState::hasTotalSize() const
+{
+    return chunks_size_.hasSet();
+}
+
+void ProcState::setTotal(const NumSize &nums)
+{
+    chunks_size_.setTotal(nums._size);
+    chunks_queue_.setTotal(nums._num);
 }
 
 void ProcState::setTotalSize(qint64 totalSize)
 {
-    _p_size.setTotal(totalSize);
-    _p_queue.reset();
+    chunks_size_.setTotal(totalSize);
+    chunks_queue_.reset();
 }
 
 void ProcState::changeTotalSize(qint64 totalSize)
 {
-    if (totalSize > _p_size._done) {
-        _p_size._total = totalSize;
+    if (totalSize > chunks_size_._done) {
+        chunks_size_._total = totalSize;
     }
 }
 
 bool ProcState::decreaseTotalSize(qint64 by_size)
 {
-    return _p_size.decreaseTotal(by_size);
+    return chunks_size_.decreaseTotal(by_size);
 }
 
 bool ProcState::decreaseTotalQueued(int by_num)
 {
-    return _p_queue.decreaseTotal(by_num);
+    return chunks_queue_.decreaseTotal(by_num);
 }
 
 void ProcState::addDoneOne()
 {
-    ++_p_queue;
+    ++chunks_queue_;
 }
 
 void ProcState::startProgress()
@@ -89,7 +105,7 @@ void ProcState::startProgress()
 
 void ProcState::isFinished()
 {
-    if (_p_size.hasChunks() && _p_size.hasSet() && isState(Idle)) {
+    if (chunks_size_.hasChunks() && chunks_size_.hasSet() && isState(Idle)) {
         setTotalSize(0); // reset to 0
         emit progressFinished();
     }
@@ -98,14 +114,14 @@ void ProcState::isFinished()
 // add this processed piece(chunk), calculate total done size and emit ::percentageChanged
 void ProcState::addChunk(int chunk)
 {
-    if (!_p_size.hasSet()) // _p_size._total == 0
+    if (!chunks_size_.hasSet()) // chunks_size_._total == 0
         return;
 
-    if (!_p_size.hasChunks()) // _p_size._done == 0
+    if (!chunks_size_.hasChunks()) // chunks_size_._done == 0
         startProgress();
 
-    _p_size << chunk;
-    const int curPerc = _p_size.percent(); // current percentage
+    chunks_size_ << chunk;
+    const int curPerc = chunks_size_.percent(); // current percentage
 
     if (curPerc > lastPerc_) {
         lastPerc_ = curPerc;
@@ -115,12 +131,12 @@ void ProcState::addChunk(int chunk)
 
 qint64 ProcState::doneSize() const
 {
-    return _p_size._done;
+    return chunks_size_._done;
 }
 
 qint64 ProcState::donePieceSize() const
 {
-    qint64 pieceSize = _p_size._done - prevDoneSize_;
+    qint64 pieceSize = chunks_size_._done - prevDoneSize_;
     prevDoneSize_ += pieceSize;
 
     return pieceSize;
@@ -128,15 +144,15 @@ qint64 ProcState::donePieceSize() const
 
 qint64 ProcState::remainingSize() const
 {
-    return _p_size.remain();
+    return chunks_size_.remain();
 }
 
-Chunks<qint64> ProcState::pSize() const
+Chunks<qint64> ProcState::chunksSize() const
 {
-    return _p_size;
+    return chunks_size_;
 }
 
-Chunks<int> ProcState::pQueue() const
+Chunks<int> ProcState::chunksQueue() const
 {
-    return _p_queue;
+    return chunks_queue_;
 }

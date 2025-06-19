@@ -15,16 +15,6 @@ class ProcState : public QObject
 
 public:
     explicit ProcState(QObject *parent = nullptr);
-    void setTotal(const NumSize &_nums);
-    void setTotalSize(qint64 totalSize);
-    void changeTotalSize(qint64 totalSize);
-    bool decreaseTotalSize(qint64 by_size);
-
-    // decreases the total number of elements in the queue [_p_queue] by number
-    bool decreaseTotalQueued(int by_num = 1);
-
-    // increases the number of finished pieces from the queue by one
-    void addDoneOne();
 
     enum State {
         Idle = 1 << 0,
@@ -38,12 +28,34 @@ public:
     Q_ENUM(State)
     //Q_DECLARE_FLAGS(States, State)
 
+    // The action expected after the completion of the task list
+    enum Awaiting {
+        AwaitingNothing = 0,
+        AwaitingClosure = 1,     // close the app
+        AwaitingSwitchToFs = 2   // switch to fs view
+    };
+
     void setState(State state);
     State state() const; // returns current state_
     bool isState(State state) const;
     bool isStarted() const;
     bool isCanceled() const;
+
+    void setAwaiting(Awaiting await);
+    bool isAwaiting() const;
+    bool isAwaiting(Awaiting await) const;
+
     bool hasTotalSize() const;
+    void setTotal(const NumSize &nums);
+    void setTotalSize(qint64 totalSize);
+    void changeTotalSize(qint64 totalSize);
+    bool decreaseTotalSize(qint64 by_size);
+
+    // decreases the total number of elements in the queue [chunks_queue_] by number
+    bool decreaseTotalQueued(int by_num = 1);
+
+    // increases the number of finished pieces from the queue by one
+    void addDoneOne();
 
     // returns the total size of the processed data
     qint64 doneSize() const;
@@ -52,8 +64,8 @@ public:
     qint64 donePieceSize() const;
 
     qint64 remainingSize() const;
-    Chunks<qint64> pSize() const;
-    Chunks<int> pQueue() const;
+    Chunks<qint64> chunksSize() const;
+    Chunks<int> chunksQueue() const;
 
 public slots:
     void addChunk(int chunk);
@@ -64,10 +76,11 @@ private:
 
     static qint64 prevDoneSize_;
     int lastPerc_ = 0; // percentage before current chunk added
-    Chunks<qint64> _p_size;
-    Chunks<int> _p_queue;
+    Chunks<qint64> chunks_size_;
+    Chunks<int> chunks_queue_;
 
     State state_ = Idle;
+    Awaiting awaiting_ = AwaitingNothing;
 
 signals:
     void stateChanged();
