@@ -55,29 +55,30 @@ void VerDateTime::set(const QString &str)
         for (int i = 0; i < 3; ++i) {
             set((DT)i, dtList.at(i));
         }
-    } else {
-        for (const QString &dt : dtList) {
-            if (dt.isEmpty())
-                continue;
+        return;
+    }
 
-            const char ch = dt.front().toLatin1();
+    for (const QString &dt : dtList) {
+        if (dt.isEmpty())
+            continue;
 
-            switch (ch) {
-            case 'c':
-            case 'C':
-                m_created = dt;
-                break;
-            case 'u':
-            case 'U':
-                m_updated = dt;
-                break;
-            case 'v':
-            case 'V':
-                m_verified = dt;
-                break;
-            default:
-                break;
-            }
+        const char ch = dt.front().toLatin1();
+
+        switch (ch) {
+        case 'c':
+        case 'C':
+            m_created = dt;
+            break;
+        case 'u':
+        case 'U':
+            m_updated = dt;
+            break;
+        case 'v':
+        case 'V':
+            m_verified = dt;
+            break;
+        default:
+            break;
         }
     }
 }

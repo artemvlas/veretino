@@ -10,7 +10,6 @@
 #include <QHeaderView>
 #include <QAction>
 #include <QMenu>
-#include "tools.h"
 #include "pathstr.h"
 #include "treemodeliterator.h"
 
@@ -237,12 +236,12 @@ void View::setIndexByPath(const QString &path)
             emit showMessage("Wrong path: " + path, "Error");
         }
     } else if (isViewDatabase()) {
-        QModelIndex _ind = TreeModel::getIndex(path, model());
+        QModelIndex ind = TreeModel::getIndex(path, model());
 
-        if (!_ind.isValid())
-            _ind = TreeModelIterator(model()).nextFile().index(); // select the very first file
+        if (!ind.isValid())
+            ind = TreeModelIterator(model()).nextFile().index(); // select the very first file
 
-        setCurIndex(_ind);
+        setCurIndex(ind);
     }
 }
 
@@ -251,11 +250,11 @@ void View::setCurIndex(const QModelIndex &ind)
     if (ind.isValid()) {
         expand(ind);
         setCurrentIndex(ind);
-        const int _tmr = (ind.model() == m_fileSystem) ? 500 : 0;
-        QTimer::singleShot(_tmr, this, &View::scrollToCurrent);
+        const int tmr = (ind.model() == m_fileSystem) ? 500 : 0;
+        QTimer::singleShot(tmr, this, &View::scrollToCurrent);
 
-        if (_tmr) // second, the control one :)
-            QTimer::singleShot((_tmr * 2), this, &View::scrollToCurrent);
+        if (tmr) // second, the control one :)
+            QTimer::singleShot((tmr * 2), this, &View::scrollToCurrent);
     }
 }
 

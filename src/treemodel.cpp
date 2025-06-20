@@ -86,11 +86,10 @@ TreeItem *TreeModel::add_folder(const QString &path)
     const QStringList pathParts = path.split('/', Qt::SkipEmptyParts);
 
     for (const QString &_subFolder : pathParts) {
-        TreeItem *_ti = parentItem->findChild(_subFolder);
-        if (_ti) {
-            parentItem = _ti;
-        }
-        else {
+        TreeItem *ti = parentItem->findChild(_subFolder);
+        if (ti) {
+            parentItem = ti;
+        } else {
             QVector<QVariant> tiData(m_rootItem->columnCount());
             tiData[ColumnName] = _subFolder;
             parentItem = parentItem->addChild(tiData);
@@ -200,8 +199,8 @@ bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int 
     if (role != Qt::EditRole || !curIndex.isValid())
         return false;
 
-    TreeItem *item = getItem(curIndex);
-    const bool result = item->setData(curIndex.column(), value);
+    TreeItem *ti = getItem(curIndex);
+    const bool result = ti->setData(curIndex.column(), value);
 
     if (result) { // to change the color of the checksum during the verification process
         const QModelIndex &endIndex = (curIndex.column() == ColumnStatus) ? curIndex.siblingAtColumn(ColumnChecksum)
@@ -232,9 +231,9 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
 TreeItem *TreeModel::getItem(const QModelIndex &curIndex) const
 {
     if (curIndex.isValid()) {
-        TreeItem *item = static_cast<TreeItem*>(curIndex.internalPointer());
-        if (item)
-            return item;
+        TreeItem *ti = static_cast<TreeItem*>(curIndex.internalPointer());
+        if (ti)
+            return ti;
     }
     return m_rootItem;
 }

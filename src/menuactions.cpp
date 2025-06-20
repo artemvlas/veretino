@@ -186,17 +186,17 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
     static const QString defstrUpdateRe = actionUpdDbReChecksums->text();
     static const QString defstrNumFormat = QStringLiteral(u" [%1]");
 
-    QString _strAddNew = defstrAddNew + (actionUpdDbAddNew->isEnabled() ? QString(defstrNumFormat)
-                                         .arg(dataNum.numberOf(FileStatus::New)) : QString());
-    actionUpdDbAddNew->setText(_strAddNew);
+    QString strAddNew = defstrAddNew + (actionUpdDbAddNew->isEnabled() ? QString(defstrNumFormat)
+                                        .arg(dataNum.numberOf(FileStatus::New)) : QString());
+    actionUpdDbAddNew->setText(strAddNew);
 
-    QString _strClearLost = defstrClearLost + (actionUpdDbClearLost->isEnabled() ? QString(defstrNumFormat)
-                                                .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
-    actionUpdDbClearLost->setText(_strClearLost);
+    QString strClearLost = defstrClearLost + (actionUpdDbClearLost->isEnabled() ? QString(defstrNumFormat)
+                                              .arg(dataNum.numberOf(FileStatus::Missing)) : QString());
+    actionUpdDbClearLost->setText(strClearLost);
 
-    QString _strUpdateRe = defstrUpdateRe + (actionUpdDbReChecksums->isEnabled() ? QString(defstrNumFormat)
-                                                        .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
-    actionUpdDbReChecksums->setText(_strUpdateRe);
+    QString strUpdateRe = defstrUpdateRe + (actionUpdDbReChecksums->isEnabled() ? QString(defstrNumFormat)
+                                            .arg(dataNum.numberOf(FileStatus::Mismatched)) : QString());
+    actionUpdDbReChecksums->setText(strUpdateRe);
 
     return menuUpdateDatabase;
 }

@@ -3,7 +3,7 @@
 ##############
 cmake_minimum_required(VERSION 3.5)
 
-project(veretino VERSION 0.6.2 LANGUAGES CXX)
+project(veretino VERSION 0.6.3 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)

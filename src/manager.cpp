@@ -161,12 +161,12 @@ void Manager::prepareSwitchToFs()
 {
     saveData();
 
-    if (m_dataMaintainer->isDataNotSaved())
-        emit showMessage("The Database is NOT saved", "Error");
-    else
+    if (m_dataMaintainer->isDataNotSaved()) {
+        qWarning() << "Warning! The Database is NOT saved";
+    } else {
         emit switchToFsPrepared();
-
-    qDebug() << "Manager::prepareSwitchToFs >> Done";
+        qDebug() << "Manager::prepareSwitchToFs >> Done";
+    }
 }
 
 void Manager::updateDatabase(const DbMod dest)
@@ -357,9 +357,10 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
         return;
 
     // changing accompanying statuses to "Matched"
-    FileStatuses flagAddedUpdated = (FileStatus::Added | FileStatus::Updated);
-    if (m_dataMaintainer->m_data->m_numbers.contains(flagAddedUpdated)) {
-        m_dataMaintainer->changeStatuses(flagAddedUpdated, FileStatus::Matched, folderItemIndex);
+    // item statuses with checksums that can be considered already verified/matched
+    FileStatuses accompStatuses = (FileStatus::Added | FileStatus::Updated | FileStatus::Moved);
+    if (m_dataMaintainer->m_data->m_numbers.contains(accompStatuses)) {
+        m_dataMaintainer->changeStatuses(accompStatuses, FileStatus::Matched, folderItemIndex);
     }
 
     // result
@@ -487,8 +488,8 @@ QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
 void Manager::updateProgText(const CalcKind calckind, const QString &file)
 {
     const QString purp = calckind ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
-    const Chunks<qint64> _p_size = m_proc->pSize();
-    const Chunks<int> _p_queue = m_proc->pQueue();
+    const Chunks<qint64> _p_size = m_proc->chunksSize();
+    const Chunks<int> _p_queue = m_proc->chunksQueue();
 
     // single file
     if (!_p_queue.hasSet()) {
@@ -588,7 +589,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
         }
     }
 
-    const int done = m_proc->pQueue()._done;
+    const int done = m_proc->chunksQueue()._done;
     if (m_proc->isCanceled()) {
         if (m_proc->isState(State::Abort)) {
             qDebug() << "Manager::calculateChecksums >> Aborted";
