@@ -161,12 +161,12 @@ void Manager::prepareSwitchToFs()
 {
     saveData();
 
-    if (m_dataMaintainer->isDataNotSaved())
-        emit showMessage("The Database is NOT saved", "Error");
-    else
+    if (m_dataMaintainer->isDataNotSaved()) {
+        qWarning() << "Warning! The Database is NOT saved";
+    } else {
         emit switchToFsPrepared();
-
-    qDebug() << "Manager::prepareSwitchToFs >> Done";
+        qDebug() << "Manager::prepareSwitchToFs >> Done";
+    }
 }
 
 void Manager::updateDatabase(const DbMod dest)

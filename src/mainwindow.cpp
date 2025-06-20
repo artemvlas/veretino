@@ -179,7 +179,7 @@ void MainWindow::connectManager()
     connect(manager->m_proc, &ProcState::progressFinished, modeSelect, &ModeSelector::getInfoPathItem);
 
     // change view
-    connect(manager, &Manager::switchToFsPrepared, ui->view, &View::setFileSystemModel);
+    connect(manager, &Manager::switchToFsPrepared, [=] { ui->view->setFileSystemModel(); proc_->setAwaiting(ProcState::AwaitingNothing); });
     connect(ui->view, &View::switchedToFs, manager->m_dataMaintainer, &DataMaintainer::clearData);
     connect(ui->view, &View::modelChanged, manager, &Manager::modelChanged);
     connect(ui->view, &View::dataSetted, manager->m_dataMaintainer, &DataMaintainer::clearOldData);
@@ -431,14 +431,14 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     }
 }
 
-void MainWindow::dialogSaveJson(VerJson *p_unsaved)
+void MainWindow::dialogSaveJson(VerJson *pUnsavedJson)
 {
-    if (!p_unsaved) {
+    if (!pUnsavedJson) {
         qWarning() << "No unsaved json found";
         return;
     }
 
-    QString file_path = p_unsaved->file_path();
+    QString file_path = pUnsavedJson->file_path();
 
     const bool is_short = pathstr::hasExtension(file_path, Lit::sl_db_exts.at(1));
     const QString ext = Lit::sl_db_exts.at(is_short); // index 0 is long, 1 is short
@@ -451,9 +451,10 @@ void MainWindow::dialogSaveJson(VerJson *p_unsaved)
                                                               str_filter);
 
         if (sel_path.isEmpty()) { // canceled
-            if (awaiting_closure
+            // TODO: should be merged different 'awaiting' methods
+            if ((awaiting_closure || proc_->isAwaiting(ProcState::AwaitingSwitchToFs))
                 && QMessageBox::question(this, "Unsaved data...",
-                                         "Exit without saving data?") != QMessageBox::Yes)
+                                         "Close without saving data?") != QMessageBox::Yes)
             {
                 continue;
             }
@@ -466,17 +467,22 @@ void MainWindow::dialogSaveJson(VerJson *p_unsaved)
         if (!pathstr::hasExtension(file_path, ext))
             file_path = pathstr::setSuffix(file_path, ext);
 
-        p_unsaved->setFilePath(file_path);
+        pUnsavedJson->setFilePath(file_path);
 
-        if (manager->m_dataMaintainer->saveJsonFile(p_unsaved))
+        if (manager->m_dataMaintainer->saveJsonFile(pUnsavedJson))
             break;
     }
 
-    delete p_unsaved;
+    delete pUnsavedJson;
     qDebug() << "dialogSaveJson:" << file_path;
 
-    if (awaiting_closure)
+    // TODO: should be merged different 'awaiting' methods
+    if (awaiting_closure) {
         close();
+    } else if (proc_->isAwaiting(ProcState::AwaitingSwitchToFs)) {
+        ui->view->setFileSystemModel();
+        proc_->setAwaiting(ProcState::AwaitingNothing);
+    }
 }
 
 void MainWindow::updateButtonInfo()

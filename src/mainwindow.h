@@ -57,7 +57,7 @@ public slots:
                                const QString &subFolder);
     void showFileCheckResult(const QString &filePath,
                              const FileValues &values);
-    void dialogSaveJson(VerJson *p_unsaved);
+    void dialogSaveJson(VerJson *pUnsavedJson);
 
     void createContextMenu_Button(const QPoint &point);
 

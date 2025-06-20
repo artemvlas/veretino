@@ -385,18 +385,19 @@ void ModeSelector::copyFsItem()
 
 void ModeSelector::showFileSystem(const QString &path)
 {
-    if (promptProcessAbort()) {
-        if (QFileInfo::exists(path))
-            p_view->m_lastPathFS = path;
+    if (!promptProcessAbort())
+        return;
 
-        if (p_view->m_data
-            && p_view->m_data->isDbFileState(DbFileState::NotSaved))
-        {
-            p_manager->addTask(&Manager::prepareSwitchToFs);
-        }
-        else {
-            p_view->setFileSystemModel();
-        }
+    if (QFileInfo::exists(path))
+        p_view->m_lastPathFS = path;
+
+    if (p_view->m_data
+        && p_view->m_data->isDbFileState(DbFileState::NotSaved))
+    {
+        p_manager->addTask(&Manager::prepareSwitchToFs);
+        p_proc->setAwaiting(ProcState::AwaitingSwitchToFs);
+    } else {
+        p_view->setFileSystemModel();
     }
 }
 
