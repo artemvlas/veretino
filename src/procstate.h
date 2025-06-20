@@ -29,7 +29,7 @@ public:
     //Q_DECLARE_FLAGS(States, State)
 
     // The action expected after the completion of the task list
-    enum Awaiting {
+    enum Awaiting : quint8 {
         AwaitingNothing = 0,
         AwaitingClosure = 1,     // close the app
         AwaitingSwitchToFs = 2   // switch to fs view

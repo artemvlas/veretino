@@ -799,23 +799,23 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     if (!p_view->isViewDatabase())
         return;
 
-    const DataContainer *data = p_view->m_data;
-    const Numbers &nums = data->m_numbers;
-    const QModelIndex v_ind = p_view->indexAt(point);
-    const QModelIndex index = p_view->isViewModel(ModelView::ModelProxy) ? data->m_proxy->mapToSource(v_ind) : v_ind;
+    const DataContainer *pData = p_view->m_data;
+    const Numbers &nums = pData->m_numbers;
+    const QModelIndex vInd = p_view->indexAt(point);
+    const QModelIndex index = p_view->isViewModel(ModelView::ModelProxy) ? pData->m_proxy->mapToSource(vInd) : vInd;
     QMenu *viewContextMenu = m_menuAct->disposableMenu();
 
     if (p_proc->isStarted()) {
-        if (!data->isInCreation())
+        if (!pData->isInCreation())
             viewContextMenu->addAction(m_menuAct->actionStop);
         viewContextMenu->addAction(m_menuAct->actionCancelBackToFS);
-    }
-    else {
+    } else {
         viewContextMenu->addAction(m_menuAct->actionShowDbStatus);
         viewContextMenu->addAction(m_menuAct->actionResetDb);
 
-        if (data->isDbFileState(DbFileState::NotSaved)
-            || QFile::exists(data->backupFilePath()))
+        // TODO: should be optimized with more clear db file state
+        if (QFileInfo::exists(pData->backupFilePath())
+            || (pData->isDbFileState(DbFileState::NotSaved) && QFileInfo::exists(pData->m_metadata.dbFilePath)))
         {
             viewContextMenu->addAction(m_menuAct->actionForgetChanges);
         }
@@ -852,7 +852,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 viewContextMenu->addSeparator();
         }
 
-        if (!isDbConst() && data->hasPossiblyMovedItems())
+        if (!isDbConst() && pData->hasPossiblyMovedItems())
             viewContextMenu->addAction(m_menuAct->actionUpdDbFindMoved);
 
         if (index.isValid()) {
@@ -863,10 +863,10 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                         case FileStatus::New:
                             viewContextMenu->addAction(m_menuAct->actionUpdFileAdd);
                             // paste from clipboard
-                            if (p_settings->allowPasteIntoDb && !copiedDigest(data->m_metadata.algorithm).isEmpty())
+                            if (p_settings->allowPasteIntoDb && !copiedDigest(pData->m_metadata.algorithm).isEmpty())
                                 viewContextMenu->addAction(m_menuAct->actionUpdFilePasteDigest);
                             // import from digest file
-                            if (QFileInfo::exists(data->digestFilePath(index)))
+                            if (QFileInfo::exists(pData->digestFilePath(index)))
                                 viewContextMenu->addAction(m_menuAct->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:
