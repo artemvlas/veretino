@@ -72,6 +72,7 @@ private:
     bool argumentInput();
     void handleChangedModel();
     void handleButtonDbHashClick();
+    void switchToFs();
 
     // updates the icon in the lower left corner
     void updateStatusIcon();
@@ -97,13 +98,13 @@ private:
     QThread *thread = new QThread;
 
     // Manager performs the main tasks. Works in separate thread^
-    Manager *manager = new Manager(settings_);
-    ModeSelector *modeSelect = nullptr;
+    Manager *manager_ = new Manager(settings_);
+    ModeSelector *modeSelect_ = nullptr;
     ProcState *proc_ = nullptr;
-    StatusBar *statusBar = new StatusBar;
+    StatusBar *statusBar_ = new StatusBar;
 
     // true if the exit attempt was rejected (to perform data saving)
-    bool awaiting_closure = false;
+    // bool awaiting_closure = false;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
