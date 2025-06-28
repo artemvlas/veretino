@@ -3,6 +3,7 @@ Veretino 0.6.3
 * Fixed the impossibility of switching to the file system due to refusal to save data.
 * Fixed the update of the verification date in the presence of moved items.
 * Fixed the erroneous appearance of the 'Forget all changes' menu action (newly created, but not saved database).
+* Fixed the adding of a newly created DB with a custom location to the list of recent ones.
 
 ---
 Veretino 0.6.2

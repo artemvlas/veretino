@@ -185,8 +185,8 @@ void MainWindow::connectManager()
     connect(ui->view, &View::switchedToFs, manager_->m_dataMaintainer, &DataMaintainer::clearData);
     connect(ui->view, &View::modelChanged, manager_, &Manager::modelChanged);
     connect(ui->view, &View::dataSetted, manager_->m_dataMaintainer, &DataMaintainer::clearOldData);
-    connect(ui->view, &View::dataSetted, this,
-            [=]{ if (ui->view->m_data) settings_->addRecentFile(ui->view->m_data->m_metadata.dbFilePath); });
+
+    connect(ui->view, &View::dataSetted, this, &MainWindow::addRecentFile);
 
     thread->start();
 }
@@ -477,8 +477,10 @@ void MainWindow::dialogSaveJson(VerJson *pUnsavedJson)
 
         pUnsavedJson->setFilePath(file_path);
 
-        if (manager_->m_dataMaintainer->saveJsonFile(pUnsavedJson))
+        if (manager_->m_dataMaintainer->saveJsonFile(pUnsavedJson)) {
+            addRecentFile();
             break;
+        }
     }
 
     delete pUnsavedJson;
@@ -561,6 +563,15 @@ void MainWindow::updateWindowTitle()
         setWindowTitle(strTitle);
     } else {
         setWindowTitle(Lit::s_appName);
+    }
+}
+
+void MainWindow::addRecentFile()
+{
+    if (ui->view->m_data) {
+        const QString &filePath = ui->view->m_data->m_metadata.dbFilePath;
+        if (QFileInfo::exists(filePath))
+            settings_->addRecentFile(filePath);
     }
 }
 
