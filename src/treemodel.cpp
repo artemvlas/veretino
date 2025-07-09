@@ -173,8 +173,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
                 return QColor(Qt::darkRed);
             default: break;
             }
-        }
-        else if (curIndex.column() == ColumnReChecksum) {
+        } else if (curIndex.column() == ColumnReChecksum) {
             return QColor(Qt::darkGreen);
         }
     }

@@ -4,13 +4,11 @@
  * https://github.com/artemvlas/veretino
 */
 #include "verjson.h"
-#include "files.h"
 #include "tools.h"
 #include "pathstr.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
-#include "treemodeliterator.h"
 #include <QDirIterator>
 #include "qmicroz.h"
 

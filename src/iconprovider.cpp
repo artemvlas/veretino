@@ -233,8 +233,8 @@ QIcon IconProvider::iconFolder() const
 
 QIcon IconProvider::appIcon()
 {
-    static const QIcon _icon = QIcon(pathstr::composeFilePath(s_folderGeneric, Lit::s_app_name, s_svg));
-    return _icon; // ":/icons/generic/veretino.svg"
+    static const QIcon icn = QIcon(pathstr::composeFilePath(s_folderGeneric, Lit::s_app_name, s_svg));
+    return icn; // ":/icons/generic/veretino.svg"
 }
 
 QPixmap IconProvider::pixmap(FileStatus status, int size) const

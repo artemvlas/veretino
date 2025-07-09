@@ -64,10 +64,11 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbAllowPaste->setChecked(settings.allowPasteIntoDb);
 
     // Tab Database
-    if (settings.dbPrefix.isEmpty() || (settings.dbPrefix == Lit::s_db_prefix))
+    if (settings.dbPrefix.isEmpty() || (settings.dbPrefix == Lit::s_db_prefix)) {
         ui->inputJsonFileNamePrefix->clear();
-    else
+    } else {
         ui->inputJsonFileNamePrefix->setText(settings.dbPrefix);
+    }
 
     ui->cbAddFolderName->setChecked(settings.addWorkDirToFilename);
     ui->cbSaveVerificationDateTime->setChecked(settings.saveVerificationDateTime);

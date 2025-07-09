@@ -166,15 +166,15 @@ QStringList DialogDbStatus::infoVerification()
     const int n_mismatch = num.numberOf(FileStatus::Mismatched);
 
     if (data_->isAllChecked()) {
-        const int _n_checksums = num.numberOf(FileStatus::CombHasChecksum);
+        const int n_checksums = num.numberOf(FileStatus::CombHasChecksum);
 
         if (n_mismatch) {
             result.append(QString("☒ %1 mismatches out of %2 available files")
                               .arg(n_mismatch)
                               .arg(n_available));
         }
-        else if (_n_checksums == n_available)
-            result.append(QString("✓ ALL %1 stored checksums matched").arg(_n_checksums));
+        else if (n_checksums == n_available)
+            result.append(QString("✓ ALL %1 stored checksums matched").arg(n_checksums));
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(n_available));
     }

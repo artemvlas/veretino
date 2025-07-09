@@ -52,7 +52,7 @@ private:
     void setCheckboxesVisible(bool visible);
     void clearChecked();
     void updateViewMode();
-    void activateItem(QTreeWidgetItem *t_item);
+    void activateItem(QTreeWidgetItem *tItem);
     void updateFilterDisplay();
     void updateLabelFilterExtensions();
     void updateLabelTotalFiltered();

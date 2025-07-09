@@ -127,22 +127,22 @@ QString VerDateTime::basicDate() const
 
 QString VerDateTime::current(DT type)
 {
-    QString __s;
+    QString str;
 
     switch (type) {
     case Created:
-        __s = QStringLiteral(u"Created: ");
+        str = QStringLiteral(u"Created: ");
         break;
     case Updated:
-        __s = QStringLiteral(u"Updated: ");
+        str = QStringLiteral(u"Updated: ");
         break;
     case Verified:
-        __s = QStringLiteral(u"Verified: ");
+        str = QStringLiteral(u"Verified: ");
         break;
     default:
         break;
     }
 
     // for example: "Created: 2023/11/09 17:45"
-    return __s + format::currentDateTime();
+    return str + format::currentDateTime();
 }

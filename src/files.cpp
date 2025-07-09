@@ -145,13 +145,13 @@ QString Files::getFolderSize(const QString &path)
     if (!QFileInfo(path).isDir())
         return QString();
 
-    NumSize __n;
+    NumSize nms;
 
     // iterating
     QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext() && !isCanceled()) {
         it.next();
-        __n << it.fileInfo().size();
+        nms << it.fileInfo().size();
     }
 
     if (isCanceled()) {
@@ -161,7 +161,7 @@ QString Files::getFolderSize(const QString &path)
 
     // result processing
     const QString folderName = pathstr::basicName(path);
-    const QString folderSize = format::filesNumSize(__n);
+    const QString folderSize = format::filesNumSize(nms);
 
     return tools::joinStrings(folderName, folderSize, Lit::s_sepColonSpace);
 }
