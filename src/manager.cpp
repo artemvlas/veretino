@@ -126,8 +126,7 @@ void Manager::restoreDatabase()
         && (m_dataMaintainer->m_data->restoreBackupFile() || m_dataMaintainer->isDataNotSaved()))
     {
         createDataModel(m_dataMaintainer->m_data->m_metadata.dbFilePath);
-    }
-    else {
+    } else {
         emit setStatusbarText("No saved changes");
     }
 }
@@ -224,11 +223,11 @@ void Manager::updateDatabase(const DbMod dest)
 
 void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
 {
-    const DataContainer *p_data = m_dataMaintainer->m_data;
+    const DataContainer *pData = m_dataMaintainer->m_data;
     const FileStatus prevStatus = TreeModel::itemFileStatus(fileIndex);
 
-    if (!p_data
-        || p_data->isImmutable()
+    if (!pData
+        || pData->isImmutable()
         || !(prevStatus & FileStatus::CombUpdatable))
     {
         return;
@@ -236,12 +235,12 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
 
     if (prevStatus == FileStatus::New) {
         if (job & (DM_ImportDigest | DM_PasteDigest)) {
-            const QString __d = (job == DM_ImportDigest) ? extractDigestFromFile(p_data->digestFilePath(fileIndex))
+            const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(pData->digestFilePath(fileIndex))
                                                          : TreeModel::itemFileChecksum(fileIndex);
 
             // checking for compliance with the current algo
-            if (tools::canBeChecksum(__d, p_data->m_metadata.algorithm))
-                m_dataMaintainer->importChecksum(fileIndex, __d);
+            if (tools::canBeChecksum(dig, pData->m_metadata.algorithm))
+                m_dataMaintainer->importChecksum(fileIndex, dig);
         } else { // calc the new one
             const QString dig = hashItem(fileIndex);
 
@@ -250,11 +249,9 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
             else
                 m_dataMaintainer->updateChecksum(fileIndex, dig);
         }
-    }
-    else if (prevStatus == FileStatus::Missing) {
+    } else if (prevStatus == FileStatus::Missing) {
         m_dataMaintainer->itemFileRemoveLost(fileIndex);
-    }
-    else if (prevStatus == FileStatus::Mismatched) {
+    } else if (prevStatus == FileStatus::Mismatched) {
         m_dataMaintainer->itemFileUpdateChecksum(fileIndex);
     }
 
@@ -452,12 +449,13 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
 
 void Manager::calcFailedMessage(const QString &filePath)
 {
-    if (!m_proc->isCanceled()) {
-        QString __s = tools::enumToString(tools::failedCalcStatus(filePath)) + ":\n";
+    if (m_proc->isCanceled())
+        return;
 
-        emit showMessage(__s += filePath, "Warning");
-        emit setStatusbarText("failed to read file");
-    }
+    QString str = tools::enumToString(tools::failedCalcStatus(filePath)) + ":\n";
+
+    emit showMessage(str += filePath, "Warning");
+    emit setStatusbarText("failed to read file");
 }
 
 QString Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const CalcKind calckind)
@@ -488,33 +486,33 @@ QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
 void Manager::updateProgText(const CalcKind calckind, const QString &file)
 {
     const QString purp = calckind ? QStringLiteral(u"Verifying") : QStringLiteral(u"Calculating");
-    const Chunks<qint64> _p_size = m_proc->chunksSize();
-    const Chunks<int> _p_queue = m_proc->chunksQueue();
+    const Chunks<qint64> chunks_size = m_proc->chunksSize();
+    const Chunks<int> chunks_queue = m_proc->chunksQueue();
 
     // single file
-    if (!_p_queue.hasSet()) {
+    if (!chunks_queue.hasSet()) {
         // purp: file (size)
-        const QString __s = tools::joinStrings(purp,
-                                               format::fileNameAndSize(file, _p_size._total),
+        const QString str = tools::joinStrings(purp,
+                                               format::fileNameAndSize(file, chunks_size._total),
                                                Lit::s_sepColonSpace);
-        emit setStatusbarText(__s);
+        emit setStatusbarText(str);
         return;
     }
 
     // to avoid calling the dataSizeReadable() func for each file
-    static qint64 _lastTotalSize;
-    static QString _lastTotalSizeR;
+    static qint64 sLastTotalSize;
+    static QString sLastTotalSizeR;
 
-    if (!_p_size.hasChunks() || (_lastTotalSize != _p_size._total)) {
-        _lastTotalSize = _p_size._total;
-        _lastTotalSizeR = format::dataSizeReadable(_lastTotalSize);
+    if (!chunks_size.hasChunks() || (sLastTotalSize != chunks_size._total)) {
+        sLastTotalSize = chunks_size._total;
+        sLastTotalSizeR = format::dataSizeReadable(sLastTotalSize);
     }
 
     // UGLY, but better performance (should be). And should be re-implemented.
-    const QString res = purp % ' ' % QString::number(_p_queue._done + 1) % QStringLiteral(u" of ")
-                    % QString::number(_p_queue._total) % QStringLiteral(u" checksums ")
-                    % (!_p_size.hasChunks() ? format::inParentheses(_lastTotalSizeR) // (%1)
-                    : ('(' % format::dataSizeReadable(_p_size._done) % QStringLiteral(u" / ") % _lastTotalSizeR % ')')); // "(%1 / %2)"
+    const QString res = purp % ' ' % QString::number(chunks_queue._done + 1) % QStringLiteral(u" of ")
+                    % QString::number(chunks_queue._total) % QStringLiteral(u" checksums ")
+                    % (!chunks_size.hasChunks() ? format::inParentheses(sLastTotalSizeR) // (%1)
+                    : ('(' % format::dataSizeReadable(chunks_size._done) % QStringLiteral(u" / ") % sLastTotalSizeR % ')')); // "(%1 / %2)"
 
     emit setStatusbarText(res);
 }
@@ -526,10 +524,10 @@ int Manager::calculateChecksums(const FileStatus status, const QModelIndex &root
 
 int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, const QModelIndex &root)
 {
-    const DataContainer *p_data = m_dataMaintainer->m_data;
+    const DataContainer *pData = m_dataMaintainer->m_data;
 
-    if (!p_data
-        || (root.isValid() && root.model() != p_data->m_model))
+    if (!pData
+        || (root.isValid() && root.model() != pData->m_model))
     {
         qDebug() << "Manager::calculateChecksums | No data or wrong rootIndex";
         return 0;
@@ -538,7 +536,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     if (status != FileStatus::Queued)
         m_dataMaintainer->addToQueue(status, root);
 
-    const NumSize num_queued = p_data->getNumbers(root).values(FileStatus::Queued);
+    const NumSize num_queued = pData->getNumbers(root).values(FileStatus::Queued);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << num_queued._num;
 
@@ -553,7 +551,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     const CalcKind calckind = (status & FileStatus::CombAvailable) ? Verification : Calculation;
 
     // process
-    TreeModelIterator iter(p_data->m_model, root);
+    TreeModelIterator iter(pData->m_model, root);
 
     while (iter.hasNext() && !m_proc->isCanceled()) {
         if (iter.nextFile().status() != FileStatus::Queued)
@@ -623,17 +621,18 @@ void Manager::showFileCheckResultMessage(const QString &filePath, const QString 
 // info about folder (number of files and total size) or file (size)
 void Manager::getPathInfo(const QString &path)
 {
-    if (m_isViewFileSysytem) {
-        QFileInfo fileInfo(path);
+    if (!m_isViewFileSysytem)
+        return;
 
-        if (fileInfo.isFile()) {
-            emit setStatusbarText(format::fileNameAndSize(path));
-        }
-        else if (fileInfo.isDir()) {
-            emit setStatusbarText(QStringLiteral(u"counting..."));
-            emit setStatusbarText(m_files->getFolderSize(path));
-        }
+    QFileInfo fileInfo(path);
+
+    if (fileInfo.isFile()) {
+        emit setStatusbarText(format::fileNameAndSize(path));
+    } else if (fileInfo.isDir()) {
+        emit setStatusbarText(QStringLiteral(u"counting..."));
+        emit setStatusbarText(m_files->getFolderSize(path));
     }
+
 }
 
 void Manager::getIndexInfo(const QModelIndex &curIndex)
@@ -644,57 +643,59 @@ void Manager::getIndexInfo(const QModelIndex &curIndex)
 
 void Manager::folderContentsList(const QString &folderPath, bool filterCreation)
 {
-    if (m_isViewFileSysytem) {
-        if (Files::isEmptyFolder(folderPath)) {
-            emit showMessage("There are no file types to display.", "Empty folder");
-            return;
-        }
+    if (!m_isViewFileSysytem)
+        return;
 
-        FilterRule comb_attr(FilterAttribute::NoAttributes);
-        if (m_settings->filter_ignore_unpermitted)
-            comb_attr.addAttribute(FilterAttribute::IgnoreUnpermitted);
-        if (m_settings->filter_ignore_symlinks)
-            comb_attr.addAttribute(FilterAttribute::IgnoreSymlinks);
-
-        const FileTypeList typesList = m_files->getFileTypes(folderPath, comb_attr);
-
-        if (!typesList.isEmpty()) {
-            if (filterCreation)
-                emit dbCreationDataCollected(folderPath, Files::dbFiles(folderPath), typesList);
-            else
-                emit folderContentsListCreated(folderPath, typesList);
-        }
+    if (Files::isEmptyFolder(folderPath)) {
+        emit showMessage("There are no file types to display.", "Empty folder");
+        return;
     }
+
+    FilterRule comb_attr(FilterAttribute::NoAttributes);
+    if (m_settings->filter_ignore_unpermitted)
+        comb_attr.addAttribute(FilterAttribute::IgnoreUnpermitted);
+    if (m_settings->filter_ignore_symlinks)
+        comb_attr.addAttribute(FilterAttribute::IgnoreSymlinks);
+
+    const FileTypeList typesList = m_files->getFileTypes(folderPath, comb_attr);
+
+    if (!typesList.isEmpty()) {
+        if (filterCreation)
+            emit dbCreationDataCollected(folderPath, Files::dbFiles(folderPath), typesList);
+        else
+            emit folderContentsListCreated(folderPath, typesList);
+    }
+
 }
 
 void Manager::makeDbContentsList()
 {
-    const DataContainer *p_data = m_dataMaintainer->m_data;
+    const DataContainer *pData = m_dataMaintainer->m_data;
 
-    if (!p_data)
+    if (!pData)
         return;
 
-    const FileTypeList typesList = m_files->getFileTypes(p_data->m_model);
+    const FileTypeList typesList = m_files->getFileTypes(pData->m_model);
 
     if (!typesList.isEmpty())
-        emit dbContentsListCreated(p_data->m_metadata.workDir, typesList);
+        emit dbContentsListCreated(pData->m_metadata.workDir, typesList);
 }
 
 void Manager::cacheMissingItems()
 {
-    DataContainer *p_data = m_dataMaintainer->m_data;
+    DataContainer *pData = m_dataMaintainer->m_data;
 
-    if (!p_data || !p_data->hasPossiblyMovedItems()) {
+    if (!pData || !pData->hasPossiblyMovedItems()) {
         return;
     }
 
-    TreeModelIterator it(p_data->m_model);
+    TreeModelIterator it(pData->m_model);
 
     while (it.hasNext()) {
         if (it.nextFile().status() == FileStatus::Missing) {
             const QString dig = it.checksum();
-            if (!p_data->_cacheMissing.contains(dig))
-                p_data->_cacheMissing[dig] = it.index();
+            if (!pData->_cacheMissing.contains(dig))
+                pData->_cacheMissing[dig] = it.index();
         }
     }
 }
