@@ -1,4 +1,9 @@
 ---
+Veretino 0.7.0
+Internal changes:
+* The QMicroz lib has become a submodule and no longer requires additional build.
+
+---
 Veretino 0.6.3
 * Fixed the impossibility of switching to the file system due to refusal to save data.
 * Fixed the update of the verification date in the presence of moved items.
