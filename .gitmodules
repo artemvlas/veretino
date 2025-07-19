@@ -1,0 +1,3 @@
+[submodule "submodules/qmicroz"]
+	path = submodules/qmicroz
+	url = https://github.com/artemvlas/qmicroz.git
