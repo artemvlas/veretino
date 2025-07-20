@@ -1,3 +1,5 @@
 # QMicroz
 add_subdirectory(qmicroz)
-target_include_directories(qmicroz PUBLIC qmicroz/src)
+
+# pathstr
+add_subdirectory(pathstr)

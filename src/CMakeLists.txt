@@ -1,6 +1,3 @@
-include_directories(pathstr)
-add_subdirectory(pathstr)
-
 set(PROJECT_SOURCES
     # HEADERS
     clickablelabel.h
