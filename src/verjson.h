@@ -36,10 +36,11 @@ public:
     QCryptographicHash::Algorithm algorithm() const;
 
     // static keys
+    static const QString h_key_Algo;
+    static const QString h_key_Comment;
     static const QString h_key_DateTime;
     static const QString h_key_Ignored;
     static const QString h_key_Included;
-    static const QString h_key_Algo;
     static const QString h_key_WorkDir;
     static const QString h_key_Flags;
 

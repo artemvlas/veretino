@@ -603,7 +603,7 @@ void ModeSelector::processChecksumsNoFilter()
     }
 }
 
-void ModeSelector::processFolderChecksums(const FilterRule &filter)
+void ModeSelector::processFolderChecksums(const FilterRule &filter, const QString comment)
 {
     MetaData metaData;
     metaData.workDir = p_view->m_lastPathFS;
@@ -611,6 +611,8 @@ void ModeSelector::processFolderChecksums(const FilterRule &filter)
     metaData.filter = filter;
     metaData.dbFilePath = composeDbFilePath();
     metaData.dbFileState = DbFileState::NoFile;
+    metaData.comment = comment;
+
     if (p_settings->dbFlagConst)
         metaData.flags |= MetaData::FlagConst;
 

@@ -53,7 +53,7 @@ public:
     void doWork();
     void processChecksumsNoFilter();
     void processChecksumsFiltered();
-    void processFolderChecksums(const FilterRule &filter);
+    void processFolderChecksums(const FilterRule &filter, const QString comment = QString());
     void openJsonDatabase(const QString &filePath);
     void openRecentDatabase(const QAction *action);
     void openBranchDb();

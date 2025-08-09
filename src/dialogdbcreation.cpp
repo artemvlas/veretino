@@ -352,6 +352,11 @@ FilterRule DialogDbCreation::resultFilter()
                       m_types->checkedExtensions());
 }
 
+QString DialogDbCreation::getComment() const
+{
+    return ui->inp_comment->toPlainText();
+}
+
 void DialogDbCreation::setFilterCreation(FilterCreation mode)
 {
     if (m_mode != mode) {

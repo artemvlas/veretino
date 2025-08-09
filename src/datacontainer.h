@@ -19,6 +19,7 @@ struct MetaData {
     QCryptographicHash::Algorithm algorithm = QCryptographicHash::Sha256;
     QString workDir;      // current working folder
     QString dbFilePath;   // path to the db file
+    QString comment;      // custom comment string/text
 
     FilterRule filter;    // file filtering rules for the current database
     VerDateTime datetime; // time stamps: date and time of creation, update, verification

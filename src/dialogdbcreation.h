@@ -35,6 +35,7 @@ public:
     void setFilterCreation(FilterCreation mode);
     FilterRule resultFilter();
     bool isFilterCreating() const;
+    QString getComment() const;
 
 private:
     Ui::DialogDbCreation *ui;

@@ -1,5 +1,8 @@
 ---
 Veretino 0.7.0
+What's new:
+* Ability to add and edit comments to databases.
+
 Internal changes:
 * The QMicroz lib has become a submodule and no longer requires additional build.
 

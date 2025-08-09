@@ -484,6 +484,9 @@ MetaData DataMaintainer::getMetaData(const VerJson &json) const
     if (strFlags.contains(QStringLiteral(u"const")))
         meta.flags |= MetaData::FlagConst;
 
+    // [comment]
+    meta.comment = json.getInfo(VerJson::h_key_Comment);
+
     return meta;
 }
 
@@ -609,7 +612,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
         return nullptr;
     }
 
-    // [Header]
+    /*** Header ***/
     const bool isBranching = TreeModel::isFolderRow(rootFolder);
     const Numbers &nums = isBranching ? m_data->getNumbers(rootFolder) : m_data->m_numbers;
     const MetaData &meta = m_data->m_metadata;
@@ -637,12 +640,15 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
         pJson->addInfo(h_key, meta.filter.extensionString());
     }
 
-    // Flags (needs to be redone after expanding the flags list)
+    // Flags (needs to be reimplement after expanding the flags list)
     if (meta.flags)
         pJson->addInfo(VerJson::h_key_Flags, QStringLiteral(u"const"));
 
+    // Comment
+    if (!meta.comment.isEmpty())
+        pJson->addInfo(VerJson::h_key_Comment, meta.comment);
 
-    // [Main data]
+    /*** Main data ***/
     emit setStatusbarText(QStringLiteral(u"Exporting data to json..."));
 
     TreeModelIterator iter(m_data->m_model, rootFolder);

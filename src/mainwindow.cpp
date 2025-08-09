@@ -219,10 +219,17 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
     clearDialogs();
 
     if (modeSelect_->isMode(Mode::DbIdle | Mode::DbCreating)) {
-        DialogDbStatus statusDialog(ui->view->m_data, this);
-        statusDialog.setCurrentTab(tab);
+        DialogDbStatus dialog(ui->view->m_data, this);
+        dialog.setCurrentTab(tab);
 
-        statusDialog.exec();
+        dialog.exec();
+
+        const QString comment = dialog.getComment();
+        if (comment != ui->view->m_data->m_metadata.comment) {
+            ui->view->m_data->m_metadata.comment = comment;
+            manager_->m_dataMaintainer->setDbFileState(DbFileState::NotSaved);
+            qDebug() << "Comment updated";
+        }
     }
 }
 
@@ -259,8 +266,10 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         return;
 
     const FilterRule filterRule = dialog.resultFilter();
+    const QString comment = dialog.getComment();
+
     if (filterRule || !dialog.isFilterCreating()) {
-        modeSelect_->processFolderChecksums(filterRule);
+        modeSelect_->processFolderChecksums(filterRule, comment);
     } else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
         msgBox.setIconPixmap(modeSelect_->m_icons.pixmap(Icons::Filter));
@@ -272,7 +281,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
         msgBox.button(QMessageBox::Yes)->setText("Continue");
 
         if (msgBox.exec() == QMessageBox::Yes)
-            modeSelect_->processFolderChecksums(filterRule);
+            modeSelect_->processFolderChecksums(filterRule, comment);
     }
 }
 

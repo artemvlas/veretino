@@ -12,10 +12,11 @@
 #include <QDirIterator>
 #include "qmicroz.h"
 
+const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
+const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");
 const QString VerJson::h_key_DateTime = QStringLiteral(u"DateTime");
 const QString VerJson::h_key_Ignored = QStringLiteral(u"Ignored");
 const QString VerJson::h_key_Included = QStringLiteral(u"Included");
-const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_WorkDir = QStringLiteral(u"WorkDir");
 const QString VerJson::h_key_Flags = QStringLiteral(u"Flags");
 
