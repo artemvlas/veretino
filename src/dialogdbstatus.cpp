@@ -26,6 +26,8 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     if (mData->isImmutable())
         setWindowTitle(windowTitle() + QStringLiteral(u" [const]"));
 
+    ui->inpComment->setMaxLength(MAX_LENGTH_COMMENT);
+
     setLabelsInfo();
     setTabsInfo();
     setVisibleTabs();
@@ -106,7 +108,7 @@ void DialogDbStatus::setTabsInfo()
     }
 
     // tab Comment
-    ui->inpComment->setPlainText(mData->m_metadata.comment);
+    ui->inpComment->setText(mData->m_metadata.comment);
 }
 
 QStringList DialogDbStatus::infoContent()
@@ -272,7 +274,7 @@ bool DialogDbStatus::isJustCreated() const
 
 QString DialogDbStatus::getComment() const
 {
-    return ui->inpComment->toPlainText();
+    return ui->inpComment->text();
 }
 
 void DialogDbStatus::showEvent(QShowEvent *event)

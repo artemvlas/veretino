@@ -62,6 +62,8 @@ DialogDbCreation::DialogDbCreation(const QString &folderPath, const FileTypeList
                                                  "to prevent changes from being made."));
 
     updateViewMode();
+
+    ui->inp_comment->setMaxLength(MAX_LENGTH_COMMENT);
 }
 
 DialogDbCreation::~DialogDbCreation()
@@ -354,7 +356,7 @@ FilterRule DialogDbCreation::resultFilter()
 
 QString DialogDbCreation::getComment() const
 {
-    return ui->inp_comment->toPlainText();
+    return ui->inp_comment->text();
 }
 
 void DialogDbCreation::setFilterCreation(FilterCreation mode)

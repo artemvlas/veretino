@@ -211,7 +211,7 @@ if there are any in the folder.</string>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="inp_comment">
+        <widget class="PlainTextEdit" name="inp_comment">
          <property name="placeholderText">
           <string>Comment...</string>
          </property>
@@ -298,6 +298,11 @@ if there are any in the folder.</string>
    <class>LineEdit</class>
    <extends>QLineEdit</extends>
    <header>src/lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>src/plaintextedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

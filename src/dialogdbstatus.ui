@@ -134,7 +134,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QPlainTextEdit" name="inpComment">
+          <widget class="PlainTextEdit" name="inpComment">
            <property name="placeholderText">
             <string>Add a Comment...</string>
            </property>
@@ -163,6 +163,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>PlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>src/plaintextedit.h</header>
+  </customwidget>
   <customwidget>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>

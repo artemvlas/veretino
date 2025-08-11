@@ -18,6 +18,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DAPP_NAME="Veretino")
 add_definitions(-DAPP_VERSION="${CMAKE_PROJECT_VERSION}")
 add_definitions(-DAPP_NAME_VERSION="Veretino ${CMAKE_PROJECT_VERSION}")
+add_definitions(-DMAX_LENGTH_COMMENT=150)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)

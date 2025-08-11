@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
     modeselector.h
     numbers.h
     nums.h
+    plaintextedit.h
     procstate.h
     progressbar.h
     proxymodel.h
@@ -58,6 +59,7 @@ set(PROJECT_SOURCES
     menuactions.cpp
     modeselector.cpp
     numbers.cpp
+    plaintextedit.cpp
     procstate.cpp
     progressbar.cpp
     proxymodel.cpp
