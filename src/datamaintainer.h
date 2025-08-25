@@ -95,7 +95,7 @@ public:
     QString itemContentsInfo(const QModelIndex &curIndex);
 
     // variables
-    DataContainer *m_data = nullptr; // main data
+    DataContainer *mData = nullptr; // main data
 
 public slots:
     void clearData();
@@ -106,14 +106,13 @@ private:
     void connections();
     bool isCanceled() const;
     MetaData getMetaData(const VerJson &json) const;
-    FileValues makeFileValues(const QString &filePath, const QString &basicDate) const;
     VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
     bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
     QString findWorkDir(const VerJson &json) const;
 
     // backup for the duration of m_data setup, should be deleted after setting the m_data to View
-    DataContainer *m_oldData = nullptr;
-    const ProcState *m_proc = nullptr;
+    DataContainer *mOldData = nullptr;
+    const ProcState *mProc = nullptr;
 
     bool m_considerFileModDate;
 
