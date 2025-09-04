@@ -37,6 +37,13 @@ public:
     void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
+
+    /* Checking a verification time stamp for obsolescence.
+     * The 'Verified' time stamp will be considered outdated if among the available files
+     * there are those that were created later. (files were copied)
+     */
+    void checkVerifDateTime();
+
     void updateNumbers();
     void updateNumbers(const QModelIndex &fileIndex,
                        const FileStatus statusBefore);

@@ -21,6 +21,7 @@ public:
     qint64 size() const;
     FileStatus status() const;
     QString checksum() const;
+    bool hasStatus(FileStatuses status) const;
 
 private:
     void setup(const QModelIndex &root);

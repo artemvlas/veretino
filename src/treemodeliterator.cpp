@@ -111,3 +111,8 @@ QString TreeModelIterator::checksum() const
 {
     return data(Column::ColumnChecksum).toString();
 }
+
+bool TreeModelIterator::hasStatus(FileStatuses check_status) const
+{
+    return check_status & status();
+}

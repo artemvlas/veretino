@@ -109,6 +109,13 @@ QString VerDateTime::toString(bool keep_empty_values) const
     return resStr;
 }
 
+QString VerDateTime::cleanValue(DT type) const
+{
+    // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
+    const int rLen = Lit::s_dt_format.size(); // 16
+    return value(type).right(rLen);
+}
+
 QString VerDateTime::basicDate() const
 {
     // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"

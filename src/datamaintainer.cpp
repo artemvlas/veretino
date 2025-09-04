@@ -53,6 +53,7 @@ bool DataMaintainer::setData(DataContainer *sourceData)
         mData = sourceData;
         mData->setParent(this);
         updateNumbers();
+        checkVerifDateTime();
     }
 
     return sourceData; // false if sourceData == nullptr, else true
@@ -109,6 +110,31 @@ void DataMaintainer::updateVerifDateTime()
     if (mData && mData->isAllMatched()) {
         mData->m_metadata.datetime.update(VerDateTime::Verified);
         setDbFileState(DbFileState::NotSaved);
+    }
+}
+
+void DataMaintainer::checkVerifDateTime()
+{
+    if (!mData || mData->m_metadata.datetime.m_verified.isEmpty())
+        return;
+
+    const QString verified = mData->m_metadata.datetime.cleanValue(VerDateTime::Verified);
+
+    TreeModelIterator it(mData->m_model);
+
+    while (it.hasNext()) {
+        it.nextFile();
+
+        if (!it.hasStatus(FileStatus::CombAvailable))
+            continue;
+
+        QFileInfo fi(mData->itemAbsolutePath(it.index()));
+
+        if (tools::isLater(verified, fi.birthTime())) {
+            mData->m_metadata.datetime.m_verified.clear();
+            qDebug() << "The Verified time stamp is obsolete. Perhaps the data was moved.";
+            break;
+        }
     }
 }
 

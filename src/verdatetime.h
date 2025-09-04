@@ -29,6 +29,9 @@ public:
     // joins stored values into a single string
     QString toString(bool keep_empty_values = true) const;
 
+    // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
+    QString cleanValue(DT type) const;
+
     // the date until which files are considered unmodified
     QString basicDate() const;
 
@@ -37,6 +40,7 @@ public:
 
     /*** VALUES ***/
     QString m_created, m_updated, m_verified;
+
 }; // class VerDateTime
 
 #endif // VERDATETIME_H

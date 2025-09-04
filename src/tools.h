@@ -48,9 +48,9 @@ bool isHexChar(const char ch);
 bool isHexChar(const QChar ch);
 
 // true ("2024/09/24 18:35", "2024/09/25 11:40")
-bool isLater(const QString &dt_before, const QString &dt_later);
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
+bool isLater(const QString &dt_before, const QString &dt_later);
 bool isLater(const QString &dt_str, const QDateTime &other);
 
 // checks for the absence of sep duplication
