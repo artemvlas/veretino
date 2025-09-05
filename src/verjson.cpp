@@ -160,8 +160,8 @@ void VerJson::addInfo(const QString &header_key, const QString &value)
 
 void VerJson::fillHeader()
 {
-    static const QString _app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
-    m_header[QStringLiteral(u"App/Origin")] = _app_origin;
+    static const QString app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
+    m_header[QStringLiteral(u"App Version")] = app_origin;
     //m_header[QStringLiteral(u"Folder")] = pathstr::basicName(workDir());
     m_header[QStringLiteral(u"Total Checksums")] = m_data.size();
 

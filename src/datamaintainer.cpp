@@ -27,7 +27,7 @@ DataMaintainer::DataMaintainer(DataContainer *initData, QObject *parent)
 void DataMaintainer::connections()
 {
     connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (mData->contains(FileStatus::Mismatched | FileStatus::Missing))
-                                                                  mData->m_metadata.datetime.m_verified.clear(); });
+                                                                  mData->m_metadata.datetime.clear(VerDateTime::Verified); });
 }
 
 void DataMaintainer::setProcState(const ProcState *procState)
@@ -115,10 +115,10 @@ void DataMaintainer::updateVerifDateTime()
 
 void DataMaintainer::checkVerifDateTime()
 {
-    if (!mData || mData->m_metadata.datetime.m_verified.isEmpty())
+    if (!mData || !mData->m_metadata.datetime.hasValue(VerDateTime::Verified))
         return;
 
-    const QString verified = mData->m_metadata.datetime.cleanValue(VerDateTime::Verified);
+    const QString verified = mData->m_metadata.datetime.value(VerDateTime::Verified);
 
     TreeModelIterator it(mData->m_model);
 
@@ -131,7 +131,7 @@ void DataMaintainer::checkVerifDateTime()
         QFileInfo fi(mData->itemAbsolutePath(it.index()));
 
         if (tools::isLater(verified, fi.birthTime())) {
-            mData->m_metadata.datetime.m_verified.clear();
+            mData->m_metadata.datetime.clear(VerDateTime::Verified);
             qDebug() << "The Verified time stamp is obsolete. Perhaps the data was moved.";
             break;
         }
@@ -649,8 +649,8 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
     pJson->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(nums.totalSize(FileStatus::CombAvailable)));
 
     // DateTime
-    const QString timestamp = (isBranching && mData->isAllMatched(nums)) ? VerDateTime::current(VerDateTime::Created)
-                                                                          : meta.datetime.toString();
+    const QString timestamp = (isBranching && mData->isAllMatched(nums)) ? VerDateTime::currentWithHint(VerDateTime::Created)
+                                                                         : meta.datetime.toString();
     pJson->addInfo(VerJson::h_key_DateTime, timestamp);
 
     // WorkDir

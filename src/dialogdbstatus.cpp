@@ -60,14 +60,14 @@ void DialogDbStatus::setLabelsInfo()
     // datetime
     const VerDateTime &dt = meta.datetime;
 
-    if (dt.m_updated.isEmpty()) {
-        ui->labelDateTime_Update->setText(dt.m_created);
+    if (dt.hasValue(VerDateTime::Updated)) {
+        ui->labelDateTime_Update->setText(dt.valueWithHint(VerDateTime::Updated));
+        ui->labelDateTime_Update->setToolTip(dt.valueWithHint(VerDateTime::Created));
     } else {
-        ui->labelDateTime_Update->setText(dt.m_updated);
-        ui->labelDateTime_Update->setToolTip(dt.m_created);
+        ui->labelDateTime_Update->setText(dt.valueWithHint(VerDateTime::Created));
     }
 
-    ui->labelDateTime_Check->setText(dt.m_verified);
+    ui->labelDateTime_Check->setText(dt.valueWithHint(VerDateTime::Verified));
 }
 
 void DialogDbStatus::setTabsInfo()
