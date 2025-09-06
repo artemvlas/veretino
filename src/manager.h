@@ -68,13 +68,13 @@ public:
 public slots:
     void processFolderSha(const MetaData &metaData);
     void branchSubfolder(const QModelIndex &subfolder);
-    void updateDatabase(const DbMod dest);
-    void updateItemFile(const QModelIndex &fileIndex, DbMod job);
+    void updateDatabase(const Manager::DbMod dest);
+    void updateItemFile(const QModelIndex &fileIndex, Manager::DbMod job);
     void importBranch(const QModelIndex &rootFolder);
 
     void processFileSha(const QString &filePath,
                         QCryptographicHash::Algorithm algo,
-                        DestFileProc result);
+                        Manager::DestFileProc result);
 
     // path to *.sha1/256/512 summary file
     void checkSummaryFile(const QString &path);
@@ -99,10 +99,10 @@ public slots:
     void getIndexInfo(const QModelIndex &curIndex);
 
     // recive the signal when Model has been changed
-    void modelChanged(ModelView modelView);
+    void modelChanged(View::ModelView modelView);
 
     // checking the list of files against the checksums stored in the database
-    void verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus checkstatus);
+    void verifyFolderItem(const QModelIndex &folderItemIndex, Files::FileStatus checkstatus);
 
     // check only selected file instead of full database verification
     void verifyFileItem(const QModelIndex &fileItemIndex);

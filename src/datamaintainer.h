@@ -129,7 +129,7 @@ signals:
     void numbersUpdated();
     void showMessage(const QString &text, const QString &title = "Info");
     void subDbForked(const QString &forkedDbFilePath);
-    void dbFileStateChanged(DbFileState state);
+    void dbFileStateChanged(MetaData::DbFileState state);
     void failedDataCreation();
     void failedJsonSave(VerJson *p_unsaved);
 }; // class DataMaintainer

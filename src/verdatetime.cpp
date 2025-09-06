@@ -168,25 +168,6 @@ QString VerDateTime::basicDate() const
 
 QString VerDateTime::currentWithHint(DT type)
 {
-    QString str;
-
-    /*switch (type) {
-    case Created:
-        str = QStringLiteral(u"Created: ");
-        break;
-    case Updated:
-        str = QStringLiteral(u"Updated: ");
-        break;
-    case Verified:
-        str = QStringLiteral(u"Verified: ");
-        break;
-    default:
-        break;
-    }
-
-    // for example: "Created: 2023/11/09 17:45"
-    return str + format::currentDateTime();*/
-
     return tools::joinStrings(valueHint(type), format::currentDateTime(), Lit::s_sepColonSpace);
 }
 

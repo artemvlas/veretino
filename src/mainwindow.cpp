@@ -134,11 +134,11 @@ void MainWindow::connectManager()
 {
     qRegisterMetaType<QVector<int>>("QVector<int>"); // for building on Windows (qt 5.15.2)
     qRegisterMetaType<QCryptographicHash::Algorithm>("QCryptographicHash::Algorithm");
-    qRegisterMetaType<ModelView>("ModelView");
+    qRegisterMetaType<View::ModelView>("View::ModelView");
     qRegisterMetaType<FileTypeList>("FileTypeList");
     qRegisterMetaType<Numbers>("Numbers");
     qRegisterMetaType<FileValues>("FileValues");
-    qRegisterMetaType<DbFileState>("DbFileState");
+    qRegisterMetaType<MetaData::DbFileState>("MetaData::DbFileState");
 
     manager_->moveToThread(thread);
 
