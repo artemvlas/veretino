@@ -20,7 +20,7 @@ FilterRule::FilterRule(const FilterMode filterMode, const QStringList &extension
 
 FilterMode FilterRule::mode() const
 {
-    return m_mode;
+    return mMode;
 }
 
 void FilterRule::setFilter(const FilterMode filterMode, const QString &extensions)
@@ -31,20 +31,20 @@ void FilterRule::setFilter(const FilterMode filterMode, const QString &extension
 
 void FilterRule::setFilter(const FilterMode filterMode, const QStringList &extensions)
 {
-    m_extensions = extensions;
-    m_mode = extensions.isEmpty() ? NotSet : filterMode;
+    mExtensions = extensions;
+    mMode = extensions.isEmpty() ? NotSet : filterMode;
 }
 
 void FilterRule::clearFilter()
 {
-    m_mode = NotSet;
-    m_extensions.clear();
+    mMode = NotSet;
+    mExtensions.clear();
     setAttributes(IgnoreAllPointless);
 }
 
 bool FilterRule::isFilter(const FilterMode filterMode) const
 {
-    return (filterMode == m_mode);
+    return (filterMode == mMode);
 }
 
 bool FilterRule::isEnabled() const
@@ -64,10 +64,10 @@ bool FilterRule::isAllowed(const QString &filePath) const
     if (isFilter(NotSet))
         return true;
 
-    // if 'isFilter(Include)': a file ('filePath') with any extension from 'm_extensions' is allowed
+    // if 'isFilter(Include)': a file ('filePath') with any extension from 'mExtensions' is allowed
     // if 'isFilter(Ignore)': than all files except these types are allowed
 
-    return pathstr::hasExtension(filePath, m_extensions) ? isFilter(Include) : isFilter(Ignore);
+    return pathstr::hasExtension(filePath, mExtensions) ? isFilter(Include) : isFilter(Ignore);
 }
 
 bool FilterRule::isAllowed(const QFileInfo &fi) const
@@ -77,36 +77,36 @@ bool FilterRule::isAllowed(const QFileInfo &fi) const
 
 QString FilterRule::extensionString(const QString &sep) const
 {
-    return m_extensions.join(sep);
+    return mExtensions.join(sep);
 }
 
 const QStringList& FilterRule::extensionList() const
 {
-    return m_extensions;
+    return mExtensions;
 }
 
 void FilterRule::setAttributes(quint8 attr)
 {
-    m_attributes = attr;
+    mAttributes = attr;
 }
 
 void FilterRule::addAttribute(FilterAttribute attr)
 {
-    m_attributes |= attr;
+    mAttributes |= attr;
 }
 
 void FilterRule::removeAttribute(FilterAttribute attr)
 {
-    m_attributes &= ~attr;
+    mAttributes &= ~attr;
 }
 
 bool FilterRule::hasAttribute(FilterAttribute attr) const
 {
-    return attr & m_attributes;
+    return attr & mAttributes;
 }
 
 bool FilterRule::hasAllowedAttributes(const QFileInfo &fi) const
 {
-    return !(hasAttribute(IgnoreUnpermitted) && !fi.isReadable()
-             || hasAttribute(IgnoreSymlinks) && fi.isSymLink());
+    return !((hasAttribute(IgnoreUnpermitted) && !fi.isReadable())
+             || (hasAttribute(IgnoreSymlinks) && fi.isSymLink()));
 }

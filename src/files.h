@@ -73,26 +73,41 @@ public:
     Q_ENUM(FileStatus)
     Q_DECLARE_FLAGS(FileStatuses, FileStatus)
 
-    // functions
+    /*** Functions ***/
     void setProcState(const ProcState *procState);
-    void setPath(const QString &path);                    // path to file or folder >> 'fsPath_'
-    FileList getFileList();                               // 'fsPath_' --> getFileList(const QString &rootFolder)
-    FileList getFileList(const FilterRule &filter);       // return filtered filelist: can ignore or include only files with specified extensions
+
+    // path to file or folder
+    void setPath(const QString &path);
+
+    FileList getFileList();
+
+    // return filtered filelist: can ignore or include only files with specified extensions
+    FileList getFileList(const FilterRule &filter);
+
     FileList getFileList(const QString &rootFolder,
                          const FilterRule &filter = FilterRule());
+
     FileList getFileList(const QAbstractItemModel *model,
                          const FileStatuses flag,
                          const QModelIndex &rootIndex = QModelIndex());
 
-    qint64 dataSize();                                     // total size of all files in the 'fsPath_' folder
-    qint64 dataSize(const QString &folder);                // total size of getFileList('folder')
-    static qint64 dataSize(const FileList &filelist);      // total size of all files in the 'filelist'
+    // total size of all files in the 'fsPath_' folder
+    qint64 dataSize();
 
-    QString getFolderSize();                               // returns "folder name: number of files (redable size)"
+    // total size of getFileList('folder')
+    qint64 dataSize(const QString &folder);
+
+    // total size of all files in the 'filelist'
+    static qint64 dataSize(const FileList &filelist);
+
+    // returns "folder name: number of files (redable size)"
+    QString getFolderSize();
     QString getFolderSize(const QString &path);
 
     // returns a list of file types (extensions) with files number and their size
-    FileTypeList getFileTypes(const QString &folderPath, FilterRule combine); // FilterAttributes are used to combine types
+    // FilterAttributes are used to combine types
+    FileTypeList getFileTypes(const QString &folderPath, FilterRule combine);
+
     FileTypeList getFileTypes(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
 
@@ -101,15 +116,19 @@ public:
     // checks whether there are any (or filtered) files the folder/subfolders
     static bool isEmptyFolder(const QString &folderPath,
                               const FilterRule &filter = FilterRule(FilterAttribute::NoAttributes));
-    static QString firstDbFile(const QString &folderPath); // returns full path
-    static QStringList dbFiles(const QString &folderPath); // file names only
+
+    // returns full path
+    static QString firstDbFile(const QString &folderPath);
+
+    // file names only
+    static QStringList dbFiles(const QString &folderPath);
 
 private:
     bool isCanceled() const;
 
-    // variables
-    QString m_fsPath; // path to the File or Folder specified when creating the object
-    const ProcState *m_proc = nullptr;
+    /*** Variables ***/
+    QString mFsPath; // path to the File or Folder specified when creating the object
+    const ProcState *mProc = nullptr;
 
 signals:
     void setStatusbarText(const QString &text = QString());

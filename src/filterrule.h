@@ -13,8 +13,8 @@ class FilterRule
 public:
     enum FilterMode : quint8 {
         NotSet,
-        Include, // only files with extensions from [m_extensions] are allowed, others are ignored
-        Ignore   // files with extensions from [m_extensions] are ignored (not included in the database)
+        Include, // only files with extensions from [mExtensions] are allowed, others are ignored
+        Ignore   // files with extensions from [mExtensions] are ignored (not included in the database)
     };
 
     enum FilterAttribute : quint8 {
@@ -29,7 +29,7 @@ public:
     FilterRule(FilterAttribute attr = IgnoreAllPointless);
     FilterRule(const FilterMode filterMode, const QStringList &extensions);
 
-    // returns m_mode
+    // returns mMode
     FilterMode mode() const;
 
     // splits the str (e.g. "txt, pdf, mkv") and sets the list
@@ -39,7 +39,7 @@ public:
     // sets defaults
     void clearFilter();
 
-    // checks whether the specified mode is setted (m_mode == filterMode)
+    // checks whether the specified mode is setted (mMode == filterMode)
     bool isFilter(const FilterMode filterMode) const;
 
     // != NotSet
@@ -52,17 +52,17 @@ public:
     // as well as the file extension matches the filter rules
     bool isAllowed(const QFileInfo &fi) const;
 
-    // creates a string listing the elements of a list (m_extensions)
+    // creates a string listing the elements of a list (mExtensions)
     QString extensionString(const QString &sep = QStringLiteral(u", ")) const;
 
-    // returns a ref to m_extensions
+    // returns a ref to mExtensions
     const QStringList& extensionList() const;
 
     // -- Attributes --
-    // replace current ones (m_attributes = attr)
+    // replace current ones (mAttributes = attr)
     void setAttributes(quint8 attr);
 
-    // add flag to m_attributes
+    // add flag to mAttributes
     void addAttribute(FilterAttribute attr);
 
     // remove flag
@@ -78,11 +78,12 @@ public:
 
 private:
     // current mode. if set, the extension list is assumed to be non-empty
-    FilterMode m_mode = NotSet;
+    FilterMode mMode = NotSet;
 
     // list of file extensions (suffixes) for filtering
-    QStringList m_extensions;
-    quint8 m_attributes = IgnoreAllPointless;
+    QStringList mExtensions;
+    quint8 mAttributes = IgnoreAllPointless;
+
 }; // class FilterRule
 
 using FilterMode = FilterRule::FilterMode;

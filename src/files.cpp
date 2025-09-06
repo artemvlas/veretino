@@ -15,32 +15,32 @@ Files::Files(QObject *parent)
 {}
 
 Files::Files(const QString &path, QObject *parent)
-    : QObject(parent), m_fsPath(path)
+    : QObject(parent), mFsPath(path)
 {}
 
 void Files::setProcState(const ProcState *procState)
 {
-    m_proc = procState;
+    mProc = procState;
 }
 
 void Files::setPath(const QString &path)
 {
-    m_fsPath = path;
+    mFsPath = path;
 }
 
 bool Files::isCanceled() const
 {
-    return (m_proc && m_proc->isCanceled());
+    return (mProc && mProc->isCanceled());
 }
 
 FileList Files::getFileList()
 {
-    return getFileList(m_fsPath);
+    return getFileList(mFsPath);
 }
 
 FileList Files::getFileList(const FilterRule &filter)
 {
-    return getFileList(m_fsPath, filter);
+    return getFileList(mFsPath, filter);
 }
 
 FileList Files::getFileList(const QString &rootFolder, const FilterRule &filter)
@@ -103,9 +103,8 @@ bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 
     QDirIterator it(folderPath, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        if (filter.isAllowed(it.next())) {
+        if (filter.isAllowed(it.next()))
             return false;
-        }
     }
 
     return true;
@@ -137,7 +136,7 @@ QStringList Files::dbFiles(const QString &folderPath)
 
 QString Files::getFolderSize()
 {
-    return getFolderSize(m_fsPath);
+    return getFolderSize(mFsPath);
 }
 
 QString Files::getFolderSize(const QString &path)
@@ -252,7 +251,7 @@ NumSize Files::totalListed(const FileTypeList &typeList)
 
 qint64 Files::dataSize()
 {
-    return !m_fsPath.isEmpty() ? dataSize(getFileList()) : 0;
+    return !mFsPath.isEmpty() ? dataSize(getFileList()) : 0;
 }
 
 qint64 Files::dataSize(const QString &folder)
