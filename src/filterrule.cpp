@@ -72,7 +72,7 @@ bool FilterRule::isAllowed(const QString &filePath) const
 
 bool FilterRule::isAllowed(const QFileInfo &fi) const
 {
-    return hasAllowedAttributes(fi) && isAllowed(fi.fileName());
+    return passAttributes(fi) && isAllowed(fi.fileName());
 }
 
 QString FilterRule::extensionString(const QString &sep) const
@@ -105,8 +105,13 @@ bool FilterRule::hasAttribute(FilterAttribute attr) const
     return attr & m_attributes;
 }
 
-bool FilterRule::hasAllowedAttributes(const QFileInfo &fi) const
+bool FilterRule::passAttributes(const QFileInfo &fi) const
 {
-    return !(hasAttribute(IgnoreUnpermitted) && !fi.isReadable()
-             || hasAttribute(IgnoreSymlinks) && fi.isSymLink());
+    if (hasAttribute(IgnoreUnpermitted) && !fi.isReadable())
+        return false;
+
+    if (hasAttribute(IgnoreSymlinks) && fi.isSymLink())
+        return false;
+
+    return true;
 }

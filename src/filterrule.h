@@ -72,7 +72,7 @@ public:
     bool hasAttribute(FilterAttribute attr) const;
 
     // whether the file (fi) attributes (e.g. symlink, read permissions...) are allowed
-    bool hasAllowedAttributes(const QFileInfo &fi) const;
+    bool passAttributes(const QFileInfo &fi) const;
 
     explicit operator bool() const { return isEnabled(); }
 
