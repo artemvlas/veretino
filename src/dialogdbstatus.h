@@ -22,14 +22,11 @@ public:
     ~DialogDbStatus();
 
     enum Tabs { TabListed, TabFilter, TabVerification, TabChanges, TabComment, TabAutoSelect = 1000 };
-    void setCurrentTab(Tabs tab);
 
+    void setCurrentTab(Tabs tab);
     QString getComment() const;
 
 private:
-    Ui::DialogDbStatus *ui;
-    const DataContainer *mData = nullptr;
-
     QStringList infoContent();
     QStringList infoVerification();
     QStringList infoChanges();
@@ -38,11 +35,14 @@ private:
     void setTabsInfo();
     void setVisibleTabs();
     void setLabelsInfo();
+    void selectCurTab();
 
     bool isCreating() const;
     bool isJustCreated() const;
 
-    void selectCurTab();
+    /*** Vars ***/
+    Ui::DialogDbStatus *m_ui;
+    const DataContainer *m_data = nullptr;
 
     // automatic selection of the current tab during execution
     bool autoTabSelection = true;

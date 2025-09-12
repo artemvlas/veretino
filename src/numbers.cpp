@@ -16,7 +16,7 @@ void Numbers::removeFile(const FileStatus status, const qint64 size)
 {
     /*if (_val.contains(status)) {
         _val[status].subtractOne(size);
-        if (_val[status]._num == 0)
+        if (_val[status].number == 0)
             _val.remove(status);
     }*/
 
@@ -75,12 +75,12 @@ bool Numbers::contains(const FileStatuses flag) const
 
 int Numbers::numberOf(const FileStatuses flag) const
 {
-    return values(flag)._num;
+    return values(flag).number;
 }
 
 qint64 Numbers::totalSize(const FileStatuses flag) const
 {
-    return values(flag)._size;
+    return values(flag).total_size;
 }
 
 NumSize Numbers::values(const FileStatuses flag) const

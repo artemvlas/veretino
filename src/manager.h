@@ -14,11 +14,11 @@
 #include "settings.h"
 
 struct Task {
-    Task(std::function<void()> func, State run_with = State::StartSilently)
-        : _func(func), _state(run_with) {}
+    Task(std::function<void()> task, State run_state = State::StartSilently)
+        : job(task), state(run_state) {}
 
-    std::function<void()> _func;
-    State _state;
+    std::function<void()> job;
+    State state;
 }; // struct Task
 
 class Manager : public QObject

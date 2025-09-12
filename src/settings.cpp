@@ -90,8 +90,8 @@ void Settings::saveSettings()
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, Lit::s_app_name, Lit::s_app_name);
     // qDebug() << "Save settings:" << storedSettings.fileName() <<  storedSettings.format();
 
-    if (p_lastFsPath) {
-        storedSettings.setValue(s_key_history_lastFsPath, restoreLastPathOnStartup ? *p_lastFsPath : QString());
+    if (pLastFsPath) {
+        storedSettings.setValue(s_key_history_lastFsPath, restoreLastPathOnStartup ? *pLastFsPath : QString());
     }
 
     storedSettings.setValue(s_key_algo, algorithm_);
@@ -131,8 +131,8 @@ void Settings::loadSettings()
 {
     QSettings storedSettings(QSettings::IniFormat, QSettings::UserScope, Lit::s_app_name, Lit::s_app_name);
 
-    if (p_lastFsPath) {
-        *p_lastFsPath = storedSettings.value(s_key_history_lastFsPath).toString();
+    if (pLastFsPath) {
+        *pLastFsPath = storedSettings.value(s_key_history_lastFsPath).toString();
     }
 
     Settings defaults;

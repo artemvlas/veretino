@@ -39,7 +39,7 @@ void View::connectModel()
 void View::setSettings(Settings *settings)
 {
     m_settings = settings;
-    m_settings->p_lastFsPath = &m_lastPathFS;
+    m_settings->pLastFsPath = &m_lastPathFS;
 }
 
 QModelIndex View::curIndex() const

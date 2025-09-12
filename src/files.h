@@ -16,10 +16,10 @@ struct FileValues;
 using FileList = QMap<QString, FileValues>;    // {relative path to file : FileValues struct}
 
 struct FileTypeList {
-    QHash<QString, NumSize> m_extensions;       // {file extension (suffix) : files number and size}
-    QHash<FilterAttribute, NumSize> m_combined; // {combined type like 'SymLinks' or 'UnPermitted' : files number and size}
+    QHash<QString, NumSize> extensions;        // {file extension (suffix) : files number and size}
+    QHash<FilterAttribute, NumSize> combined;  // {combined type like 'SymLinks' or 'UnPermitted' : files number and size}
 
-    int count() const { return m_extensions.size() + m_combined.size(); }
+    int count() const { return extensions.size() + combined.size(); }
     bool isEmpty() const { return count() == 0; }
     explicit operator bool() const { return !isEmpty(); }
 }; // struct FileTypeList

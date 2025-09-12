@@ -93,16 +93,16 @@ private:
     Ui::MainWindow *ui;
 
     // current app settings
-    Settings *settings_ = new Settings(this);
+    Settings *m_settings = new Settings(this);
 
     // Manager thread
-    QThread *thread = new QThread;
+    QThread *m_thread = new QThread;
 
-    // Manager performs the main tasks. Works in separate thread^
-    Manager *manager_ = new Manager(settings_);
-    ModeSelector *modeSelect_ = nullptr;
+    // Manager performs the main tasks. Works in separate m_thread^
+    Manager *m_manager = new Manager(m_settings);
+    ModeSelector *m_modeSelect = nullptr;
+    StatusBar *m_statusBar = new StatusBar;
     ProcState *proc_ = nullptr;
-    StatusBar *statusBar_ = new StatusBar;
 
     // true if the exit attempt was rejected (to perform data saving)
     // bool awaiting_closure = false;

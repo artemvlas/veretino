@@ -450,7 +450,7 @@ QString filesNumSize(const Numbers &num, FileStatus status)
 
 QString filesNumSize(const NumSize &nums)
 {
-    return filesNumSize(nums._num, nums._size);
+    return filesNumSize(nums.number, nums.total_size);
 }
 
 QString fileNameAndSize(const QString &filePath)

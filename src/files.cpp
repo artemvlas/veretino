@@ -180,22 +180,22 @@ FileTypeList Files::getFileTypes(const QString &folderPath, FilterRule combine)
         if (combine.hasAttribute(FilterAttribute::IgnoreUnpermitted)
             && !it.fileInfo().isReadable())
         {
-            res.m_combined[FilterAttribute::IgnoreUnpermitted] << size;
+            res.combined[FilterAttribute::IgnoreUnpermitted] << size;
         }
         else if (combine.hasAttribute(FilterAttribute::IgnoreSymlinks)
                  && it.fileInfo().isSymLink())
         {
-            res.m_combined[FilterAttribute::IgnoreSymlinks] << size;
+            res.combined[FilterAttribute::IgnoreSymlinks] << size;
         }
         else {
             const QString filename = it.fileName();
 
             if (paths::isDbFile(filename))
-                res.m_combined[FilterAttribute::IgnoreDbFiles] << size;
+                res.combined[FilterAttribute::IgnoreDbFiles] << size;
             else if (paths::isDigestFile(filename))
-                res.m_combined[FilterAttribute::IgnoreDigestFiles] << size;
+                res.combined[FilterAttribute::IgnoreDigestFiles] << size;
             else
-                res.m_extensions[pathstr::suffix(filename)] << size;
+                res.extensions[pathstr::suffix(filename)] << size;
         }
     }
 
@@ -220,11 +220,11 @@ FileTypeList Files::getFileTypes(const QAbstractItemModel *model, const QModelIn
             const QString file_path = it.path();
 
             if (paths::isDbFile(file_path))
-                res.m_combined[FilterAttribute::IgnoreDbFiles] << it.size();
+                res.combined[FilterAttribute::IgnoreDbFiles] << it.size();
             else if (paths::isDigestFile(file_path))
-                res.m_combined[FilterAttribute::IgnoreDigestFiles] << it.size();
+                res.combined[FilterAttribute::IgnoreDigestFiles] << it.size();
             else
-                res.m_extensions[pathstr::suffix(file_path)] << it.size();
+                res.extensions[pathstr::suffix(file_path)] << it.size();
         }
     }
 
@@ -235,15 +235,15 @@ NumSize Files::totalListed(const FileTypeList &typeList)
 {
     NumSize res;
 
-    if (!typeList.m_extensions.isEmpty()) {
+    if (!typeList.extensions.isEmpty()) {
         QHash<QString, NumSize>::const_iterator it;
-        for (it = typeList.m_extensions.constBegin(); it != typeList.m_extensions.constEnd(); ++it)
+        for (it = typeList.extensions.constBegin(); it != typeList.extensions.constEnd(); ++it)
             res.add(it.value());
     }
 
-    if (!typeList.m_combined.isEmpty()) {
+    if (!typeList.combined.isEmpty()) {
         QHash<FilterAttribute, NumSize>::const_iterator it2;
-        for (it2 = typeList.m_combined.constBegin(); it2 != typeList.m_combined.constEnd(); ++it2)
+        for (it2 = typeList.combined.constBegin(); it2 != typeList.combined.constEnd(); ++it2)
             res.add(it2.value());
     }
 

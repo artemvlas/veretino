@@ -55,7 +55,7 @@ public:
     QByteArray headerStateDb;
 
     // pointer to ui->view->m_lastPathFS
-    QString *p_lastFsPath = nullptr;
+    QString *pLastFsPath = nullptr;
 
 private:
     QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;

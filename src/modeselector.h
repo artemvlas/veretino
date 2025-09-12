@@ -123,10 +123,10 @@ private:
     // additionally checks whether the length matches the algorithm
     QString copiedDigest(QCryptographicHash::Algorithm algo) const;
 
-    View *p_view;
-    Settings *p_settings;
-    ProcState *p_proc = nullptr;
-    Manager *p_manager = nullptr;
+    View *m_view;
+    Settings *m_settings;
+    ProcState *m_proc = nullptr;
+    Manager *m_manager = nullptr;
 
 }; // class ModeSelector
 

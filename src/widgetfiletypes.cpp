@@ -15,9 +15,9 @@ WidgetFileTypes::WidgetFileTypes(QWidget *parent)
 
 void WidgetFileTypes::setItems(const FileTypeList &extList)
 {
-    if (!extList.m_extensions.isEmpty()) {
+    if (!extList.extensions.isEmpty()) {
         QHash<QString, NumSize>::const_iterator it;
-        for (it = extList.m_extensions.constBegin(); it != extList.m_extensions.constEnd(); ++it) {
+        for (it = extList.extensions.constBegin(); it != extList.extensions.constEnd(); ++it) {
             if (it.key().isEmpty()) {
                 addItem(QStringLiteral(u"No type"), it.value(), QIcon(), TypeAttribute::UnCheckable);
             } else {
@@ -26,9 +26,9 @@ void WidgetFileTypes::setItems(const FileTypeList &extList)
         }
     }
 
-    if (!extList.m_combined.isEmpty()) {
+    if (!extList.combined.isEmpty()) {
         QHash<FilterAttribute, NumSize>::const_iterator it;
-        for (it = extList.m_combined.constBegin(); it != extList.m_combined.constEnd(); ++it) {
+        for (it = extList.combined.constBegin(); it != extList.combined.constEnd(); ++it) {
             QIcon icn;
             QString type;
 
@@ -69,11 +69,11 @@ ItemFileType* WidgetFileTypes::addItem(const QString &type, const NumSize &nums,
         item->setAttribute(attribute);
 
     // ColumnFilesNumber (1)
-    item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, nums._num);
+    item->setData(ItemFileType::ColumnFilesNumber, Qt::DisplayRole, nums.number);
 
     // ColumnTotalSize (2)
-    item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(nums._size));
-    item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, nums._size);
+    item->setData(ItemFileType::ColumnTotalSize, Qt::DisplayRole, format::dataSizeReadable(nums.total_size));
+    item->setData(ItemFileType::ColumnTotalSize, Qt::UserRole, nums.total_size);
 
     m_items.append(item);
     return item;

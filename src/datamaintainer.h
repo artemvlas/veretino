@@ -101,8 +101,8 @@ public:
     // file: "filename (size)"; folder: contents (availability, size etc.)
     QString itemContentsInfo(const QModelIndex &curIndex);
 
-    // variables
-    DataContainer *mData = nullptr; // main data
+    /*** Variables ***/
+    DataContainer *m_data = nullptr; // main data
 
 public slots:
     void clearData();
@@ -117,10 +117,10 @@ private:
     bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
     QString findWorkDir(const VerJson &json) const;
 
+    /*** Variables ***/
     // backup for the duration of m_data setup, should be deleted after setting the m_data to View
-    DataContainer *mOldData = nullptr;
-    const ProcState *mProc = nullptr;
-
+    DataContainer *m_oldData = nullptr;
+    const ProcState *m_proc = nullptr;
     bool m_considerFileModDate;
 
 signals:
@@ -131,7 +131,7 @@ signals:
     void subDbForked(const QString &forkedDbFilePath);
     void dbFileStateChanged(MetaData::DbFileState state);
     void failedDataCreation();
-    void failedJsonSave(VerJson *p_unsaved);
+    void failedJsonSave(VerJson *pUnsaved);
 }; // class DataMaintainer
 
 #endif // DATAMAINTAINER_H
