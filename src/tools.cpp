@@ -273,7 +273,7 @@ QString numString(qint64 num)
     return numstr;
 }
 
-QString millisecToReadable(qint64 milliseconds, bool approx)
+QString msecsToReadable(qint64 milliseconds, bool approx)
 {
     int seconds = milliseconds / 1000;
     int minutes = seconds / 60;
@@ -332,12 +332,24 @@ QString dataSizeReadable(const qint64 sizeBytes)
     }
 
     const float x = std::round(converted * 100) / 100;
-    return QString::number(x, 'f', 2) % ch % QStringLiteral(u"iB");
+    return QString::number(x, 'f', 2) % ' ' % ch % QStringLiteral(u"iB");
 }
 
 QString dataSizeReadableExt(const qint64 sizeBytes)
 {
     return QString("%1 (%2 bytes)").arg(dataSizeReadable(sizeBytes), numString(sizeBytes));
+}
+
+QString processSpeed(qint64 msecs, qint64 size)
+{
+    if (msecs == 0)
+        return QStringLiteral(u"instant");
+
+    if (size == 0)
+        return QStringLiteral(u"idle");
+
+    QString str = dataSizeReadable((size / msecs) * 1000);
+    return str + QStringLiteral(u"/s");
 }
 
 QString shortenString(const QString &string, int length, bool cutEnd)

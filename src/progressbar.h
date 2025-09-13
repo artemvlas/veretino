@@ -34,8 +34,8 @@ private:
     QTimer *m_timer = new QTimer(this);
     QElapsedTimer m_elapsedTimer;
 
-    qint64 pieceTime_; // milliseconds
-    qint64 pieceSize_;
+    qint64 m_pieceTime; // milliseconds
+    qint64 m_pieceSize;
 }; // class ProgressBar
 
 #endif // PROGRESSBAR_H

@@ -67,26 +67,21 @@ void ProgressBar::updateProgressInfo()
 
 void ProgressBar::updateDonePiece()
 {
-    pieceTime_ = m_elapsedTimer.restart();
-    pieceSize_ = m_proc->donePieceSize();
+    m_pieceTime = m_elapsedTimer.restart();
+    m_pieceSize = m_proc->donePieceSize();
 }
 
 QString ProgressBar::progTimeLeft() const
 {
-    if (pieceSize_ > 0) {
-        qint64 timeleft = (m_proc->remainingSize() / pieceSize_) * pieceTime_;
-        return format::millisecToReadable(timeleft, true);
+    if (m_pieceSize > 0) {
+        qint64 timeleft = (m_proc->remainingSize() / m_pieceSize) * m_pieceTime;
+        return format::msecsToReadable(timeleft, true);
     }
 
     return QStringLiteral(u"∞");
 }
 
 QString ProgressBar::progSpeed() const
-{
-    if (pieceTime_ > 0 && pieceSize_ > 0) {
-        QString str = format::dataSizeReadable((pieceSize_ / pieceTime_) * 1000);
-        return str + QStringLiteral(u"/s");
-    }
-
-    return QStringLiteral(u"idle");
+{    
+    return format::processSpeed(m_pieceTime, m_pieceSize);
 }

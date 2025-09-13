@@ -90,13 +90,17 @@ QString currentDateTime();
 QString numString(qint64 num);
 
 // converts milliseconds to readable time like "1 min 23 sec"
-QString millisecToReadable(qint64 milliseconds, bool approx = false);
+QString msecsToReadable(qint64 milliseconds, bool approx = false);
 
 // converts size in bytes to human readable form like "129.17 GiB"
 QString dataSizeReadable(const qint64 sizeBytes);
 
 // returning style example: "6.08 GiB (6,532,974,324 bytes)"
 QString dataSizeReadableExt(const qint64 sizeBytes);
+
+// returns the readable string of the process speed
+QString processSpeed(qint64 msecs, qint64 size);
+
 QString shortenString(const QString &string, int length = 64, bool cutEnd = true);
 QString simplifiedChars(QString str);
 QString inParentheses(const int number);
