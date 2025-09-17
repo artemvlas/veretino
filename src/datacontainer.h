@@ -46,50 +46,11 @@ public:
     // clears the current data models, sets the new empty ones
     void setData();
     void setData(const MetaData &meta, TreeModel *data);
-    bool hasData() const;
 
     // deletes data models and clears m_numbers
     void clearData();
 
-    QString databaseFileName() const;
-    QString backupFilePath() const;
-
-    // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
-    QString itemAbsolutePath(const QModelIndex &curIndex) const;
-
-    // returns the path to the found Branch, an empty string if not found; caches the result
-    QString branch_path_existing(const QModelIndex &subfolder);
-
-    // returns the composed path regardless of the file's existence
-    QString branch_path_composed(const QModelIndex &subfolder) const;
-
-    QString digestFilePath(const QModelIndex &fileIndex) const;
-
-    bool isDbFileState(DbFileState state) const;
-    bool isWorkDirRelative() const;
-    bool isFilterApplied() const;
-    bool contains(const FileStatuses flags,
-                  const QModelIndex &subfolder = QModelIndex()) const;
-    bool isAllChecked() const;
-    bool isAllMatched(const QModelIndex &subfolder = QModelIndex()) const;
-    bool isAllMatched(const Numbers &nums) const;
-    bool isInCreation() const;
-
-    // has FlagConst
-    bool isImmutable() const;
-
-    // has New and Missing
-    bool hasPossiblyMovedItems() const;
-
-    bool isBackupExists() const;
-    bool makeBackup(bool forceOverwrite = false) const;
-    bool restoreBackupFile() const;
-    void removeBackupFile() const;
-
-    const Numbers& updateNumbers();
-    Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
-    static Numbers getNumbers(const QAbstractItemModel *model,
-                              const QModelIndex &rootIndex = QModelIndex());
+    bool hasData() const;
 
     // DATA
     TreeModel *m_model = nullptr;  // main data
@@ -103,5 +64,58 @@ public:
 private:
     void createModels();
 }; // class DataContainer
+
+/*** <!!!> ***/
+/*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
+/*** They will be moved or changed in the future ***/
+struct DataHelper {
+    static QString databaseFileName(const DataContainer *data);
+    static QString backupFilePath(const DataContainer *data);
+    static QString digestFilePath(const DataContainer *data, const QModelIndex &fileIndex);
+
+    // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
+    static QString itemAbsolutePath(const DataContainer *data, const QModelIndex &curIndex);
+
+    // returns the path to the found Branch, an empty string if not found; caches the result
+    static QString branch_path_existing(DataContainer *data, const QModelIndex &subfolder);
+
+    // returns the composed path regardless of the file's existence
+    static QString branch_path_composed(const DataContainer *data, const QModelIndex &subfolder);
+
+    static bool isDbFileState(const DataContainer *data, DbFileState state);
+
+    static bool isWorkDirRelative(const DataContainer *data);
+
+    static bool isFilterApplied(const DataContainer *data);
+
+    static bool contains(const DataContainer *data, const FileStatuses flags,
+                         const QModelIndex &subfolder = QModelIndex());
+
+    static bool isAllChecked(const DataContainer *data);
+
+    static bool isAllMatched(const DataContainer *data, const QModelIndex &subfolder = QModelIndex());
+    static bool isAllMatched(const Numbers &nums);
+    static bool isInCreation(const DataContainer *data);
+
+    // has FlagConst
+    static bool isImmutable(const DataContainer *data);
+
+    // has New and Missing
+    static bool hasPossiblyMovedItems(const DataContainer *data);
+
+    static const Numbers& updateNumbers(DataContainer *data);
+
+    static Numbers getNumbers(const DataContainer *data, const QModelIndex &rootIndex = QModelIndex());
+
+    static Numbers getNumbers(const QAbstractItemModel *model,
+                              const QModelIndex &rootIndex = QModelIndex());
+
+
+    static bool isBackupExists(const DataContainer *data);
+    static bool makeBackup(const DataContainer *data, bool forceOverwrite = false);
+    static bool restoreBackupFile(const DataContainer *data);
+    static void removeBackupFile(const DataContainer *data);
+
+}; // struct DataHelper
 
 #endif // DATACONTAINER_H

@@ -70,32 +70,41 @@ void DataContainer::clearData()
     m_numbers.clear();
 }
 
-QString DataContainer::databaseFileName() const
+DataContainer::~DataContainer()
 {
-    return pathstr::basicName(m_metadata.dbFilePath);
+    DataHelper::removeBackupFile(this);
+    qDebug() << Q_FUNC_INFO << DataHelper::databaseFileName(this);
 }
 
-QString DataContainer::backupFilePath() const
+/*** <!!!> ***/
+/*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
+/*** They will be moved or changed in the future ***/
+QString DataHelper::databaseFileName(const DataContainer *data)
+{
+    return pathstr::basicName(data->m_metadata.dbFilePath);
+}
+
+QString DataHelper::backupFilePath(const DataContainer *data)
 {
     using namespace pathstr;
-    return joinPath(parentFolder(m_metadata.dbFilePath),
-                    QStringLiteral(u".tmp-backup_") + basicName(m_metadata.dbFilePath));
+    return joinPath(parentFolder(data->m_metadata.dbFilePath),
+                    QStringLiteral(u".tmp-backup_") + basicName(data->m_metadata.dbFilePath));
 }
 
 // returns the absolute path to the db item (file or subfolder)
 // (working folder path in filesystem + relative path in the database)
-QString DataContainer::itemAbsolutePath(const QModelIndex &curIndex) const
+QString DataHelper::itemAbsolutePath(const DataContainer *data, const QModelIndex &curIndex)
 {
-    return pathstr::joinPath(m_metadata.workDir, TreeModel::getPath(curIndex));
+    return pathstr::joinPath(data->m_metadata.workDir, TreeModel::getPath(curIndex));
 }
 
-QString DataContainer::branch_path_existing(const QModelIndex &subfolder)
+QString DataHelper::branch_path_existing(DataContainer *data, const QModelIndex &subfolder)
 {
     if (!TreeModel::isFolderRow(subfolder))
         return QString();
 
-    if (_cacheBranches.contains(subfolder)) {
-        const QString fp = _cacheBranches.value(subfolder);
+    if (data->_cacheBranches.contains(subfolder)) {
+        const QString fp = data->_cacheBranches.value(subfolder);
         if (fp.isEmpty() || QFileInfo::exists(fp)) { // in case of renaming
             qDebug() << "DC::branchFilePath >> return cached:" << fp;
             return fp;
@@ -103,136 +112,136 @@ QString DataContainer::branch_path_existing(const QModelIndex &subfolder)
     }
 
     // searching
-    QString path = branch_path_composed(subfolder);
+    QString path = branch_path_composed(data, subfolder);
     if (!QFileInfo::exists(path))
         path = Files::firstDbFile(pathstr::parentFolder(path));
 
     // caching the result; an empty value means no branches
-    _cacheBranches[subfolder] = path;
+    data->_cacheBranches[subfolder] = path;
 
     return path;
 }
 
 // returns the predefined/supposed path to the branch db file, regardless of its existence
-QString DataContainer::branch_path_composed(const QModelIndex &subfolder) const
+QString DataHelper::branch_path_composed(const DataContainer *data, const QModelIndex &subfolder)
 {
-    const bool isLongExt = pathstr::hasExtension(m_metadata.dbFilePath, Lit::sl_db_exts.first());
+    const bool isLongExt = pathstr::hasExtension(data->m_metadata.dbFilePath, Lit::sl_db_exts.first());
     QString extension = Lit::sl_db_exts.at(isLongExt ? 0 : 1);
-    QString folderPath = itemAbsolutePath(subfolder);
+    QString folderPath = itemAbsolutePath(data, subfolder);
     QString fileName = format::composeDbFileName(QStringLiteral(u"checksums"), folderPath, extension);
     QString filePath = pathstr::joinPath(folderPath, fileName);
 
     return filePath;
 }
 
-QString DataContainer::digestFilePath(const QModelIndex &fileIndex) const
+QString DataHelper::digestFilePath(const DataContainer *data, const QModelIndex &fileIndex)
 {
-    return paths::digestFilePath(itemAbsolutePath(fileIndex), m_metadata.algorithm);
+    return paths::digestFilePath(itemAbsolutePath(data, fileIndex), data->m_metadata.algorithm);
 }
 
-bool DataContainer::isWorkDirRelative() const
+bool DataHelper::isWorkDirRelative(const DataContainer *data)
 {
-    return (pathstr::parentFolder(m_metadata.dbFilePath) == m_metadata.workDir);
+    return data->m_metadata.workDir == pathstr::parentFolder(data->m_metadata.dbFilePath);
 }
 
-bool DataContainer::isFilterApplied() const
+bool DataHelper::isFilterApplied(const DataContainer *data)
 {
-    return m_metadata.filter.isEnabled();
+    return data->m_metadata.filter.isEnabled();
 }
 
-bool DataContainer::contains(const FileStatuses flags, const QModelIndex &subfolder) const
+bool DataHelper::contains(const DataContainer *data, const FileStatuses flags, const QModelIndex &subfolder)
 {
-    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
+    const Numbers &num = TreeModel::isFolderRow(subfolder) ? getNumbers(data, subfolder) : data->m_numbers;
 
     return num.contains(flags);
 }
 
-bool DataContainer::isAllChecked() const
+bool DataHelper::isAllChecked(const DataContainer *data)
 {
-    return (contains(FileStatus::CombChecked)
-            && !contains(FileStatus::CombNotChecked | FileStatus::CombProcessing));
+    return (contains(data, FileStatus::CombChecked)
+            && !contains(data, FileStatus::CombNotChecked | FileStatus::CombProcessing));
 }
 
-bool DataContainer::isAllMatched(const QModelIndex &subfolder) const
+bool DataHelper::isAllMatched(const DataContainer *data, const QModelIndex &subfolder)
 {
-    const Numbers &nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
+    const Numbers &nums = TreeModel::isFolderRow(subfolder) ? getNumbers(data, subfolder) : data->m_numbers;
 
     return isAllMatched(nums);
 }
 
-bool DataContainer::isAllMatched(const Numbers &nums) const
+bool DataHelper::isAllMatched(const Numbers &nums)
 {
     return (!nums.contains(FileStatus::CombProcessing)
             && nums.numberOf(FileStatus::Matched) == nums.numberOf(FileStatus::CombHasChecksum));
 }
 
-bool DataContainer::isDbFileState(DbFileState state) const
+bool DataHelper::isDbFileState(const DataContainer *data, DbFileState state)
 {
-    return (state == m_metadata.dbFileState);
+    return (state == data->m_metadata.dbFileState);
 }
 
-bool DataContainer::isInCreation() const
+bool DataHelper::isInCreation(const DataContainer *data)
 {
-    return (m_metadata.dbFileState == MetaData::NoFile);
+    return (data->m_metadata.dbFileState == MetaData::NoFile);
 }
 
-bool DataContainer::isImmutable() const
+bool DataHelper::isImmutable(const DataContainer *data)
 {
-    return (m_metadata.flags & MetaData::FlagConst);
+    return (data->m_metadata.flags & MetaData::FlagConst);
 }
 
-bool DataContainer::hasPossiblyMovedItems() const
+bool DataHelper::hasPossiblyMovedItems(const DataContainer *data)
 {
-    return (contains(FileStatus::New) && contains(FileStatus::Missing));
+    return contains(data, FileStatus::New) && contains(data, FileStatus::Missing);
 }
 
-bool DataContainer::isBackupExists() const
+bool DataHelper::isBackupExists(const DataContainer *data)
 {
-    return QFileInfo::exists(backupFilePath());
+    return QFileInfo::exists(backupFilePath(data));
 }
 
-bool DataContainer::makeBackup(bool forceOverwrite) const
+bool DataHelper::makeBackup(const DataContainer *data, bool forceOverwrite)
 {
-    if (!QFileInfo::exists(m_metadata.dbFilePath))
+    if (!QFileInfo::exists(data->m_metadata.dbFilePath))
         return false;
 
     if (forceOverwrite)
-        removeBackupFile();
+        removeBackupFile(data);
 
-    return QFile::copy(m_metadata.dbFilePath,
-                       backupFilePath());
+    return QFile::copy(data->m_metadata.dbFilePath,
+                       backupFilePath(data));
 }
 
-bool DataContainer::restoreBackupFile() const
+bool DataHelper::restoreBackupFile(const DataContainer *data)
 {
-    if (isBackupExists()) {
-        if (QFile::exists(m_metadata.dbFilePath)) {
-            if (!QFile::remove(m_metadata.dbFilePath))
+    if (isBackupExists(data)) {
+        if (QFile::exists(data->m_metadata.dbFilePath)) {
+            if (!QFile::remove(data->m_metadata.dbFilePath))
                 return false;
         }
-        return QFile::rename(backupFilePath(), m_metadata.dbFilePath);
+        return QFile::rename(backupFilePath(data), data->m_metadata.dbFilePath);
     }
     return false;
 }
 
-void DataContainer::removeBackupFile() const
+void DataHelper::removeBackupFile(const DataContainer *data)
 {
-    if (isBackupExists())
-        QFile::remove(backupFilePath());
+    if (isBackupExists(data))
+        QFile::remove(backupFilePath(data));
 }
 
-const Numbers& DataContainer::updateNumbers()
+const Numbers& DataHelper::updateNumbers(DataContainer *data)
 {
-    m_numbers = getNumbers();
-    return m_numbers;
+    data->m_numbers = getNumbers(data);
+    return data->m_numbers;
 }
 
-Numbers DataContainer::getNumbers(const QModelIndex &rootIndex) const
+Numbers DataHelper::getNumbers(const DataContainer *data, const QModelIndex &rootIndex)
 {
-    return getNumbers(m_model, rootIndex);
+    return getNumbers(data->m_model, rootIndex);
 }
 
-Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
+Numbers DataHelper::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
 {
     Numbers num;
 
@@ -244,10 +253,4 @@ Numbers DataContainer::getNumbers(const QAbstractItemModel *model, const QModelI
     }
 
     return num;
-}
-
-DataContainer::~DataContainer()
-{
-    removeBackupFile();
-    qDebug() << Q_FUNC_INFO << databaseFileName();
 }

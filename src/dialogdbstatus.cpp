@@ -20,10 +20,10 @@ DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     m_ui->setupUi(this);
     setWindowIcon(IconProvider::appIcon());
 
-    if (m_data->isDbFileState(DbFileState::NotSaved))
+    if (DataHelper::isDbFileState(m_data, DbFileState::NotSaved))
         setWindowTitle(windowTitle() + QStringLiteral(u" [unsaved]"));
 
-    if (m_data->isImmutable())
+    if (DataHelper::isImmutable(m_data))
         setWindowTitle(windowTitle() + QStringLiteral(u" [const]"));
 
     m_ui->inpComment->setMaxLength(MAX_LENGTH_COMMENT);
@@ -49,12 +49,12 @@ void DialogDbStatus::setLabelsInfo()
 {
     const MetaData &meta = m_data->m_metadata;
 
-    m_ui->labelDbFileName->setText(m_data->databaseFileName());
+    m_ui->labelDbFileName->setText(DataHelper::databaseFileName(m_data));
     m_ui->labelDbFileName->setToolTip(meta.dbFilePath);
     m_ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(meta.algorithm));
     m_ui->labelWorkDir->setToolTip(meta.workDir);
 
-    if (!m_data->isWorkDirRelative())
+    if (!DataHelper::isWorkDirRelative(m_data))
         m_ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
@@ -80,8 +80,8 @@ void DialogDbStatus::setTabsInfo()
     m_ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
     // tab Filter
-    m_ui->tabWidget->setTabEnabled(TabFilter, m_data->isFilterApplied());
-    if (m_data->isFilterApplied()) {
+    m_ui->tabWidget->setTabEnabled(TabFilter, DataHelper::isFilterApplied(m_data));
+    if (DataHelper::isFilterApplied(m_data)) {
         m_ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
         const FilterRule &filter = m_data->m_metadata.filter;
@@ -94,14 +94,14 @@ void DialogDbStatus::setTabsInfo()
     }
 
     // tab Verification
-    m_ui->tabWidget->setTabEnabled(TabVerification, m_data->contains(FileStatus::CombChecked));
-    if (m_data->contains(FileStatus::CombChecked)) {
+    m_ui->tabWidget->setTabEnabled(TabVerification, DataHelper::contains(m_data, FileStatus::CombChecked));
+    if (DataHelper::contains(m_data, FileStatus::CombChecked)) {
         m_ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         m_ui->labelVerification->setText(infoVerification().join('\n'));
     }
 
     // tab Result
-    m_ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && m_data->contains(FileStatus::CombDbChanged));
+    m_ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && DataHelper::contains(m_data, FileStatus::CombDbChanged));
     if (m_ui->tabWidget->isTabEnabled(TabChanges)) {
         m_ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         m_ui->labelResult->setText(infoChanges().join('\n'));
@@ -155,7 +155,7 @@ QStringList DialogDbStatus::infoContent()
     contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(num, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(num.numberOf(FileStatus::Missing)));
 
-    if (m_data->isImmutable()) {
+    if (DataHelper::isImmutable(m_data)) {
         contentNumbers.append(QString());
         contentNumbers.append(QStringLiteral(u"No changes are allowed"));
     }
@@ -170,7 +170,7 @@ QStringList DialogDbStatus::infoVerification()
     const int n_available = num.numberOf(FileStatus::CombAvailable);
     const int n_mismatch = num.numberOf(FileStatus::Mismatched);
 
-    if (m_data->isAllChecked()) {
+    if (DataHelper::isAllChecked(m_data)) {
         const int n_checksums = num.numberOf(FileStatus::CombHasChecksum);
 
         if (n_mismatch) {
@@ -183,7 +183,7 @@ QStringList DialogDbStatus::infoVerification()
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(n_available));
     }
-    else if (m_data->contains(FileStatus::CombChecked)) {
+    else if (DataHelper::contains(m_data, FileStatus::CombChecked)) {
         // to account for added and updated files, the total number in parentheses is used
         const int n_added_updated = num.numberOf(FileStatus::Added | FileStatus::Updated);
 
@@ -264,12 +264,12 @@ void DialogDbStatus::setCurrentTab(Tabs tab)
 
 bool DialogDbStatus::isCreating() const
 {
-    return m_data->isDbFileState(MetaData::NoFile);
+    return DataHelper::isDbFileState(m_data, MetaData::NoFile);
 }
 
 bool DialogDbStatus::isJustCreated() const
 {
-    return m_data->isDbFileState(MetaData::Created);
+    return DataHelper::isDbFileState(m_data, MetaData::Created);
 }
 
 QString DialogDbStatus::getComment() const

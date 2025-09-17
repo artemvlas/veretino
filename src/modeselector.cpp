@@ -224,7 +224,7 @@ Mode ModeSelector::mode() const
 {
     if (m_view->isViewDatabase()) {
         if (m_proc && m_proc->isStarted()) {
-            if (m_view->m_data->isInCreation())
+            if (DataHelper::isInCreation(m_view->m_data))
                 return DbCreating;
             else if (m_proc->isState(State::StartVerbose))
                 return DbProcessing;
@@ -392,7 +392,7 @@ void ModeSelector::showFileSystem(const QString &path)
         m_view->m_lastPathFS = path;
 
     if (m_view->m_data
-        && m_view->m_data->isDbFileState(DbFileState::NotSaved))
+        && DataHelper::isDbFileState(m_view->m_data, DbFileState::NotSaved))
     {
         m_manager->addTask(&Manager::prepareSwitchToFs);
         m_proc->setAwaiting(ProcState::AwaitingSwitchToFs);
@@ -441,7 +441,7 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
 {
     if (promptProcessAbort()) {
         // aborted process
-        if (m_view->isViewDatabase() && m_view->m_data->contains(FileStatus::CombProcessing))
+        if (m_view->isViewDatabase() && DataHelper::contains(m_view->m_data, FileStatus::CombProcessing))
             m_view->clear();
 
         m_manager->addTask(&Manager::saveData);
@@ -463,7 +463,7 @@ void ModeSelector::openBranchDb()
     if (!m_view->m_data)
         return;
 
-    QString assumedPath = m_view->m_data->branch_path_existing(m_view->curIndex());
+    QString assumedPath = DataHelper::branch_path_existing(m_view->m_data, m_view->curIndex());
 
     if (QFileInfo::exists(assumedPath))
         openJsonDatabase(assumedPath);
@@ -475,7 +475,7 @@ void ModeSelector::importBranch()
         return;
 
     const QModelIndex ind = m_view->curIndex();
-    const QString path = m_view->m_data->branch_path_existing(ind);
+    const QString path = DataHelper::branch_path_existing(m_view->m_data, ind);
 
     if (!path.isEmpty()) {
         stopProcess();
@@ -539,7 +539,7 @@ void ModeSelector::exportItemSum()
         return;
     }
 
-    const QString filePath = m_view->m_data->itemAbsolutePath(ind);
+    const QString filePath = DataHelper::itemAbsolutePath(m_view->m_data, ind);
 
     FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
     fileVal.checksum = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
@@ -808,7 +808,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
     QMenu *viewContextMenu = m_menuAct->disposableMenu();
 
     if (m_proc->isStarted()) {
-        if (!pData->isInCreation())
+        if (!DataHelper::isInCreation(pData))
             viewContextMenu->addAction(m_menuAct->actionStop);
         viewContextMenu->addAction(m_menuAct->actionCancelBackToFS);
     } else {
@@ -816,8 +816,8 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
         viewContextMenu->addAction(m_menuAct->actionResetDb);
 
         // TODO: should be optimized with more clear db file state
-        if (QFileInfo::exists(pData->backupFilePath())
-            || (pData->isDbFileState(DbFileState::NotSaved) && QFileInfo::exists(pData->m_metadata.dbFilePath)))
+        if (QFileInfo::exists(DataHelper::backupFilePath(pData))
+            || (DataHelper::isDbFileState(pData, DbFileState::NotSaved) && QFileInfo::exists(pData->m_metadata.dbFilePath)))
         {
             viewContextMenu->addAction(m_menuAct->actionForgetChanges);
         }
@@ -854,7 +854,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                 viewContextMenu->addSeparator();
         }
 
-        if (!isDbConst() && pData->hasPossiblyMovedItems())
+        if (!isDbConst() && DataHelper::hasPossiblyMovedItems(pData))
             viewContextMenu->addAction(m_menuAct->actionUpdDbFindMoved);
 
         if (index.isValid()) {
@@ -868,7 +868,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                             if (m_settings->allowPasteIntoDb && !copiedDigest(pData->m_metadata.algorithm).isEmpty())
                                 viewContextMenu->addAction(m_menuAct->actionUpdFilePasteDigest);
                             // import from digest file
-                            if (QFileInfo::exists(pData->digestFilePath(index)))
+                            if (QFileInfo::exists(DataHelper::digestFilePath(pData, index)))
                                 viewContextMenu->addAction(m_menuAct->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:
@@ -901,7 +901,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                     viewContextMenu->addAction(m_menuAct->actionCopyFolder);
 
                     // contains branch db file
-                    if (!m_view->m_data->branch_path_existing(index).isEmpty()) {
+                    if (!DataHelper::branch_path_existing(m_view->m_data, index).isEmpty()) {
                         viewContextMenu->addAction(m_menuAct->actionBranchOpen);
                         if (has_new && !isDbConst())
                             viewContextMenu->addAction(m_menuAct->actionBranchImport);
@@ -945,7 +945,7 @@ QString ModeSelector::copiedDigest(QCryptographicHash::Algorithm algo) const
 
 bool ModeSelector::isDbConst() const
 {
-    return (m_view->m_data && m_view->m_data->isImmutable());
+    return m_view->m_data && DataHelper::isImmutable(m_view->m_data);
 }
 
 bool ModeSelector::promptProcessStop()

@@ -123,7 +123,7 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
 void Manager::restoreDatabase()
 {
     if (m_dataMaintainer->m_data
-        && (m_dataMaintainer->m_data->restoreBackupFile() || m_dataMaintainer->isDataNotSaved()))
+        && (DataHelper::restoreBackupFile(m_dataMaintainer->m_data) || m_dataMaintainer->isDataNotSaved()))
     {
         createDataModel(m_dataMaintainer->m_data->m_metadata.dbFilePath);
     } else {
@@ -170,7 +170,7 @@ void Manager::prepareSwitchToFs()
 
 void Manager::updateDatabase(const DbMod dest)
 {
-    if (!m_dataMaintainer->m_data || m_dataMaintainer->m_data->isImmutable())
+    if (!m_dataMaintainer->m_data || DataHelper::isImmutable(m_dataMaintainer->m_data))
         return;
 
     const Numbers &nums = m_dataMaintainer->m_data->m_numbers;
@@ -227,7 +227,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
     const FileStatus prevStatus = TreeModel::itemFileStatus(fileIndex);
 
     if (!pData
-        || pData->isImmutable()
+        || DataHelper::isImmutable(pData)
         || !(prevStatus & FileStatus::CombUpdatable))
     {
         return;
@@ -235,7 +235,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
 
     if (prevStatus == FileStatus::New) {
         if (job & (DM_ImportDigest | DM_PasteDigest)) {
-            const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(pData->digestFilePath(fileIndex))
+            const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(DataHelper::digestFilePath(pData, fileIndex))
                                                          : TreeModel::itemFileChecksum(fileIndex);
 
             // checking for compliance with the current algo
@@ -323,7 +323,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     const QString dig = hashItem(fileItemIndex, Verification);
 
     if (!dig.isEmpty()) {
-        showFileCheckResultMessage(m_dataMaintainer->m_data->itemAbsolutePath(fileItemIndex), storedSum, dig);
+        showFileCheckResultMessage(DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex), storedSum, dig);
         m_dataMaintainer->updateChecksum(fileItemIndex, dig);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
     } else if (m_proc->isCanceled()) {
@@ -338,7 +338,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
         return;
     }
 
-    if (!m_dataMaintainer->m_data->contains(FileStatus::CombAvailable, folderItemIndex)) {
+    if (!DataHelper::contains(m_dataMaintainer->m_data, FileStatus::CombAvailable, folderItemIndex)) {
         QString warningText = "There are no files available for verification.";
         if (!folderItemIndex.isValid())
             warningText.append("\n\n" + k_movedDbWarning);
@@ -369,7 +369,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
             m_dataMaintainer->updateVerifDateTime();
         }
     } else { // if subfolder
-        const Numbers &nums = m_dataMaintainer->m_data->getNumbers(folderItemIndex);
+        const Numbers &nums = DataHelper::getNumbers(m_dataMaintainer->m_data, folderItemIndex);
         const QString subfolderName = TreeModel::itemName(folderItemIndex);
 
         emit folderChecked(nums, subfolderName);
@@ -473,7 +473,7 @@ QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
     m_dataMaintainer->setFileStatus(ind,
                                     calckind ? FileStatus::Verifying : FileStatus::Calculating);
 
-    const QString filePath = m_dataMaintainer->m_data->itemAbsolutePath(ind);
+    const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, ind);
     const QString digest = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind);
 
     if (digest.isEmpty() && !m_proc->isCanceled()) {
@@ -537,7 +537,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     if (status != FileStatus::Queued)
         m_dataMaintainer->addToQueue(status, root);
 
-    const NumSize num_queued = pData->getNumbers(root).values(FileStatus::Queued);
+    const NumSize num_queued = DataHelper::getNumbers(pData, root).values(FileStatus::Queued);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << num_queued.number;
 
@@ -686,7 +686,7 @@ void Manager::cacheMissingItems()
 {
     DataContainer *pData = m_dataMaintainer->m_data;
 
-    if (!pData || !pData->hasPossiblyMovedItems()) {
+    if (!pData || !DataHelper::hasPossiblyMovedItems(pData)) {
         return;
     }
 
@@ -699,6 +699,8 @@ void Manager::cacheMissingItems()
                 pData->_cacheMissing[dig] = it.index();
         }
     }
+
+    qDebug() << Q_FUNC_INFO << "Cached:" << pData->_cacheMissing.size();
 }
 
 void Manager::modelChanged(ModelView modelView)

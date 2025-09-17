@@ -120,7 +120,7 @@ void View::setData(DataContainer *data)
     m_data = data;
     m_lastPathFS = data->m_metadata.dbFilePath;
 
-    if (data->isInCreation()) {
+    if (DataHelper::isInCreation(data)) {
         setTreeModel(ModelView::ModelSource);
     } else {
         setTreeModel(ModelView::ModelProxy);
@@ -184,7 +184,7 @@ QString View::curAbsPath() const
         return m_fileSystem->filePath(curIndex());
 
     if (isViewDatabase())
-        return m_data->itemAbsolutePath(curIndex());
+        return DataHelper::itemAbsolutePath(m_data, curIndex());
 
     return QString();
 }

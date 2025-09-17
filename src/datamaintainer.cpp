@@ -26,7 +26,7 @@ DataMaintainer::DataMaintainer(DataContainer *initData, QObject *parent)
 
 void DataMaintainer::connections()
 {
-    connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (m_data->contains(FileStatus::Mismatched | FileStatus::Missing))
+    connect(this, &DataMaintainer::numbersUpdated, this, [=]{ if (DataHelper::contains(m_data, (FileStatus::Mismatched | FileStatus::Missing)))
                                                                   m_data->m_metadata.datetime.clear(VerDateTime::Verified); });
 }
 
@@ -97,17 +97,17 @@ void DataMaintainer::updateDateTime()
 
     VerDateTime &dt = m_data->m_metadata.datetime;
 
-    if (m_data->isDbFileState(DbFileState::NoFile)) {
+    if (DataHelper::isDbFileState(m_data, DbFileState::NoFile)) {
         dt.update(VerDateTime::Created);
     }
-    else if (m_data->contains(FileStatus::CombDbChanged)) {
+    else if (DataHelper::contains(m_data, FileStatus::CombDbChanged)) {
         dt.update(VerDateTime::Updated);
     }
 }
 
 void DataMaintainer::updateVerifDateTime()
 {
-    if (m_data && m_data->isAllMatched()) {
+    if (m_data && DataHelper::isAllMatched(m_data)) {
         m_data->m_metadata.datetime.update(VerDateTime::Verified);
         setDbFileState(DbFileState::NotSaved);
     }
@@ -128,7 +128,7 @@ void DataMaintainer::checkVerifDateTime()
         if (!it.hasStatus(FileStatus::CombAvailable))
             continue;
 
-        QFileInfo fi(m_data->itemAbsolutePath(it.index()));
+        QFileInfo fi(DataHelper::itemAbsolutePath(m_data, it.index()));
 
         if (tools::isLater(verified, fi.birthTime())) {
             m_data->m_metadata.datetime.clear(VerDateTime::Verified);
@@ -192,7 +192,7 @@ void DataMaintainer::updateNumbers()
         return;
     }
 
-    m_data->updateNumbers();
+    DataHelper::updateNumbers(m_data);
     emit numbersUpdated();
 }
 
@@ -221,7 +221,7 @@ void DataMaintainer::moveNumbers(const FileStatus before, const FileStatus after
 
 void DataMaintainer::setDbFileState(DbFileState state)
 {
-    if (m_data && !m_data->isDbFileState(state)) {
+    if (m_data && !DataHelper::isDbFileState(m_data, state)) {
         m_data->m_metadata.dbFileState = state;
         emit dbFileStateChanged(state);
     }
@@ -638,27 +638,27 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 
     /*** Header ***/
     const bool isBranching = TreeModel::isFolderRow(rootFolder);
-    const Numbers &nums = isBranching ? m_data->getNumbers(rootFolder) : m_data->m_numbers;
+    const Numbers &nums = isBranching ? DataHelper::getNumbers(m_data, rootFolder) : m_data->m_numbers;
     const MetaData &meta = m_data->m_metadata;
 
-    const QString &pathToSave = isBranching ? m_data->branch_path_composed(rootFolder) // branching
-                                            : m_data->m_metadata.dbFilePath;           // main database
+    const QString &pathToSave = isBranching ? DataHelper::branch_path_composed(m_data, rootFolder) // branching
+                                            : m_data->m_metadata.dbFilePath;                       // main database
 
     VerJson *pJson = new VerJson(pathToSave);
     pJson->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : pathstr::basicName(meta.workDir));
     pJson->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(nums.totalSize(FileStatus::CombAvailable)));
 
     // DateTime
-    const QString timestamp = (isBranching && m_data->isAllMatched(nums)) ? VerDateTime::currentWithHint(VerDateTime::Created)
-                                                                         : meta.datetime.toString();
+    const QString timestamp = (isBranching && DataHelper::isAllMatched(nums)) ? VerDateTime::currentWithHint(VerDateTime::Created)
+                                                                              : meta.datetime.toString();
     pJson->addInfo(VerJson::h_key_DateTime, timestamp);
 
     // WorkDir
-    if (!isBranching && !m_data->isWorkDirRelative())
+    if (!isBranching && !DataHelper::isWorkDirRelative(m_data))
         pJson->addInfo(VerJson::h_key_WorkDir, meta.workDir);
 
     // Filter
-    if (m_data->isFilterApplied()) {
+    if (DataHelper::isFilterApplied(m_data)) {
         const bool inc = meta.filter.isFilter(FilterRule::Include);
         const QString &h_key = inc ? VerJson::h_key_Included : VerJson::h_key_Ignored;
         pJson->addInfo(h_key, meta.filter.extensionString());
@@ -706,7 +706,7 @@ bool DataMaintainer::exportToJson()
     if (!pJson)
         return false;
 
-    m_data->makeBackup();
+    DataHelper::makeBackup(m_data);
 
     if (saveJsonFile(pJson)) {
         delete pJson;
@@ -727,7 +727,7 @@ bool DataMaintainer::saveJsonFile(VerJson *pJson)
         return false;
 
     if (pJson->save()) {
-        setDbFileState(m_data->isInCreation() ? DbFileState::Created : DbFileState::Saved);
+        setDbFileState(DataHelper::isInCreation(m_data) ? DbFileState::Created : DbFileState::Saved);
         m_data->m_metadata.dbFilePath = pJson->file_path();
 
         emit setStatusbarText(QStringLiteral(u"Saved"));
@@ -771,7 +771,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     if (!m_data)
         return 0;
 
-    const QString filePath = m_data->branch_path_existing(rootFolder);
+    const QString filePath = DataHelper::branch_path_existing(m_data, rootFolder);
     VerJson json(filePath);
     if (!json.load() || !json)
         return 0;
@@ -824,7 +824,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     }
     // if curIndex is at folder row
     else if (TreeModel::isFolderRow(curIndex)) {
-        const Numbers &num = m_data->getNumbers(curIndex);
+        const Numbers &num = DataHelper::getNumbers(m_data, curIndex);
 
         QList<FileStatus> statuses = num.statuses();
 
@@ -860,12 +860,12 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 
 bool DataMaintainer::isCanceled() const
 {
-    return (m_proc && m_proc->isCanceled());
+    return m_proc && m_proc->isCanceled();
 }
 
 bool DataMaintainer::isDataNotSaved() const
 {
-    return (m_data && m_data->isDbFileState(DbFileState::NotSaved));
+    return m_data && DataHelper::isDbFileState(m_data, DbFileState::NotSaved);
 }
 
 void DataMaintainer::saveData()

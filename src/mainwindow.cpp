@@ -380,7 +380,7 @@ void MainWindow::dialogSettings()
 
         if (m_settings->detectMoved
             && dc->_cacheMissing.isEmpty()
-            && dc->hasPossiblyMovedItems())
+            && DataHelper::hasPossiblyMovedItems(dc))
         {
             m_manager->addTaskWithState(State::Idle, &Manager::cacheMissingItems);
         }
@@ -514,7 +514,7 @@ void MainWindow::updateMenuActions()
 {
     m_modeSelect->m_menuAct->actionShowFilesystem->setEnabled(!ui->view->isViewFileSystem());
     m_modeSelect->m_menuAct->actionSave->setEnabled(ui->view->isViewDatabase()
-                                                   && ui->view->m_data->isDbFileState(DbFileState::NotSaved));
+                                                    && DataHelper::isDbFileState(ui->view->m_data, DbFileState::NotSaved));
 }
 
 void MainWindow::updateStatusIcon()
@@ -566,8 +566,8 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        QString strAdd = data->isAllMatched() ? QStringLiteral(u"✓ verified")
-                                              : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
+        QString strAdd = DataHelper::isAllMatched(data) ? QStringLiteral(u"✓ verified")
+                                                        : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
 
         const QString strTitle = tools::joinStrings(Lit::s_appName, strAdd, Lit::s_sepStick);
         setWindowTitle(strTitle);
