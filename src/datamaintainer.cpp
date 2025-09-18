@@ -357,11 +357,11 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
 
 bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
 {
-    if (!m_data || !m_data->_cacheMissing.contains(checksum))
+    if (!m_data || !m_data->m_cacheMissing.contains(checksum))
         return false;
 
     // moved out
-    QModelIndex ind_movedout = m_data->_cacheMissing.take(checksum);
+    QModelIndex ind_movedout = m_data->m_cacheMissing.take(checksum);
     const FileStatus status = TreeModel::itemFileStatus(ind_movedout);
 
     if (status & (FileStatus::Missing | FileStatus::Removed)) {
@@ -760,7 +760,7 @@ void DataMaintainer::forkJsonDb(const QModelIndex &rootFolder)
         emit subDbForked(pJson->file_path());
 
         // update cached value
-        m_data->_cacheBranches[rootFolder] = pJson->file_path();
+        m_data->m_cacheBranches[rootFolder] = pJson->file_path();
     } else {
         qWarning() << "An error occurred while creating the Branch!";
     }

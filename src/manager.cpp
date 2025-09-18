@@ -695,12 +695,12 @@ void Manager::cacheMissingItems()
     while (it.hasNext()) {
         if (it.nextFile().status() == FileStatus::Missing) {
             const QString dig = it.checksum();
-            if (!pData->_cacheMissing.contains(dig))
-                pData->_cacheMissing[dig] = it.index();
+            if (!pData->m_cacheMissing.contains(dig))
+                pData->m_cacheMissing[dig] = it.index();
         }
     }
 
-    qDebug() << Q_FUNC_INFO << "Cached:" << pData->_cacheMissing.size();
+    qDebug() << Q_FUNC_INFO << "Cached:" << pData->m_cacheMissing.size();
 }
 
 void Manager::modelChanged(ModelView modelView)

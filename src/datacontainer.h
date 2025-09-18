@@ -39,30 +39,30 @@ class DataContainer : public QObject
 
 public:
     explicit DataContainer(QObject *parent = nullptr);
-    explicit DataContainer(const MetaData &meta, QObject *parent = nullptr);
     explicit DataContainer(const MetaData &meta, TreeModel *data, QObject *parent = nullptr);
     ~DataContainer();
 
-    // clears the current data models, sets the new empty ones
-    void setData();
-    void setData(const MetaData &meta, TreeModel *data);
+    // replace the current data and metadata with new ones, clears numbers and cache
+    void set(const MetaData &meta, TreeModel *data);
 
-    // deletes data models and clears m_numbers
-    void clearData();
+    // set empty data and metadata
+    void clear();
 
-    bool hasData() const;
+    // is m_model empty
+    bool isEmpty() const;
 
-    // DATA
-    TreeModel *m_model = nullptr;  // main data
-    ProxyModel *m_proxy = nullptr;
+    /*** DATA ***/
+    // main data model
+    TreeModel *m_model = new TreeModel(this);
+
+    // view proxy (sort, filter)
+    ProxyModel *m_proxy = new ProxyModel(m_model, this);
+
     MetaData m_metadata;
     Numbers m_numbers;
 
-    QHash<QString, QModelIndex> _cacheMissing;
-    QHash<QModelIndex, QString> _cacheBranches;
-
-private:
-    void createModels();
+    QHash<QString, QModelIndex> m_cacheMissing;
+    QHash<QModelIndex, QString> m_cacheBranches;
 }; // class DataContainer
 
 /*** <!!!> ***/

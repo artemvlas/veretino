@@ -379,15 +379,15 @@ void MainWindow::dialogSettings()
         DataContainer *dc = ui->view->m_data;
 
         if (m_settings->detectMoved
-            && dc->_cacheMissing.isEmpty()
+            && dc->m_cacheMissing.isEmpty()
             && DataHelper::hasPossiblyMovedItems(dc))
         {
             m_manager->addTaskWithState(State::Idle, &Manager::cacheMissingItems);
         }
         else if (!m_settings->detectMoved
-                   && !dc->_cacheMissing.isEmpty())
+                   && !dc->m_cacheMissing.isEmpty())
         {
-            dc->_cacheMissing.clear();
+            dc->m_cacheMissing.clear();
         }
     }
 }

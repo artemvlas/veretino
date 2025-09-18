@@ -11,52 +11,26 @@
 #include "pathstr.h"
 
 DataContainer::DataContainer(QObject *parent)
-    : QObject(parent)
-{
-    createModels();
-}
-
-DataContainer::DataContainer(const MetaData &meta, QObject *parent)
-    : QObject(parent), m_metadata(meta)
-{
-    createModels();
-}
+    : QObject(parent) {}
 
 DataContainer::DataContainer(const MetaData &meta, TreeModel *data, QObject *parent)
-    : QObject(parent)
+    : m_metadata(meta), m_model(data), QObject(parent)
 {
-    setData(meta, data);
+    if (m_model)
+        m_model->setParent(this);
 }
 
-void DataContainer::setData()
+DataContainer::~DataContainer()
 {
-    clearData();
-    createModels();
+    DataHelper::removeBackupFile(this);
+    qDebug() << Q_FUNC_INFO << DataHelper::databaseFileName(this);
 }
 
-void DataContainer::setData(const MetaData &meta, TreeModel *data)
+void DataContainer::set(const MetaData &meta, TreeModel *data)
 {
-    clearData();
-    m_model = data;
-    m_model->setParent(this);
-    m_proxy = new ProxyModel(m_model, this);
+    if (!data)
+        return;
 
-    m_metadata = meta;
-}
-
-bool DataContainer::hasData() const
-{
-    return m_model && !m_model->isEmpty();
-}
-
-void DataContainer::createModels()
-{
-    m_model = new TreeModel(this);
-    m_proxy = new ProxyModel(m_model, this);
-}
-
-void DataContainer::clearData()
-{
     if (m_proxy) {
         delete m_proxy;
         m_proxy = nullptr;
@@ -67,13 +41,25 @@ void DataContainer::clearData()
         m_model = nullptr;
     }
 
+    m_model = data;
+    m_model->setParent(this);
+    m_proxy = new ProxyModel(m_model, this);
+
+    m_metadata = meta;
+
     m_numbers.clear();
+    m_cacheMissing.clear();
+    m_cacheBranches.clear();
 }
 
-DataContainer::~DataContainer()
+void DataContainer::clear()
 {
-    DataHelper::removeBackupFile(this);
-    qDebug() << Q_FUNC_INFO << DataHelper::databaseFileName(this);
+    set(MetaData(), new TreeModel(this));
+}
+
+bool DataContainer::isEmpty() const
+{
+    return !m_model || m_model->isEmpty();
 }
 
 /*** <!!!> ***/
@@ -103,8 +89,8 @@ QString DataHelper::branch_path_existing(DataContainer *data, const QModelIndex 
     if (!TreeModel::isFolderRow(subfolder))
         return QString();
 
-    if (data->_cacheBranches.contains(subfolder)) {
-        const QString fp = data->_cacheBranches.value(subfolder);
+    if (data->m_cacheBranches.contains(subfolder)) {
+        const QString fp = data->m_cacheBranches.value(subfolder);
         if (fp.isEmpty() || QFileInfo::exists(fp)) { // in case of renaming
             qDebug() << "DC::branchFilePath >> return cached:" << fp;
             return fp;
@@ -117,7 +103,7 @@ QString DataHelper::branch_path_existing(DataContainer *data, const QModelIndex 
         path = Files::firstDbFile(pathstr::parentFolder(path));
 
     // caching the result; an empty value means no branches
-    data->_cacheBranches[subfolder] = path;
+    data->m_cacheBranches[subfolder] = path;
 
     return path;
 }
