@@ -13,12 +13,18 @@ class ItemFileType : public QTreeWidgetItem
 {
 public:
     ItemFileType(QTreeWidget* parent);
-    enum Column { ColumnType, ColumnFilesNumber, ColumnTotalSize };
+
+    enum Column {
+        ColumnType,
+        ColumnFilesNumber,
+        ColumnTotalSize
+    };
+
     enum TypeAttribute {
         NotSet = 0,
         UnCheckable = 1,  // enabling the checkbox is prohibited
         UnFilterable = 2, // values ​​do not count toward the filtered list
-    }; // enum TypeAttribute
+    };
 
     // toggle checkbox status (checked or unchecked)
     void toggle();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>570</width>
-    <height>140</height>
+    <height>141</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,6 +58,13 @@
         <widget class="QLabel" name="labelFileSize">
          <property name="text">
           <string>File size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelSpeed">
+         <property name="text">
+          <string>Speed</string>
          </property>
         </widget>
        </item>

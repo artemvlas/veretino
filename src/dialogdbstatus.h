@@ -21,7 +21,14 @@ public:
     explicit DialogDbStatus(const DataContainer *data, QWidget *parent = nullptr);
     ~DialogDbStatus();
 
-    enum Tabs { TabListed, TabFilter, TabVerification, TabChanges, TabComment, TabAutoSelect = 1000 };
+    enum Tabs {
+        TabListed,
+        TabFilter,
+        TabVerification,
+        TabChanges,
+        TabComment,
+        TabAutoSelect = 1000
+    };
 
     void setCurrentTab(Tabs tab);
     QString getComment() const;

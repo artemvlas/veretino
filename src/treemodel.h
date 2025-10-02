@@ -21,7 +21,14 @@ public:
     ~TreeModel();
 
     enum ItemDataRoles { RawDataRole = 1000 };
-    enum Column { ColumnName, ColumnSize, ColumnStatus, ColumnChecksum, ColumnReChecksum };
+
+    enum Column {
+        ColumnName,
+        ColumnSize,
+        ColumnStatus,
+        ColumnChecksum,
+        ColumnReChecksum
+    };
     Q_ENUM(Column)
 
     QVariant data(const QModelIndex &curIndex, int role) const override;

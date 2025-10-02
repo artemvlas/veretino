@@ -19,7 +19,8 @@ class DialogFileProcResult : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogFileProcResult(const QString &filePath, const FileValues &values, QWidget *parent = nullptr);
+    explicit DialogFileProcResult(const QString &filePath,
+                                  const FileValues &values, QWidget *parent = nullptr);
     ~DialogFileProcResult();
 
 private:

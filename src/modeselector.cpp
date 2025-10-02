@@ -543,7 +543,7 @@ void ModeSelector::exportItemSum()
 
     FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
     fileVal.checksum = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
-                                                      : TreeModel::itemFileChecksum(ind);
+                                                     : TreeModel::itemFileChecksum(ind);
 
     emit m_manager->fileProcessed(filePath, fileVal);
 }

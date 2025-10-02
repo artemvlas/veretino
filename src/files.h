@@ -124,9 +124,10 @@ struct FileValues {
         : status(fileStatus), size(fileSize) {}
 
     FileStatus status;
-    qint64 size;        // file size in bytes
-    QString checksum;   // newly computed or imported from the database
-    QString reChecksum; // the recomputed checksum, if it does not match the 'checksum'
+    qint64 size;            // file size in bytes
+    qint64 hash_time = -1;  // hashing time in milliseconds
+    QString checksum;       // newly computed or imported from the database
+    QString reChecksum;     // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues
 
 #endif // FILES_H

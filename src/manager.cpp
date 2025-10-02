@@ -93,8 +93,13 @@ void Manager::processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
 {
-    const QString dig = hashFile(filePath, algo);
+    m_elapsedTimer.start();
 
+    // hashing
+    const QString dig = hashFile(filePath, algo);
+    const qint64 hash_time = m_elapsedTimer.elapsed();
+
+    // result handling
     if (dig.isEmpty()) {
         calcFailedMessage(filePath);
         return;
@@ -116,6 +121,7 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
 
     FileValues fileVal(purpose, QFileInfo(filePath).size());
     fileVal.checksum = dig.toLower();
+    fileVal.hash_time = hash_time;
 
     emit fileProcessed(filePath, fileVal);
 }
@@ -549,7 +555,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     bool isMismatchFound = false;
 
     // checking whether this is a Calculation or Verification process
-    const CalcKind calckind = (status & FileStatus::CombAvailable) ? Verification : Calculation;
+    const CalcKind calc_kind = (status & FileStatus::CombAvailable) ? Verification : Calculation;
 
     // process
     TreeModelIterator iter(pData->m_model, root);
@@ -559,7 +565,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
             continue;
 
         // hashing
-        const QString dig = hashItem(iter.index(), calckind);
+        const QString dig = hashItem(iter.index(), calc_kind);
 
         if (m_proc->isCanceled())
             break;

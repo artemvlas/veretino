@@ -43,6 +43,15 @@ DialogFileProcResult::DialogFileProcResult(const QString &filePath, const FileVa
     default:
         break;
     }
+
+    // Hashing Speed
+    const bool isHashTimeRecorded = (values.hash_time >= 0);
+    ui->labelSpeed->setVisible(isHashTimeRecorded);
+
+    if (isHashTimeRecorded) {
+        ui->labelSpeed->setText(QStringLiteral(u"Speed: ")
+                                + format::processSpeed(values.hash_time, values.size));
+    }
 }
 
 DialogFileProcResult::~DialogFileProcResult()

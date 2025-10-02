@@ -43,7 +43,8 @@ public:
     QAction *actionClearRecent = new QAction(QStringLiteral(u"Clear History"), this);
     QAction *actionAbout = new QAction(QStringLiteral(u"About"), this);
 
-    QList<QAction*> m_menuFileActions { actionChooseFolder, actionOpenDatabaseFile, actionSave, actionShowFilesystem, actionOpenDialogSettings };
+    QList<QAction*> m_menuFileActions { actionChooseFolder, actionOpenDatabaseFile, actionSave,
+                                        actionShowFilesystem, actionOpenDialogSettings };
 
     // File system View
     QAction *actionToHome = new QAction(QStringLiteral(u"to Home"), this);

@@ -12,6 +12,7 @@
 #include "view.h"
 #include "procstate.h"
 #include "settings.h"
+#include <QElapsedTimer>
 
 struct Task {
     Task(std::function<void()> task, State run_state = State::StartSilently)
@@ -149,8 +150,10 @@ private:
     Files *m_files = new Files(this);
     ShaCalculator m_shaCalc;
     QList<Task> m_taskQueue;
+    QElapsedTimer m_elapsedTimer;
 
-    const QString k_movedDbWarning = QStringLiteral(u"The database file may have been moved or refers to an inaccessible location.");
+    const QString k_movedDbWarning = QStringLiteral(
+        u"The database file may have been moved or refers to an inaccessible location.");
 
 signals:
     // sends the 'text' to statusbar

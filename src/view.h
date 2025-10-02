@@ -18,6 +18,7 @@ class View : public QTreeView
 
 public:
     explicit View(QWidget *parent = nullptr);
+
     enum ModelView {
         NotSetted = 1,
         FileSystem = 1 << 1,
@@ -27,7 +28,12 @@ public:
     };
     Q_ENUM(ModelView)
 
-    enum ColumnFileSystem { ColumnFsName, ColumnFsSize, ColumnFsType, ColumnFsDateModified };
+    enum ColumnFileSystem {
+        ColumnFsName,
+        ColumnFsSize,
+        ColumnFsType,
+        ColumnFsDateModified
+    };
 
     void setSettings(Settings *settings);
     QString curAbsPath() const;
