@@ -22,26 +22,33 @@ DialogFileProcResult::DialogFileProcResult(const QString &filePath, const FileVa
 
     icons_.setTheme(palette());
     setFileName(filePath_);
-    setExtLineVisible(values_.status != FileStatus::ToSumFile);
+    setExtLineVisible(values_.hash_purpose != FileValues::HashingPurpose::SaveToDigestFile);
 
-    switch (values_.status) {
-    case FileStatus::Matched:
-        setModeMatched();
-        break;
-    case FileStatus::Mismatched:
-        setModeMismatched();
-        break;
-    case FileStatus::Computed:
-        setModeComputed();
-        break;
-    case FileStatus::ToClipboard:
-        setModeCopied();
-        break;
-    case FileStatus::ToSumFile:
-        makeSumFile();
-        break;
-    default:
-        break;
+    if (values_.status & (FileStatus::Matched | FileStatus::Mismatched)) {
+        switch (values_.status) {
+        case FileStatus::Matched:
+            setModeMatched();
+            break;
+        case FileStatus::Mismatched:
+            setModeMismatched();
+            break;
+        default:
+            break;
+        }
+    } else {
+        switch (values_.hash_purpose) {
+        case FileValues::HashingPurpose::Generic:
+            setModeComputed();
+            break;
+        case FileValues::HashingPurpose::CopyToClipboard:
+            setModeCopied();
+            break;
+        case FileValues::HashingPurpose::SaveToDigestFile:
+            makeSumFile();
+            break;
+        default:
+            break;
+        }
     }
 
     // Hashing Speed

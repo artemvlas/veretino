@@ -65,9 +65,9 @@ public:
         CombNewLost = New | Missing,
         CombUnreadable = UnPermitted | ReadError,
 
-        Computed = 1 << 17,    // the checksum has been calculated and is ready for further processing (copy or save)
-        ToClipboard = 1 << 18, // the calculated checksum is intended to be copied to the clipboard
-        ToSumFile = 1 << 19,   // the calculated checksum is intended to be stored in the summary file
+        //Computed = 1 << 17,    // the checksum has been calculated and is ready for further processing (copy or save)
+        //ToClipboard = 1 << 18, // the calculated checksum is intended to be copied to the clipboard
+        //ToSumFile = 1 << 19,   // the calculated checksum is intended to be stored in the summary file
     }; // enum FileStatus
 
     Q_ENUM(FileStatus)
@@ -123,11 +123,21 @@ struct FileValues {
     FileValues(FileStatus fileStatus = FileStatus::NotSet, qint64 fileSize = -1)
         : status(fileStatus), size(fileSize) {}
 
+    enum HashingPurpose : quint8 {
+        Generic,
+        AddToDb,
+        Verify,
+        CopyToClipboard,
+        SaveToDigestFile
+    };
+
+    /*** Variables ***/
     FileStatus status;
-    qint64 size;            // file size in bytes
-    qint64 hash_time = -1;  // hashing time in milliseconds
-    QString checksum;       // newly computed or imported from the database
-    QString reChecksum;     // the recomputed checksum, if it does not match the 'checksum'
+    HashingPurpose hash_purpose = Generic;
+    qint64 hash_time = -1;    // hashing time in milliseconds
+    qint64 size;              // file size in bytes
+    QString checksum;         // newly computed or imported from the database
+    QString reChecksum;       // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues
 
 #endif // FILES_H

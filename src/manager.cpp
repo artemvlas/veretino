@@ -91,7 +91,7 @@ void Manager::processFolderSha(const MetaData &metaData)
     }
 }
 
-void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, DestFileProc result)
+void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, FileValues::HashingPurpose purp)
 {
     m_elapsedTimer.start();
 
@@ -105,23 +105,10 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
         return;
     }
 
-    FileStatus purpose;
-
-    switch (result) {
-        case SumFile:
-            purpose = FileStatus::ToSumFile;
-            break;
-        case Clipboard:
-            purpose = FileStatus::ToClipboard;
-            break;
-        default:
-            purpose = FileStatus::Computed;
-            break;
-    }
-
-    FileValues fileVal(purpose, QFileInfo(filePath).size());
+    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
     fileVal.checksum = dig.toLower();
     fileVal.hash_time = hash_time;
+    fileVal.hash_purpose = purp;
 
     emit fileProcessed(filePath, fileVal);
 }

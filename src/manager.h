@@ -29,9 +29,6 @@ class Manager : public QObject
 public:
     explicit Manager(Settings *settings, QObject *parent = nullptr);
 
-    // Purpose of file processing (checksum calculation)
-    enum DestFileProc { Generic, Clipboard, SumFile };
-
     enum DbMod {
         DM_AutoSelect = 0,
         DM_AddNew = 1 << 0,
@@ -75,7 +72,7 @@ public slots:
 
     void processFileSha(const QString &filePath,
                         QCryptographicHash::Algorithm algo,
-                        Manager::DestFileProc result);
+                        FileValues::HashingPurpose purp);
 
     // path to *.sha1/256/512 summary file
     void checkSummaryFile(const QString &path);
@@ -173,7 +170,6 @@ signals:
     void taskAdded();
 }; // class Manager
 
-using DestFileProc = Manager::DestFileProc;
 using DbMod = Manager::DbMod;
 
 #endif // MANAGER_H

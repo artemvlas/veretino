@@ -42,7 +42,7 @@ void ModeSelector::connectActions()
     connect(m_menuAct->actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
     connect(m_menuAct->actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
     connect(m_menuAct->actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{ processFileSha(m_view->curAbsPath(), m_settings->algorithm(), DestFileProc::Clipboard); });
+            [=]{ processFileSha(m_view->curAbsPath(), m_settings->algorithm(), FileValues::HashingPurpose::CopyToClipboard); });
     connect(m_menuAct->actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(m_menuAct->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
 
@@ -268,7 +268,7 @@ bool ModeSelector::isMode(const Modes expected)
 // tasks execution --->>>
 void ModeSelector::procSumFile(QCryptographicHash::Algorithm algo)
 {
-    processFileSha(m_view->curAbsPath(), algo, DestFileProc::SumFile);
+    processFileSha(m_view->curAbsPath(), algo, FileValues::HashingPurpose::SaveToDigestFile);
 }
 
 void ModeSelector::promptItemFileUpd()
@@ -484,7 +484,7 @@ void ModeSelector::importBranch()
     }
 }
 
-void ModeSelector::processFileSha(const QString &path, QCryptographicHash::Algorithm algo, DestFileProc result)
+void ModeSelector::processFileSha(const QString &path, QCryptographicHash::Algorithm algo, FileValues::HashingPurpose result)
 {
     m_manager->addTask(&Manager::processFileSha, path, algo, result);
 }
@@ -541,7 +541,8 @@ void ModeSelector::exportItemSum()
 
     const QString filePath = DataHelper::itemAbsolutePath(m_view->m_data, ind);
 
-    FileValues fileVal(FileStatus::ToSumFile, QFileInfo(filePath).size());
+    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
+    fileVal.hash_purpose = FileValues::HashingPurpose::SaveToDigestFile;
     fileVal.checksum = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
                                                      : TreeModel::itemFileChecksum(ind);
 
