@@ -313,10 +313,13 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
+    m_elapsedTimer.start();
     const QString dig = hashItem(fileItemIndex, Verification);
+    const qint64 hash_time = m_elapsedTimer.elapsed();
 
     if (!dig.isEmpty()) {
-        showFileCheckResultMessage(DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex), storedSum, dig);
+        const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
+        showFileCheckResultMessage(filePath, storedSum, dig, hash_time);
         m_dataMaintainer->updateChecksum(fileItemIndex, dig);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
     } else if (m_proc->isCanceled()) {
@@ -431,10 +434,13 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
+    m_elapsedTimer.start();
+
     const QString digest = hashFile(filePath, algo, Verification);
+    const qint64 hash_time = m_elapsedTimer.elapsed();
 
     if (!digest.isEmpty()) {
-        showFileCheckResultMessage(filePath, checkSum, digest);
+        showFileCheckResultMessage(filePath, checkSum, digest, hash_time);
     } else {
         calcFailedMessage(filePath);
     }
@@ -598,12 +604,16 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     return done;
 }
 
-void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)
+void Manager::showFileCheckResultMessage(const QString &filePath,
+                                         const QString &checksumEstimated,
+                                         const QString &checksumCalculated,
+                                         qint64 hashTime)
 {
     FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
     fileVal.hash_purpose = FileValues::HashingPurpose::Verify;
     fileVal.checksum = checksumEstimated.toLower();
     fileVal.reChecksum = checksumCalculated;
+    fileVal.hash_time = hashTime;
 
     emit fileProcessed(filePath, fileVal);
 }

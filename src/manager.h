@@ -120,7 +120,8 @@ private:
 
     void showFileCheckResultMessage(const QString &filePath,
                                     const QString &checksumEstimated,
-                                    const QString &checksumCalculated);
+                                    const QString &checksumCalculated,
+                                    qint64 hashTime = -1);
 
     void calcFailedMessage(const QString &filePath);
 

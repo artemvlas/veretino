@@ -64,10 +64,6 @@ public:
         CombMatched = Matched | Added | Updated | Moved,
         CombNewLost = New | Missing,
         CombUnreadable = UnPermitted | ReadError,
-
-        //Computed = 1 << 17,    // the checksum has been calculated and is ready for further processing (copy or save)
-        //ToClipboard = 1 << 18, // the calculated checksum is intended to be copied to the clipboard
-        //ToSumFile = 1 << 19,   // the calculated checksum is intended to be stored in the summary file
     }; // enum FileStatus
 
     Q_ENUM(FileStatus)
@@ -124,11 +120,11 @@ struct FileValues {
         : status(fileStatus), size(fileSize) {}
 
     enum HashingPurpose : quint8 {
-        Generic,
+        Generic,           // the checksum has been calculated and is ready for further processing (copy or save)
         AddToDb,
         Verify,
-        CopyToClipboard,
-        SaveToDigestFile
+        CopyToClipboard,   // the calculated checksum is intended to be copied to the clipboard
+        SaveToDigestFile   // ... stored in a summary file
     };
 
     /*** Variables ***/
