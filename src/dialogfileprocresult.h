@@ -32,6 +32,7 @@ private:
     void addButtonCopy();
     void addButtonSave();
     void makeSumFile();
+    void verify();
 
     void setModeMatched();
     void setModeMismatched();

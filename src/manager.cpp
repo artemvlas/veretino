@@ -600,14 +600,10 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
 void Manager::showFileCheckResultMessage(const QString &filePath, const QString &checksumEstimated, const QString &checksumCalculated)
 {
-    const int compare = checksumEstimated.compare(checksumCalculated, Qt::CaseInsensitive);
-    FileStatus status = (compare == 0) ? FileStatus::Matched : FileStatus::Mismatched;
-    FileValues fileVal(status, QFileInfo(filePath).size());
+    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
+    fileVal.hash_purpose = FileValues::HashingPurpose::Verify;
     fileVal.checksum = checksumEstimated.toLower();
-
-    if (compare) { // Mismatched
-        fileVal.reChecksum = checksumCalculated;
-    }
+    fileVal.reChecksum = checksumCalculated;
 
     emit fileProcessed(filePath, fileVal);
 }

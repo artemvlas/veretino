@@ -24,40 +24,21 @@ DialogFileProcResult::DialogFileProcResult(const QString &filePath, const FileVa
     setFileName(filePath_);
     setExtLineVisible(values_.hash_purpose != FileValues::HashingPurpose::SaveToDigestFile);
 
-    if (values_.status & (FileStatus::Matched | FileStatus::Mismatched)) {
-        switch (values_.status) {
-        case FileStatus::Matched:
-            setModeMatched();
-            break;
-        case FileStatus::Mismatched:
-            setModeMismatched();
-            break;
-        default:
-            break;
-        }
-    } else {
-        switch (values_.hash_purpose) {
-        case FileValues::HashingPurpose::Generic:
-            setModeComputed();
-            break;
-        case FileValues::HashingPurpose::CopyToClipboard:
-            setModeCopied();
-            break;
-        case FileValues::HashingPurpose::SaveToDigestFile:
-            makeSumFile();
-            break;
-        default:
-            break;
-        }
-    }
-
-    // Hashing Speed
-    const bool isHashTimeRecorded = (values.hash_time >= 0);
-    ui->labelSpeed->setVisible(isHashTimeRecorded);
-
-    if (isHashTimeRecorded) {
-        ui->labelSpeed->setText(QStringLiteral(u"Speed: ")
-                                + format::processSpeed(values.hash_time, values.size));
+    switch (values_.hash_purpose) {
+    case FileValues::HashingPurpose::Generic:
+        setModeComputed();
+        break;
+    case FileValues::HashingPurpose::Verify:
+        verify();
+        break;
+    case FileValues::HashingPurpose::CopyToClipboard:
+        setModeCopied();
+        break;
+    case FileValues::HashingPurpose::SaveToDigestFile:
+        makeSumFile();
+        break;
+    default:
+        break;
     }
 }
 
@@ -160,9 +141,19 @@ void DialogFileProcResult::setExtLineVisible(bool visible)
     ui->labelFileSize->setVisible(visible);
     ui->labelAlgo->setVisible(visible);
 
-    if (visible) {
-        ui->labelFileSize->setText(QStringLiteral(u"Size: ") + format::dataSizeReadable(values_.size));
-        ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(values_.checksum.length()));
+    // Hashing Speed
+    const bool isHashTimeRecorded = (values_.hash_time >= 0);
+    ui->labelSpeed->setVisible(visible && isHashTimeRecorded);
+
+    if (!visible)
+        return;
+
+    ui->labelFileSize->setText(QStringLiteral(u"Size: ") + format::dataSizeReadable(values_.size));
+    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(values_.checksum.length()));
+
+    if (isHashTimeRecorded) {
+        ui->labelSpeed->setText(QStringLiteral(u"Speed: ")
+                                + format::processSpeed(values_.hash_time, values_.size));
     }
 }
 
@@ -202,5 +193,21 @@ void DialogFileProcResult::makeSumFile()
         setModeStored();
     } else {
         setModeUnstored();
+    }
+}
+
+void DialogFileProcResult::verify()
+{
+    if (values_.checksum.isEmpty() || values_.reChecksum.isEmpty()) {
+        setWindowTitle("not enough data!");
+        return;
+    }
+
+    const int compare = values_.checksum.compare(values_.reChecksum, Qt::CaseInsensitive);
+
+    if (compare == 0) { // Matched
+        setModeMatched();
+    } else {
+        setModeMismatched();
     }
 }

@@ -132,10 +132,11 @@ struct FileValues {
     };
 
     /*** Variables ***/
-    FileStatus status;
+    FileStatus status = FileStatus::NotSet;
     HashingPurpose hash_purpose = Generic;
-    qint64 hash_time = -1;    // hashing time in milliseconds
-    qint64 size;              // file size in bytes
+
+    qint64 hash_time = -1;    // hashing time in milliseconds, -1 if not set
+    qint64 size = -1;         // file size in bytes, -1 if not set
     QString checksum;         // newly computed or imported from the database
     QString reChecksum;       // the recomputed checksum, if it does not match the 'checksum'
 }; // struct FileValues
