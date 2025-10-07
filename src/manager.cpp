@@ -93,21 +93,15 @@ void Manager::processFolderSha(const MetaData &metaData)
 
 void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algorithm algo, FileValues::HashingPurpose purp)
 {
-    m_elapsedTimer.start();
-
     // hashing
-    const QString dig = hashFile(filePath, algo);
-    const qint64 hash_time = m_elapsedTimer.elapsed();
+    FileValues fileVal = hashFile(filePath, algo);
 
     // result handling
-    if (dig.isEmpty()) {
+    if (fileVal.checksum.isEmpty()) {
         calcFailedMessage(filePath);
         return;
     }
 
-    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
-    fileVal.checksum = dig.toLower();
-    fileVal.hash_time = hash_time;
     fileVal.hash_purpose = purp;
 
     emit fileProcessed(filePath, fileVal);
@@ -434,13 +428,10 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    m_elapsedTimer.start();
+    const FileValues fileVal = hashFile(filePath, algo, Verification);
 
-    const QString digest = hashFile(filePath, algo, Verification);
-    const qint64 hash_time = m_elapsedTimer.elapsed();
-
-    if (!digest.isEmpty()) {
-        showFileCheckResultMessage(filePath, checkSum, digest, hash_time);
+    if (!fileVal.checksum.isEmpty()) {
+        showFileCheckResultMessage(filePath, checkSum, fileVal.checksum, fileVal.hash_time);
     } else {
         calcFailedMessage(filePath);
     }
@@ -457,14 +448,20 @@ void Manager::calcFailedMessage(const QString &filePath)
     emit setStatusbarText("failed to read file");
 }
 
-QString Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const CalcKind calckind)
+FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const CalcKind calckind)
 {
+    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
+
     if (!m_proc->hasTotalSize())
-        m_proc->setTotalSize(QFileInfo(filePath).size());
+        m_proc->setTotalSize(fileVal.size);
 
     updateProgText(calckind, filePath);
 
-    return m_shaCalc.calculate(filePath, algo);
+    m_elapsedTimer.start();
+    fileVal.checksum = m_shaCalc.calculate(filePath, algo);
+    fileVal.hash_time = m_elapsedTimer.elapsed();
+
+    return fileVal;
 }
 
 QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
@@ -473,7 +470,7 @@ QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
                                     calckind ? FileStatus::Verifying : FileStatus::Calculating);
 
     const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, ind);
-    const QString digest = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind);
+    const QString digest = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind).checksum;
 
     if (digest.isEmpty() && !m_proc->isCanceled()) {
         m_dataMaintainer->setFileStatus(ind,

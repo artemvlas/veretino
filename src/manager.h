@@ -125,9 +125,9 @@ private:
 
     void calcFailedMessage(const QString &filePath);
 
-    QString hashFile(const QString &filePath,
-                     QCryptographicHash::Algorithm algo,
-                     const CalcKind calckind = Calculation);
+    FileValues hashFile(const QString &filePath,
+                        QCryptographicHash::Algorithm algo,
+                        const CalcKind calckind = Calculation);
 
     QString hashItem(const QModelIndex &ind,
                      const CalcKind calckind = Calculation);
