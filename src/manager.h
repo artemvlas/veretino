@@ -129,8 +129,8 @@ private:
                         QCryptographicHash::Algorithm algo,
                         const CalcKind calckind = Calculation);
 
-    QString hashItem(const QModelIndex &ind,
-                     const CalcKind calckind = Calculation);
+    FileValues hashItem(const QModelIndex &ind,
+                        const CalcKind calckind = Calculation);
 
     int calculateChecksums(const FileStatus status,
                            const QModelIndex &root = QModelIndex());

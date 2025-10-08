@@ -2,11 +2,13 @@
 Veretino 0.7.0
 What's new:
 * Ability to add and edit comments to databases.
+* Added display of the hashing speed of each file.
 * The 'Verified' time stamp is now considered obsolete after moving the folder.
 * Fixed display of size and speed (added missing space).
 
 Internal changes:
 * The QMicroz lib has become a submodule and no longer requires additional build.
+* Simplified DataContainer.
 
 ---
 Veretino 0.6.3

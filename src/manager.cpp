@@ -229,12 +229,14 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
             if (tools::canBeChecksum(dig, pData->m_metadata.algorithm))
                 m_dataMaintainer->importChecksum(fileIndex, dig);
         } else { // calc the new one
-            const QString dig = hashItem(fileIndex);
+            const FileValues fileVal = hashItem(fileIndex);
 
-            if (dig.isEmpty()) // return previous status
+            if (fileVal.checksum.isEmpty()) { // return previous status
                 m_dataMaintainer->setFileStatus(fileIndex, prevStatus);
-            else
-                m_dataMaintainer->updateChecksum(fileIndex, dig);
+            } else {
+                m_dataMaintainer->updateChecksum(fileIndex, fileVal.checksum);
+                m_dataMaintainer->setItemValue(fileIndex, Column::ColumnSpeed, fileVal.hash_time);
+            }
         }
     } else if (prevStatus == FileStatus::Missing) {
         m_dataMaintainer->itemFileRemoveLost(fileIndex);
@@ -307,15 +309,14 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    m_elapsedTimer.start();
-    const QString dig = hashItem(fileItemIndex, Verification);
-    const qint64 hash_time = m_elapsedTimer.elapsed();
+    const FileValues fileVal = hashItem(fileItemIndex, Verification);
 
-    if (!dig.isEmpty()) {
+    if (!fileVal.checksum.isEmpty()) {
         const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
-        showFileCheckResultMessage(filePath, storedSum, dig, hash_time);
-        m_dataMaintainer->updateChecksum(fileItemIndex, dig);
+        showFileCheckResultMessage(filePath, storedSum, fileVal.checksum, fileVal.hash_time);
+        m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.checksum);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
+        m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnSpeed, fileVal.hash_time);
     } else if (m_proc->isCanceled()) {
         // return previous status
         m_dataMaintainer->setFileStatus(fileItemIndex, storedStatus);
@@ -464,20 +465,21 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
     return fileVal;
 }
 
-QString Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
+FileValues Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
 {
     m_dataMaintainer->setFileStatus(ind,
                                     calckind ? FileStatus::Verifying : FileStatus::Calculating);
 
     const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, ind);
-    const QString digest = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind).checksum;
+    const FileValues fileVal = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind);
 
-    if (digest.isEmpty() && !m_proc->isCanceled()) {
+    // error handling
+    if (fileVal.checksum.isEmpty() && !m_proc->isCanceled()) {
         m_dataMaintainer->setFileStatus(ind,
                                         tools::failedCalcStatus(filePath, calckind));
     }
 
-    return digest;
+    return fileVal;
 }
 
 void Manager::updateProgText(const CalcKind calckind, const QString &file)
@@ -555,12 +557,12 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
             continue;
 
         // hashing
-        const QString dig = hashItem(iter.index(), calc_kind);
+        const FileValues fileVal = hashItem(iter.index(), calc_kind);
 
         if (m_proc->isCanceled())
             break;
 
-        if (dig.isEmpty()) {
+        if (fileVal.checksum.isEmpty()) {
             m_proc->decreaseTotalQueued();
             m_proc->decreaseTotalSize(iter.size());
             continue;
@@ -568,15 +570,16 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         // success
         m_proc->addDoneOne();
+        m_dataMaintainer->setItemValue(iter.index(), Column::ColumnSpeed, fileVal.hash_time);
 
         if (purpose == DM_FindMoved) {
-            if (!m_dataMaintainer->tryMoved(iter.index(), dig))
+            if (!m_dataMaintainer->tryMoved(iter.index(), fileVal.checksum))
                 m_dataMaintainer->setFileStatus(iter.index(), status); // rollback status
             continue;
         }
 
         // != DM_FindMoved
-        if (!m_dataMaintainer->updateChecksum(iter.index(), dig)
+        if (!m_dataMaintainer->updateChecksum(iter.index(), fileVal.checksum)
             && !isMismatchFound) // the signal is only needed once
         {
             emit mismatchFound();

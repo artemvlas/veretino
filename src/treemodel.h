@@ -27,7 +27,8 @@ public:
         ColumnSize,
         ColumnStatus,
         ColumnChecksum,
-        ColumnReChecksum
+        ColumnReChecksum,
+        ColumnSpeed
     };
     Q_ENUM(Column)
 

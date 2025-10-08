@@ -15,7 +15,8 @@ const QVector<QVariant> TreeModel::s_rootItemData = {
     QStringLiteral(u"Size"),
     QStringLiteral(u"Status"),
     QStringLiteral(u"Checksum"),
-    QStringLiteral(u"ReChecksum")
+    QStringLiteral(u"ReChecksum"),
+    QStringLiteral(u"Speed")
 };
 
 TreeModel::TreeModel(QObject *parent)
@@ -184,10 +185,19 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
     const QVariant tiData = getItem(curIndex)->data(curIndex.column());
 
     if (tiData.isValid() && role != RawDataRole) {
-        if (curIndex.column() == ColumnSize)
+        switch(curIndex.column()) {
+        case ColumnSize:
+            return format::dataSizeReadable(tiData.toLongLong());
+        case ColumnStatus:
+            return format::fileItemStatus(tiData.value<FileStatus>());
+        case ColumnSpeed:
+            return format::processSpeed(tiData.toLongLong(), itemFileSize(curIndex));
+        }
+
+        /*if (curIndex.column() == ColumnSize)
             return format::dataSizeReadable(tiData.toLongLong());
         if (curIndex.column() == ColumnStatus)
-            return format::fileItemStatus(tiData.value<FileStatus>());
+            return format::fileItemStatus(tiData.value<FileStatus>());*/
     }
 
     return tiData;
