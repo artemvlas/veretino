@@ -2,7 +2,7 @@
 Veretino 0.7.0
 What's new:
 * Ability to add and edit comments to databases.
-* Added display of the hashing speed of each file.
+* Added display of the each file's hashing time and speed.
 * The 'Verified' time stamp is now considered obsolete after moving the folder.
 * Fixed display of size and speed (added missing space).
 

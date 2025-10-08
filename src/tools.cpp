@@ -275,6 +275,11 @@ QString numString(qint64 num)
 
 QString msecsToReadable(qint64 milliseconds, bool approx)
 {
+    if (milliseconds < 1000) {
+        return approx ? QStringLiteral("now")
+                      : tools::joinStrings(milliseconds, QStringLiteral("msec"));
+    }
+
     int seconds = milliseconds / 1000;
     int minutes = seconds / 60;
     seconds = seconds % 60;

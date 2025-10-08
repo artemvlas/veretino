@@ -235,7 +235,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
                 m_dataMaintainer->setFileStatus(fileIndex, prevStatus);
             } else {
                 m_dataMaintainer->updateChecksum(fileIndex, fileVal.checksum);
-                m_dataMaintainer->setItemValue(fileIndex, Column::ColumnSpeed, fileVal.hash_time);
+                m_dataMaintainer->setItemValue(fileIndex, Column::ColumnHashTime, fileVal.hash_time);
             }
         }
     } else if (prevStatus == FileStatus::Missing) {
@@ -316,7 +316,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         showFileCheckResultMessage(filePath, storedSum, fileVal.checksum, fileVal.hash_time);
         m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.checksum);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
-        m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnSpeed, fileVal.hash_time);
+        m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnHashTime, fileVal.hash_time);
     } else if (m_proc->isCanceled()) {
         // return previous status
         m_dataMaintainer->setFileStatus(fileItemIndex, storedStatus);
@@ -570,7 +570,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         // success
         m_proc->addDoneOne();
-        m_dataMaintainer->setItemValue(iter.index(), Column::ColumnSpeed, fileVal.hash_time);
+        m_dataMaintainer->setItemValue(iter.index(), Column::ColumnHashTime, fileVal.hash_time);
 
         if (purpose == DM_FindMoved) {
             if (!m_dataMaintainer->tryMoved(iter.index(), fileVal.checksum))

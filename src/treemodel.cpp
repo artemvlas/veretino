@@ -16,6 +16,7 @@ const QVector<QVariant> TreeModel::s_rootItemData = {
     QStringLiteral(u"Status"),
     QStringLiteral(u"Checksum"),
     QStringLiteral(u"ReChecksum"),
+    QStringLiteral(u"Hashing Time"),
     QStringLiteral(u"Speed")
 };
 
@@ -190,14 +191,17 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
             return format::dataSizeReadable(tiData.toLongLong());
         case ColumnStatus:
             return format::fileItemStatus(tiData.value<FileStatus>());
-        case ColumnSpeed:
-            return format::processSpeed(tiData.toLongLong(), itemFileSize(curIndex));
+        case ColumnHashTime:
+            return format::msecsToReadable(tiData.toLongLong());
+        default:
+            break;
         }
+    }
 
-        /*if (curIndex.column() == ColumnSize)
-            return format::dataSizeReadable(tiData.toLongLong());
-        if (curIndex.column() == ColumnStatus)
-            return format::fileItemStatus(tiData.value<FileStatus>());*/
+    if (curIndex.column() == ColumnSpeed) {
+        const qint64 hash_time = itemHashTime(curIndex);
+        if (hash_time >= 0)
+            return format::processSpeed(hash_time, itemFileSize(curIndex));
     }
 
     return tiData;
@@ -360,4 +364,11 @@ QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
 QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 {
     return fileIndex.siblingAtColumn(ColumnReChecksum).data().toString();
+}
+
+qint64 TreeModel::itemHashTime(const QModelIndex &fileIndex)
+{
+    const QVariant val = fileIndex.siblingAtColumn(ColumnHashTime).data(RawDataRole);
+
+    return val.isValid() ? val.toLongLong() : -1;
 }

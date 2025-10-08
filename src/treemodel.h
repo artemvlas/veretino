@@ -28,6 +28,7 @@ public:
         ColumnStatus,
         ColumnChecksum,
         ColumnReChecksum,
+        ColumnHashTime,
         ColumnSpeed
     };
     Q_ENUM(Column)
@@ -72,6 +73,7 @@ public:
     static FileStatus itemFileStatus(const QModelIndex &fileIndex);
     static QString itemFileChecksum(const QModelIndex &fileIndex);
     static QString itemFileReChecksum(const QModelIndex &fileIndex);
+    static qint64 itemHashTime(const QModelIndex &fileIndex);
 
 public slots:
     void clearCacheFolderItems();
