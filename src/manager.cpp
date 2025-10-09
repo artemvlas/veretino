@@ -309,15 +309,18 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         return;
     }
 
-    const FileValues fileVal = hashItem(fileItemIndex, Verification);
+    FileValues fileVal = hashItem(fileItemIndex, Verification);
 
-    if (!fileVal.checksum.isEmpty()) {
-        const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
-        showFileCheckResultMessage(filePath, storedSum, fileVal.checksum, fileVal.hash_time);
-        m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.checksum);
+    if (!fileVal.reChecksum.isEmpty()) {
+        m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.reChecksum);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
         m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnHashTime, fileVal.hash_time);
-    } else if (m_proc->isCanceled()) {
+
+        fileVal.checksum = storedSum.toLower();
+        const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
+        emit fileProcessed(filePath, fileVal);
+    }
+    else if (m_proc->isCanceled()) {
         // return previous status
         m_dataMaintainer->setFileStatus(fileItemIndex, storedStatus);
     }
@@ -429,10 +432,11 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum)
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
 {
-    const FileValues fileVal = hashFile(filePath, algo, Verification);
+    FileValues fileVal = hashFile(filePath, algo, Verification);
 
-    if (!fileVal.checksum.isEmpty()) {
-        showFileCheckResultMessage(filePath, checkSum, fileVal.checksum, fileVal.hash_time);
+    if (!fileVal.reChecksum.isEmpty()) {
+        fileVal.checksum = checkSum;
+        emit fileProcessed(filePath, fileVal);
     } else {
         calcFailedMessage(filePath);
     }
@@ -451,15 +455,22 @@ void Manager::calcFailedMessage(const QString &filePath)
 
 FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const CalcKind calckind)
 {
-    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
+    QFileInfo fi(filePath);
+    FileValues fileVal(FileStatus::NotSet, fi.size());
+
+    if (calckind == Verification)
+        fileVal.hash_purpose = FileValues::HashingPurpose::Verify;
 
     if (!m_proc->hasTotalSize())
         m_proc->setTotalSize(fileVal.size);
 
     updateProgText(calckind, filePath);
 
+    QString &sum = (calckind == Verification) ? fileVal.reChecksum : fileVal.checksum;
+
+    // hashing
     m_elapsedTimer.start();
-    fileVal.checksum = m_shaCalc.calculate(filePath, algo);
+    sum = m_shaCalc.calculate(filePath, algo);
     fileVal.hash_time = m_elapsedTimer.elapsed();
 
     return fileVal;
@@ -473,8 +484,10 @@ FileValues Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
     const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, ind);
     const FileValues fileVal = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind);
 
+    const QString &sum = (calckind == Verification) ? fileVal.reChecksum : fileVal.checksum;
+
     // error handling
-    if (fileVal.checksum.isEmpty() && !m_proc->isCanceled()) {
+    if (sum.isEmpty() && !m_proc->isCanceled()) {
         m_dataMaintainer->setFileStatus(ind,
                                         tools::failedCalcStatus(filePath, calckind));
     }
@@ -558,11 +571,12 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         // hashing
         const FileValues fileVal = hashItem(iter.index(), calc_kind);
+        const QString &sum = (calc_kind == Verification) ? fileVal.reChecksum : fileVal.checksum;
 
         if (m_proc->isCanceled())
             break;
 
-        if (fileVal.checksum.isEmpty()) {
+        if (sum.isEmpty()) {
             m_proc->decreaseTotalQueued();
             m_proc->decreaseTotalSize(iter.size());
             continue;
@@ -573,13 +587,13 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
         m_dataMaintainer->setItemValue(iter.index(), Column::ColumnHashTime, fileVal.hash_time);
 
         if (purpose == DM_FindMoved) {
-            if (!m_dataMaintainer->tryMoved(iter.index(), fileVal.checksum))
+            if (!m_dataMaintainer->tryMoved(iter.index(), sum))
                 m_dataMaintainer->setFileStatus(iter.index(), status); // rollback status
             continue;
         }
 
         // != DM_FindMoved
-        if (!m_dataMaintainer->updateChecksum(iter.index(), fileVal.checksum)
+        if (!m_dataMaintainer->updateChecksum(iter.index(), sum)
             && !isMismatchFound) // the signal is only needed once
         {
             emit mismatchFound();
@@ -602,20 +616,6 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     // end
     m_dataMaintainer->updateNumbers();
     return done;
-}
-
-void Manager::showFileCheckResultMessage(const QString &filePath,
-                                         const QString &checksumEstimated,
-                                         const QString &checksumCalculated,
-                                         qint64 hashTime)
-{
-    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
-    fileVal.hash_purpose = FileValues::HashingPurpose::Verify;
-    fileVal.checksum = checksumEstimated.toLower();
-    fileVal.reChecksum = checksumCalculated;
-    fileVal.hash_time = hashTime;
-
-    emit fileProcessed(filePath, fileVal);
 }
 
 // info about folder (number of files and total size) or file (size)

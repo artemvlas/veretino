@@ -118,11 +118,6 @@ private:
     void queueTask(Task task);
     void sendDbUpdated();
 
-    void showFileCheckResultMessage(const QString &filePath,
-                                    const QString &checksumEstimated,
-                                    const QString &checksumCalculated,
-                                    qint64 hashTime = -1);
-
     void calcFailedMessage(const QString &filePath);
 
     FileValues hashFile(const QString &filePath,
