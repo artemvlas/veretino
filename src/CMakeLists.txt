@@ -11,6 +11,7 @@ set(PROJECT_SOURCES
     dialogfileprocresult.h
     dialogsettings.h
     files.h
+    filevalues.h
     filterrule.h
     iconprovider.h
     itemfiletype.h

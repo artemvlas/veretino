@@ -12,6 +12,7 @@
 #include "view.h"
 #include "procstate.h"
 #include "settings.h"
+#include "files.h"
 #include <QElapsedTimer>
 
 struct Task {
@@ -100,7 +101,7 @@ public slots:
     void modelChanged(View::ModelView modelView);
 
     // checking the list of files against the checksums stored in the database
-    void verifyFolderItem(const QModelIndex &folderItemIndex, Files::FileStatus checkstatus);
+    void verifyFolderItem(const QModelIndex &folderItemIndex, FileValues::FileStatus checkstatus);
 
     // check only selected file instead of full database verification
     void verifyFileItem(const QModelIndex &fileItemIndex);

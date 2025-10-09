@@ -8,7 +8,7 @@
 
 #include <QAbstractItemModel>
 #include "treeitem.h"
-#include "files.h"
+#include "filevalues.h"
 
 class TreeItem;
 

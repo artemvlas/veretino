@@ -97,7 +97,7 @@ FileList Files::getFileList(const QAbstractItemModel *model, const FileStatuses 
 bool Files::isEmptyFolder(const QString &folderPath, const FilterRule &filter)
 {
     if (!QFileInfo(folderPath).isDir()) {
-        qDebug() << "Files::isEmptyFolder | Wrong path:" << folderPath;
+        qWarning() << "Files::isEmptyFolder | Wrong path:" << folderPath;
         return true;
     }
 

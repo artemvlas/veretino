@@ -11,7 +11,7 @@
 #include <QAbstractItemModel>
 #include <QPalette>
 #include <QMetaEnum>
-#include "files.h"
+#include "filevalues.h"
 #include "numbers.h"
 
 struct Lit { // Literals

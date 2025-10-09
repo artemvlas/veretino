@@ -9,6 +9,7 @@
 #include "treemodeliterator.h"
 #include "tools.h"
 #include "pathstr.h"
+#include "files.h"
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}

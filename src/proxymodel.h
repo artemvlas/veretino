@@ -7,7 +7,7 @@
 #define PROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include "files.h"
+#include "filevalues.h"
 
 class ProxyModel : public QSortFilterProxyModel
 {

@@ -12,6 +12,7 @@
 #include "proxymodel.h"
 #include "numbers.h"
 #include "verdatetime.h"
+#include "filterrule.h"
 
 class TreeModel;
 

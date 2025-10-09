@@ -7,7 +7,7 @@
 #define DIALOGFILEPROCRESULT_H
 
 #include <QDialog>
-#include "files.h"
+#include "filevalues.h"
 #include "iconprovider.h"
 
 namespace Ui {

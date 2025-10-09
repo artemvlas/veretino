@@ -9,7 +9,7 @@
 #include <QPalette>
 #include <QIcon>
 #include <QFileIconProvider>
-#include "files.h"
+#include "filevalues.h"
 
 class IconProvider
 {

@@ -541,8 +541,9 @@ void ModeSelector::exportItemSum()
 
     const QString filePath = DataHelper::itemAbsolutePath(m_view->m_data, ind);
 
-    FileValues fileVal(FileStatus::NotSet, QFileInfo(filePath).size());
-    fileVal.hash_purpose = FileValues::HashingPurpose::SaveToDigestFile;
+    FileValues fileVal(FileValues::HashingPurpose::SaveToDigestFile,
+                       QFileInfo(filePath).size());
+
     fileVal.checksum = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
                                                      : TreeModel::itemFileChecksum(ind);
 

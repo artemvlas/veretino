@@ -11,7 +11,6 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QDebug>
-#include "files.h"
 #include "pathstr.h"
 
 const QStringList Lit::sl_db_exts = {

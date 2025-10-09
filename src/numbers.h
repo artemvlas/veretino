@@ -6,7 +6,9 @@
 #ifndef NUMBERS_H
 #define NUMBERS_H
 
-#include "files.h"
+#include "filevalues.h"
+#include "nums.h"
+#include "QHash"
 
 class Numbers
 {
