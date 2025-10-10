@@ -261,7 +261,7 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
 
     DialogDbCreation dialog(folder, extList, this);
     dialog.setSettings(m_settings);
-    dialog.setWindowTitle(QStringLiteral(u"Creating a new database..."));
+    dialog.setWindowTitle(QStringLiteral(u"New database..."));
 
     if (!dialog.exec())
         return;
@@ -274,12 +274,12 @@ void MainWindow::showDialogDbCreation(const QString &folder, const QStringList &
     } else { // filter creation is enabled, BUT no suffix(type) is ​​selected
         QMessageBox msgBox(this);
         msgBox.setIconPixmap(m_modeSelect->m_icons.pixmap(Icons::Filter));
-        msgBox.setWindowTitle("No filter specified");
-        msgBox.setText("File filtering is not set.");
-        msgBox.setInformativeText("Continue with all files?");
+        msgBox.setWindowTitle(QStringLiteral(u"No filter specified"));
+        msgBox.setText(QStringLiteral(u"File filtering is not set."));
+        msgBox.setInformativeText(QStringLiteral(u"Continue with all files?"));
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort);
         msgBox.setDefaultButton(QMessageBox::Yes);
-        msgBox.button(QMessageBox::Yes)->setText("Continue");
+        msgBox.button(QMessageBox::Yes)->setText(QStringLiteral(u"Continue"));
 
         if (msgBox.exec() == QMessageBox::Yes)
             m_modeSelect->processFolderChecksums(filterRule, comment);
@@ -307,20 +307,23 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
 
     QMessageBox msgBox(this);
 
-    QString titleText = result.contains(FileStatus::Mismatched) ? "FAILED" : "Success";
-    QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder) : QString();
+    QString titleText = result.contains(FileStatus::Mismatched) ? QStringLiteral(u"FAILED")
+                                                                : QStringLiteral(u"Success");
+
+    QString messageText = !subFolder.isEmpty() ? QString("Subfolder: %1\n\n").arg(subFolder)
+                                               : QString();
 
     if (result.contains(FileStatus::Mismatched)) {
         if (m_modeSelect->isDbConst()) {
             msgBox.setStandardButtons(QMessageBox::Cancel);
         } else {
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-            msgBox.button(QMessageBox::Ok)->setText("Update");
+            msgBox.button(QMessageBox::Ok)->setText(QStringLiteral(u"Update"));
             msgBox.button(QMessageBox::Ok)->setIcon(m_modeSelect->m_icons.icon(FileStatus::Updated));
             msgBox.setDefaultButton(QMessageBox::Cancel);
         }
 
-        msgBox.button(QMessageBox::Cancel)->setText("Continue");
+        msgBox.button(QMessageBox::Cancel)->setText(QStringLiteral(u"Continue"));
         msgBox.button(QMessageBox::Cancel)->setIcon(QIcon());
 
         const int n_mismatch = result.numberOf(FileStatus::Mismatched);
@@ -333,7 +336,7 @@ void MainWindow::showFolderCheckResult(const Numbers &result, const QString &sub
         if (n_notchecked) {
             messageText.append("\n\n");
             messageText.append(format::filesNumber(n_notchecked)
-                               + " remain unchecked.");
+                               + QStringLiteral(u" remain unchecked."));
         }
     } else {
         messageText.append(QString("ALL %1 files passed verification.")

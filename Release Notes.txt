@@ -5,6 +5,7 @@ What's new:
 * Added display of the each file's hashing time and speed.
 * The 'Verified' time stamp is now considered obsolete after moving the folder.
 * Fixed display of size and speed (added missing space).
+* Fixed the appearance of the 'Branch Folder' menu action when there are only new items in the subfolder and nothing to branch.
 
 Internal changes:
 * The QMicroz lib has become a submodule and no longer requires additional build.

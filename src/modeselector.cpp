@@ -907,7 +907,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                         viewContextMenu->addAction(m_menuAct->actionBranchOpen);
                         if (has_new && !isDbConst())
                             viewContextMenu->addAction(m_menuAct->actionBranchImport);
-                    } else {
+                    } else if (has_avail) {
                         viewContextMenu->addAction(m_menuAct->actionBranchMake);
                     }
 
