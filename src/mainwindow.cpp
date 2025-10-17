@@ -222,13 +222,17 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
     if (m_modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
         DialogDbStatus dialog(ui->view->m_data, this);
         dialog.setCurrentTab(tab);
-
         dialog.exec();
 
-        const QString comment = dialog.getComment();
-        if (comment != ui->view->m_data->m_metadata.comment) {
-            ui->view->m_data->m_metadata.comment = comment;
-            m_manager->m_dataMaintainer->setDbFileState(DbFileState::NotSaved);
+        QString &old_comment = ui->view->m_data->m_metadata.comment;
+        const QString new_comment = dialog.getComment();
+
+        if (new_comment != old_comment) {
+            old_comment = new_comment;
+
+            if (!m_modeSelect->isMode(Mode::DbCreating))
+                m_manager->m_dataMaintainer->setDbFileState(DbFileState::NotSaved);
+
             qDebug() << "Comment updated";
         }
     }
