@@ -13,6 +13,7 @@ set(PROJECT_SOURCES
     files.h
     filevalues.h
     filterrule.h
+    hasher.h
     iconprovider.h
     itemfiletype.h
     lineedit.h
@@ -27,7 +28,6 @@ set(PROJECT_SOURCES
     progressbar.h
     proxymodel.h
     settings.h
-    shacalculator.h
     statusbar.h
     tools.h
     treeitem.h
@@ -51,6 +51,7 @@ set(PROJECT_SOURCES
     dialogsettings.cpp
     files.cpp
     filterrule.cpp
+    hasher.cpp
     iconprovider.cpp
     itemfiletype.cpp
     lineedit.cpp
@@ -65,7 +66,6 @@ set(PROJECT_SOURCES
     progressbar.cpp
     proxymodel.cpp
     settings.cpp
-    shacalculator.cpp
     statusbar.cpp
     tools.cpp
     treeitem.cpp

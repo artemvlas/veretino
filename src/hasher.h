@@ -3,24 +3,29 @@
  * licensed under the GNU GPLv3.
  * https://github.com/artemvlas/veretino
 */
-#ifndef SHACALCULATOR_H
-#define SHACALCULATOR_H
+#ifndef HASHER_H
+#define HASHER_H
 
 #include <QObject>
 #include "QCryptographicHash"
 #include "procstate.h"
 
-class ShaCalculator : public QObject
+/*** Error codes ***/
+#define CALC_ERROR -1        /* Error of some kind during reading and hashing the file */
+#define CALC_CANCELED -2     /* Hashing canceled */
+#define CALC_NOPERM -3       /* No read permissions */
+#define CALC_NOFILE -4       /* Non-existent file path */
+
+class Hasher : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ShaCalculator(QObject *parent = nullptr);
-    explicit ShaCalculator(QCryptographicHash::Algorithm algo, QObject *parent = nullptr);
+    explicit Hasher(QObject *parent = nullptr);
+    explicit Hasher(QCryptographicHash::Algorithm algo, QObject *parent = nullptr);
     void setAlgorithm(QCryptographicHash::Algorithm algo);
     void setProcState(const ProcState *procState);
 
-//public slots:
     QString calculate(const QString &filePath);
     QString calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
 
@@ -35,6 +40,6 @@ private:
 
 signals:   
     void doneChunk(int done);
-}; // class ShaCalculator
+}; // class Hasher
 
-#endif // SHACALCULATOR_H
+#endif // HASHER_H

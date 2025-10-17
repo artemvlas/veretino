@@ -52,6 +52,8 @@ public:
         CombMatched = Matched | Added | Updated | Moved,
         CombNewLost = New | Missing,
         CombUnreadable = UnPermitted | ReadError,
+        CombNoFile = Missing | Removed,
+        CombCalcError = CombNoFile | CombUnreadable
     }; // enum FileStatus
 
     Q_ENUM(FileStatus)

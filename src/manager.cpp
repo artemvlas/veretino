@@ -23,7 +23,7 @@ Manager::Manager(Settings *settings, QObject *parent)
     m_dataMaintainer->setProcState(m_proc);
     m_shaCalc.setProcState(m_proc);
 
-    connect(&m_shaCalc, &ShaCalculator::doneChunk, m_proc, &ProcState::addChunk);
+    connect(&m_shaCalc, &Hasher::doneChunk, m_proc, &ProcState::addChunk);
     connect(m_dataMaintainer, &DataMaintainer::showMessage, this, &Manager::showMessage);
     connect(m_dataMaintainer, &DataMaintainer::setStatusbarText, this, &Manager::setStatusbarText);
     connect(m_files, &Files::setStatusbarText, this, &Manager::setStatusbarText);
@@ -467,9 +467,28 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
     updateProgText(calckind, filePath);
 
     // hashing
-    m_elapsedTimer.start();
-    fileVal.defaultChecksum() = m_shaCalc.calculate(filePath, algo); // automatic choose: '.checksum' or '.reChecksum'
-    fileVal.hash_time = m_elapsedTimer.elapsed();
+    try {
+        m_elapsedTimer.start();
+
+        // automatic choose: '.checksum' or '.reChecksum'
+        fileVal.defaultChecksum() = m_shaCalc.calculate(filePath, algo);
+        fileVal.hash_time = m_elapsedTimer.elapsed();
+    }
+    catch (int error_code) {
+        switch (error_code) {
+        case CALC_ERROR:
+            fileVal.status = FileStatus::ReadError;
+            break;
+        case CALC_NOPERM:
+            fileVal.status = FileStatus::UnPermitted;
+            break;
+        case CALC_NOFILE:
+            fileVal.status = (calckind == Verification) ? FileStatus::Missing : FileStatus::Removed;
+            break;
+        default:
+            break;
+        }
+    }
 
     return fileVal;
 }
@@ -483,9 +502,8 @@ FileValues Manager::hashItem(const QModelIndex &ind, const CalcKind calckind)
     const FileValues fileVal = hashFile(filePath, m_dataMaintainer->m_data->m_metadata.algorithm, calckind);
 
     // error handling
-    if (fileVal.defaultChecksum().isEmpty() && !m_proc->isCanceled()) {
-        m_dataMaintainer->setFileStatus(ind,
-                                        tools::failedCalcStatus(filePath, calckind));
+    if (fileVal.status & FileStatus::CombCalcError) {
+        m_dataMaintainer->setFileStatus(ind, fileVal.status);
     }
 
     return fileVal;

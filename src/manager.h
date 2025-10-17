@@ -8,7 +8,7 @@
 
 #include <QObject>
 #include "datamaintainer.h"
-#include "shacalculator.h"
+#include "hasher.h"
 #include "view.h"
 #include "procstate.h"
 #include "settings.h"
@@ -142,7 +142,7 @@ private:
     bool m_isViewFileSysytem;
     Settings *m_settings = nullptr;
     Files *m_files = new Files(this);
-    ShaCalculator m_shaCalc;
+    Hasher m_shaCalc;
     QList<Task> m_taskQueue;
     QElapsedTimer m_elapsedTimer;
 

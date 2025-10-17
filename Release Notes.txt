@@ -11,6 +11,7 @@ Internal changes:
 * The QMicroz lib has become a submodule and no longer requires additional build.
 * Simplified DataContainer.
 * Advanced FileValues.
+* Hasher (prev. ShaCalculator) now throws the error codes.
 
 ---
 Veretino 0.6.3
