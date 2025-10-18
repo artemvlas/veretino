@@ -4,8 +4,8 @@
  * https://github.com/artemvlas/veretino
 */
 #include "hasher.h"
+#include "tools.h"
 #include <QFile>
-#include <QDebug>
 
 Hasher::Hasher(QObject *parent)
     : QObject(parent)
@@ -35,7 +35,7 @@ QString Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm
     QFile file(filePath);
 
     if (!file.open(QIODevice::ReadOnly)) {
-        throw file.exists() ? CALC_NOPERM : CALC_NOFILE;
+        throw file.exists() ? ERR_NOPERM : ERR_NOTEXIST;
     }
 
     QCryptographicHash hash(algo);
@@ -47,13 +47,12 @@ QString Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm
             hash.addData(buf);
             emit doneChunk(buf.size());
         } else {
-            qWarning() << "Read ERROR:" << filePath;
-            throw CALC_ERROR;
+            throw ERR_READ;
         }
     }
 
     if (isCanceled())
-        throw CALC_CANCELED;
+        throw ERR_CANCELED;
 
     // result
     return hash.result().toHex();

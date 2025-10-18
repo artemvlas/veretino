@@ -476,13 +476,14 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
     }
     catch (int error_code) {
         switch (error_code) {
-        case CALC_ERROR:
+        case ERR_READ:
             fileVal.status = FileStatus::ReadError;
+            qWarning() << "Read ERROR:" << filePath;
             break;
-        case CALC_NOPERM:
+        case ERR_NOPERM:
             fileVal.status = FileStatus::UnPermitted;
             break;
-        case CALC_NOFILE:
+        case ERR_NOTEXIST:
             fileVal.status = (calckind == Verification) ? FileStatus::Missing : FileStatus::Removed;
             break;
         default:

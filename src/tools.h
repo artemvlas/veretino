@@ -6,6 +6,13 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+/*** Error codes ***/
+#define ERR_OK 0             /* No errors */
+#define ERR_READ -1          /* Error of some kind during reading the file */
+#define ERR_CANCELED -2      /* Process canceled */
+#define ERR_NOPERM -3        /* No read permissions */
+#define ERR_NOTEXIST -4      /* Non-existent file path */
+
 #include <QString>
 #include <QCryptographicHash>
 #include <QAbstractItemModel>

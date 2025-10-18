@@ -10,12 +10,6 @@
 #include "QCryptographicHash"
 #include "procstate.h"
 
-/*** Error codes ***/
-#define CALC_ERROR -1        /* Error of some kind during reading and hashing the file */
-#define CALC_CANCELED -2     /* Hashing canceled */
-#define CALC_NOPERM -3       /* No read permissions */
-#define CALC_NOFILE -4       /* Non-existent file path */
-
 class Hasher : public QObject
 {
     Q_OBJECT
