@@ -16,7 +16,7 @@ const QVector<QVariant> TreeModel::s_rootItemData = {
     QStringLiteral(u"Status"),
     QStringLiteral(u"Checksum"),
     QStringLiteral(u"ReChecksum"),
-    QStringLiteral(u"Hashing Time"),
+    QStringLiteral(u"Elapsed"),
     QStringLiteral(u"Speed")
 };
 
@@ -191,7 +191,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
             return format::dataSizeReadable(tiData.toLongLong());
         case ColumnStatus:
             return format::fileItemStatus(tiData.value<FileStatus>());
-        case ColumnHashTime:
+        case ColumnElapsed:
             return format::msecsToReadable(tiData.toLongLong());
         default:
             break;
@@ -368,7 +368,7 @@ QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 
 qint64 TreeModel::itemHashTime(const QModelIndex &fileIndex)
 {
-    const QVariant val = fileIndex.siblingAtColumn(ColumnHashTime).data(RawDataRole);
+    const QVariant val = fileIndex.siblingAtColumn(ColumnElapsed).data(RawDataRole);
 
     return val.isValid() ? val.toLongLong() : -1;
 }

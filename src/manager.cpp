@@ -235,7 +235,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
                 m_dataMaintainer->setFileStatus(fileIndex, prevStatus);
             } else {
                 m_dataMaintainer->updateChecksum(fileIndex, fileVal.checksum);
-                m_dataMaintainer->setItemValue(fileIndex, Column::ColumnHashTime, fileVal.hash_time);
+                m_dataMaintainer->setItemValue(fileIndex, Column::ColumnElapsed, fileVal.hash_time);
             }
         }
     } else if (prevStatus == FileStatus::Missing) {
@@ -314,7 +314,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     if (!fileVal.reChecksum.isEmpty()) {
         m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.reChecksum);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
-        m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnHashTime, fileVal.hash_time);
+        m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnElapsed, fileVal.hash_time);
 
         fileVal.checksum = storedSum.toLower();
         const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
@@ -598,7 +598,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         // success
         m_proc->addDoneOne();
-        m_dataMaintainer->setItemValue(iter.index(), Column::ColumnHashTime, fileVal.hash_time);
+        m_dataMaintainer->setItemValue(iter.index(), Column::ColumnElapsed, fileVal.hash_time);
 
         if (purpose == DM_FindMoved) {
             if (!m_dataMaintainer->tryMoved(iter.index(), sum))

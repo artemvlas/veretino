@@ -28,7 +28,7 @@ public:
         ColumnStatus,
         ColumnChecksum,
         ColumnReChecksum,
-        ColumnHashTime,
+        ColumnElapsed,
         ColumnSpeed
     };
     Q_ENUM(Column)
@@ -43,13 +43,17 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     bool setData(const QModelIndex &curIndex, const QVariant &value,
-                        int role = Qt::EditRole) override;
+                 int role = Qt::EditRole) override;
 
     bool isEmpty() const;
+
+    // add a file item with no check for presence
     void add_file(const QString &filePath, const FileValues &values);
 
     // checks for presence first; much slower for large lists
     bool add_file_unforced(const QString &filePath, const FileValues &values);
+
+    // add a list of files/items
     void populate(const FileList &filesData);
 
     // build path by current index data
