@@ -399,30 +399,18 @@ void Manager::checkSummaryFile(const QString &path)
 
 QString Manager::extractDigestFromFile(const QString &digest_file)
 {
-    QFile sumFile(digest_file);
-    if (!sumFile.open(QFile::ReadOnly)) {
+    QString digest;
+
+    try {
+        digest = tools::extractDigestFromFile(digest_file);
+        if (digest.isEmpty())
+            emit showMessage("Checksum not found", "Warning");
+    }
+    catch (int) {
         emit showMessage("Error while reading Summary File", "Error");
-        return QString();
     }
 
-    const QString line = sumFile.readLine();
-
-    static const QStringList l_seps { "  ", " *" };
-
-    for (int it = 0; it <= l_seps.size(); ++it) {
-        int cut = (it < l_seps.size()) ? line.indexOf(l_seps.at(it))
-                                       : tools::algoStrLen(tools::strToAlgo(pathstr::suffix(digest_file)));
-
-        if (cut > 0) {
-            const QString dig = line.left(cut);
-            if (tools::canBeChecksum(dig)) {
-                return dig;
-            }
-        }
-    }
-
-    emit showMessage("Checksum not found", "Warning");
-    return QString();
+    return digest;
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)

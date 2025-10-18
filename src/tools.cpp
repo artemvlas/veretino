@@ -216,6 +216,32 @@ QString joinStrings(const QString &str, int num)
     return str % ' ' % QString::number(num);
 }
 
+QString extractDigestFromFile(const QString &digest_file)
+{
+    QFile sumFile(digest_file);
+    if (!sumFile.open(QFile::ReadOnly)) {
+        throw sumFile.exists() ? ERR_NOPERM : ERR_NOTEXIST;
+    }
+
+    const QString line = sumFile.readLine();
+
+    static const QStringList l_seps { "  ", " *" };
+
+    for (int it = 0; it <= l_seps.size(); ++it) {
+        int cut = (it < l_seps.size()) ? line.indexOf(l_seps.at(it))
+                                       : algoStrLen(strToAlgo(pathstr::suffix(digest_file)));
+
+        if (cut > 0) {
+            const QString dig = line.left(cut);
+            if (canBeChecksum(dig)) {
+                return dig;
+            }
+        }
+    }
+
+    return QString();
+}
+
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
 {
     if (QFileInfo::exists(path))
