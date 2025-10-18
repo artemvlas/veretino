@@ -63,6 +63,7 @@ public:
     }
 
     void clearTasks();
+    QString extractDigestFromFile(const QString &digest_file);
 
 public slots:
     void processFolderSha(const MetaData &metaData);
@@ -136,7 +137,6 @@ private:
                            const QModelIndex &root = QModelIndex());
 
     void updateProgText(const CalcKind calckind, const QString &file);
-    QString extractDigestFromFile(const QString &digest_file);
 
     // variables
     bool m_isViewFileSysytem;

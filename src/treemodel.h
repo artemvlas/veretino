@@ -53,7 +53,7 @@ public:
     // checks for presence first; much slower for large lists
     bool add_file_unforced(const QString &filePath, const FileValues &values);
 
-    // add a list of files/items
+    // add a list of file items
     void populate(const FileList &filesData);
 
     // build path by current index data

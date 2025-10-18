@@ -41,10 +41,15 @@ void ModeSelector::connectActions()
     connect(m_menuAct->actionProcessSha1File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha1); });
     connect(m_menuAct->actionProcessSha256File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha256); });
     connect(m_menuAct->actionProcessSha512File, &QAction::triggered, this, [=]{ procSumFile(QCryptographicHash::Sha512); });
-    connect(m_menuAct->actionProcessSha_toClipboard, &QAction::triggered, this,
-            [=]{ processFileSha(m_view->curAbsPath(), m_settings->algorithm(), FileValues::HashingPurpose::CopyToClipboard); });
     connect(m_menuAct->actionOpenDatabase, &QAction::triggered, this, &ModeSelector::doWork);
     connect(m_menuAct->actionCheckSumFile , &QAction::triggered, this, &ModeSelector::doWork);
+
+    // TODO: move off lambda
+    connect(m_menuAct->actionProcessSha_toClipboard, &QAction::triggered, this, [=]{
+        if (isMode(File)) { processFileSha(m_view->curAbsPath(), m_settings->algorithm(), FileValues::HashingPurpose::CopyToClipboard); }
+        // TODO: move to another thread
+        else if (isMode(SumFile)) { QGuiApplication::clipboard()->setText(m_manager->extractDigestFromFile(m_view->curAbsPath())); }
+    });
 
     // DB Model View
     connect(m_menuAct->actionCancelBackToFS, SIGNAL(triggered()), this, SLOT(showFileSystem()));
@@ -790,6 +795,7 @@ void ModeSelector::createContextMenu_ViewFs(const QPoint &point)
         } else if (isMode(DbFile)) {
             viewContextMenu->addAction(m_menuAct->actionOpenDatabase);
         } else if (isMode(SumFile)) {
+            viewContextMenu->addAction(m_menuAct->actionProcessSha_toClipboard);
             viewContextMenu->addAction(m_menuAct->actionCheckSumFile);
         }
     }
