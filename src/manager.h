@@ -120,8 +120,6 @@ private:
     void queueTask(Task task);
     void sendDbUpdated();
 
-    void calcFailedMessage(const QString &filePath);
-
     FileValues hashFile(const QString &filePath,
                         QCryptographicHash::Algorithm algo,
                         const CalcKind calckind = Calculation);

@@ -97,14 +97,10 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
     FileValues fileVal = hashFile(filePath, algo);
 
     // result handling
-    if (fileVal.checksum.isEmpty()) {
-        calcFailedMessage(filePath);
-        return;
+    if (!m_proc->isCanceled()) {
+        fileVal.hash_purpose = purp;
+        emit fileProcessed(filePath, fileVal);
     }
-
-    fileVal.hash_purpose = purp;
-
-    emit fileProcessed(filePath, fileVal);
 }
 
 void Manager::restoreDatabase()
@@ -422,23 +418,10 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
 {
     FileValues fileVal = hashFile(filePath, algo, Verification);
 
-    if (!fileVal.reChecksum.isEmpty()) {
+    if (!m_proc->isCanceled()) {
         fileVal.checksum = checkSum;
         emit fileProcessed(filePath, fileVal);
-    } else {
-        calcFailedMessage(filePath);
     }
-}
-
-void Manager::calcFailedMessage(const QString &filePath)
-{
-    if (m_proc->isCanceled())
-        return;
-
-    QString str = tools::enumToString(tools::failedCalcStatus(filePath)) + ":\n";
-
-    emit showMessage(str += filePath, "Warning");
-    emit setStatusbarText("failed to read file");
 }
 
 FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algorithm algo, const CalcKind calckind)
@@ -477,6 +460,9 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
         default:
             break;
         }
+
+        if (error_code != ERR_CANCELED)
+            emit setStatusbarText("failed to read file");
     }
 
     return fileVal;

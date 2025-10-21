@@ -4,7 +4,10 @@ What's new:
 * Ability to add and edit comments to databases.
 * Added display of the each file's hashing time and speed.
 * The 'Verified' time stamp is now considered obsolete after moving the folder.
-* Added the ability to directly copy checksums from digest files.
+* Ability to directly copy checksums from digest files.
+* The file processing results dialog now also displays reading errors, if any.
+
+Fixes and Minor Enhancements:
 * Fixed display of size and speed (added missing space).
 * Fixed the appearance of the 'Branch Folder' menu action when there are only new items in the subfolder and nothing to branch.
 

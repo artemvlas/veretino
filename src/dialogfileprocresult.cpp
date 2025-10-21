@@ -19,10 +19,15 @@ DialogFileProcResult::DialogFileProcResult(const QString &filePath, const FileVa
 {
     ui->setupUi(this);
     setWindowIcon(IconProvider::appIcon());
-
     icons_.setTheme(palette());
+
     setFileName(filePath_);
     setExtLineVisible(values_.hash_purpose != FileValues::HashingPurpose::SaveToDigestFile);
+
+    if (values_.status & FileValues::CombCalcError) {
+        setModeReadError();
+        return;
+    }
 
     switch (values_.hash_purpose) {
     case FileValues::HashingPurpose::Generic:
@@ -121,6 +126,28 @@ void DialogFileProcResult::setModeUnstored()
     addButtonCopy();
 }
 
+void DialogFileProcResult::setModeReadError()
+{
+    resize(400, height());
+    setIcon(values_.status);
+    ui->textChecksum->setVisible(false);
+
+    switch (values_.status) {
+    case FileValues::Missing:
+    case FileValues::Removed:
+        setWindowTitle(QStringLiteral(u"File not found"));
+        break;
+    case FileValues::UnPermitted:
+        setWindowTitle(QStringLiteral(u"No read permissions"));
+        break;
+    case FileValues::ReadError:
+        setWindowTitle(QStringLiteral(u"Read Error"));
+        break;
+    default:
+        break;
+    }
+}
+
 void DialogFileProcResult::setIcon(Icons icon)
 {
     ui->labelIcon->setPixmap(icons_.pixmap(icon));
@@ -138,22 +165,27 @@ void DialogFileProcResult::setFileName(const QString &filePath)
 
 void DialogFileProcResult::setExtLineVisible(bool visible)
 {
-    ui->labelFileSize->setVisible(visible);
-    ui->labelAlgo->setVisible(visible);
+    const bool hasSize = (values_.size >= 0);
+    const bool hasHashTime = (values_.hash_time >= 0);
+    const bool hasDigest = !values_.defaultChecksum().isEmpty();
 
-    // Hashing Speed
-    const bool isHashTimeRecorded = (values_.hash_time >= 0);
-    ui->labelSpeed->setVisible(visible && isHashTimeRecorded);
+    ui->labelFileSize->setVisible(visible && hasSize);
+    ui->labelSpeed->setVisible(visible && hasHashTime);
+    ui->labelAlgo->setVisible(visible && hasDigest);
 
-    if (!visible)
-        return;
+    if (hasSize) {
+        ui->labelFileSize->setText(QStringLiteral(u"Size: ")
+                                   + format::dataSizeReadable(values_.size));
+    }
 
-    ui->labelFileSize->setText(QStringLiteral(u"Size: ") + format::dataSizeReadable(values_.size));
-    ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(values_.checksum.length()));
-
-    if (isHashTimeRecorded) {
+    if (hasHashTime) {
         ui->labelSpeed->setText(QStringLiteral(u"Speed: ")
                                 + format::processSpeed(values_.hash_time, values_.size));
+    }
+
+    if (hasDigest) {
+        ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ")
+                               + format::algoToStr(values_.checksum.length()));
     }
 }
 

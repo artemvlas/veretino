@@ -40,6 +40,7 @@ private:
     void setModeCopied();
     void setModeStored();
     void setModeUnstored();
+    void setModeReadError();
 
     Ui::DialogFileProcResult *ui;
     IconProvider icons_;
