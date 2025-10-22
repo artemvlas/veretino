@@ -133,9 +133,9 @@ bool VerJson::save()
     const QByteArray data = QJsonDocument(content).toJson();
 
     if (pathstr::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
-        return QMicroz::compress_buf(data,
-                                     QStringLiteral("checksums.ver.json"),
-                                     m_file_path);
+        return QMicroz::compress(QStringLiteral("checksums.ver.json"),
+                                 data,
+                                 m_file_path);
     }
 
     QFile file(m_file_path);
