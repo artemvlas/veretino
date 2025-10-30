@@ -429,13 +429,13 @@ void DataMaintainer::rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatu
     }
 }
 
-// checks if there is at least one file from the list (json.data() keys) in the folder (workDir)
+// checks if there is at least one file from the list (json.items() keys) in the folder (workDir)
 bool DataMaintainer::isPresentInWorkDir(const VerJson &json, const QString &workDir) const
 {
     if (!QFileInfo::exists(workDir))
         return false;
 
-    const QJsonObject &fileList = json.data();
+    const QJsonObject &fileList = json.items();
 
     QJsonObject::const_iterator i;
 
@@ -536,7 +536,7 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &
     // populating the main data
     emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
     const QString basicDate = m_considerFileModDate ? meta.datetime.basicDate() : QString();
-    const QJsonObject &itemList = json.data(); // { file_path : checksum }
+    const QJsonObject &itemList = json.items(); // { file_path : checksum }
 
     for (QJsonObject::const_iterator it = itemList.constBegin();
          !isCanceled() && it != itemList.constEnd(); ++it)
@@ -779,7 +779,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     if (json.algorithm() != m_data->m_metadata.algorithm)
         return -1;
 
-    const QJsonObject &mainList = json.data();
+    const QJsonObject &mainList = json.items();
 
     int num = 0;
     TreeModelIterator it(m_data->m_model, rootFolder);

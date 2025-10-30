@@ -8,10 +8,12 @@
 
 /*** Error codes ***/
 #define ERR_OK 0             /* No errors */
-#define ERR_READ -1          /* Error of some kind during reading the file */
-#define ERR_CANCELED -2      /* Process canceled */
-#define ERR_NOPERM -3        /* No read permissions */
-#define ERR_NOTEXIST -4      /* Non-existent file path */
+#define ERR_ERROR -1         /* Error of some kind */
+#define ERR_READ -2          /* Error while reading file */
+#define ERR_WRITE -3         /* Error while writing to file */
+#define ERR_CANCELED -4      /* Process canceled */
+#define ERR_NOPERM -5        /* No read permissions */
+#define ERR_NOTEXIST -6      /* Non-existent file path */
 
 #include <QString>
 #include <QCryptographicHash>

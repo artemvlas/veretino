@@ -18,11 +18,11 @@ class VerJson : public QObject
 public:
     explicit VerJson(QObject *parent = nullptr);
     explicit VerJson(const QString &filePath, QObject *parent = nullptr);
-    explicit operator bool() const { return !m_data.isEmpty(); }
+    explicit operator bool() const { return !m_items.isEmpty(); }
 
     const QString& file_path() const;
     void setFilePath(const QString &filePath);
-    bool setFile(const QString &filePath);
+
     bool load();
     bool save();
 
@@ -30,7 +30,7 @@ public:
     void addItemUnr(const QString &file);
     void addInfo(const QString &header_key, const QString &value);
 
-    const QJsonObject& data() const;
+    const QJsonObject& items() const;
     const QJsonArray& unreadableFiles() const;
     QString getInfo(const QString &header_key) const;
     QCryptographicHash::Algorithm algorithm() const;
@@ -49,15 +49,15 @@ public:
 
 private:
     void fillHeader();
-    QString findValueStr(const QJsonObject &object,
-                         const QString &approxKey,
-                         int sampleLength = 4) const;
-    QString firstValueString(const QJsonObject &obj) const;
+
+    // returns the value corresponding to the key
+    // if there is no such key, searches for a match of the first characters
+    QString findValue(const QJsonObject &object, const QString &key) const;
 
     QString m_file_path;
     QString m_workdir;
     QJsonObject m_header;
-    QJsonObject m_data;
+    QJsonObject m_items;
     QJsonArray m_unreadable;
 
     static const QString a_key_Unreadable;

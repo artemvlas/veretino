@@ -31,10 +31,7 @@ VerJson::VerJson(QObject *parent)
 
 VerJson::VerJson(const QString &filePath, QObject *parent)
     : QObject(parent), m_file_path(filePath)
-{
-    //if (QFile::exists(filePath))
-    //    load();
-}
+{}
 
 const QString& VerJson::file_path() const
 {
@@ -44,17 +41,6 @@ const QString& VerJson::file_path() const
 void VerJson::setFilePath(const QString &filePath)
 {
     m_file_path = filePath;
-}
-
-bool VerJson::setFile(const QString &filePath)
-{
-    if (!QFile::exists(filePath)) {
-        qWarning() << "File not found:" + filePath;
-        return false;
-    }
-
-    m_file_path = filePath;
-    return load();
 }
 
 bool VerJson::load()
@@ -72,7 +58,7 @@ bool VerJson::load()
 
     QByteArray ba = jFile.readAll();
 
-    if (ba.startsWith("PK")) { // is compressed
+    if (QMicroz::isArchive(ba)) { // is compressed
         QMicroz qmz(ba);
         if (qmz)
             ba = qmz.extractData(0);
@@ -89,7 +75,7 @@ bool VerJson::load()
 
             if (header.isObject() && main_list.isObject()) {
                 m_header = header.toObject();
-                m_data = main_list.toObject();
+                m_items = main_list.toObject();
 
                 if (main_array.size() > 2) {
                     QJsonValueRef additional = main_array[2];
@@ -108,7 +94,7 @@ bool VerJson::load()
 
 bool VerJson::save()
 {
-    if (m_data.isEmpty()) {
+    if (m_items.isEmpty()) {
         qWarning() << "No data to save";
         return false;
     }
@@ -122,7 +108,7 @@ bool VerJson::save()
 
     QJsonArray content;
     content.append(m_header);
-    content.append(m_data);
+    content.append(m_items);
 
     if (!m_unreadable.isEmpty()) {
         QJsonObject unr;
@@ -145,7 +131,7 @@ bool VerJson::save()
 
 void VerJson::addItem(const QString &file, const QString &checksum)
 {
-    m_data[file] = checksum;
+    m_items[file] = checksum;
 }
 
 void VerJson::addItemUnr(const QString &file)
@@ -163,18 +149,22 @@ void VerJson::fillHeader()
     static const QString app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
     m_header[QStringLiteral(u"App Version")] = app_origin;
     //m_header[QStringLiteral(u"Folder")] = pathstr::basicName(workDir());
-    m_header[QStringLiteral(u"Total Checksums")] = m_data.size();
+    m_header[QStringLiteral(u"Total Checksums")] = m_items.size();
 
     if (!m_header.contains(h_key_Algo))
         m_header[h_key_Algo] = format::algoToStr(algorithm());
 }
 
-QString VerJson::findValueStr(const QJsonObject &object, const QString &approxKey, int sampleLength) const
+QString VerJson::findValue(const QJsonObject &object, const QString &key) const
 {
+    if (object.contains(key))
+        return object.value(key).toString();
+
+    const QString search_pattern = key.left(4);
     QJsonObject::const_iterator i;
 
     for (i = object.constBegin(); i != object.constEnd(); ++i) {
-        if (i.key().contains(approxKey.left(sampleLength), Qt::CaseInsensitive)) {
+        if (i.key().contains(search_pattern, Qt::CaseInsensitive)) {
             return i.value().toString();
         }
     }
@@ -184,27 +174,20 @@ QString VerJson::findValueStr(const QJsonObject &object, const QString &approxKe
 
 QString VerJson::getInfo(const QString &header_key) const
 {
-    if (m_header.contains(header_key))
-        return m_header.value(header_key).toString();
-
-    return findValueStr(m_header, header_key);
-}
-
-QString VerJson::firstValueString(const QJsonObject &obj) const
-{
-    return !obj.isEmpty() ? obj.begin().value().toString() : QString();
+    return findValue(m_header, header_key);
 }
 
 QCryptographicHash::Algorithm VerJson::algorithm() const
 {
-    const QString first_value = firstValueString(m_data);
+    const QString first_value = !m_items.isEmpty() ? m_items.begin().value().toString()
+                                                   : QString();
 
     // main list object
     if (tools::canBeChecksum(first_value))
         return tools::algoByStrLen(first_value.length());
 
     // header object
-    const QString strAlgo = findValueStr(m_header, QStringLiteral(u"Algo"));
+    const QString strAlgo = findValue(m_header, QStringLiteral(u"Algo"));
 
     if (strAlgo.isEmpty()) {
         qWarning() << "VerJson::algorithm >> Not found!";
@@ -214,9 +197,9 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
     return tools::strToAlgo(strAlgo);
 }
 
-const QJsonObject& VerJson::data() const
+const QJsonObject& VerJson::items() const
 {
-    return m_data;
+    return m_items;
 }
 
 const QJsonArray& VerJson::unreadableFiles() const
