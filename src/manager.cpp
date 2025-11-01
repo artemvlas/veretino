@@ -117,7 +117,7 @@ void Manager::restoreDatabase()
 void Manager::createDataModel(const QString &dbFilePath)
 {
     if (!paths::isDbFile(dbFilePath)) {
-        qDebug() << "Manager::createDataModel | Wrong DB file:" << dbFilePath;
+        qWarning() << "Manager::createDataModel | Wrong DB file:" << dbFilePath;
         return;
     }
 

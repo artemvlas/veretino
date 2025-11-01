@@ -23,7 +23,7 @@ public:
     const QString& file_path() const;
     void setFilePath(const QString &filePath);
 
-    bool load();
+    void load();
     bool save();
 
     void addItem(const QString &file, const QString &checksum);

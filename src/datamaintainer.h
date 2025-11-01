@@ -89,7 +89,6 @@ public:
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
     bool tryMoved(const QModelIndex &file, const QString &checksum);
 
-    TreeModel* createDataModel(const VerJson &json, const MetaData &meta);
     bool importJson(const QString &filePath);
     bool exportToJson();
     bool saveJsonFile(VerJson *json);
@@ -113,6 +112,7 @@ private:
     void connections();
     bool isCanceled() const;
     MetaData getMetaData(const VerJson &json) const;
+    TreeModel* makeModel(const VerJson &json, const MetaData &meta);
     VerJson* makeJson(const QModelIndex &rootFolder = QModelIndex());
     bool isPresentInWorkDir(const VerJson &json, const QString &workDir) const;
     QString findWorkDir(const VerJson &json) const;

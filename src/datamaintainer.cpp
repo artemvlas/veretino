@@ -516,7 +516,7 @@ MetaData DataMaintainer::getMetaData(const VerJson &json) const
     return meta;
 }
 
-TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &meta)
+TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
 {
     auto makeFileValues = [](const QString &filePath, const QString &basicDate) {
         if (!QFileInfo::exists(filePath))
@@ -528,7 +528,7 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &
                                 ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
 
         return FileValues(status, fi.size());
-    };
+    }; // lambda makeFileValues
 
     const QString &workDir = meta.workDir;
     TreeModel *pModel = new TreeModel();
@@ -586,9 +586,8 @@ TreeModel* DataMaintainer::createDataModel(const VerJson &json, const MetaData &
     emit setStatusbarText();
 
     if (isCanceled()) {
-        qDebug() << "parseJson | Canceled:" << pathstr::basicName(json.file_path());
         delete pModel;
-        return nullptr;
+        throw ERR_CANCELED;
     }
 
     pModel->clearCacheFolderItems();
@@ -599,33 +598,48 @@ bool DataMaintainer::importJson(const QString &filePath)
 {
     VerJson json(filePath);
 
-    if (!json.load()) {
-        emit setStatusbarText("An error occurred while opening the database.");
-        return false;
+    try {
+        json.load();
+
+        // parsing
+        emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
+
+        const MetaData meta = getMetaData(json);   // meta data
+        TreeModel *model = makeModel(json, meta);  // main data
+
+        // setting the parsed data
+        setData(meta, model);
+        return true;
+    }
+    catch (int err) {
+        QString hint;
+
+        switch (err) {
+        case ERR_CANCELED:
+            qDebug() << "Parsing Canceled:" << pathstr::basicName(json.file_path());
+            emit failedDataCreation();
+            return false;
+        case ERR_ERROR:
+            hint = "Corrupted or incompatible database";
+            break;
+        case ERR_READ:
+        case ERR_NOTEXIST:
+            hint = "Error while opening the file";
+            break;
+        case ERR_NOTFOUND:
+            hint = "The database is empty (doesn't contain checksums)";
+            break;
+        default:
+            hint = "Error Code: " + QString::number(err);
+            break;
+        }
+
+        QString message = tools::joinStrings(hint, pathstr::basicName(json.file_path()), '\n');
+        emit showMessage(message, "Error");
+        emit setStatusbarText(hint);
     }
 
-    if (!json) {
-        emit showMessage(pathstr::basicName(filePath) + "\n\n"
-                                                      "The database doesn't contain checksums.\n"
-                                                      "Probably all files have been ignored.", "Empty Database!");
-        emit setStatusbarText();
-        return false;
-    }
-
-    emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
-
-    // parsing
-    const MetaData meta = getMetaData(json);         // meta data
-    TreeModel *model = createDataModel(json, meta);  // main data
-
-    if (!model) { // canceled
-        emit failedDataCreation();
-        return false;
-    }
-
-    // setting the parsed data
-    setData(meta, model);
-    return true;
+    return false;
 }
 
 // returns the path to the file if the write was successful, otherwise an empty string
@@ -773,8 +787,14 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
 
     const QString filePath = DataHelper::branch_path_existing(m_data, rootFolder);
     VerJson json(filePath);
-    if (!json.load() || !json)
+
+    try {
+        json.load();
+    }
+    catch (int err) {
+        qWarning() << Q_FUNC_INFO << "Error" << err;
         return 0;
+    }
 
     if (json.algorithm() != m_data->m_metadata.algorithm)
         return -1;

@@ -43,18 +43,12 @@ void VerJson::setFilePath(const QString &filePath)
     m_file_path = filePath;
 }
 
-bool VerJson::load()
+void VerJson::load()
 {
-    if (!QFile::exists(m_file_path)) {
-        qWarning() << "File not found:" + m_file_path;
-        return false;
-    }
-
     QFile jFile(m_file_path);
-    if (!jFile.open(QFile::ReadOnly)) {
-        qWarning() << "Failed to open file!";
-        return false;
-    }
+
+    if (!jFile.open(QFile::ReadOnly))
+        throw QFile::exists(m_file_path) ? ERR_READ : ERR_NOTEXIST;
 
     QByteArray ba = jFile.readAll();
 
@@ -67,29 +61,31 @@ bool VerJson::load()
     const QJsonDocument doc = QJsonDocument::fromJson(ba);
 
     // the Veretino json file is QJsonArray of QJsonObjects [{}, {}, ...]
-    if (doc.isArray()) {
-        QJsonArray main_array = doc.array();
-        if (main_array.size() > 1) {
-            QJsonValueRef header = main_array[0];
-            QJsonValueRef main_list = main_array[1];
+    if (!doc.isArray())
+        throw ERR_ERROR;
 
-            if (header.isObject() && main_list.isObject()) {
-                m_header = header.toObject();
-                m_items = main_list.toObject();
+    QJsonArray main_array = doc.array();
 
-                if (main_array.size() > 2) {
-                    QJsonValueRef additional = main_array[2];
-                    m_unreadable = additional.isObject() ? additional.toObject().value(a_key_Unreadable).toArray()
-                                                         : QJsonArray();
-                }
+    if (main_array.size() < 2)
+        throw ERR_ERROR;
 
-                return true;
-            }
-        }
+    QJsonValueRef header = main_array[0];
+    QJsonValueRef items = main_array[1];
+
+    if (!header.isObject() || !items.isObject())
+        throw ERR_ERROR;
+
+    m_header = header.toObject();
+    m_items = items.toObject();
+
+    if (m_items.isEmpty())
+        throw ERR_NOTFOUND;
+
+    if (main_array.size() > 2) {
+        QJsonValueRef additional = main_array[2];
+        m_unreadable = additional.isObject() ? additional.toObject().value(a_key_Unreadable).toArray()
+                                             : QJsonArray();
     }
-
-    qWarning() << "Corrupted or unreadable Json Database:" + m_file_path;
-    return false;
 }
 
 bool VerJson::save()
