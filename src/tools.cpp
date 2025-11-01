@@ -512,8 +512,8 @@ QString fileItemStatus(FileStatus status)
     case FileStatus::Queued: return QStringLiteral(u"queued");
     case FileStatus::Calculating: return QStringLiteral(u"calculating...");
     case FileStatus::Verifying: return QStringLiteral(u"verifying...");
-    case FileStatus::NotChecked: return QStringLiteral(u"ready");
-    case FileStatus::NotCheckedMod: return QStringLiteral(u"ready (modif.)");
+    case FileStatus::NotChecked: return QStringLiteral(u"unchecked");
+    case FileStatus::NotCheckedMod: return QStringLiteral(u"modified");
     case FileStatus::Matched: return QStringLiteral(u"match");
     case FileStatus::Mismatched: return QStringLiteral(u"not match");
     case FileStatus::New: return QStringLiteral(u"new");

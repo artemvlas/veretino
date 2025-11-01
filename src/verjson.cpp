@@ -79,7 +79,7 @@ void VerJson::load()
     m_items = items.toObject();
 
     if (m_items.isEmpty())
-        throw ERR_NOTFOUND;
+        throw ERR_NODATA;
 
     if (main_array.size() > 2) {
         QJsonValueRef additional = main_array[2];

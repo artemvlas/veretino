@@ -534,7 +534,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
     TreeModel *pModel = new TreeModel();
 
     // populating the main data
-    emit setStatusbarText(QStringLiteral(u"Parsing Json database..."));
+    emit setStatusbarText(QStringLiteral(u"Parsing..."));
     const QString basicDate = m_considerFileModDate ? meta.datetime.basicDate() : QString();
     const QJsonObject &itemList = json.items(); // { file_path : checksum }
 
@@ -626,7 +626,7 @@ bool DataMaintainer::importJson(const QString &filePath)
         case ERR_NOTEXIST:
             hint = "Error while opening the file";
             break;
-        case ERR_NOTFOUND:
+        case ERR_NODATA:
             hint = "The database is empty (doesn't contain checksums)";
             break;
         default:

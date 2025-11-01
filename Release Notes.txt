@@ -6,6 +6,7 @@ What's new:
 * The 'Verified' time stamp is now considered obsolete after moving the folder.
 * Ability to directly copy checksums from digest files.
 * The file processing results dialog now also displays reading errors, if any.
+* Some item statuses have been renamed.
 
 Fixes and Minor Enhancements:
 * Fixed display of size and speed (added missing space).

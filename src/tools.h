@@ -14,7 +14,7 @@
 #define ERR_CANCELED -4      /* Process canceled */
 #define ERR_NOPERM -5        /* No read permissions */
 #define ERR_NOTEXIST -6      /* Non-existent file path */
-#define ERR_NOTFOUND -7      /* Nothing found. The results list is empty. */
+#define ERR_NODATA -7        /* No source or result data */
 
 #include <QString>
 #include <QCryptographicHash>
