@@ -47,8 +47,12 @@ void VerJson::load()
 {
     QFile jFile(m_file_path);
 
-    if (!jFile.open(QFile::ReadOnly))
-        throw QFile::exists(m_file_path) ? ERR_READ : ERR_NOTEXIST;
+    if (!jFile.open(QFile::ReadOnly)) {
+        if (QFile::exists(m_file_path))
+            throw Exception(ERR_READ, "File read error. Probably no read permissions.");
+        else
+            throw Exception(ERR_NOTEXIST, "File not found.");
+    }
 
     QByteArray ba = jFile.readAll();
 
@@ -62,24 +66,24 @@ void VerJson::load()
 
     // the Veretino json file is QJsonArray of QJsonObjects [{}, {}, ...]
     if (!doc.isArray())
-        throw ERR_ERROR;
+        throw Exception(ERR_ERROR, "Corrupted or incompatible database. Main array not found.");
 
     QJsonArray main_array = doc.array();
 
     if (main_array.size() < 2)
-        throw ERR_ERROR;
+        throw Exception(ERR_ERROR, "Corrupted or incompatible database. Not enough objects.");
 
     QJsonValueRef header = main_array[0];
     QJsonValueRef items = main_array[1];
 
     if (!header.isObject() || !items.isObject())
-        throw ERR_ERROR;
+        throw Exception(ERR_ERROR, "Corrupted or incompatible database. Objects (dictionaries) not found.");
 
     m_header = header.toObject();
     m_items = items.toObject();
 
     if (m_items.isEmpty())
-        throw ERR_NODATA;
+        throw Exception(ERR_NODATA, "Empty database. No checksums found.");
 
     if (main_array.size() > 2) {
         QJsonValueRef additional = main_array[2];

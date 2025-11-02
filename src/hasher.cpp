@@ -35,7 +35,10 @@ QString Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm
     QFile file(filePath);
 
     if (!file.open(QIODevice::ReadOnly)) {
-        throw file.exists() ? ERR_NOPERM : ERR_NOTEXIST;
+        if (file.exists())
+            throw Exception(ERR_NOPERM, "Error opening file. Probably no read permissions.");
+        else
+            throw Exception(ERR_NOTEXIST, "File not found.");
     }
 
     QCryptographicHash hash(algo);
@@ -47,12 +50,12 @@ QString Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm
             hash.addData(buf);
             emit doneChunk(buf.size());
         } else {
-            throw ERR_READ;
+            throw Exception(ERR_READ, "File read error.");
         }
     }
 
     if (isCanceled())
-        throw ERR_CANCELED;
+        throw Exception(ERR_CANCELED);
 
     // result
     return hash.result().toHex();

@@ -39,6 +39,13 @@ static const QString s_dt_format;
 static const QString s_db_prefix;
 }; // struct Lit
 
+class Exception : public std::runtime_error {
+public:
+    int errorCode;
+    Exception(int code, const std::string& msg = "")
+        : std::runtime_error(msg), errorCode(code) {}
+}; // class Exception
+
 namespace tools {
 // returns the checksum str length: sha(1) = 40, sha(256) = 64, sha(512) = 128
 int algoStrLen(QCryptographicHash::Algorithm algo);

@@ -399,11 +399,9 @@ QString Manager::extractDigestFromFile(const QString &digest_file)
 
     try {
         digest = tools::extractDigestFromFile(digest_file);
-        if (digest.isEmpty())
-            emit showMessage("Checksum not found", "Warning");
     }
-    catch (int) {
-        emit showMessage("Error while reading Summary File", "Error");
+    catch (const Exception& e) {
+        emit showMessage(e.what(), "Error");
     }
 
     return digest;
@@ -445,8 +443,8 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
         fileVal.defaultChecksum() = m_shaCalc.calculate(filePath, algo);
         fileVal.hash_time = m_elapsedTimer.elapsed();
     }
-    catch (int error_code) {
-        switch (error_code) {
+    catch (const Exception& e) {
+        switch (e.errorCode) {
         case ERR_READ:
             fileVal.status = FileStatus::ReadError;
             qWarning() << "Read ERROR:" << filePath;
@@ -461,8 +459,8 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
             break;
         }
 
-        if (error_code != ERR_CANCELED)
-            emit setStatusbarText("failed to read file");
+        if (e.errorCode != ERR_CANCELED)
+            emit setStatusbarText(e.what());
     }
 
     return fileVal;

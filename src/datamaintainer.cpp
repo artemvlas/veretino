@@ -587,7 +587,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
 
     if (isCanceled()) {
         delete pModel;
-        throw ERR_CANCELED;
+        throw Exception(ERR_CANCELED, "Parsing Canceled: " + pathstr::basicName(json.file_path()).toStdString());
     }
 
     pModel->clearCacheFolderItems();
@@ -611,32 +611,16 @@ bool DataMaintainer::importJson(const QString &filePath)
         setData(meta, model);
         return true;
     }
-    catch (int err) {
-        QString hint;
-
-        switch (err) {
-        case ERR_CANCELED:
-            qDebug() << "Parsing Canceled:" << pathstr::basicName(json.file_path());
+    catch (const Exception& e) {
+        if (e.errorCode == ERR_CANCELED) {
+            qDebug() << e.what();
             emit failedDataCreation();
             return false;
-        case ERR_ERROR:
-            hint = "Corrupted or incompatible database";
-            break;
-        case ERR_READ:
-        case ERR_NOTEXIST:
-            hint = "Error while opening the file";
-            break;
-        case ERR_NODATA:
-            hint = "The database is empty (doesn't contain checksums)";
-            break;
-        default:
-            hint = "Error Code: " + QString::number(err);
-            break;
         }
 
-        QString message = tools::joinStrings(hint, pathstr::basicName(json.file_path()), '\n');
+        QString message = tools::joinStrings(e.what(), pathstr::basicName(json.file_path()), '\n');
         emit showMessage(message, "Error");
-        emit setStatusbarText(hint);
+        emit setStatusbarText(e.what());
     }
 
     return false;
@@ -791,8 +775,8 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
     try {
         json.load();
     }
-    catch (int err) {
-        qWarning() << Q_FUNC_INFO << "Error" << err;
+    catch (const Exception& e) {
+        qWarning() << Q_FUNC_INFO << "Error" << e.errorCode;
         return 0;
     }
 

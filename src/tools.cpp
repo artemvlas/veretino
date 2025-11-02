@@ -220,7 +220,10 @@ QString extractDigestFromFile(const QString &digest_file)
 {
     QFile sumFile(digest_file);
     if (!sumFile.open(QFile::ReadOnly)) {
-        throw sumFile.exists() ? ERR_NOPERM : ERR_NOTEXIST;
+        if (sumFile.exists())
+            throw Exception(ERR_NOPERM, "Error opening file. Probably no read permissions.");
+        else
+            throw Exception(ERR_NOTEXIST, "File not found.");
     }
 
     const QString line = sumFile.readLine();
@@ -239,7 +242,7 @@ QString extractDigestFromFile(const QString &digest_file)
         }
     }
 
-    return QString();
+    throw Exception(ERR_NODATA, "Checksum not found");
 }
 
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
