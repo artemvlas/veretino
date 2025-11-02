@@ -219,12 +219,7 @@ QString joinStrings(const QString &str, int num)
 QString extractDigestFromFile(const QString &digest_file)
 {
     QFile sumFile(digest_file);
-    if (!sumFile.open(QFile::ReadOnly)) {
-        if (sumFile.exists())
-            throw Exception(ERR_NOPERM, "Error opening file. Probably no read permissions.");
-        else
-            throw Exception(ERR_NOTEXIST, "File not found.");
-    }
+    openFile(sumFile, QFile::ReadOnly);
 
     const QString line = sumFile.readLine();
 
@@ -252,6 +247,32 @@ FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
 
     return isChecksumStored ? FileStatus::Missing : FileStatus::Removed;
 }
+
+void openFile(QFile &file, QFile::OpenMode mode)
+{
+    if (file.open(mode))
+        return;
+
+    if (mode == QFile::ReadOnly) {
+        if (!file.exists())
+            throw Exception(ERR_NOTEXIST, "File not found.");
+
+        if (!file.isReadable())
+            throw Exception(ERR_NOPERM, "No read permissions.");
+        else
+            throw Exception(ERR_READ, "File read error.");
+    }
+
+    if (mode == QFile::WriteOnly) {
+        if (!file.isWritable())
+            throw Exception(ERR_NOPERM, "No write permissions.");
+        else
+            throw Exception(ERR_WRITE, "File write error.");
+    }
+
+    throw Exception(ERR_ERROR, "Error opening file.");
+}
+
 } // namespace tools
 
 namespace paths {

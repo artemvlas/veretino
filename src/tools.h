@@ -12,7 +12,7 @@
 #define ERR_READ -2          /* Error while reading file */
 #define ERR_WRITE -3         /* Error while writing to file */
 #define ERR_CANCELED -4      /* Process canceled */
-#define ERR_NOPERM -5        /* No read permissions */
+#define ERR_NOPERM -5        /* No read or write permissions */
 #define ERR_NOTEXIST -6      /* Non-existent file path */
 #define ERR_NODATA -7        /* No source or result data */
 
@@ -21,6 +21,7 @@
 #include <QAbstractItemModel>
 #include <QPalette>
 #include <QMetaEnum>
+#include <QFile>
 #include "filevalues.h"
 #include "numbers.h"
 
@@ -85,6 +86,9 @@ QString joinStrings(const QString &str, int num);
 QString extractDigestFromFile(const QString &digest_file);
 
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
+
+// try to open the 'file'; if an error occurs, throws exceptions
+void openFile(QFile &file, QFile::OpenMode mode = QFile::ReadOnly);
 
 template<typename QEnum>
 QString enumToString(const QEnum value)

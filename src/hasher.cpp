@@ -33,13 +33,7 @@ QString Hasher::calculate(const QString &filePath)
 QString Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
 {
     QFile file(filePath);
-
-    if (!file.open(QIODevice::ReadOnly)) {
-        if (file.exists())
-            throw Exception(ERR_NOPERM, "Error opening file. Probably no read permissions.");
-        else
-            throw Exception(ERR_NOTEXIST, "File not found.");
-    }
+    tools::openFile(file, QFile::ReadOnly);
 
     QCryptographicHash hash(algo);
 
