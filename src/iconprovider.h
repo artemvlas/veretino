@@ -87,8 +87,7 @@ private:
 
         if (s_cache.contains(_value)) {
             return s_cache.value(_value);
-        }
-        else {
+        } else {
             _Pic pic;
             if constexpr(std::is_same_v<_Pic, QIcon>)
                 pic = QIcon(svgFilePath(_value));

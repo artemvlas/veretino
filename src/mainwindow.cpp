@@ -561,6 +561,7 @@ void MainWindow::setWinTitleMismatchFound()
                                                   QStringLiteral(u"<!> mismatches found"),
                                                   Lit::s_sepStick);
     setWindowTitle(str);
+    setWindowIcon(m_modeSelect->m_icons.icon(FileStatus::Mismatched));
 }
 
 void MainWindow::updateWindowTitle()
@@ -573,13 +574,20 @@ void MainWindow::updateWindowTitle()
             return;
         }
 
-        QString strAdd = DataHelper::isAllMatched(data) ? QStringLiteral(u"✓ verified")
-                                                        : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
+        const bool isVerified = DataHelper::isAllMatched(data);
+
+        QString strAdd = isVerified ? QStringLiteral(u"✓ verified")
+                                    : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
+
+        QIcon icn = isVerified ? m_modeSelect->m_icons.icon(FileStatus::Matched)
+                               : IconProvider::appIcon();
 
         const QString strTitle = tools::joinStrings(Lit::s_appName, strAdd, Lit::s_sepStick);
         setWindowTitle(strTitle);
+        setWindowIcon(icn);
     } else {
         setWindowTitle(Lit::s_appName);
+        setWindowIcon(IconProvider::appIcon());
     }
 }
 

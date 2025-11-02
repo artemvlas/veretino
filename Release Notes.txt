@@ -7,6 +7,7 @@ What's new:
 * Ability to directly copy checksums from digest files.
 * The file processing results dialog now also displays reading errors, if any.
 * Some item statuses have been renamed.
+* Main window icon displays the verification status.
 
 Fixes and Minor Enhancements:
 * Fixed display of size and speed (added missing space).
