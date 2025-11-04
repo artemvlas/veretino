@@ -462,7 +462,7 @@ QString composeDbFileName(const QString &prefix, const QString &folder, const QS
     if (folder.isEmpty())
         return tools::joinStrings(prefix, extension, u'.');
 
-    const QString folderStr = simplifiedChars(pathstr::basicName(folder));
+    const QString folderStr = simplifiedChars(pathstr::entryName(folder));
     const QString dbFileName = tools::joinStrings(prefix, folderStr, u'_');
 
     return tools::joinStrings(dbFileName, extension, u'.');
@@ -527,7 +527,7 @@ QString fileNameAndSize(const QString &filePath)
 
 QString fileNameAndSize(const QString &file, const qint64 size)
 {
-    return addStrInParentheses(pathstr::basicName(file), dataSizeReadable(size));
+    return addStrInParentheses(pathstr::entryName(file), dataSizeReadable(size));
 }
 
 QString fileItemStatus(FileStatus status)

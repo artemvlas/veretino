@@ -68,14 +68,14 @@ bool DataContainer::isEmpty() const
 /*** They will be moved or changed in the future ***/
 QString DataHelper::databaseFileName(const DataContainer *data)
 {
-    return pathstr::basicName(data->m_metadata.dbFilePath);
+    return pathstr::entryName(data->m_metadata.dbFilePath);
 }
 
 QString DataHelper::backupFilePath(const DataContainer *data)
 {
     using namespace pathstr;
     return joinPath(parentFolder(data->m_metadata.dbFilePath),
-                    QStringLiteral(u".tmp-backup_") + basicName(data->m_metadata.dbFilePath));
+                    QStringLiteral(u".tmp-backup_") + entryName(data->m_metadata.dbFilePath));
 }
 
 // returns the absolute path to the db item (file or subfolder)

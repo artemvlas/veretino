@@ -153,7 +153,7 @@ void MenuActions::updateMenuOpenRecent(const QStringList &recentFiles)
 
     for (const QString &recentFilePath : recentFiles) {
         if (QFileInfo::exists(recentFilePath)) {
-            QAction *act = menuOpenRecent->addAction(dbIcon, pathstr::basicName(recentFilePath));
+            QAction *act = menuOpenRecent->addAction(dbIcon, pathstr::entryName(recentFilePath));
             act->setToolTip(recentFilePath);
         }
     }

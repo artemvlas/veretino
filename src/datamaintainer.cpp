@@ -587,7 +587,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
 
     if (isCanceled()) {
         delete pModel;
-        throw Exception(ERR_CANCELED, "Parsing Canceled: " + pathstr::basicName(json.file_path()).toStdString());
+        throw Exception(ERR_CANCELED, "Parsing Canceled: " + pathstr::entryName(json.file_path()).toStdString());
     }
 
     pModel->clearCacheFolderItems();
@@ -618,7 +618,7 @@ bool DataMaintainer::importJson(const QString &filePath)
             return false;
         }
 
-        QString message = tools::joinStrings(e.what(), pathstr::basicName(json.file_path()), '\n');
+        QString message = tools::joinStrings(e.what(), pathstr::entryName(json.file_path()), '\n');
         emit showMessage(message, "Error");
         emit setStatusbarText(e.what());
     }
@@ -643,7 +643,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
                                             : m_data->m_metadata.dbFilePath;                       // main database
 
     VerJson *pJson = new VerJson(pathToSave);
-    pJson->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : pathstr::basicName(meta.workDir));
+    pJson->addInfo(QStringLiteral(u"Folder"), isBranching ? rootFolder.data().toString() : pathstr::entryName(meta.workDir));
     pJson->addInfo(QStringLiteral(u"Total Size"), format::dataSizeReadableExt(nums.totalSize(FileStatus::CombAvailable)));
 
     // DateTime

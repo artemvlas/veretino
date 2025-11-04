@@ -576,7 +576,7 @@ void ModeSelector::makeDbContList()
 
 QString ModeSelector::composeDbFilePath()
 {
-    QString folderName = m_settings->addWorkDirToFilename ? pathstr::basicName(m_view->m_lastPathFS) : QString();
+    QString folderName = m_settings->addWorkDirToFilename ? pathstr::entryName(m_view->m_lastPathFS) : QString();
     QString prefix = m_settings->dbPrefix.isEmpty() ? Lit::s_db_prefix : m_settings->dbPrefix;
     QString databaseFileName = format::composeDbFileName(prefix, folderName, m_settings->dbFileExtension());
 
@@ -647,7 +647,7 @@ bool ModeSelector::overwriteDbPrompt()
 
     QMessageBox msgBox(m_view);
     msgBox.setWindowTitle("Existing database detected");
-    msgBox.setText("The folder already contains the database file:\n" + pathstr::basicName(dbFilePath));
+    msgBox.setText("The folder already contains the database file:\n" + pathstr::entryName(dbFilePath));
     msgBox.setInformativeText("Do you want to open or overwrite it?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Open);

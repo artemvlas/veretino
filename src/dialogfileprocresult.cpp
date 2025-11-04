@@ -160,7 +160,7 @@ void DialogFileProcResult::setIcon(FileStatus status)
 
 void DialogFileProcResult::setFileName(const QString &filePath)
 {
-    ui->labelFileName->setText(QStringLiteral(u"File: ") + pathstr::basicName(filePath));
+    ui->labelFileName->setText(QStringLiteral(u"File: ") + pathstr::entryName(filePath));
 }
 
 void DialogFileProcResult::setExtLineVisible(bool visible)
@@ -213,7 +213,7 @@ void DialogFileProcResult::makeSumFile()
         return;
 
     const QString sumFile = paths::digestFilePath(filePath_, chsum.size());
-    const QString strToWrite = tools::joinStrings(chsum, pathstr::basicName(filePath_), QStringLiteral(u" *"));
+    const QString strToWrite = tools::joinStrings(chsum, pathstr::entryName(filePath_), QStringLiteral(u" *"));
 
     setFileName(sumFile);
 

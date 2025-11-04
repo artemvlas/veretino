@@ -160,7 +160,7 @@ QString Files::getFolderSize(const QString &path)
     }
 
     // result processing
-    const QString folderName = pathstr::basicName(path);
+    const QString folderName = pathstr::entryName(path);
     const QString folderSize = format::filesNumSize(nms);
 
     return tools::joinStrings(folderName, folderSize, Lit::s_sepColonSpace);

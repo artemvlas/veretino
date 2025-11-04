@@ -48,7 +48,7 @@ bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &val
 {
     const TreeItem *parentItem = add_folder(pathstr::parentFolder(filePath));
 
-    if (parentItem->findChild(pathstr::basicName(filePath))) {
+    if (parentItem->findChild(pathstr::entryName(filePath))) {
         return false;
     }
 
@@ -60,7 +60,7 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
 {
     // data preparation
     QVector<QVariant> tiData(m_rootItem->columnCount());
-    tiData[ColumnName] = pathstr::basicName(filePath);
+    tiData[ColumnName] = pathstr::entryName(filePath);
 
     if (values.size >= 0)
         tiData[ColumnSize] = values.size;

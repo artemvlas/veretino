@@ -142,7 +142,7 @@ void VerJson::fillHeader()
 {
     static const QString app_origin = tools::joinStrings(Lit::s_appNameVersion, Lit::s_webpage, QStringLiteral(u" >> "));
     m_header[QStringLiteral(u"App Version")] = app_origin;
-    //m_header[QStringLiteral(u"Folder")] = pathstr::basicName(workDir());
+    //m_header[QStringLiteral(u"Folder")] = pathstr::entryName(workDir());
     m_header[QStringLiteral(u"Total Checksums")] = m_items.size();
 
     if (!m_header.contains(h_key_Algo))
