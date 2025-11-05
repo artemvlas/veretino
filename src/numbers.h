@@ -7,7 +7,7 @@
 #define NUMBERS_H
 
 #include "filevalues.h"
-#include "nums.h"
+#include "nums.hpp"
 #include "QHash"
 
 class Numbers

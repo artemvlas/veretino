@@ -7,7 +7,7 @@
 #define ITEMFILETYPE_H
 
 #include <QTreeWidgetItem>
-#include "nums.h"
+#include "nums.hpp"
 
 class ItemFileType : public QTreeWidgetItem
 {

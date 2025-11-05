@@ -7,7 +7,7 @@
 #define PROCSTATE_H
 
 #include <QObject>
-#include "nums.h"
+#include "nums.hpp"
 
 class ProcState : public QObject
 {

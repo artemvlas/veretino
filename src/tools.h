@@ -65,9 +65,10 @@ bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo);
 bool isHexChar(const char ch);
 bool isHexChar(const QChar ch);
 
-// true ("2024/09/24 18:35", "2024/09/25 11:40")
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
+
+// true ("2024/09/24 18:35", "2024/09/25 11:40")
 bool isLater(const QString &dt_before, const QString &dt_later);
 bool isLater(const QString &dt_str, const QDateTime &other);
 

@@ -22,7 +22,7 @@ set(PROJECT_SOURCES
     menuactions.h
     modeselector.h
     numbers.h
-    nums.h
+    nums.hpp
     plaintextedit.h
     procstate.h
     progressbar.h
