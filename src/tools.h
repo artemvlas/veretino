@@ -155,6 +155,14 @@ QString coloredText(bool ignore);
 
 // 'className': "QLineEdit", "QTreeView", "QLabel", etc...
 QString coloredText(const QString &className, bool ignore);
+
+/* if not a root (or child of root) path, returns "../path"
+ * "/home"               -> "/home"
+ * "C:/fooFolder"        -> "C:/fooFolder"
+ * "C:/folder/fooFolder" -> "../fooFolder"
+ */
+QString shortenPath(const QString &path);
+
 } // namespace format
 
 #endif // TOOLS_H

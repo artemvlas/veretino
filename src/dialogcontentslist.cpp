@@ -6,7 +6,6 @@
 #include "dialogcontentslist.h"
 #include "ui_dialogcontentslist.h"
 #include "tools.h"
-#include "pathstr.h"
 #include <QPushButton>
 #include <QDebug>
 
@@ -20,7 +19,7 @@ DialogContentsList::DialogContentsList(const QString &folderPath, const FileType
     ui->types_->setColumnWidth(ItemFileType::ColumnFilesNumber, 130);
     ui->types_->sortByColumn(ItemFileType::ColumnTotalSize, Qt::DescendingOrder);
 
-    ui->labelFolderName->setText(pathstr::shortenPath(folderPath));
+    ui->labelFolderName->setText(format::shortenPath(folderPath));
     ui->labelFolderName->setToolTip(folderPath);
     ui->chbTop10->setVisible(extList.count() > 15);
 

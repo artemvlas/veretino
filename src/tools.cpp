@@ -566,4 +566,12 @@ QString coloredText(const QString &className, bool ignore)
     return className % QStringLiteral(u" { ") % coloredText(ignore) % QStringLiteral(u" }");
 }
 
+QString shortenPath(const QString &path)
+{
+    using namespace pathstr;
+
+    return isRoot(parentFolder(path)) ? path
+                                      : QStringLiteral(u"../") + entryName(path);
+}
+
 } // namespace format

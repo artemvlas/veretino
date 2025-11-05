@@ -446,7 +446,7 @@ void MainWindow::promptOpenBranch(const QString &dbFilePath)
     QMessageBox msgBox(this);
     msgBox.setIconPixmap(m_modeSelect->m_icons.pixmap(Icons::AddFork));
     msgBox.setWindowTitle("A new Branch has been created");
-    msgBox.setText("The subfolder data is forked:\n" + pathstr::shortenPath(dbFilePath));
+    msgBox.setText("The subfolder data is forked:\n" + format::shortenPath(dbFilePath));
     msgBox.setInformativeText("Do you want to open it or stay in the current one?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
@@ -577,7 +577,7 @@ void MainWindow::updateWindowTitle()
         const bool isVerified = DataHelper::isAllMatched(data);
 
         QString strAdd = isVerified ? QStringLiteral(u"✓ verified")
-                                    : QStringLiteral(u"DB > ") + pathstr::shortenPath(data->m_metadata.workDir);
+                                    : QStringLiteral(u"DB > ") + format::shortenPath(data->m_metadata.workDir);
 
         QIcon icn = isVerified ? m_modeSelect->m_icons.icon(FileStatus::Matched)
                                : IconProvider::appIcon();
