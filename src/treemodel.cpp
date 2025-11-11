@@ -193,15 +193,11 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
             return format::fileItemStatus(tiData.value<FileStatus>());
         case ColumnElapsed:
             return format::msecsToReadable(tiData.toLongLong());
+        case ColumnSpeed:
+            return format::processSpeed(tiData.toLongLong());
         default:
             break;
         }
-    }
-
-    if (curIndex.column() == ColumnSpeed) {
-        const qint64 hash_time = itemHashTime(curIndex);
-        if (hash_time >= 0)
-            return format::processSpeed(hash_time, itemFileSize(curIndex));
     }
 
     return tiData;

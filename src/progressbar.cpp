@@ -82,6 +82,6 @@ QString ProgressBar::progTimeLeft() const
 }
 
 QString ProgressBar::progSpeed() const
-{    
-    return format::processSpeed(m_pieceTime, m_pieceSize);
+{
+    return format::processSpeed(m_pieceSize, m_pieceTime);
 }

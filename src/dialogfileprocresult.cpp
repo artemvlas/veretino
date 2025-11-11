@@ -180,7 +180,7 @@ void DialogFileProcResult::setExtLineVisible(bool visible)
 
     if (hasHashTime) {
         ui->labelSpeed->setText(QStringLiteral(u"Speed: ")
-                                + format::processSpeed(values_.hash_time, values_.size));
+                                + format::processSpeed(values_.size, values_.hash_time));
     }
 
     if (hasDigest) {

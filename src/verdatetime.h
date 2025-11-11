@@ -17,7 +17,7 @@ public:
     // Verified means all files exist and match the checksums
     enum DT { Created, Updated, Verified };
 
-    // ref to mCreated || mUpdated || mVerified
+    // ref to m_created || m_updated || m_verified
     const QString& value(DT type) const;
 
     // e.g. "Created: 2024/09/24 18:35"
@@ -31,9 +31,9 @@ public:
 
     /* parse 'str' and set found values
      * e.g. str == "Created: 2023/11/03 19:15, Updated: 2024/05/02 17:13, Verified: 2025/09/03 21:37" --->>
-     * mCreated = "2023/11/03 19:15"
-     * mUpdated = "2024/05/02 17:13"
-     * mVerified = "2025/09/03 21:37"
+     * m_created = "2023/11/03 19:15"
+     * m_updated = "2024/05/02 17:13"
+     * m_verified = "2025/09/03 21:37"
      */
     void set(const QString &str);
 
@@ -44,7 +44,7 @@ public:
     void clear(DT type);
 
     /* join stored values to a single string with hints
-     * e.g. mCreated = "2023/11/03 19:15", mUpdated = "2024/05/02 17:13" --->>
+     * e.g. m_created = "2023/11/03 19:15", m_updated = "2024/05/02 17:13" --->>
      * "Created: "2023/11/03 19:15", Updated: "2024/05/02 17:13"
      */
     QString toString(bool keep_empty_values = true) const;
@@ -63,7 +63,7 @@ private:
 
     /*** VALUES ***/
     // format: "2024/09/24 18:35"
-    QString mCreated, mUpdated, mVerified;
+    QString m_created, m_updated, m_verified;
 
 }; // class VerDateTime
 

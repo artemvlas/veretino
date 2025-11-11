@@ -232,6 +232,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
             } else {
                 m_dataMaintainer->updateChecksum(fileIndex, fileVal.checksum);
                 m_dataMaintainer->setItemValue(fileIndex, Column::ColumnElapsed, fileVal.hash_time);
+                m_dataMaintainer->setItemValue(fileIndex, Column::ColumnSpeed, fileVal.hash_speed());
             }
         }
     } else if (prevStatus == FileStatus::Missing) {
@@ -311,6 +312,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.reChecksum);
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
         m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnElapsed, fileVal.hash_time);
+        m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnSpeed, fileVal.hash_speed());
 
         fileVal.checksum = storedSum.toLower();
         const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
@@ -572,6 +574,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
         // success
         m_proc->addDoneOne();
         m_dataMaintainer->setItemValue(iter.index(), Column::ColumnElapsed, fileVal.hash_time);
+        m_dataMaintainer->setItemValue(iter.index(), Column::ColumnSpeed, fileVal.hash_speed());
 
         if (purpose == DM_FindMoved) {
             if (!m_dataMaintainer->tryMoved(iter.index(), sum))

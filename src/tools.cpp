@@ -394,7 +394,7 @@ QString dataSizeReadableExt(const qint64 sizeBytes)
     return QString("%1 (%2 bytes)").arg(dataSizeReadable(sizeBytes), numString(sizeBytes));
 }
 
-QString processSpeed(qint64 msecs, qint64 size)
+QString processSpeed(qint64 size, qint64 msecs)
 {
     if (msecs == 0)
         return QStringLiteral(u"instant");

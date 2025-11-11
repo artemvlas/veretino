@@ -17,16 +17,16 @@ VerDateTime::VerDateTime(const QString &str)
 
 VerDateTime::operator bool() const
 {
-    return (!mCreated.isEmpty() || !mUpdated.isEmpty());
+    return (!m_created.isEmpty() || !m_updated.isEmpty());
 }
 
 const QString& VerDateTime::value(DT type) const
 {
     switch (type) {
-    case Created: return mCreated;
-    case Updated: return mUpdated;
-    case Verified: return mVerified;
-    default: return mUpdated;
+    case Created: return m_created;
+    case Updated: return m_updated;
+    case Verified: return m_verified;
+    default: return m_updated;
     }
 }
 
@@ -46,16 +46,16 @@ void VerDateTime::set(DT type, const QString &value)
 {
     switch (type) {
     case Created:
-        mCreated = value;
-        mUpdated.clear();
-        mVerified.clear();
+        m_created = value;
+        m_updated.clear();
+        m_verified.clear();
         break;
     case Updated:
-        mUpdated = value;
-        mVerified.clear();
+        m_updated = value;
+        m_verified.clear();
         break;
     case Verified:
-        mVerified = value;
+        m_verified = value;
     }
 }
 
@@ -79,15 +79,15 @@ void VerDateTime::set(const QString &str)
         switch (ch) {
         case 'c':
         case 'C':
-            mCreated = cleanValue(dt);
+            m_created = cleanValue(dt);
             break;
         case 'u':
         case 'U':
-            mUpdated = cleanValue(dt);
+            m_updated = cleanValue(dt);
             break;
         case 'v':
         case 'V':
-            mVerified = cleanValue(dt);
+            m_verified = cleanValue(dt);
             break;
         default:
             break;
@@ -104,13 +104,13 @@ void VerDateTime::clear(DT type)
 {
     switch (type) {
     case Created:
-        mCreated.clear();
+        m_created.clear();
         break;
     case Updated:
-        mUpdated.clear();
+        m_updated.clear();
         break;
     case Verified:
-        mVerified.clear();
+        m_verified.clear();
         break;
     default: break;
     }
@@ -122,7 +122,7 @@ QString VerDateTime::toString(bool keep_empty_values) const
 
     // OLD impl. for values-with-hint stored by default
     /*if (keep_empty_values)
-        resStr.reserve(mCreated.size() + mUpdated.size() + mVerified.size() + 4); // ", " * 2 = 4
+        resStr.reserve(m_created.size() + m_updated.size() + m_verified.size() + 4); // ", " * 2 = 4
 
     for (int i = 0; i < 3; ++i) {
         const QString &val = value((DT)i);
@@ -155,11 +155,11 @@ QString VerDateTime::cleanValue(const QString &value_with_hint) const
 
 QString VerDateTime::basicDate() const
 {
-    if (!mVerified.isEmpty())
-        return mVerified;
+    if (!m_verified.isEmpty())
+        return m_verified;
 
-    if (mUpdated.isEmpty())
-        return mCreated;
+    if (m_updated.isEmpty())
+        return m_created;
 
     // if the update time is not empty and there is no verification time,
     // return an empty string

@@ -74,6 +74,9 @@ public:
     const QString& defaultChecksum() const { return (hash_purpose == Verify) ? reChecksum : checksum; }
     explicit operator bool() const { return !defaultChecksum().isEmpty(); }
 
+    // bytes per one millisecond
+    inline qint64 hash_speed() const { return (hash_time > 0) ? (size / hash_time) : size; }
+
     /*** Variables ***/
     FileStatus status = FileStatus::NotSet;
     HashingPurpose hash_purpose = Generic;

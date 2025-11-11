@@ -43,7 +43,7 @@ static const QString s_db_prefix;
 class Exception : public std::runtime_error {
 public:
     int errorCode;
-    Exception(int code, const std::string& msg = "")
+    Exception(int code, const std::string& msg = std::string())
         : std::runtime_error(msg), errorCode(code) {}
 }; // class Exception
 
@@ -122,8 +122,12 @@ QString dataSizeReadable(const qint64 sizeBytes);
 // returning style example: "6.08 GiB (6,532,974,324 bytes)"
 QString dataSizeReadableExt(const qint64 sizeBytes);
 
-// returns the readable string of the process speed
-QString processSpeed(qint64 msecs, qint64 size);
+/* Returns a readable process speed string.
+ * Converts the number of bytes ('size') processed within 'msecs' of time
+ * (one millisecond by default) into readable form:
+ * 1025 -> "1MiB/s"
+ */
+QString processSpeed(qint64 size, qint64 msecs = 1);
 
 QString shortenString(const QString &string, int length = 64, bool cutEnd = true);
 QString simplifiedChars(QString str);
