@@ -20,7 +20,7 @@ public:
     explicit View(QWidget *parent = nullptr);
 
     enum ModelView {
-        NotSetted = 1,
+        NotSet = 1,
         FileSystem = 1 << 1,
         ModelSource = 1 << 2,
         ModelProxy = 1 << 3,

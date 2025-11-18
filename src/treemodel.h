@@ -79,6 +79,13 @@ public:
     static QString itemFileReChecksum(const QModelIndex &fileIndex);
     static qint64 itemHashTime(const QModelIndex &fileIndex);
 
+    template <typename T>
+    static T getSiblingValue(const QModelIndex &ind, Column col) {
+        const QVariant val = ind.siblingAtColumn(col).data(RawDataRole);
+
+        return val.value<T>();
+    }
+
 public slots:
     void clearCacheFolderItems();
 

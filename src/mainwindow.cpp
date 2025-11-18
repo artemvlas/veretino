@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(IconProvider::appIcon());
     QThread::currentThread()->setObjectName("Main Thread");
     m_thread->setObjectName("Manager Thread");
+    m_proc = m_manager->m_proc;
 
     ui->button->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->view->setSettings(m_settings);
@@ -37,9 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_modeSelect = new ModeSelector(ui->view, m_settings, this);
     m_modeSelect->setManager(m_manager);
-    m_modeSelect->setProcState(m_manager->m_proc);
-    ui->progressBar->setProcState(m_manager->m_proc);
-    proc_ = m_manager->m_proc;
+    m_modeSelect->setProcState(m_proc);
+    ui->progressBar->setProcState(m_proc);
 
     m_modeSelect->m_menuAct->populateMenuFile(ui->menuFile);
     ui->menuHelp->addAction(m_modeSelect->m_menuAct->actionAbout);
@@ -66,10 +66,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     // if a computing process is running, show a prompt when user wants to close the app
     if (m_modeSelect->promptProcessAbort()) {
-        if (!proc_->isAwaiting(ProcState::AwaitingClosure)
+        if (!m_proc->isAwaiting(ProcState::AwaitingClosure)
             && m_manager->m_dataMaintainer->isDataNotSaved())
         {
-            proc_->setAwaiting(ProcState::AwaitingClosure);
+            m_proc->setAwaiting(ProcState::AwaitingClosure);
             m_modeSelect->saveData();
             event->ignore();
             return;
@@ -124,9 +124,9 @@ void MainWindow::connections()
     connect(m_statusBar, &StatusBar::buttonDbListedClicked, this, [=]{ showDbStatusTab(DialogDbStatus::TabListed); });
     connect(m_statusBar, &StatusBar::buttonDbContentsClicked, m_modeSelect, &ModeSelector::makeDbContList);
     connect(m_statusBar, &StatusBar::buttonDbHashClicked, this, &MainWindow::handleButtonDbHashClick);
-    connect(m_manager->m_proc, &ProcState::progressStarted, this,
+    connect(m_proc, &ProcState::progressStarted, this,
             [=] { if (m_modeSelect->isMode(Mode::DbProcessing)) m_statusBar->setButtonsEnabled(false); });
-    connect(m_manager->m_proc, &ProcState::progressFinished, this,
+    connect(m_proc, &ProcState::progressFinished, this,
             [=] { if (ui->view->isViewDatabase()) m_statusBar->setButtonsEnabled(true); });
 }
 
@@ -164,14 +164,14 @@ void MainWindow::connectManager()
     connect(m_manager->m_dataMaintainer, &DataMaintainer::numbersUpdated, this, &MainWindow::updateWindowTitle);
     connect(m_manager->m_dataMaintainer, &DataMaintainer::subDbForked, this, &MainWindow::promptOpenBranch);
     connect(m_manager->m_dataMaintainer, &DataMaintainer::failedDataCreation, this,
-            [=]{ if (ui->view->isViewModel(ModelView::NotSetted)) m_modeSelect->showFileSystem(); });
+            [=]{ if (ui->view->isViewModel(ModelView::NotSet)) m_modeSelect->showFileSystem(); });
     connect(m_manager->m_dataMaintainer, &DataMaintainer::failedJsonSave, this, &MainWindow::dialogSaveJson);
     connect(m_manager->m_dataMaintainer, &DataMaintainer::dbFileStateChanged, this, &MainWindow::updateMenuActions);
     connect(m_manager->m_dataMaintainer, &DataMaintainer::dbFileStateChanged, this,
-            [=]{ if (proc_->isAwaiting(ProcState::AwaitingClosure)) close(); });
+            [=]{ if (m_proc->isAwaiting(ProcState::AwaitingClosure)) close(); });
 
     // process status
-    connect(m_manager->m_proc, &ProcState::stateChanged, this, [=]{ if (proc_->isState(State::Idle)) ui->view->setViewProxy(); });
+    connect(m_manager->m_proc, &ProcState::stateChanged, this, [=]{ if (m_proc->isState(State::Idle)) ui->view->setViewProxy(); });
     connect(m_manager->m_proc, &ProcState::stateChanged, this, &MainWindow::updateButtonInfo);
     connect(m_manager->m_proc, &ProcState::progressStarted, ui->progressBar, &ProgressBar::start);
     connect(m_manager->m_proc, &ProcState::progressFinished, ui->progressBar, &ProgressBar::finish);
@@ -202,7 +202,7 @@ void MainWindow::saveSettings()
 void MainWindow::switchToFs()
 {
     ui->view->setFileSystemModel();
-    proc_->setAwaiting(ProcState::AwaitingNothing);
+    m_proc->setAwaiting(ProcState::AwaitingNothing);
 }
 
 void MainWindow::showDbStatus()
@@ -212,7 +212,7 @@ void MainWindow::showDbStatus()
 
 void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
 {
-    if (proc_->isState(State::StartSilently)) {
+    if (m_proc->isState(State::StartSilently)) {
         qDebug() << "MainWindow::showDbStatusTab | Rejected >> State::StartSilently";
         return;
     }
@@ -477,7 +477,7 @@ void MainWindow::dialogSaveJson(VerJson *pUnsavedJson)
                                                               str_filter);
 
         if (sel_path.isEmpty()) { // canceled
-            if (proc_->isAwaiting()
+            if (m_proc->isAwaiting()
                 && QMessageBox::question(this, "Unsaved data...",
                                          "Close without saving data?") != QMessageBox::Yes)
             {
@@ -503,9 +503,9 @@ void MainWindow::dialogSaveJson(VerJson *pUnsavedJson)
     delete pUnsavedJson;
     qDebug() << "dialogSaveJson:" << file_path;
 
-    if (proc_->isAwaiting(ProcState::AwaitingClosure)) {
+    if (m_proc->isAwaiting(ProcState::AwaitingClosure)) {
         close();
-    } else if (proc_->isAwaiting(ProcState::AwaitingSwitchToFs)) {
+    } else if (m_proc->isAwaiting(ProcState::AwaitingSwitchToFs)) {
         switchToFs();
     }
 }
@@ -527,7 +527,7 @@ void MainWindow::updateMenuActions()
 void MainWindow::updateStatusIcon()
 {
     QIcon statusIcon;
-    if (proc_->isStarted()) {
+    if (m_proc->isStarted()) {
         statusIcon = m_modeSelect->m_icons.icon(FileStatus::Calculating);
     }
     else if (ui->view->isViewFileSystem()) {
@@ -548,7 +548,7 @@ void MainWindow::updatePermanentStatus()
     if (ui->view->isViewDatabase()) {
         if (m_modeSelect->isMode(Mode::DbCreating))
             m_statusBar->setModeDbCreating();
-        else if (!proc_->isStarted())
+        else if (!m_proc->isStarted())
             m_statusBar->setModeDb(ui->view->m_data);
     } else {
         m_statusBar->clearButtons();
@@ -621,7 +621,7 @@ void MainWindow::handleChangedModel()
 
 void MainWindow::handleButtonDbHashClick()
 {
-    if (!proc_->isStarted() && ui->view->isViewDatabase()) {
+    if (!m_proc->isStarted() && ui->view->isViewDatabase()) {
         const Numbers &nums = ui->view->m_data->m_numbers;
         if (nums.contains(FileStatus::CombChecked))
             showDbStatusTab(DialogDbStatus::TabVerification);
@@ -714,7 +714,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         showDbStatus();
     }
     else if (event->key() == Qt::Key_F5
-             && !proc_->isStarted() && m_modeSelect->isMode(Mode::DbIdle))
+             && !m_proc->isStarted() && m_modeSelect->isMode(Mode::DbIdle))
     {
         m_modeSelect->resetDatabase();
     }

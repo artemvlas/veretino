@@ -140,7 +140,7 @@ void View::clear()
     setModel(nullptr);
     m_data = nullptr;
 
-    emit modelChanged(NotSetted);
+    emit modelChanged(NotSet);
 }
 
 // when the process is completed, return to the Proxy Model view
@@ -309,7 +309,7 @@ ModelView View::curViewModel() const
     else if (m_data && model() == m_data->m_proxy)
         return ModelProxy;
     else
-        return NotSetted;
+        return NotSet;
 }
 
 bool View::isViewModel(const ModelView modelView) const
@@ -406,7 +406,7 @@ void View::restoreHeaderState()
 
 void View::headerContextMenuRequested(const QPoint &point)
 {
-    if (isViewModel(NotSetted))
+    if (isViewModel(NotSet))
         return;
 
     QMenu *headerContextMenu = new QMenu(this);

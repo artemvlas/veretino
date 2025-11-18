@@ -752,7 +752,7 @@ void ModeSelector::createContextMenu_View(const QPoint &point)
         createContextMenu_ViewFs(point);
     else if (m_view->isViewDatabase())
         createContextMenu_ViewDb(point);
-    else if (m_view->isViewModel(ModelView::NotSetted))
+    else if (m_view->isViewModel(ModelView::NotSet))
         m_menuAct->contextMenuViewNot()->exec(m_view->viewport()->mapToGlobal(point));
 }
 

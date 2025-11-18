@@ -102,7 +102,7 @@ private:
     Manager *m_manager = new Manager(m_settings);
     ModeSelector *m_modeSelect = nullptr;
     StatusBar *m_statusBar = new StatusBar;
-    ProcState *proc_ = nullptr;
+    ProcState *m_proc = nullptr;
 
     // true if the exit attempt was rejected (to perform data saving)
     // bool awaiting_closure = false;
