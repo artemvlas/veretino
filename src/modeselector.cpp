@@ -529,9 +529,14 @@ void ModeSelector::verifyItems(const QModelIndex &root, FileStatus status)
 void ModeSelector::branchSubfolder()
 {
     const QModelIndex ind = m_view->curIndex();
-    if (ind.isValid()) {
-        m_manager->addTask(&Manager::branchSubfolder, ind);
-    }
+    if (!ind.isValid())
+        return;
+
+    m_manager->addTask(&Manager::branchSubfolder, ind);
+
+    // update statusbar text
+    // TODO: generalize the functions of updating the statusbar after an operation is completed.
+    m_manager->addTaskWithState(State::Idle, &Manager::getIndexInfo, ind);
 }
 
 void ModeSelector::exportItemSum()
