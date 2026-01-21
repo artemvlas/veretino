@@ -166,6 +166,8 @@ QString ModeSelector::getButtonText()
             return QStringLiteral(u"New/Lost");
         case UpdateMismatch:
             return QStringLiteral(u"Update");
+        case ModeNoAvailableItems:
+            return QStringLiteral(u"Set WorkDir");
         case NoMode:
             return QStringLiteral(u"Browse");
         default:
@@ -197,6 +199,8 @@ QIcon ModeSelector::getButtonIcon()
             return m_icons.icon(Icons::Update);
         case UpdateMismatch:
             return m_icons.icon(FileStatus::Updated);
+        case ModeNoAvailableItems:
+            return m_icons.icon(Icons::Folder);
         default:
             break;
     }
@@ -234,6 +238,9 @@ Mode ModeSelector::mode() const
             else if (m_proc->isState(State::StartVerbose))
                 return DbProcessing;
         }
+
+        if (!m_view->m_data->m_numbers.contains(FileStatus::CombAvailable))
+            return ModeNoAvailableItems;
 
         if (!isDbConst()) {
             if (m_view->m_data->m_numbers.contains(FileStatus::Mismatched))
@@ -710,6 +717,9 @@ void ModeSelector::doWork()
         case UpdateMismatch:
             if (!m_proc->isStarted())
                 updateDatabase(DbMod::DM_UpdateMismatches);
+            break;
+        case ModeNoAvailableItems:
+            emit m_manager->noAvailableItems();
             break;
         case NoMode:
             if (!m_proc->isStarted())

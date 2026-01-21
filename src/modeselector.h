@@ -30,6 +30,7 @@ public:
         Model = 1 << 8,
         ModelNewLost = 1 << 9,
         UpdateMismatch = 1 << 10,
+        ModeNoAvailableItems = 1 << 11,
         DbIdle = Model | ModelNewLost | UpdateMismatch
     };
     Q_ENUM(Mode)
