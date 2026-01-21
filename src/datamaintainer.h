@@ -89,7 +89,7 @@ public:
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
     bool tryMoved(const QModelIndex &file, const QString &checksum);
 
-    bool importJson(const QString &filePath);
+    bool importJson(const QString &filePath, const QString &customWorkDir);
     bool exportToJson();
     bool saveJsonFile(VerJson *json);
     void forkJsonDb(const QModelIndex &rootFolder);

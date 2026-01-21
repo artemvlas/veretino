@@ -442,7 +442,7 @@ void ModeSelector::restoreDatabase()
     m_manager->addTask(&Manager::restoreDatabase);
 }
 
-void ModeSelector::openJsonDatabase(const QString &filePath)
+void ModeSelector::openJsonDatabase(const QString &filePath, const QString &customWorkDir)
 {
     if (promptProcessAbort()) {
         // aborted process
@@ -450,7 +450,7 @@ void ModeSelector::openJsonDatabase(const QString &filePath)
             m_view->clear();
 
         m_manager->addTask(&Manager::saveData);
-        m_manager->addTask(&Manager::createDataModel, filePath);
+        m_manager->addTask(&Manager::createDataModel, filePath, customWorkDir);
     }
 }
 

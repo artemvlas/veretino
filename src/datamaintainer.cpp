@@ -465,7 +465,7 @@ MetaData DataMaintainer::getMetaData(const VerJson &json) const
 {
     MetaData meta;
     meta.dbFilePath = json.file_path();
-    meta.workDir = findWorkDir(json);
+    //meta.workDir = findWorkDir(json); <!> moved to ::importJson
     meta.dbFileState = MetaData::Saved;
 
     // [filter rule]
@@ -594,21 +594,30 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
     return pModel;
 }
 
-bool DataMaintainer::importJson(const QString &filePath)
+bool DataMaintainer::importJson(const QString &filePath, const QString &customWorkDir)
 {
     VerJson json(filePath);
 
     try {
         json.load();
 
-        // parsing
+        // parsing...
         emit setStatusbarText(QStringLiteral(u"Importing Json database..."));
 
-        const MetaData meta = getMetaData(json);   // meta data
-        TreeModel *model = makeModel(json, meta);  // main data
+        // meta data
+        MetaData meta = getMetaData(json);
+        meta.workDir = customWorkDir.isEmpty() ? findWorkDir(json) : customWorkDir;
+
+        // main data
+        TreeModel *model = makeModel(json, meta);
 
         // setting the parsed data
         setData(meta, model);
+
+        // the WorkDir has been changed
+        if (!customWorkDir.isEmpty())
+            setDbFileState(DbFileState::NotSaved);
+
         return true;
     }
     catch (const Exception& e) {

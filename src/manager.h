@@ -86,7 +86,7 @@ public slots:
                    const QString &checkSum,
                    QCryptographicHash::Algorithm algo);
 
-    void createDataModel(const QString &dbFilePath);
+    void createDataModel(const QString &dbFilePath, const QString &customWorkDir = QString());
     void restoreDatabase();
     void saveData();
     void prepareSwitchToFs();
@@ -163,6 +163,7 @@ signals:
     void switchToFsPrepared();
     void mismatchFound();
     void taskAdded();
+    void noAvailableItems();
 }; // class Manager
 
 using DbMod = Manager::DbMod;
