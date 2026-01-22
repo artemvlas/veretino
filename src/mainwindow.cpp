@@ -522,16 +522,22 @@ void MainWindow::dialogChooseWorkDir()
     QMessageBox msgBox(this);
     msgBox.setIconPixmap(m_modeSelect->m_icons.pixmap(Icons::Folder));
     msgBox.setWindowTitle("Select a working folder");
-    msgBox.setText("No file items available in the current working folder");
+    msgBox.setText("No file items available in the current working folder.");
     msgBox.setInformativeText("Choose a different path?");
     msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Cancel);
-    //msgBox.setDefaultButton(QMessageBox::Open);
 
     if (msgBox.exec() != QMessageBox::Open)
         return;
 
     const QString dir = QFileDialog::getExistingDirectory(this, QString(), pData->m_metadata.workDir);
 
+    // canceled by user
+    if (dir.isEmpty())
+        return;
+
+    /* Search for available database item (existing on disk) in the specified working folder.
+     * If any, the WorkDir is considered to be selected correctly.
+     */
     QThread *lambdaThread = QThread::create([this, dir, pData]() {
         TreeModelIterator it(pData->m_model);
 
