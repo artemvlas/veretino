@@ -27,10 +27,10 @@
        <item>
         <widget class="QFrame" name="frame">
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -60,7 +60,7 @@
        <item>
         <widget class="Line" name="line_2">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -117,7 +117,7 @@ immediately after any changes are made.</string>
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -150,7 +150,7 @@ immediately after any changes are made.</string>
           <string>labelDatabaseFilename</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -167,10 +167,10 @@ immediately after any changes are made.</string>
        <item row="2" column="1">
         <widget class="QFrame" name="frame_3">
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -199,7 +199,7 @@ immediately after any changes are made.</string>
        <item row="3" column="0" colspan="2">
         <widget class="Line" name="line">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -293,6 +293,17 @@ Only for items with the New status.</string>
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="cbImportWhenAdding">
+           <property name="toolTip">
+            <string>If a matching digest file (*.shaX) is found when adding a new item to the DB,
+try to import the checksum from it instead of calculate a new one.</string>
+           </property>
+           <property name="text">
+            <string>Import Checksums when Adding</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -302,10 +313,10 @@ Only for items with the New status.</string>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok|QDialogButtonBox::StandardButton::RestoreDefaults</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
     </widget>
    </item>

@@ -120,6 +120,7 @@ void DialogDbCreation::updateSettings()
     m_settings->isLongExtension = ui->rb_ext_long->isChecked();
     m_settings->addWorkDirToFilename = ui->cb_add_folder_name->isChecked();
     m_settings->dbFlagConst = ui->cb_flag_const->isChecked();
+    m_settings->m_importSumsWhenItemAdding = ui->cbImportWhenAdding->isChecked();
 
     // filter
     m_settings->filter_editable_exts = ui->cb_editable_exts->isChecked();
@@ -141,6 +142,7 @@ void DialogDbCreation::setDbConfig()
     ui->rb_ext_short->setChecked(!m_settings->isLongExtension);
     ui->cb_add_folder_name->setChecked(m_settings->addWorkDirToFilename);
     ui->cb_flag_const->setChecked(m_settings->dbFlagConst);
+    ui->cbImportWhenAdding->setChecked(m_settings->m_importSumsWhenItemAdding);
 
     if (!m_settings->dbPrefix.isEmpty() && (m_settings->dbPrefix != Lit::s_db_prefix))
         ui->inp_db_prefix->setText(m_settings->dbPrefix);

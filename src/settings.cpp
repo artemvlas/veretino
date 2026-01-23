@@ -19,6 +19,7 @@ const QString Settings::s_key_instantSaving = "instantSaving";
 const QString Settings::s_key_considerDateModified = "considerDateModified";
 const QString Settings::s_key_detectMoved = "detectMoved";
 const QString Settings::s_key_allowPasteIntoDb = "allowPasteIntoDb";
+const QString Settings::s_key_importSumsWhenItemAdding = "importSumsWhenItemAdding";
 
 // history
 const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
@@ -105,6 +106,7 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_considerDateModified, considerDateModified);
     storedSettings.setValue(s_key_detectMoved, detectMoved);
     storedSettings.setValue(s_key_allowPasteIntoDb, allowPasteIntoDb);
+    storedSettings.setValue(s_key_importSumsWhenItemAdding, m_importSumsWhenItemAdding);
 
     // filter
     storedSettings.setValue(s_key_filter_mode, filter_mode);
@@ -147,6 +149,7 @@ void Settings::loadSettings()
     considerDateModified = storedSettings.value(s_key_considerDateModified, defaults.considerDateModified).toBool();
     detectMoved = storedSettings.value(s_key_detectMoved, defaults.detectMoved).toBool();
     allowPasteIntoDb = storedSettings.value(s_key_allowPasteIntoDb, defaults.allowPasteIntoDb).toBool();
+    m_importSumsWhenItemAdding = storedSettings.value(s_key_importSumsWhenItemAdding, defaults.m_importSumsWhenItemAdding).toBool();
 
     // filter
     filter_mode = static_cast<FilterMode>(storedSettings.value(s_key_filter_mode, FilterMode::NotSet).toInt());
