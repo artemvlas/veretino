@@ -13,6 +13,7 @@
 #include "dialogfileprocresult.h"
 #include "dialogsettings.h"
 #include "dialogabout.h"
+#include "treemodeliterator.h"
 #include <QMimeData>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -180,6 +181,7 @@ void MainWindow::connectManager()
 
     // <!> experimental
     connect(m_manager->m_proc, &ProcState::progressFinished, m_modeSelect, &ModeSelector::getInfoPathItem);
+    connect(m_manager, &Manager::noAvailableItems, this, &MainWindow::dialogChooseWorkDir);
 
     // change view
     connect(m_manager, &Manager::switchToFsPrepared, this, &MainWindow::switchToFs);
@@ -508,6 +510,52 @@ void MainWindow::dialogSaveJson(VerJson *pUnsavedJson)
     } else if (m_proc->isAwaiting(ProcState::AwaitingSwitchToFs)) {
         switchToFs();
     }
+}
+
+void MainWindow::dialogChooseWorkDir()
+{
+    if (!ui->view->isViewDatabase())
+        return;
+
+    const DataContainer *pData = ui->view->m_data;
+
+    QMessageBox msgBox(this);
+    msgBox.setIconPixmap(m_modeSelect->m_icons.pixmap(Icons::Folder));
+    msgBox.setWindowTitle("Select a working folder");
+    msgBox.setText("No file items available in the current working folder.");
+    msgBox.setInformativeText("Choose a different path?");
+    msgBox.setStandardButtons(QMessageBox::Open | QMessageBox::Cancel);
+
+    if (msgBox.exec() != QMessageBox::Open)
+        return;
+
+    const QString dir = QFileDialog::getExistingDirectory(this, QString(), pData->m_metadata.workDir);
+
+    // canceled by user
+    if (dir.isEmpty())
+        return;
+
+    /* Search for available database item (existing on disk) in the specified working folder.
+     * If any, the WorkDir is considered to be selected correctly.
+     */
+    QThread *lambdaThread = QThread::create([this, dir, pData]() {
+        TreeModelIterator it(pData->m_model);
+
+        while (it.hasNext()) {
+            it.nextFile();
+
+            if (QFileInfo::exists(pathstr::joinPath(dir, it.path()))) {
+                m_modeSelect->openJsonDatabase(pData->m_metadata.dbFilePath, dir);
+                return;
+            }
+        }
+
+        // If no available ones are found, open this dialog again
+        emit m_manager->noAvailableItems();
+    });
+
+    QObject::connect(lambdaThread, &QThread::finished, lambdaThread, &QObject::deleteLater);
+    lambdaThread->start();
 }
 
 void MainWindow::updateButtonInfo()

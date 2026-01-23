@@ -114,7 +114,7 @@ void Manager::restoreDatabase()
     }
 }
 
-void Manager::createDataModel(const QString &dbFilePath)
+void Manager::createDataModel(const QString &dbFilePath, const QString &customWorkDir)
 {
     if (!paths::isDbFile(dbFilePath)) {
         qWarning() << "Manager::createDataModel | Wrong DB file:" << dbFilePath;
@@ -123,12 +123,16 @@ void Manager::createDataModel(const QString &dbFilePath)
 
     m_dataMaintainer->setConsiderDateModified(m_settings->considerDateModified);
 
-    if (m_dataMaintainer->importJson(dbFilePath)) {
+    if (m_dataMaintainer->importJson(dbFilePath, customWorkDir)) {
         if (m_settings->detectMoved)
             cacheMissingItems();
 
         emit setViewData(m_dataMaintainer->m_data);
-        sendDbUpdated(); // using timer 0
+
+        if (m_dataMaintainer->m_data->m_numbers.contains(FileStatus::CombAvailable))
+            sendDbUpdated(); // using timer 0
+        else
+            emit noAvailableItems();
     }
 }
 

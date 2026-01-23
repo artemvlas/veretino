@@ -1,3 +1,7 @@
+Veretino
+What's new:
+* Added the ability to select a custom working folder if there are no items available in the current one.
+
 ---
 Veretino 0.7.0
 What's new:
