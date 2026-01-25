@@ -63,7 +63,7 @@ public:
     }
 
     void clearTasks();
-    QString extractDigestFromFile(const QString &digest_file);
+    QString extractDigestFromFile(const QString &digestFile, bool showException = true);
 
 public slots:
     void processFolderSha(const MetaData &metaData);

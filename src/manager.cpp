@@ -225,9 +225,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
             const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(DataHelper::digestFilePath(pData, fileIndex))
                                                          : TreeModel::itemFileChecksum(fileIndex);
 
-            // checking for compliance with the current algo
-            if (tools::canBeChecksum(dig, pData->m_metadata.algorithm))
-                m_dataMaintainer->importChecksum(fileIndex, dig);
+            m_dataMaintainer->importChecksum(fileIndex, dig);
         } else { // calc the new one
             const FileValues fileVal = hashItem(fileIndex);
 
@@ -399,15 +397,16 @@ void Manager::checkSummaryFile(const QString &path)
     checkFile(checkFilePath, storedChecksum);
 }
 
-QString Manager::extractDigestFromFile(const QString &digest_file)
+QString Manager::extractDigestFromFile(const QString &digestFile, bool showException)
 {
     QString digest;
 
     try {
-        digest = tools::extractDigestFromFile(digest_file);
+        digest = tools::extractDigestFromFile(digestFile);
     }
     catch (const Exception& e) {
-        emit showMessage(e.what(), "Error");
+        if (showException)
+            emit showMessage(e.what(), "Error");
     }
 
     return digest;
@@ -554,6 +553,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
     // checking whether this is a Calculation or Verification process
     const CalcKind calc_kind = (status & FileStatus::CombAvailable) ? Verification : Calculation;
+    const bool allow_import = m_settings->m_importSumsWhenItemAdding && calc_kind == Calculation;
 
     // process
     TreeModelIterator iter(pData->m_model, root);
@@ -561,6 +561,20 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
     while (iter.hasNext() && !m_proc->isCanceled()) {
         if (iter.nextFile().status() != FileStatus::Queued)
             continue;
+
+        if (allow_import) {
+            const QString filePath = DataHelper::itemAbsolutePath(pData, iter.index());
+            const QString shaFilePath = paths::digestFilePath(filePath, pData->m_metadata.algorithm);
+
+            if (QFileInfo::exists(shaFilePath)) {
+                const QString digest = extractDigestFromFile(shaFilePath, false);
+
+                if (m_dataMaintainer->importChecksum(iter.index(), digest)) {
+                    m_proc->addDoneOne();
+                    continue;
+                }
+            }
+        }
 
         // hashing
         const FileValues fileVal = hashItem(iter.index(), calc_kind);
