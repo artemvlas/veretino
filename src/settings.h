@@ -40,6 +40,7 @@ public:
     bool considerDateModified = true;
     bool detectMoved = false;
     bool allowPasteIntoDb = false;
+    bool m_importSumsWhenItemAdding = false; // TODO: unify var names
 
     FilterMode filter_mode = FilterMode::NotSet;
     QStringList filter_last_exts;
@@ -71,6 +72,7 @@ private:
     static const QString s_key_considerDateModified;
     static const QString s_key_detectMoved;
     static const QString s_key_allowPasteIntoDb;
+    static const QString s_key_importSumsWhenItemAdding;
     static const QString s_key_history_lastFsPath;
     static const QString s_key_history_recentDbFiles;
     static const QString s_key_view_geometry;

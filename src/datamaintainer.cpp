@@ -256,12 +256,13 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
 
 bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &checksum)
 {
-    if (TreeModel::hasStatus(FileStatus::New, file) && !checksum.isEmpty()) {
+    // checking for compliance with the current algo
+    if (tools::canBeChecksum(checksum, m_data->m_metadata.algorithm)
+        && TreeModel::hasStatus((FileStatus::New | FileStatus::Queued), file))
+    {
         setItemValue(file, Column::ColumnChecksum, checksum);
         setFileStatus(file, FileStatus::Imported);
         return true;
-
-        // m_data->numbers_.moveFile(FileStatus::New, FileStatus::Imported, TreeModel::itemFileSize(_file));
     }
 
     return false;

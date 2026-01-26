@@ -62,6 +62,7 @@ void DialogSettings::loadSettings(const Settings &settings)
     ui->cbConsiderDateModified->setChecked(settings.considerDateModified);
     ui->cbDetectMoved->setChecked(settings.detectMoved);
     ui->cbAllowPaste->setChecked(settings.allowPasteIntoDb);
+    ui->cbImportWhenAdding->setChecked(settings.m_importSumsWhenItemAdding);
 
     // Tab Database
     if (settings.dbPrefix.isEmpty() || (settings.dbPrefix == Lit::s_db_prefix)) {
@@ -99,6 +100,7 @@ void DialogSettings::updateSettings()
     settings_->considerDateModified = ui->cbConsiderDateModified->isChecked();
     settings_->detectMoved = ui->cbDetectMoved->isChecked();
     settings_->allowPasteIntoDb = ui->cbAllowPaste->isChecked();
+    settings_->m_importSumsWhenItemAdding = ui->cbImportWhenAdding->isChecked();
 
     // database
     const QString inpPrefix = ui->inputJsonFileNamePrefix->text();
