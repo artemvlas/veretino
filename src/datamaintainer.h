@@ -86,6 +86,7 @@ public:
     void rollBackStoppedCalc(const QModelIndex &rootIndex, FileStatus prevStatus);
 
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
+    bool removeDigestEntry(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
     bool tryMoved(const QModelIndex &file, const QString &checksum);
 

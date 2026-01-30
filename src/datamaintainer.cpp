@@ -356,6 +356,21 @@ bool DataMaintainer::itemFileRemoveLost(const QModelIndex &fileIndex)
     return false;
 }
 
+bool DataMaintainer::removeDigestEntry(const QModelIndex &fileIndex)
+{
+    if (!m_data || !TreeModel::hasStatus(FileStatus::Missing | FileStatus::Imported, fileIndex))
+        return false;
+
+    FileStatus beforeStatus = TreeModel::itemFileStatus(fileIndex);
+    FileStatus afterStatus = (beforeStatus == FileStatus::Imported) ? FileStatus::New : FileStatus::Removed;
+
+    clearChecksum(fileIndex);
+    setFileStatus(fileIndex, afterStatus);
+    updateNumbers(fileIndex, beforeStatus);
+    setDbFileState(DbFileState::NotSaved);
+    return true;
+}
+
 bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
 {
     if (!m_data || !m_data->m_cacheMissing.contains(checksum))

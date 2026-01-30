@@ -766,6 +766,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     {
         m_modeSelect->resetDatabase();
     }
+    else if (event->key() == Qt::Key_Delete
+             && !m_proc->isStarted() && m_modeSelect->isMode(Mode::DbIdle)
+             && TreeModel::hasStatus(FileStatus::Missing | FileStatus::Imported, ui->view->curIndex()))
+    {
+        m_manager->m_dataMaintainer->removeDigestEntry(ui->view->curIndex());
+    }
     // TMP ^^^
 
     QMainWindow::keyPressEvent(event);
