@@ -380,9 +380,9 @@ void View::saveHeaderState()
         return;
 
     if (isViewFileSystem())
-        m_settings->headerStateFs = header()->saveState();
+        m_settings->m_headerStateFs = header()->saveState();
     else if (isViewDatabase())
-        m_settings->headerStateDb = header()->saveState();
+        m_settings->m_headerStateDb = header()->saveState();
 }
 
 void View::restoreHeaderState()
@@ -391,9 +391,9 @@ void View::restoreHeaderState()
 
     if (m_settings) {
         if (isViewFileSystem())
-            headerState = m_settings->headerStateFs;
+            headerState = m_settings->m_headerStateFs;
         else if (isViewDatabase())
-            headerState = m_settings->headerStateDb;
+            headerState = m_settings->m_headerStateDb;
     }
 
     if (!headerState.isEmpty()) {

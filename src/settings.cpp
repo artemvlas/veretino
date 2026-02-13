@@ -46,15 +46,15 @@ Settings::Settings(QObject *parent)
 
 void Settings::setAlgorithm(QCryptographicHash::Algorithm algo)
 {
-    if (algorithm_ != algo) {
-        algorithm_ = algo;
+    if (m_algorithm != algo) {
+        m_algorithm = algo;
         emit algorithmChanged();
     }
 }
 
 QCryptographicHash::Algorithm Settings::algorithm() const
 {
-    return algorithm_;
+    return m_algorithm;
 }
 
 QString Settings::dbFileExtension() const
@@ -95,7 +95,7 @@ void Settings::saveSettings()
         storedSettings.setValue(s_key_history_lastFsPath, restoreLastPathOnStartup ? *pLastFsPath : QString());
     }
 
-    storedSettings.setValue(s_key_algo, algorithm_);
+    storedSettings.setValue(s_key_algo, m_algorithm);
     storedSettings.setValue(s_key_dbPrefix, dbPrefix);
     storedSettings.setValue(s_key_restoreLastPath, restoreLastPathOnStartup);
     storedSettings.setValue(s_key_addWorkDir, addWorkDirToFilename);
@@ -122,11 +122,11 @@ void Settings::saveSettings()
     storedSettings.setValue(s_key_history_recentDbFiles, recentFiles);
 
     // geometry
-    storedSettings.setValue(s_key_view_geometry, geometryMainWindow);
+    storedSettings.setValue(s_key_view_geometry, m_geometryMainWindow);
 
     // TreeView header(columns) state
-    storedSettings.setValue(s_key_view_columnStateFs, headerStateFs);
-    storedSettings.setValue(s_key_view_columnStateDb, headerStateDb);
+    storedSettings.setValue(s_key_view_columnStateFs, m_headerStateFs);
+    storedSettings.setValue(s_key_view_columnStateDb, m_headerStateDb);
 }
 
 void Settings::loadSettings()
@@ -138,7 +138,7 @@ void Settings::loadSettings()
     }
 
     Settings defaults;
-    algorithm_ = static_cast<QCryptographicHash::Algorithm>(storedSettings.value(s_key_algo, defaults.algorithm()).toInt());
+    m_algorithm = static_cast<QCryptographicHash::Algorithm>(storedSettings.value(s_key_algo, defaults.algorithm()).toInt());
     dbPrefix = storedSettings.value(s_key_dbPrefix, defaults.dbPrefix).toString();
     restoreLastPathOnStartup = storedSettings.value(s_key_restoreLastPath, defaults.restoreLastPathOnStartup).toBool();
     addWorkDirToFilename = storedSettings.value(s_key_addWorkDir, defaults.addWorkDirToFilename).toBool();
@@ -165,9 +165,9 @@ void Settings::loadSettings()
     recentFiles = storedSettings.value(s_key_history_recentDbFiles).toStringList();
 
     // geometry
-    geometryMainWindow = storedSettings.value(s_key_view_geometry).toByteArray();
+    m_geometryMainWindow = storedSettings.value(s_key_view_geometry).toByteArray();
 
     // TreeView header(columns) state
-    headerStateFs = storedSettings.value(s_key_view_columnStateFs).toByteArray();
-    headerStateDb = storedSettings.value(s_key_view_columnStateDb).toByteArray();
+    m_headerStateFs = storedSettings.value(s_key_view_columnStateFs).toByteArray();
+    m_headerStateDb = storedSettings.value(s_key_view_columnStateDb).toByteArray();
 }

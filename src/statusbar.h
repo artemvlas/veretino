@@ -58,13 +58,13 @@ public:
 private:
     StatusBarButton* addPermanentButton();
 
-    const IconProvider *p_icons = nullptr;
-    QLabel *statusTextLabel = new QLabel(this);
-    QLabel *statusIconLabel = new QLabel(this);
-    StatusBarButton *buttonDbHash = nullptr;
-    StatusBarButton *buttonDbSize = nullptr;
-    StatusBarButton *buttonDbMain = nullptr;
-    StatusBarButton *buttonDbCreating = nullptr;
+    const IconProvider *m_icons = nullptr;
+    QLabel *m_statusTextLabel = new QLabel(this);
+    QLabel *m_statusIconLabel = new QLabel(this);
+    StatusBarButton *m_buttonDbHash = nullptr;
+    StatusBarButton *m_buttonDbSize = nullptr;
+    StatusBarButton *m_buttonDbMain = nullptr;
+    StatusBarButton *m_buttonDbCreating = nullptr;
 
 signals:
     void buttonFsFilterClicked();

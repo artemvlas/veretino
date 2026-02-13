@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_settings->loadSettings();
 
-    restoreGeometry(m_settings->geometryMainWindow);
+    restoreGeometry(m_settings->m_geometryMainWindow);
 
     m_modeSelect = new ModeSelector(ui->view, m_settings, this);
     m_modeSelect->setManager(m_manager);
@@ -197,7 +197,7 @@ void MainWindow::connectManager()
 void MainWindow::saveSettings()
 {
     ui->view->saveHeaderState();
-    m_settings->geometryMainWindow = saveGeometry();
+    m_settings->m_geometryMainWindow = saveGeometry();
     m_settings->saveSettings();
 }
 

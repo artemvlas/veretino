@@ -51,15 +51,15 @@ public:
     bool filter_ignore_unpermitted = true;
     bool filter_ignore_symlinks = true;
 
-    QByteArray geometryMainWindow;
-    QByteArray headerStateFs;
-    QByteArray headerStateDb;
+    QByteArray m_geometryMainWindow;
+    QByteArray m_headerStateFs;
+    QByteArray m_headerStateDb;
 
     // pointer to ui->view->m_lastPathFS
     QString *pLastFsPath = nullptr;
 
 private:
-    QCryptographicHash::Algorithm algorithm_ = QCryptographicHash::Sha256;
+    QCryptographicHash::Algorithm m_algorithm = QCryptographicHash::Sha256;
 
     static const QString s_key_algo;
     static const QString s_key_dbPrefix;
