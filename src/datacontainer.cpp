@@ -24,7 +24,7 @@ DataContainer::DataContainer(const MetaData &meta, TreeModel *data, QObject *par
 DataContainer::~DataContainer()
 {
     DataHelper::removeBackupFile(this);
-    qDebug() << Q_FUNC_INFO << DataHelper::databaseFileName(this);
+    qDebug() << Q_FUNC_INFO << m_metadata.dbFilePath;
 }
 
 void DataContainer::set(const MetaData &meta, TreeModel *data)
@@ -66,11 +66,6 @@ bool DataContainer::isEmpty() const
 /*** <!!!> ***/
 /*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
 /*** They will be moved or changed in the future ***/
-QString DataHelper::databaseFileName(const DataContainer *data)
-{
-    return pathstr::entryName(data->m_metadata.dbFilePath);
-}
-
 QString DataHelper::backupFilePath(const DataContainer *data)
 {
     using namespace pathstr;

@@ -70,7 +70,6 @@ public:
 /*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
 /*** They will be moved or changed in the future ***/
 struct DataHelper {
-    static QString databaseFileName(const DataContainer *data);
     static QString backupFilePath(const DataContainer *data);
     static QString digestFilePath(const DataContainer *data, const QModelIndex &fileIndex);
 

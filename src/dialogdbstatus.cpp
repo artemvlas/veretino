@@ -49,7 +49,7 @@ void DialogDbStatus::setLabelsInfo()
 {
     const MetaData &meta = m_data->m_metadata;
 
-    m_ui->labelDbFileName->setText(DataHelper::databaseFileName(m_data));
+    m_ui->labelDbFileName->setText(pathstr::entryName(m_data->m_metadata.dbFilePath));
     m_ui->labelDbFileName->setToolTip(meta.dbFilePath);
     m_ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(meta.algorithm));
     m_ui->labelWorkDir->setToolTip(meta.workDir);
