@@ -729,7 +729,7 @@ bool DataMaintainer::exportToJson()
     if (!pJson)
         return false;
 
-    DataHelper::makeBackup(m_data);
+    BackupFile(m_data).makeBackup();
 
     if (saveJsonFile(pJson)) {
         delete pJson;

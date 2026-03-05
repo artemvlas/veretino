@@ -66,11 +66,34 @@ public:
     QHash<QModelIndex, QString> m_cacheBranches;
 }; // class DataContainer
 
+class BackupFile final
+{
+public:
+    explicit BackupFile(const DataContainer *data);
+    explicit BackupFile(const MetaData *meta);
+    explicit BackupFile(const QString *dbFile);
+
+    explicit operator bool() const { return hasDbFilePath(); }
+
+    QString backupFilePath() const;
+    bool isBackupExists() const;
+    bool isDbExists() const;
+
+    bool makeBackup(bool forceOverwrite = false) const;
+    bool restoreBackupFile() const;
+    void removeBackupFile() const;
+
+private:
+    bool hasDbFilePath() const;
+
+    const QString *m_dbFile = nullptr;
+}; // class BackupFile
+
 /*** <!!!> ***/
 /*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
 /*** They will be moved or changed in the future ***/
 struct DataHelper {
-    static QString backupFilePath(const DataContainer *data);
+    //static QString backupFilePath(const DataContainer *data);
     static QString digestFilePath(const DataContainer *data, const QModelIndex &fileIndex);
 
     // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
@@ -109,12 +132,6 @@ struct DataHelper {
 
     static Numbers getNumbers(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
-
-
-    static bool isBackupExists(const DataContainer *data);
-    static bool makeBackup(const DataContainer *data, bool forceOverwrite = false);
-    static bool restoreBackupFile(const DataContainer *data);
-    static void removeBackupFile(const DataContainer *data);
 
 }; // struct DataHelper
 

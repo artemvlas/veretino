@@ -23,7 +23,7 @@ DataContainer::DataContainer(const MetaData &meta, TreeModel *data, QObject *par
 
 DataContainer::~DataContainer()
 {
-    DataHelper::removeBackupFile(this);
+    BackupFile(this).removeBackupFile();
     qDebug() << Q_FUNC_INFO << m_metadata.dbFilePath;
 }
 
@@ -63,15 +63,76 @@ bool DataContainer::isEmpty() const
     return !m_model || m_model->isEmpty();
 }
 
+BackupFile::BackupFile(const DataContainer *data)
+    : m_dbFile(data ? &data->m_metadata.dbFilePath : nullptr) {}
+
+BackupFile::BackupFile(const MetaData *meta)
+    : m_dbFile(meta ? &meta->dbFilePath : nullptr) {}
+
+BackupFile::BackupFile(const QString *dbFile)
+    : m_dbFile(dbFile) {}
+
+QString BackupFile::backupFilePath() const
+{
+    if (!hasDbFilePath())
+        return {};
+
+    return pathstr::prependFileName(*m_dbFile,
+                                    QStringLiteral(u".tmp-backup_"));
+}
+
+bool BackupFile::isBackupExists() const
+{
+    return QFileInfo::exists(backupFilePath());
+}
+
+bool BackupFile::isDbExists() const
+{
+    return hasDbFilePath() && QFileInfo::exists(*m_dbFile);
+}
+
+bool BackupFile::makeBackup(bool forceOverwrite) const
+{
+    if (!isDbExists())
+        return false;
+
+    if (forceOverwrite)
+        removeBackupFile();
+
+    return QFile::copy(*m_dbFile, backupFilePath());
+}
+
+bool BackupFile::restoreBackupFile() const
+{
+    if (isBackupExists()) {
+        if (isDbExists()) {
+            if (!QFile::remove(*m_dbFile))
+                return false;
+        }
+        return QFile::rename(backupFilePath(), *m_dbFile);
+    }
+    return false;
+}
+
+void BackupFile::removeBackupFile() const
+{
+    if (isBackupExists())
+        QFile::remove(backupFilePath());
+}
+
+bool BackupFile::hasDbFilePath() const
+{
+    if (!m_dbFile) {
+        qWarning() << Q_FUNC_INFO << "DB file is not set";
+        return false;
+    }
+
+    return !(*m_dbFile).isEmpty();
+}
+
 /*** <!!!> ***/
 /*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
 /*** They will be moved or changed in the future ***/
-QString DataHelper::backupFilePath(const DataContainer *data)
-{
-    using namespace pathstr;
-    return joinPath(parentFolder(data->m_metadata.dbFilePath),
-                    QStringLiteral(u".tmp-backup_") + entryName(data->m_metadata.dbFilePath));
-}
 
 // returns the absolute path to the db item (file or subfolder)
 // (working folder path in filesystem + relative path in the database)
@@ -175,41 +236,6 @@ bool DataHelper::isImmutable(const DataContainer *data)
 bool DataHelper::hasPossiblyMovedItems(const DataContainer *data)
 {
     return contains(data, FileStatus::New) && contains(data, FileStatus::Missing);
-}
-
-bool DataHelper::isBackupExists(const DataContainer *data)
-{
-    return QFileInfo::exists(backupFilePath(data));
-}
-
-bool DataHelper::makeBackup(const DataContainer *data, bool forceOverwrite)
-{
-    if (!QFileInfo::exists(data->m_metadata.dbFilePath))
-        return false;
-
-    if (forceOverwrite)
-        removeBackupFile(data);
-
-    return QFile::copy(data->m_metadata.dbFilePath,
-                       backupFilePath(data));
-}
-
-bool DataHelper::restoreBackupFile(const DataContainer *data)
-{
-    if (isBackupExists(data)) {
-        if (QFile::exists(data->m_metadata.dbFilePath)) {
-            if (!QFile::remove(data->m_metadata.dbFilePath))
-                return false;
-        }
-        return QFile::rename(backupFilePath(data), data->m_metadata.dbFilePath);
-    }
-    return false;
-}
-
-void DataHelper::removeBackupFile(const DataContainer *data)
-{
-    if (isBackupExists(data))
-        QFile::remove(backupFilePath(data));
 }
 
 const Numbers& DataHelper::updateNumbers(DataContainer *data)

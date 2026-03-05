@@ -105,10 +105,10 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
 
 void Manager::restoreDatabase()
 {
-    if (m_dataMaintainer->m_data
-        && (DataHelper::restoreBackupFile(m_dataMaintainer->m_data) || m_dataMaintainer->isDataNotSaved()))
-    {
-        createDataModel(m_dataMaintainer->m_data->m_metadata.dbFilePath);
+    const DataContainer *pData = m_dataMaintainer->m_data;
+
+    if (pData && (BackupFile(pData).restoreBackupFile() || m_dataMaintainer->isDataNotSaved())) {
+        createDataModel(pData->m_metadata.dbFilePath);
     } else {
         emit setStatusbarText("No saved changes");
     }
