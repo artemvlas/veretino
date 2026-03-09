@@ -93,9 +93,6 @@ private:
 /*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
 /*** They will be moved or changed in the future ***/
 struct DataHelper {
-    //static QString backupFilePath(const DataContainer *data);
-    static QString digestFilePath(const DataContainer *data, const QModelIndex &fileIndex);
-
     // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
     static QString itemAbsolutePath(const DataContainer *data, const QModelIndex &curIndex);
 

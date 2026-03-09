@@ -891,7 +891,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                             if (m_settings->allowPasteIntoDb && !copiedDigest(pData->m_metadata.algorithm).isEmpty())
                                 viewContextMenu->addAction(m_menuAct->actionUpdFilePasteDigest);
                             // import from digest file
-                            if (QFileInfo::exists(DataHelper::digestFilePath(pData, index)))
+                            if (QFileInfo::exists(m_manager->m_dataMaintainer->digestFilePath(index)))
                                 viewContextMenu->addAction(m_menuAct->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:

@@ -887,6 +887,16 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
     return QString();
 }
 
+QString DataMaintainer::digestFilePath(const QModelIndex &fileIndex)
+{
+    if (!m_data)
+        return QString();
+
+    const QString absPath = DataHelper::itemAbsolutePath(m_data, fileIndex);
+
+    return paths::digestFilePath(absPath, m_data->m_metadata.algorithm);
+}
+
 bool DataMaintainer::isCanceled() const
 {
     return m_proc && m_proc->isCanceled();

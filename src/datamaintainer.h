@@ -101,6 +101,8 @@ public:
     // file: "filename (size)"; folder: contents (availability, size etc.)
     QString itemContentsInfo(const QModelIndex &curIndex);
 
+    QString digestFilePath(const QModelIndex &fileIndex);
+
     /*** Variables ***/
     DataContainer *m_data = nullptr; // main data
 

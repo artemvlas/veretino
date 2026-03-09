@@ -177,11 +177,6 @@ QString DataHelper::branch_path_composed(const DataContainer *data, const QModel
     return filePath;
 }
 
-QString DataHelper::digestFilePath(const DataContainer *data, const QModelIndex &fileIndex)
-{
-    return paths::digestFilePath(itemAbsolutePath(data, fileIndex), data->m_metadata.algorithm);
-}
-
 bool DataHelper::isWorkDirRelative(const DataContainer *data)
 {
     return data->m_metadata.workDir == pathstr::parentFolder(data->m_metadata.dbFilePath);
