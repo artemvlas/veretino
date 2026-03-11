@@ -16,6 +16,10 @@ public:
     explicit DbStatistics(const DataContainer *data);
 
     void setData(const DataContainer *data);
+    void clear();
+
+    const DataContainer* data() const;
+    const MetaData& metadata() const;
 
     Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
     const Numbers& updateNumbers();

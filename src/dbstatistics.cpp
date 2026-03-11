@@ -14,6 +14,21 @@ void DbStatistics::setData(const DataContainer *data)
     m_numbers.clear();
 }
 
+void DbStatistics::clear()
+{
+    setData(nullptr);
+}
+
+const DataContainer* DbStatistics::data() const
+{
+    return m_data;
+}
+
+const MetaData& DbStatistics::metadata() const
+{
+    return m_data->m_metadata;
+}
+
 const Numbers& DbStatistics::updateNumbers()
 {
     m_numbers = getNumbers();
