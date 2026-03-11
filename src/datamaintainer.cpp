@@ -10,6 +10,7 @@
 #include "treemodeliterator.h"
 #include "tools.h"
 #include "pathstr.h"
+#include "backupfile.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)

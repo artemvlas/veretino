@@ -1,5 +1,6 @@
 set(PROJECT_SOURCES
     # HEADERS
+    backupfile.h
     clickablelabel.h
     datacontainer.h
     datamaintainer.h
@@ -40,6 +41,7 @@ set(PROJECT_SOURCES
     widgetfiletypes.h
 
     # SOURCES
+    backupfile.cpp
     clickablelabel.cpp
     datacontainer.cpp
     datamaintainer.cpp

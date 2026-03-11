@@ -13,6 +13,7 @@
 #include <QAbstractButton>
 #include "tools.h"
 #include "pathstr.h"
+#include "backupfile.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, m_view(view), m_settings(settings)

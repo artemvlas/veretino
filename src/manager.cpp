@@ -15,6 +15,7 @@
 #include "treemodeliterator.h"
 #include "tools.h"
 #include "pathstr.h"
+#include "backupfile.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)
