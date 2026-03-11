@@ -48,7 +48,7 @@ public:
     void setStatusText(const QString &text);
     void setStatusIcon(const QIcon &icon);
 
-    void setModeDb(const DataContainer *data);
+    void setModeDb(const Numbers &num, QCryptographicHash::Algorithm algo);
     void setModeDbCreating();
 
     void clearButtons();

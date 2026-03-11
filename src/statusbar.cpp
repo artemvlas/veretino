@@ -33,7 +33,7 @@ void StatusBar::setStatusIcon(const QIcon &icon)
     m_statusIconLabel->setPixmap(icon.pixmap(16, 16));
 }
 
-void StatusBar::setModeDb(const DataContainer *data)
+void StatusBar::setModeDb(const Numbers &num, QCryptographicHash::Algorithm algo)
 {
     clearButtons();
 
@@ -60,14 +60,12 @@ void StatusBar::setModeDb(const DataContainer *data)
     }
 
     // update info
-    const Numbers &num = data->m_numbers;
-
     QString checkResult = QString("☒ %1\n✓ %2")
                               .arg(num.numberOf(FileStatus::Mismatched))
                               .arg(num.numberOf(FileStatus::CombMatched));
 
     m_buttonDbHash->setToolTip(checkResult);
-    m_buttonDbHash->setText(format::algoToStr(data->m_metadata.algorithm));
+    m_buttonDbHash->setText(format::algoToStr(algo));
     m_buttonDbSize->setText(format::dataSizeReadable(num.totalSize(FileStatus::CombAvailable)));
 
     QString strDbMain = QString::number(num.numberOf(FileStatus::CombAvailable));
