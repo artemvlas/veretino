@@ -24,11 +24,6 @@ const DataContainer* DbStatistics::data() const
     return m_data;
 }
 
-const MetaData& DbStatistics::metadata() const
-{
-    return m_data->m_metadata;
-}
-
 const Numbers& DbStatistics::updateNumbers()
 {
     m_numbers = getNumbers();
@@ -79,12 +74,10 @@ bool DbStatistics::checkCondition(Condition condition) const
     case FilterApplied:
         return m_data->m_metadata.filter.isEnabled();
     case AllChecked:
-        return (contains(FileStatus::CombChecked)
-                && !contains(FileStatus::CombNotChecked | FileStatus::CombProcessing));
     case AllMatched:
-        return isAllMatched(m_numbers);
+    case Verified:
     case HasPossiblyMovedItems:
-        return contains(FileStatus::New) && contains(FileStatus::Missing);
+        return checkCondition(condition, m_numbers);
     default:
         break;
     }
@@ -92,17 +85,32 @@ bool DbStatistics::checkCondition(Condition condition) const
     return false;
 }
 
-bool DbStatistics::isAllMatched(const QModelIndex &subfolder) const
+bool DbStatistics::checkCondition(Condition condition, const QModelIndex &subfolder) const
 {
-    const Numbers &nums = TreeModel::isFolderRow(subfolder) ? getNumbers(subfolder) : m_numbers;
+    if (!TreeModel::isFolderRow(subfolder))
+        return checkCondition(condition);
 
-    return isAllMatched(nums);
+    return checkCondition(condition, getNumbers(subfolder));
 }
 
-bool DbStatistics::isAllMatched(const Numbers &nums)
+bool DbStatistics::checkCondition(Condition condition, const Numbers &nums)
 {
-    return (!nums.contains(FileStatus::CombProcessing)
-            && nums.numberOf(FileStatus::Matched) == nums.numberOf(FileStatus::CombHasChecksum));
+    switch (condition) {
+    case AllChecked:
+        return (nums.contains(FileStatus::CombChecked)
+                && !nums.contains(FileStatus::CombNotChecked | FileStatus::CombProcessing));
+    case AllMatched:
+        return (!nums.contains(FileStatus::CombProcessing)
+                && nums.numberOf(FileStatus::Matched) == nums.numberOf(FileStatus::CombHasChecksum));
+    case Verified:
+        return !nums.contains(FileStatus::Missing) && checkCondition(AllChecked, nums);
+    case HasPossiblyMovedItems:
+        return nums.contains(FileStatus::New) && nums.contains(FileStatus::Missing);
+    default:
+        break;
+    }
+
+    return false;
 }
 
 bool DbStatistics::isDbFileState(DbFileState state) const

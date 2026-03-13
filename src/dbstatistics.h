@@ -19,16 +19,12 @@ public:
     void clear();
 
     const DataContainer* data() const;
-    const MetaData& metadata() const;
 
     Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
     const Numbers& updateNumbers();
 
     bool contains(const FileStatuses flags,
                   const QModelIndex &subfolder = QModelIndex()) const;
-
-    bool isAllMatched(const QModelIndex &subfolder = QModelIndex()) const;
-    static bool isAllMatched(const Numbers &nums);
 
     bool isDbFileState(DbFileState state) const;
 
@@ -45,15 +41,18 @@ public:
         // File Items
         AllChecked = 1 << 6,
         AllMatched = 1 << 7,
-        HasPossiblyMovedItems = 1 << 8, // has New and Missing items
+        Verified = 1 << 8,
+        HasPossiblyMovedItems = 1 << 9, // has New and Missing items
     };
 
     bool checkCondition(Condition condition) const;
+    bool checkCondition(Condition condition, const QModelIndex &subfolder) const;
+    static bool checkCondition(Condition condition, const Numbers &nums);
 
     Numbers m_numbers;
 
 private:
     const DataContainer *m_data = nullptr;
-};
+}; // class DbStatistics
 
 #endif // DBSTATISTICS_H
