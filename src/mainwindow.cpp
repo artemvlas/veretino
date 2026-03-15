@@ -723,14 +723,20 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWindow::dropEvent(QDropEvent *event)
 {
-    const QString path = event->mimeData()->urls().first().toLocalFile();
+    const QList<QUrl> urls = event->mimeData()->urls();
 
-    if (QFileInfo::exists(path)) {
-        if (paths::isDbFile(path)) {
-            m_modeSelect->openJsonDatabase(path);
-        } else {
-            m_modeSelect->showFileSystem(path);
-        }
+    if (urls.isEmpty())
+        return;
+
+    const QString path = urls.first().toLocalFile();
+
+    if (!QFileInfo::exists(path))
+        return;
+
+    if (paths::isDbFile(path)) {
+        m_modeSelect->openJsonDatabase(path);
+    } else {
+        m_modeSelect->showFileSystem(path);
     }
 }
 
