@@ -597,7 +597,7 @@ void MainWindow::updatePermanentStatus()
         if (m_modeSelect->isMode(Mode::DbCreating))
             m_statusBar->setModeDbCreating();
         else if (!m_proc->isStarted())
-            m_statusBar->setModeDb(ui->view->m_data);
+            m_statusBar->setModeDb(ui->view->m_data->m_numbers, ui->view->m_data->m_metadata.algorithm);
     } else {
         m_statusBar->clearButtons();
     }

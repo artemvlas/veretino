@@ -70,9 +70,6 @@ public:
 /*** DataHelper is a TEMPORARY holder of functions separated from the DataContainer ***/
 /*** They will be moved or changed in the future ***/
 struct DataHelper {
-    static QString backupFilePath(const DataContainer *data);
-    static QString digestFilePath(const DataContainer *data, const QModelIndex &fileIndex);
-
     // returns the absolute path (workdir + path in db) to the db item (file or subfolder)
     static QString itemAbsolutePath(const DataContainer *data, const QModelIndex &curIndex);
 
@@ -109,12 +106,6 @@ struct DataHelper {
 
     static Numbers getNumbers(const QAbstractItemModel *model,
                               const QModelIndex &rootIndex = QModelIndex());
-
-
-    static bool isBackupExists(const DataContainer *data);
-    static bool makeBackup(const DataContainer *data, bool forceOverwrite = false);
-    static bool restoreBackupFile(const DataContainer *data);
-    static void removeBackupFile(const DataContainer *data);
 
 }; // struct DataHelper
 

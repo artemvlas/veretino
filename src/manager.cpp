@@ -15,6 +15,7 @@
 #include "treemodeliterator.h"
 #include "tools.h"
 #include "pathstr.h"
+#include "backupfile.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)
@@ -105,10 +106,10 @@ void Manager::processFileSha(const QString &filePath, QCryptographicHash::Algori
 
 void Manager::restoreDatabase()
 {
-    if (m_dataMaintainer->m_data
-        && (DataHelper::restoreBackupFile(m_dataMaintainer->m_data) || m_dataMaintainer->isDataNotSaved()))
-    {
-        createDataModel(m_dataMaintainer->m_data->m_metadata.dbFilePath);
+    const DataContainer *pData = m_dataMaintainer->m_data;
+
+    if (pData && (BackupFile(pData).restoreBackupFile() || m_dataMaintainer->isDataNotSaved())) {
+        createDataModel(pData->m_metadata.dbFilePath);
     } else {
         emit setStatusbarText("No saved changes");
     }
@@ -222,7 +223,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
 
     if (prevStatus == FileStatus::New) {
         if (job & (DM_ImportDigest | DM_PasteDigest)) {
-            const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(DataHelper::digestFilePath(pData, fileIndex))
+            const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(m_dataMaintainer->digestFilePath(fileIndex))
                                                          : TreeModel::itemFileChecksum(fileIndex);
 
             m_dataMaintainer->importChecksum(fileIndex, dig);

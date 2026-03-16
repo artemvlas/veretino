@@ -13,6 +13,7 @@
 #include <QAbstractButton>
 #include "tools.h"
 #include "pathstr.h"
+#include "backupfile.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, m_view(view), m_settings(settings)
@@ -839,7 +840,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
         viewContextMenu->addAction(m_menuAct->actionResetDb);
 
         // TODO: should be optimized with more clear db file state
-        if (QFileInfo::exists(DataHelper::backupFilePath(pData))
+        if (BackupFile(pData).isBackupExists()
             || (DataHelper::isDbFileState(pData, DbFileState::NotSaved) && QFileInfo::exists(pData->m_metadata.dbFilePath)))
         {
             viewContextMenu->addAction(m_menuAct->actionForgetChanges);
@@ -891,7 +892,7 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
                             if (m_settings->allowPasteIntoDb && !copiedDigest(pData->m_metadata.algorithm).isEmpty())
                                 viewContextMenu->addAction(m_menuAct->actionUpdFilePasteDigest);
                             // import from digest file
-                            if (QFileInfo::exists(DataHelper::digestFilePath(pData, index)))
+                            if (QFileInfo::exists(m_manager->m_dataMaintainer->digestFilePath(index)))
                                 viewContextMenu->addAction(m_menuAct->actionUpdFileImportDigest);
                             break;
                         case FileStatus::Missing:
