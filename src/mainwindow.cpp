@@ -14,6 +14,7 @@
 #include "dialogsettings.h"
 #include "dialogabout.h"
 #include "treemodeliterator.h"
+#include "dbfileextension.h"
 #include <QMimeData>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -468,8 +469,7 @@ void MainWindow::dialogSaveJson(VerJson *pUnsavedJson)
 
     QString file_path = pUnsavedJson->file_path();
 
-    const bool is_short = pathstr::hasExtension(file_path, Lit::sl_db_exts.at(1));
-    const QString ext = Lit::sl_db_exts.at(is_short); // index 0 is long, 1 is short
+    const QString ext = DbFileExtension(file_path).extension();
     const QString str_filter = QStringLiteral(u"Veretino DB (*.%1)").arg(ext);
 
     while (true) {

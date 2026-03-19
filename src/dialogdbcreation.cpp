@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QMenu>
+#include "dbfileextension.h"
 
 const QMap<QString, QSet<QString>> DialogDbCreation::s_presets = {
     { QStringLiteral(u"Archives"), { QStringLiteral(u"zip"), QStringLiteral(u"7z"), QStringLiteral(u"gz"), QStringLiteral(u"tgz"),
@@ -238,7 +239,7 @@ void DialogDbCreation::updateDbFilename()
     const QString inpText = ui->inp_db_prefix->text();
     const QString prefix = inpText.isEmpty() ? Lit::s_db_prefix : format::simplifiedChars(inpText);
     const QString &folderName = ui->cb_add_folder_name->isChecked() ? m_workDir : QString(); // QStringLiteral(u"@FolderName")
-    const QString ext = Lit::sl_db_exts.at(ui->rb_ext_short->isChecked());
+    const QString ext = DbFileExtension::extension(!ui->rb_ext_short->isChecked());
     const QString dbFileName = format::composeDbFileName(prefix, folderName, ext);
     const QString dbFilePath = pathstr::joinPath(m_workDir, dbFileName);
     const bool exists = QFileInfo::exists(dbFilePath);

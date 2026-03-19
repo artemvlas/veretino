@@ -12,11 +12,8 @@
 #include <QUrl>
 #include <QDebug>
 #include "pathstr.h"
+#include "dbfileextension.h"
 
-const QStringList Lit::sl_db_exts = {
-    QStringLiteral(u"ver.json"),
-    QStringLiteral(u"ver")
-};
 const QStringList Lit::sl_digest_exts = {
     QStringLiteral(u"md5"),
     QStringLiteral(u"sha1"),
@@ -289,7 +286,8 @@ QString digestFilePath(const QString &file, const int sum_len)
 
 bool isDbFile(const QString &filePath)
 {
-    return pathstr::hasExtension(filePath, Lit::sl_db_exts);
+    return pathstr::hasExtension(filePath, DbFileExtension::s_extLong)
+           || pathstr::hasExtension(filePath, DbFileExtension::s_extShort);
 }
 
 bool isDigestFile(const QString &filePath)

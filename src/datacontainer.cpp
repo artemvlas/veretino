@@ -11,6 +11,7 @@
 #include "pathstr.h"
 #include "files.h"
 #include "backupfile.h"
+#include "dbfileextension.h"
 
 DataContainer::DataContainer(QObject *parent)
     : QObject(parent) {}
@@ -102,8 +103,7 @@ QString DataHelper::branch_path_existing(DataContainer *data, const QModelIndex 
 // returns the predefined/supposed path to the branch db file, regardless of its existence
 QString DataHelper::branch_path_composed(const DataContainer *data, const QModelIndex &subfolder)
 {
-    const bool isLongExt = pathstr::hasExtension(data->m_metadata.dbFilePath, Lit::sl_db_exts.first());
-    QString extension = Lit::sl_db_exts.at(isLongExt ? 0 : 1);
+    QString extension = DbFileExtension(data->m_metadata.dbFilePath).extension();
     QString folderPath = itemAbsolutePath(data, subfolder);
     QString fileName = format::composeDbFileName(QStringLiteral(u"checksums"), folderPath, extension);
     QString filePath = pathstr::joinPath(folderPath, fileName);
