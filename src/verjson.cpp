@@ -5,12 +5,12 @@
 */
 #include "verjson.h"
 #include "tools.h"
-#include "pathstr.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QDirIterator>
 #include "qmicroz.h"
+#include "dbfileextension.h"
 
 const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");
@@ -112,7 +112,7 @@ bool VerJson::save()
 
     const QByteArray data = QJsonDocument(content).toJson();
 
-    if (pathstr::hasExtension(m_file_path, Lit::sl_db_exts.at(1))) { // *.ver should be compressed
+    if (DbFileExtension::hasShort(m_file_path)) { // *.ver should be compressed
         return QMicroz::compress(QStringLiteral("checksums.ver.json"),
                                  data,
                                  m_file_path);

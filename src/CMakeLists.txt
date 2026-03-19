@@ -4,6 +4,7 @@ set(PROJECT_SOURCES
     clickablelabel.h
     datacontainer.h
     datamaintainer.h
+    dbfileextension.h
     dbstatistics.h
     dialogabout.h
     dialogdbcreation.h
@@ -45,6 +46,7 @@ set(PROJECT_SOURCES
     clickablelabel.cpp
     datacontainer.cpp
     datamaintainer.cpp
+    dbfileextension.cpp
     dbstatistics.cpp
     dialogabout.cpp
     dialogdbcreation.cpp

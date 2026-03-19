@@ -7,6 +7,7 @@
 #include "settings.h"
 #include <QSettings>
 #include "tools.h"
+#include "dbfileextension.h"
 
 const QString Settings::s_key_algo = "algorithm";
 const QString Settings::s_key_dbPrefix = "dbPrefix";
@@ -64,7 +65,8 @@ QString Settings::dbFileExtension() const
 
 QString Settings::dbFileExtension(bool isLong)
 {
-    return Lit::sl_db_exts.at(isLong ? 0 : 1); // "ver.json" : "ver";
+    // "ver.json" || "ver"
+    return DbFileExtension::extension(isLong);
 }
 
 void Settings::addRecentFile(const QString &filePath)

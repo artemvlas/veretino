@@ -26,7 +26,6 @@
 #include "numbers.h"
 
 struct Lit { // Literals
-static const QStringList sl_db_exts;
 static const QStringList sl_digest_exts;
 static const QStringList sl_digest_Exts;
 static const QString s_webpage;
