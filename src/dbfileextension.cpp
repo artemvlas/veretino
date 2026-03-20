@@ -5,7 +5,7 @@ const QString DbFileExtension::s_extLong = QStringLiteral(u"ver.json");
 const QString DbFileExtension::s_extShort = QStringLiteral(u"ver");
 
 DbFileExtension::DbFileExtension(const QString &dbFile)
-    : m_dbFile(dbFile) {}
+    : m_dbFile(&dbFile) {}
 
 QString DbFileExtension::extension() const
 {
@@ -14,12 +14,12 @@ QString DbFileExtension::extension() const
 
 bool DbFileExtension::hasLong() const
 {
-    return hasLong(m_dbFile);
+    return hasLong(*m_dbFile);
 }
 
 bool DbFileExtension::hasShort() const
 {
-    return hasShort(m_dbFile);
+    return hasShort(*m_dbFile);
 }
 
 QString DbFileExtension::extension(bool isLong)
@@ -35,4 +35,11 @@ bool DbFileExtension::hasLong(const QString &dbFile)
 bool DbFileExtension::hasShort(const QString &dbFile)
 {
     return pathstr::hasExtension(dbFile, s_extShort);
+}
+
+bool DbFileExtension::isDbFile(const QString &filePath)
+{
+    // or just hasLong(...) || hasShort(...)
+    return pathstr::hasExtension(filePath, s_extLong)
+           || pathstr::hasExtension(filePath, s_extShort);
 }

@@ -11,20 +11,30 @@
 class DbFileExtension
 {
 public:
-    DbFileExtension(const QString &dbFile);
+    explicit DbFileExtension(const QString &dbFile);
     QString extension() const;
     bool hasLong() const;
     bool hasShort() const;
 
+    // if <isLong> is true, returns "ver.json" else "ver"
     static QString extension(bool isLong);
+
+    // <dbFile> ends with ".ver.json"
     static bool hasLong(const QString &dbFile);
+
+    // <dbFile> ends with ".ver"
     static bool hasShort(const QString &dbFile);
 
-    static const QString s_extLong;
-    static const QString s_extShort;
+    // <filePath> ends with ".ver.json" or ".ver"
+    static bool isDbFile(const QString &filePath);
+
+    explicit operator bool() const { return isDbFile(*m_dbFile); }
+
+    static const QString s_extLong;  // "ver.json"
+    static const QString s_extShort; // "ver"
 
 private:
-    QString m_dbFile;
+    const QString *m_dbFile;
 }; // class DbFileExtension
 
 #endif // DBFILEEXTENSION_H
