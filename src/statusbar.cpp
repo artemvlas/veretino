@@ -6,6 +6,7 @@
 #include "statusbar.h"
 #include <QDebug>
 #include "tools.h"
+#include "algostring.h"
 
 StatusBar::StatusBar(QWidget *parent)
     : QStatusBar(parent)
@@ -65,7 +66,7 @@ void StatusBar::setModeDb(const Numbers &num, QCryptographicHash::Algorithm algo
                               .arg(num.numberOf(FileStatus::CombMatched));
 
     m_buttonDbHash->setToolTip(checkResult);
-    m_buttonDbHash->setText(format::algoToStr(algo));
+    m_buttonDbHash->setText(AlgoString::name(algo));
     m_buttonDbSize->setText(format::dataSizeReadable(num.totalSize(FileStatus::CombAvailable)));
 
     QString strDbMain = QString::number(num.numberOf(FileStatus::CombAvailable));

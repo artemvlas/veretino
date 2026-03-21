@@ -14,6 +14,7 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "backupfile.h"
+#include "algostring.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, m_view(view), m_settings(settings)
@@ -156,7 +157,7 @@ QString ModeSelector::getButtonText()
             return QStringLiteral(u"Abort");
         case Folder:
         case File:
-            return format::algoToStr(m_settings->algorithm());
+            return AlgoString::name(m_settings->algorithm());
         case DbFile:
             return QStringLiteral(u"Open");
         case SumFile:

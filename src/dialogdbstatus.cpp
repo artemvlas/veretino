@@ -11,6 +11,7 @@
 #include "iconprovider.h"
 #include "tools.h"
 #include "pathstr.h"
+#include "algostring.h"
 
 DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
     : QDialog(parent)
@@ -51,7 +52,7 @@ void DialogDbStatus::setLabelsInfo()
 
     m_ui->labelDbFileName->setText(pathstr::entryName(m_data->m_metadata.dbFilePath));
     m_ui->labelDbFileName->setToolTip(meta.dbFilePath);
-    m_ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + format::algoToStr(meta.algorithm));
+    m_ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + AlgoString::name(meta.algorithm));
     m_ui->labelWorkDir->setToolTip(meta.workDir);
 
     if (!DataHelper::isWorkDirRelative(m_data))

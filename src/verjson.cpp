@@ -11,6 +11,7 @@
 #include <QDirIterator>
 #include "qmicroz.h"
 #include "dbfileextension.h"
+#include "algostring.h"
 
 const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");
@@ -146,7 +147,7 @@ void VerJson::fillHeader()
     m_header[QStringLiteral(u"Total Checksums")] = m_items.size();
 
     if (!m_header.contains(h_key_Algo))
-        m_header[h_key_Algo] = format::algoToStr(algorithm());
+        m_header[h_key_Algo] = AlgoString::name(algorithm());
 }
 
 QString VerJson::findValue(const QJsonObject &object, const QString &key) const
@@ -178,7 +179,7 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
 
     // main list object
     if (tools::canBeChecksum(first_value))
-        return tools::algoByStrLen(first_value.length());
+        return AlgoString::algoByStrLen(first_value.length());
 
     // header object
     const QString strAlgo = findValue(m_header, QStringLiteral(u"Algo"));
@@ -188,7 +189,7 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
         return static_cast<QCryptographicHash::Algorithm>(0);
     }
 
-    return tools::strToAlgo(strAlgo);
+    return AlgoString::strToAlgo(strAlgo);
 }
 
 const QJsonObject& VerJson::items() const

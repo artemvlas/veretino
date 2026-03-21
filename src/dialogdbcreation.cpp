@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QMenu>
 #include "dbfileextension.h"
+#include "algostring.h"
 
 const QMap<QString, QSet<QString>> DialogDbCreation::s_presets = {
     { QStringLiteral(u"Archives"), { QStringLiteral(u"zip"), QStringLiteral(u"7z"), QStringLiteral(u"gz"), QStringLiteral(u"tgz"),
@@ -132,7 +133,7 @@ void DialogDbCreation::updateSettings()
                                                       : QStringList();
 
     // algo
-    m_settings->setAlgorithm(tools::strToAlgo(ui->cmb_algo->currentText()));
+    m_settings->setAlgorithm(AlgoString::strToAlgo(ui->cmb_algo->currentText()));
 }
 
 void DialogDbCreation::setDbConfig()
@@ -151,7 +152,10 @@ void DialogDbCreation::setDbConfig()
     updateDbFilename();
 
     // algo
-    ui->cmb_algo->addItems(Lit::sl_digest_Exts.mid(1)); // all except index 0 (MD5)
+    //ui->cmb_algo->addItems(Lit::sl_digest_Exts.mid(1)); // all except index 0 (MD5)
+    ui->cmb_algo->addItem(AlgoString::name(QCryptographicHash::Sha1));
+    ui->cmb_algo->addItem(AlgoString::name(QCryptographicHash::Sha256));
+    ui->cmb_algo->addItem(AlgoString::name(QCryptographicHash::Sha512));
     ui->cmb_algo->setCurrentIndex(cmbAlgoIndex());
 }
 

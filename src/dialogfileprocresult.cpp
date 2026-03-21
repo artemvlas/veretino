@@ -7,6 +7,7 @@
 #include "ui_dialogfileprocresult.h"
 #include "tools.h"
 #include "pathstr.h"
+#include "algostring.h"
 #include <QPushButton>
 #include <QFile>
 #include <QClipboard>
@@ -185,7 +186,7 @@ void DialogFileProcResult::setExtLineVisible(bool visible)
 
     if (hasDigest) {
         ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ")
-                               + format::algoToStr(values_.checksum.length()));
+                               + AlgoString::name(values_.checksum.length()));
     }
 }
 

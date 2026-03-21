@@ -1,5 +1,6 @@
 set(PROJECT_SOURCES
     # HEADERS
+    algostring.h
     backupfile.h
     clickablelabel.h
     datacontainer.h
@@ -42,6 +43,7 @@ set(PROJECT_SOURCES
     widgetfiletypes.h
 
     # SOURCES
+    algostring.cpp
     backupfile.cpp
     clickablelabel.cpp
     datacontainer.cpp
