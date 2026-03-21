@@ -13,19 +13,7 @@
 #include <QDebug>
 #include "pathstr.h"
 #include "dbfileextension.h"
-
-const QStringList Lit::sl_digest_exts = {
-    QStringLiteral(u"md5"),
-    QStringLiteral(u"sha1"),
-    QStringLiteral(u"sha256"),
-    QStringLiteral(u"sha512")
-};
-const QStringList Lit::sl_digest_Exts = {
-    QStringLiteral(u"MD5"),
-    QStringLiteral(u"SHA-1"),
-    QStringLiteral(u"SHA-256"),
-    QStringLiteral(u"SHA-512")
-};
+#include "algostring.h"
 
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
@@ -38,61 +26,6 @@ const QString Lit::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
 const QString Lit::s_db_prefix = QStringLiteral(u"checksums");
 
 namespace tools {
-int algoStrLen(QCryptographicHash::Algorithm algo)
-{
-    switch (algo) {
-    case QCryptographicHash::Md5:
-        return 32;
-    case QCryptographicHash::Sha1:
-        return 40;
-    case QCryptographicHash::Sha256:
-        return 64;
-    case QCryptographicHash::Sha512:
-        return 128;
-    default:
-        return 0;
-    }
-}
-
-QCryptographicHash::Algorithm algoByStrLen(int strLen)
-{
-    switch (strLen) {
-    case 32:
-        return QCryptographicHash::Md5;
-    case 40:
-        return QCryptographicHash::Sha1;
-    case 64:
-        return QCryptographicHash::Sha256;
-    case 128:
-        return QCryptographicHash::Sha512;
-    default:
-        return static_cast<QCryptographicHash::Algorithm>(0);
-    }
-}
-
-QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo)
-{
-    QList<int> digits;
-
-    for (QChar ch : strAlgo) {
-        if (ch.isDigit())
-            digits.append(ch.digitValue());
-    }
-
-    switch (digitsToNum(digits)) {
-        case 1:
-            return QCryptographicHash::Sha1;
-        case 256:
-            return QCryptographicHash::Sha256;
-        case 512:
-            return QCryptographicHash::Sha512;
-        case 5:
-            return QCryptographicHash::Md5;
-        default:
-            return static_cast<QCryptographicHash::Algorithm>(0);
-    }
-}
-
 int digitsToNum(const QList<int> &digits)
 {
     int number = 0;
@@ -122,7 +55,7 @@ bool canBeChecksum(const QString &str)
 
 bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo)
 {
-    return (str.size() == algoStrLen(algo)) && canBeChecksum(str);
+    return (str.size() == AlgoString::digestLength(algo)) && canBeChecksum(str);
 }
 
 bool isHexChar(const char ch)
@@ -224,7 +157,7 @@ QString extractDigestFromFile(const QString &digest_file)
 
     for (int it = 0; it <= l_seps.size(); ++it) {
         int cut = (it < l_seps.size()) ? line.indexOf(l_seps.at(it))
-                                       : algoStrLen(strToAlgo(pathstr::suffix(digest_file)));
+                                       : AlgoString::digestLength(AlgoString::strToAlgo(pathstr::suffix(digest_file)));
 
         if (cut > 0) {
             const QString dig = line.left(cut);
@@ -275,13 +208,13 @@ void openFile(QFile &file, QFile::OpenMode mode)
 namespace paths {
 QString digestFilePath(const QString &file, QCryptographicHash::Algorithm algo)
 {
-    const QString ext = format::algoToStr(algo, false);
+    const QString ext = AlgoString::suffix(algo);
     return tools::joinStrings(file, ext, u'.');
 }
 
 QString digestFilePath(const QString &file, const int sum_len)
 {
-    return digestFilePath(file, tools::algoByStrLen(sum_len));
+    return digestFilePath(file, AlgoString::algoByStrLen(sum_len));
 }
 
 bool isDbFile(const QString &filePath)
@@ -292,7 +225,7 @@ bool isDbFile(const QString &filePath)
 
 bool isDigestFile(const QString &filePath)
 {
-    return pathstr::hasExtension(filePath, Lit::sl_digest_exts);
+    return AlgoString::isDigestFile(filePath);
 }
 
 void browsePath(const QString &path)
@@ -464,29 +397,6 @@ QString composeDbFileName(const QString &prefix, const QString &folder, const QS
     const QString dbFileName = tools::joinStrings(prefix, folderStr, u'_');
 
     return tools::joinStrings(dbFileName, extension, u'.');
-}
-
-QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters)
-{
-    const QStringList &lst = capitalLetters ? Lit::sl_digest_Exts : Lit::sl_digest_exts;
-
-    switch (algo) {
-    case QCryptographicHash::Md5:
-        return lst.at(0);
-    case QCryptographicHash::Sha1:
-        return lst.at(1);
-    case QCryptographicHash::Sha256:
-        return lst.at(2);
-    case QCryptographicHash::Sha512:
-        return lst.at(3);
-    default:
-        return "Unknown";
-    }
-}
-
-QString algoToStr(int sumStrLength, bool capitalLetters)
-{
-    return algoToStr(tools::algoByStrLen(sumStrLength), capitalLetters);
 }
 
 QString filesNumber(int number)

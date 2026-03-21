@@ -26,8 +26,6 @@
 #include "numbers.h"
 
 struct Lit { // Literals
-static const QStringList sl_digest_exts;
-static const QStringList sl_digest_Exts;
 static const QString s_webpage;
 static const QString s_appName;
 static const QString s_appNameVersion;
@@ -47,13 +45,6 @@ public:
 }; // class Exception
 
 namespace tools {
-// returns the checksum str length: sha(1) = 40, sha(256) = 64, sha(512) = 128
-int algoStrLen(QCryptographicHash::Algorithm algo);
-
-// ^vice versa
-QCryptographicHash::Algorithm algoByStrLen(int strLen);
-QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
-
 // {0,1,2,3} --> 123
 int digitsToNum(const QList<int> &digits);
 
@@ -139,8 +130,6 @@ QString inParentheses(const QString &str);
 QString addStrInParentheses(const QString &str1, const QString &str2);
 QString composeDbFileName(const QString &prefix,
                           const QString &folder, const QString &extension);
-QString algoToStr(QCryptographicHash::Algorithm algo, bool capitalLetters = true);
-QString algoToStr(int sumStrLength, bool capitalLetters = true);
 
 // returns "filename (readable size)" for file
 QString fileNameAndSize(const QString &filePath);

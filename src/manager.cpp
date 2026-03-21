@@ -16,6 +16,7 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "backupfile.h"
+#include "algostring.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)
@@ -415,7 +416,7 @@ QString Manager::extractDigestFromFile(const QString &digestFile, bool showExcep
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum)
 {
-    checkFile(filePath, checkSum, tools::algoByStrLen(checkSum.length()));
+    checkFile(filePath, checkSum, AlgoString::algoByStrLen(checkSum.length()));
 }
 
 void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)

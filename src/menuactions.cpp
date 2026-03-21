@@ -5,7 +5,7 @@
 */
 
 #include "menuactions.h"
-#include "tools.h"
+#include "algostring.h"
 #include "pathstr.h"
 #include <QFileInfo>
 
@@ -220,7 +220,7 @@ QMenu* MenuActions::menuAlgorithm(QCryptographicHash::Algorithm curAlgo)
         break;
     }
 
-    menuAlgo->menuAction()->setText(QStringLiteral(u"Algorithm ") + format::algoToStr(curAlgo));
+    menuAlgo->menuAction()->setText(QStringLiteral(u"Algorithm ") + AlgoString::name(curAlgo));
 
     return menuAlgo;
 }
