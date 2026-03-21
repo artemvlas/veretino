@@ -22,7 +22,7 @@ bool DbFileExtension::hasShort() const
     return hasShort(*m_dbFile);
 }
 
-QString DbFileExtension::extension(bool isLong)
+const QString& DbFileExtension::extension(bool isLong)
 {
     return isLong ? s_extLong : s_extShort;
 }

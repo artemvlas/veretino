@@ -17,7 +17,7 @@ public:
     bool hasShort() const;
 
     // if <isLong> is true, returns "ver.json" else "ver"
-    static QString extension(bool isLong);
+    static const QString& extension(bool isLong);
 
     // <dbFile> ends with ".ver.json"
     static bool hasLong(const QString &dbFile);
