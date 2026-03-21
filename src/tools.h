@@ -48,13 +48,6 @@ namespace tools {
 // {0,1,2,3} --> 123
 int digitsToNum(const QList<int> &digits);
 
-bool canBeChecksum(const QString &str);
-bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo);
-
-// whether the char is a digit or a letter from 'Aa' to 'Ff'
-bool isHexChar(const char ch);
-bool isHexChar(const QChar ch);
-
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
 

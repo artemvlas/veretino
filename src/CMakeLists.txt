@@ -14,6 +14,7 @@ set(PROJECT_SOURCES
     dialogexistingdbs.h
     dialogfileprocresult.h
     dialogsettings.h
+    digeststring.h
     files.h
     filevalues.h
     filterrule.h
@@ -57,6 +58,7 @@ set(PROJECT_SOURCES
     dialogexistingdbs.cpp
     dialogfileprocresult.cpp
     dialogsettings.cpp
+    digeststring.cpp
     files.cpp
     filterrule.cpp
     hasher.cpp

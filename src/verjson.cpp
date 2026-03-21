@@ -12,6 +12,7 @@
 #include "qmicroz.h"
 #include "dbfileextension.h"
 #include "algostring.h"
+#include "digeststring.h"
 
 const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");
@@ -178,8 +179,11 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
                                                    : QString();
 
     // main list object
-    if (tools::canBeChecksum(first_value))
-        return AlgoString::algoByStrLen(first_value.length());
+    DigestString dgStr(first_value);
+    if (dgStr)
+        return dgStr.algorithm();
+
+    qWarning() << Q_FUNC_INFO << "Algo NOT selected by first value";
 
     // header object
     const QString strAlgo = findValue(m_header, QStringLiteral(u"Algo"));

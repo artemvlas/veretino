@@ -14,6 +14,7 @@
 #include "pathstr.h"
 #include "dbfileextension.h"
 #include "algostring.h"
+#include "digeststring.h"
 
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
@@ -35,39 +36,6 @@ int digitsToNum(const QList<int> &digits)
     }
 
     return number;
-}
-
-bool canBeChecksum(const QString &str)
-{
-    static const QSet<int> s_perm_length = {32, 40, 64, 128};
-
-    if (!s_perm_length.contains(str.length())) {
-        return false;
-    }
-
-    for (int i = 0; i < str.length(); ++i) {
-        if (!isHexChar(str.at(i)))
-            return false;
-    }
-
-    return true;
-}
-
-bool canBeChecksum(const QString &str, QCryptographicHash::Algorithm algo)
-{
-    return (str.size() == AlgoString::digestLength(algo)) && canBeChecksum(str);
-}
-
-bool isHexChar(const char ch)
-{
-    return (ch >= '0' && ch <= '9')
-           || (ch >= 'A' && ch <= 'F')
-           || (ch >= 'a' && ch <= 'f');
-}
-
-bool isHexChar(const QChar ch)
-{
-    return isHexChar(ch.toLatin1());
 }
 
 bool isLater(const QString &dt_before, const QString &dt_later)
@@ -161,7 +129,7 @@ QString extractDigestFromFile(const QString &digest_file)
 
         if (cut > 0) {
             const QString dig = line.left(cut);
-            if (canBeChecksum(dig)) {
+            if (DigestString::isValid(dig)) {
                 return dig;
             }
         }

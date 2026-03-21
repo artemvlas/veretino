@@ -11,6 +11,7 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "backupfile.h"
+#include "digeststring.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)
@@ -258,7 +259,7 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
 bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &checksum)
 {
     // checking for compliance with the current algo
-    if (tools::canBeChecksum(checksum, m_data->m_metadata.algorithm)
+    if (DigestString::isValid(checksum, m_data->m_metadata.algorithm)
         && TreeModel::hasStatus((FileStatus::New | FileStatus::Queued), file))
     {
         setItemValue(file, Column::ColumnChecksum, checksum);

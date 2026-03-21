@@ -1,3 +1,8 @@
+/*
+ * This file is part of Veretino,
+ * licensed under the GNU GPLv3.
+ * https://github.com/artemvlas/veretino
+*/
 #include "dbstatistics.h"
 #include "treemodeliterator.h"
 #include "pathstr.h"

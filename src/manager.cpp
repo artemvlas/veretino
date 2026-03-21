@@ -17,6 +17,7 @@
 #include "pathstr.h"
 #include "backupfile.h"
 #include "algostring.h"
+#include "digeststring.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)
@@ -289,7 +290,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     const FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
     const QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
 
-    if (!tools::canBeChecksum(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
+    if (!DigestString::isValid(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
         switch (storedStatus) {
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");

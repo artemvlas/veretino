@@ -8,6 +8,7 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "algostring.h"
+#include "digeststring.h"
 #include <QPushButton>
 #include <QFile>
 #include <QClipboard>
@@ -210,7 +211,7 @@ void DialogFileProcResult::makeSumFile()
 {
     const QString &chsum = values_.checksum;
 
-    if (filePath_.isEmpty() || !tools::canBeChecksum(chsum))
+    if (filePath_.isEmpty() || !DigestString::isValid(chsum))
         return;
 
     const QString sumFile = paths::digestFilePath(filePath_, chsum.size());
