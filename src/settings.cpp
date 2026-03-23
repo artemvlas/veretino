@@ -9,37 +9,37 @@
 #include "tools.h"
 #include "dbfileextension.h"
 
-const QString Settings::s_key_algo = "algorithm";
-const QString Settings::s_key_dbPrefix = "dbPrefix";
-const QString Settings::s_key_restoreLastPath = "restoreLastPathOnStartup";
-const QString Settings::s_key_addWorkDir = "addWorkDirToFilename";
-const QString Settings::s_key_isLongExt = "isLongExtension";
-const QString Settings::s_key_saveVerifDate = "saveVerifDate";
-const QString Settings::s_key_dbFlagConst = "dbFlagConst";
-const QString Settings::s_key_instantSaving = "instantSaving";
-const QString Settings::s_key_considerDateModified = "considerDateModified";
-const QString Settings::s_key_detectMoved = "detectMoved";
-const QString Settings::s_key_allowPasteIntoDb = "allowPasteIntoDb";
-const QString Settings::s_key_importSumsWhenItemAdding = "importSumsWhenItemAdding";
+const QString Settings::s_key_algo = QStringLiteral(u"algorithm");
+const QString Settings::s_key_dbPrefix = QStringLiteral(u"dbPrefix");
+const QString Settings::s_key_restoreLastPath = QStringLiteral(u"restoreLastPathOnStartup");
+const QString Settings::s_key_addWorkDir = QStringLiteral(u"addWorkDirToFilename");
+const QString Settings::s_key_isLongExt = QStringLiteral(u"isLongExtension");
+const QString Settings::s_key_saveVerifDate = QStringLiteral(u"saveVerifDate");
+const QString Settings::s_key_dbFlagConst = QStringLiteral(u"dbFlagConst");
+const QString Settings::s_key_instantSaving = QStringLiteral(u"instantSaving");
+const QString Settings::s_key_considerDateModified = QStringLiteral(u"considerDateModified");
+const QString Settings::s_key_detectMoved = QStringLiteral(u"detectMoved");
+const QString Settings::s_key_allowPasteIntoDb = QStringLiteral(u"allowPasteIntoDb");
+const QString Settings::s_key_importSumsWhenItemAdding = QStringLiteral(u"importSumsWhenItemAdding");
 
 // history
-const QString Settings::s_key_history_lastFsPath = "history/lastFsPath";
-const QString Settings::s_key_history_recentDbFiles = "history/recentDbFiles";
+const QString Settings::s_key_history_lastFsPath = QStringLiteral(u"history/lastFsPath");
+const QString Settings::s_key_history_recentDbFiles = QStringLiteral(u"history/recentDbFiles");
 
 // view
-const QString Settings::s_key_view_geometry = "view/geometry";
-const QString Settings::s_key_view_columnStateFs = "view/columnStateFs";
-const QString Settings::s_key_view_columnStateDb = "view/columnStateDb";
+const QString Settings::s_key_view_geometry = QStringLiteral(u"view/geometry");
+const QString Settings::s_key_view_columnStateFs = QStringLiteral(u"view/columnStateFs");
+const QString Settings::s_key_view_columnStateDb = QStringLiteral(u"view/columnStateDb");
 
 // filter
-const QString Settings::s_key_filter_mode = "filter/mode";
-const QString Settings::s_key_filter_last_exts = "filter/last_exts";
-const QString Settings::s_key_filter_ignore_db = "filter/ignore_db";
-const QString Settings::s_key_filter_ignore_sha = "filter/ignore_sha";
-const QString Settings::s_key_filter_remember_exts = "filter/remember_exts";
-const QString Settings::s_key_filter_editable_exts = "filter/editable_exts";
-const QString Settings::s_key_filter_ignore_unpermitted = "filter/ignore_unpermitted";
-const QString Settings::s_key_filter_ignore_symlinks = "filter/ignore_symlinks";
+const QString Settings::s_key_filter_mode = QStringLiteral(u"filter/mode");
+const QString Settings::s_key_filter_last_exts = QStringLiteral(u"filter/last_exts");
+const QString Settings::s_key_filter_ignore_db = QStringLiteral(u"filter/ignore_db");
+const QString Settings::s_key_filter_ignore_sha = QStringLiteral(u"filter/ignore_sha");
+const QString Settings::s_key_filter_remember_exts = QStringLiteral(u"filter/remember_exts");
+const QString Settings::s_key_filter_editable_exts = QStringLiteral(u"filter/editable_exts");
+const QString Settings::s_key_filter_ignore_unpermitted = QStringLiteral(u"filter/ignore_unpermitted");
+const QString Settings::s_key_filter_ignore_symlinks = QStringLiteral(u"filter/ignore_symlinks");
 
 Settings::Settings(QObject *parent)
     : QObject{parent}
