@@ -223,11 +223,15 @@ void MainWindow::showDbStatusTab(DialogDbStatus::Tabs tab)
     clearDialogs();
 
     if (m_modeSelect->isMode(Mode::DbIdle | Mode::DbCreating)) {
-        DialogDbStatus dialog(ui->view->m_data, this);
+        DataContainer *pData = ui->view->m_data;
+        DbStatistics dbStat(pData);
+        dbStat.m_numbers = pData->m_numbers;
+
+        DialogDbStatus dialog(&dbStat, this);
         dialog.setCurrentTab(tab);
         dialog.exec();
 
-        QString &old_comment = ui->view->m_data->m_metadata.comment;
+        QString &old_comment = pData->m_metadata.comment;
         const QString new_comment = dialog.getComment();
 
         if (new_comment != old_comment) {

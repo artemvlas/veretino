@@ -7,7 +7,7 @@
 #define DIALOGDBSTATUS_H
 
 #include <QDialog>
-#include "datacontainer.h"
+#include "dbstatistics.h"
 
 namespace Ui {
 class DialogDbStatus;
@@ -18,7 +18,7 @@ class DialogDbStatus : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogDbStatus(const DataContainer *data, QWidget *parent = nullptr);
+    explicit DialogDbStatus(const DbStatistics *stat, QWidget *parent = nullptr);
     ~DialogDbStatus();
 
     enum Tabs {
@@ -49,7 +49,7 @@ private:
 
     /*** Vars ***/
     Ui::DialogDbStatus *m_ui;
-    const DataContainer *m_data = nullptr;
+    const DbStatistics *m_stat = nullptr;
 
     // automatic selection of the current tab during execution
     bool autoTabSelection = true;

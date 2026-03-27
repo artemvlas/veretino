@@ -13,18 +13,18 @@
 #include "pathstr.h"
 #include "algostring.h"
 
-DialogDbStatus::DialogDbStatus(const DataContainer *data, QWidget *parent)
+DialogDbStatus::DialogDbStatus(const DbStatistics *stat, QWidget *parent)
     : QDialog(parent)
     , m_ui(new Ui::DialogDbStatus)
-    , m_data(data)
+    , m_stat(stat)
 {
     m_ui->setupUi(this);
     setWindowIcon(IconProvider::appIcon());
 
-    if (DataHelper::isDbFileState(m_data, DbFileState::NotSaved))
+    if (m_stat->checkCondition(DbStatistics::NotSaved))
         setWindowTitle(windowTitle() + QStringLiteral(u" [unsaved]"));
 
-    if (DataHelper::isImmutable(m_data))
+    if (m_stat->checkCondition(DbStatistics::Immutable))
         setWindowTitle(windowTitle() + QStringLiteral(u" [const]"));
 
     m_ui->inpComment->setMaxLength(MAX_LENGTH_COMMENT);
@@ -42,20 +42,21 @@ DialogDbStatus::~DialogDbStatus()
 
 void DialogDbStatus::connections()
 {
-    connect(m_ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(pathstr::parentFolder(m_data->m_metadata.dbFilePath)); });
-    connect(m_ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(m_data->m_metadata.workDir); });
+    const MetaData &meta = m_stat->data()->m_metadata;
+    connect(m_ui->labelDbFileName, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(pathstr::parentFolder(meta.dbFilePath)); });
+    connect(m_ui->labelWorkDir, &ClickableLabel::doubleClicked, this, [=]{ paths::browsePath(meta.workDir); });
 }
 
 void DialogDbStatus::setLabelsInfo()
 {
-    const MetaData &meta = m_data->m_metadata;
+    const MetaData &meta = m_stat->data()->m_metadata;
 
-    m_ui->labelDbFileName->setText(pathstr::entryName(m_data->m_metadata.dbFilePath));
+    m_ui->labelDbFileName->setText(pathstr::entryName(meta.dbFilePath));
     m_ui->labelDbFileName->setToolTip(meta.dbFilePath);
     m_ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ") + AlgoString::name(meta.algorithm));
     m_ui->labelWorkDir->setToolTip(meta.workDir);
 
-    if (!DataHelper::isWorkDirRelative(m_data))
+    if (!m_stat->checkCondition(DbStatistics::WorkDirRelative))
         m_ui->labelWorkDir->setText(QStringLiteral(u"WorkDir: Specified"));
 
     // datetime
@@ -80,12 +81,16 @@ void DialogDbStatus::setTabsInfo()
     m_ui->labelContentNumbers->setText(infoContent().join('\n'));
     m_ui->tabWidget->setTabIcon(TabListed, icons.icon(Icons::Database));
 
+    const MetaData &meta = m_stat->data()->m_metadata;
+
     // tab Filter
-    m_ui->tabWidget->setTabEnabled(TabFilter, DataHelper::isFilterApplied(m_data));
-    if (DataHelper::isFilterApplied(m_data)) {
+    const bool isFilter = m_stat->checkCondition(DbStatistics::FilterApplied);
+    m_ui->tabWidget->setTabEnabled(TabFilter, isFilter);
+
+    if (isFilter) {
         m_ui->tabWidget->setTabIcon(TabFilter, icons.icon(Icons::Filter));
 
-        const FilterRule &filter = m_data->m_metadata.filter;
+        const FilterRule &filter = meta.filter;
         m_ui->labelFiltersInfo->setStyleSheet(format::coloredText(filter.isFilter(FilterRule::Ignore)));
 
         const QString exts = filter.extensionString();
@@ -95,21 +100,25 @@ void DialogDbStatus::setTabsInfo()
     }
 
     // tab Verification
-    m_ui->tabWidget->setTabEnabled(TabVerification, DataHelper::contains(m_data, FileStatus::CombChecked));
-    if (DataHelper::contains(m_data, FileStatus::CombChecked)) {
+    const bool isChecked = m_stat->contains(FileStatus::CombChecked);
+    m_ui->tabWidget->setTabEnabled(TabVerification, isChecked);
+
+    if (isChecked) {
         m_ui->tabWidget->setTabIcon(TabVerification, icons.icon(Icons::DoubleGear));
         m_ui->labelVerification->setText(infoVerification().join('\n'));
     }
 
     // tab Result
-    m_ui->tabWidget->setTabEnabled(TabChanges, !isJustCreated() && DataHelper::contains(m_data, FileStatus::CombDbChanged));
-    if (m_ui->tabWidget->isTabEnabled(TabChanges)) {
+    const bool isChanged = !isJustCreated() && m_stat->contains(FileStatus::CombDbChanged);
+    m_ui->tabWidget->setTabEnabled(TabChanges, isChanged);
+
+    if (isChanged) {
         m_ui->tabWidget->setTabIcon(TabChanges, icons.icon(Icons::Update));
         m_ui->labelResult->setText(infoChanges().join('\n'));
     }
 
     // tab Comment
-    m_ui->inpComment->setText(m_data->m_metadata.comment);
+    m_ui->inpComment->setText(meta.comment);
 }
 
 QStringList DialogDbStatus::infoContent()
@@ -117,7 +126,7 @@ QStringList DialogDbStatus::infoContent()
     if (isCreating())
         return { QStringLiteral(u"The checksum list is being calculated...") };
 
-    const Numbers &num = m_data->m_numbers;
+    const Numbers &num = m_stat->m_numbers;
     QStringList contentNumbers;
     const NumSize nAvail = num.values(FileStatus::CombAvailable);
     const int numChecksums = num.numberOf(FileStatus::CombHasChecksum);
@@ -156,7 +165,7 @@ QStringList DialogDbStatus::infoContent()
     contentNumbers.append(QStringLiteral(u"New:     ") + format::filesNumSize(num, FileStatus::New));
     contentNumbers.append(QStringLiteral(u"Missing: ") + format::filesNumber(num.numberOf(FileStatus::Missing)));
 
-    if (DataHelper::isImmutable(m_data)) {
+    if (m_stat->checkCondition(DbStatistics::Immutable)) {
         contentNumbers.append(QString());
         contentNumbers.append(QStringLiteral(u"No changes are allowed"));
     }
@@ -167,11 +176,11 @@ QStringList DialogDbStatus::infoContent()
 QStringList DialogDbStatus::infoVerification()
 {
     QStringList result;
-    const Numbers &num = m_data->m_numbers;
+    const Numbers &num = m_stat->m_numbers;
     const int n_available = num.numberOf(FileStatus::CombAvailable);
     const int n_mismatch = num.numberOf(FileStatus::Mismatched);
 
-    if (DataHelper::isAllChecked(m_data)) {
+    if (m_stat->checkCondition(DbStatistics::AllChecked)) {
         const int n_checksums = num.numberOf(FileStatus::CombHasChecksum);
 
         if (n_mismatch) {
@@ -184,7 +193,7 @@ QStringList DialogDbStatus::infoVerification()
         else
             result.append(QString("✓ All %1 available files matched the stored checksums").arg(n_available));
     }
-    else if (DataHelper::contains(m_data, FileStatus::CombChecked)) {
+    else if (m_stat->contains(FileStatus::CombChecked)) {
         // to account for added and updated files, the total number in parentheses is used
         const int n_added_updated = num.numberOf(FileStatus::Added | FileStatus::Updated);
 
@@ -214,7 +223,7 @@ QStringList DialogDbStatus::infoVerification()
 
 QStringList DialogDbStatus::infoChanges()
 {
-    const Numbers &numb = m_data->m_numbers;
+    const Numbers &num = m_stat->m_numbers;
     QStringList result;
 
     // This list is used instead of Numbers::statuses() to order the strings
@@ -224,7 +233,7 @@ QStringList DialogDbStatus::infoChanges()
     static const FileStatuses flag_numsize = (FileStatus::Added | FileStatus::Moved); // for these the size will be shown
 
     for (const FileStatus st : statuses) {
-        const NumSize ns = numb.values(st);
+        const NumSize ns = num.values(st);
         if (ns) {
             const QString str = (st & flag_numsize) ? format::filesNumSize(ns)
                                                     : QString::number(ns.number);
@@ -265,12 +274,12 @@ void DialogDbStatus::setCurrentTab(Tabs tab)
 
 bool DialogDbStatus::isCreating() const
 {
-    return DataHelper::isDbFileState(m_data, MetaData::NoFile);
+    return m_stat->isDbFileState(MetaData::NoFile);
 }
 
 bool DialogDbStatus::isJustCreated() const
 {
-    return DataHelper::isDbFileState(m_data, MetaData::Created);
+    return m_stat->isDbFileState(MetaData::Created);
 }
 
 QString DialogDbStatus::getComment() const
