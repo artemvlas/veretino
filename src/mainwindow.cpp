@@ -619,17 +619,20 @@ void MainWindow::setWinTitleMismatchFound()
 void MainWindow::updateWindowTitle()
 {
     if (ui->view->isViewDatabase()) {
-        const DataContainer *data = ui->view->m_data;
+        DataContainer *pData = ui->view->m_data;
 
-        if (data->m_numbers.contains(FileStatus::Mismatched)) {
+        DbStatistics dbStat(pData);
+        dbStat.m_numbers = pData->m_numbers;
+
+        if (dbStat.checkCondition(DbStatistics::Mismatched)) {
             setWinTitleMismatchFound();
             return;
         }
 
-        const bool isVerified = DataHelper::isAllMatched(data);
+        const bool isVerified = dbStat.checkCondition(DbStatistics::AllMatched);
 
         QString strAdd = isVerified ? QStringLiteral(u"✓ verified")
-                                    : QStringLiteral(u"DB > ") + format::shortenPath(data->m_metadata.workDir);
+                                    : QStringLiteral(u"DB > ") + format::shortenPath(pData->m_metadata.workDir);
 
         QIcon icn = isVerified ? m_modeSelect->m_icons.icon(FileStatus::Matched)
                                : IconProvider::appIcon();

@@ -41,8 +41,9 @@ public:
         // File Items
         AllChecked = 1 << 6,
         AllMatched = 1 << 7,
-        Verified = 1 << 8,
-        HasPossiblyMovedItems = 1 << 9, // has New and Missing items
+        //Verified = 1 << 8,
+        Mismatched = 1 << 9,
+        HasPossiblyMovedItems = 1 << 10, // has New and Missing items
     };
 
     bool checkCondition(Condition condition) const;

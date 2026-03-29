@@ -80,7 +80,8 @@ bool DbStatistics::checkCondition(Condition condition) const
         return m_data->m_metadata.filter.isEnabled();
     case AllChecked:
     case AllMatched:
-    case Verified:
+    //case Verified:
+    case Mismatched:
     case HasPossiblyMovedItems:
         return checkCondition(condition, m_numbers);
     default:
@@ -107,8 +108,10 @@ bool DbStatistics::checkCondition(Condition condition, const Numbers &nums)
     case AllMatched:
         return (!nums.contains(FileStatus::CombProcessing)
                 && nums.numberOf(FileStatus::Matched) == nums.numberOf(FileStatus::CombHasChecksum));
-    case Verified:
-        return !nums.contains(FileStatus::Missing) && checkCondition(AllChecked, nums);
+    //case Verified:
+    //    return !nums.contains(FileStatus::Missing) && checkCondition(AllChecked, nums);
+    case Mismatched:
+        return nums.contains(FileStatus::Mismatched);
     case HasPossiblyMovedItems:
         return nums.contains(FileStatus::New) && nums.contains(FileStatus::Missing);
     default:
