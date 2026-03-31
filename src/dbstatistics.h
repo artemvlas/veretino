@@ -20,8 +20,10 @@ public:
 
     const DataContainer* data() const;
 
-    Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
     const Numbers& updateNumbers();
+    Numbers getNumbers(const QModelIndex &rootIndex = QModelIndex()) const;
+    static Numbers getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex = QModelIndex());
+
 
     bool contains(const FileStatuses flags,
                   const QModelIndex &subfolder = QModelIndex()) const;

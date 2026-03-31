@@ -40,9 +40,16 @@ Numbers DbStatistics::getNumbers(const QModelIndex &rootIndex) const
     if (!m_data)
         return {};
 
-    Numbers num;
+    return getNumbers(m_data->m_model, rootIndex);
+}
 
-    TreeModelIterator iter(m_data->m_model, rootIndex);
+Numbers DbStatistics::getNumbers(const QAbstractItemModel *model, const QModelIndex &rootIndex)
+{
+    if (!model)
+        return {};
+
+    Numbers num;
+    TreeModelIterator iter(model, rootIndex);
 
     while (iter.hasNext()) {
         iter.nextFile();
