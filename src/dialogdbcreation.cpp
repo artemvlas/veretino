@@ -247,14 +247,15 @@ void DialogDbCreation::updateDbFilename()
     const QString dbFileName = format::composeDbFileName(prefix, folderName, ext);
     const QString dbFilePath = pathstr::joinPath(m_workDir, dbFileName);
     const bool exists = QFileInfo::exists(dbFilePath);
-    const QString color = exists ? format::coloredText(true) : QString();
+    const QString colored = exists ? QStringLiteral(u"color: red") : QString();
     const QString toolTip = exists ? QStringLiteral(u"The file already exists") : QStringLiteral(u"Available");
     const QString acceptBtnText = exists ? QStringLiteral(u"Overwrite") : QStringLiteral(u"Create");
 
-    ui->l_db_filename->setStyleSheet(color);
+    ui->l_db_filename->setStyleSheet(colored);
     ui->l_db_filename->setText(dbFileName);
     ui->l_db_filename->setToolTip(toolTip);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(acceptBtnText);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setStyleSheet(colored);
 }
 
 void DialogDbCreation::setItemsVisibility(bool isTop10Checked)
