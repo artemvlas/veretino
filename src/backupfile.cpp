@@ -1,5 +1,6 @@
 #include "backupfile.h"
 #include "pathstr.h"
+#include <QDebug>
 
 BackupFile::BackupFile(const DataContainer *data)
     : m_dbFile(data ? &data->m_metadata.dbFilePath : nullptr) {}
