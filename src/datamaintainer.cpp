@@ -262,7 +262,7 @@ bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &chec
     if (DigestString::isValid(checksum, m_data->m_metadata.algorithm)
         && TreeModel::hasStatus((FileStatus::New | FileStatus::Queued), file))
     {
-        setItemValue(file, Column::ColumnChecksum, checksum);
+        setItemValue(file, Column::ColumnChecksum, checksum.toLower());
         setFileStatus(file, FileStatus::Imported);
         return true;
     }
