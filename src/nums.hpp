@@ -37,6 +37,7 @@ struct NumSize {
     friend bool operator<=(const NumSize& lhs, const NumSize& rhs) { return (lhs < rhs) || (lhs == rhs); }
     friend bool operator>=(const NumSize& lhs, const NumSize& rhs) { return (rhs < lhs) || (lhs == rhs); }
     explicit operator bool() const { return number > 0; }
+    explicit operator int() const { return number; }
 
     /*** Values ***/
     int number = 0;

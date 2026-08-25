@@ -87,6 +87,17 @@ void DataMaintainer::setFileStatus(const QModelIndex &index, FileStatus status)
     setItemValue(index, Column::ColumnStatus, status);
 }
 
+void DataMaintainer::changeFileStatus(const QModelIndex &index, FileStatus status)
+{
+    const FileStatus oldStatus = TreeModel::itemFileStatus(index);
+
+    if (oldStatus == status)
+        return;
+
+    setFileStatus(index, status);
+    m_data->m_numbers.moveFile(oldStatus, status, TreeModel::itemFileSize(index));
+}
+
 void DataMaintainer::setConsiderDateModified(bool consider)
 {
     m_considerFileModDate = consider;
@@ -281,7 +292,8 @@ int DataMaintainer::changeStatuses(const FileStatuses statuses, const FileStatus
     TreeModelIterator iter(m_data->m_model, rootIndex);
 
     while (iter.hasNext()) {
-        if (statuses & iter.nextFile().status()) {
+        iter.nextFile();
+        if (iter.hasStatus(statuses)) {
             setFileStatus(iter.index(), newStatus);
             ++number;
         }

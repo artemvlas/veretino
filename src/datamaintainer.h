@@ -34,6 +34,7 @@ public:
                       Column column,
                       const QVariant &value = QVariant());
     void setFileStatus(const QModelIndex &index, FileStatus status);
+    void changeFileStatus(const QModelIndex &index, FileStatus status);
     void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
