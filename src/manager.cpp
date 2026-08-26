@@ -540,10 +540,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
         return 0;
     }
 
-    if (status != FileStatus::Queued)
-        m_dataMaintainer->addToQueue(status, root);
-
-    const NumSize num_queued = DataHelper::getNumbers(pData, root).values(FileStatus::Queued);
+    const NumSize num_queued = m_dataMaintainer->addToQueue(status, root);
 
     qDebug() << "Manager::calculateChecksums | Queued:" << num_queued.number;
 

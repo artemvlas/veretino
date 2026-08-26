@@ -87,15 +87,17 @@ void DataMaintainer::setFileStatus(const QModelIndex &index, FileStatus status)
     setItemValue(index, Column::ColumnStatus, status);
 }
 
-void DataMaintainer::changeFileStatus(const QModelIndex &index, FileStatus status)
+bool DataMaintainer::changeFileStatus(const QModelIndex &index, FileStatus status)
 {
     const FileStatus oldStatus = TreeModel::itemFileStatus(index);
 
     if (oldStatus == status)
-        return;
+        return false;
 
     setFileStatus(index, status);
-    m_data->m_numbers.moveFile(oldStatus, status, TreeModel::itemFileSize(index));
+    return m_data->m_numbers.moveFile(oldStatus,
+                                      status,
+                                      TreeModel::itemFileSize(index));
 }
 
 void DataMaintainer::setConsiderDateModified(bool consider)
@@ -284,7 +286,7 @@ bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &chec
 int DataMaintainer::changeStatuses(const FileStatuses statuses, const FileStatus newStatus, const QModelIndex &rootIndex)
 {
     if (!m_data || tools::isFlagCombined(newStatus)) {
-        qDebug() << "DM::changeStatuses >> Error";
+        qWarning() << "DM::changeStatuses >> Error";
         return 0;
     }
 
@@ -305,9 +307,29 @@ int DataMaintainer::changeStatuses(const FileStatuses statuses, const FileStatus
     return number;
 }
 
-int DataMaintainer::addToQueue(const FileStatuses statuses, const QModelIndex &rootIndex)
+NumSize DataMaintainer::addToQueue(const FileStatuses statuses, const QModelIndex &rootIndex)
 {
-    return changeStatuses(statuses, FileStatus::Queued, rootIndex);
+    if (!m_data) {
+        qWarning() << "DM::addToQueue >> Error";
+        return {};
+    }
+
+    const FileStatuses st = statuses | FileStatus::Queued;
+    NumSize number;
+    TreeModelIterator iter(m_data->m_model, rootIndex);
+
+    while (iter.hasNext()) {
+        iter.nextFile();
+        if (iter.hasStatus(st)) {
+            changeFileStatus(iter.index(), FileStatus::Queued);
+            number.addOne(iter.size());
+        }
+    }
+
+    if (number > 0)
+        emit numbersUpdated();
+
+    return number;
 }
 
 void DataMaintainer::clearChecksum(const QModelIndex &fileIndex)

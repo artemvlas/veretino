@@ -34,7 +34,7 @@ public:
                       Column column,
                       const QVariant &value = QVariant());
     void setFileStatus(const QModelIndex &index, FileStatus status);
-    void changeFileStatus(const QModelIndex &index, FileStatus status);
+    bool changeFileStatus(const QModelIndex &index, FileStatus status);
     void setConsiderDateModified(bool consider);
     void updateDateTime();
     void updateVerifDateTime();
@@ -67,8 +67,9 @@ public:
                        const QModelIndex &rootIndex = QModelIndex());
 
     // changes items status from <statuses> to FileStatus::Queued
-    int addToQueue(const FileStatuses statuses,
-                   const QModelIndex &rootIndex = QModelIndex());
+    // returns queued count and total size
+    NumSize addToQueue(const FileStatuses statuses,
+                       const QModelIndex &rootIndex = QModelIndex());
 
     // clears stored checksum string, single file item
     void clearChecksum(const QModelIndex &fileIndex);
