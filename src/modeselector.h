@@ -73,6 +73,7 @@ public:
     void verify(const QModelIndex index = QModelIndex());
     void verifyModified();
     void verifyItems(const QModelIndex &root, FileStatus status);
+    void recheckMismatched();
     void branchSubfolder();
 
     void makeFolderContentsList(const QString &folderPath);

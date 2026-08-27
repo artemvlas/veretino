@@ -77,6 +77,7 @@ void ModeSelector::connectActions()
     connect(m_menuAct->actionCheckItemSubfolder, &QAction::triggered, this, &ModeSelector::verifyItem);
     connect(m_menuAct->actionCheckAll, &QAction::triggered, this, &ModeSelector::verifyDb);
     connect(m_menuAct->actionCheckAllMod, &QAction::triggered, this, &ModeSelector::verifyModified);
+    connect(m_menuAct->actionCheckAllMismatches, &QAction::triggered, this, &ModeSelector::recheckMismatched);
     connect(m_menuAct->actionCopyStoredChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnChecksum); });
     connect(m_menuAct->actionCopyReChecksum, &QAction::triggered, this, [=]{ copyDataToClipboard(Column::ColumnReChecksum); });
     connect(m_menuAct->actionBranchMake, &QAction::triggered, this, &ModeSelector::branchSubfolder);
@@ -529,6 +530,11 @@ void ModeSelector::verifyModified()
     verifyItems(QModelIndex(), FileStatus::NotCheckedMod);
 }
 
+void ModeSelector::recheckMismatched()
+{
+    verifyItems(QModelIndex(), FileStatus::Mismatched);
+}
+
 void ModeSelector::verifyItems(const QModelIndex &root, FileStatus status)
 {
     stopProcess();
@@ -943,6 +949,9 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 
         if (nums.contains(FileStatus::NotCheckedMod))
             viewContextMenu->addAction(m_menuAct->actionCheckAllMod);
+
+        if (nums.contains(FileStatus::Mismatched))
+            viewContextMenu->addAction(m_menuAct->actionCheckAllMismatches);
 
         viewContextMenu->addAction(m_menuAct->actionCheckAll);
 

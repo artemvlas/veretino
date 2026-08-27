@@ -79,6 +79,7 @@ public:
     QAction *actionBranchImport = new QAction(QStringLiteral(u"Import Branch"), this);
     QAction *actionCheckAll = new QAction(QStringLiteral(u"Check ALL available files"), this);
     QAction *actionCheckAllMod = new QAction(QStringLiteral(u"Check Modified files"), this);
+    QAction *actionCheckAllMismatches = new QAction(QStringLiteral(u"ReCheck Mismatched files"), this);
     QAction *actionCopyStoredChecksum = new QAction(QStringLiteral(u"Copy stored Checksum"), this);
     QAction *actionCopyReChecksum = new QAction(QStringLiteral(u"Copy ReChecksum"), this);
     QAction *actionExportSum = new QAction(QStringLiteral(u"Export to *.sha"), this);

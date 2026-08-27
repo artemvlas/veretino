@@ -1,6 +1,7 @@
 Veretino 0.8.0
 What's new:
 * Ability to import checksums from digest files (*.shaX) when creating a database.
+* Ability to recheck all mismatched files.
 * Ability to select a custom working folder if there are no items available in the current one.
 * The Del key removes a 'missing' or 'imported' entry.
 * The Overwrite button text (db creation) is colored red.
