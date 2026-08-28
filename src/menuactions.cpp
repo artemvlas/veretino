@@ -89,6 +89,8 @@ void MenuActions::setActionsIcons()
     actionCheckCurFileFromModel->setIcon(m_icons.icon(Icons::Scan));
     actionCheckItemSubfolder->setIcon(m_icons.icon(Icons::FolderSync));
     //actionCheckAllMod->setIcon(m_icons.icon(FileStatus::NotCheckedMod));
+    actionCheckAllMismatches->setIcon(m_icons.icon(FileStatus::Mismatched));
+    actionCheckAllReadError->setIcon(m_icons.icon(FileStatus::ReadError));
     actionCheckAll->setIcon(m_icons.icon(Icons::Start));
     actionCopyStoredChecksum->setIcon(m_icons.icon(Icons::Copy));
     actionCopyReChecksum->setIcon(m_icons.icon(Icons::Copy));
@@ -199,6 +201,26 @@ QMenu* MenuActions::menuUpdateDb(const Numbers &dataNum)
     actionUpdDbReChecksums->setText(strUpdateRe);
 
     return menuUpdateDatabase;
+}
+
+QMenu* MenuActions::menuReCheck(const Numbers &dataNum)
+{
+    if (!m_menuReCheck) {
+        m_menuReCheck = new QMenu(QStringLiteral(u"ReCheck Items"));
+        //m_menuReCheck->menuAction()->setIcon(m_icons.icon(Icons::HashFile));
+
+        m_menuReCheck->addAction(actionCheckAllMismatches);
+        m_menuReCheck->addAction(actionCheckAllReadError);
+        m_menuReCheck->addSeparator();
+        m_menuReCheck->addAction(actionCheckAllChecked);
+    }
+
+    actionCheckAllMismatches->setEnabled(dataNum.contains(FileStatus::Mismatched));
+    actionCheckAllReadError->setEnabled(dataNum.contains(FileStatus::ReadError));
+    //actionCheckAllChecked->setEnabled(dataNum.contains(FileStatus::CombChecked | FileStatus::CombMatched | FileStatus::CombUnreadable));
+    actionCheckAllChecked->setEnabled(false);
+
+    return m_menuReCheck;
 }
 
 // returns QMenu *menuAlgo: sets checked one of the nested actions,

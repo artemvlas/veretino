@@ -74,6 +74,7 @@ public:
     void verifyModified();
     void verifyItems(const QModelIndex &root, FileStatus status);
     void recheckMismatched();
+    void recheckReadError();
     void branchSubfolder();
 
     void makeFolderContentsList(const QString &folderPath);

@@ -30,6 +30,7 @@ public:
     void updateMenuOpenRecent(const QStringList &recentFiles);
     void populateMenuFile(QMenu *menuFile);
     QMenu* menuUpdateDb(const Numbers &dataNum); // returns *menuUpdateDatabase
+    QMenu* menuReCheck(const Numbers &dataNum);  // return m_menuReCheck
     QMenu* menuAlgorithm(QCryptographicHash::Algorithm curAlgo);
     QMenu* disposableMenu() const; // (context) menu, which will be deleted when closed
     QMenu* contextMenuViewNot();
@@ -79,7 +80,9 @@ public:
     QAction *actionBranchImport = new QAction(QStringLiteral(u"Import Branch"), this);
     QAction *actionCheckAll = new QAction(QStringLiteral(u"Check ALL available files"), this);
     QAction *actionCheckAllMod = new QAction(QStringLiteral(u"Check Modified files"), this);
-    QAction *actionCheckAllMismatches = new QAction(QStringLiteral(u"ReCheck Mismatched files"), this);
+    QAction *actionCheckAllMismatches = new QAction(QStringLiteral(u"Mismatched"), this);
+    QAction *actionCheckAllReadError = new QAction(QStringLiteral(u"Read Error"), this);
+    QAction *actionCheckAllChecked = new QAction(QStringLiteral(u"All Checked"), this);
     QAction *actionCopyStoredChecksum = new QAction(QStringLiteral(u"Copy stored Checksum"), this);
     QAction *actionCopyReChecksum = new QAction(QStringLiteral(u"Copy ReChecksum"), this);
     QAction *actionExportSum = new QAction(QStringLiteral(u"Export to *.sha"), this);
@@ -113,7 +116,8 @@ public:
     QMenu *menuCreateDigest = new QMenu(QStringLiteral(u"Create Digest file"));
     QMenu *menuOpenRecent = new QMenu(QStringLiteral(u"Open Recent"));
     QMenu *menuUpdateDatabase = nullptr;
-    QList<QMenu*> m_listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase };
+    QMenu *m_menuReCheck = nullptr;
+    QList<QMenu*> m_listOfMenus = { menuAlgo, menuCreateDigest, menuOpenRecent, menuUpdateDatabase, m_menuReCheck };
 
 private:
     void setActionsIcons();
