@@ -10,14 +10,14 @@
 #include "iconprovider.h"
 #include <QDebug>
 
-const QVector<QVariant> TreeModel::s_rootItemData = {
-    QStringLiteral(u"Name"),
-    QStringLiteral(u"Size"),
-    QStringLiteral(u"Status"),
-    QStringLiteral(u"Checksum"),
-    QStringLiteral(u"ReChecksum"),
-    QStringLiteral(u"Elapsed"),
-    QStringLiteral(u"Speed")
+const QVector<TreeItem::Data> TreeModel::s_rootItemData = {
+    {QStringLiteral(u"Name")},
+    {QStringLiteral(u"Size")},
+    {QStringLiteral(u"Status")},
+    {QStringLiteral(u"Checksum")},
+    {QStringLiteral(u"ReChecksum")},
+    {QStringLiteral(u"Elapsed")},
+    {QStringLiteral(u"Speed")}
 };
 
 TreeModel::TreeModel(QObject *parent)
@@ -59,13 +59,16 @@ bool TreeModel::add_file_unforced(const QString &filePath, const FileValues &val
 void TreeModel::add_file(const QString &filePath, const FileValues &values)
 {
     // data preparation
-    QVector<QVariant> tiData(m_rootItem->columnCount());
+    QVector<TreeItem::Data> tiData(m_rootItem->columnCount());
     tiData[ColumnName] = pathstr::entryName(filePath);
 
-    if (values.size >= 0)
-        tiData[ColumnSize] = values.size;
+    if (values.size >= 0) {
+        tiData[ColumnSize].setData(values.size, TreeItem::FallbackRole);
+        tiData[ColumnSize].setData(format::dataSizeReadable(values.size), Qt::DisplayRole);
+    }
 
-    tiData[ColumnStatus] = QVariant::fromValue(values.status);
+    tiData[ColumnStatus].setData(QVariant::fromValue(values.status), TreeItem::FallbackRole);
+    tiData[ColumnStatus].setData(format::fileItemStatus(values.status), Qt::DisplayRole);
 
     if (!values.checksum.isEmpty())
         tiData[ColumnChecksum] = values.checksum;
@@ -87,13 +90,13 @@ TreeItem *TreeModel::add_folder(const QString &path)
     TreeItem *parentItem = m_rootItem;
     const QStringList pathParts = path.split('/', Qt::SkipEmptyParts);
 
-    for (const QString &_subFolder : pathParts) {
-        TreeItem *ti = parentItem->findChild(_subFolder);
+    for (const QString &subFolder : pathParts) {
+        TreeItem *ti = parentItem->findChild(subFolder);
         if (ti) {
             parentItem = ti;
         } else {
-            QVector<QVariant> tiData(m_rootItem->columnCount());
-            tiData[ColumnName] = _subFolder;
+            QVector<TreeItem::Data> tiData(m_rootItem->columnCount());
+            tiData[ColumnName] = subFolder;
             parentItem = parentItem->addChild(tiData);
         }
     }
@@ -159,7 +162,7 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
                                        : s_icons.iconFolder();
         }
         if (curIndex.column() == ColumnStatus && isFileRow(curIndex)) {
-            return s_icons.icon(curIndex.data(RawDataRole).value<FileStatus>());
+            return s_icons.icon(curIndex.data(TreeItem::FallbackRole).value<FileStatus>());
         }
     }
 
@@ -180,42 +183,42 @@ QVariant TreeModel::data(const QModelIndex &curIndex, int role) const
         }
     }
 
-    if (role != Qt::DisplayRole && role != Qt::EditRole && role != RawDataRole)
+    if (role != Qt::DisplayRole && role != Qt::EditRole && role != TreeItem::FallbackRole)
         return QVariant();
 
-    const QVariant tiData = getItem(curIndex)->data(curIndex.column());
+    const QVariant tiData = getItem(curIndex)->data(curIndex.column(), role);
 
-    if (tiData.isValid() && role != RawDataRole) {
-        switch(curIndex.column()) {
-        case ColumnSize:
-            return format::dataSizeReadable(tiData.toLongLong());
-        case ColumnStatus:
-            return format::fileItemStatus(tiData.value<FileStatus>());
-        case ColumnElapsed:
-            return format::msecsToReadable(tiData.toLongLong());
-        case ColumnSpeed:
-            return format::processSpeed(tiData.toLongLong());
-        default:
-            break;
-        }
-    }
+    // if (tiData.isValid() && role != RawDataRole) {
+    //     switch(curIndex.column()) {
+    //     case ColumnSize:
+    //         return format::dataSizeReadable(tiData.toLongLong());
+    //     case ColumnStatus:
+    //         return format::fileItemStatus(tiData.value<FileStatus>());
+    //     case ColumnElapsed:
+    //         return format::msecsToReadable(tiData.toLongLong());
+    //     case ColumnSpeed:
+    //         return format::processSpeed(tiData.toLongLong());
+    //     default:
+    //         break;
+    //     }
+    // }
 
     return tiData;
 }
 
 bool TreeModel::setData(const QModelIndex &curIndex, const QVariant &value, int role)
 {
-    if (role != Qt::EditRole || !curIndex.isValid())
+    if (!curIndex.isValid())
         return false;
 
     TreeItem *ti = getItem(curIndex);
-    const bool result = ti->setData(curIndex.column(), value);
+    const bool result = ti->setData(curIndex.column(), value, role);
 
-    if (result) { // to change the color of the checksum during the verification process
+    if (result && (role == Qt::DisplayRole)) { // to change the color of the checksum during the verification process
         const QModelIndex &endIndex = (curIndex.column() == ColumnStatus) ? curIndex.siblingAtColumn(ColumnChecksum)
                                                                           : curIndex;
 
-        emit dataChanged(curIndex, endIndex, { Qt::DisplayRole, Qt::EditRole, RawDataRole });
+        emit dataChanged(curIndex, endIndex, { Qt::DisplayRole });
     }
 
     return result;
@@ -344,12 +347,12 @@ QString TreeModel::itemName(const QModelIndex &curIndex)
 
 qint64 TreeModel::itemFileSize(const QModelIndex &fileIndex)
 {
-    return fileIndex.siblingAtColumn(ColumnSize).data(RawDataRole).toLongLong();
+    return fileIndex.siblingAtColumn(ColumnSize).data(TreeItem::FallbackRole).toLongLong();
 }
 
 FileStatus TreeModel::itemFileStatus(const QModelIndex &fileIndex)
 {
-    return fileIndex.siblingAtColumn(ColumnStatus).data(RawDataRole).value<FileStatus>();
+    return fileIndex.siblingAtColumn(ColumnStatus).data(TreeItem::FallbackRole).value<FileStatus>();
 }
 
 QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
@@ -364,7 +367,7 @@ QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 
 qint64 TreeModel::itemHashTime(const QModelIndex &fileIndex)
 {
-    const QVariant val = fileIndex.siblingAtColumn(ColumnElapsed).data(RawDataRole);
+    const QVariant val = fileIndex.siblingAtColumn(ColumnElapsed).data(TreeItem::FallbackRole);
 
     return val.isValid() ? val.toLongLong() : -1;
 }

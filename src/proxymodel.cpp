@@ -23,7 +23,7 @@ void ProxyModel::setInitSettings()
 {
     setSortCaseSensitivity(Qt::CaseInsensitive);
     setRecursiveFilteringEnabled(true);
-    setSortRole(TreeModel::RawDataRole);
+    setSortRole(TreeItem::FallbackRole);
     //setDynamicSortFilter(false);
 }
 
@@ -33,7 +33,7 @@ bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent
         return true;
 
     QModelIndex ind = sourceModel()->index(sourceRow, Column::ColumnStatus, sourceParent);
-    FileStatus status = ind.data(TreeModel::RawDataRole).value<FileStatus>();
+    FileStatus status = ind.data(TreeItem::FallbackRole).value<FileStatus>();
 
     return (status & m_filteredFlags);
 }

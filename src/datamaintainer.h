@@ -33,6 +33,9 @@ public:
     bool setItemValue(const QModelIndex &fileIndex,
                       Column column,
                       const QVariant &value = QVariant());
+    bool setItemValue(const QModelIndex &fileIndex,
+                      Column column,
+                      const QVariant &value, quint8 role);
     void setFileStatus(const QModelIndex &index, FileStatus status);
     bool changeFileStatus(const QModelIndex &index, FileStatus status);
     void setConsiderDateModified(bool consider);

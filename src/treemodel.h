@@ -20,7 +20,7 @@ public:
     explicit TreeModel(QObject *parent = nullptr);
     ~TreeModel();
 
-    enum ItemDataRoles { RawDataRole = 1000 };
+    //enum ItemDataRoles { RawDataRole = 1000 };
 
     enum Column {
         ColumnName,
@@ -43,7 +43,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     bool setData(const QModelIndex &curIndex, const QVariant &value,
-                 int role = Qt::EditRole) override;
+                 int role = Qt::DisplayRole) override;
 
     bool isEmpty() const;
 
@@ -79,12 +79,12 @@ public:
     static QString itemFileReChecksum(const QModelIndex &fileIndex);
     static qint64 itemHashTime(const QModelIndex &fileIndex);
 
-    template <typename T>
-    static T getSiblingValue(const QModelIndex &ind, Column col) {
-        const QVariant val = ind.siblingAtColumn(col).data(RawDataRole);
+    // template <typename T>
+    // static T getSiblingValue(const QModelIndex &ind, Column col) {
+    //     const QVariant val = ind.siblingAtColumn(col).data(RawDataRole);
 
-        return val.value<T>();
-    }
+    //     return val.value<T>();
+    // }
 
 public slots:
     void clearCacheFolderItems();
@@ -93,7 +93,7 @@ private:
     TreeItem *getItem(const QModelIndex &curIndex) const;
     TreeItem *add_folder(const QString &path);
 
-    static const QVector<QVariant> s_rootItemData;
+    static const QVector<TreeItem::Data> s_rootItemData;
     TreeItem *m_rootItem;
     QHash<QString, TreeItem*> m_cacheFolderItems;
 }; // class TreeModel

@@ -5,7 +5,7 @@
 */
 #include "treeitem.h"
 
-TreeItem::TreeItem(const QVector<QVariant> &data, TreeItem *parent)
+TreeItem::TreeItem(const QVector<TreeItem::Data> &data, TreeItem *parent)
     : itemData(data), parentItem(parent)
 {}
 
@@ -34,9 +34,9 @@ int TreeItem::columnCount() const
     return itemData.count();
 }
 
-QVariant TreeItem::data(int column) const
+QVariant TreeItem::data(int column, quint8 role) const
 {
-    return (column < itemData.size() && column >= 0) ? itemData.at(column) : QVariant();
+    return (column < itemData.size() && column >= 0) ? itemData.at(column).data(role) : QVariant();
 }
 
 TreeItem *TreeItem::parent()
@@ -44,12 +44,12 @@ TreeItem *TreeItem::parent()
     return parentItem;
 }
 
-bool TreeItem::setData(int column, const QVariant &value)
+bool TreeItem::setData(int column, const QVariant &value, quint8 role)
 {
     if (column < 0 || column >= itemData.size())
         return false;
 
-    itemData[column] = value;
+    itemData[column].setData(value, role);
     return true;
 }
 
@@ -58,7 +58,7 @@ void TreeItem::appendChild(TreeItem *item)
     childItems.append(item);
 }
 
-TreeItem *TreeItem::addChild(const QVector<QVariant> &tiData)
+TreeItem *TreeItem::addChild(const QVector<TreeItem::Data> &tiData)
 {
     TreeItem *ti = new TreeItem(tiData, this);
     childItems.append(ti);

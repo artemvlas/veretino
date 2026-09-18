@@ -79,12 +79,18 @@ void DataMaintainer::clearOldData()
 
 bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value)
 {
-    return (m_data && m_data->m_model->setData(fileIndex.siblingAtColumn(column), value));
+    return setItemValue(fileIndex, column, value, Qt::DisplayRole);
+}
+
+bool DataMaintainer::setItemValue(const QModelIndex &fileIndex, Column column, const QVariant &value, quint8 role)
+{
+    return m_data && m_data->m_model->setData(fileIndex.siblingAtColumn(column), value, role);
 }
 
 void DataMaintainer::setFileStatus(const QModelIndex &index, FileStatus status)
 {
-    setItemValue(index, Column::ColumnStatus, status);
+    setItemValue(index, Column::ColumnStatus, status, TreeItem::FallbackRole);
+    setItemValue(index, Column::ColumnStatus, format::fileItemStatus(status), Qt::DisplayRole);
 }
 
 bool DataMaintainer::changeFileStatus(const QModelIndex &index, FileStatus status)
@@ -878,7 +884,7 @@ QString DataMaintainer::itemContentsInfo(const QModelIndex &curIndex)
 
     if (TreeModel::isFileRow(curIndex)) {
         const QString fileName = TreeModel::itemName(curIndex);
-        const QVariant fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeModel::RawDataRole);
+        const QVariant fileSize = curIndex.siblingAtColumn(Column::ColumnSize).data(TreeItem::FallbackRole);
 
         if (fileSize.isValid()) {
             return format::addStrInParentheses(fileName,
