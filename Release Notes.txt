@@ -4,6 +4,7 @@ What's new:
 * Ability to recheck all mismatched files.
 * Ability to select a custom working folder if there are no items available in the current one.
 * The Del key removes a 'missing' or 'imported' entry.
+* Added confirmation for overwriting digest files.
 * The Overwrite button text (db creation) is colored red.
 * The imported checksum is now only lowercase.
 

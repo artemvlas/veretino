@@ -31,7 +31,9 @@ private:
     void hideLineSizeAlgo();
     void addButtonCopy();
     void addButtonSave();
+    void addButtonOverwrite();
     void makeSumFile();
+    void makeSumFileUnforce(); // checks the existence of the digest file first
     void verify();
 
     void setModeMatched();
@@ -40,12 +42,15 @@ private:
     void setModeCopied();
     void setModeStored();
     void setModeUnstored();
+    void setModeDigestFileExists();
     void setModeReadError();
 
-    Ui::DialogFileProcResult *ui;
-    IconProvider icons_;
-    QString filePath_;
-    FileValues values_;
+    QString digestFilePath() const;
+
+    Ui::DialogFileProcResult *m_ui;
+    IconProvider m_icons;
+    QString m_filePath;
+    FileValues m_values;
 }; // class DialogFileProcResult
 
 #endif // DIALOGFILEPROCRESULT_H
