@@ -975,13 +975,13 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 QString ModeSelector::copiedDigest() const
 {
     QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-    return DigestString::isValid(clipboardText) ? clipboardText : QString();
+    return DigestStringView::isValid(clipboardText) ? clipboardText : QString();
 }
 
 QString ModeSelector::copiedDigest(QCryptographicHash::Algorithm algo) const
 {
     QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-    return DigestString::isValid(clipboardText, algo) ? clipboardText : QString();
+    return DigestStringView::isValid(clipboardText, algo) ? clipboardText : QString();
 }
 
 bool ModeSelector::isDbConst() const

@@ -290,7 +290,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     const FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
     const QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
 
-    if (!DigestString::isValid(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
+    if (!DigestStringView::isValid(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
         switch (storedStatus) {
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");

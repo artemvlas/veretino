@@ -235,7 +235,7 @@ void DialogFileProcResult::makeSumFile()
 {
     const QString &chsum = m_values.checksum;
 
-    if (m_filePath.isEmpty() || !DigestString::isValid(chsum))
+    if (m_filePath.isEmpty() || !DigestStringView::isValid(chsum))
         return;
 
     const QString sumFile = digestFilePath();

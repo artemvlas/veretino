@@ -7,20 +7,25 @@
 #include "algostring.h"
 #include <QSet>
 
-DigestString::DigestString(const QString &digest)
+DigestStringView::DigestStringView(const QString &digest)
     : m_digest(&digest) {}
 
-bool DigestString::isValid() const
+bool DigestStringView::isEmpty() const
+{
+    return m_digest->isEmpty();
+}
+
+bool DigestStringView::isValid() const
 {
     return isValid(*m_digest);
 }
 
-bool DigestString::isValid(QCryptographicHash::Algorithm algo) const
+bool DigestStringView::isValid(QCryptographicHash::Algorithm algo) const
 {
     return isValid(*m_digest, algo);
 }
 
-bool DigestString::isValid(const QString &digest)
+bool DigestStringView::isValid(const QString &digest)
 {
     static const QSet<int> s_perm_length = {32, 40, 64, 128};
 
@@ -45,17 +50,40 @@ bool DigestString::isValid(const QString &digest)
     return true;
 }
 
-bool DigestString::isValid(const QString &digest, QCryptographicHash::Algorithm algo)
+bool DigestStringView::isValid(const QString &digest, QCryptographicHash::Algorithm algo)
 {
     return (digest.size() == AlgoString::digestLength(algo)) && isValid(digest);
 }
 
-QCryptographicHash::Algorithm DigestString::algorithm() const
+bool DigestStringView::verify(const QString &another) const
+{
+    return verify(toString(), another);
+}
+
+bool DigestStringView::verify(const DigestStringView &another) const
+{
+    return verify(toString(), another.toString());
+}
+
+bool DigestStringView::verify(const QString &first, const QString &second)
+{
+    if (first.length() != second.length())
+        return false;
+
+    for (int i = 0; i < first.length(); ++i) {
+        if (first.at(i).toLower() != second.at(i).toLower())
+            return false;
+    }
+
+    return true;
+}
+
+QCryptographicHash::Algorithm DigestStringView::algorithm() const
 {
     return algorithm(*m_digest);
 }
 
-QCryptographicHash::Algorithm DigestString::algorithm(const QString &digest)
+QCryptographicHash::Algorithm DigestStringView::algorithm(const QString &digest)
 {
     return AlgoString::algoByStrLen(digest.length());
 }

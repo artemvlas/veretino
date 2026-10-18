@@ -129,7 +129,7 @@ QString extractDigestFromFile(const QString &digest_file)
 
         if (cut > 0) {
             const QString dig = line.left(cut);
-            if (DigestString::isValid(dig)) {
+            if (DigestStringView::isValid(dig)) {
                 return dig;
             }
         }
