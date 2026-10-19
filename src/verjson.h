@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QCryptographicHash>
+#include "digest.h"
 
 class VerJson : public QObject
 {
@@ -26,7 +27,7 @@ public:
     void load();
     bool save();
 
-    void addItem(const QString &file, const QString &checksum);
+    void addItem(const QString &file, const Digest &checksum);
     void addItemUnr(const QString &file);
     void addInfo(const QString &header_key, const QString &value);
 

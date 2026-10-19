@@ -63,7 +63,7 @@ public:
     }
 
     void clearTasks();
-    QString extractDigestFromFile(const QString &digestFile, bool showException = true);
+    Digest extractDigestFromFile(const QString &digestFile, bool showException = true);
 
 public slots:
     void processFolderSha(const MetaData &metaData);
@@ -80,10 +80,10 @@ public slots:
     void checkSummaryFile(const QString &path);
 
     void checkFile(const QString &filePath,
-                   const QString &checkSum);
+                   const Digest &checkSum);
 
     void checkFile(const QString &filePath,
-                   const QString &checkSum,
+                   const Digest &checkSum,
                    QCryptographicHash::Algorithm algo);
 
     void createDataModel(const QString &dbFilePath, const QString &customWorkDir = QString());

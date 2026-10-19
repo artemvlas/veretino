@@ -125,9 +125,9 @@ bool VerJson::save()
     return (file.open(QFile::WriteOnly) && file.write(data));
 }
 
-void VerJson::addItem(const QString &file, const QString &checksum)
+void VerJson::addItem(const QString &file, const Digest &checksum)
 {
-    m_items[file] = checksum;
+    m_items[file] = QString(checksum);
 }
 
 void VerJson::addItemUnr(const QString &file)

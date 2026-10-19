@@ -242,18 +242,18 @@ void DataMaintainer::setDbFileState(DbFileState state)
     }
 }
 
-bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
+bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const Digest &computedChecksum)
 {
     if (!m_data || !fileRowIndex.isValid() || fileRowIndex.model() != m_data->m_model) {
         qDebug() << "DM::updateChecksum >> Error";
         return false;
     }
 
-    const QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
+    const Digest storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
         if (!tryMoved(fileRowIndex, computedChecksum)) {
-            setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
+            setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum.digest());
             setFileStatus(fileRowIndex, FileStatus::Added);
         }
         return true;
@@ -263,19 +263,19 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
         return true;
     }
     else {
-        setItemValue(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
+        setItemValue(fileRowIndex, Column::ColumnReChecksum, computedChecksum.digest());
         setFileStatus(fileRowIndex, FileStatus::Mismatched);
         return false;
     }
 }
 
-bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &checksum)
+bool DataMaintainer::importChecksum(const QModelIndex &file, const Digest &checksum)
 {
     // checking for compliance with the current algo
-    if (DigestView::isValid(checksum.toUtf8(), m_data->m_metadata.algorithm)
+    if (checksum.isValid(m_data->m_metadata.algorithm)
         && TreeModel::hasStatus((FileStatus::New | FileStatus::Queued), file))
     {
-        setItemValue(file, Column::ColumnChecksum, checksum.toLower());
+        setItemValue(file, Column::ColumnChecksum, checksum.digest().toLower());
         setFileStatus(file, FileStatus::Imported);
         return true;
     }
@@ -407,7 +407,7 @@ bool DataMaintainer::removeDigestEntry(const QModelIndex &fileIndex)
     return true;
 }
 
-bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
+bool DataMaintainer::tryMoved(const QModelIndex &file, const Digest &checksum)
 {
     if (!m_data || !m_data->m_cacheMissing.contains(checksum))
         return false;
@@ -423,7 +423,7 @@ bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
 
         // moved
         setFileStatus(file, FileStatus::Moved);
-        setItemValue(file, Column::ColumnChecksum, checksum);
+        setItemValue(file, Column::ColumnChecksum, checksum.digest());
         return true;
     }
 
@@ -456,10 +456,10 @@ int DataMaintainer::updateMismatchedChecksums()
 bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
 {
     if (m_data && TreeModel::hasReChecksum(fileIndex)) {
-        const QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
+        const Digest reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
         if (!reChecksum.isEmpty()) {
-            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum);
+            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum.digest());
             setItemValue(fileIndex, Column::ColumnReChecksum);
             setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Updated);
             return true;
@@ -738,7 +738,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 
     while (iter.hasNext() && !isCanceled()) {
         iter.nextFile();
-        const QString checksum = iter.checksum();
+        const Digest checksum = iter.checksum();
         if (!checksum.isEmpty()) {
             pJson->addItem(iter.path(rootFolder), checksum);
         }
@@ -855,7 +855,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
             const QJsonValue val = mainList.value(it.path(rootFolder));
 
             if (!val.isUndefined()
-                && importChecksum(it.index(), val.toString()))
+                && importChecksum(it.index(), Digest(val.toString().toUtf8())))
             {
                 ++num;
             }

@@ -75,8 +75,8 @@ public:
     static QString itemName(const QModelIndex &curIndex);
     static qint64 itemFileSize(const QModelIndex &fileIndex);
     static FileStatus itemFileStatus(const QModelIndex &fileIndex);
-    static QString itemFileChecksum(const QModelIndex &fileIndex);
-    static QString itemFileReChecksum(const QModelIndex &fileIndex);
+    static Digest itemFileChecksum(const QModelIndex &fileIndex);
+    static Digest itemFileReChecksum(const QModelIndex &fileIndex);
     static qint64 itemHashTime(const QModelIndex &fileIndex);
 
     template <typename T>

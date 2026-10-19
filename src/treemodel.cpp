@@ -352,14 +352,16 @@ FileStatus TreeModel::itemFileStatus(const QModelIndex &fileIndex)
     return fileIndex.siblingAtColumn(ColumnStatus).data(RawDataRole).value<FileStatus>();
 }
 
-QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
+Digest TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
 {
-    return fileIndex.siblingAtColumn(ColumnChecksum).data().toString();
+    Digest digest(fileIndex.siblingAtColumn(ColumnChecksum).data().toByteArray());
+    return digest;
 }
 
-QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
+Digest TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 {
-    return fileIndex.siblingAtColumn(ColumnReChecksum).data().toString();
+    Digest digest(fileIndex.siblingAtColumn(ColumnReChecksum).data().toByteArray());
+    return digest;
 }
 
 qint64 TreeModel::itemHashTime(const QModelIndex &fileIndex)

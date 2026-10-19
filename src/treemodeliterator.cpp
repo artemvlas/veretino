@@ -107,9 +107,10 @@ FileStatus TreeModelIterator::status() const
     return data(Column::ColumnStatus).value<FileStatus>();
 }
 
-QString TreeModelIterator::checksum() const
+Digest TreeModelIterator::checksum() const
 {
-    return data(Column::ColumnChecksum).toString();
+    Digest digest(data(Column::ColumnChecksum).toByteArray());
+    return digest;
 }
 
 bool TreeModelIterator::hasStatus(FileStatuses check_status) const

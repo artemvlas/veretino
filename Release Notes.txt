@@ -8,6 +8,9 @@ What's new:
 * The Overwrite button text (db creation) is colored red.
 * The imported checksum is now only lowercase.
 
+Internal changes:
+* Transfer of checksum carrier to its own "Digest" type.
+
 ---
 Veretino 0.7.0
 What's new:

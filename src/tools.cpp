@@ -114,11 +114,12 @@ QString joinStrings(const QString &str, int num)
     return str % ' ' % QString::number(num);
 }
 
-QString extractDigestFromFile(const QString &digest_file)
+Digest extractDigestFromFile(const QString &digest_file)
 {
     QFile sumFile(digest_file);
     openFile(sumFile, QFile::ReadOnly);
 
+    // <!!!> TODO: should be rewritten with QByteArray
     const QString line = sumFile.readLine();
 
     static const QStringList l_seps { "  ", " *" };
@@ -128,10 +129,9 @@ QString extractDigestFromFile(const QString &digest_file)
                                        : AlgoString::digestLength(AlgoString::strToAlgo(pathstr::suffix(digest_file)));
 
         if (cut > 0) {
-            const QString dig = line.left(cut);
-            if (DigestView::isValid(dig.toUtf8())) {
+            const Digest dig(line.left(cut).toUtf8());
+            if (dig.isValid())
                 return dig;
-            }
         }
     }
 
