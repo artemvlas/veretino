@@ -235,7 +235,7 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
             if (fileVal.checksum.isEmpty()) { // return previous status
                 m_dataMaintainer->setFileStatus(fileIndex, prevStatus);
             } else {
-                m_dataMaintainer->updateChecksum(fileIndex, fileVal.checksum);
+                m_dataMaintainer->updateChecksum(fileIndex, QString(fileVal.checksum));
                 m_dataMaintainer->setItemValue(fileIndex, Column::ColumnElapsed, fileVal.hash_time);
                 m_dataMaintainer->setItemValue(fileIndex, Column::ColumnSpeed, fileVal.hash_speed());
             }
@@ -288,9 +288,9 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     }
 
     const FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
-    const QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
+    const QByteArray storedSum = TreeModel::itemFileChecksum(fileItemIndex).toUtf8();
 
-    if (!DigestView::isValid(storedSum.toUtf8()) || !(storedStatus & FileStatus::CombAvailable)) {
+    if (!DigestView::isValid(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
         switch (storedStatus) {
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");
@@ -314,12 +314,12 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     FileValues fileVal = hashItem(fileItemIndex, Verification);
 
     if (!fileVal.reChecksum.isEmpty()) {
-        m_dataMaintainer->updateChecksum(fileItemIndex, fileVal.reChecksum);
+        m_dataMaintainer->updateChecksum(fileItemIndex, QString(fileVal.reChecksum));
         m_dataMaintainer->updateNumbers(fileItemIndex, storedStatus);
         m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnElapsed, fileVal.hash_time);
         m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnSpeed, fileVal.hash_speed());
 
-        fileVal.checksum = storedSum.toLower();
+        fileVal.checksum.set(storedSum.toLower());
         const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
         emit fileProcessed(filePath, fileVal);
     }
@@ -425,7 +425,7 @@ void Manager::checkFile(const QString &filePath, const QString &checkSum, QCrypt
     FileValues fileVal = hashFile(filePath, algo, Verification);
 
     if (!m_proc->isCanceled()) {
-        fileVal.checksum = checkSum;
+        fileVal.checksum.set(checkSum.toUtf8());
         emit fileProcessed(filePath, fileVal);
     }
 }
@@ -448,7 +448,7 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
         m_elapsedTimer.start();
 
         // automatic choose: '.checksum' or '.reChecksum'
-        fileVal.defaultChecksum() = m_shaCalc.calculate(filePath, algo);
+        fileVal.defaultChecksum().set(m_shaCalc.calculate(filePath, algo));
         fileVal.hash_time = m_elapsedTimer.elapsed();
     }
     catch (const Exception& e) {
@@ -578,7 +578,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         // hashing
         const FileValues fileVal = hashItem(iter.index(), calc_kind);
-        const QString &sum = fileVal.defaultChecksum();
+        const Digest &sum = fileVal.defaultChecksum();
 
         if (m_proc->isCanceled())
             break;
@@ -595,13 +595,13 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
         m_dataMaintainer->setItemValue(iter.index(), Column::ColumnSpeed, fileVal.hash_speed());
 
         if (purpose == DM_FindMoved) {
-            if (!m_dataMaintainer->tryMoved(iter.index(), sum))
+            if (!m_dataMaintainer->tryMoved(iter.index(), QString(sum)))
                 m_dataMaintainer->setFileStatus(iter.index(), status); // rollback status
             continue;
         }
 
         // != DM_FindMoved
-        if (!m_dataMaintainer->updateChecksum(iter.index(), sum)
+        if (!m_dataMaintainer->updateChecksum(iter.index(), QString(sum))
             && !isMismatchFound) // the signal is only needed once
         {
             emit mismatchFound();

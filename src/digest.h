@@ -33,6 +33,7 @@ public:
     /*** Operators ***/
     explicit operator bool() const { return isValid(); }
     friend bool operator==(const DigestView& lhs, const DigestView& rhs) { return lhs.verify(rhs); }
+    operator const QByteArray&() const { return *m_digest; }
 
 private:
     const QByteArray *m_digest;
@@ -42,11 +43,17 @@ private:
 class Digest
 {
 public:
+    explicit Digest() {}
+
     explicit Digest(const QByteArray &digest)
         : m_digest(digest) {}
 
     explicit Digest(QByteArray&& digest) noexcept
         : m_digest(std::move(digest)) {}
+
+    void set(QByteArray digest) {
+        m_digest = std::move(digest);
+    }
 
     bool isEmpty() const {
         return m_digest.isEmpty();
@@ -77,9 +84,15 @@ public:
     /*** Operators ***/
     explicit operator bool() const { return isValid(); }
     friend bool operator==(const Digest& lhs, const Digest& rhs) { return lhs.verify(rhs); }
+    operator const QByteArray&() const { return m_digest; }
+
+    // Digest& operator=(const QByteArray &digest) {
+    //     m_digest = digest;
+    //     return *this;
+    // }
 
 private:
-    const QByteArray m_digest;
+    QByteArray m_digest;
 
 }; // class Digest
 

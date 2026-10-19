@@ -576,8 +576,10 @@ void ModeSelector::exportItemSum()
     FileValues fileVal(FileValues::HashingPurpose::SaveToDigestFile,
                        QFileInfo(filePath).size());
 
-    fileVal.checksum = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
-                                                     : TreeModel::itemFileChecksum(ind);
+    QString digest = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
+                                                   : TreeModel::itemFileChecksum(ind);
+
+    fileVal.checksum.set(digest.toUtf8());
 
     emit m_manager->fileProcessed(filePath, fileVal);
 }

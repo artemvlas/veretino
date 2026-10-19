@@ -595,7 +595,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
     {
         const QString fullPath = pathstr::joinPath(workDir, it.key());
         FileValues values = makeFileValues(fullPath, basicDate);
-        values.checksum = it.value().toString();
+        values.checksum.set(it.value().toString().toUtf8());
 
         pModel->add_file(it.key(), values);
     }

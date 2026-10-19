@@ -68,7 +68,7 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
     tiData[ColumnStatus] = QVariant::fromValue(values.status);
 
     if (!values.checksum.isEmpty())
-        tiData[ColumnChecksum] = values.checksum;
+        tiData[ColumnChecksum] = values.checksum.digest();
 
     // item adding
     TreeItem *parentItem = add_folder(pathstr::parentFolder(filePath));
