@@ -179,7 +179,7 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
                                                    : QString();
 
     // main list object
-    DigestView dgStr(first_value);
+    DigestView dgStr(first_value.toUtf8());
     if (dgStr)
         return dgStr.algorithm();
 

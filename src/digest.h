@@ -6,47 +6,46 @@
 #ifndef DIGEST_H
 #define DIGEST_H
 
-#include <QString>
 #include <QCryptographicHash>
 
 class DigestView
 {
 public:
-    explicit DigestView(const QString &digest);
+    explicit DigestView(const QByteArray &digest);
 
     bool isEmpty() const;
 
     // canBeChecksum
     bool isValid() const;
     bool isValid(QCryptographicHash::Algorithm algo) const;
-    static bool isValid(const QString &digest);
-    static bool isValid(const QString &digest, QCryptographicHash::Algorithm algo);
+    static bool isValid(const QByteArray &digest);
+    static bool isValid(const QByteArray &digest, QCryptographicHash::Algorithm algo);
 
-    bool verify(const QString &another) const;
+    bool verify(const QByteArray &another) const;
     bool verify(const DigestView &another) const;
-    static bool verify(const QString &first, const QString &second);
+    static bool verify(const QByteArray &first, const QByteArray &second);
 
     QCryptographicHash::Algorithm algorithm() const;
-    static QCryptographicHash::Algorithm algorithm(const QString &digest);
+    static QCryptographicHash::Algorithm algorithm(const QByteArray &digest);
 
-    const QString& toString() const { return *m_digest; }
+    const QByteArray& digest() const { return *m_digest; }
 
     /*** Operators ***/
     explicit operator bool() const { return isValid(); }
     friend bool operator==(const DigestView& lhs, const DigestView& rhs) { return lhs.verify(rhs); }
 
 private:
-    const QString *m_digest;
+    const QByteArray *m_digest;
 }; // class DigestView
 
 
 class Digest
 {
 public:
-    explicit Digest(const QString &digest)
+    explicit Digest(const QByteArray &digest)
         : m_digest(digest) {}
 
-    explicit Digest(QString&& digest) noexcept
+    explicit Digest(QByteArray&& digest) noexcept
         : m_digest(std::move(digest)) {}
 
     bool isEmpty() const {
@@ -60,18 +59,18 @@ public:
         return DigestView::isValid(m_digest, algo);
     }
 
-    bool verify(const QString &another) const {
+    bool verify(const QByteArray &another) const {
         return DigestView::verify(m_digest, another);
     }
     bool verify(const Digest &another) const {
-        return DigestView::verify(m_digest, another.toString());
+        return DigestView::verify(m_digest, another.digest());
     }
 
     QCryptographicHash::Algorithm algorithm() const {
         return DigestView::algorithm(m_digest);
     }
 
-    const QString& toString() const {
+    const QByteArray& digest() const {
         return m_digest;
     }
 
@@ -80,7 +79,7 @@ public:
     friend bool operator==(const Digest& lhs, const Digest& rhs) { return lhs.verify(rhs); }
 
 private:
-    const QString m_digest;
+    const QByteArray m_digest;
 
 }; // class Digest
 

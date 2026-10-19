@@ -272,7 +272,7 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
 bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &checksum)
 {
     // checking for compliance with the current algo
-    if (DigestView::isValid(checksum, m_data->m_metadata.algorithm)
+    if (DigestView::isValid(checksum.toUtf8(), m_data->m_metadata.algorithm)
         && TreeModel::hasStatus((FileStatus::New | FileStatus::Queued), file))
     {
         setItemValue(file, Column::ColumnChecksum, checksum.toLower());
