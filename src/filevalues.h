@@ -7,7 +7,7 @@
 #define FILEVALUES_H
 
 #include <QObject>
-#include "digeststring.h"
+#include "digest.h"
 
 struct FileValues {
     Q_GADGET
@@ -77,7 +77,7 @@ public:
     // bytes per one millisecond
     inline qint64 hash_speed() const { return (hash_time > 0) ? (size / hash_time) : size; }
 
-    bool verify() const { return DigestStringView(checksum).verify(reChecksum); }
+    bool verify() const { return DigestView(checksum).verify(reChecksum); }
 
     /*** Operators ***/
     explicit operator bool() const { return !defaultChecksum().isEmpty(); }

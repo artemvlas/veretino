@@ -3,16 +3,16 @@
  * licensed under the GNU GPLv3.
  * https://github.com/artemvlas/veretino
 */
-#ifndef DIGESTSTRING_H
-#define DIGESTSTRING_H
+#ifndef DIGEST_H
+#define DIGEST_H
 
 #include <QString>
 #include <QCryptographicHash>
 
-class DigestStringView
+class DigestView
 {
 public:
-    explicit DigestStringView(const QString &digest);
+    explicit DigestView(const QString &digest);
 
     bool isEmpty() const;
 
@@ -23,7 +23,7 @@ public:
     static bool isValid(const QString &digest, QCryptographicHash::Algorithm algo);
 
     bool verify(const QString &another) const;
-    bool verify(const DigestStringView &another) const;
+    bool verify(const DigestView &another) const;
     static bool verify(const QString &first, const QString &second);
 
     QCryptographicHash::Algorithm algorithm() const;
@@ -33,20 +33,20 @@ public:
 
     /*** Operators ***/
     explicit operator bool() const { return isValid(); }
-    friend bool operator==(const DigestStringView& lhs, const DigestStringView& rhs) { return lhs.verify(rhs); }
+    friend bool operator==(const DigestView& lhs, const DigestView& rhs) { return lhs.verify(rhs); }
 
 private:
     const QString *m_digest;
-}; // class DigestStringView
+}; // class DigestView
 
 
-class DigestString
+class Digest
 {
 public:
-    explicit DigestString(const QString &digest)
+    explicit Digest(const QString &digest)
         : m_digest(digest) {}
 
-    explicit DigestString(QString&& digest) noexcept
+    explicit Digest(QString&& digest) noexcept
         : m_digest(std::move(digest)) {}
 
     bool isEmpty() const {
@@ -54,21 +54,21 @@ public:
     }
 
     bool isValid() const {
-        return DigestStringView::isValid(m_digest);
+        return DigestView::isValid(m_digest);
     }
     bool isValid(QCryptographicHash::Algorithm algo) const {
-        return DigestStringView::isValid(m_digest, algo);
+        return DigestView::isValid(m_digest, algo);
     }
 
     bool verify(const QString &another) const {
-        return DigestStringView::verify(m_digest, another);
+        return DigestView::verify(m_digest, another);
     }
-    bool verify(const DigestString &another) const {
-        return DigestStringView::verify(m_digest, another.toString());
+    bool verify(const Digest &another) const {
+        return DigestView::verify(m_digest, another.toString());
     }
 
     QCryptographicHash::Algorithm algorithm() const {
-        return DigestStringView::algorithm(m_digest);
+        return DigestView::algorithm(m_digest);
     }
 
     const QString& toString() const {
@@ -77,11 +77,11 @@ public:
 
     /*** Operators ***/
     explicit operator bool() const { return isValid(); }
-    friend bool operator==(const DigestString& lhs, const DigestString& rhs) { return lhs.verify(rhs); }
+    friend bool operator==(const Digest& lhs, const Digest& rhs) { return lhs.verify(rhs); }
 
 private:
     const QString m_digest;
 
-}; // class DigestString
+}; // class Digest
 
-#endif // DIGESTSTRING_H
+#endif // DIGEST_H

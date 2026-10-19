@@ -14,7 +14,7 @@
 #include "pathstr.h"
 #include "dbfileextension.h"
 #include "algostring.h"
-#include "digeststring.h"
+#include "digest.h"
 
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
@@ -129,7 +129,7 @@ QString extractDigestFromFile(const QString &digest_file)
 
         if (cut > 0) {
             const QString dig = line.left(cut);
-            if (DigestStringView::isValid(dig)) {
+            if (DigestView::isValid(dig)) {
                 return dig;
             }
         }

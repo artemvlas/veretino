@@ -15,7 +15,7 @@
 #include "pathstr.h"
 #include "backupfile.h"
 #include "algostring.h"
-#include "digeststring.h"
+#include "digest.h"
 
 ModeSelector::ModeSelector(View *view, Settings *settings, QObject *parent)
     : QObject{parent}, m_view(view), m_settings(settings)
@@ -975,13 +975,13 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 QString ModeSelector::copiedDigest() const
 {
     QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-    return DigestStringView::isValid(clipboardText) ? clipboardText : QString();
+    return DigestView::isValid(clipboardText) ? clipboardText : QString();
 }
 
 QString ModeSelector::copiedDigest(QCryptographicHash::Algorithm algo) const
 {
     QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-    return DigestStringView::isValid(clipboardText, algo) ? clipboardText : QString();
+    return DigestView::isValid(clipboardText, algo) ? clipboardText : QString();
 }
 
 bool ModeSelector::isDbConst() const

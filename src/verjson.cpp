@@ -12,7 +12,7 @@
 #include "qmicroz.h"
 #include "dbfileextension.h"
 #include "algostring.h"
-#include "digeststring.h"
+#include "digest.h"
 
 const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");
@@ -179,7 +179,7 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
                                                    : QString();
 
     // main list object
-    DigestStringView dgStr(first_value);
+    DigestView dgStr(first_value);
     if (dgStr)
         return dgStr.algorithm();
 

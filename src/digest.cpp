@@ -3,29 +3,29 @@
  * licensed under the GNU GPLv3.
  * https://github.com/artemvlas/veretino
 */
-#include "digeststring.h"
+#include "digest.h"
 #include "algostring.h"
 #include <QSet>
 
-DigestStringView::DigestStringView(const QString &digest)
+DigestView::DigestView(const QString &digest)
     : m_digest(&digest) {}
 
-bool DigestStringView::isEmpty() const
+bool DigestView::isEmpty() const
 {
     return m_digest->isEmpty();
 }
 
-bool DigestStringView::isValid() const
+bool DigestView::isValid() const
 {
     return isValid(*m_digest);
 }
 
-bool DigestStringView::isValid(QCryptographicHash::Algorithm algo) const
+bool DigestView::isValid(QCryptographicHash::Algorithm algo) const
 {
     return isValid(*m_digest, algo);
 }
 
-bool DigestStringView::isValid(const QString &digest)
+bool DigestView::isValid(const QString &digest)
 {
     static const QSet<int> s_perm_length = {32, 40, 64, 128};
 
@@ -50,22 +50,22 @@ bool DigestStringView::isValid(const QString &digest)
     return true;
 }
 
-bool DigestStringView::isValid(const QString &digest, QCryptographicHash::Algorithm algo)
+bool DigestView::isValid(const QString &digest, QCryptographicHash::Algorithm algo)
 {
     return (digest.size() == AlgoString::digestLength(algo)) && isValid(digest);
 }
 
-bool DigestStringView::verify(const QString &another) const
+bool DigestView::verify(const QString &another) const
 {
     return verify(toString(), another);
 }
 
-bool DigestStringView::verify(const DigestStringView &another) const
+bool DigestView::verify(const DigestView &another) const
 {
     return verify(toString(), another.toString());
 }
 
-bool DigestStringView::verify(const QString &first, const QString &second)
+bool DigestView::verify(const QString &first, const QString &second)
 {
     if (first.length() != second.length())
         return false;
@@ -78,12 +78,12 @@ bool DigestStringView::verify(const QString &first, const QString &second)
     return true;
 }
 
-QCryptographicHash::Algorithm DigestStringView::algorithm() const
+QCryptographicHash::Algorithm DigestView::algorithm() const
 {
     return algorithm(*m_digest);
 }
 
-QCryptographicHash::Algorithm DigestStringView::algorithm(const QString &digest)
+QCryptographicHash::Algorithm DigestView::algorithm(const QString &digest)
 {
     return AlgoString::algoByStrLen(digest.length());
 }
