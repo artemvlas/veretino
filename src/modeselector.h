@@ -69,7 +69,7 @@ public:
                         QCryptographicHash::Algorithm algo,
                         FileValues::HashingPurpose result = FileValues::HashingPurpose::Generic);
     void checkSummaryFile(const QString &path);
-    void checkFile(const QString &filePath, const QString &checkSum);
+    void checkFile(const QString &filePath, const Digest &checkSum);
     void verify(const QModelIndex index = QModelIndex());
     void verifyModified();
     void verifyItems(const QModelIndex &root, FileStatus status);

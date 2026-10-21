@@ -125,9 +125,9 @@ bool VerJson::save()
     return (file.open(QFile::WriteOnly) && file.write(data));
 }
 
-void VerJson::addItem(const QString &file, const QString &checksum)
+void VerJson::addItem(const QString &file, const Digest &checksum)
 {
-    m_items[file] = checksum;
+    m_items[file] = QString(checksum);
 }
 
 void VerJson::addItemUnr(const QString &file)
@@ -179,7 +179,7 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
                                                    : QString();
 
     // main list object
-    DigestView dgStr(first_value);
+    DigestView dgStr(first_value.toUtf8());
     if (dgStr)
         return dgStr.algorithm();
 

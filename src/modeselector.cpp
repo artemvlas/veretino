@@ -51,7 +51,7 @@ void ModeSelector::connectActions()
     connect(m_menuAct->actionProcessSha_toClipboard, &QAction::triggered, this, [=]{
         if (isMode(File)) { processFileSha(m_view->curAbsPath(), m_settings->algorithm(), FileValues::HashingPurpose::CopyToClipboard); }
         // TODO: move to another thread
-        else if (isMode(SumFile)) { QGuiApplication::clipboard()->setText(m_manager->extractDigestFromFile(m_view->curAbsPath())); }
+        else if (isMode(SumFile)) { QGuiApplication::clipboard()->setText(QString(m_manager->extractDigestFromFile(m_view->curAbsPath()))); }
     });
 
     // DB Model View
@@ -386,7 +386,8 @@ void ModeSelector::showFolderContentTypes()
 
 void ModeSelector::checkFileByClipboardChecksum()
 {
-    checkFile(m_view->curAbsPath(), QGuiApplication::clipboard()->text().simplified());
+    const QString checksum = QGuiApplication::clipboard()->text().simplified();
+    checkFile(m_view->curAbsPath(), Digest(checksum.toUtf8()));
 }
 
 void ModeSelector::copyFsItem()
@@ -511,9 +512,9 @@ void ModeSelector::checkSummaryFile(const QString &path)
     m_manager->addTask(&Manager::checkSummaryFile, path);
 }
 
-void ModeSelector::checkFile(const QString &filePath, const QString &checkSum)
+void ModeSelector::checkFile(const QString &filePath, const Digest &checkSum)
 {
-    m_manager->addTask(qOverload<const QString&, const QString&>(&Manager::checkFile), filePath, checkSum);
+    m_manager->addTask(qOverload<const QString&, const Digest&>(&Manager::checkFile), filePath, checkSum);
 }
 
 void ModeSelector::verify(const QModelIndex index)
@@ -576,8 +577,10 @@ void ModeSelector::exportItemSum()
     FileValues fileVal(FileValues::HashingPurpose::SaveToDigestFile,
                        QFileInfo(filePath).size());
 
-    fileVal.checksum = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
-                                                     : TreeModel::itemFileChecksum(ind);
+    Digest digest = TreeModel::hasReChecksum(ind) ? TreeModel::itemFileReChecksum(ind)
+                                                  : TreeModel::itemFileChecksum(ind);
+
+    fileVal.checksum = digest;
 
     emit m_manager->fileProcessed(filePath, fileVal);
 }
@@ -975,13 +978,13 @@ void ModeSelector::createContextMenu_ViewDb(const QPoint &point)
 QString ModeSelector::copiedDigest() const
 {
     QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-    return DigestView::isValid(clipboardText) ? clipboardText : QString();
+    return DigestView::isValid(clipboardText.toUtf8()) ? clipboardText : QString();
 }
 
 QString ModeSelector::copiedDigest(QCryptographicHash::Algorithm algo) const
 {
     QString clipboardText = QGuiApplication::clipboard()->text().simplified();
-    return DigestView::isValid(clipboardText, algo) ? clipboardText : QString();
+    return DigestView::isValid(clipboardText.toUtf8(), algo) ? clipboardText : QString();
 }
 
 bool ModeSelector::isDbConst() const

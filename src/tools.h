@@ -67,7 +67,7 @@ QString joinStrings(int num, const QString &str);
 // --> "str X"
 QString joinStrings(const QString &str, int num);
 
-QString extractDigestFromFile(const QString &digest_file);
+Digest extractDigestFromFile(const QString &digest_file);
 
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
 

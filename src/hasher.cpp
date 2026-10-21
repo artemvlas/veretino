@@ -25,12 +25,12 @@ void Hasher::setProcState(const ProcState *procState)
     m_proc = procState;
 }
 
-QString Hasher::calculate(const QString &filePath)
+QByteArray Hasher::calculate(const QString &filePath)
 {
     return calculate(filePath, m_algo);
 }
 
-QString Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
+QByteArray Hasher::calculate(const QString &filePath, QCryptographicHash::Algorithm algo)
 {
     QFile file(filePath);
     tools::openFile(file, QFile::ReadOnly);

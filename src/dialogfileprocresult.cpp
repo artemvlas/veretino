@@ -60,7 +60,7 @@ void DialogFileProcResult::setModeMatched()
     setIcon(FileStatus::Matched);
 
     m_ui->textChecksum->setTextColor(QColor("green"));
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 }
 
 void DialogFileProcResult::setModeMismatched()
@@ -69,13 +69,13 @@ void DialogFileProcResult::setModeMismatched()
     setIcon(FileStatus::Mismatched);
 
     m_ui->textChecksum->setTextColor(QColor("red"));
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 
     QTextEdit *reChecksum = new QTextEdit(this);
     reChecksum->setReadOnly(true);
     reChecksum->setMinimumHeight(45);
     reChecksum->setTextColor(QColor("green"));
-    reChecksum->setText(m_values.reChecksum);
+    reChecksum->setText(QString(m_values.reChecksum));
     m_ui->verticalLayout->addWidget(reChecksum);
 }
 
@@ -84,7 +84,7 @@ void DialogFileProcResult::setModeComputed()
     setWindowTitle(QStringLiteral(u"Checksum calculated"));
     setIcon(Icons::HashFile);
 
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 
     m_ui->buttonBox->clear();
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
@@ -98,9 +98,9 @@ void DialogFileProcResult::setModeCopied()
     setWindowTitle(QStringLiteral(u"Copied to clipboard"));
     setIcon(Icons::Paste);
 
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 
-    QGuiApplication::clipboard()->setText(m_values.checksum);
+    QGuiApplication::clipboard()->setText(QString(m_values.checksum));
 }
 
 void DialogFileProcResult::setModeStored()
@@ -109,7 +109,7 @@ void DialogFileProcResult::setModeStored()
     setIcon(Icons::Save);
     setExtLineVisible(false);
 
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 
     m_ui->buttonBox->clear();
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok);
@@ -121,7 +121,7 @@ void DialogFileProcResult::setModeUnstored()
     setIcon(Icons::DocClose);
     setExtLineVisible(false);
 
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 
     m_ui->buttonBox->clear();
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
@@ -134,7 +134,7 @@ void DialogFileProcResult::setModeDigestFileExists()
     setIcon(Icons::Update);
     setExtLineVisible(false);
 
-    m_ui->textChecksum->setText(m_values.checksum);
+    m_ui->textChecksum->setText(QString(m_values.checksum));
 
     m_ui->buttonBox->clear();
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
@@ -202,7 +202,7 @@ void DialogFileProcResult::setExtLineVisible(bool visible)
 
     if (hasDigest) {
         m_ui->labelAlgo->setText(QStringLiteral(u"Algorithm: ")
-                                 + AlgoString::name(m_values.checksum.length()));
+                                 + AlgoString::name(m_values.checksum.digest().length()));
     }
 }
 
@@ -211,7 +211,7 @@ void DialogFileProcResult::addButtonCopy()
     QPushButton *buttonCopy = m_ui->buttonBox->addButton(QStringLiteral(u"Copy"), QDialogButtonBox::AcceptRole);
     buttonCopy->setIcon(m_icons.icon(Icons::Copy));
 
-    connect(buttonCopy, &QPushButton::clicked, this, [=]{ QGuiApplication::clipboard()->setText(m_values.checksum); });
+    connect(buttonCopy, &QPushButton::clicked, this, [=]{ QGuiApplication::clipboard()->setText(QString(m_values.checksum)); });
 }
 
 void DialogFileProcResult::addButtonSave()
@@ -233,13 +233,13 @@ void DialogFileProcResult::addButtonOverwrite()
 
 void DialogFileProcResult::makeSumFile()
 {
-    const QString &chsum = m_values.checksum;
-
-    if (m_filePath.isEmpty() || !DigestView::isValid(chsum))
+    if (m_filePath.isEmpty() || !m_values.checksum.isValid())
         return;
 
     const QString sumFile = digestFilePath();
-    const QString strToWrite = tools::joinStrings(chsum, pathstr::entryName(m_filePath), QStringLiteral(u" *"));
+    const QString strToWrite = tools::joinStrings(QString(m_values.checksum),
+                                                  pathstr::entryName(m_filePath),
+                                                  QStringLiteral(u" *"));
 
     setFileName(sumFile);
 
@@ -273,9 +273,7 @@ void DialogFileProcResult::verify()
         return;
     }
 
-    const int compare = m_values.checksum.compare(m_values.reChecksum, Qt::CaseInsensitive);
-
-    if (compare == 0) { // Matched
+    if (m_values.verify()) { // Matched
         setModeMatched();
     } else {
         setModeMismatched();
@@ -284,5 +282,5 @@ void DialogFileProcResult::verify()
 
 QString DialogFileProcResult::digestFilePath() const
 {
-    return paths::digestFilePath(m_filePath, m_values.checksum.size());
+    return paths::digestFilePath(m_filePath, m_values.checksum.algorithm());
 }
