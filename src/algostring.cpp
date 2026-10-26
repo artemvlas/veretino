@@ -4,14 +4,6 @@
  * https://github.com/artemvlas/veretino
 */
 #include "algostring.h"
-#include "pathstr.h"
-
-const QStringList AlgoString::sl_digest_exts = {
-    QStringLiteral(u"md5"),
-    QStringLiteral(u"sha1"),
-    QStringLiteral(u"sha256"),
-    QStringLiteral(u"sha512")
-};
 
 AlgoString::AlgoString(QCryptographicHash::Algorithm algo)
     : m_algo(algo) {}
@@ -50,37 +42,6 @@ QString AlgoString::name(QCryptographicHash::Algorithm algo)
 QString AlgoString::name(int digestLength)
 {
     return name(algoByStrLen(digestLength));
-}
-
-QString AlgoString::suffix() const
-{
-    return suffix(m_algo);
-}
-
-QString AlgoString::suffix(QCryptographicHash::Algorithm algo)
-{
-    switch (algo) {
-    case QCryptographicHash::Md5:
-        return sl_digest_exts.at(0);
-    case QCryptographicHash::Sha1:
-        return sl_digest_exts.at(1);
-    case QCryptographicHash::Sha256:
-        return sl_digest_exts.at(2);
-    case QCryptographicHash::Sha512:
-        return sl_digest_exts.at(3);
-    default:
-        return {};
-    }
-}
-
-QString AlgoString::suffix(int digestLength)
-{
-    return suffix(algoByStrLen(digestLength));
-}
-
-bool AlgoString::isDigestFile(const QString &filePath)
-{
-    return pathstr::hasExtension(filePath, sl_digest_exts);
 }
 
 int AlgoString::digestLength() const

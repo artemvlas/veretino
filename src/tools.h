@@ -67,8 +67,6 @@ QString joinStrings(int num, const QString &str);
 // --> "str X"
 QString joinStrings(const QString &str, int num);
 
-Digest extractDigestFromFile(const QString &digest_file);
-
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
 
 // try to open the 'file'; if an error occurs, throws exceptions
@@ -82,9 +80,6 @@ QString enumToString(const QEnum value)
 } // namespace tools
 
 namespace paths {
-// ../folder/file.txt --> ../folder/file.txt.shaX
-QString digestFilePath(const QString &file, QCryptographicHash::Algorithm algo);
-QString digestFilePath(const QString &file, const int sum_len);
 bool isDbFile(const QString &filePath);
 bool isDigestFile(const QString &filePath);
 void browsePath(const QString &path);

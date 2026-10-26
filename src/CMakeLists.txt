@@ -15,6 +15,7 @@ set(PROJECT_SOURCES
     dialogfileprocresult.h
     dialogsettings.h
     digest.h
+    digestfile.h
     files.h
     filevalues.h
     filterrule.h
@@ -59,6 +60,7 @@ set(PROJECT_SOURCES
     dialogfileprocresult.cpp
     dialogsettings.cpp
     digest.cpp
+    digestfile.cpp
     files.cpp
     filterrule.cpp
     hasher.cpp

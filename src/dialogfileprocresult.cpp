@@ -9,6 +9,7 @@
 #include "pathstr.h"
 #include "algostring.h"
 #include "digest.h"
+#include "digestfile.h"
 #include <QPushButton>
 #include <QFile>
 #include <QClipboard>
@@ -282,5 +283,5 @@ void DialogFileProcResult::verify()
 
 QString DialogFileProcResult::digestFilePath() const
 {
-    return paths::digestFilePath(m_filePath, m_values.checksum.algorithm());
+    return DigestFile::digestFilePath(m_filePath, m_values.checksum.algorithm());
 }

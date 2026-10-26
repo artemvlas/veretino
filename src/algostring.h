@@ -22,14 +22,6 @@ public:
     static QString name(QCryptographicHash::Algorithm algo);
     static QString name(int digestLength);
 
-    // "md5", "sha1", "sha256", "sha512"
-    QString suffix() const;
-    static QString suffix(QCryptographicHash::Algorithm algo);
-    static QString suffix(int digestLength);
-
-    // <filePath> ends with suffix ("md5", "sha1", "sha256", "sha512")
-    static bool isDigestFile(const QString &filePath);
-
     // returns the checksum str length: sha(1) = 40, sha(256) = 64, sha(512) = 128
     int digestLength() const;
     static int digestLength(QCryptographicHash::Algorithm algo);
@@ -39,8 +31,6 @@ public:
 
     // "SHA-256" -> QCryptographicHash::Sha256
     static QCryptographicHash::Algorithm strToAlgo(const QString &strAlgo);
-
-    static const QStringList sl_digest_exts;
 
 private:
     // {0,1,2,3} --> 123

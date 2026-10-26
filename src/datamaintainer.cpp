@@ -12,6 +12,7 @@
 #include "pathstr.h"
 #include "backupfile.h"
 #include "digest.h"
+#include "digestfile.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)
@@ -930,7 +931,7 @@ QString DataMaintainer::digestFilePath(const QModelIndex &fileIndex)
 
     const QString absPath = DataHelper::itemAbsolutePath(m_data, fileIndex);
 
-    return paths::digestFilePath(absPath, m_data->m_metadata.algorithm);
+    return DigestFile::digestFilePath(absPath, m_data->m_metadata.algorithm);
 }
 
 bool DataMaintainer::isCanceled() const

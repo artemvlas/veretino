@@ -15,6 +15,7 @@
 #include "dbfileextension.h"
 #include "algostring.h"
 #include "digest.h"
+#include "digestfile.h"
 
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
@@ -114,30 +115,6 @@ QString joinStrings(const QString &str, int num)
     return str % ' ' % QString::number(num);
 }
 
-Digest extractDigestFromFile(const QString &digest_file)
-{
-    QFile sumFile(digest_file);
-    openFile(sumFile, QFile::ReadOnly);
-
-    // <!!!> TODO: should be rewritten with QByteArray
-    const QString line = sumFile.readLine();
-
-    static const QStringList l_seps { "  ", " *" };
-
-    for (int it = 0; it <= l_seps.size(); ++it) {
-        int cut = (it < l_seps.size()) ? line.indexOf(l_seps.at(it))
-                                       : AlgoString::digestLength(AlgoString::strToAlgo(pathstr::suffix(digest_file)));
-
-        if (cut > 0) {
-            const Digest dig(line.left(cut).toUtf8());
-            if (dig.isValid())
-                return dig;
-        }
-    }
-
-    throw Exception(ERR_NODATA, "Checksum not found");
-}
-
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
 {
     if (QFileInfo::exists(path))
@@ -174,17 +151,6 @@ void openFile(QFile &file, QFile::OpenMode mode)
 } // namespace tools
 
 namespace paths {
-QString digestFilePath(const QString &file, QCryptographicHash::Algorithm algo)
-{
-    const QString ext = AlgoString::suffix(algo);
-    return tools::joinStrings(file, ext, u'.');
-}
-
-QString digestFilePath(const QString &file, const int sum_len)
-{
-    return digestFilePath(file, AlgoString::algoByStrLen(sum_len));
-}
-
 bool isDbFile(const QString &filePath)
 {
     return pathstr::hasExtension(filePath, DbFileExtension::s_extLong)
@@ -193,7 +159,7 @@ bool isDbFile(const QString &filePath)
 
 bool isDigestFile(const QString &filePath)
 {
-    return AlgoString::isDigestFile(filePath);
+    return DigestFile::isDigestFile(filePath);
 }
 
 void browsePath(const QString &path)

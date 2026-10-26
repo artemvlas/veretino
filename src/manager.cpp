@@ -16,8 +16,8 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "backupfile.h"
-#include "algostring.h"
 #include "digest.h"
+#include "digestfile.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)
@@ -405,7 +405,7 @@ Digest Manager::extractDigestFromFile(const QString &digestFile, bool showExcept
     Digest digest;
 
     try {
-        digest = tools::extractDigestFromFile(digestFile);
+        digest = DigestFile::extractDigest(digestFile);
     }
     catch (const Exception& e) {
         if (showException)
@@ -564,7 +564,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         if (allow_import) {
             const QString filePath = DataHelper::itemAbsolutePath(pData, iter.index());
-            const QString shaFilePath = paths::digestFilePath(filePath, pData->m_metadata.algorithm);
+            const QString shaFilePath = DigestFile::digestFilePath(filePath, pData->m_metadata.algorithm);
 
             if (QFileInfo::exists(shaFilePath)) {
                 const Digest digest = extractDigestFromFile(shaFilePath, false);
