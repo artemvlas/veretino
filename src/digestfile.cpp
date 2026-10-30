@@ -102,20 +102,24 @@ Digest DigestFile::extractDigest(const QString &digestFile)
     QFile sumFile(digestFile);
     tools::openFile(sumFile, QFile::ReadOnly);
 
-    // <!!!> TODO: should be rewritten with QByteArray
-    const QString line = sumFile.readLine();
+    const QByteArray line = sumFile.readLine();
 
-    static const QStringList l_seps { "  ", " *" };
+    const int cut = line.indexOf(' ');
 
-    for (int it = 0; it <= l_seps.size(); ++it) {
-        int cut = (it < l_seps.size()) ? line.indexOf(l_seps.at(it))
-                                       : AlgoString::digestLength(AlgoString::strToAlgo(pathstr::suffix(digestFile)));
+    if (cut > 0) {
+        const Digest dig(line.left(cut));
+        if (dig.isValid())
+            return dig;
+    }
 
-        if (cut > 0) {
-            const Digest dig(line.left(cut).toUtf8());
-            if (dig.isValid())
-                return dig;
-        }
+    const QString suffix = pathstr::suffix(digestFile);
+    const QCryptographicHash::Algorithm algo = AlgoString::strToAlgo(suffix);
+    const int digestLength = AlgoString::digestLength(algo);
+
+    if (digestLength > 0) {
+        const Digest dig(line.left(digestLength));
+        if (dig.isValid())
+            return dig;
     }
 
     throw Exception(ERR_NODATA, "Checksum not found");
