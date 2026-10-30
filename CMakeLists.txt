@@ -23,6 +23,20 @@ add_definitions(-DMAX_LENGTH_COMMENT=150)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
 
+# Checking the existence of submodules
+set(REQUIRED_SUBMODULES
+    "${CMAKE_SOURCE_DIR}/submodules/pathstr"
+    "${CMAKE_SOURCE_DIR}/submodules/qmicroz"
+)
+
+foreach(SUBMODULE_PATH ${REQUIRED_SUBMODULES})
+    if(NOT EXISTS "${SUBMODULE_PATH}/CMakeLists.txt")
+        message(FATAL_ERROR
+            "Required submodule not found at ${SUBMODULE_PATH}.
+            Please run: git submodule update --init --recursive")
+    endif()
+endforeach()
+
 add_subdirectory(submodules)
 add_subdirectory(src)
 
