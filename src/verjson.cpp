@@ -13,6 +13,7 @@
 #include "dbfileextension.h"
 #include "algostring.h"
 #include "digest.h"
+#include "exception.h"
 
 const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");

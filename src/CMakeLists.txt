@@ -16,6 +16,7 @@ set(PROJECT_SOURCES
     dialogsettings.h
     digest.h
     digestfile.h
+    exception.h
     files.h
     filevalues.h
     filterrule.h

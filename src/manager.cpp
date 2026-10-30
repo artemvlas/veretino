@@ -18,6 +18,7 @@
 #include "backupfile.h"
 #include "digest.h"
 #include "digestfile.h"
+#include "exception.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)

@@ -13,6 +13,7 @@
 #include "backupfile.h"
 #include "digest.h"
 #include "digestfile.h"
+#include "exception.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)

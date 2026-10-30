@@ -13,9 +13,8 @@
 #include <QDebug>
 #include "pathstr.h"
 #include "dbfileextension.h"
-#include "algostring.h"
-#include "digest.h"
 #include "digestfile.h"
+#include "exception.h"
 
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);

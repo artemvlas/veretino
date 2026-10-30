@@ -37,13 +37,6 @@ static const QString s_dt_format;
 static const QString s_db_prefix;
 }; // struct Lit
 
-class Exception : public std::runtime_error {
-public:
-    int errorCode;
-    Exception(int code, const std::string& msg = std::string())
-        : std::runtime_error(msg), errorCode(code) {}
-}; // class Exception
-
 namespace tools {
 // {0,1,2,3} --> 123
 int digitsToNum(const QList<int> &digits);

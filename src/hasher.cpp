@@ -5,6 +5,7 @@
 */
 #include "hasher.h"
 #include "tools.h"
+#include "exception.h"
 #include <QFile>
 
 Hasher::Hasher(QObject *parent)

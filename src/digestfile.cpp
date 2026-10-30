@@ -8,6 +8,7 @@
 #include "pathstr.h"
 #include "algostring.h"
 #include "tools.h"
+#include "exception.h"
 #include <QDebug>
 
 const QStringList DigestFile::sl_digest_exts = {
