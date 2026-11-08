@@ -132,10 +132,13 @@ void DataMaintainer::updateVerifDateTime()
 
 void DataMaintainer::checkVerifDateTime()
 {
-    if (!m_data || !m_data->m_metadata.datetime.hasValue(VerDateTime::Verified))
+    if (!m_data)
         return;
 
-    const QString verified = m_data->m_metadata.datetime.value(VerDateTime::Verified);
+    VerDateTime &dt = m_data->m_metadata.datetime;
+
+    if (!dt.hasValue(VerDateTime::Verified))
+        return;
 
     TreeModelIterator it(m_data->m_model);
 
@@ -147,8 +150,8 @@ void DataMaintainer::checkVerifDateTime()
 
         QFileInfo fi(DataHelper::itemAbsolutePath(m_data, it.index()));
 
-        if (tools::isLater(verified, fi.birthTime())) {
-            m_data->m_metadata.datetime.clear(VerDateTime::Verified);
+        if (dt.isLater(VerDateTime::Verified, fi.birthTime())) {
+            dt.clear(VerDateTime::Verified);
             qDebug() << "The Verified time stamp is obsolete. Perhaps the data was moved.";
             break;
         }
@@ -578,7 +581,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
 
         QFileInfo fi(filePath);
         FileStatus status = (!basicDate.isEmpty()
-                             && tools::isLater(basicDate, fi.lastModified()))
+                             && VerDateTime::isLater(basicDate, fi.lastModified()))
                                 ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
 
         return FileValues(status, fi.size());

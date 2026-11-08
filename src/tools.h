@@ -33,7 +33,6 @@ static const QString s_app_name;
 static const QString s_sepStick;
 static const QString s_sepCommaSpace;
 static const QString s_sepColonSpace;
-static const QString s_dt_format;
 static const QString s_db_prefix;
 }; // struct Lit
 
@@ -43,10 +42,6 @@ int digitsToNum(const QList<int> &digits);
 
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
-
-// true ("2024/09/24 18:35", "2024/09/25 11:40")
-bool isLater(const QString &dt_before, const QString &dt_later);
-bool isLater(const QString &dt_str, const QDateTime &other);
 
 // checks for the absence of sep duplication
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
@@ -79,8 +74,6 @@ void browsePath(const QString &path);
 } // namespace paths
 
 namespace format {
-QString currentDateTime();
-
 // Returns a string of numbers separated by commas: 1,234,567,890
 QString numString(qint64 num);
 

@@ -5,7 +5,6 @@
 */
 #include "tools.h"
 #include <QStringBuilder>
-#include <QDateTime>
 #include <QFileInfo>
 #include <cmath>
 #include <QDesktopServices>
@@ -23,7 +22,6 @@ const QString Lit::s_app_name = QStringLiteral(u"veretino");
 const QString Lit::s_sepStick = QStringLiteral(u" | ");
 const QString Lit::s_sepCommaSpace = QStringLiteral(u", ");
 const QString Lit::s_sepColonSpace = QStringLiteral(u": ");
-const QString Lit::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
 const QString Lit::s_db_prefix = QStringLiteral(u"checksums");
 
 namespace tools {
@@ -36,38 +34,6 @@ int digitsToNum(const QList<int> &digits)
     }
 
     return number;
-}
-
-bool isLater(const QString &dt_before, const QString &dt_later)
-{
-    // format "yyyy/MM/dd HH:mm"
-    const int dt_str_len = 16;
-
-    if (dt_before.size() != dt_str_len
-        || dt_later.size() != dt_str_len)
-    {
-        return false;
-    }
-
-    for (int i = 0; i < dt_before.size(); ++i) {
-        const int ch1v = dt_before.at(i).digitValue();
-        const int ch2v = dt_later.at(i).digitValue();
-
-        if (ch1v < ch2v)
-            return true;
-        if (ch1v > ch2v)
-            return false;
-    }
-
-    return false;
-}
-
-bool isLater(const QString &dt_str, const QDateTime &other)
-{
-    if (dt_str.isEmpty())
-        return false;
-
-    return isLater(dt_str, other.toString(Lit::s_dt_format));
 }
 
 bool isFlagCombined(const int flag)
@@ -170,11 +136,6 @@ void browsePath(const QString &path)
 } // namespace paths
 
 namespace format {
-QString currentDateTime()
-{
-    return QDateTime::currentDateTime().toString(Lit::s_dt_format);
-}
-
 QString numString(qint64 num)
 {
     QString numstr = QString::number(num);
