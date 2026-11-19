@@ -71,7 +71,7 @@ void TreeModel::add_file(const QString &filePath, const FileValues &values)
     tiData[ColumnStatus].setData(format::fileItemStatus(values.status), Qt::DisplayRole);
 
     if (!values.checksum.isEmpty())
-        tiData[ColumnChecksum] = values.checksum;
+        tiData[ColumnChecksum] = values.checksum.digest();
 
     // item adding
     TreeItem *parentItem = add_folder(pathstr::parentFolder(filePath));
@@ -355,14 +355,16 @@ FileStatus TreeModel::itemFileStatus(const QModelIndex &fileIndex)
     return fileIndex.siblingAtColumn(ColumnStatus).data(TreeItem::FallbackRole).value<FileStatus>();
 }
 
-QString TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
+Digest TreeModel::itemFileChecksum(const QModelIndex &fileIndex)
 {
-    return fileIndex.siblingAtColumn(ColumnChecksum).data().toString();
+    Digest digest(fileIndex.siblingAtColumn(ColumnChecksum).data().toByteArray());
+    return digest;
 }
 
-QString TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
+Digest TreeModel::itemFileReChecksum(const QModelIndex &fileIndex)
 {
-    return fileIndex.siblingAtColumn(ColumnReChecksum).data().toString();
+    Digest digest(fileIndex.siblingAtColumn(ColumnReChecksum).data().toByteArray());
+    return digest;
 }
 
 qint64 TreeModel::itemHashTime(const QModelIndex &fileIndex)

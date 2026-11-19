@@ -62,7 +62,7 @@ public:
     MetaData m_metadata;
     Numbers m_numbers;
 
-    QHash<QString, QModelIndex> m_cacheMissing;
+    QHash<Digest, QModelIndex> m_cacheMissing;
     QHash<QModelIndex, QString> m_cacheBranches;
 }; // class DataContainer
 

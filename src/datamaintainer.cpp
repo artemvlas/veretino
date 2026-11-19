@@ -11,7 +11,9 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "backupfile.h"
-#include "digeststring.h"
+#include "digest.h"
+#include "digestfile.h"
+#include "exception.h"
 
 DataMaintainer::DataMaintainer(QObject *parent)
     : QObject(parent)
@@ -136,10 +138,13 @@ void DataMaintainer::updateVerifDateTime()
 
 void DataMaintainer::checkVerifDateTime()
 {
-    if (!m_data || !m_data->m_metadata.datetime.hasValue(VerDateTime::Verified))
+    if (!m_data)
         return;
 
-    const QString verified = m_data->m_metadata.datetime.value(VerDateTime::Verified);
+    VerDateTime &dt = m_data->m_metadata.datetime;
+
+    if (!dt.hasValue(VerDateTime::Verified))
+        return;
 
     TreeModelIterator it(m_data->m_model);
 
@@ -151,8 +156,8 @@ void DataMaintainer::checkVerifDateTime()
 
         QFileInfo fi(DataHelper::itemAbsolutePath(m_data, it.index()));
 
-        if (tools::isLater(verified, fi.birthTime())) {
-            m_data->m_metadata.datetime.clear(VerDateTime::Verified);
+        if (dt.isLater(VerDateTime::Verified, fi.birthTime())) {
+            dt.clear(VerDateTime::Verified);
             qDebug() << "The Verified time stamp is obsolete. Perhaps the data was moved.";
             break;
         }
@@ -248,18 +253,18 @@ void DataMaintainer::setDbFileState(DbFileState state)
     }
 }
 
-bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QString &computedChecksum)
+bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const Digest &computedChecksum)
 {
     if (!m_data || !fileRowIndex.isValid() || fileRowIndex.model() != m_data->m_model) {
         qDebug() << "DM::updateChecksum >> Error";
         return false;
     }
 
-    const QString storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
+    const Digest storedChecksum = TreeModel::itemFileChecksum(fileRowIndex);
 
     if (storedChecksum.isEmpty()) {
         if (!tryMoved(fileRowIndex, computedChecksum)) {
-            setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum);
+            setItemValue(fileRowIndex, Column::ColumnChecksum, computedChecksum.digest());
             setFileStatus(fileRowIndex, FileStatus::Added);
         }
         return true;
@@ -269,19 +274,19 @@ bool DataMaintainer::updateChecksum(const QModelIndex &fileRowIndex, const QStri
         return true;
     }
     else {
-        setItemValue(fileRowIndex, Column::ColumnReChecksum, computedChecksum);
+        setItemValue(fileRowIndex, Column::ColumnReChecksum, computedChecksum.digest());
         setFileStatus(fileRowIndex, FileStatus::Mismatched);
         return false;
     }
 }
 
-bool DataMaintainer::importChecksum(const QModelIndex &file, const QString &checksum)
+bool DataMaintainer::importChecksum(const QModelIndex &file, const Digest &checksum)
 {
     // checking for compliance with the current algo
-    if (DigestString::isValid(checksum, m_data->m_metadata.algorithm)
+    if (checksum.isValid(m_data->m_metadata.algorithm)
         && TreeModel::hasStatus((FileStatus::New | FileStatus::Queued), file))
     {
-        setItemValue(file, Column::ColumnChecksum, checksum.toLower());
+        setItemValue(file, Column::ColumnChecksum, checksum.digest().toLower());
         setFileStatus(file, FileStatus::Imported);
         return true;
     }
@@ -413,7 +418,7 @@ bool DataMaintainer::removeDigestEntry(const QModelIndex &fileIndex)
     return true;
 }
 
-bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
+bool DataMaintainer::tryMoved(const QModelIndex &file, const Digest &checksum)
 {
     if (!m_data || !m_data->m_cacheMissing.contains(checksum))
         return false;
@@ -429,7 +434,7 @@ bool DataMaintainer::tryMoved(const QModelIndex &file, const QString &checksum)
 
         // moved
         setFileStatus(file, FileStatus::Moved);
-        setItemValue(file, Column::ColumnChecksum, checksum);
+        setItemValue(file, Column::ColumnChecksum, checksum.digest());
         return true;
     }
 
@@ -462,10 +467,10 @@ int DataMaintainer::updateMismatchedChecksums()
 bool DataMaintainer::itemFileUpdateChecksum(const QModelIndex &fileIndex)
 {
     if (m_data && TreeModel::hasReChecksum(fileIndex)) {
-        const QString reChecksum = TreeModel::itemFileReChecksum(fileIndex);
+        const Digest reChecksum = TreeModel::itemFileReChecksum(fileIndex);
 
         if (!reChecksum.isEmpty()) {
-            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum);
+            setItemValue(fileIndex, Column::ColumnChecksum, reChecksum.digest());
             setItemValue(fileIndex, Column::ColumnReChecksum);
             setItemValue(fileIndex, Column::ColumnStatus, FileStatus::Updated);
             return true;
@@ -582,7 +587,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
 
         QFileInfo fi(filePath);
         FileStatus status = (!basicDate.isEmpty()
-                             && tools::isLater(basicDate, fi.lastModified()))
+                             && VerDateTime::isLater(basicDate, fi.lastModified()))
                                 ? FileStatus::NotCheckedMod : FileStatus::NotChecked;
 
         return FileValues(status, fi.size());
@@ -601,7 +606,7 @@ TreeModel* DataMaintainer::makeModel(const VerJson &json, const MetaData &meta)
     {
         const QString fullPath = pathstr::joinPath(workDir, it.key());
         FileValues values = makeFileValues(fullPath, basicDate);
-        values.checksum = it.value().toString();
+        values.checksum.set(it.value().toString().toUtf8());
 
         pModel->add_file(it.key(), values);
     }
@@ -744,7 +749,7 @@ VerJson* DataMaintainer::makeJson(const QModelIndex &rootFolder)
 
     while (iter.hasNext() && !isCanceled()) {
         iter.nextFile();
-        const QString checksum = iter.checksum();
+        const Digest checksum = iter.checksum();
         if (!checksum.isEmpty()) {
             pJson->addItem(iter.path(rootFolder), checksum);
         }
@@ -861,7 +866,7 @@ int DataMaintainer::importBranch(const QModelIndex &rootFolder)
             const QJsonValue val = mainList.value(it.path(rootFolder));
 
             if (!val.isUndefined()
-                && importChecksum(it.index(), val.toString()))
+                && importChecksum(it.index(), Digest(val.toString().toUtf8())))
             {
                 ++num;
             }
@@ -936,7 +941,7 @@ QString DataMaintainer::digestFilePath(const QModelIndex &fileIndex)
 
     const QString absPath = DataHelper::itemAbsolutePath(m_data, fileIndex);
 
-    return paths::digestFilePath(absPath, m_data->m_metadata.algorithm);
+    return DigestFile::digestFilePath(absPath, m_data->m_metadata.algorithm);
 }
 
 bool DataMaintainer::isCanceled() const

@@ -20,8 +20,8 @@ public:
     void setAlgorithm(QCryptographicHash::Algorithm algo);
     void setProcState(const ProcState *procState);
 
-    QString calculate(const QString &filePath);
-    QString calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
+    QByteArray calculate(const QString &filePath);
+    QByteArray calculate(const QString &filePath, QCryptographicHash::Algorithm algo);
 
 private:
     inline bool isCanceled() const;

@@ -12,7 +12,8 @@
 #include "qmicroz.h"
 #include "dbfileextension.h"
 #include "algostring.h"
-#include "digeststring.h"
+#include "digest.h"
+#include "exception.h"
 
 const QString VerJson::h_key_Algo = QStringLiteral(u"Hash Algorithm");
 const QString VerJson::h_key_Comment = QStringLiteral(u"Comment");
@@ -125,9 +126,9 @@ bool VerJson::save()
     return (file.open(QFile::WriteOnly) && file.write(data));
 }
 
-void VerJson::addItem(const QString &file, const QString &checksum)
+void VerJson::addItem(const QString &file, const Digest &checksum)
 {
-    m_items[file] = checksum;
+    m_items[file] = QString(checksum);
 }
 
 void VerJson::addItemUnr(const QString &file)
@@ -179,7 +180,7 @@ QCryptographicHash::Algorithm VerJson::algorithm() const
                                                    : QString();
 
     // main list object
-    DigestString dgStr(first_value);
+    DigestView dgStr(first_value.toUtf8());
     if (dgStr)
         return dgStr.algorithm();
 

@@ -7,6 +7,8 @@
 #include "tools.h"
 #include <QStringList>
 
+const QString VerDateTime::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
+
 VerDateTime::VerDateTime()
 {}
 
@@ -97,7 +99,7 @@ void VerDateTime::set(const QString &str)
 
 void VerDateTime::update(DT type)
 {
-    set(type, format::currentDateTime());
+    set(type, currentDateTime());
 }
 
 void VerDateTime::clear(DT type)
@@ -149,7 +151,7 @@ QString VerDateTime::toString(bool keep_empty_values) const
 
 QString VerDateTime::cleanValue(const QString &value_with_hint) const
 {
-    static const int rLen = Lit::s_dt_format.size(); // 16
+    static const int rLen = s_dt_format.size(); // 16
     return value_with_hint.right(rLen);
 }
 
@@ -168,7 +170,54 @@ QString VerDateTime::basicDate() const
 
 QString VerDateTime::currentWithHint(DT type)
 {
-    return tools::joinStrings(valueHint(type), format::currentDateTime(), Lit::s_sepColonSpace);
+    return tools::joinStrings(valueHint(type), currentDateTime(), Lit::s_sepColonSpace);
+}
+
+QString VerDateTime::currentDateTime()
+{
+    return QDateTime::currentDateTime().toString(s_dt_format);
+}
+
+bool VerDateTime::isLater(const QString &dt_before, const QString &dt_later)
+{
+    // format "yyyy/MM/dd HH:mm"
+    const int dt_str_len = 16;
+
+    if (dt_before.size() != dt_str_len
+        || dt_later.size() != dt_str_len)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < dt_before.size(); ++i) {
+        const int ch1v = dt_before.at(i).digitValue();
+        const int ch2v = dt_later.at(i).digitValue();
+
+        if (ch1v < ch2v)
+            return true;
+        if (ch1v > ch2v)
+            return false;
+    }
+
+    return false;
+}
+
+bool VerDateTime::isLater(const QString &dt_str, const QDateTime &other)
+{
+    if (dt_str.isEmpty())
+        return false;
+
+    return isLater(dt_str, other.toString(s_dt_format));
+}
+
+bool VerDateTime::isLater(DT type, const QDateTime &other) const
+{
+    return isLater(value(type), other);
+}
+
+bool VerDateTime::isLater(const QDateTime &other) const
+{
+    return isLater(basicDate(), other);
 }
 
 QString VerDateTime::valueHint(DT type)

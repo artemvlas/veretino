@@ -33,16 +33,8 @@ static const QString s_app_name;
 static const QString s_sepStick;
 static const QString s_sepCommaSpace;
 static const QString s_sepColonSpace;
-static const QString s_dt_format;
 static const QString s_db_prefix;
 }; // struct Lit
-
-class Exception : public std::runtime_error {
-public:
-    int errorCode;
-    Exception(int code, const std::string& msg = std::string())
-        : std::runtime_error(msg), errorCode(code) {}
-}; // class Exception
 
 namespace tools {
 // {0,1,2,3} --> 123
@@ -50,10 +42,6 @@ int digitsToNum(const QList<int> &digits);
 
 bool isFlagCombined(const int flag);
 bool isFlagNonCombined(const int flag);
-
-// true ("2024/09/24 18:35", "2024/09/25 11:40")
-bool isLater(const QString &dt_before, const QString &dt_later);
-bool isLater(const QString &dt_str, const QDateTime &other);
 
 // checks for the absence of sep duplication
 QString joinStrings(const QString &str1, const QString &str2, QChar sep);
@@ -66,8 +54,6 @@ QString joinStrings(int num, const QString &str);
 
 // --> "str X"
 QString joinStrings(const QString &str, int num);
-
-QString extractDigestFromFile(const QString &digest_file);
 
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored = false);
 
@@ -82,17 +68,12 @@ QString enumToString(const QEnum value)
 } // namespace tools
 
 namespace paths {
-// ../folder/file.txt --> ../folder/file.txt.shaX
-QString digestFilePath(const QString &file, QCryptographicHash::Algorithm algo);
-QString digestFilePath(const QString &file, const int sum_len);
 bool isDbFile(const QString &filePath);
 bool isDigestFile(const QString &filePath);
 void browsePath(const QString &path);
 } // namespace paths
 
 namespace format {
-QString currentDateTime();
-
 // Returns a string of numbers separated by commas: 1,234,567,890
 QString numString(qint64 num);
 

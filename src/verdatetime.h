@@ -7,11 +7,12 @@
 #define VERDATETIME_H
 
 #include <QString>
+#include <QDateTime>
 
 class VerDateTime {
 public:
-    VerDateTime();
-    VerDateTime(const QString &str);
+    explicit VerDateTime();
+    explicit VerDateTime(const QString &str);
     explicit operator bool() const;
 
     // Verified means all files exist and match the checksums
@@ -55,6 +56,17 @@ public:
     // returns current dt string, e.g. "Created: 2023/11/09 17:45"
     static QString currentWithHint(DT type);
 
+    static QString currentDateTime();
+
+    // true ("2024/09/24 18:35", "2024/09/25 11:40")
+    static bool isLater(const QString &dt_before, const QString &dt_later);
+    static bool isLater(const QString &dt_str, const QDateTime &other);
+
+    bool isLater(DT type, const QDateTime &other) const;
+
+    // later than the basicDate
+    bool isLater(const QDateTime &other) const;
+
 private:
     // "Created: 2024/09/24 18:35" --> "2024/09/24 18:35"
     QString cleanValue(const QString &value_with_hint) const;
@@ -64,6 +76,8 @@ private:
     /*** VALUES ***/
     // format: "2024/09/24 18:35"
     QString m_created, m_updated, m_verified;
+
+    static const QString s_dt_format;
 
 }; // class VerDateTime
 

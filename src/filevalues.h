@@ -7,6 +7,7 @@
 #define FILEVALUES_H
 
 #include <QObject>
+#include "digest.h"
 
 struct FileValues {
     Q_GADGET
@@ -69,13 +70,20 @@ public:
     FileValues(qint64 fileSize)
         : size(fileSize) {}
 
+    FileValues(Digest digest)
+        : checksum(std::move(digest)) {}
+
     /*** Funcs ***/
-    QString& defaultChecksum() { return (hash_purpose == Verify) ? reChecksum : checksum; }
-    const QString& defaultChecksum() const { return (hash_purpose == Verify) ? reChecksum : checksum; }
-    explicit operator bool() const { return !defaultChecksum().isEmpty(); }
+    Digest& defaultChecksum() { return (hash_purpose == Verify) ? reChecksum : checksum; }
+    const Digest& defaultChecksum() const { return (hash_purpose == Verify) ? reChecksum : checksum; }
 
     // bytes per one millisecond
     inline qint64 hash_speed() const { return (hash_time > 0) ? (size / hash_time) : size; }
+
+    bool verify() const { return checksum.verify(reChecksum); }
+
+    /*** Operators ***/
+    explicit operator bool() const { return !defaultChecksum().isEmpty(); }
 
     /*** Variables ***/
     FileStatus status = FileStatus::NotSet;
@@ -83,8 +91,9 @@ public:
 
     qint64 hash_time = -1;    // hashing time in milliseconds, -1 if not set
     qint64 size = -1;         // file size in bytes, -1 if not set
-    QString checksum;         // newly computed or imported from the database
-    QString reChecksum;       // the re-computed one (for verification purpose)
+    Digest checksum;          // newly computed or imported from the database
+    Digest reChecksum;        // the re-computed one (for verification purpose)
+
 }; // struct FileValues
 
 using FileStatus = FileValues::FileStatus;

@@ -5,6 +5,7 @@
 */
 #ifndef TREEMODELITERATOR_H
 #define TREEMODELITERATOR_H
+
 #include <QAbstractItemModel>
 #include "treemodel.h"
 
@@ -20,7 +21,7 @@ public:
     QString path(const QModelIndex &root = QModelIndex()) const;
     qint64 size() const;
     FileStatus status() const;
-    QString checksum() const;
+    Digest checksum() const;
     bool hasStatus(FileStatuses status) const;
 
 private:

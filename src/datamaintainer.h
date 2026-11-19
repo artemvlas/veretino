@@ -59,10 +59,10 @@ public:
 
     // returns 'true' if Added or Matched. returns false if Mismatched
     bool updateChecksum(const QModelIndex &fileRowIndex,
-                        const QString &computedChecksum);
+                        const Digest &computedChecksum);
 
     bool importChecksum(const QModelIndex &file,
-                        const QString &checksum);
+                        const Digest &checksum);
 
     // changes the status of all items with <statuses> to the <newStatus>
     int changeStatuses(const FileStatuses statuses,
@@ -93,7 +93,7 @@ public:
     bool itemFileRemoveLost(const QModelIndex &fileIndex);
     bool removeDigestEntry(const QModelIndex &fileIndex);
     bool itemFileUpdateChecksum(const QModelIndex &fileIndex);
-    bool tryMoved(const QModelIndex &file, const QString &checksum);
+    bool tryMoved(const QModelIndex &file, const Digest &checksum);
 
     bool importJson(const QString &filePath, const QString &customWorkDir);
     bool exportToJson();

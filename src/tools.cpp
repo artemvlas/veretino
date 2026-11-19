@@ -5,7 +5,6 @@
 */
 #include "tools.h"
 #include <QStringBuilder>
-#include <QDateTime>
 #include <QFileInfo>
 #include <cmath>
 #include <QDesktopServices>
@@ -13,8 +12,8 @@
 #include <QDebug>
 #include "pathstr.h"
 #include "dbfileextension.h"
-#include "algostring.h"
-#include "digeststring.h"
+#include "digestfile.h"
+#include "exception.h"
 
 const QString Lit::s_webpage = QStringLiteral(u"https://github.com/artemvlas/veretino");
 const QString Lit::s_appName = QStringLiteral(APP_NAME);
@@ -23,7 +22,6 @@ const QString Lit::s_app_name = QStringLiteral(u"veretino");
 const QString Lit::s_sepStick = QStringLiteral(u" | ");
 const QString Lit::s_sepCommaSpace = QStringLiteral(u", ");
 const QString Lit::s_sepColonSpace = QStringLiteral(u": ");
-const QString Lit::s_dt_format = QStringLiteral(u"yyyy/MM/dd HH:mm");
 const QString Lit::s_db_prefix = QStringLiteral(u"checksums");
 
 namespace tools {
@@ -36,38 +34,6 @@ int digitsToNum(const QList<int> &digits)
     }
 
     return number;
-}
-
-bool isLater(const QString &dt_before, const QString &dt_later)
-{
-    // format "yyyy/MM/dd HH:mm"
-    const int dt_str_len = 16;
-
-    if (dt_before.size() != dt_str_len
-        || dt_later.size() != dt_str_len)
-    {
-        return false;
-    }
-
-    for (int i = 0; i < dt_before.size(); ++i) {
-        const int ch1v = dt_before.at(i).digitValue();
-        const int ch2v = dt_later.at(i).digitValue();
-
-        if (ch1v < ch2v)
-            return true;
-        if (ch1v > ch2v)
-            return false;
-    }
-
-    return false;
-}
-
-bool isLater(const QString &dt_str, const QDateTime &other)
-{
-    if (dt_str.isEmpty())
-        return false;
-
-    return isLater(dt_str, other.toString(Lit::s_dt_format));
 }
 
 bool isFlagCombined(const int flag)
@@ -114,30 +80,6 @@ QString joinStrings(const QString &str, int num)
     return str % ' ' % QString::number(num);
 }
 
-QString extractDigestFromFile(const QString &digest_file)
-{
-    QFile sumFile(digest_file);
-    openFile(sumFile, QFile::ReadOnly);
-
-    const QString line = sumFile.readLine();
-
-    static const QStringList l_seps { "  ", " *" };
-
-    for (int it = 0; it <= l_seps.size(); ++it) {
-        int cut = (it < l_seps.size()) ? line.indexOf(l_seps.at(it))
-                                       : AlgoString::digestLength(AlgoString::strToAlgo(pathstr::suffix(digest_file)));
-
-        if (cut > 0) {
-            const QString dig = line.left(cut);
-            if (DigestString::isValid(dig)) {
-                return dig;
-            }
-        }
-    }
-
-    throw Exception(ERR_NODATA, "Checksum not found");
-}
-
 FileStatus failedCalcStatus(const QString &path, bool isChecksumStored)
 {
     if (QFileInfo::exists(path))
@@ -174,17 +116,6 @@ void openFile(QFile &file, QFile::OpenMode mode)
 } // namespace tools
 
 namespace paths {
-QString digestFilePath(const QString &file, QCryptographicHash::Algorithm algo)
-{
-    const QString ext = AlgoString::suffix(algo);
-    return tools::joinStrings(file, ext, u'.');
-}
-
-QString digestFilePath(const QString &file, const int sum_len)
-{
-    return digestFilePath(file, AlgoString::algoByStrLen(sum_len));
-}
-
 bool isDbFile(const QString &filePath)
 {
     return pathstr::hasExtension(filePath, DbFileExtension::s_extLong)
@@ -193,7 +124,7 @@ bool isDbFile(const QString &filePath)
 
 bool isDigestFile(const QString &filePath)
 {
-    return AlgoString::isDigestFile(filePath);
+    return DigestFile::isDigestFile(filePath);
 }
 
 void browsePath(const QString &path)
@@ -205,11 +136,6 @@ void browsePath(const QString &path)
 } // namespace paths
 
 namespace format {
-QString currentDateTime()
-{
-    return QDateTime::currentDateTime().toString(Lit::s_dt_format);
-}
-
 QString numString(qint64 num)
 {
     QString numstr = QString::number(num);

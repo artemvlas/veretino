@@ -16,8 +16,9 @@
 #include "tools.h"
 #include "pathstr.h"
 #include "backupfile.h"
-#include "algostring.h"
-#include "digeststring.h"
+#include "digest.h"
+#include "digestfile.h"
+#include "exception.h"
 
 Manager::Manager(Settings *settings, QObject *parent)
     : QObject(parent), m_settings(settings)
@@ -225,8 +226,8 @@ void Manager::updateItemFile(const QModelIndex &fileIndex, DbMod job)
 
     if (prevStatus == FileStatus::New) {
         if (job & (DM_ImportDigest | DM_PasteDigest)) {
-            const QString dig = (job == DM_ImportDigest) ? extractDigestFromFile(m_dataMaintainer->digestFilePath(fileIndex))
-                                                         : TreeModel::itemFileChecksum(fileIndex);
+            const Digest dig = (job == DM_ImportDigest) ? extractDigestFromFile(m_dataMaintainer->digestFilePath(fileIndex))
+                                                        : TreeModel::itemFileChecksum(fileIndex);
 
             m_dataMaintainer->importChecksum(fileIndex, dig);
         } else { // calc the new one
@@ -288,9 +289,9 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
     }
 
     const FileStatus storedStatus = TreeModel::itemFileStatus(fileItemIndex);
-    const QString storedSum = TreeModel::itemFileChecksum(fileItemIndex);
+    const Digest storedSum = TreeModel::itemFileChecksum(fileItemIndex);
 
-    if (!DigestString::isValid(storedSum) || !(storedStatus & FileStatus::CombAvailable)) {
+    if (!storedSum.isValid() || !(storedStatus & FileStatus::CombAvailable)) {
         switch (storedStatus) {
         case FileStatus::Missing:
             emit showMessage("File does not exist", "Missing File");
@@ -319,7 +320,7 @@ void Manager::verifyFileItem(const QModelIndex &fileItemIndex)
         m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnElapsed, fileVal.hash_time);
         m_dataMaintainer->setItemValue(fileItemIndex, Column::ColumnSpeed, fileVal.hash_speed());
 
-        fileVal.checksum = storedSum.toLower();
+        fileVal.checksum = Digest(storedSum.digest().toLower());
         const QString filePath = DataHelper::itemAbsolutePath(m_dataMaintainer->m_data, fileItemIndex);
         emit fileProcessed(filePath, fileVal);
     }
@@ -375,7 +376,7 @@ void Manager::verifyFolderItem(const QModelIndex &folderItemIndex, FileStatus ch
 
 void Manager::checkSummaryFile(const QString &path)
 {
-    const QString storedChecksum = extractDigestFromFile(path);
+    const Digest storedChecksum = extractDigestFromFile(path);
 
     if (storedChecksum.isEmpty())
         return;
@@ -389,7 +390,7 @@ void Manager::checkSummaryFile(const QString &path)
             return;
 
         const QString line = sumFile.readLine();
-        checkFilePath = pathstr::joinPath(pathstr::parentFolder(path), line.mid(storedChecksum.length() + 2).remove('\n'));
+        checkFilePath = pathstr::joinPath(pathstr::parentFolder(path), line.mid(storedChecksum.digest().length() + 2).remove('\n'));
 
         if (!QFileInfo(checkFilePath).isFile()) {
             emit showMessage("No File to check", "Warning");
@@ -400,12 +401,12 @@ void Manager::checkSummaryFile(const QString &path)
     checkFile(checkFilePath, storedChecksum);
 }
 
-QString Manager::extractDigestFromFile(const QString &digestFile, bool showException)
+Digest Manager::extractDigestFromFile(const QString &digestFile, bool showException)
 {
-    QString digest;
+    Digest digest;
 
     try {
-        digest = tools::extractDigestFromFile(digestFile);
+        digest = DigestFile::extractDigest(digestFile);
     }
     catch (const Exception& e) {
         if (showException)
@@ -415,12 +416,12 @@ QString Manager::extractDigestFromFile(const QString &digestFile, bool showExcep
     return digest;
 }
 
-void Manager::checkFile(const QString &filePath, const QString &checkSum)
+void Manager::checkFile(const QString &filePath, const Digest &checkSum)
 {
-    checkFile(filePath, checkSum, AlgoString::algoByStrLen(checkSum.length()));
+    checkFile(filePath, checkSum, checkSum.algorithm());
 }
 
-void Manager::checkFile(const QString &filePath, const QString &checkSum, QCryptographicHash::Algorithm algo)
+void Manager::checkFile(const QString &filePath, const Digest &checkSum, QCryptographicHash::Algorithm algo)
 {
     FileValues fileVal = hashFile(filePath, algo, Verification);
 
@@ -448,7 +449,7 @@ FileValues Manager::hashFile(const QString &filePath, QCryptographicHash::Algori
         m_elapsedTimer.start();
 
         // automatic choose: '.checksum' or '.reChecksum'
-        fileVal.defaultChecksum() = m_shaCalc.calculate(filePath, algo);
+        fileVal.defaultChecksum().set(m_shaCalc.calculate(filePath, algo));
         fileVal.hash_time = m_elapsedTimer.elapsed();
     }
     catch (const Exception& e) {
@@ -564,10 +565,10 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         if (allow_import) {
             const QString filePath = DataHelper::itemAbsolutePath(pData, iter.index());
-            const QString shaFilePath = paths::digestFilePath(filePath, pData->m_metadata.algorithm);
+            const QString shaFilePath = DigestFile::digestFilePath(filePath, pData->m_metadata.algorithm);
 
             if (QFileInfo::exists(shaFilePath)) {
-                const QString digest = extractDigestFromFile(shaFilePath, false);
+                const Digest digest = extractDigestFromFile(shaFilePath, false);
 
                 if (m_dataMaintainer->importChecksum(iter.index(), digest)) {
                     m_proc->addDoneOne();
@@ -578,7 +579,7 @@ int Manager::calculateChecksums(const DbMod purpose, const FileStatus status, co
 
         // hashing
         const FileValues fileVal = hashItem(iter.index(), calc_kind);
-        const QString &sum = fileVal.defaultChecksum();
+        const Digest &sum = fileVal.defaultChecksum();
 
         if (m_proc->isCanceled())
             break;
@@ -701,7 +702,7 @@ void Manager::cacheMissingItems()
 
     while (it.hasNext()) {
         if (it.nextFile().status() == FileStatus::Missing) {
-            const QString dig = it.checksum();
+            const Digest dig = it.checksum();
             if (!pData->m_cacheMissing.contains(dig))
                 pData->m_cacheMissing[dig] = it.index();
         }
